@@ -14,6 +14,14 @@
 
 ---
 
+## ⚠️ Important Note
+
+**The backend code is in the `/backend` folder**, not the root.
+
+When deploying to Railway, you MUST set the **Root Directory** to `backend` (see Step 4). Otherwise Railway will look in the wrong place and fail with "No start command was found".
+
+---
+
 ## 📋 Deployment Steps
 
 ### Step 1: Set Up Vercel Postgres (5 minutes)
@@ -52,11 +60,26 @@ You should see: `✅ Database tables created successfully!`
 4. Select **Deploy from GitHub repo**
 5. Click **Configure GitHub App** (if first time)
 6. Select your repository: `majeanson/anthropicJoffre`
-7. Click **Deploy Now**
+7. Click **Add variables** (we'll add them in next step)
+8. Click **Deploy**
 
-**Railway will auto-detect and deploy!** 🎉
+**Important:** The initial deployment may fail - that's expected! We need to configure it first.
 
-### Step 4: Configure Backend Environment Variables (3 minutes)
+### Step 4: Set Backend Root Directory (CRITICAL - Do This First!)
+
+⚠️ **Railway is trying to deploy from the root, but our backend is in `/backend`**
+
+1. In Railway, click on your service (should show build error)
+2. Click **Settings** tab
+3. Scroll down to **Service Settings** section
+4. Find **Root Directory**
+5. Click the field and enter: `backend`
+6. Click outside to save
+7. Scroll down and click **Redeploy** (or it will auto-redeploy)
+
+Now Railway will look in the `backend` folder and find the `package.json`!
+
+### Step 5: Configure Backend Environment Variables (3 minutes)
 
 In the Railway dashboard:
 
@@ -72,14 +95,6 @@ In the Railway dashboard:
 | `CLIENT_URL` | Your frontend URL (add after Step 6) | `https://trick-game.vercel.app` |
 
 4. Click **Deploy** (Railway will redeploy)
-
-### Step 5: Set Backend Root Directory (Important!)
-
-1. In Railway, click **Settings** tab
-2. Scroll to **Root Directory**
-3. Set to: `backend`
-4. Click **Update**
-5. Railway will redeploy with correct directory
 
 ### Step 6: Get Your Railway Backend URL
 
