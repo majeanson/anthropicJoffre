@@ -12,7 +12,6 @@ export function BettingPhase({ players, currentBets, currentPlayerId, onPlaceBet
   const [betAmount, setBetAmount] = useState<number>(7);
   const [withoutTrump, setWithoutTrump] = useState(false);
 
-  const currentPlayer = players.find(p => p.id === currentPlayerId);
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
 
   const handleSubmit = (e: React.FormEvent) => {
