@@ -1,0 +1,242 @@
+import { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { GameState, Card } from './types/game';
+import { Lobby } from './components/Lobby';
+import { BettingPhase } from './components/BettingPhase';
+import { PlayingPhase } from './components/PlayingPhase';
+
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+
+function App() {
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [gameState, setGameState] = useState<GameState | null>(null);
+  const [gameId, setGameId] = useState<string>('');
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    const newSocket = io(SOCKET_URL);
+    setSocket(newSocket);
+
+    newSocket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    newSocket.on('game_created', ({ gameId, gameState }) => {
+      setGameId(gameId);
+      setGameState(gameState);
+    });
+
+    newSocket.on('player_joined', ({ gameState }) => {
+      setGameState(gameState);
+    });
+
+    newSocket.on('round_started', (gameState) => {
+      setGameState(gameState);
+    });
+
+    newSocket.on('game_updated', (gameState) => {
+      setGameState(gameState);
+    });
+
+    newSocket.on('trick_resolved', ({ gameState }) => {
+      setGameState(gameState);
+    });
+
+    newSocket.on('round_ended', (gameState) => {
+      setGameState(gameState);
+    });
+
+    newSocket.on('game_over', ({ winningTeam, gameState }) => {
+      setGameState(gameState);
+      alert(`Game Over! Team ${winningTeam} wins!`);
+    });
+
+    newSocket.on('error', ({ message }) => {
+      setError(message);
+    });
+
+    newSocket.on('player_left', ({ gameState }) => {
+      setGameState(gameState);
+    });
+
+    return () => {
+      newSocket.close();
+    };
+  }, []);
+
+  const handleCreateGame = (playerName: string) => {
+    if (socket) {
+      socket.emit('create_game', playerName);
+    }
+  };
+
+  const handleJoinGame = (gameId: string, playerName: string) => {
+    if (socket) {
+      socket.emit('join_game', { gameId, playerName });
+      setGameId(gameId);
+    }
+  };
+
+  const handlePlaceBet = (amount: number, withoutTrump: boolean) => {
+    if (socket && gameId) {
+      socket.emit('place_bet', { gameId, amount, withoutTrump });
+    }
+  };
+
+  const handlePlayCard = (card: Card) => {
+    if (socket && gameId) {
+      socket.emit('play_card', { gameId, card });
+    }
+  };
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-red-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-bold text-red-600 mb-2">Error</h2>
+          <p className="text-gray-700">{error}</p>
+          <button
+            onClick={() => {
+              setError('');
+              setGameState(null);
+              setGameId('');
+            }}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Back to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!gameState) {
+    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} />;
+  }
+
+  if (gameState.phase === 'team_selection') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center p-6">
+        <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full">
+          <h2 className="text-3xl font-bold mb-6 text-gray-800">Waiting Room</h2>
+          <div className="mb-6">
+            <p className="text-sm text-gray-600 mb-2">Game ID:</p>
+            <div className="bg-gray-100 p-3 rounded-lg font-mono text-lg">{gameId}</div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="font-semibold text-gray-700">Players ({gameState.players.length}/4)</h3>
+            {gameState.players.map((player) => (
+              <div key={player.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
+                <span className="font-medium">{player.name}</span>
+                <span className="text-sm text-gray-500">Team {player.teamId}</span>
+              </div>
+            ))}
+          </div>
+          {gameState.players.length < 4 && (
+            <p className="mt-6 text-center text-gray-600">
+              Waiting for {4 - gameState.players.length} more player(s)...
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState.phase === 'betting') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-900 to-amber-900 flex items-center justify-center p-6">
+        <BettingPhase
+          players={gameState.players}
+          currentBets={gameState.currentBets}
+          currentPlayerId={socket?.id || ''}
+          onPlaceBet={handlePlaceBet}
+        />
+      </div>
+    );
+  }
+
+  if (gameState.phase === 'playing') {
+    return (
+      <PlayingPhase
+        gameState={gameState}
+        currentPlayerId={socket?.id || ''}
+        onPlayCard={handlePlayCard}
+      />
+    );
+  }
+
+  if (gameState.phase === 'scoring') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-6">
+        <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full">
+          <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Round {gameState.roundNumber} Complete!</h2>
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="text-center p-6 bg-blue-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">Team 1</h3>
+              <p className="text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+            </div>
+            <div className="text-center p-6 bg-red-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-red-800 mb-2">Team 2</h3>
+              <p className="text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {gameState.players.map((player) => {
+              const bet = gameState.currentBets.find(b => b.playerId === player.id);
+              return (
+                <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
+                    <span className="font-medium">{player.name}</span>
+                  </div>
+                  <div className="text-sm">
+                    <span>Bet: {bet?.amount} | Won: {player.tricksWon}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-6 text-center text-gray-600">Next round starting soon...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState.phase === 'game_over') {
+    const winningTeam = gameState.teamScores.team1 >= 41 ? 1 : 2;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-900 to-orange-900 flex items-center justify-center p-6">
+        <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full text-center">
+          <h2 className="text-4xl font-bold mb-6 text-gray-800">Game Over!</h2>
+          <div className={`text-6xl font-bold mb-6 ${winningTeam === 1 ? 'text-blue-600' : 'text-red-600'}`}>
+            Team {winningTeam} Wins!
+          </div>
+          <div className="grid grid-cols-2 gap-6 mb-6">
+            <div className="text-center p-6 bg-blue-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-blue-800 mb-2">Team 1</h3>
+              <p className="text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+            </div>
+            <div className="text-center p-6 bg-red-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-red-800 mb-2">Team 2</h3>
+              <p className="text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              setGameState(null);
+              setGameId('');
+            }}
+            className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Back to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+export default App;
