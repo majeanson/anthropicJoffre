@@ -17,14 +17,27 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+// Configure CORS for Socket.io
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: allowedOrigins.length > 1 ? allowedOrigins : '*',
     methods: ['GET', 'POST'],
+    credentials: true,
   },
 });
 
-app.use(cors());
+// Configure CORS for Express
+app.use(cors({
+  origin: allowedOrigins.length > 1 ? allowedOrigins : '*',
+  credentials: true,
+}));
 app.use(express.json());
 
 // In-memory game storage (can be moved to Redis for production)
@@ -268,6 +281,15 @@ async function endRound(gameId: string) {
 
 const PORT = process.env.PORT || 3001;
 
-httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+httpServer.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 CORS origins:`, allowedOrigins.length > 1 ? allowedOrigins : ['*']);
+  console.log(`💾 Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
+}).on('error', (error: any) => {
+  console.error('❌ Failed to start server:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use`);
+  }
+  process.exit(1);
 });
