@@ -1,114 +1,114 @@
 # Quick Start Guide
 
-## 🚀 Get Started in 5 Minutes
+Get the trick card game running locally in 5 minutes.
 
-### 1. Install Dependencies
+## Prerequisites
 
-From the root directory:
+- Node.js 18+ ([Download](https://nodejs.org/))
+- PostgreSQL database (local or [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres))
+- Git
+
+## Setup Steps
+
+### 1. Clone & Install (2 minutes)
+
 ```bash
+git clone https://github.com/majeanson/anthropicJoffre.git
+cd anthropicJoffre
+
+# Install all dependencies
 npm install
 npm run install:all
 ```
 
-Or install manually:
+### 2. Configure Environment (1 minute)
+
+**Backend:**
 ```bash
-# Backend
-cd backend
-npm install
-
-# Frontend
-cd ../frontend
-npm install
-```
-
-### 2. Set Up Database
-
-**Option A: Local PostgreSQL**
-```bash
-# Make sure PostgreSQL is running
 cd backend
 cp .env.example .env
-# Edit .env with your local database URL
+```
+
+Edit `backend/.env`:
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/trickgame
+PORT=3001
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+```
+
+**Frontend:**
+```bash
+cd ../frontend
+cp .env.example .env
+```
+
+Edit `frontend/.env`:
+```env
+VITE_SOCKET_URL=http://localhost:3001
+```
+
+### 3. Setup Database (1 minute)
+
+```bash
+cd ../backend
 npm run db:setup
 ```
 
-**Option B: Vercel Postgres**
-1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
-2. Create a new Postgres database
-3. Copy the connection string
-4. Create `backend/.env` and add:
-   ```
-   DATABASE_URL=your_vercel_connection_string
-   PORT=3001
-   ```
-5. Run setup:
-   ```bash
-   cd backend
-   npm run db:setup
-   ```
+You should see: `✅ Database tables created successfully!`
 
-### 3. Configure Frontend
+### 4. Run the App (1 minute)
 
-```bash
-cd frontend
-cp .env.example .env
-# Edit .env if needed (default is http://localhost:3001)
-```
-
-### 4. Start Development Servers
-
-**Option A: Run both servers at once (from root)**
+From the root directory:
 ```bash
 npm run dev
 ```
 
-**Option B: Run separately**
-```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
+This starts both servers:
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:3001
 
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
+## Play Locally
+
+1. Open http://localhost:5173
+2. Create a game
+3. Open 3 more browser windows/tabs
+4. Join with the Game ID
+5. Play!
+
+## Troubleshooting
+
+**"Database connection failed"**
+```bash
+# Check your DATABASE_URL in backend/.env
+# Make sure PostgreSQL is running
+cd backend && npm run db:setup
 ```
 
-### 5. Play!
-
-1. Open browser to `http://localhost:5173`
-2. Create a game and share the Game ID with 3 friends
-3. Each player should join with the Game ID
-4. Start playing!
-
-## 🧪 Run Tests
-
+**"Can't connect to backend"**
 ```bash
-cd backend
-npm test
+# Make sure backend is running on port 3001
+# Check backend/.env has PORT=3001
+# Check frontend/.env has VITE_SOCKET_URL=http://localhost:3001
 ```
 
-## 📝 Game Rules Summary
+**"npm install fails"**
+```bash
+# Clear cache and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
 
-- **Players**: 4 players, 2 teams
-- **Cards**: 0-7 in Red, Brown, Green, Blue (32 cards total)
-- **Phases**: Betting → Playing → Scoring → Repeat
-- **Betting**: Bet 7-12 tricks, optionally "without trump" for 2x points
-- **Trump**: First card played determines trump for the round
-- **Winning**: First team to 41 points wins
+## Using Vercel Postgres
 
-## 🐛 Troubleshooting
+1. Go to https://vercel.com/dashboard/storage
+2. Create Postgres database
+3. Copy connection string
+4. Add to `backend/.env` as `DATABASE_URL`
+5. Run `npm run db:setup`
 
-**Database connection error:**
-- Check your `DATABASE_URL` in `backend/.env`
-- Make sure PostgreSQL is running
-- Run `npm run db:setup` again
+## Next Steps
 
-**Socket connection error:**
-- Check backend is running on port 3001
-- Check `VITE_SOCKET_URL` in `frontend/.env`
-- Check for firewall/antivirus blocking
-
-**Cards not displaying:**
-- Make sure all dependencies are installed
-- Try clearing browser cache
-- Check browser console for errors
+- [Deploy to production](RAILWAY_DEPLOY.md)
+- [API documentation](README.md#-api-reference)
+- [Game rules](README.md#-game-rules)

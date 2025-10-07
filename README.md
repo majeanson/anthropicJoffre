@@ -1,125 +1,247 @@
-# Trick Card Game
+# Trick Card Game 🎮
 
-A real-time trick card game with WebSocket support and PostgreSQL for historical data.
+A real-time multiplayer trick-taking card game built with React, Node.js, Socket.io, and PostgreSQL.
 
-## 🚀 Deploy to Production
+## 🎯 Features
 
-**Quick Deploy (Recommended):**
-- **[Railway + Vercel Guide](RAILWAY_DEPLOY.md)** - Production-ready, no WebSocket timeouts (~$5-10/month)
-- **[Vercel Only Guide](VERCEL_DEPLOY.md)** - All-in-one Vercel (has WebSocket timeout limits)
+- **Real-time multiplayer** - 4 players, 2 teams, live gameplay
+- **Team-based strategy** - Cooperative betting and trick-taking
+- **Special cards** - Red 0 (+5 points), Brown 0 (-2 points)
+- **No-trump betting** - Double or nothing gameplay
+- **Game history** - PostgreSQL persistence
+- **Production-ready** - Deployed on Railway + Vercel
 
-**For Local Development:**
-- See [QUICKSTART.md](QUICKSTART.md) - Get running in 5 minutes
+## 🚀 Quick Start
 
-## Game Rules
+### Local Development
 
-- **Players**: 4 players in 2 teams
-- **Cards**: 0-7 in four colors (red, brown, green, blue) = 32 cards
-- **Special cards**: 0 red (+5 points), 0 brown (-2 points)
-
-### Game Flow
-
-1. **Team Selection**: Players form 2 teams
-2. **Betting**: Players bet 7-12 tricks, with/without trump
-3. **Card Playing**: Highest bidder starts, first card determines trump
-4. **Scoring**: Meet bet = gain points, miss = lose points (doubled for no-trump)
-5. **Win Condition**: First team to 41 points wins
-
-## Setup
-
-### Prerequisites
-
-- Node.js 18+ and npm
-- PostgreSQL database (local or Vercel Postgres)
-
-### Backend Setup
-
-1. Install dependencies:
 ```bash
-cd backend
+# Clone the repository
+git clone https://github.com/majeanson/anthropicJoffre.git
+cd anthropicJoffre
+
+# Install all dependencies
 npm install
+npm run install:all
+
+# Set up environment variables
+cd backend && cp .env.example .env
+cd ../frontend && cp .env.example .env
+
+# Set up database (add your DATABASE_URL to backend/.env first)
+cd ../backend && npm run db:setup
+
+# Run both servers
+cd .. && npm run dev
 ```
 
-2. Create `.env` file (copy from `.env.example`):
-```bash
-cp .env.example .env
+Frontend: http://localhost:5173
+Backend: http://localhost:3001
+
+**See [QUICKSTART.md](QUICKSTART.md) for detailed local setup**
+
+### Deploy to Production
+
+**See [RAILWAY_DEPLOY.md](RAILWAY_DEPLOY.md) for full deployment guide**
+
+Quick deploy:
+1. Deploy backend to Railway (WebSocket-optimized, no timeouts)
+2. Deploy frontend to Vercel (free, fast CDN)
+3. Connect with Vercel Postgres
+
+Cost: ~$5-10/month
+
+## 📖 Game Rules
+
+### Setup
+- **4 players** form 2 teams (Team 1 vs Team 2)
+- **32 cards**: Values 0-7 in 4 colors (Red, Brown, Green, Blue)
+- **8 cards** dealt to each player per round
+
+### Phases
+
+**1. Betting Phase**
+- Each player bets 7-12 tricks they'll win
+- Optional: Bet "without trump" for 2x points
+- Highest bidder starts the round
+
+**2. Playing Phase**
+- First card played determines trump suit
+- Must follow suit if possible
+- Trump cards beat all other suits
+- Highest card of leading/trump suit wins trick
+
+**3. Scoring**
+- Met bet: **+bet points**
+- Missed bet: **-bet points**
+- No-trump: Points **x2**
+- Special cards add bonus points when won
+
+**4. Win Condition**
+- First team to **41 points** wins!
+
+## 🏗️ Project Structure
+
+```
+anthropicJoffre/
+├── backend/              # Node.js + Socket.io server
+│   ├── src/
+│   │   ├── db/          # PostgreSQL queries & schema
+│   │   ├── game/        # Game logic & card handling
+│   │   ├── types/       # TypeScript definitions
+│   │   └── index.ts     # Main server & Socket.io handlers
+│   └── package.json
+│
+├── frontend/            # React + Vite client
+│   ├── src/
+│   │   ├── components/  # UI components
+│   │   ├── types/       # TypeScript definitions
+│   │   └── App.tsx      # Main app & Socket.io client
+│   └── package.json
+│
+├── README.md           # This file
+├── QUICKSTART.md       # Local development guide
+└── RAILWAY_DEPLOY.md   # Production deployment guide
 ```
 
-3. Configure your database connection in `.env`:
-```
-DATABASE_URL=postgresql://user:password@host:5432/dbname
-PORT=3001
-```
+## 🛠️ Tech Stack
 
-**For Vercel Postgres:**
-- Go to your Vercel dashboard
-- Navigate to Storage → Create Database → Postgres
-- Copy the connection string and paste it in your `.env` file
+**Backend**
+- Node.js + TypeScript
+- Express.js
+- Socket.io (WebSockets)
+- PostgreSQL (pg)
+- Jest (testing)
 
-4. Set up the database tables:
-```bash
-npm run db:setup
-```
+**Frontend**
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- Socket.io-client
 
-5. Start the development server:
-```bash
-npm run dev
-```
+**Deployment**
+- Railway (backend)
+- Vercel (frontend + database)
 
-The backend will run on `http://localhost:3001`
+## 🎮 How to Play
 
-### Frontend Setup
+### Create a Game
+1. Visit the frontend URL
+2. Click "Create Game"
+3. Share the Game ID with 3 friends
 
-1. Install dependencies:
-```bash
-cd frontend
-npm install
-```
+### Join a Game
+1. Get Game ID from host
+2. Click "Join Game"
+3. Enter Game ID and your name
 
-2. Create `.env` file (copy from `.env.example`):
-```bash
-cp .env.example .env
-```
+### Gameplay
+1. **Wait** for 4 players to join
+2. **Bet** your tricks (7-12)
+3. **Play** your cards strategically
+4. **Win** tricks to meet your bet
+5. First team to 41 points wins!
 
-3. Configure the backend URL in `.env`:
-```
-VITE_SOCKET_URL=http://localhost:3001
-```
+## 🔧 Development
 
-4. Start the development server:
-```bash
-npm run dev
-```
-
-The frontend will run on `http://localhost:5173`
-
-### Running Tests
-
-Backend tests:
+### Run Tests
 ```bash
 cd backend
 npm test
 ```
 
-## How to Play
+### Build for Production
+```bash
+# Backend
+cd backend
+npm run build
 
-1. Open the app in your browser
-2. Create a new game or join an existing game with the Game ID
-3. Wait for 4 players to join (2 teams of 2)
-4. **Betting Phase**: Each player bets how many tricks they think they'll win (7-12)
-   - Optionally select "Without Trump" for double points
-5. **Playing Phase**:
-   - Highest bidder starts
-   - First card played becomes trump for that round
-   - Follow the leading suit if possible
-   - Trump cards beat all other suits
-6. **Scoring**:
-   - Meet or exceed your bet: gain points equal to your bet
-   - Miss your bet: lose points equal to your bet
-   - "Without Trump" bets double the points (win or lose)
-7. First team to reach 41 points wins!
+# Frontend
+cd frontend
+npm run build
+```
 
-## Special Cards
+### Environment Variables
 
-- **Red 0**: +5 points when won in a trick
-- **Brown 0**: -2 points when won in a trick
+**Backend** (`.env`)
+```env
+DATABASE_URL=postgresql://...
+PORT=3001
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
+```
+
+**Frontend** (`.env`)
+```env
+VITE_SOCKET_URL=http://localhost:3001
+```
+
+## 📝 API Reference
+
+### REST Endpoints
+- `GET /` - Server info
+- `GET /api/health` - Health check
+- `GET /api/games/history` - Recent games
+
+### Socket.io Events
+
+**Client → Server**
+- `create_game` - Create new game
+- `join_game` - Join existing game
+- `place_bet` - Submit bet
+- `play_card` - Play a card
+
+**Server → Client**
+- `game_created` - Game created successfully
+- `player_joined` - Player joined game
+- `round_started` - New round begins
+- `game_updated` - Game state changed
+- `trick_resolved` - Trick winner determined
+- `round_ended` - Round complete
+- `game_over` - Game finished
+
+## 🤝 Contributing
+
+Contributions welcome! To add features:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+**Development tips:**
+- Backend tests: `cd backend && npm test`
+- Type safety: Both projects use TypeScript strict mode
+- Code style: Keep components small and focused
+- Socket events: Add new events to types first
+
+## 📄 License
+
+MIT License - feel free to use this project however you like!
+
+## 🆘 Troubleshooting
+
+**Can't connect to server**
+- Check backend is running on correct port
+- Verify `VITE_SOCKET_URL` matches backend URL
+- Check browser console for errors
+
+**Database errors**
+- Verify `DATABASE_URL` is set
+- Run `npm run db:setup` to create tables
+- Check Postgres is accessible
+
+**Players disconnecting**
+- If using Vercel for backend, use Railway instead (no WebSocket timeouts)
+- Check Railway logs for errors
+
+**Build fails**
+- Delete `node_modules` and reinstall
+- Check Node.js version (18+ required)
+- Run `npm run build` locally first
+
+---
+
+Built with ❤️ using Claude Code

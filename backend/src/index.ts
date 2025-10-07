@@ -1,5 +1,3 @@
-console.log('🔄 Starting Trick Card Game Server...');
-
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
@@ -15,16 +13,10 @@ import {
 } from './game/logic';
 import { saveGameHistory, getRecentGames } from './db';
 
-console.log('📦 All imports loaded successfully');
-
 dotenv.config();
-console.log('⚙️  Environment loaded');
 
 const app = express();
-console.log('✅ Express app created');
-
 const httpServer = createServer(app);
-console.log('✅ HTTP server created');
 
 // Configure CORS for Socket.io
 const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, ''); // Remove trailing slash
@@ -312,20 +304,13 @@ async function endRound(gameId: string) {
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const HOST = '0.0.0.0';
 
-console.log(`🎯 Attempting to bind to ${HOST}:${PORT}...`);
-
 httpServer.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running on ${HOST}:${PORT}`);
+  console.log(`🚀 Trick Card Game Server running on ${HOST}:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS origins:`, corsOrigin === '*' ? ['*'] : allowedOrigins);
-  console.log(`💾 Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
-  console.log(`✅ Server is ready to accept connections`);
-}).on('error', (error: any) => {
-  console.error('❌ Failed to start server:', error);
-  if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use`);
-  } else if (error.code === 'EACCES') {
-    console.error(`Permission denied to bind to port ${PORT}`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`🌐 CORS: ${corsOrigin === '*' ? 'All origins' : allowedOrigins.join(', ')}`);
   }
+}).on('error', (error: any) => {
+  console.error('❌ Server failed to start:', error.message);
   process.exit(1);
 });
