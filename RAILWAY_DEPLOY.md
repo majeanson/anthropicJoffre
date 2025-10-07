@@ -91,8 +91,9 @@ In the Railway dashboard:
 |----------|-------|---------|
 | `DATABASE_URL` | Your Vercel Postgres URL | `postgres://default:xxx@...` |
 | `NODE_ENV` | `production` | `production` |
-| `PORT` | Railway auto-sets this | (leave empty) |
-| `CLIENT_URL` | Your frontend URL (add after Step 6) | `https://trick-game.vercel.app` |
+| `CLIENT_URL` | Leave empty for now (add after Step 7) | Will add later |
+
+**Note:** Do NOT add `PORT` - Railway sets this automatically!
 
 4. Click **Deploy** (Railway will redeploy)
 
