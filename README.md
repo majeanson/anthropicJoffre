@@ -2,6 +2,15 @@
 
 A real-time trick card game with WebSocket support and PostgreSQL for historical data.
 
+## 🚀 Deploy to Production
+
+**Quick Deploy (Recommended):**
+- **[Railway + Vercel Guide](RAILWAY_DEPLOY.md)** - Production-ready, no WebSocket timeouts (~$5-10/month)
+- **[Vercel Only Guide](VERCEL_DEPLOY.md)** - All-in-one Vercel (has WebSocket timeout limits)
+
+**For Local Development:**
+- See [QUICKSTART.md](QUICKSTART.md) - Get running in 5 minutes
+
 ## Game Rules
 
 - **Players**: 4 players in 2 teams
