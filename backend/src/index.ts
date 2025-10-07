@@ -47,7 +47,26 @@ const games = new Map<string, GameState>();
 
 // REST endpoints
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    database: process.env.DATABASE_URL ? 'configured' : 'missing',
+    cors: corsOrigin,
+  });
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Trick Card Game API',
+    status: 'running',
+    endpoints: {
+      health: '/api/health',
+      history: '/api/games/history',
+      socket: '/socket.io'
+    }
+  });
 });
 
 app.get('/api/games/history', async (req, res) => {

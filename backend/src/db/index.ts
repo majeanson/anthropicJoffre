@@ -3,12 +3,23 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+let pool: Pool | null = null;
+
+const getPool = () => {
+  if (!pool && process.env.DATABASE_URL) {
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+    });
+  }
+  return pool;
+};
 
 export const query = (text: string, params?: any[]) => {
-  return pool.query(text, params);
+  const dbPool = getPool();
+  if (!dbPool) {
+    throw new Error('Database not configured. Set DATABASE_URL environment variable.');
+  }
+  return dbPool.query(text, params);
 };
 
 export const saveGameHistory = async (
@@ -38,4 +49,4 @@ export const getRecentGames = async (limit: number = 10) => {
   return result.rows;
 };
 
-export default pool;
+export default getPool();
