@@ -1,0 +1,60 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - heading "Team 1" [level=3] [ref=e8]
+      - paragraph [ref=e9]: "0"
+    - generic [ref=e10]:
+      - paragraph [ref=e11]: Round 1
+      - paragraph [ref=e12]: "Trump: blue"
+    - generic [ref=e13]:
+      - heading "Team 2" [level=3] [ref=e14]
+      - paragraph [ref=e15]: "0"
+  - generic [ref=e17]:
+    - heading "Current Trick" [level=3] [ref=e18]
+    - generic [ref=e20]:
+      - button "6" [ref=e21]:
+        - generic [ref=e22]: "6"
+      - generic [ref=e23]: Player 1
+  - generic [ref=e25]:
+    - generic [ref=e26]:
+      - generic [ref=e29]: Player 1
+      - generic [ref=e30]:
+        - paragraph [ref=e31]: "Tricks: 0"
+        - paragraph [ref=e32]: "Cards: 7"
+    - generic [ref=e33]:
+      - generic [ref=e36]: Player 2
+      - generic [ref=e37]:
+        - paragraph [ref=e38]: "Tricks: 0"
+        - paragraph [ref=e39]: "Cards: 8"
+    - generic [ref=e40]:
+      - generic [ref=e43]: Player 3
+      - generic [ref=e44]:
+        - paragraph [ref=e45]: "Tricks: 0"
+        - paragraph [ref=e46]: "Cards: 8"
+    - generic [ref=e47]:
+      - generic [ref=e50]: Player 4
+      - generic [ref=e51]:
+        - paragraph [ref=e52]: "Tricks: 0"
+        - paragraph [ref=e53]: "Cards: 8"
+  - generic [ref=e55]:
+    - heading "Your Hand" [level=3] [ref=e56]
+    - generic [ref=e57]:
+      - button "1" [disabled] [ref=e58]:
+        - generic [ref=e59]: "1"
+      - button "2" [disabled] [ref=e60]:
+        - generic [ref=e61]: "2"
+      - button "4" [disabled] [ref=e62]:
+        - generic [ref=e63]: "4"
+      - button "6" [disabled] [ref=e64]:
+        - generic [ref=e65]: "6"
+      - button "5" [disabled] [ref=e66]:
+        - generic [ref=e67]: "5"
+      - button "7" [disabled] [ref=e68]:
+        - generic [ref=e69]: "7"
+      - button "1" [disabled] [ref=e70]:
+        - generic [ref=e71]: "1"
+    - paragraph [ref=e72]: Waiting for other players...
+```

@@ -214,7 +214,7 @@ Contributions welcome! To add features:
 **Development tips:**
 - Backend tests: `cd backend && npm test`
 - Type safety: Both projects use TypeScript strict mode
-- Code style: Keep components small and focused
+- Code style: Keep components small and focused. Prefer none comments and good nomenclature.
 - Socket events: Add new events to types first
 
 ## 📄 License
