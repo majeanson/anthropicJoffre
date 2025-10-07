@@ -19,13 +19,14 @@ const app = express();
 const httpServer = createServer(app);
 
 // Configure CORS for Socket.io
+const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, ''); // Remove trailing slash
 const allowedOrigins: string[] = [
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.CLIENT_URL || '',
+  clientUrl || '',
 ].filter((origin): origin is string => Boolean(origin) && origin.length > 0);
 
-const corsOrigin = process.env.CLIENT_URL ? allowedOrigins : '*';
+const corsOrigin = clientUrl ? allowedOrigins : '*';
 
 const io = new Server(httpServer, {
   cors: {
@@ -300,17 +301,21 @@ async function endRound(gameId: string) {
   }
 }
 
-const PORT = process.env.PORT || 3001;
+const PORT = parseInt(process.env.PORT || '3001', 10);
+const HOST = '0.0.0.0';
 
-httpServer.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+httpServer.listen(PORT, HOST, () => {
+  console.log(`🚀 Server running on ${HOST}:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🌐 CORS origins:`, corsOrigin === '*' ? ['*'] : allowedOrigins);
   console.log(`💾 Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
+  console.log(`✅ Server is ready to accept connections`);
 }).on('error', (error: any) => {
   console.error('❌ Failed to start server:', error);
   if (error.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use`);
+  } else if (error.code === 'EACCES') {
+    console.error(`Permission denied to bind to port ${PORT}`);
   }
   process.exit(1);
 });
