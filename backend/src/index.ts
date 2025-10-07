@@ -19,15 +19,17 @@ const app = express();
 const httpServer = createServer(app);
 
 // Configure CORS for Socket.io
-const allowedOrigins = [
+const allowedOrigins: string[] = [
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.CLIENT_URL,
-].filter(Boolean);
+  process.env.CLIENT_URL || '',
+].filter((origin): origin is string => Boolean(origin) && origin.length > 0);
+
+const corsOrigin = process.env.CLIENT_URL ? allowedOrigins : '*';
 
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins.length > 1 ? allowedOrigins : '*',
+    origin: corsOrigin,
     methods: ['GET', 'POST'],
     credentials: true,
   },
@@ -35,7 +37,7 @@ const io = new Server(httpServer, {
 
 // Configure CORS for Express
 app.use(cors({
-  origin: allowedOrigins.length > 1 ? allowedOrigins : '*',
+  origin: corsOrigin,
   credentials: true,
 }));
 app.use(express.json());
@@ -281,10 +283,10 @@ async function endRound(gameId: string) {
 
 const PORT = process.env.PORT || 3001;
 
-httpServer.listen(PORT, '0.0.0.0', () => {
+httpServer.listen(Number(PORT), '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS origins:`, allowedOrigins.length > 1 ? allowedOrigins : ['*']);
+  console.log(`🌐 CORS origins:`, corsOrigin === '*' ? ['*'] : allowedOrigins);
   console.log(`💾 Database: ${process.env.DATABASE_URL ? 'Connected' : 'Not configured'}`);
 }).on('error', (error: any) => {
   console.error('❌ Failed to start server:', error);
