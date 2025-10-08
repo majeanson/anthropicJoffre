@@ -83,7 +83,11 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
 export const getHighestBet = (bets: Bet[]): Bet | null => {
   if (bets.length === 0) return null;
 
-  return bets.reduce((highest, current) => {
+  // Filter out skipped bets
+  const validBets = bets.filter(bet => !bet.skipped);
+  if (validBets.length === 0) return null;
+
+  return validBets.reduce((highest, current) => {
     if (isBetHigher(current, highest)) return current;
     return highest;
   });

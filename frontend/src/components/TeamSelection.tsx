@@ -21,6 +21,24 @@ export function TeamSelection({
   const team1Players = players.filter(p => p.teamId === 1);
   const team2Players = players.filter(p => p.teamId === 2);
 
+  // Validation for starting game
+  const canStartGame = (): boolean => {
+    if (players.length !== 4) return false;
+    if (team1Players.length !== 2) return false;
+    if (team2Players.length !== 2) return false;
+    return true;
+  };
+
+  const getStartGameMessage = (): string => {
+    if (players.length !== 4) {
+      return `Waiting for ${4 - players.length} more player(s) to join`;
+    }
+    if (team1Players.length !== 2 || team2Players.length !== 2) {
+      return 'Teams must have 2 players each';
+    }
+    return '';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center p-6">
       <div className="bg-white rounded-xl p-8 shadow-2xl max-w-4xl w-full">
@@ -149,22 +167,28 @@ export function TeamSelection({
         </div>
 
         {/* Start Game Button */}
-        {players.length === 4 && (
-          <div className="text-center">
+        <div className="text-center">
+          {canStartGame() ? (
             <button
               onClick={onStartGame}
-              className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-bold hover:bg-green-700 shadow-lg"
+              className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-bold hover:bg-green-700 shadow-lg transition-colors"
             >
               Start Game
             </button>
-          </div>
-        )}
-
-        {players.length < 4 && (
-          <p className="text-center text-gray-600">
-            Waiting for {4 - players.length} more player(s)...
-          </p>
-        )}
+          ) : (
+            <div className="space-y-3">
+              <button
+                disabled
+                className="bg-gray-300 text-gray-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed"
+              >
+                Start Game
+              </button>
+              <p className="text-gray-600 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-lg">
+                {getStartGameMessage()}
+              </p>
+            </div>
+          )}
+        </div>
 
         <div className="mt-6 p-4 bg-gray-100 rounded-lg">
           <h4 className="font-semibold text-gray-700 mb-2">How to Play:</h4>

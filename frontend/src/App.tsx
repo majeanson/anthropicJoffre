@@ -78,9 +78,9 @@ function App() {
     }
   };
 
-  const handlePlaceBet = (amount: number, withoutTrump: boolean) => {
+  const handlePlaceBet = (amount: number, withoutTrump: boolean, skipped?: boolean) => {
     if (socket && gameId) {
-      socket.emit('place_bet', { gameId, amount, withoutTrump });
+      socket.emit('place_bet', { gameId, amount, withoutTrump, skipped });
     }
   };
 
@@ -154,6 +154,7 @@ function App() {
           currentBets={gameState.currentBets}
           currentPlayerId={socket?.id || ''}
           currentPlayerIndex={gameState.currentPlayerIndex}
+          dealerIndex={gameState.dealerIndex}
           onPlaceBet={handlePlaceBet}
         />
       </div>

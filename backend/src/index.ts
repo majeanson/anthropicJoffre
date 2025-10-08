@@ -191,7 +191,7 @@ io.on('connection', (socket) => {
     startNewRound(gameId);
   });
 
-  socket.on('place_bet', ({ gameId, amount, withoutTrump }: { gameId: string; amount: number; withoutTrump: boolean }) => {
+  socket.on('place_bet', ({ gameId, amount, withoutTrump, skipped }: { gameId: string; amount: number; withoutTrump: boolean; skipped?: boolean }) => {
     const game = games.get(gameId);
     if (!game || game.phase !== 'betting') return;
 
@@ -200,7 +200,42 @@ io.on('connection', (socket) => {
 
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
 
-    // Validate betting rules
+    // Handle skip bet
+    if (skipped) {
+      // Dealer cannot skip if there are existing bets
+      if (isDealer && game.currentBets.length > 0) {
+        socket.emit('invalid_bet', {
+          message: 'As dealer, you cannot skip. You must match or raise the highest bet.'
+        });
+        return;
+      }
+
+      // All players can skip if no bets yet
+      const bet: Bet = {
+        playerId: socket.id,
+        amount: -1,
+        withoutTrump: false,
+        skipped: true,
+      };
+
+      game.currentBets.push(bet);
+
+      // If all 4 players skip, restart betting with first player after dealer
+      if (game.currentBets.length === 4 && game.currentBets.every(b => b.skipped)) {
+        game.currentBets = [];
+        game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
+        io.to(gameId).emit('game_updated', game);
+        io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
+        return;
+      }
+
+      // Move to next player
+      game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+      io.to(gameId).emit('game_updated', game);
+      return;
+    }
+
+    // Validate betting rules for non-skip bets
     if (game.currentBets.length > 0) {
       const currentHighest = getHighestBet(game.currentBets);
       if (currentHighest) {
@@ -232,6 +267,7 @@ io.on('connection', (socket) => {
       playerId: socket.id,
       amount,
       withoutTrump,
+      skipped: false,
     };
 
     game.currentBets.push(bet);

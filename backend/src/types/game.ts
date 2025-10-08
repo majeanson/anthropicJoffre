@@ -17,8 +17,9 @@ export interface Player {
 
 export interface Bet {
   playerId: string;
-  amount: number; // 7-12
+  amount: number; // 7-12, or -1 for skip
   withoutTrump: boolean;
+  skipped?: boolean; // True if player skipped their bet
 }
 
 export type GamePhase =

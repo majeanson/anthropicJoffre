@@ -68,21 +68,39 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 ### Betting System
 - **Range**: 7-12 points (NOT tricks)
 - **Hierarchy**: Higher amount > Same amount with "without trump" > Same amount with trump
+- **Skip Option**: Players can skip their bet if no one has bet yet, or if they're not the dealer
 - **Dealer rule**:
   - Betting order: Player after dealer → ... → Dealer last
-  - Non-dealers MUST raise (beat current highest)
-  - Dealer CAN equalize (match highest) or raise
+  - Non-dealers MUST raise (beat current highest) OR skip (if no bets yet)
+  - Dealer CAN equalize (match highest) or raise, but CANNOT skip if there are bets
+  - If all 4 players skip, betting restarts from player after dealer
+
+**UI Validation**:
+- Place Bet button disabled when bet is too low
+- Yellow warning message explains why bet is invalid
+- Skip button only shown when skip is allowed
+- Dealer privilege message shown to dealer
+- Skipped bets shown with gray "Skipped" badge
 
 **Implementation**:
-- `backend/src/game/logic.ts:75-81` - `isBetHigher()` helper
-- `backend/src/index.ts:193-245` - Betting validation and turn order
+- `backend/src/game/logic.ts:75-94` - `isBetHigher()` and `getHighestBet()` helpers
+- `backend/src/index.ts:194-288` - Betting validation, skip handling, and turn order
+- `frontend/src/components/BettingPhase.tsx` - Client-side validation and UI feedback
 
 ### Suit-Following Rule
 - Players MUST play the led suit if they have it in hand
 - First card in trick determines led suit
 - Trump can always be played if no led suit in hand
 
-**Implementation**: `backend/src/index.ts:177-189` - Validation before card play
+**UI Validation**:
+- Unplayable cards visually disabled with gray overlay and ✕ mark
+- Blue info box shows led suit and requirement
+- Yellow warning message when trying to play wrong suit
+- "Waiting for [Player]..." message shown when not your turn
+
+**Implementation**:
+- `backend/src/index.ts:297-309` - Validation before card play
+- `frontend/src/components/PlayingPhase.tsx` - Client-side playable card detection and UI feedback
 
 ### Trick Winner Logic
 1. Trump always beats non-trump
@@ -113,6 +131,41 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 **Implementation**: `backend/src/index.ts:330` - Dealer rotation in `startNewRound()`
 
 **Important for Testing**: First round betting order is Player 3, 4, 1, 2 (not 1, 2, 3, 4)
+
+---
+
+## 🎨 UI/UX Validation Patterns
+
+All game phases implement validation feedback to guide players:
+
+### Team Selection Phase
+- **Disabled State**: Start Game button disabled until 4 players with balanced teams (2v2)
+- **Feedback**: Yellow info box explaining "Waiting for X more player(s)" or "Teams must have 2 players each"
+- **Visual**: Gray disabled button vs green enabled button
+
+### Betting Phase
+- **Disabled State**: Place Bet button disabled when bet doesn't meet requirements
+- **Feedback**:
+  - Yellow warning: "You must raise the bet. Minimum: X"
+  - Purple info: "Dealer Privilege: You can match or raise" (shown to dealer)
+  - Gray "Skipped" badge for skipped bets
+- **Visual**: Skip button only shown when allowed
+- **Validation**: Real-time validation as slider/checkbox changes
+
+### Playing Phase
+- **Disabled State**: Unplayable cards have gray overlay with ✕ mark
+- **Feedback**:
+  - Blue info: "Led suit: [Color] - You must play [color]"
+  - Yellow warning: "You must follow suit ([color]) if you have it"
+  - Gray text: "Waiting for [PlayerName]..."
+- **Visual**: Your turn indicated with green "(Your Turn)" text
+
+### General Principles
+1. **Proactive Feedback**: Show requirements BEFORE user tries invalid action
+2. **Clear Messaging**: Explain WHY action is blocked, not just THAT it's blocked
+3. **Visual Hierarchy**: Use color-coded messages (yellow=warning, blue=info, purple=special rule)
+4. **Disabled States**: Gray out unavailable options with visual indicators
+5. **Contextual Help**: Show relevant rules/constraints for current situation
 
 ---
 
@@ -147,9 +200,11 @@ await page.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 
 
 ### Test Organization
 - `01-lobby.spec.ts` - Game creation and joining
-- `02-betting.spec.ts` - Betting phase validation
-- `03-playing.spec.ts` - Card playing mechanics
+- `02-betting.spec.ts` - Betting phase rules and turn order
+- `03-playing.spec.ts` - Card playing mechanics and suit following
 - `04-game-flow.spec.ts` - Full round and scoring
+- `05-skip-bet.spec.ts` - Skip bet functionality and validation
+- `06-validation.spec.ts` - UI validation feedback across all phases
 
 ### Running Tests
 ```bash

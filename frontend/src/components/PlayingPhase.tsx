@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Card as CardComponent } from './Card';
 import { GameState, Card as CardType } from '../types/game';
 
@@ -8,10 +9,54 @@ interface PlayingPhaseProps {
 }
 
 export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: PlayingPhaseProps) {
+  const [validationMessage, setValidationMessage] = useState<string>('');
+
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
 
   if (!currentPlayer) return null;
+
+  // Determine which cards are playable
+  const getPlayableCards = (): CardType[] => {
+    if (!isCurrentTurn) return [];
+
+    // If no cards in trick, all cards are playable
+    if (gameState.currentTrick.length === 0) return currentPlayer.hand;
+
+    // Get led suit
+    const ledSuit = gameState.currentTrick[0].card.color;
+    const cardsInLedSuit = currentPlayer.hand.filter(c => c.color === ledSuit);
+
+    // If player has led suit, they must play it
+    if (cardsInLedSuit.length > 0) {
+      return cardsInLedSuit;
+    }
+
+    // Otherwise, all cards are playable
+    return currentPlayer.hand;
+  };
+
+  const playableCards = getPlayableCards();
+
+  const isCardPlayable = (card: CardType): boolean => {
+    return playableCards.some(c => c.color === card.color && c.value === card.value);
+  };
+
+  const handleCardClick = (card: CardType) => {
+    if (!isCurrentTurn) {
+      setValidationMessage("Wait for your turn");
+      return;
+    }
+
+    if (!isCardPlayable(card)) {
+      const ledSuit = gameState.currentTrick[0]?.card.color;
+      setValidationMessage(`You must follow suit (${ledSuit}) if you have it`);
+      return;
+    }
+
+    setValidationMessage('');
+    onPlayCard(card);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-6">
@@ -89,18 +134,44 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
           <h3 className="text-lg font-semibold mb-4">
             Your Hand {isCurrentTurn && <span className="text-green-600">(Your Turn)</span>}
           </h3>
+
+          {validationMessage && (
+            <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
+              {validationMessage}
+            </div>
+          )}
+
+          {isCurrentTurn && gameState.currentTrick.length > 0 && (
+            <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-sm">
+              <strong>Led suit:</strong> {gameState.currentTrick[0].card.color.charAt(0).toUpperCase() + gameState.currentTrick[0].card.color.slice(1)}
+              {playableCards.length < currentPlayer.hand.length &&
+                ` - You must play ${gameState.currentTrick[0].card.color}`}
+            </div>
+          )}
+
           <div className="flex gap-4 flex-wrap justify-center">
-            {currentPlayer.hand.map((card, index) => (
-              <CardComponent
-                key={`${card.color}-${card.value}-${index}`}
-                card={card}
-                onClick={() => isCurrentTurn && onPlayCard(card)}
-                disabled={!isCurrentTurn}
-              />
-            ))}
+            {currentPlayer.hand.map((card, index) => {
+              const playable = isCardPlayable(card);
+              return (
+                <div key={`${card.color}-${card.value}-${index}`} className="relative">
+                  <CardComponent
+                    card={card}
+                    onClick={() => handleCardClick(card)}
+                    disabled={!isCurrentTurn || !playable}
+                  />
+                  {isCurrentTurn && !playable && (
+                    <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-2xl font-bold">✕</span>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
           {!isCurrentTurn && (
-            <p className="text-center text-gray-500 mt-4">Waiting for other players...</p>
+            <p className="text-center text-gray-500 mt-4">
+              Waiting for {gameState.players[gameState.currentPlayerIndex]?.name}...
+            </p>
           )}
         </div>
       </div>
