@@ -8,15 +8,15 @@
       - paragraph [ref=e9]: "0"
     - generic [ref=e10]:
       - paragraph [ref=e11]: Round 1
-      - paragraph [ref=e12]: "Trump: green"
+      - paragraph [ref=e12]: "Trump: blue"
     - generic [ref=e13]:
       - heading "Team 2" [level=3] [ref=e14]
       - paragraph [ref=e15]: "0"
   - generic [ref=e17]:
     - heading "Current Trick" [level=3] [ref=e18]
     - generic [ref=e20]:
-      - button "3" [ref=e21]:
-        - generic [ref=e22]: "3"
+      - button "5" [ref=e21]:
+        - generic [ref=e22]: "5"
       - generic [ref=e23]: Player 1
   - generic [ref=e25]:
     - generic [ref=e26]:
@@ -42,18 +42,18 @@
   - generic [ref=e55]:
     - heading "Your Hand" [level=3] [ref=e56]
     - generic [ref=e57]:
-      - button "6" [disabled] [ref=e58]:
-        - generic [ref=e59]: "6"
-      - button "3" [disabled] [ref=e60]:
-        - generic [ref=e61]: "3"
-      - button "7" [disabled] [ref=e62]:
-        - generic [ref=e63]: "7"
-      - button "7" [disabled] [ref=e64]:
-        - generic [ref=e65]: "7"
+      - button "4" [disabled] [ref=e58]:
+        - generic [ref=e59]: "4"
+      - button "7" [disabled] [ref=e60]:
+        - generic [ref=e61]: "7"
+      - button "4" [disabled] [ref=e62]:
+        - generic [ref=e63]: "4"
+      - button "5" [disabled] [ref=e64]:
+        - generic [ref=e65]: "5"
       - button "4" [disabled] [ref=e66]:
         - generic [ref=e67]: "4"
-      - button "0" [disabled] [ref=e68]:
-        - generic [ref=e69]: "0"
+      - button "3" [disabled] [ref=e68]:
+        - generic [ref=e69]: "3"
       - button "6" [disabled] [ref=e70]:
         - generic [ref=e71]: "6"
     - paragraph [ref=e72]: Waiting for other players...

@@ -5,14 +5,16 @@ interface BettingPhaseProps {
   players: Player[];
   currentBets: Bet[];
   currentPlayerId: string;
+  currentPlayerIndex: number;
   onPlaceBet: (amount: number, withoutTrump: boolean) => void;
 }
 
-export function BettingPhase({ players, currentBets, currentPlayerId, onPlaceBet }: BettingPhaseProps) {
+export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, onPlaceBet }: BettingPhaseProps) {
   const [betAmount, setBetAmount] = useState<number>(7);
   const [withoutTrump, setWithoutTrump] = useState(false);
 
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
+  const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,6 +62,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, onPlaceBet
               value={betAmount}
               onChange={(e) => setBetAmount(Number(e.target.value))}
               className="w-full"
+              disabled={!isMyTurn}
             />
             <div className="text-center text-2xl font-bold text-blue-600 mt-2">
               {betAmount}
@@ -73,18 +76,25 @@ export function BettingPhase({ players, currentBets, currentPlayerId, onPlaceBet
               checked={withoutTrump}
               onChange={(e) => setWithoutTrump(e.target.checked)}
               className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+              disabled={!isMyTurn}
             />
             <label htmlFor="withoutTrump" className="text-sm font-medium text-gray-700">
               Without Trump (Double points)
             </label>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-          >
-            Place Bet
-          </button>
+          {isMyTurn ? (
+            <button
+              type="submit"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Place Bet
+            </button>
+          ) : (
+            <div className="text-center text-gray-600 font-medium py-3">
+              Waiting for {players[currentPlayerIndex]?.name}'s bet...
+            </div>
+          )}
         </form>
       )}
 

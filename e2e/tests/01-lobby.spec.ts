@@ -24,8 +24,8 @@ test.describe('Lobby and Player Joining', () => {
     // Submit
     await page.getByRole('button', { name: /create/i }).click();
 
-    // Should show waiting room
-    await expect(page.getByRole('heading', { name: /waiting room/i })).toBeVisible();
+    // Should show team selection screen
+    await expect(page.getByRole('heading', { name: /team selection/i })).toBeVisible();
 
     // Should show game ID
     await expect(page.getByText(/game id/i)).toBeVisible();
@@ -87,8 +87,9 @@ test.describe('Lobby and Player Joining', () => {
     await page4.getByPlaceholder(/your name/i).fill('Player 4');
     await page4.getByRole('button', { name: /join/i }).click();
 
-    // Game should start (no more waiting message)
-    await expect(page1.getByText(/waiting for.*player/i)).not.toBeVisible({ timeout: 10000 });
+    // Should show Start Game button when 4 players are present
+    await expect(page1.getByRole('button', { name: /start game/i })).toBeVisible({ timeout: 10000 });
+    await expect(page1.getByText(/waiting for.*player/i)).not.toBeVisible();
 
     await context.close();
   });

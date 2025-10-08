@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createGameWith4Players, placeAllBets, playFullRound } from './helpers';
+import { createGameWith4Players, placeAllBets, playFullRound, playFullTrick } from './helpers';
 
 test.describe('Game Flow and Scoring', () => {
   test('should complete a full round and show scoring phase', async ({ browser }) => {
@@ -29,8 +29,8 @@ test.describe('Game Flow and Scoring', () => {
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-    // All players bet 7
-    await placeAllBets(pages, [7, 7, 7, 7]);
+    // All players bet (in player order [P1, P2, P3, P4])
+    await placeAllBets(pages); // Uses defaults: P3=7, P4=8, P1=9, P2=9
 
     // Get initial scores
     const initialScore = await pages[0].locator('text=/team 1/i').locator('..').locator('text=/^\\d+$/').textContent();
@@ -56,8 +56,9 @@ test.describe('Game Flow and Scoring', () => {
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-    // Players bet high (12) - unlikely to meet
-    await placeAllBets(pages, [12, 12, 12, 12]);
+    // Players bet high - unlikely to meet
+    // Betting order: P3, P4, P1, P2 → bets 10, 11, 12, 12
+    await placeAllBets(pages, [12, 12, 10, 11]);
 
     // Play full round
     await playFullRound(pages);
@@ -78,8 +79,9 @@ test.describe('Game Flow and Scoring', () => {
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-    // Player 1 bets without trump
-    await placeAllBets(pages, [7, 7, 7, 7], [true, false, false, false]);
+    // Player 1 bets without trump (escalating bets: 7, 8, 9, 9)
+    // Note: Player 1 is index 0, in betting order they bet 3rd with amount at index 0
+    await placeAllBets(pages, [9, 9, 7, 8], [true, false, false, false]);
 
     // Play full round
     await playFullRound(pages);
@@ -131,29 +133,12 @@ test.describe('Game Flow and Scoring', () => {
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
     await placeAllBets(pages);
 
-    // Play one complete trick
-    for (let i = 0; i < 4; i++) {
-      let currentPlayerIndex = -1;
-      for (let j = 0; j < 4; j++) {
-        if (await pages[j].getByText(/your turn/i).isVisible()) {
-          currentPlayerIndex = j;
-          break;
-        }
-      }
-
-      if (currentPlayerIndex >= 0) {
-        const card = pages[currentPlayerIndex].locator('button').filter({ hasText: /^[0-7]$/ }).first();
-        await card.click();
-        await pages[0].waitForTimeout(500);
-      }
-    }
-
-    // Wait for trick resolution
-    await pages[0].waitForTimeout(3000);
+    // Play one complete trick using helper
+    await playFullTrick(pages);
 
     // One player should have tricks won = 1
     const playerWithTrick = pages[0].locator('text=/tricks.*1/i');
-    await expect(playerWithTrick.first()).toBeVisible();
+    await expect(playerWithTrick.first()).toBeVisible({ timeout: 5000 });
 
     await context.close();
   });
@@ -215,7 +200,7 @@ test.describe('Game Flow and Scoring', () => {
       }
 
       if (currentPlayerIndex >= 0) {
-        const card = pages[currentPlayerIndex].locator('button').filter({ hasText: /^[0-7]$/ }).first();
+        const card = pages[currentPlayerIndex].locator('[data-card-value]').first();
         await card.click();
         await pages[0].waitForTimeout(500);
       }

@@ -27,6 +27,9 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
     <button
       onClick={onClick}
       disabled={disabled}
+      data-testid={`card-${card.color}-${card.value}`}
+      data-card-value={card.value}
+      data-card-color={card.color}
       className={`
         ${colorStyles[card.color]}
         ${sizeStyles[size]}

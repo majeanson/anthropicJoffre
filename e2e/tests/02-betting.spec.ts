@@ -30,6 +30,10 @@ async function createGameWith4Players(browser: any) {
     pages.push(page);
   }
 
+  // Wait for team selection to be ready, then start game
+  await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
+  await pages[0].getByRole('button', { name: /start game/i }).click();
+
   // Wait for betting phase to start
   await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -67,14 +71,15 @@ test.describe('Betting Phase', () => {
   test('should allow changing bet amount', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
-    const page1 = pages[0];
-    const slider = page1.locator('input[type="range"]');
+    // Player 3 bets first (dealer rotates from 0 to 1, so Player 2 is dealer, Player 3 starts)
+    const page3 = pages[2];
+    const slider = page3.locator('input[type="range"]');
 
     // Change to 10
     await slider.fill('10');
 
     // Should display 10
-    await expect(page1.locator('text=/^10$/').first()).toBeVisible();
+    await expect(page3.locator('text=/^10$/').first()).toBeVisible();
 
     await context.close();
   });
@@ -82,8 +87,9 @@ test.describe('Betting Phase', () => {
   test('should allow selecting "without trump" option', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
-    const page1 = pages[0];
-    const checkbox = page1.locator('input[type="checkbox"]#withoutTrump');
+    // Player 3 bets first
+    const page3 = pages[2];
+    const checkbox = page3.locator('input[type="checkbox"]#withoutTrump');
 
     // Should be unchecked by default
     await expect(checkbox).not.toBeChecked();
@@ -100,14 +106,14 @@ test.describe('Betting Phase', () => {
 
     const page1 = pages[0];
 
-    // Should show all 4 players
-    await expect(page1.getByText('Player 1')).toBeVisible();
-    await expect(page1.getByText('Player 2')).toBeVisible();
-    await expect(page1.getByText('Player 3')).toBeVisible();
-    await expect(page1.getByText('Player 4')).toBeVisible();
+    // Should show all 4 players in the player list (look within player bet sections)
+    await expect(page1.locator('.bg-gray-50 .font-medium', { hasText: 'Player 1' })).toBeVisible();
+    await expect(page1.locator('.bg-gray-50 .font-medium', { hasText: 'Player 2' })).toBeVisible();
+    await expect(page1.locator('.bg-gray-50 .font-medium', { hasText: 'Player 3' })).toBeVisible();
+    await expect(page1.locator('.bg-gray-50 .font-medium', { hasText: 'Player 4' })).toBeVisible();
 
-    // All should show "Waiting..." initially
-    const waitingTexts = page1.locator('text=/waiting/i');
+    // All should show "Waiting..." initially (in player list, not the turn indicator)
+    const waitingTexts = page1.locator('.text-sm.text-gray-500', { hasText: 'Waiting...' });
     await expect(waitingTexts).toHaveCount(4);
 
     await context.close();
@@ -116,23 +122,24 @@ test.describe('Betting Phase', () => {
   test('should submit bet and show waiting state', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
-    const page1 = pages[0];
+    // Player 3 bets first
+    const page3 = pages[2];
 
     // Set bet amount
-    const slider = page1.locator('input[type="range"]');
+    const slider = page3.locator('input[type="range"]');
     await slider.fill('8');
 
     // Submit bet
-    await page1.getByRole('button', { name: /place bet/i }).click();
+    await page3.getByRole('button', { name: /place bet/i }).click();
 
     // Should show waiting message
-    await expect(page1.getByText(/waiting for other players to bet/i)).toBeVisible();
+    await expect(page3.getByText(/waiting for other players to bet/i)).toBeVisible();
 
     // Should not show bet form anymore
-    await expect(page1.getByRole('button', { name: /place bet/i })).not.toBeVisible();
+    await expect(page3.getByRole('button', { name: /place bet/i })).not.toBeVisible();
 
-    // Other players should see Player 1's bet
-    await expect(pages[1].getByText(/8 tricks/i)).toBeVisible();
+    // Other players should see Player 3's bet
+    await expect(pages[0].getByText(/8 tricks/i)).toBeVisible();
 
     await context.close();
   });
@@ -140,16 +147,17 @@ test.describe('Betting Phase', () => {
   test('should show "No Trump" indicator for without-trump bets', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
-    const page1 = pages[0];
+    // Player 3 bets first
+    const page3 = pages[2];
 
     // Select without trump
-    await page1.locator('input[type="checkbox"]#withoutTrump').check();
+    await page3.locator('input[type="checkbox"]#withoutTrump').check();
 
     // Submit bet
-    await page1.getByRole('button', { name: /place bet/i }).click();
+    await page3.getByRole('button', { name: /place bet/i }).click();
 
     // Other players should see "No Trump" indicator
-    await expect(pages[1].getByText(/no trump/i)).toBeVisible();
+    await expect(pages[0].getByText(/no trump/i)).toBeVisible();
 
     await context.close();
   });
@@ -157,9 +165,11 @@ test.describe('Betting Phase', () => {
   test('should transition to playing phase when all bets are placed', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
-    // All players place bets
+    // Betting order: Player 3, 4, 1, 2 (Player 2 is dealer, bets last)
+    const bettingOrder = [2, 3, 0, 1]; // indices for pages array
     for (let i = 0; i < 4; i++) {
-      const page = pages[i];
+      const pageIndex = bettingOrder[i];
+      const page = pages[pageIndex];
       const slider = page.locator('input[type="range"]');
       await slider.fill(`${7 + i}`); // Different bets: 7, 8, 9, 10
       await page.getByRole('button', { name: /place bet/i }).click();
@@ -174,27 +184,33 @@ test.describe('Betting Phase', () => {
   test('should correctly identify highest bidder', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
-    // Player 1: 7
-    await pages[0].locator('input[type="range"]').fill('7');
-    await pages[0].getByRole('button', { name: /place bet/i }).click();
-
-    // Player 2: 12 (highest)
-    await pages[1].locator('input[type="range"]').fill('12');
-    await pages[1].getByRole('button', { name: /place bet/i }).click();
-
+    // Betting order: Player 3, 4, 1, 2 (Player 2 is dealer, bets last)
     // Player 3: 8
     await pages[2].locator('input[type="range"]').fill('8');
     await pages[2].getByRole('button', { name: /place bet/i }).click();
+    await pages[0].locator('.bg-green-100', { hasText: '8 tricks' }).waitFor(); // Wait for bet to register
 
     // Player 4: 9
     await pages[3].locator('input[type="range"]').fill('9');
     await pages[3].getByRole('button', { name: /place bet/i }).click();
+    await pages[0].locator('.bg-green-100', { hasText: '9 tricks' }).waitFor(); // Wait for bet to register
+
+    // Player 1: 12 (highest, raises to max)
+    await pages[0].getByRole('button', { name: /place bet/i }).waitFor({ state: 'visible' });
+    await pages[0].locator('input[type="range"]').fill('12');
+    await pages[0].getByRole('button', { name: /place bet/i }).click();
+    await pages[2].locator('.bg-green-100', { hasText: '12 tricks' }).waitFor(); // Wait for bet to register
+
+    // Player 2 (dealer): 12 (matches highest, allowed for dealer)
+    await pages[1].getByRole('button', { name: /place bet/i }).waitFor({ state: 'visible' });
+    await pages[1].locator('input[type="range"]').fill('12');
+    await pages[1].getByRole('button', { name: /place bet/i }).click();
 
     // Wait for playing phase
     await pages[0].waitForSelector('text=/your hand/i', { timeout: 10000 });
 
-    // Player 2 (highest bidder) should have turn first
-    await expect(pages[1].getByText(/your turn/i)).toBeVisible();
+    // Player 1 (first with highest bet of 12) should have turn first
+    await expect(pages[0].getByText(/your turn/i)).toBeVisible();
 
     await context.close();
   });

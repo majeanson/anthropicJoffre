@@ -48,6 +48,7 @@ describe('Game Logic', () => {
         teamId: 1,
         hand: [],
         tricksWon: 8,
+        pointsWon: 8,
       };
 
       const bet: Bet = {
@@ -67,6 +68,7 @@ describe('Game Logic', () => {
         teamId: 1,
         hand: [],
         tricksWon: 5,
+        pointsWon: 5,
       };
 
       const bet: Bet = {
@@ -86,6 +88,7 @@ describe('Game Logic', () => {
         teamId: 1,
         hand: [],
         tricksWon: 8,
+        pointsWon: 8,
       };
 
       const bet: Bet = {

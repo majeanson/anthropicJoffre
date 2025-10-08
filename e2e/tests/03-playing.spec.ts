@@ -33,13 +33,32 @@ async function setupGameToPlayingPhase(browser: any) {
     }
   }
 
+  // Wait for team selection to be ready, then start game
+  await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
+  await pages[0].getByRole('button', { name: /start game/i }).click();
+
   // Wait for betting phase
   await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-  // All players place bets
+  // All players place bets in correct order: Player 3, 4, 1, 2 (Player 2 is dealer)
+  // Bets must escalate: 7, 8, 9, 9 (dealer can match)
+  const bettingOrder = [2, 3, 0, 1];
+  const betAmounts = [7, 8, 9, 9]; // Escalating bets, last one can match (dealer)
+
   for (let i = 0; i < 4; i++) {
-    await pages[i].locator('input[type="range"]').fill('7');
-    await pages[i].getByRole('button', { name: /place bet/i }).click();
+    const pageIndex = bettingOrder[i];
+    const page = pages[pageIndex];
+
+    // Wait for Place Bet button to appear (means it's this player's turn)
+    await page.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
+
+    await page.locator('input[type="range"]').fill(betAmounts[i].toString());
+    await page.getByRole('button', { name: /place bet/i }).click();
+
+    // Wait for bet to register
+    if (i < 3) {
+      await pages[0].waitForTimeout(500);
+    }
   }
 
   // Wait for playing phase
@@ -57,7 +76,7 @@ test.describe('Card Playing Phase', () => {
       await expect(page.getByText(/your hand/i)).toBeVisible();
 
       // Should have 8 cards
-      const cards = page.locator('button[class*="bg-red-500"], button[class*="bg-amber-700"], button[class*="bg-green-500"], button[class*="bg-blue-500"]');
+      const cards = page.locator('[data-card-value]');
       await expect(cards).toHaveCount(8);
     }
 
@@ -158,11 +177,11 @@ test.describe('Card Playing Phase', () => {
     const currentPage = pages[currentPlayerIndex];
 
     // Get first card and click it
-    const firstCard = currentPage.locator('button').filter({ hasText: /^[0-7]$/ }).first();
+    const firstCard = currentPage.locator('[data-card-value]').first();
     await firstCard.click();
 
     // Card should appear in trick area
-    await expect(currentPage.locator('text=/current trick/i').locator('..').locator('button')).toHaveCount(1);
+    await expect(currentPage.locator('text=/current trick/i').locator('..').locator('[data-card-value]')).toHaveCount(1);
 
     await context.close();
   });
@@ -179,7 +198,7 @@ test.describe('Card Playing Phase', () => {
       }
     }
 
-    const firstCard = pages[currentPlayerIndex].locator('button').filter({ hasText: /^[0-7]$/ }).first();
+    const firstCard = pages[currentPlayerIndex].locator('[data-card-value]').first();
     await firstCard.click();
 
     // Trump should be displayed
@@ -205,7 +224,7 @@ test.describe('Card Playing Phase', () => {
       expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
       // Play a card
-      const card = pages[currentPlayerIndex].locator('button').filter({ hasText: /^[0-7]$/ }).first();
+      const card = pages[currentPlayerIndex].locator('[data-card-value]').first();
       await card.click();
 
       // Wait a bit for state update
@@ -233,18 +252,19 @@ test.describe('Card Playing Phase', () => {
 
     const currentPage = pages[currentPlayerIndex];
 
-    // Count cards before
-    const cardsBefore = await currentPage.locator('button').filter({ hasText: /^[0-7]$/ }).count();
+    // Count cards in hand before (not in trick area)
+    const handArea = currentPage.locator('text=/your hand/i').locator('..');
+    const cardsBefore = await handArea.locator('[data-card-value]').count();
 
     // Play a card
-    const firstCard = currentPage.locator('button').filter({ hasText: /^[0-7]$/ }).first();
+    const firstCard = handArea.locator('[data-card-value]').first();
     await firstCard.click();
 
-    // Wait for update
-    await currentPage.waitForTimeout(1000);
+    // Wait for card to appear in trick area
+    await expect(currentPage.locator('text=/current trick/i').locator('..').locator('[data-card-value]')).toHaveCount(1, { timeout: 3000 });
 
-    // Count cards after
-    const cardsAfter = await currentPage.locator('button').filter({ hasText: /^[0-7]$/ }).count();
+    // Count cards in hand after
+    const cardsAfter = await handArea.locator('[data-card-value]').count();
 
     expect(cardsAfter).toBe(cardsBefore - 1);
 

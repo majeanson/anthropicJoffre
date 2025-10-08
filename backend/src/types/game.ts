@@ -12,6 +12,7 @@ export interface Player {
   teamId: 1 | 2;
   hand: Card[];
   tricksWon: number;
+  pointsWon: number; // Points earned from tricks and special cards
 }
 
 export interface Bet {
@@ -41,6 +42,7 @@ export interface GameState {
   trump: CardColor | null;
   currentTrick: TrickCard[];
   currentPlayerIndex: number;
+  dealerIndex: number; // Index of the current dealer
   teamScores: {
     team1: number;
     team2: number;

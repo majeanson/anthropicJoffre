@@ -13,24 +13,41 @@ export const determineWinner = (
 ): string => {
   if (trick.length === 0) throw new Error('Empty trick');
 
+  const ledSuit = trick[0].card.color; // First card determines the led suit
   let winningCard = trick[0];
 
   for (let i = 1; i < trick.length; i++) {
     const current = trick[i];
+    const currentIsTrump = trump && current.card.color === trump;
+    const winningIsTrump = trump && winningCard.card.color === trump;
+    const currentIsLedSuit = current.card.color === ledSuit;
+    const winningIsLedSuit = winningCard.card.color === ledSuit;
 
-    // If current card is trump and winning card is not
-    if (trump && current.card.color === trump && winningCard.card.color !== trump) {
+    // Trump always beats non-trump
+    if (currentIsTrump && !winningIsTrump) {
       winningCard = current;
     }
-    // If both are trump or both are not trump, compare values
-    else if (
-      (trump && current.card.color === trump && winningCard.card.color === trump) ||
-      (current.card.color !== trump && winningCard.card.color !== trump)
-    ) {
+    // If both are trump, higher value wins
+    else if (currentIsTrump && winningIsTrump) {
       if (current.card.value > winningCard.card.value) {
         winningCard = current;
       }
     }
+    // If winning card is trump, current can't beat it (unless also trump, handled above)
+    else if (winningIsTrump) {
+      // Do nothing, trump stays winning
+    }
+    // Led suit beats off-suit (when no trump involved)
+    else if (currentIsLedSuit && !winningIsLedSuit) {
+      winningCard = current;
+    }
+    // If both are led suit, higher value wins
+    else if (currentIsLedSuit && winningIsLedSuit) {
+      if (current.card.value > winningCard.card.value) {
+        winningCard = current;
+      }
+    }
+    // Both are off-suit (not trump, not led suit) - keep the winning card as is
   }
 
   return winningCard.playerId;
@@ -44,25 +61,30 @@ export const calculateRoundScore = (
   player: Player,
   bet: Bet
 ): number => {
-  const tricksWon = player.tricksWon;
+  const pointsWon = player.pointsWon;
   const betAmount = bet.amount;
   const multiplier = bet.withoutTrump ? 2 : 1;
 
-  if (tricksWon >= betAmount) {
+  if (pointsWon >= betAmount) {
     return betAmount * multiplier;
   } else {
     return -betAmount * multiplier;
   }
 };
 
+export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
+  // bet1 is higher if amount is greater
+  if (bet1.amount > bet2.amount) return true;
+  // bet1 is higher if same amount but withoutTrump
+  if (bet1.amount === bet2.amount && bet1.withoutTrump && !bet2.withoutTrump) return true;
+  return false;
+};
+
 export const getHighestBet = (bets: Bet[]): Bet | null => {
   if (bets.length === 0) return null;
 
   return bets.reduce((highest, current) => {
-    if (current.amount > highest.amount) return current;
-    if (current.amount === highest.amount && current.withoutTrump && !highest.withoutTrump) {
-      return current;
-    }
+    if (isBetHigher(current, highest)) return current;
     return highest;
   });
 };

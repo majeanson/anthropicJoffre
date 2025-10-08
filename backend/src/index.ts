@@ -10,6 +10,7 @@ import {
   calculateTrickPoints,
   calculateRoundScore,
   getHighestBet,
+  isBetHigher,
 } from './game/logic';
 import { saveGameHistory, getRecentGames } from './db';
 
@@ -92,6 +93,7 @@ io.on('connection', (socket) => {
       teamId: 1,
       hand: [],
       tricksWon: 0,
+      pointsWon: 0,
     };
 
     const gameState: GameState = {
@@ -103,6 +105,7 @@ io.on('connection', (socket) => {
       trump: null,
       currentTrick: [],
       currentPlayerIndex: 0,
+      dealerIndex: 0, // First player is the initial dealer
       teamScores: { team1: 0, team2: 0 },
       roundNumber: 1,
     };
@@ -131,21 +134,99 @@ io.on('connection', (socket) => {
       teamId: teamId as 1 | 2,
       hand: [],
       tricksWon: 0,
+      pointsWon: 0,
     };
 
     game.players.push(player);
     socket.join(gameId);
     io.to(gameId).emit('player_joined', { player, gameState: game });
+  });
 
-    // Start game if 4 players
-    if (game.players.length === 4) {
-      startNewRound(gameId);
+  socket.on('select_team', ({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
+    const game = games.get(gameId);
+    if (!game || game.phase !== 'team_selection') return;
+
+    const player = game.players.find(p => p.id === socket.id);
+    if (!player) return;
+
+    // Check if team has space (max 2 players per team)
+    const teamCount = game.players.filter(p => p.teamId === teamId).length;
+    if (teamCount >= 2 && player.teamId !== teamId) {
+      socket.emit('error', { message: 'Team is full' });
+      return;
     }
+
+    player.teamId = teamId;
+    io.to(gameId).emit('game_updated', game);
+  });
+
+  socket.on('swap_position', ({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
+    const game = games.get(gameId);
+    if (!game || game.phase !== 'team_selection') return;
+
+    const currentPlayer = game.players.find(p => p.id === socket.id);
+    const targetPlayer = game.players.find(p => p.id === targetPlayerId);
+
+    if (!currentPlayer || !targetPlayer) return;
+
+    // Swap positions in the players array
+    const currentIndex = game.players.indexOf(currentPlayer);
+    const targetIndex = game.players.indexOf(targetPlayer);
+
+    game.players[currentIndex] = targetPlayer;
+    game.players[targetIndex] = currentPlayer;
+
+    io.to(gameId).emit('game_updated', game);
+  });
+
+  socket.on('start_game', ({ gameId }: { gameId: string }) => {
+    const game = games.get(gameId);
+    if (!game || game.phase !== 'team_selection') return;
+
+    if (game.players.length !== 4) {
+      socket.emit('error', { message: 'Need 4 players to start' });
+      return;
+    }
+
+    startNewRound(gameId);
   });
 
   socket.on('place_bet', ({ gameId, amount, withoutTrump }: { gameId: string; amount: number; withoutTrump: boolean }) => {
     const game = games.get(gameId);
     if (!game || game.phase !== 'betting') return;
+
+    const currentPlayer = game.players[game.currentPlayerIndex];
+    if (currentPlayer.id !== socket.id) return;
+
+    const isDealer = game.currentPlayerIndex === game.dealerIndex;
+
+    // Validate betting rules
+    if (game.currentBets.length > 0) {
+      const currentHighest = getHighestBet(game.currentBets);
+      if (currentHighest) {
+        const newBet: Bet = { playerId: socket.id, amount, withoutTrump };
+
+        // Dealer can equalize the bet
+        if (isDealer) {
+          // Dealer must match or beat the highest bet
+          if (amount < currentHighest.amount) {
+            socket.emit('invalid_bet', {
+              message: 'As dealer, you can match the highest bet or raise'
+            });
+            return;
+          }
+          // If same amount, dealer can match even if current highest is withoutTrump
+        } else {
+          // Non-dealers must raise (beat the current highest)
+          if (!isBetHigher(newBet, currentHighest)) {
+            socket.emit('invalid_bet', {
+              message: 'You must bid higher than the current highest bet (without trump beats with trump at same value)'
+            });
+            return;
+          }
+        }
+      }
+    }
 
     const bet: Bet = {
       playerId: socket.id,
@@ -162,6 +243,9 @@ io.on('connection', (socket) => {
         (p) => p.id === game.highestBet?.playerId
       );
       game.currentPlayerIndex = highestBidderIndex;
+    } else {
+      // Move to next player
+      game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
     }
 
     io.to(gameId).emit('game_updated', game);
@@ -173,6 +257,20 @@ io.on('connection', (socket) => {
 
     const currentPlayer = game.players[game.currentPlayerIndex];
     if (currentPlayer.id !== socket.id) return;
+
+    // Validate suit-following rule
+    if (game.currentTrick.length > 0) {
+      const ledSuit = game.currentTrick[0].card.color;
+      const hasLedSuit = currentPlayer.hand.some((c) => c.color === ledSuit);
+
+      // If player has the led suit, they must play it
+      if (hasLedSuit && card.color !== ledSuit) {
+        socket.emit('invalid_move', {
+          message: 'You must follow suit if you have it in your hand'
+        });
+        return;
+      }
+    }
 
     // Set trump on first card
     if (game.currentTrick.length === 0 && !game.trump) {
@@ -189,9 +287,15 @@ io.on('connection', (socket) => {
 
     // Check if trick is complete
     if (game.currentTrick.length === 4) {
+      // Emit state with card played before resolving trick
+      io.to(gameId).emit('game_updated', game);
       resolveTrick(gameId);
     } else {
+      // Move to next player
+      const previousIndex = game.currentPlayerIndex;
       game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+      console.log(`Turn advanced from player ${previousIndex} to player ${game.currentPlayerIndex}, trick has ${game.currentTrick.length} cards`);
+      // Emit updated state
       io.to(gameId).emit('game_updated', game);
     }
   });
@@ -219,14 +323,19 @@ function startNewRound(gameId: string) {
   game.players.forEach((player, index) => {
     player.hand = hands[index];
     player.tricksWon = 0;
+    player.pointsWon = 0;
   });
+
+  // Rotate dealer to next player
+  game.dealerIndex = (game.dealerIndex + 1) % 4;
 
   game.phase = 'betting';
   game.currentBets = [];
   game.highestBet = null;
   game.trump = null;
   game.currentTrick = [];
-  game.currentPlayerIndex = 0;
+  // Betting starts with player after dealer
+  game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
 
   io.to(gameId).emit('round_started', game);
 }
@@ -236,22 +345,26 @@ function resolveTrick(gameId: string) {
   if (!game) return;
 
   const winnerId = determineWinner(game.currentTrick, game.trump);
-  const points = calculateTrickPoints(game.currentTrick);
+  const specialCardPoints = calculateTrickPoints(game.currentTrick);
 
   const winner = game.players.find((p) => p.id === winnerId);
   if (winner) {
     winner.tricksWon += 1;
+    // Award 1 point for winning trick + special card points
+    winner.pointsWon += 1 + specialCardPoints;
   }
 
   game.currentTrick = [];
   game.currentPlayerIndex = game.players.findIndex((p) => p.id === winnerId);
 
-  io.to(gameId).emit('trick_resolved', { winnerId, points, gameState: game });
+  // Emit trick resolution with updated state
+  io.to(gameId).emit('trick_resolved', { winnerId, points: 1 + specialCardPoints, gameState: game });
 
   // Check if round is over (all cards played)
   if (game.players.every((p) => p.hand.length === 0)) {
     endRound(gameId);
   } else {
+    // Continue playing - emit game state for next turn
     io.to(gameId).emit('game_updated', game);
   }
 }
@@ -275,8 +388,6 @@ async function endRound(gameId: string) {
     }
   });
 
-  io.to(gameId).emit('round_ended', game);
-
   // Check for game over
   if (game.teamScores.team1 >= 41 || game.teamScores.team2 >= 41) {
     game.phase = 'game_over';
@@ -296,6 +407,10 @@ async function endRound(gameId: string) {
 
     io.to(gameId).emit('game_over', { winningTeam, gameState: game });
   } else {
+    // Emit round ended and schedule next round
+    io.to(gameId).emit('round_ended', game);
+
+    // Start next round after delay
     game.roundNumber += 1;
     setTimeout(() => startNewRound(gameId), 5000);
   }

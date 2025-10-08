@@ -4,6 +4,7 @@ import { GameState, Card } from './types/game';
 import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
 import { PlayingPhase } from './components/PlayingPhase';
+import { TeamSelection } from './components/TeamSelection';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -89,6 +90,24 @@ function App() {
     }
   };
 
+  const handleSelectTeam = (teamId: 1 | 2) => {
+    if (socket && gameId) {
+      socket.emit('select_team', { gameId, teamId });
+    }
+  };
+
+  const handleSwapPosition = (targetPlayerId: string) => {
+    if (socket && gameId) {
+      socket.emit('swap_position', { gameId, targetPlayerId });
+    }
+  };
+
+  const handleStartGame = () => {
+    if (socket && gameId) {
+      socket.emit('start_game', { gameId });
+    }
+  };
+
   if (error) {
     return (
       <div className="min-h-screen bg-red-50 flex items-center justify-center">
@@ -116,30 +135,14 @@ function App() {
 
   if (gameState.phase === 'team_selection') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center p-6">
-        <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full">
-          <h2 className="text-3xl font-bold mb-6 text-gray-800">Waiting Room</h2>
-          <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">Game ID:</p>
-            <div className="bg-gray-100 p-3 rounded-lg font-mono text-lg">{gameId}</div>
-          </div>
-          <div className="space-y-3">
-            <h3 className="font-semibold text-gray-700">Players ({gameState.players.length}/4)</h3>
-            {gameState.players.map((player) => (
-              <div key={player.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
-                <span className="font-medium">{player.name}</span>
-                <span className="text-sm text-gray-500">Team {player.teamId}</span>
-              </div>
-            ))}
-          </div>
-          {gameState.players.length < 4 && (
-            <p className="mt-6 text-center text-gray-600">
-              Waiting for {4 - gameState.players.length} more player(s)...
-            </p>
-          )}
-        </div>
-      </div>
+      <TeamSelection
+        players={gameState.players}
+        gameId={gameId}
+        currentPlayerId={socket?.id || ''}
+        onSelectTeam={handleSelectTeam}
+        onSwapPosition={handleSwapPosition}
+        onStartGame={handleStartGame}
+      />
     );
   }
 
@@ -150,6 +153,7 @@ function App() {
           players={gameState.players}
           currentBets={gameState.currentBets}
           currentPlayerId={socket?.id || ''}
+          currentPlayerIndex={gameState.currentPlayerIndex}
           onPlaceBet={handlePlaceBet}
         />
       </div>
@@ -191,7 +195,7 @@ function App() {
                     <span className="font-medium">{player.name}</span>
                   </div>
                   <div className="text-sm">
-                    <span>Bet: {bet?.amount} | Won: {player.tricksWon}</span>
+                    <span>Bet: {bet?.amount} pts | Earned: {player.pointsWon} pts ({player.tricksWon} tricks)</span>
                   </div>
                 </div>
               );
