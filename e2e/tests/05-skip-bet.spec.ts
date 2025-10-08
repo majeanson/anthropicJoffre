@@ -174,4 +174,52 @@ test.describe('Skip Bet Functionality', () => {
 
     await context.close();
   });
+
+  test('should handle skip then bet scenario without infinite rerender', async ({ browser }) => {
+    const { context, pages } = await createGameWith4Players(browser);
+
+    await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
+
+    // Player 3 skips (first in betting order)
+    const page3 = pages[2];
+    await page3.getByRole('button', { name: /skip/i }).waitFor({ timeout: 15000 });
+    await page3.getByRole('button', { name: /skip/i }).click();
+    await pages[0].waitForTimeout(500);
+
+    // Player 4 places bet of 7
+    const page4 = pages[3];
+    await page4.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
+    await page4.locator('input[type="range"]').fill('7');
+    await page4.getByRole('button', { name: /place bet/i }).click();
+    await pages[0].waitForTimeout(500);
+
+    // Player 1 should now be able to bet (must raise to 8 or more)
+    const page1 = pages[0];
+    await page1.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
+
+    // At bet 7, should show validation message
+    await page1.locator('input[type="range"]').fill('7');
+    await expect(page1.getByText(/you must raise/i)).toBeVisible();
+
+    // Raise to 8, should be valid
+    await page1.locator('input[type="range"]').fill('8');
+    await pages[0].waitForTimeout(300);
+
+    // No validation message should appear
+    const validationMsg = page1.getByText(/you must raise/i);
+    await expect(validationMsg).not.toBeVisible();
+
+    // Place Bet button should be enabled
+    const placeBetButton = page1.getByRole('button', { name: /place bet/i });
+    await expect(placeBetButton).toBeEnabled();
+
+    // Should be able to place bet without issues
+    await placeBetButton.click();
+    await pages[0].waitForTimeout(500);
+
+    // Should show that bet was placed successfully
+    await expect(page1.getByText(/waiting for other players/i)).toBeVisible();
+
+    await context.close();
+  });
 });

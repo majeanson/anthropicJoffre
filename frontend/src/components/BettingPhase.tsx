@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Bet, Player } from '../types/game';
 
 interface BettingPhaseProps {
@@ -13,14 +13,13 @@ interface BettingPhaseProps {
 export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet }: BettingPhaseProps) {
   const [betAmount, setBetAmount] = useState<number>(7);
   const [withoutTrump, setWithoutTrump] = useState(false);
-  const [validationMessage, setValidationMessage] = useState<string>('');
 
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
   const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
   const isDealer = currentPlayerIndex === dealerIndex;
 
-  // Get highest valid bet (excluding skipped bets)
-  const getHighestBet = (): Bet | null => {
+  // Get highest valid bet (excluding skipped bets) - memoized
+  const highestBet = useMemo((): Bet | null => {
     const validBets = currentBets.filter(b => !b.skipped);
     if (validBets.length === 0) return null;
     return validBets.reduce((highest, current) => {
@@ -28,19 +27,19 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       if (current.amount === highest.amount && current.withoutTrump && !highest.withoutTrump) return current;
       return highest;
     });
-  };
+  }, [currentBets]);
 
-  const highestBet = getHighestBet();
-
-  // Validate bet amount
-  const isBetValid = (): boolean => {
-    if (!highestBet) return true; // First bet, any amount valid
+  // Validate bet amount and get validation message - memoized
+  const validation = useMemo(() => {
+    if (!highestBet) return { isValid: true, message: '' };
 
     if (isDealer) {
       // Dealer can match or raise
       if (betAmount < highestBet.amount) {
-        setValidationMessage(`As dealer, you must match or raise. Minimum: ${highestBet.amount}`);
-        return false;
+        return {
+          isValid: false,
+          message: `As dealer, you must match or raise. Minimum: ${highestBet.amount}`
+        };
       }
     } else {
       // Non-dealer must raise
@@ -49,16 +48,15 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         (betAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
 
       if (!newBetIsHigher) {
-        setValidationMessage(
-          `You must raise the bet. Minimum: ${highestBet.amount}${!highestBet.withoutTrump ? ' (or ' + highestBet.amount + ' without trump)' : ''}`
-        );
-        return false;
+        return {
+          isValid: false,
+          message: `You must raise the bet. Minimum: ${highestBet.amount}${!highestBet.withoutTrump ? ' (or ' + highestBet.amount + ' without trump)' : ''}`
+        };
       }
     }
 
-    setValidationMessage('');
-    return true;
-  };
+    return { isValid: true, message: '' };
+  }, [highestBet, isDealer, betAmount, withoutTrump]);
 
   const canSkip = (): boolean => {
     // Dealer cannot skip if there are existing bets
@@ -68,20 +66,13 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
     return true;
   };
 
-  // Update validation when bet amount or withoutTrump changes
-  useEffect(() => {
-    if (isMyTurn && highestBet) {
-      isBetValid();
-    }
-  }, [betAmount, withoutTrump, isMyTurn]);
-
   const handleSkip = () => {
     onPlaceBet(0, false, true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isBetValid()) return;
+    if (!validation.isValid) return;
     onPlaceBet(betAmount, withoutTrump, false);
   };
 
@@ -157,9 +148,9 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             </label>
           </div>
 
-          {validationMessage && isMyTurn && (
+          {validation.message && isMyTurn && (
             <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
-              {validationMessage}
+              {validation.message}
             </div>
           )}
 
@@ -167,9 +158,9 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             <div className="flex gap-3">
               <button
                 type="submit"
-                disabled={!isBetValid()}
+                disabled={!validation.isValid}
                 className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
-                  isBetValid()
+                  validation.isValid
                     ? 'bg-blue-600 text-white hover:bg-blue-700'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
