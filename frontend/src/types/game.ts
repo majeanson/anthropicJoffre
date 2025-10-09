@@ -78,3 +78,11 @@ export interface GameState {
   roundNumber: number;
   roundHistory: RoundHistory[];
 }
+
+export interface PlayerSession {
+  gameId: string;
+  playerId: string;
+  playerName: string;
+  token: string;
+  timestamp: number;
+}

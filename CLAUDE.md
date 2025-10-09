@@ -306,6 +306,237 @@ npm run dev
 
 ---
 
+## 🛡️ Validation System
+
+The game implements a **4-layer defense-in-depth validation strategy** to prevent cheating, race conditions, and ensure data integrity.
+
+**See**: `VALIDATION_SYSTEM.md` for comprehensive documentation
+
+### Validation Architecture
+
+**Layer 1: Client-Side Validation** (UX Enhancement)
+- Immediate feedback to users
+- Visual disabled states for invalid actions
+- Informational messages explaining constraints
+- **Not security** - can be bypassed by malicious clients
+
+**Layer 2: Client-Side Debouncing** (Race Condition Prevention)
+- Prevents rapid-fire duplicate actions
+- `isPlayingCard` flag prevents double-clicks
+- Automatically resets when turn changes or trick completes
+
+**Layer 3: Server-Side State Validation** (Security)
+- All critical validation happens server-side
+- Verifies game phase, player turn, card ownership
+- Checks suit-following rules, bet requirements
+- Never trusts client input
+
+**Layer 4: Server-Side Race Condition Protection** (Edge Cases)
+- Prevents duplicate actions during async operations
+- Trick completion lock (`currentTrick.length >= 4`)
+- Duplicate play check (`hasAlreadyPlayed`)
+- Immediate turn advancement before trick resolution
+
+### Key Validations by Phase
+
+**Team Selection** (backend/src/index.ts:146-218):
+- Game existence check
+- Phase verification (prevent changes after start)
+- Player membership validation
+- Team ID validation (must be 1 or 2)
+- Team size enforcement (max 2 per team)
+- Self-swap prevention for position changes
+
+**Betting Phase** (backend/src/index.ts:250-383):
+- Turn validation (enforce betting order)
+- Duplicate bet prevention
+- Bet range check (7-12 points)
+- Dealer privilege rules (can match, others must raise)
+- Skip validation (dealer can't skip if bets exist)
+
+**Playing Phase** (backend/src/index.ts:384-479):
+- **Layer 1**: Trick completion check (prevent play during resolution)
+- **Layer 2**: Turn validation (enforce turn-based play)
+- **Layer 3**: Card data validation (prevent malformed data)
+- **Layer 4**: Card ownership validation (prevent cheating)
+- **Layer 5**: Duplicate play prevention (race condition protection)
+- **Layer 6**: Suit-following validation (enforce game rules)
+
+### Race Condition Solution
+
+**The Problem**: When 4th card completes a trick, there's a 3-second delay before trick clears. During this window, the player who won could click another card.
+
+**The Solution** (4 layers):
+1. **Client debounce**: `isPlayingCard` flag prevents rapid clicks
+2. **Immediate turn advancement**: Turn changes BEFORE 3-second delay
+3. **Trick completion lock**: Server rejects plays when `currentTrick.length >= 4`
+4. **Duplicate play check**: Server tracks `hasAlreadyPlayed` per trick
+
+**Implementation**:
+```typescript
+// Backend: Immediate turn advancement (before setTimeout)
+game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+
+// Backend: Trick completion lock
+if (game.currentTrick.length >= 4) {
+  socket.emit('invalid_move', { message: 'Please wait for trick to resolve' });
+  return;
+}
+
+// Frontend: Client debouncing
+const [isPlayingCard, setIsPlayingCard] = useState(false);
+useEffect(() => {
+  if (!isCurrentTurn) setIsPlayingCard(false);
+}, [isCurrentTurn]);
+```
+
+### Error Message Best Practices
+
+**Clear and Actionable**:
+- ✅ "You must follow suit (red) if you have it"
+- ❌ "Invalid move"
+
+**Event Types**:
+- `'error'` - General errors (game not found, wrong phase)
+- `'invalid_bet'` - Betting violations
+- `'invalid_move'` - Card playing violations
+
+### Security Implications
+
+**What This Prevents**:
+- ✅ Playing cards not in your hand (cheating)
+- ✅ Playing multiple cards in one turn (race conditions)
+- ✅ Betting out of turn (cheating)
+- ✅ Changing teams after game starts (griefing)
+- ✅ Starting game without balanced teams (exploitation)
+
+**What This Doesn't Prevent** (Future Work):
+- ❌ Slow play / AFK (no timeout system yet)
+- ❌ Colluding via external chat (social issue)
+- ❌ Intentionally bad plays (can't detect intent)
+
+---
+
+## 🏆 Leaderboard & Round History
+
+### Leaderboard Feature
+**Location**: `frontend/src/components/Leaderboard.tsx`
+
+**Access**: Click "🏆 Leaderboard" button during gameplay (top-right of playing phase)
+
+**Features**:
+- **Current Standings**: Live team scores with leading team indicator (crown icon)
+- **Team Composition**: Shows which players are on each team with tricks won
+- **Current Bet**: Displays active bet details (bidder, amount, type)
+- **Round History**: Complete history of all finished rounds with detailed stats
+
+### Round History Data Structure
+
+**Backend Type** (backend/src/types/game.ts):
+```typescript
+export interface RoundHistory {
+  roundNumber: number;           // Sequential round counter
+  bets: Bet[];                   // All bets placed in betting phase
+  highestBet: Bet;               // Winning bet
+  offensiveTeam: 1 | 2;          // Team that won the bet
+  offensivePoints: number;       // Points earned by offensive team
+  defensivePoints: number;       // Points earned by defensive team
+  betAmount: number;             // Target points to achieve
+  withoutTrump: boolean;         // 2x multiplier if true
+  betMade: boolean;              // Did offensive team meet their bet?
+  roundScore: {
+    team1: number;               // Points gained/lost this round
+    team2: number;
+  };
+  cumulativeScore: {
+    team1: number;               // Total score after this round
+    team2: number;
+  };
+}
+```
+
+**Implementation** (backend/src/index.ts:634-655):
+- Round history populated in `endRound()` function
+- Captures complete round state before starting next round
+- Synchronized to all clients via `game_updated` event
+
+### UI Components
+
+**Leaderboard Modal**:
+- Full-screen modal with semi-transparent backdrop
+- Sticky header with round number
+- Scrollable content area
+- Three sections: Current Standings, Current Bet, Round History
+
+**Visual Design**:
+- Team 1: Blue gradient background
+- Team 2: Red gradient background
+- Leading team: Yellow ring (ring-4 ring-yellow-400)
+- Successful bet: Green badge
+- Failed bet: Red badge
+- Crown icon (👑) on leading team
+
+**Round History Display**:
+- Reverse chronological order (newest first)
+- Expandable cards with hover effects
+- Grid layout showing: Bidder, Bet Details, Points Earned, Round Score
+- Color-coded score deltas (+/- indicators)
+- Total cumulative scores shown
+
+### Data Synchronization
+
+**Backend**:
+```typescript
+// Initialize in game creation (backend/src/index.ts:112)
+roundHistory: []
+
+// Populate in endRound() (backend/src/index.ts:634-655)
+game.roundHistory.push({
+  roundNumber: game.roundNumber,
+  bets: [...game.currentBets],
+  highestBet: game.highestBet,
+  // ... all other fields
+});
+
+// Emit to all clients
+io.to(gameId).emit('game_updated', game);
+```
+
+**Frontend**:
+```typescript
+// Access from gameState prop
+gameState.roundHistory.slice().reverse().map(round => {
+  // Render round details
+})
+```
+
+### Integration Points
+
+**Playing Phase** (frontend/src/components/PlayingPhase.tsx:161-176):
+```typescript
+<button
+  onClick={() => setShowLeaderboard(true)}
+  className="bg-yellow-500 hover:bg-yellow-600..."
+>
+  🏆 Leaderboard
+</button>
+
+<Leaderboard
+  gameState={gameState}
+  isOpen={showLeaderboard}
+  onClose={() => setShowLeaderboard(false)}
+/>
+```
+
+### Use Cases
+
+1. **Track Game Progress**: See how the game evolved round by round
+2. **Verify Scoring**: Check if bets were made and points calculated correctly
+3. **Strategic Analysis**: Review past bets and outcomes to inform strategy
+4. **End-Game Summary**: See complete game history before game_over
+
+---
+
 ## 🧪 Testing Strategy
 
 ### E2E Testing with Playwright
@@ -514,6 +745,7 @@ npm run test:e2e     # Run E2E tests
 ✅ Led suit vs trump logic
 ✅ Points vs tricks distinction
 ✅ "Without trump" bet priority
+✅ Skip bet functionality with dealer restrictions
 ✅ Circular trick layout with previous trick viewer
 ✅ 3-second pause after trick completion
 ✅ Bot player AI system for automated gameplay
@@ -521,6 +753,11 @@ npm run test:e2e     # Run E2E tests
 ✅ Test Panel for state manipulation
 ✅ 4-Player debug view (all perspectives simultaneously)
 ✅ Debug controls (Test, State, 4-Player toggle)
+✅ **Multi-layered validation system** (4-layer defense-in-depth)
+✅ **Race condition prevention** (trick completion lock, duplicate play check)
+✅ **Leaderboard with round history** (comprehensive game stats tracking)
+✅ **Round-by-round analytics** (bets, points, outcomes)
+✅ Comprehensive documentation (VALIDATION_SYSTEM.md, BOT_PLAYER_SYSTEM.md, IMPROVEMENT_SUGGESTIONS.md)
 ✅ E2E test suite (27/35 tests passing - 77%)
 
 ### Future Enhancements
@@ -543,6 +780,9 @@ npm run test:e2e     # Run E2E tests
 - **Quick Start**: See QUICKSTART.md
 - **Testing**: See TDD_WORKFLOW.md
 - **Contributing**: See CONTRIBUTING.md
+- **Validation System**: See VALIDATION_SYSTEM.md (multi-layer validation architecture)
+- **Bot Player System**: See BOT_PLAYER_SYSTEM.md (AI decision-making and lifecycle)
+- **Improvement Suggestions**: See IMPROVEMENT_SUGGESTIONS.md (future enhancement roadmap)
 
 ---
 

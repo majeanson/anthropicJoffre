@@ -90,3 +90,25 @@ export interface GameHistory {
   rounds: number;
   createdAt: Date;
 }
+
+export interface PlayerSession {
+  gameId: string;
+  playerId: string;
+  playerName: string;
+  token: string;
+  timestamp: number;
+}
+
+export interface PlayerTimeout {
+  gameId: string;
+  playerId: string;
+  phase: 'betting' | 'playing';
+  startTime: number;
+  timeoutDuration: number; // in milliseconds (default 60000 = 60s)
+}
+
+export interface TimeoutConfig {
+  enabled: boolean;
+  bettingTimeout: number; // milliseconds
+  playingTimeout: number; // milliseconds
+}

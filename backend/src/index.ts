@@ -3,7 +3,8 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { GameState, Player, Bet, TrickCard, Card } from './types/game';
+import crypto from 'crypto';
+import { GameState, Player, Bet, TrickCard, Card, PlayerSession } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
 import {
   determineWinner,
@@ -47,6 +48,43 @@ app.use(express.json());
 // In-memory game storage (can be moved to Redis for production)
 const games = new Map<string, GameState>();
 
+// Session storage for reconnection (maps token to session data)
+const playerSessions = new Map<string, PlayerSession>();
+
+// Helper to generate secure random token
+function generateSessionToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}
+
+// Helper to create and store player session
+function createPlayerSession(gameId: string, playerId: string, playerName: string): PlayerSession {
+  const token = generateSessionToken();
+  const session: PlayerSession = {
+    gameId,
+    playerId,
+    playerName,
+    token,
+    timestamp: Date.now(),
+  };
+  playerSessions.set(token, session);
+  return session;
+}
+
+// Helper to validate session token
+function validateSessionToken(token: string): PlayerSession | null {
+  const session = playerSessions.get(token);
+  if (!session) return null;
+
+  // Check if session is expired (2 minutes = 120000ms)
+  const SESSION_TIMEOUT = 120000;
+  if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
+    playerSessions.delete(token);
+    return null;
+  }
+
+  return session;
+}
+
 // REST endpoints
 app.get('/api/health', (req, res) => {
   res.json({
@@ -86,7 +124,7 @@ io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('create_game', (playerName: string) => {
-    const gameId = Math.random().toString(36).substring(7);
+    const gameId = Math.random().toString(36).substring(7).toUpperCase();
     const player: Player = {
       id: socket.id,
       name: playerName,
@@ -114,7 +152,11 @@ io.on('connection', (socket) => {
 
     games.set(gameId, gameState);
     socket.join(gameId);
-    socket.emit('game_created', { gameId, gameState });
+
+    // Create session for reconnection
+    const session = createPlayerSession(gameId, socket.id, playerName);
+
+    socket.emit('game_created', { gameId, gameState, session });
   });
 
   socket.on('join_game', ({ gameId, playerName }: { gameId: string; playerName: string }) => {
@@ -141,7 +183,11 @@ io.on('connection', (socket) => {
 
     game.players.push(player);
     socket.join(gameId);
-    io.to(gameId).emit('player_joined', { player, gameState: game });
+
+    // Create session for reconnection
+    const session = createPlayerSession(gameId, socket.id, playerName);
+
+    io.to(gameId).emit('player_joined', { player, gameState: game, session });
   });
 
   socket.on('select_team', ({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
@@ -491,16 +537,105 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Reconnection handler
+  socket.on('reconnect_to_game', ({ token }: { token: string }) => {
+    console.log('Reconnection attempt with token:', token.substring(0, 10) + '...');
+
+    const session = validateSessionToken(token);
+    if (!session) {
+      socket.emit('reconnection_failed', { message: 'Invalid or expired session token' });
+      return;
+    }
+
+    const game = games.get(session.gameId);
+    if (!game) {
+      socket.emit('reconnection_failed', { message: 'Game no longer exists' });
+      playerSessions.delete(token);
+      return;
+    }
+
+    // Check if game is finished
+    if (game.phase === 'game_over') {
+      socket.emit('reconnection_failed', { message: 'Game has finished' });
+      return;
+    }
+
+    // Find player in game
+    const player = game.players.find(p => p.name === session.playerName);
+    if (!player) {
+      socket.emit('reconnection_failed', { message: 'Player no longer in game' });
+      playerSessions.delete(token);
+      return;
+    }
+
+    // Update player's socket ID
+    const oldSocketId = player.id;
+    player.id = socket.id;
+
+    // Update session with new socket ID and timestamp
+    session.playerId = socket.id;
+    session.timestamp = Date.now();
+
+    // Join game room
+    socket.join(session.gameId);
+
+    console.log(`Player ${session.playerName} reconnected to game ${session.gameId}`);
+
+    // Send updated game state to reconnected player
+    socket.emit('reconnection_successful', { gameState: game, session });
+
+    // Notify other players
+    io.to(session.gameId).emit('player_reconnected', {
+      playerId: socket.id,
+      playerName: session.playerName,
+      oldSocketId
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
-    // Handle player disconnect
+
+    // Find player's game and session
+    let playerGame: GameState | null = null;
+    let playerGameId: string | null = null;
+
     games.forEach((game, gameId) => {
-      const playerIndex = game.players.findIndex((p) => p.id === socket.id);
-      if (playerIndex !== -1) {
-        game.players.splice(playerIndex, 1);
-        io.to(gameId).emit('player_left', { playerId: socket.id, gameState: game });
+      const player = game.players.find((p) => p.id === socket.id);
+      if (player) {
+        playerGame = game;
+        playerGameId = gameId;
       }
     });
+
+    if (!playerGame || !playerGameId) {
+      return; // Player not in any game
+    }
+
+    // Don't immediately remove player - give 2 minutes grace period for reconnection
+    console.log(`Player ${socket.id} disconnected. Waiting for reconnection...`);
+
+    // Notify other players of disconnection
+    io.to(playerGameId).emit('player_disconnected', {
+      playerId: socket.id,
+      waitingForReconnection: true
+    });
+
+    // Set timeout to remove player if they don't reconnect
+    setTimeout(() => {
+      const game = games.get(playerGameId!);
+      if (!game) return;
+
+      const player = game.players.find((p) => p.id === socket.id);
+      if (player) {
+        // Player didn't reconnect - remove them
+        const playerIndex = game.players.findIndex((p) => p.id === socket.id);
+        if (playerIndex !== -1) {
+          game.players.splice(playerIndex, 1);
+          io.to(playerGameId!).emit('player_left', { playerId: socket.id, gameState: game });
+          console.log(`Player ${socket.id} removed from game ${playerGameId} (no reconnection)`);
+        }
+      }
+    }, 120000); // 2 minutes
   });
 });
 

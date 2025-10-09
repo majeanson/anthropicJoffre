@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { GameState, Card } from './types/game';
+import { GameState, Card, PlayerSession } from './types/game';
 import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
 import { PlayingPhase } from './components/PlayingPhase';
@@ -20,6 +20,7 @@ function App() {
   const [debugMode, setDebugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
+  const [reconnecting, setReconnecting] = useState<boolean>(false);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
@@ -28,15 +29,72 @@ function App() {
 
     newSocket.on('connect', () => {
       console.log('Connected to server');
+
+      // Check for existing session and attempt reconnection
+      const sessionData = localStorage.getItem('gameSession');
+      if (sessionData) {
+        try {
+          const session: PlayerSession = JSON.parse(sessionData);
+          console.log('Found existing session, attempting reconnection...');
+          setReconnecting(true);
+          newSocket.emit('reconnect_to_game', { token: session.token });
+        } catch (e) {
+          console.error('Failed to parse session data:', e);
+          localStorage.removeItem('gameSession');
+        }
+      }
     });
 
-    newSocket.on('game_created', ({ gameId, gameState }) => {
+    newSocket.on('game_created', ({ gameId, gameState, session }: { gameId: string; gameState: GameState; session: PlayerSession }) => {
       setGameId(gameId);
       setGameState(gameState);
+
+      // Save session to localStorage
+      if (session) {
+        localStorage.setItem('gameSession', JSON.stringify(session));
+      }
     });
 
-    newSocket.on('player_joined', ({ gameState }) => {
+    newSocket.on('player_joined', ({ gameState, session }: { gameState: GameState; session?: PlayerSession }) => {
       setGameState(gameState);
+
+      // Save session to localStorage
+      if (session) {
+        localStorage.setItem('gameSession', JSON.stringify(session));
+      }
+    });
+
+    newSocket.on('reconnection_successful', ({ gameState, session }: { gameState: GameState; session: PlayerSession }) => {
+      console.log('Reconnection successful!');
+      setReconnecting(false);
+      setGameId(gameState.id);
+      setGameState(gameState);
+
+      // Update session in localStorage
+      localStorage.setItem('gameSession', JSON.stringify(session));
+    });
+
+    newSocket.on('reconnection_failed', ({ message }: { message: string }) => {
+      console.log('Reconnection failed:', message);
+      setReconnecting(false);
+
+      // Clear invalid session
+      localStorage.removeItem('gameSession');
+
+      // Don't show error for expired sessions, just go back to lobby
+      if (!message.includes('expired')) {
+        setError(message);
+      }
+    });
+
+    newSocket.on('player_reconnected', ({ playerName }: { playerName: string; playerId: string; oldSocketId: string }) => {
+      console.log(`${playerName} reconnected`);
+      // Could show a toast notification here
+    });
+
+    newSocket.on('player_disconnected', ({ playerId, waitingForReconnection }: { playerId: string; waitingForReconnection: boolean }) => {
+      console.log(`Player ${playerId} disconnected. Waiting for reconnection: ${waitingForReconnection}`);
+      // Could show a notification that player disconnected
     });
 
     newSocket.on('round_started', (gameState) => {
@@ -57,6 +115,10 @@ function App() {
 
     newSocket.on('game_over', ({ winningTeam, gameState }) => {
       setGameState(gameState);
+
+      // Clear session on game over
+      localStorage.removeItem('gameSession');
+
       alert(`Game Over! Team ${winningTeam} wins!`);
     });
 
@@ -250,6 +312,19 @@ function App() {
           >
             Back to Lobby
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show reconnecting UI
+  if (reconnecting) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-lg shadow-2xl text-center">
+          <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Reconnecting...</h2>
+          <p className="text-gray-600">Restoring your game session</p>
         </div>
       </div>
     );

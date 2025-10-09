@@ -1,0 +1,72 @@
+
+Running 3 tests using 1 worker
+
+  ✘  1 [chromium] › tests\09-reconnection-simple.spec.ts:15:7 › Reconnection Support - Basic Tests › should save session to localStorage when creating game (1.0m)
+  ✘  2 [chromium] › tests\09-reconnection-simple.spec.ts:46:7 › Reconnection Support - Basic Tests › should reconnect after page reload (5.4s)
+  ✘  3 [chromium] › tests\09-reconnection-simple.spec.ts:75:7 › Reconnection Support - Basic Tests › should clear expired session (12.3s)
+
+
+  1) [chromium] › tests\09-reconnection-simple.spec.ts:15:7 › Reconnection Support - Basic Tests › should save session to localStorage when creating game 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: page.click: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button[type="submit"]:has-text("Create Game")')[22m
+
+
+      25 |     // Fill in name and create game
+      26 |     await page.fill('input[placeholder="Enter your name"]', 'TestPlayer');
+    > 27 |     await page.click('button[type="submit"]:has-text("Create Game")');
+         |                ^
+      28 |
+      29 |     // Wait for game to be created
+      30 |     await page.waitForSelector('text=/Game Code:/i', { timeout: 10000 });
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\09-reconnection-simple.spec.ts:27:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\09-reconnection-simple-Rec-239cd-lStorage-when-creating-game-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\09-reconnection-simple-Rec-239cd-lStorage-when-creating-game-chromium\error-context.md
+
+  2) [chromium] › tests\09-reconnection-simple.spec.ts:46:7 › Reconnection Support - Basic Tests › should reconnect after page reload 
+
+    Error: page.goto: net::ERR_INSUFFICIENT_RESOURCES at http://localhost:5173/
+    Call log:
+    [2m  - navigating to "http://localhost:5173/", waiting until "load"[22m
+
+
+       6 |     // Clear all storage
+       7 |     await context.clearCookies();
+    >  8 |     await page.goto('http://localhost:5173');
+         |                ^
+       9 |     await page.evaluate(() => {
+      10 |       localStorage.clear();
+      11 |       sessionStorage.clear();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\09-reconnection-simple.spec.ts:8:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\09-reconnection-simple-Rec-8444f-reconnect-after-page-reload-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests\09-reconnection-simple.spec.ts:75:7 › Reconnection Support - Basic Tests › should clear expired session 
+
+    Error: page.reload: net::ERR_INSUFFICIENT_RESOURCES
+    Call log:
+    [2m  - waiting for navigation until "load"[22m
+
+
+      86 |
+      87 |     // Reload page
+    > 88 |     await page.reload();
+         |                ^
+      89 |
+      90 |     // Should eventually show lobby (not stay in reconnecting state)
+      91 |     await page.waitForSelector('button:has-text("Create Game")', { timeout: 15000 });
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\09-reconnection-simple.spec.ts:88:16
+
+  3 failed
+    [chromium] › tests\09-reconnection-simple.spec.ts:15:7 › Reconnection Support - Basic Tests › should save session to localStorage when creating game 
+    [chromium] › tests\09-reconnection-simple.spec.ts:46:7 › Reconnection Support - Basic Tests › should reconnect after page reload 
+    [chromium] › tests\09-reconnection-simple.spec.ts:75:7 › Reconnection Support - Basic Tests › should clear expired session 
