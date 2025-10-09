@@ -104,6 +104,7 @@ io.on('connection', (socket) => {
       highestBet: null,
       trump: null,
       currentTrick: [],
+      previousTrick: null,
       currentPlayerIndex: 0,
       dealerIndex: 0, // First player is the initial dealer
       teamScores: { team1: 0, team2: 0 },
@@ -398,6 +399,7 @@ function startNewRound(gameId: string) {
   game.highestBet = null;
   game.trump = null;
   game.currentTrick = [];
+  game.previousTrick = null;
   // Betting starts with player after dealer
   game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
 
@@ -410,27 +412,38 @@ function resolveTrick(gameId: string) {
 
   const winnerId = determineWinner(game.currentTrick, game.trump);
   const specialCardPoints = calculateTrickPoints(game.currentTrick);
+  const totalPoints = 1 + specialCardPoints;
 
   const winner = game.players.find((p) => p.id === winnerId);
   if (winner) {
     winner.tricksWon += 1;
     // Award 1 point for winning trick + special card points
-    winner.pointsWon += 1 + specialCardPoints;
+    winner.pointsWon += totalPoints;
   }
 
-  game.currentTrick = [];
-  game.currentPlayerIndex = game.players.findIndex((p) => p.id === winnerId);
+  // Store current trick as previous trick before clearing
+  game.previousTrick = {
+    trick: [...game.currentTrick],
+    winnerId,
+    points: totalPoints,
+  };
 
-  // Emit trick resolution with updated state
-  io.to(gameId).emit('trick_resolved', { winnerId, points: 1 + specialCardPoints, gameState: game });
+  // Emit trick resolution with updated state (showing trick result for 3 seconds)
+  io.to(gameId).emit('trick_resolved', { winnerId, points: totalPoints, gameState: game });
 
-  // Check if round is over (all cards played)
-  if (game.players.every((p) => p.hand.length === 0)) {
-    endRound(gameId);
-  } else {
-    // Continue playing - emit game state for next turn
-    io.to(gameId).emit('game_updated', game);
-  }
+  // Wait 3 seconds before clearing trick and continuing
+  setTimeout(() => {
+    game.currentTrick = [];
+    game.currentPlayerIndex = game.players.findIndex((p) => p.id === winnerId);
+
+    // Check if round is over (all cards played)
+    if (game.players.every((p) => p.hand.length === 0)) {
+      endRound(gameId);
+    } else {
+      // Continue playing - emit game state for next turn
+      io.to(gameId).emit('game_updated', game);
+    }
+  }, 3000);
 }
 
 async function endRound(gameId: string) {

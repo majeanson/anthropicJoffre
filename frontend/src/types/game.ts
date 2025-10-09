@@ -34,6 +34,12 @@ export interface TrickCard {
   card: Card;
 }
 
+export interface TrickResult {
+  trick: TrickCard[];
+  winnerId: string;
+  points: number;
+}
+
 export interface GameState {
   id: string;
   phase: GamePhase;
@@ -42,6 +48,7 @@ export interface GameState {
   highestBet: Bet | null;
   trump: CardColor | null;
   currentTrick: TrickCard[];
+  previousTrick: TrickResult | null;
   currentPlayerIndex: number;
   dealerIndex: number;
   teamScores: {

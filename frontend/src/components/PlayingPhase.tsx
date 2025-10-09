@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Card as CardComponent } from './Card';
-import { GameState, Card as CardType } from '../types/game';
+import { GameState, Card as CardType, TrickCard } from '../types/game';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -10,11 +10,30 @@ interface PlayingPhaseProps {
 
 export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: PlayingPhaseProps) {
   const [validationMessage, setValidationMessage] = useState<string>('');
+  const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
 
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
 
   if (!currentPlayer) return null;
+
+  // Find current player's index
+  const currentPlayerIndex = gameState.players.findIndex(p => p.id === currentPlayerId);
+
+  // Arrange cards in circular order relative to current player (bottom)
+  // Positions: [bottom, left, top, right]
+  const getCardPositions = (trick: TrickCard[]) => {
+    const positions = [null, null, null, null]; // bottom, left, top, right
+
+    trick.forEach(tc => {
+      const playerIndex = gameState.players.findIndex(p => p.id === tc.playerId);
+      // Calculate relative position (0=bottom, 1=left, 2=top, 3=right)
+      const relativePos = (playerIndex - currentPlayerIndex + 4) % 4;
+      positions[relativePos] = tc;
+    });
+
+    return positions;
+  };
 
   // Determine which cards are playable
   const getPlayableCards = (): CardType[] => {
@@ -58,6 +77,36 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
     onPlayCard(card);
   };
 
+  const cardPositions = getCardPositions(gameState.currentTrick);
+  const previousCardPositions = gameState.previousTrick ? getCardPositions(gameState.previousTrick.trick) : null;
+
+  // Get player names for each position
+  const getPlayerName = (positionIndex: number): string => {
+    const playerIndex = (currentPlayerIndex + positionIndex) % 4;
+    return gameState.players[playerIndex]?.name || '';
+  };
+
+  const getPlayerTeam = (positionIndex: number): 1 | 2 => {
+    const playerIndex = (currentPlayerIndex + positionIndex) % 4;
+    return gameState.players[playerIndex]?.teamId || 1;
+  };
+
+  const renderCard = (tc: TrickCard | null, position: string, isWinner: boolean = false) => {
+    if (!tc) {
+      return (
+        <div className="w-20 h-28 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
+          <span className="text-white/40 text-xs">Empty</span>
+        </div>
+      );
+    }
+
+    return (
+      <div className={`transition-all duration-300 ${isWinner ? 'scale-110 ring-4 ring-yellow-400' : ''}`}>
+        <CardComponent card={tc.card} size="medium" />
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-6">
       {/* Score Board */}
@@ -84,23 +133,121 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
         </div>
       </div>
 
-      {/* Current Trick */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="bg-white/10 backdrop-blur rounded-xl p-8 min-h-48">
-          <h3 className="text-white text-xl font-semibold mb-4 text-center">Current Trick</h3>
-          <div className="flex justify-center gap-6 flex-wrap">
-            {gameState.currentTrick.map((tc, index) => {
-              const player = gameState.players.find(p => p.id === tc.playerId);
-              return (
-                <div key={index} className="flex flex-col items-center gap-2">
-                  <CardComponent card={tc.card} size="medium" />
-                  <span className="text-white text-sm">{player?.name}</span>
+      {/* Circular Card Layout */}
+      <div className="max-w-6xl mx-auto mb-8 relative">
+        <div className="bg-white/10 backdrop-blur rounded-xl p-8 min-h-[500px] relative">
+          {/* Previous Trick Button */}
+          {gameState.previousTrick && (
+            <button
+              onClick={() => setShowPreviousTrick(!showPreviousTrick)}
+              className="absolute top-4 right-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+            >
+              {showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
+            </button>
+          )}
+
+          {showPreviousTrick && previousCardPositions ? (
+            // Previous Trick View
+            <div className="relative h-[400px]">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                <div className="text-yellow-400 text-2xl font-bold mb-2">Previous Trick</div>
+                <div className="text-white text-lg">
+                  Winner: {gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name}
                 </div>
-              );
-            })}
-          </div>
-          {gameState.currentTrick.length === 0 && (
-            <p className="text-white/60 text-center">No cards played yet</p>
+                <div className="text-white/80 text-sm">
+                  +{gameState.previousTrick.points} points
+                </div>
+              </div>
+
+              {/* Bottom (Current Player) */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                {renderCard(previousCardPositions[0], 'bottom', previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(0)} (You)
+                </div>
+              </div>
+
+              {/* Left (Partner/Opponent) */}
+              <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(1)}
+                </div>
+                {renderCard(previousCardPositions[1], 'left', previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
+              </div>
+
+              {/* Top (Opponent) */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(2)}
+                </div>
+                {renderCard(previousCardPositions[2], 'top', previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
+              </div>
+
+              {/* Right (Partner/Opponent) */}
+              <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
+                {renderCard(previousCardPositions[3], 'right', previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(3)}
+                </div>
+              </div>
+            </div>
+          ) : (
+            // Current Trick View
+            <div className="relative h-[400px]">
+              {gameState.currentTrick.length === 0 && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60 text-center">
+                  <p className="text-xl">Waiting for first card...</p>
+                </div>
+              )}
+
+              {/* Bottom (Current Player) */}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                {renderCard(cardPositions[0], 'bottom')}
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(0)} (You)
+                </div>
+              </div>
+
+              {/* Left (Partner/Opponent) */}
+              <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(1)}
+                </div>
+                {renderCard(cardPositions[1], 'left')}
+              </div>
+
+              {/* Top (Opponent) */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(2)}
+                </div>
+                {renderCard(cardPositions[2], 'top')}
+              </div>
+
+              {/* Right (Partner/Opponent) */}
+              <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
+                {renderCard(cardPositions[3], 'right')}
+                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                }`}>
+                  {getPlayerName(3)}
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
