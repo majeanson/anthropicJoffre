@@ -337,17 +337,19 @@ io.on('connection', (socket) => {
       (c) => !(c.color === card.color && c.value === card.value)
     );
 
+    // Move to next player IMMEDIATELY (before resolving trick)
+    const previousIndex = game.currentPlayerIndex;
+    game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+
     // Check if trick is complete
     if (game.currentTrick.length === 4) {
-      // Emit state with card played before resolving trick
+      // Emit state with all 4 cards played and turn advanced
       io.to(gameId).emit('game_updated', game);
+      console.log(`Trick complete with ${game.currentTrick.length} cards. Resolving...`);
       resolveTrick(gameId);
     } else {
-      // Move to next player
-      const previousIndex = game.currentPlayerIndex;
-      game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+      // Emit updated state with turn advanced
       console.log(`Turn advanced from player ${previousIndex} to player ${game.currentPlayerIndex}, trick has ${game.currentTrick.length} cards`);
-      // Emit updated state
       io.to(gameId).emit('game_updated', game);
     }
   });
