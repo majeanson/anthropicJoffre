@@ -145,10 +145,27 @@ io.on('connection', (socket) => {
 
   socket.on('select_team', ({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
     const game = games.get(gameId);
-    if (!game || game.phase !== 'team_selection') return;
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    if (game.phase !== 'team_selection') {
+      socket.emit('error', { message: 'Cannot select team - game has already started' });
+      return;
+    }
 
     const player = game.players.find(p => p.id === socket.id);
-    if (!player) return;
+    if (!player) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    // Validate teamId is 1 or 2
+    if (teamId !== 1 && teamId !== 2) {
+      socket.emit('error', { message: 'Invalid team ID' });
+      return;
+    }
 
     // Check if team has space (max 2 players per team)
     const teamCount = game.players.filter(p => p.teamId === teamId).length;
@@ -163,12 +180,33 @@ io.on('connection', (socket) => {
 
   socket.on('swap_position', ({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
     const game = games.get(gameId);
-    if (!game || game.phase !== 'team_selection') return;
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    if (game.phase !== 'team_selection') {
+      socket.emit('error', { message: 'Cannot swap positions - game has already started' });
+      return;
+    }
 
     const currentPlayer = game.players.find(p => p.id === socket.id);
     const targetPlayer = game.players.find(p => p.id === targetPlayerId);
 
-    if (!currentPlayer || !targetPlayer) return;
+    if (!currentPlayer) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    if (!targetPlayer) {
+      socket.emit('error', { message: 'Target player not found' });
+      return;
+    }
+
+    if (currentPlayer.id === targetPlayer.id) {
+      socket.emit('error', { message: 'Cannot swap with yourself' });
+      return;
+    }
 
     // Swap positions in the players array
     const currentIndex = game.players.indexOf(currentPlayer);
@@ -182,10 +220,27 @@ io.on('connection', (socket) => {
 
   socket.on('start_game', ({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
-    if (!game || game.phase !== 'team_selection') return;
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    if (game.phase !== 'team_selection') {
+      socket.emit('error', { message: 'Game has already started' });
+      return;
+    }
 
     if (game.players.length !== 4) {
-      socket.emit('error', { message: 'Need 4 players to start' });
+      socket.emit('error', { message: 'Need exactly 4 players to start' });
+      return;
+    }
+
+    // Validate teams are balanced (2v2)
+    const team1Count = game.players.filter(p => p.teamId === 1).length;
+    const team2Count = game.players.filter(p => p.teamId === 2).length;
+
+    if (team1Count !== 2 || team2Count !== 2) {
+      socket.emit('error', { message: 'Teams must be balanced (2 players per team)' });
       return;
     }
 
@@ -197,9 +252,32 @@ io.on('connection', (socket) => {
     if (!game || game.phase !== 'betting') return;
 
     const currentPlayer = game.players[game.currentPlayerIndex];
-    if (currentPlayer.id !== socket.id) return;
+    if (currentPlayer.id !== socket.id) {
+      socket.emit('invalid_bet', {
+        message: 'It is not your turn to bet'
+      });
+      return;
+    }
+
+    // Check if player has already bet
+    const hasAlreadyBet = game.currentBets.some(b => b.playerId === socket.id);
+    if (hasAlreadyBet) {
+      console.log(`Player ${socket.id} attempted to bet multiple times`);
+      socket.emit('invalid_bet', {
+        message: 'You have already placed your bet'
+      });
+      return;
+    }
 
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
+
+    // Validate bet amount range (only for non-skip bets)
+    if (!skipped && (amount < 7 || amount > 12)) {
+      socket.emit('invalid_bet', {
+        message: 'Bet amount must be between 7 and 12'
+      });
+      return;
+    }
 
     // Handle skip bet
     if (skipped) {
@@ -308,7 +386,43 @@ io.on('connection', (socket) => {
     if (!game || game.phase !== 'playing') return;
 
     const currentPlayer = game.players[game.currentPlayerIndex];
-    if (currentPlayer.id !== socket.id) return;
+    if (currentPlayer.id !== socket.id) {
+      socket.emit('invalid_move', {
+        message: 'It is not your turn'
+      });
+      return;
+    }
+
+    // Validate card data structure
+    if (!card || !card.color || card.value === undefined) {
+      console.log(`Player ${socket.id} sent invalid card data:`, card);
+      socket.emit('invalid_move', {
+        message: 'Invalid card data'
+      });
+      return;
+    }
+
+    // Validate that card is in player's hand
+    const cardInHand = currentPlayer.hand.find(
+      c => c.color === card.color && c.value === card.value
+    );
+    if (!cardInHand) {
+      console.log(`Player ${socket.id} attempted to play card not in hand:`, card);
+      socket.emit('invalid_move', {
+        message: 'You do not have that card in your hand'
+      });
+      return;
+    }
+
+    // Check if player has already played a card in this trick
+    const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === socket.id);
+    if (hasAlreadyPlayed) {
+      console.log(`Player ${socket.id} attempted to play multiple cards in same trick`);
+      socket.emit('invalid_move', {
+        message: 'You have already played a card this turn'
+      });
+      return;
+    }
 
     // Validate suit-following rule
     if (game.currentTrick.length > 0) {
