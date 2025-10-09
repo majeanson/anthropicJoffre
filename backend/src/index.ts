@@ -232,6 +232,18 @@ io.on('connection', (socket) => {
         return;
       }
 
+      // Check if all 4 players have bet (including skips)
+      if (game.currentBets.length === 4) {
+        game.highestBet = getHighestBet(game.currentBets);
+        game.phase = 'playing';
+        const highestBidderIndex = game.players.findIndex(
+          (p) => p.id === game.highestBet?.playerId
+        );
+        game.currentPlayerIndex = highestBidderIndex;
+        io.to(gameId).emit('game_updated', game);
+        return;
+      }
+
       // Move to next player
       game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
       io.to(gameId).emit('game_updated', game);
