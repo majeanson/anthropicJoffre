@@ -169,6 +169,143 @@ All game phases implement validation feedback to guide players:
 
 ---
 
+## 🤖 Bot Players & Testing Tools
+
+### Bot Player System
+The game includes an AI bot system for single-screen testing without needing 4 browser windows.
+
+**Implementation**: `frontend/src/utils/botPlayer.ts`
+
+```typescript
+class BotPlayer {
+  // Alternates bots between Team 1 and Team 2
+  static selectTeam(playerIndex: number): 1 | 2
+
+  // Makes betting decisions (30% skip, 7-12 range, 20% without trump)
+  static makeBet(gameState: GameState, playerId: string): { amount, withoutTrump, skipped }
+
+  // Selects valid card following suit-following rules
+  static playCard(gameState: GameState, playerId: string): Card | null
+
+  // Returns 500-1500ms delay for natural gameplay feel
+  static getActionDelay(): number
+}
+```
+
+**Bot Decision Logic**:
+- **Team Selection**: Alternates between teams (even index → Team 1, odd → Team 2)
+- **Betting**:
+  - 30% chance to skip (if allowed)
+  - Random bet amount between 7-12
+  - 20% chance for "without trump" modifier
+  - Dealer always bets if no one else has
+- **Card Playing**:
+  - Follows suit-following rules strictly
+  - Random selection among valid playable cards
+  - Respects trump and led suit requirements
+
+### Quick Play Feature
+**Location**: Lobby screen (purple button with ⚡ icon)
+
+**Usage**: Click "Quick Play (1 Player + 3 Bots)" to instantly create a 4-player game
+
+**Implementation**: `frontend/src/App.tsx:120-151`
+```typescript
+const handleQuickPlay = () => {
+  socket.emit('create_game', 'You');
+
+  // After 500ms, spawn 3 bot players
+  setTimeout(() => {
+    for (let i = 0; i < 3; i++) {
+      const botSocket = io(SOCKET_URL);
+      const botName = `Bot ${i + 1}`;
+
+      // Bot connects and joins game
+      // Bot listens for game_updated, round_started, trick_resolved
+      // Bot takes automated actions via handleBotAction()
+    }
+  }, 500);
+}
+```
+
+**How it works**:
+1. Creates game with human player named "You"
+2. Spawns 3 separate socket connections for Bot 1, Bot 2, Bot 3
+3. Bots join the game automatically
+4. Bots listen for game state updates and take actions
+5. Each bot has natural 500-1500ms delay between actions
+
+### Test Panel
+**Access**: Click "🧪 Test" button in top-right debug controls
+
+**Location**: `frontend/src/components/TestPanel.tsx`
+
+**Features**:
+- **Set Team Scores**: Manually adjust Team 1 and Team 2 scores
+- **Quick Actions**:
+  - Team 1 Near Win (40-0)
+  - Team 2 Near Win (0-40)
+  - Close Game (35-35)
+  - Reset Scores (0-0)
+- **Apply Scores**: Changes affect all connected players immediately
+
+**Usage Scenarios**:
+- Test end-game scenarios without playing full rounds
+- Verify game_over transitions at 41+ points
+- Test scoring display at different score levels
+- Quickly reset game state during development
+
+**Server Integration** (TODO):
+Currently emits test events, but backend handlers need implementation:
+```typescript
+socket.emit('__test_set_scores', { team1: 40, team2: 35 });
+```
+
+### Debug Controls Overview
+**Location**: Top-right corner of game screen (always available)
+
+1. **🧪 Test** - Opens Test Panel for state manipulation
+2. **🔍 State** - Opens Debug Panel to inspect full game state JSON
+3. **🐛 4-Player** - Toggles 4-player debug view (shows all perspectives)
+
+**4-Player Debug View**:
+- Shows all 4 players' hands and perspectives simultaneously
+- Each player's section includes their hand, bet controls, and card play
+- Perfect for testing with bot players on single screen
+- Compatible with bot system (bots appear as regular players)
+
+**Implementation**: `frontend/src/components/DebugMultiPlayerView.tsx`
+
+### Development Testing Workflow
+
+**Recommended approach for rapid iteration**:
+
+1. **Quick Play** - Start game with bots instantly
+2. **4-Player View** - Switch to multi-perspective view
+3. **Test Panel** - Manipulate scores to test specific scenarios
+4. **State Panel** - Inspect game state when debugging issues
+
+**Example workflow**:
+```bash
+# Terminal 1: Run dev server
+npm run dev
+
+# Browser: http://localhost:5173
+1. Click "Quick Play (1 Player + 3 Bots)"
+2. Click "🐛 4-Player" to see all perspectives
+3. Click "🧪 Test" to manipulate state as needed
+4. Play through game or test specific scenarios
+```
+
+**Benefits over 4-browser testing**:
+- ✅ Single screen, single browser tab
+- ✅ Faster iteration (no manual clicks in 4 windows)
+- ✅ Automated bot actions (betting, card playing)
+- ✅ State manipulation for edge case testing
+- ✅ Full visibility of all players simultaneously
+
+---
+
 ## 🧪 Testing Strategy
 
 ### E2E Testing with Playwright
@@ -239,13 +376,18 @@ backend/src/
 frontend/src/
 ├── components/        # UI components (one per file)
 │   ├── Card.tsx      # Single card display
-│   ├── Lobby.tsx     # Game creation/joining
+│   ├── Lobby.tsx     # Game creation/joining (includes QuickPlay)
 │   ├── TeamSelection.tsx  # Team/position selection
 │   ├── BettingPhase.tsx   # Betting UI
-│   └── PlayingPhase.tsx   # Game board
+│   ├── PlayingPhase.tsx   # Game board with circular trick layout
+│   ├── DebugPanel.tsx     # Game state inspector (JSON viewer)
+│   ├── DebugMultiPlayerView.tsx  # 4-player simultaneous view
+│   └── TestPanel.tsx      # State manipulation for testing
+├── utils/            # Utility functions and helpers
+│   └── botPlayer.ts  # AI bot decision-making system
 ├── types/            # TypeScript definitions
 │   └── game.ts       # Shared game types (sync with backend)
-└── App.tsx           # Main app + Socket.io client setup
+└── App.tsx           # Main app + Socket.io client setup + bot integration
 ```
 
 ---
@@ -372,15 +514,25 @@ npm run test:e2e     # Run E2E tests
 ✅ Led suit vs trump logic
 ✅ Points vs tricks distinction
 ✅ "Without trump" bet priority
+✅ Circular trick layout with previous trick viewer
+✅ 3-second pause after trick completion
+✅ Bot player AI system for automated gameplay
+✅ Quick Play feature (1 human + 3 bots)
+✅ Test Panel for state manipulation
+✅ 4-Player debug view (all perspectives simultaneously)
+✅ Debug controls (Test, State, 4-Player toggle)
 ✅ E2E test suite (27/35 tests passing - 77%)
 
 ### Future Enhancements
+- [ ] Backend handlers for Test Panel state manipulation
 - [ ] Spectator mode
 - [ ] Game replay functionality
 - [ ] Player statistics tracking
 - [ ] Tournament mode
 - [ ] Mobile responsive improvements
 - [ ] Sound effects and animations
+- [ ] Bot AI improvements (smarter betting/playing strategy)
+- [ ] Adjustable bot difficulty levels
 
 ---
 
@@ -394,5 +546,5 @@ npm run test:e2e     # Run E2E tests
 
 ---
 
-*Last updated: 2025-10-07*
+*Last updated: 2025-10-08*
 *Project: Trick Card Game (anthropicJoffre)*
