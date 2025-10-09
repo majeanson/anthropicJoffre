@@ -385,6 +385,15 @@ io.on('connection', (socket) => {
     const game = games.get(gameId);
     if (!game || game.phase !== 'playing') return;
 
+    // Prevent playing when trick is complete (4 cards already played)
+    if (game.currentTrick.length >= 4) {
+      console.log(`Player ${socket.id} attempted to play while trick is being resolved`);
+      socket.emit('invalid_move', {
+        message: 'Please wait for the current trick to be resolved'
+      });
+      return;
+    }
+
     const currentPlayer = game.players[game.currentPlayerIndex];
     if (currentPlayer.id !== socket.id) {
       socket.emit('invalid_move', {
