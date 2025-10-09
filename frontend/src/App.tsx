@@ -5,6 +5,8 @@ import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
 import { PlayingPhase } from './components/PlayingPhase';
 import { TeamSelection } from './components/TeamSelection';
+import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
+import { DebugPanel } from './components/DebugPanel';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -13,6 +15,8 @@ function App() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [gameId, setGameId] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const [debugMode, setDebugMode] = useState<boolean>(false);
+  const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
@@ -133,47 +137,130 @@ function App() {
     return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} />;
   }
 
+  // Debug controls (always available, even in production)
+  const DebugControls = () => (
+    <div className="fixed top-4 right-4 z-50 flex gap-2">
+      <button
+        onClick={() => setDebugPanelOpen(true)}
+        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-colors flex items-center gap-2"
+        title="Open Debug Panel"
+        aria-label="Open debug panel to inspect game state"
+      >
+        🔍 State
+      </button>
+      {gameState && gameState.players.length === 4 && (
+        <button
+          onClick={() => setDebugMode(!debugMode)}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-colors"
+          title="Toggle 4-Player Debug View"
+          aria-label={debugMode ? 'Switch to single player view' : 'Switch to 4-player debug view'}
+        >
+          {debugMode ? '👤 Single' : '🐛 4-Player'}
+        </button>
+      )}
+    </div>
+  );
+
+  // If debug mode is enabled, use the multi-player view
+  if (debugMode && gameState.players.length === 4) {
+    return (
+      <>
+        <DebugControls />
+        <DebugPanel
+          gameState={gameState}
+          gameId={gameId}
+          isOpen={debugPanelOpen}
+          onClose={() => setDebugPanelOpen(false)}
+        />
+        <DebugMultiPlayerView
+          gameState={gameState}
+          gameId={gameId}
+          onPlaceBet={handlePlaceBet}
+          onPlayCard={handlePlayCard}
+          onSelectTeam={handleSelectTeam}
+          onSwapPosition={handleSwapPosition}
+          onStartGame={handleStartGame}
+        />
+      </>
+    );
+  }
+
   if (gameState.phase === 'team_selection') {
     return (
-      <TeamSelection
-        players={gameState.players}
-        gameId={gameId}
-        currentPlayerId={socket?.id || ''}
-        onSelectTeam={handleSelectTeam}
-        onSwapPosition={handleSwapPosition}
-        onStartGame={handleStartGame}
-      />
+      <>
+        <DebugControls />
+        <DebugPanel
+          gameState={gameState}
+          gameId={gameId}
+          isOpen={debugPanelOpen}
+          onClose={() => setDebugPanelOpen(false)}
+        />
+        <TeamSelection
+          players={gameState.players}
+          gameId={gameId}
+          currentPlayerId={socket?.id || ''}
+          onSelectTeam={handleSelectTeam}
+          onSwapPosition={handleSwapPosition}
+          onStartGame={handleStartGame}
+        />
+      </>
     );
   }
 
   if (gameState.phase === 'betting') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-900 to-amber-900 flex items-center justify-center p-6">
-        <BettingPhase
-          players={gameState.players}
-          currentBets={gameState.currentBets}
-          currentPlayerId={socket?.id || ''}
-          currentPlayerIndex={gameState.currentPlayerIndex}
-          dealerIndex={gameState.dealerIndex}
-          onPlaceBet={handlePlaceBet}
+      <>
+        <DebugControls />
+        <DebugPanel
+          gameState={gameState}
+          gameId={gameId}
+          isOpen={debugPanelOpen}
+          onClose={() => setDebugPanelOpen(false)}
         />
-      </div>
+        <div className="min-h-screen bg-gradient-to-br from-orange-900 to-amber-900 flex items-center justify-center p-6">
+          <BettingPhase
+            players={gameState.players}
+            currentBets={gameState.currentBets}
+            currentPlayerId={socket?.id || ''}
+            currentPlayerIndex={gameState.currentPlayerIndex}
+            dealerIndex={gameState.dealerIndex}
+            onPlaceBet={handlePlaceBet}
+          />
+        </div>
+      </>
     );
   }
 
   if (gameState.phase === 'playing') {
     return (
-      <PlayingPhase
-        gameState={gameState}
-        currentPlayerId={socket?.id || ''}
-        onPlayCard={handlePlayCard}
-      />
+      <>
+        <DebugControls />
+        <DebugPanel
+          gameState={gameState}
+          gameId={gameId}
+          isOpen={debugPanelOpen}
+          onClose={() => setDebugPanelOpen(false)}
+        />
+        <PlayingPhase
+          gameState={gameState}
+          currentPlayerId={socket?.id || ''}
+          onPlayCard={handlePlayCard}
+        />
+      </>
     );
   }
 
   if (gameState.phase === 'scoring') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-6">
+      <>
+        <DebugControls />
+        <DebugPanel
+          gameState={gameState}
+          gameId={gameId}
+          isOpen={debugPanelOpen}
+          onClose={() => setDebugPanelOpen(false)}
+        />
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-6">
         <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full">
           <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Round {gameState.roundNumber} Complete!</h2>
           <div className="grid grid-cols-2 gap-6 mb-6">
@@ -204,14 +291,23 @@ function App() {
           </div>
           <p className="mt-6 text-center text-gray-600">Next round starting soon...</p>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   if (gameState.phase === 'game_over') {
     const winningTeam = gameState.teamScores.team1 >= 41 ? 1 : 2;
     return (
-      <div className="min-h-screen bg-gradient-to-br from-yellow-900 to-orange-900 flex items-center justify-center p-6">
+      <>
+        <DebugControls />
+        <DebugPanel
+          gameState={gameState}
+          gameId={gameId}
+          isOpen={debugPanelOpen}
+          onClose={() => setDebugPanelOpen(false)}
+        />
+        <div className="min-h-screen bg-gradient-to-br from-yellow-900 to-orange-900 flex items-center justify-center p-6">
         <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full text-center">
           <h2 className="text-4xl font-bold mb-6 text-gray-800">Game Over!</h2>
           <div className={`text-6xl font-bold mb-6 ${winningTeam === 1 ? 'text-blue-600' : 'text-red-600'}`}>
@@ -237,7 +333,8 @@ function App() {
             Back to Lobby
           </button>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 

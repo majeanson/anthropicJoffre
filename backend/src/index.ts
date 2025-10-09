@@ -202,15 +202,18 @@ io.on('connection', (socket) => {
 
     // Handle skip bet
     if (skipped) {
-      // Dealer cannot skip if there are existing bets
-      if (isDealer && game.currentBets.length > 0) {
+      // Check if there are any non-skipped bets
+      const hasValidBets = game.currentBets.some(b => !b.skipped);
+
+      // Dealer cannot skip ONLY if no one has bet (all skipped or no bets) - must bet minimum 7
+      if (isDealer && !hasValidBets) {
         socket.emit('invalid_bet', {
-          message: 'As dealer, you cannot skip. You must match or raise the highest bet.'
+          message: 'As dealer, you must bet at least 7 points when no one has bet.'
         });
         return;
       }
 
-      // All players can skip if no bets yet
+      // Add the skip bet
       const bet: Bet = {
         playerId: socket.id,
         amount: -1,
@@ -336,6 +339,19 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Test-only handler to set scores
+  socket.on('__test_set_scores', ({ team1, team2 }: { team1: number; team2: number }) => {
+    // Find game for this socket
+    games.forEach((game) => {
+      if (game.players.some(p => p.id === socket.id)) {
+        game.teamScores.team1 = team1;
+        game.teamScores.team2 = team2;
+        console.log(`TEST: Set scores to Team1=${team1}, Team2=${team2}`);
+        io.to(game.id).emit('game_updated', game);
+      }
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
     // Handle player disconnect
@@ -411,18 +427,58 @@ async function endRound(gameId: string) {
 
   game.phase = 'scoring';
 
-  // Calculate scores
-  game.players.forEach((player) => {
-    const bet = game.currentBets.find((b) => b.playerId === player.id);
-    if (bet) {
-      const score = calculateRoundScore(player, bet);
-      if (player.teamId === 1) {
-        game.teamScores.team1 += score;
-      } else {
-        game.teamScores.team2 += score;
-      }
+  // Find offensive team (highest bet winner)
+  if (!game.highestBet) return;
+
+  const offensivePlayer = game.players.find(p => p.id === game.highestBet?.playerId);
+  if (!offensivePlayer) return;
+
+  const offensiveTeamId = offensivePlayer.teamId;
+  const defensiveTeamId = offensiveTeamId === 1 ? 2 : 1;
+
+  // Calculate offensive team total points
+  const offensiveTeamPoints = game.players
+    .filter(p => p.teamId === offensiveTeamId)
+    .reduce((sum, p) => sum + p.pointsWon, 0);
+
+  // Calculate defensive team total points
+  const defensiveTeamPoints = game.players
+    .filter(p => p.teamId === defensiveTeamId)
+    .reduce((sum, p) => sum + p.pointsWon, 0);
+
+  const betAmount = game.highestBet.amount;
+  const multiplier = game.highestBet.withoutTrump ? 2 : 1;
+
+  // Offensive team: win or lose their bet
+  let offensiveScore = 0;
+  if (offensiveTeamPoints >= betAmount) {
+    // Made their bet - gain bet amount
+    offensiveScore = betAmount * multiplier;
+    if (offensiveTeamId === 1) {
+      game.teamScores.team1 += offensiveScore;
+    } else {
+      game.teamScores.team2 += offensiveScore;
     }
-  });
+    console.log(`Offensive Team ${offensiveTeamId} made bet (${offensiveTeamPoints}/${betAmount}): +${offensiveScore}`);
+  } else {
+    // Failed their bet - lose bet amount
+    offensiveScore = -(betAmount * multiplier);
+    if (offensiveTeamId === 1) {
+      game.teamScores.team1 += offensiveScore;
+    } else {
+      game.teamScores.team2 += offensiveScore;
+    }
+    console.log(`Offensive Team ${offensiveTeamId} failed bet (${offensiveTeamPoints}/${betAmount}): ${offensiveScore}`);
+  }
+
+  // Defensive team: always gain their points (no negatives)
+  if (defensiveTeamId === 1) {
+    game.teamScores.team1 += defensiveTeamPoints;
+  } else {
+    game.teamScores.team2 += defensiveTeamPoints;
+  }
+  console.log(`Defensive Team ${defensiveTeamId}: +${defensiveTeamPoints}`);
+  console.log(`Round ${game.roundNumber} Scores - Team 1: ${game.teamScores.team1}, Team 2: ${game.teamScores.team2}`);
 
   // Check for game over
   if (game.teamScores.team1 >= 41 || game.teamScores.team2 >= 41) {
@@ -448,7 +504,7 @@ async function endRound(gameId: string) {
 
     // Start next round after delay
     game.roundNumber += 1;
-    setTimeout(() => startNewRound(gameId), 5000);
+    setTimeout(() => startNewRound(gameId), 3000);
   }
 }
 

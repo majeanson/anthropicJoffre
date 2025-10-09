@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Bet, Player } from '../types/game';
 
 interface BettingPhaseProps {
@@ -11,9 +11,6 @@ interface BettingPhaseProps {
 }
 
 export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet }: BettingPhaseProps) {
-  const [betAmount, setBetAmount] = useState<number>(7);
-  const [withoutTrump, setWithoutTrump] = useState(false);
-
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
   const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
   const isDealer = currentPlayerIndex === dealerIndex;
@@ -29,51 +26,36 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
     });
   }, [currentBets]);
 
-  // Validate bet amount and get validation message - memoized
-  const validation = useMemo(() => {
-    if (!highestBet) return { isValid: true, message: '' };
-
-    if (isDealer) {
-      // Dealer can match or raise
-      if (betAmount < highestBet.amount) {
-        return {
-          isValid: false,
-          message: `As dealer, you must match or raise. Minimum: ${highestBet.amount}`
-        };
-      }
-    } else {
-      // Non-dealer must raise
-      const newBetIsHigher =
-        betAmount > highestBet.amount ||
-        (betAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
-
-      if (!newBetIsHigher) {
-        return {
-          isValid: false,
-          message: `You must raise the bet. Minimum: ${highestBet.amount}${!highestBet.withoutTrump ? ' (or ' + highestBet.amount + ' without trump)' : ''}`
-        };
-      }
-    }
-
-    return { isValid: true, message: '' };
-  }, [highestBet, isDealer, betAmount, withoutTrump]);
-
   const canSkip = (): boolean => {
-    // Dealer cannot skip if there are existing bets
-    if (isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped)) {
-      return false;
+    // Dealer can skip if there are existing valid bets
+    // Dealer cannot skip if no one has bet (must bet minimum 7)
+    if (isDealer) {
+      const hasValidBets = currentBets.some(b => !b.skipped);
+      return hasValidBets; // Can skip only if someone has bet
     }
-    return true;
+    return true; // Non-dealers can always skip
+  };
+
+  const handleBetClick = (amount: number, withoutTrump: boolean) => {
+    onPlaceBet(amount, withoutTrump, false);
   };
 
   const handleSkip = () => {
     onPlaceBet(0, false, true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validation.isValid) return;
-    onPlaceBet(betAmount, withoutTrump, false);
+  // Check if a bet option is valid
+  const isBetValid = (amount: number, withoutTrump: boolean): boolean => {
+    if (!highestBet) return true; // No bets yet, all valid
+
+    if (isDealer) {
+      // Dealer can match or raise
+      return amount >= highestBet.amount;
+    } else {
+      // Non-dealer must raise (higher amount or same with withoutTrump)
+      return amount > highestBet.amount ||
+             (amount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
+    }
   };
 
   return (
@@ -115,80 +97,79 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       </div>
 
       {!hasPlacedBet && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Bet Amount (7-12 points)
-            </label>
-            <input
-              type="range"
-              min="7"
-              max="12"
-              value={betAmount}
-              onChange={(e) => setBetAmount(Number(e.target.value))}
-              className="w-full"
-              disabled={!isMyTurn}
-            />
-            <div className="text-center text-2xl font-bold text-blue-600 mt-2">
-              {betAmount}
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="withoutTrump"
-              checked={withoutTrump}
-              onChange={(e) => setWithoutTrump(e.target.checked)}
-              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-              disabled={!isMyTurn}
-            />
-            <label htmlFor="withoutTrump" className="text-sm font-medium text-gray-700">
-              Without Trump (Double points)
-            </label>
-          </div>
-
-          {validation.message && isMyTurn && (
-            <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
-              {validation.message}
-            </div>
-          )}
-
+        <div className="space-y-4">
           {isMyTurn ? (
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={!validation.isValid}
-                className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
-                  validation.isValid
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Place Bet
-              </button>
-              {canSkip() && (
-                <button
-                  type="button"
-                  onClick={handleSkip}
-                  className="px-6 py-3 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
-                >
-                  Skip
-                </button>
+            <>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Select Your Bet:
+                </label>
+
+                {/* Skip Button */}
+                {canSkip() && (
+                  <button
+                    onClick={handleSkip}
+                    className="w-full py-3 px-4 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+                  >
+                    SKIP
+                  </button>
+                )}
+
+                {/* Bet buttons 7-12 */}
+                {[7, 8, 9, 10, 11, 12].map((amount) => {
+                  const withTrumpValid = isBetValid(amount, false);
+                  const withoutTrumpValid = isBetValid(amount, true);
+
+                  return (
+                    <div key={amount} className="flex gap-2">
+                      {/* With Trump */}
+                      <button
+                        onClick={() => handleBetClick(amount, false)}
+                        disabled={!withTrumpValid}
+                        className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+                          withTrumpValid
+                            ? 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {amount}
+                      </button>
+
+                      {/* Without Trump */}
+                      <button
+                        onClick={() => handleBetClick(amount, true)}
+                        disabled={!withoutTrumpValid}
+                        className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+                          withoutTrumpValid
+                            ? 'bg-purple-600 text-white hover:bg-purple-700'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {amount} (No Trump)
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) && (
+                <div className="bg-purple-50 border border-purple-200 text-purple-800 px-4 py-3 rounded-lg text-sm">
+                  <strong>Dealer Privilege:</strong> You can match the highest bet or raise it.
+                </div>
               )}
-            </div>
+
+              {isDealer && !currentBets.some(b => !b.skipped) && (
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
+                  As dealer, you must bet at least 7 points when no one has bet.
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center text-gray-600 font-medium py-3">
               Waiting for {players[currentPlayerIndex]?.name}'s bet...
             </div>
           )}
-
-          {isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) && (
-            <div className="bg-purple-50 border border-purple-200 text-purple-800 px-4 py-3 rounded-lg text-sm">
-              <strong>Dealer Privilege:</strong> You can match the highest bet or raise it.
-            </div>
-          )}
-        </form>
+        </div>
       )}
 
       {hasPlacedBet && (
