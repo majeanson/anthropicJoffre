@@ -120,34 +120,44 @@ function App() {
   const handleQuickPlay = () => {
     if (!socket) return;
 
+    // Listen for game creation to spawn bots
+    const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string; gameState: GameState }) => {
+      // Spawn 3 bot players after game is created
+      setTimeout(() => {
+        for (let i = 0; i < 3; i++) {
+          const botSocket = io(SOCKET_URL);
+          const botName = `Bot ${i + 1}`;
+
+          botSocket.on('connect', () => {
+            botSocket.emit('join_game', { gameId: createdGameId, playerName: botName });
+          });
+
+          botSocket.on('player_joined', ({ gameState }: { gameState: GameState }) => {
+            handleBotAction(botSocket, gameState, botSocket.id || '');
+          });
+
+          botSocket.on('game_updated', (state: GameState) => {
+            handleBotAction(botSocket, state, botSocket.id || '');
+          });
+
+          botSocket.on('round_started', (state: GameState) => {
+            handleBotAction(botSocket, state, botSocket.id || '');
+          });
+
+          botSocket.on('trick_resolved', ({ gameState }: { gameState: GameState }) => {
+            handleBotAction(botSocket, gameState, botSocket.id || '');
+          });
+        }
+      }, 500);
+
+      // Remove the listener after bots are spawned
+      socket.off('game_created', gameCreatedHandler);
+    };
+
+    socket.on('game_created', gameCreatedHandler);
+
     // Create game with player
     socket.emit('create_game', 'You');
-
-    // Wait for game creation, then add 3 bots
-    setTimeout(() => {
-      for (let i = 0; i < 3; i++) {
-        const botSocket = io(SOCKET_URL);
-        const botName = `Bot ${i + 1}`;
-
-        botSocket.on('connect', () => {
-          if (gameId) {
-            botSocket.emit('join_game', { gameId, playerName: botName });
-          }
-        });
-
-        botSocket.on('game_updated', (state: GameState) => {
-          handleBotAction(botSocket, state, botSocket.id || '');
-        });
-
-        botSocket.on('round_started', (state: GameState) => {
-          handleBotAction(botSocket, state, botSocket.id || '');
-        });
-
-        botSocket.on('trick_resolved', ({ gameState }: { gameState: GameState }) => {
-          handleBotAction(botSocket, gameState, botSocket.id || '');
-        });
-      }
-    }, 500);
   };
 
   const handleBotAction = (botSocket: Socket, state: GameState, botId: string) => {
@@ -156,25 +166,39 @@ function App() {
       clearTimeout(botTimeoutRef.current);
     }
 
-    // Schedule bot action with delay
-    botTimeoutRef.current = setTimeout(() => {
-      const currentPlayer = state.players[state.currentPlayerIndex];
-      if (!currentPlayer || currentPlayer.id !== botId) return;
+    // Team selection phase - bot selects team immediately
+    if (state.phase === 'team_selection') {
+      const bot = state.players.find(p => p.id === botId);
 
-      // Team selection phase
-      if (state.phase === 'team_selection') {
+      // If bot hasn't selected a team yet, select one
+      if (bot && !bot.teamId) {
         const playerIndex = state.players.findIndex(p => p.id === botId);
         const teamId = BotPlayer.selectTeam(playerIndex);
-        botSocket.emit('select_team', { gameId: state.id, teamId });
 
-        // Auto-start if all 4 players joined
-        if (state.players.length === 4) {
-          setTimeout(() => {
-            botSocket.emit('start_game', { gameId: state.id });
-          }, 1000);
-        }
+        setTimeout(() => {
+          botSocket.emit('select_team', { gameId: state.id, teamId });
+        }, BotPlayer.getActionDelay());
       }
 
+      // Check if all players have teams and auto-start
+      const allHaveTeams = state.players.every(p => p.teamId);
+      const team1Count = state.players.filter(p => p.teamId === 1).length;
+      const team2Count = state.players.filter(p => p.teamId === 2).length;
+
+      if (allHaveTeams && team1Count === 2 && team2Count === 2 && state.players.length === 4) {
+        setTimeout(() => {
+          botSocket.emit('start_game', { gameId: state.id });
+        }, 2000);
+      }
+      return;
+    }
+
+    // For other phases, only act when it's the bot's turn
+    const currentPlayer = state.players[state.currentPlayerIndex];
+    if (!currentPlayer || currentPlayer.id !== botId) return;
+
+    // Schedule bot action with delay
+    botTimeoutRef.current = setTimeout(() => {
       // Betting phase
       if (state.phase === 'betting') {
         const bet = BotPlayer.makeBet(state, botId);
