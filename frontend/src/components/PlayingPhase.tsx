@@ -22,8 +22,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
 
   // Arrange cards in circular order relative to current player (bottom)
   // Positions: [bottom, left, top, right]
-  const getCardPositions = (trick: TrickCard[]) => {
-    const positions = [null, null, null, null]; // bottom, left, top, right
+  const getCardPositions = (trick: TrickCard[]): (TrickCard | null)[] => {
+    const positions: (TrickCard | null)[] = [null, null, null, null]; // bottom, left, top, right
 
     trick.forEach(tc => {
       const playerIndex = gameState.players.findIndex(p => p.id === tc.playerId);
@@ -91,7 +91,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
     return gameState.players[playerIndex]?.teamId || 1;
   };
 
-  const renderCard = (tc: TrickCard | null, position: string, isWinner: boolean = false) => {
+  const renderCard = (tc: TrickCard | null, isWinner: boolean = false) => {
     if (!tc) {
       return (
         <div className="w-20 h-28 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
@@ -152,16 +152,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                 <div className="text-yellow-400 text-2xl font-bold mb-2">Previous Trick</div>
                 <div className="text-white text-lg">
-                  Winner: {gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name}
+                  Winner: {gameState.previousTrick ? gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name : ''}
                 </div>
                 <div className="text-white/80 text-sm">
-                  +{gameState.previousTrick.points} points
+                  +{gameState.previousTrick?.points || 0} points
                 </div>
               </div>
 
               {/* Bottom (Current Player) */}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                {renderCard(previousCardPositions[0], 'bottom', previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
+                {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
                 <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                 }`}>
@@ -176,7 +176,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
                 }`}>
                   {getPlayerName(1)}
                 </div>
-                {renderCard(previousCardPositions[1], 'left', previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
+                {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
               </div>
 
               {/* Top (Opponent) */}
@@ -186,12 +186,12 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
                 }`}>
                   {getPlayerName(2)}
                 </div>
-                {renderCard(previousCardPositions[2], 'top', previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
+                {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
               </div>
 
               {/* Right (Partner/Opponent) */}
               <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
-                {renderCard(previousCardPositions[3], 'right', previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
+                {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
                 <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                 }`}>
@@ -210,7 +210,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
 
               {/* Bottom (Current Player) */}
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                {renderCard(cardPositions[0], 'bottom')}
+                {renderCard(cardPositions[0])}
                 <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                 }`}>
@@ -225,7 +225,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
                 }`}>
                   {getPlayerName(1)}
                 </div>
-                {renderCard(cardPositions[1], 'left')}
+                {renderCard(cardPositions[1])}
               </div>
 
               {/* Top (Opponent) */}
@@ -235,12 +235,12 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
                 }`}>
                   {getPlayerName(2)}
                 </div>
-                {renderCard(cardPositions[2], 'top')}
+                {renderCard(cardPositions[2])}
               </div>
 
               {/* Right (Partner/Opponent) */}
               <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
-                {renderCard(cardPositions[3], 'right')}
+                {renderCard(cardPositions[3])}
                 <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                   getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                 }`}>
