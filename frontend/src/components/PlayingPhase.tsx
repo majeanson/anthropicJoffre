@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card as CardComponent } from './Card';
 import { GameState, Card as CardType, TrickCard } from '../types/game';
 
@@ -11,9 +11,22 @@ interface PlayingPhaseProps {
 export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: PlayingPhaseProps) {
   const [validationMessage, setValidationMessage] = useState<string>('');
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
+  const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
 
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
+
+  // Reset isPlayingCard flag when it's no longer the player's turn or when trick changes
+  useEffect(() => {
+    if (!isCurrentTurn) {
+      setIsPlayingCard(false);
+    }
+  }, [isCurrentTurn]);
+
+  // Also reset when currentTrick length changes (new trick started or card was played)
+  useEffect(() => {
+    setIsPlayingCard(false);
+  }, [gameState.currentTrick.length]);
 
   if (!currentPlayer) return null;
 
@@ -62,6 +75,11 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
   };
 
   const handleCardClick = (card: CardType) => {
+    // Prevent multiple rapid clicks
+    if (isPlayingCard) {
+      return;
+    }
+
     if (!isCurrentTurn) {
       setValidationMessage("Wait for your turn");
       return;
@@ -74,6 +92,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
     }
 
     setValidationMessage('');
+    setIsPlayingCard(true);
     onPlayCard(card);
   };
 
