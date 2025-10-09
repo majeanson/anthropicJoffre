@@ -20,7 +20,7 @@ function App() {
   const [debugMode, setDebugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
-  const botTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
@@ -132,6 +132,7 @@ function App() {
             botSocket.emit('join_game', { gameId: createdGameId, playerName: botName });
           });
 
+          // Listen to all game state updates
           botSocket.on('player_joined', ({ gameState }: { gameState: GameState }) => {
             handleBotAction(botSocket, gameState, botSocket.id || '');
           });
@@ -147,6 +148,10 @@ function App() {
           botSocket.on('trick_resolved', ({ gameState }: { gameState: GameState }) => {
             handleBotAction(botSocket, gameState, botSocket.id || '');
           });
+
+          botSocket.on('round_ended', (state: GameState) => {
+            handleBotAction(botSocket, state, botSocket.id || '');
+          });
         }
       }, 500);
 
@@ -161,9 +166,11 @@ function App() {
   };
 
   const handleBotAction = (botSocket: Socket, state: GameState, botId: string) => {
-    // Clear any existing timeout
-    if (botTimeoutRef.current) {
-      clearTimeout(botTimeoutRef.current);
+    // Clear any existing timeout for this bot
+    const existingTimeout = botTimeoutsRef.current.get(botId);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+      botTimeoutsRef.current.delete(botId);
     }
 
     // Team selection phase - bot selects team immediately
@@ -175,9 +182,11 @@ function App() {
         const playerIndex = state.players.findIndex(p => p.id === botId);
         const teamId = BotPlayer.selectTeam(playerIndex);
 
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
           botSocket.emit('select_team', { gameId: state.id, teamId });
+          botTimeoutsRef.current.delete(botId);
         }, BotPlayer.getActionDelay());
+        botTimeoutsRef.current.set(botId, timeout);
       }
 
       // Check if all players have teams and auto-start
@@ -186,9 +195,10 @@ function App() {
       const team2Count = state.players.filter(p => p.teamId === 2).length;
 
       if (allHaveTeams && team1Count === 2 && team2Count === 2 && state.players.length === 4) {
-        setTimeout(() => {
+        const timeout = setTimeout(() => {
           botSocket.emit('start_game', { gameId: state.id });
         }, 2000);
+        botTimeoutsRef.current.set(`${botId}-start`, timeout);
       }
       return;
     }
@@ -198,7 +208,7 @@ function App() {
     if (!currentPlayer || currentPlayer.id !== botId) return;
 
     // Schedule bot action with delay
-    botTimeoutRef.current = setTimeout(() => {
+    const timeout = setTimeout(() => {
       // Betting phase
       if (state.phase === 'betting') {
         const bet = BotPlayer.makeBet(state, botId);
@@ -217,7 +227,11 @@ function App() {
           botSocket.emit('play_card', { gameId: state.id, card });
         }
       }
+
+      botTimeoutsRef.current.delete(botId);
     }, BotPlayer.getActionDelay());
+
+    botTimeoutsRef.current.set(botId, timeout);
   };
 
   if (error) {
