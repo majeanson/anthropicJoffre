@@ -129,58 +129,59 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-3 md:p-6">
       {/* Score Board */}
-      <div className="max-w-6xl mx-auto mb-6">
-        <div className="bg-white rounded-xl p-6 shadow-lg">
+      <div className="max-w-6xl mx-auto mb-4 md:mb-6">
+        <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg">
           <div className="flex justify-between items-center">
             <div>
-              <h3 className="text-sm text-gray-600">Team 1</h3>
-              <p className="text-3xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+              <h3 className="text-xs md:text-sm text-gray-600">Team 1</h3>
+              <p className="text-2xl md:text-3xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
             </div>
             <div className="text-center">
-              <p className="text-sm text-gray-600">Round {gameState.roundNumber}</p>
+              <p className="text-xs md:text-sm text-gray-600">Round {gameState.roundNumber}</p>
               {gameState.trump && (
-                <p className="text-lg font-semibold mt-1">
+                <p className="text-sm md:text-lg font-semibold mt-1">
                   Trump: <span className="capitalize">{gameState.trump}</span>
                 </p>
               )}
             </div>
             <div>
-              <h3 className="text-sm text-gray-600">Team 2</h3>
-              <p className="text-3xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+              <h3 className="text-xs md:text-sm text-gray-600">Team 2</h3>
+              <p className="text-2xl md:text-3xl font-bold text-red-600">{gameState.teamScores.team2}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Circular Card Layout */}
-      <div className="max-w-6xl mx-auto mb-8 relative">
-        <div className="bg-white/10 backdrop-blur rounded-xl p-8 min-h-[500px] relative">
+      {/* Circular Card Layout - Use grid on mobile, circular on desktop */}
+      <div className="max-w-6xl mx-auto mb-4 md:mb-8 relative">
+        <div className="bg-white/10 backdrop-blur rounded-xl p-4 md:p-8 min-h-[300px] md:min-h-[500px] relative">
           {/* Action Buttons */}
-          <div className="absolute top-4 right-4 flex gap-2">
+          <div className="flex flex-wrap gap-2 mb-4 md:absolute md:top-4 md:right-4 md:mb-0">
             <button
               onClick={() => setShowLeaderboard(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-lg"
+              className="bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors shadow-lg min-h-[44px] flex items-center justify-center flex-1 md:flex-initial"
             >
               🏆 Leaderboard
             </button>
             {gameState.previousTrick && (
               <button
                 onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors min-h-[44px] flex items-center justify-center flex-1 md:flex-initial"
               >
-                {showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
+                {showPreviousTrick ? 'Current' : 'Previous'}
               </button>
             )}
           </div>
 
           {showPreviousTrick && previousCardPositions ? (
-            // Previous Trick View
-            <div className="relative h-[400px]">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                <div className="text-yellow-400 text-2xl font-bold mb-2">Previous Trick</div>
-                <div className="text-white text-lg">
+            // Previous Trick View - Grid on mobile, circular on desktop
+            <>
+              {/* Title - always visible */}
+              <div className="text-center mb-4 md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:mb-0">
+                <div className="text-yellow-400 text-xl md:text-2xl font-bold mb-2">Previous Trick</div>
+                <div className="text-white text-base md:text-lg">
                   Winner: {gameState.previousTrick ? gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name : ''}
                 </div>
                 <div className="text-white/80 text-sm">
@@ -188,114 +189,146 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
                 </div>
               </div>
 
-              {/* Bottom (Current Player) */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(0)} (You)
-                </div>
+              {/* Mobile Grid Layout */}
+              <div className="grid grid-cols-2 gap-4 md:hidden">
+                {[0, 1, 2, 3].map(pos => (
+                  <div key={pos} className="flex flex-col items-center gap-2">
+                    <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      getPlayerTeam(pos) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                    }`}>
+                      {getPlayerName(pos)}{pos === 0 ? ' (You)' : ''}
+                    </div>
+                    {renderCard(previousCardPositions[pos], previousCardPositions[pos]?.playerId === gameState.previousTrick?.winnerId)}
+                  </div>
+                ))}
               </div>
 
-              {/* Left (Partner/Opponent) */}
-              <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(1)}
+              {/* Desktop Circular Layout */}
+              <div className="hidden md:block relative h-[400px]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                  {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(0)} (You)
+                  </div>
                 </div>
-                {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
-              </div>
 
-              {/* Top (Opponent) */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(2)}
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(1)}
+                  </div>
+                  {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
                 </div>
-                {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
-              </div>
 
-              {/* Right (Partner/Opponent) */}
-              <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
-                {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(3)}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(2)}
+                  </div>
+                  {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
+                </div>
+
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
+                  {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(3)}
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           ) : (
-            // Current Trick View
-            <div className="relative h-[400px]">
-              {gameState.currentTrick.length === 0 && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60 text-center">
-                  <p className="text-xl">Waiting for first card...</p>
-                </div>
-              )}
-
-              {/* Bottom (Current Player) */}
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                {renderCard(cardPositions[0])}
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(0)} (You)
-                </div>
+            // Current Trick View - Grid on mobile, circular on desktop
+            <>
+              {/* Mobile Grid Layout */}
+              <div className="grid grid-cols-2 gap-4 md:hidden">
+                {gameState.currentTrick.length === 0 ? (
+                  <div className="col-span-2 text-white/60 text-center py-8">
+                    <p className="text-base">Waiting for first card...</p>
+                  </div>
+                ) : (
+                  [0, 1, 2, 3].map(pos => (
+                    <div key={pos} className="flex flex-col items-center gap-2">
+                      <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        getPlayerTeam(pos) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                      }`}>
+                        {getPlayerName(pos)}{pos === 0 ? ' (You)' : ''}
+                      </div>
+                      {renderCard(cardPositions[pos])}
+                    </div>
+                  ))
+                )}
               </div>
 
-              {/* Left (Partner/Opponent) */}
-              <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(1)}
-                </div>
-                {renderCard(cardPositions[1])}
-              </div>
+              {/* Desktop Circular Layout */}
+              <div className="hidden md:block relative h-[400px]">
+                {gameState.currentTrick.length === 0 && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60 text-center">
+                    <p className="text-xl">Waiting for first card...</p>
+                  </div>
+                )}
 
-              {/* Top (Opponent) */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(2)}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                  {renderCard(cardPositions[0])}
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(0)} (You)
+                  </div>
                 </div>
-                {renderCard(cardPositions[2])}
-              </div>
 
-              {/* Right (Partner/Opponent) */}
-              <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
-                {renderCard(cardPositions[3])}
-                <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                }`}>
-                  {getPlayerName(3)}
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(1)}
+                  </div>
+                  {renderCard(cardPositions[1])}
+                </div>
+
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(2)}
+                  </div>
+                  {renderCard(cardPositions[2])}
+                </div>
+
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
+                  {renderCard(cardPositions[3])}
+                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                    getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+                  }`}>
+                    {getPlayerName(3)}
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
 
       {/* Players Info */}
-      <div className="max-w-6xl mx-auto mb-6">
-        <div className="grid grid-cols-4 gap-4">
+      <div className="max-w-6xl mx-auto mb-4 md:mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
           {gameState.players.map((player, index) => (
             <div
               key={player.id}
-              className={`bg-white rounded-lg p-4 ${
-                gameState.currentPlayerIndex === index ? 'ring-4 ring-yellow-400' : ''
+              className={`bg-white rounded-lg p-2 md:p-4 ${
+                gameState.currentPlayerIndex === index ? 'ring-2 md:ring-4 ring-yellow-400' : ''
               }`}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
-                <span className="font-medium truncate">{player.name}</span>
+              <div className="flex items-center gap-1 md:gap-2 mb-1 md:mb-2">
+                <span className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
+                <span className="font-medium text-xs md:text-base truncate">{player.name}</span>
               </div>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs md:text-sm text-gray-600">
                 <p>Tricks: {player.tricksWon}</p>
                 <p>Cards: {player.hand.length}</p>
               </div>
@@ -306,46 +339,49 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
 
       {/* Player Hand */}
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-xl p-6 shadow-lg">
-          <h3 className="text-lg font-semibold mb-4">
+        <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg">
+          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">
             Your Hand {isCurrentTurn && <span className="text-green-600">(Your Turn)</span>}
           </h3>
 
           {validationMessage && (
-            <div className="mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
+            <div className="mb-3 md:mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 md:px-4 md:py-3 rounded-lg text-xs md:text-sm">
               {validationMessage}
             </div>
           )}
 
           {isCurrentTurn && gameState.currentTrick.length > 0 && (
-            <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg text-sm">
+            <div className="mb-3 md:mb-4 bg-blue-50 border border-blue-200 text-blue-800 px-3 py-2 md:px-4 md:py-3 rounded-lg text-xs md:text-sm">
               <strong>Led suit:</strong> {gameState.currentTrick[0].card.color.charAt(0).toUpperCase() + gameState.currentTrick[0].card.color.slice(1)}
               {playableCards.length < currentPlayer.hand.length &&
                 ` - You must play ${gameState.currentTrick[0].card.color}`}
             </div>
           )}
 
-          <div className="flex gap-4 flex-wrap justify-center">
-            {currentPlayer.hand.map((card, index) => {
-              const playable = isCardPlayable(card);
-              return (
-                <div key={`${card.color}-${card.value}-${index}`} className="relative">
-                  <CardComponent
-                    card={card}
-                    onClick={() => handleCardClick(card)}
-                    disabled={!isCurrentTurn || !playable}
-                  />
-                  {isCurrentTurn && !playable && (
-                    <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-2xl font-bold">✕</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+          {/* Card Hand - Horizontal scrollable on mobile */}
+          <div className="overflow-x-auto md:overflow-x-visible -mx-4 md:mx-0 px-4 md:px-0">
+            <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
+              {currentPlayer.hand.map((card, index) => {
+                const playable = isCardPlayable(card);
+                return (
+                  <div key={`${card.color}-${card.value}-${index}`} className="relative flex-shrink-0 md:flex-shrink">
+                    <CardComponent
+                      card={card}
+                      onClick={() => handleCardClick(card)}
+                      disabled={!isCurrentTurn || !playable}
+                    />
+                    {isCurrentTurn && !playable && (
+                      <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
+                        <span className="text-white text-xl md:text-2xl font-bold">✕</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
           {!isCurrentTurn && (
-            <p className="text-center text-gray-500 mt-4">
+            <p className="text-center text-gray-500 mt-3 md:mt-4 text-sm md:text-base">
               Waiting for {gameState.players[gameState.currentPlayerIndex]?.name}...
             </p>
           )}
