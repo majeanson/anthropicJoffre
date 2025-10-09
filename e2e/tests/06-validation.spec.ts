@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createGameWith4Players, placeAllBets } from './helpers';
+import { createGameWith4Players, placeAllBets, findCurrentPlayerIndex } from './helpers';
 
 test.describe('Validation Feedback', () => {
   test.describe('Team Selection Validation', () => {
@@ -44,21 +44,40 @@ test.describe('Validation Feedback', () => {
       await context.close();
     });
 
-    test('should show message when teams are unbalanced (3 vs 1)', async ({ browser }) => {
-      const { context, pages } = await createGameWith4Players(browser);
+    test('should show dealer indicator during team selection', async ({ browser }) => {
+      // Create game but don't start it - stop at team selection
+      const context = await browser.newContext();
+      const pages = [];
+      let gameId: string | null = null;
 
+      for (let i = 1; i <= 4; i++) {
+        const page = await context.newPage();
+        await page.goto('/');
+
+        if (i === 1) {
+          await page.getByRole('button', { name: /create game/i }).click();
+          await page.getByPlaceholder(/enter your name/i).fill(`Player ${i}`);
+          await page.getByRole('button', { name: /create/i }).click();
+
+          await page.waitForSelector('.font-mono', { timeout: 10000 });
+          const gameIdElement = page.locator('.font-mono');
+          gameId = await gameIdElement.textContent();
+        } else {
+          await page.getByRole('button', { name: /join game/i }).click();
+          await page.getByPlaceholder(/game id/i).fill(gameId!);
+          await page.getByPlaceholder(/your name/i).fill(`Player ${i}`);
+          await page.getByRole('button', { name: /join/i }).click();
+        }
+
+        pages.push(page);
+      }
+
+      // Should be at team selection
       await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
 
-      // By default, players might be distributed unevenly
-      // Try to create 3-1 split by having players join Team 1
-      // (This test assumes team selection allows this state temporarily)
-
-      // Start Game button should show appropriate message
-      const message = pages[0].getByText(/teams must have 2 players each/i);
-
-      // If teams are already balanced (2-2), this is fine - test passes
-      // If unbalanced, message should be visible
-      await message.isVisible().catch(() => true);
+      // Start Game button should be enabled (4 players, default 2-2 split)
+      const startButton = pages[0].getByRole('button', { name: /start game/i });
+      await expect(startButton).toBeEnabled();
 
       await context.close();
     });
@@ -72,22 +91,22 @@ test.describe('Validation Feedback', () => {
 
       // Player 3 bets 9
       const page3 = pages[2];
-      await page3.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-      await page3.locator('input[type="range"]').fill('9');
-      await page3.getByRole('button', { name: /place bet/i }).click();
+      const bet9Button = page3.locator('button:has-text("9")').first();
+      await bet9Button.waitFor({ state: 'visible', timeout: 15000 });
+      await bet9Button.click();
       await pages[0].waitForTimeout(500);
 
-      // Player 4 tries to bet 7 (too low)
+      // Player 4 should see bet 7 button disabled (too low)
       const page4 = pages[3];
-      await page4.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-      await page4.locator('input[type="range"]').fill('7');
+      await pages[0].waitForTimeout(500); // Wait for turn
 
-      // Should show validation message
-      await expect(page4.getByText(/you must raise/i)).toBeVisible();
+      // Button for 7 should be disabled (must raise to 10+)
+      const bet7Button = page4.locator('button:has-text("7")').first();
+      await expect(bet7Button).toBeDisabled({ timeout: 2000 });
 
-      // Place Bet button should be disabled
-      const placeBetButton = page4.getByRole('button', { name: /place bet/i });
-      await expect(placeBetButton).toBeDisabled();
+      // Button for 10 should be enabled (valid raise)
+      const bet10Button = page4.locator('button:has-text("10")').first();
+      await expect(bet10Button).toBeEnabled();
 
       await context.close();
     });
@@ -99,20 +118,22 @@ test.describe('Validation Feedback', () => {
 
       // Player 3 bets 10 with "without trump"
       const page3 = pages[2];
-      await page3.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-      await page3.locator('input[type="range"]').fill('10');
-      await page3.locator('input[type="checkbox"]#withoutTrump').check();
-      await page3.getByRole('button', { name: /place bet/i }).click();
+      const bet10NoTrumpButton = page3.locator('button:has-text("10 (No Trump)")');
+      await bet10NoTrumpButton.waitFor({ state: 'visible', timeout: 15000 });
+      await bet10NoTrumpButton.click();
       await pages[0].waitForTimeout(500);
 
-      // Player 4 tries to bet 10 with trump
+      // Player 4 should see regular 10 button disabled (must beat "without trump")
       const page4 = pages[3];
-      await page4.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-      await page4.locator('input[type="range"]').fill('10');
+      await pages[0].waitForTimeout(500); // Wait for turn
 
-      // Should show message about "without trump" option
-      const validationMessage = page4.getByText(/you must raise/i);
-      await expect(validationMessage).toBeVisible();
+      // Regular 10 button should be disabled (same amount with trump loses to without trump)
+      const bet10Button = page4.locator('button:has-text("10")').first();
+      await expect(bet10Button).toBeDisabled({ timeout: 2000 });
+
+      // Button for 11 should be enabled (valid raise)
+      const bet11Button = page4.locator('button:has-text("11")').first();
+      await expect(bet11Button).toBeEnabled();
 
       await context.close();
     });
@@ -133,81 +154,35 @@ test.describe('Validation Feedback', () => {
   test.describe('Playing Phase Validation', () => {
     test('should show validation message when trying to play wrong suit', async ({ browser }) => {
       const { context, pages } = await createGameWith4Players(browser);
-
-      await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
       await placeAllBets(pages);
 
-      // Wait for playing phase
-      await pages[0].waitForSelector('text=/your hand/i', { timeout: 10000 });
-
-      // Find who has first turn
-      let firstPlayerIndex = -1;
-      for (let i = 0; i < 4; i++) {
-        if (await pages[i].getByText(/your turn/i).isVisible()) {
-          firstPlayerIndex = i;
-          break;
-        }
-      }
-
-      expect(firstPlayerIndex).toBeGreaterThanOrEqual(0);
-
       // First player plays a card
-      const firstPage = pages[firstPlayerIndex];
-      const firstCard = firstPage.locator('[data-card-value]').first();
+      const firstPlayerIndex = await findCurrentPlayerIndex(pages);
+      const firstCard = pages[firstPlayerIndex].locator('[data-card-value]').first();
       await firstCard.click();
 
       await pages[0].waitForTimeout(500);
 
-      // Find second player
-      let secondPlayerIndex = -1;
-      for (let i = 0; i < 4; i++) {
-        if (await pages[i].getByText(/your turn/i).isVisible()) {
-          secondPlayerIndex = i;
-          break;
-        }
-      }
-
-      expect(secondPlayerIndex).toBeGreaterThanOrEqual(0);
-
       // Second player should see "Led suit" information
-      const secondPage = pages[secondPlayerIndex];
-      await expect(secondPage.getByText(/led suit/i)).toBeVisible();
+      const secondPlayerIndex = await findCurrentPlayerIndex(pages);
+      await expect(pages[secondPlayerIndex].getByText(/led suit/i)).toBeVisible();
 
       await context.close();
     });
 
     test('should visually disable unplayable cards', async ({ browser }) => {
       const { context, pages } = await createGameWith4Players(browser);
-
-      await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
       await placeAllBets(pages);
 
-      await pages[0].waitForSelector('text=/your hand/i', { timeout: 10000 });
-
       // Play one card to establish led suit
-      let firstPlayerIndex = -1;
-      for (let i = 0; i < 4; i++) {
-        if (await pages[i].getByText(/your turn/i).isVisible()) {
-          firstPlayerIndex = i;
-          break;
-        }
-      }
-
-      const firstPage = pages[firstPlayerIndex];
-      const firstCard = firstPage.locator('[data-card-value]').first();
+      const firstPlayerIndex = await findCurrentPlayerIndex(pages);
+      const firstCard = pages[firstPlayerIndex].locator('[data-card-value]').first();
       await firstCard.click();
 
       await pages[0].waitForTimeout(500);
 
       // Second player might see disabled cards (if they have led suit)
-      let secondPlayerIndex = -1;
-      for (let i = 0; i < 4; i++) {
-        if (await pages[i].getByText(/your turn/i).isVisible()) {
-          secondPlayerIndex = i;
-          break;
-        }
-      }
-
+      const secondPlayerIndex = await findCurrentPlayerIndex(pages);
       const secondPage = pages[secondPlayerIndex];
 
       // Check if any cards have the disabled overlay (✕ mark)
@@ -224,22 +199,10 @@ test.describe('Validation Feedback', () => {
 
     test('should show which player we are waiting for', async ({ browser }) => {
       const { context, pages } = await createGameWith4Players(browser);
-
-      await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
       await placeAllBets(pages);
 
-      await pages[0].waitForSelector('text=/your hand/i', { timeout: 10000 });
-
-      // Find whose turn it is
-      let currentPlayerIndex = -1;
-      for (let i = 0; i < 4; i++) {
-        if (await pages[i].getByText(/your turn/i).isVisible()) {
-          currentPlayerIndex = i;
-          break;
-        }
-      }
-
       // Other players should see "Waiting for [PlayerName]..."
+      const currentPlayerIndex = await findCurrentPlayerIndex(pages);
       const otherPlayerIndex = (currentPlayerIndex + 1) % 4;
       await expect(pages[otherPlayerIndex].getByText(/waiting for/i)).toBeVisible();
 

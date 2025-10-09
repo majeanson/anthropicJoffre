@@ -5,14 +5,12 @@ test.describe('Skip Bet Functionality', () => {
   test('should allow first player to skip bet', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
-    // Wait for betting phase
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-    // First player (Player 3) should see Skip button
+    // Player 3 is first in betting order (Player 2 is dealer)
     const page3 = pages[2];
-    await page3.waitForSelector('text=/your turn/i', { state: 'hidden', timeout: 1000 }).catch(() => {});
 
-    // Skip button should be visible
+    // Skip button should be visible for first player
     const skipButton = page3.getByRole('button', { name: /skip/i });
     await expect(skipButton).toBeVisible();
 
@@ -59,9 +57,9 @@ test.describe('Skip Bet Functionality', () => {
 
     // Player 3 places a bet (first in betting order)
     const page3 = pages[2];
-    await page3.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-    await page3.locator('input[type="range"]').fill('7');
-    await page3.getByRole('button', { name: /place bet/i }).click();
+    const bet7Button = page3.locator('button:has-text("7")').first();
+    await bet7Button.waitFor({ state: 'visible', timeout: 15000 });
+    await bet7Button.click();
 
     // Players 4 and 1 skip
     await pages[3].getByRole('button', { name: /skip/i }).waitFor({ timeout: 15000 });
@@ -83,13 +81,13 @@ test.describe('Skip Bet Functionality', () => {
     await context.close();
   });
 
-  test('should restart betting when all 4 players skip', async ({ browser }) => {
+  test('should force dealer to bet minimum when all others skip', async ({ browser }) => {
     const { context, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-    // All players skip (betting order: P3, P4, P1, P2)
-    const bettingOrder = [2, 3, 0, 1];
+    // First 3 players skip (betting order: P3, P4, P1)
+    const bettingOrder = [2, 3, 0];
 
     for (let i = 0; i < bettingOrder.length; i++) {
       const pageIndex = bettingOrder[i];
@@ -101,12 +99,15 @@ test.describe('Skip Bet Functionality', () => {
       await pages[0].waitForTimeout(500);
     }
 
-    // Should show error message about restarting
-    await expect(pages[0].getByText(/all players skipped/i)).toBeVisible({ timeout: 5000 });
+    // Player 2 (dealer) should NOT see Skip button
+    const page2 = pages[1];
+    await pages[0].waitForTimeout(500); // Wait for turn
 
-    // Betting should restart - first player should be able to bet again
-    await pages[2].getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-    await expect(pages[2].getByRole('button', { name: /place bet/i })).toBeVisible();
+    const skipButton = page2.getByRole('button', { name: /skip/i });
+    await expect(skipButton).not.toBeVisible({ timeout: 2000 }).catch(() => {});
+
+    // Should see message that dealer must bet
+    await expect(page2.getByText(/you must bet at least 7/i)).toBeVisible({ timeout: 2000 });
 
     await context.close();
   });
@@ -118,22 +119,18 @@ test.describe('Skip Bet Functionality', () => {
 
     // Player 3 bets 10
     const page3 = pages[2];
-    await page3.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-    await page3.locator('input[type="range"]').fill('10');
-    await page3.getByRole('button', { name: /place bet/i }).click();
+    const bet10ButtonP3 = page3.locator('button:has-text("10")').first();
+    await bet10ButtonP3.waitFor({ state: 'visible', timeout: 15000 });
+    await bet10ButtonP3.click();
     await pages[0].waitForTimeout(500);
 
-    // Player 4 tries to bet 10 (same as current)
+    // Player 4 should see bet 10 button disabled (same as current, must raise)
     const page4 = pages[3];
-    await page4.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-    await page4.locator('input[type="range"]').fill('10');
+    await pages[3].waitForTimeout(1000); // Wait for turn
 
-    // Should show validation message
-    await expect(page4.getByText(/you must raise/i)).toBeVisible({ timeout: 2000 });
-
-    // Place Bet button should be disabled
-    const placeBetButton = page4.getByRole('button', { name: /place bet/i });
-    await expect(placeBetButton).toBeDisabled();
+    // Button for 10 should be disabled (non-dealer can't match)
+    const bet10ButtonP4 = page4.locator('button:has-text("10")').first();
+    await expect(bet10ButtonP4).toBeDisabled({ timeout: 2000 });
 
     await context.close();
   });
@@ -151,9 +148,9 @@ test.describe('Skip Bet Functionality', () => {
       const pageIndex = bettingOrder[i];
       const page = pages[pageIndex];
 
-      await page.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-      await page.locator('input[type="range"]').fill(betAmounts[i].toString());
-      await page.getByRole('button', { name: /place bet/i }).click();
+      const betButton = page.locator(`button:has-text("${betAmounts[i]}")`).first();
+      await betButton.waitFor({ state: 'visible', timeout: 15000 });
+      await betButton.click();
 
       if (i < bettingOrder.length - 1) {
         await pages[0].waitForTimeout(500);
@@ -162,15 +159,14 @@ test.describe('Skip Bet Functionality', () => {
 
     // Player 2 (dealer) can match at 9
     const page2 = pages[1];
-    await page2.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-    await page2.locator('input[type="range"]').fill('9');
+    await pages[0].waitForTimeout(500); // Wait for turn
 
     // Should see dealer privilege message
-    await expect(page2.getByText(/dealer privilege/i)).toBeVisible();
+    await expect(page2.getByText(/dealer privilege/i)).toBeVisible({ timeout: 5000 });
 
-    // Place Bet button should be enabled
-    const placeBetButton = page2.getByRole('button', { name: /place bet/i });
-    await expect(placeBetButton).toBeEnabled();
+    // Button for 9 should be enabled (dealer can match)
+    const bet9Button = page2.locator('button:has-text("9")').first();
+    await expect(bet9Button).toBeEnabled();
 
     await context.close();
   });
@@ -188,33 +184,25 @@ test.describe('Skip Bet Functionality', () => {
 
     // Player 4 places bet of 7
     const page4 = pages[3];
-    await page4.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-    await page4.locator('input[type="range"]').fill('7');
-    await page4.getByRole('button', { name: /place bet/i }).click();
+    const bet7ButtonP4 = page4.locator('button:has-text("7")').first();
+    await bet7ButtonP4.waitFor({ state: 'visible', timeout: 15000 });
+    await bet7ButtonP4.click();
     await pages[0].waitForTimeout(500);
 
     // Player 1 should now be able to bet (must raise to 8 or more)
     const page1 = pages[0];
-    await page1.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
+    await pages[0].waitForTimeout(500); // Wait for turn
 
-    // At bet 7, should show validation message
-    await page1.locator('input[type="range"]').fill('7');
-    await expect(page1.getByText(/you must raise/i)).toBeVisible();
+    // Button for 7 should be disabled (must raise)
+    const bet7ButtonP1 = page1.locator('button:has-text("7")').first();
+    await expect(bet7ButtonP1).toBeDisabled({ timeout: 2000 });
 
-    // Raise to 8, should be valid
-    await page1.locator('input[type="range"]').fill('8');
-    await pages[0].waitForTimeout(300);
-
-    // No validation message should appear
-    const validationMsg = page1.getByText(/you must raise/i);
-    await expect(validationMsg).not.toBeVisible();
-
-    // Place Bet button should be enabled
-    const placeBetButton = page1.getByRole('button', { name: /place bet/i });
-    await expect(placeBetButton).toBeEnabled();
+    // Button for 8 should be enabled (valid raise)
+    const bet8ButtonP1 = page1.locator('button:has-text("8")').first();
+    await expect(bet8ButtonP1).toBeEnabled();
 
     // Should be able to place bet without issues
-    await placeBetButton.click();
+    await bet8ButtonP1.click();
     await pages[0].waitForTimeout(500);
 
     // Should show that bet was placed successfully

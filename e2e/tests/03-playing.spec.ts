@@ -1,75 +1,10 @@
 import { test, expect, Page } from '@playwright/test';
-
-async function setupGameToPlayingPhase(browser: any) {
-  const context = await browser.newContext();
-  const pages: Page[] = [];
-
-  // Create game with 4 players
-  for (let i = 1; i <= 4; i++) {
-    const page = await context.newPage();
-    await page.goto('/');
-
-    if (i === 1) {
-      await page.getByRole('button', { name: /create game/i }).click();
-      await page.getByPlaceholder(/enter your name/i).fill(`Player ${i}`);
-      await page.getByRole('button', { name: /create/i }).click();
-
-      await page.waitForSelector('.font-mono', { timeout: 10000 });
-      const gameIdElement = page.locator('.font-mono');
-      const gameId = await gameIdElement.textContent();
-      pages.push(page);
-
-      // Add other players
-      for (let j = 2; j <= 4; j++) {
-        const nextPage = await context.newPage();
-        await nextPage.goto('/');
-        await nextPage.getByRole('button', { name: /join game/i }).click();
-        await nextPage.getByPlaceholder(/game id/i).fill(gameId!);
-        await nextPage.getByPlaceholder(/your name/i).fill(`Player ${j}`);
-        await nextPage.getByRole('button', { name: /join/i }).click();
-        pages.push(nextPage);
-      }
-      break;
-    }
-  }
-
-  // Wait for team selection to be ready, then start game
-  await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
-  await pages[0].getByRole('button', { name: /start game/i }).click();
-
-  // Wait for betting phase
-  await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
-
-  // All players place bets in correct order: Player 3, 4, 1, 2 (Player 2 is dealer)
-  // Bets must escalate: 7, 8, 9, 9 (dealer can match)
-  const bettingOrder = [2, 3, 0, 1];
-  const betAmounts = [7, 8, 9, 9]; // Escalating bets, last one can match (dealer)
-
-  for (let i = 0; i < 4; i++) {
-    const pageIndex = bettingOrder[i];
-    const page = pages[pageIndex];
-
-    // Wait for Place Bet button to appear (means it's this player's turn)
-    await page.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 });
-
-    await page.locator('input[type="range"]').fill(betAmounts[i].toString());
-    await page.getByRole('button', { name: /place bet/i }).click();
-
-    // Wait for bet to register
-    if (i < 3) {
-      await pages[0].waitForTimeout(500);
-    }
-  }
-
-  // Wait for playing phase
-  await pages[0].waitForSelector('text=/your hand/i', { timeout: 10000 });
-
-  return { context, pages };
-}
+import { createGameWith4Players, placeAllBets, findCurrentPlayerIndex } from './helpers';
 
 test.describe('Card Playing Phase', () => {
   test('should display player hands after betting', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
     // All players should see their hand
     for (const page of pages) {
@@ -84,7 +19,8 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should show current trick area', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
     // Should show trick area
     await expect(pages[0].getByText(/current trick/i)).toBeVisible();
@@ -93,7 +29,8 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should show score board with team scores', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
     // Should show team scores
     await expect(pages[0].getByText(/team 1/i)).toBeVisible();
@@ -106,7 +43,8 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should show player info (cards left, tricks won)', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
     // Should show all 4 players
     await expect(pages[0].getByText('Player 1')).toBeVisible();
@@ -126,7 +64,8 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should indicate whose turn it is', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
     // First player (highest bidder or designated starter) should have turn
     const firstPlayerPage = pages.find(async (page) => {
@@ -139,23 +78,16 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should disable cards when not player turn', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
-    // Find page with turn
-    let currentPlayerIndex = -1;
-    for (let i = 0; i < 4; i++) {
-      if (await pages[i].getByText(/your turn/i).isVisible()) {
-        currentPlayerIndex = i;
-        break;
-      }
-    }
-
+    const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
     // Other players should see waiting message
     for (let i = 0; i < 4; i++) {
       if (i !== currentPlayerIndex) {
-        await expect(pages[i].getByText(/waiting for other players/i)).toBeVisible();
+        await expect(pages[i].getByText(/waiting for/i)).toBeVisible();
       }
     }
 
@@ -163,17 +95,10 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should allow current player to play a card', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
-    // Find current player
-    let currentPlayerIndex = -1;
-    for (let i = 0; i < 4; i++) {
-      if (await pages[i].getByText(/your turn/i).isVisible()) {
-        currentPlayerIndex = i;
-        break;
-      }
-    }
-
+    const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     const currentPage = pages[currentPlayerIndex];
 
     // Get first card and click it
@@ -187,17 +112,10 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should set trump suit from first card played', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
-    // Find current player and play first card
-    let currentPlayerIndex = -1;
-    for (let i = 0; i < 4; i++) {
-      if (await pages[i].getByText(/your turn/i).isVisible()) {
-        currentPlayerIndex = i;
-        break;
-      }
-    }
-
+    const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     const firstCard = pages[currentPlayerIndex].locator('[data-card-value]').first();
     await firstCard.click();
 
@@ -208,19 +126,12 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should complete a full trick with 4 cards', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
     // Play 4 cards (one from each player)
     for (let round = 0; round < 4; round++) {
-      // Find current player
-      let currentPlayerIndex = -1;
-      for (let i = 0; i < 4; i++) {
-        if (await pages[i].getByText(/your turn/i).isVisible()) {
-          currentPlayerIndex = i;
-          break;
-        }
-      }
-
+      const currentPlayerIndex = await findCurrentPlayerIndex(pages);
       expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
       // Play a card
@@ -239,17 +150,10 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should decrease card count after playing', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
-    // Find current player
-    let currentPlayerIndex = -1;
-    for (let i = 0; i < 4; i++) {
-      if (await pages[i].getByText(/your turn/i).isVisible()) {
-        currentPlayerIndex = i;
-        break;
-      }
-    }
-
+    const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     const currentPage = pages[currentPlayerIndex];
 
     // Count cards in hand before (not in trick area)
@@ -272,7 +176,8 @@ test.describe('Card Playing Phase', () => {
   });
 
   test('should show special card indicators (+5 for Red 0, -2 for Brown 0)', async ({ browser }) => {
-    const { context, pages } = await setupGameToPlayingPhase(browser);
+    const { context, pages } = await createGameWith4Players(browser);
+    await placeAllBets(pages);
 
     // Look for special cards in any player's hand
     const red0 = pages[0].locator('button.bg-red-500').filter({ hasText: '0' }).first();
