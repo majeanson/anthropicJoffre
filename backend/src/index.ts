@@ -109,6 +109,7 @@ io.on('connection', (socket) => {
       dealerIndex: 0, // First player is the initial dealer
       teamScores: { team1: 0, team2: 0 },
       roundNumber: 1,
+      roundHistory: [],
     };
 
     games.set(gameId, gameState);
@@ -629,6 +630,29 @@ async function endRound(gameId: string) {
   }
   console.log(`Defensive Team ${defensiveTeamId}: +${defensiveTeamPoints}`);
   console.log(`Round ${game.roundNumber} Scores - Team 1: ${game.teamScores.team1}, Team 2: ${game.teamScores.team2}`);
+
+  // Add round to history
+  const roundScore = {
+    team1: offensiveTeamId === 1 ? offensiveScore : defensiveTeamPoints,
+    team2: offensiveTeamId === 2 ? offensiveScore : defensiveTeamPoints,
+  };
+
+  game.roundHistory.push({
+    roundNumber: game.roundNumber,
+    bets: [...game.currentBets],
+    highestBet: game.highestBet,
+    offensiveTeam: offensiveTeamId,
+    offensivePoints: offensiveTeamPoints,
+    defensivePoints: defensiveTeamPoints,
+    betAmount: game.highestBet.amount,
+    withoutTrump: game.highestBet.withoutTrump,
+    betMade: offensiveTeamPoints >= betAmount,
+    roundScore,
+    cumulativeScore: {
+      team1: game.teamScores.team1,
+      team2: game.teamScores.team2,
+    },
+  });
 
   // Check for game over
   if (game.teamScores.team1 >= 41 || game.teamScores.team2 >= 41) {

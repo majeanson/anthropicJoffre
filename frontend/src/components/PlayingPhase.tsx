@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card as CardComponent } from './Card';
+import { Leaderboard } from './Leaderboard';
 import { GameState, Card as CardType, TrickCard } from '../types/game';
 
 interface PlayingPhaseProps {
@@ -12,6 +13,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
   const [validationMessage, setValidationMessage] = useState<string>('');
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
@@ -155,15 +157,23 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
       {/* Circular Card Layout */}
       <div className="max-w-6xl mx-auto mb-8 relative">
         <div className="bg-white/10 backdrop-blur rounded-xl p-8 min-h-[500px] relative">
-          {/* Previous Trick Button */}
-          {gameState.previousTrick && (
+          {/* Action Buttons */}
+          <div className="absolute top-4 right-4 flex gap-2">
             <button
-              onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-              className="absolute top-4 right-4 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              onClick={() => setShowLeaderboard(true)}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors shadow-lg"
             >
-              {showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
+              🏆 Leaderboard
             </button>
-          )}
+            {gameState.previousTrick && (
+              <button
+                onClick={() => setShowPreviousTrick(!showPreviousTrick)}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+              >
+                {showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
+              </button>
+            )}
+          </div>
 
           {showPreviousTrick && previousCardPositions ? (
             // Previous Trick View
@@ -341,6 +351,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
           )}
         </div>
       </div>
+
+      {/* Leaderboard Modal */}
+      <Leaderboard
+        gameState={gameState}
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
     </div>
   );
 }

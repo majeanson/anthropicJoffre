@@ -40,6 +40,26 @@ export interface TrickResult {
   points: number;
 }
 
+export interface RoundHistory {
+  roundNumber: number;
+  bets: Bet[];
+  highestBet: Bet;
+  offensiveTeam: 1 | 2;
+  offensivePoints: number;
+  defensivePoints: number;
+  betAmount: number;
+  withoutTrump: boolean;
+  betMade: boolean;
+  roundScore: {
+    team1: number;
+    team2: number;
+  };
+  cumulativeScore: {
+    team1: number;
+    team2: number;
+  };
+}
+
 export interface GameState {
   id: string;
   phase: GamePhase;
@@ -56,6 +76,7 @@ export interface GameState {
     team2: number;
   };
   roundNumber: number;
+  roundHistory: RoundHistory[];
 }
 
 export interface GameHistory {
