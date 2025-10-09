@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { GameState, Card } from './types/game';
 import { Lobby } from './components/Lobby';
@@ -7,6 +7,8 @@ import { PlayingPhase } from './components/PlayingPhase';
 import { TeamSelection } from './components/TeamSelection';
 import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
 import { DebugPanel } from './components/DebugPanel';
+import { TestPanel } from './components/TestPanel';
+import { BotPlayer } from './utils/botPlayer';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -17,6 +19,8 @@ function App() {
   const [error, setError] = useState<string>('');
   const [debugMode, setDebugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
+  const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
+  const botTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
@@ -112,6 +116,86 @@ function App() {
     }
   };
 
+  // Bot player functionality
+  const handleQuickPlay = () => {
+    if (!socket) return;
+
+    // Create game with player
+    socket.emit('create_game', 'You');
+
+    // Wait for game creation, then add 3 bots
+    setTimeout(() => {
+      for (let i = 0; i < 3; i++) {
+        const botSocket = io(SOCKET_URL);
+        const botName = `Bot ${i + 1}`;
+
+        botSocket.on('connect', () => {
+          if (gameId) {
+            botSocket.emit('join_game', { gameId, playerName: botName });
+          }
+        });
+
+        botSocket.on('game_updated', (state: GameState) => {
+          handleBotAction(botSocket, state, botSocket.id || '');
+        });
+
+        botSocket.on('round_started', (state: GameState) => {
+          handleBotAction(botSocket, state, botSocket.id || '');
+        });
+
+        botSocket.on('trick_resolved', ({ gameState }: { gameState: GameState }) => {
+          handleBotAction(botSocket, gameState, botSocket.id || '');
+        });
+      }
+    }, 500);
+  };
+
+  const handleBotAction = (botSocket: Socket, state: GameState, botId: string) => {
+    // Clear any existing timeout
+    if (botTimeoutRef.current) {
+      clearTimeout(botTimeoutRef.current);
+    }
+
+    // Schedule bot action with delay
+    botTimeoutRef.current = setTimeout(() => {
+      const currentPlayer = state.players[state.currentPlayerIndex];
+      if (!currentPlayer || currentPlayer.id !== botId) return;
+
+      // Team selection phase
+      if (state.phase === 'team_selection') {
+        const playerIndex = state.players.findIndex(p => p.id === botId);
+        const teamId = BotPlayer.selectTeam(playerIndex);
+        botSocket.emit('select_team', { gameId: state.id, teamId });
+
+        // Auto-start if all 4 players joined
+        if (state.players.length === 4) {
+          setTimeout(() => {
+            botSocket.emit('start_game', { gameId: state.id });
+          }, 1000);
+        }
+      }
+
+      // Betting phase
+      if (state.phase === 'betting') {
+        const bet = BotPlayer.makeBet(state, botId);
+        botSocket.emit('place_bet', {
+          gameId: state.id,
+          amount: bet.amount,
+          withoutTrump: bet.withoutTrump,
+          skipped: bet.skipped
+        });
+      }
+
+      // Playing phase
+      if (state.phase === 'playing') {
+        const card = BotPlayer.playCard(state, botId);
+        if (card) {
+          botSocket.emit('play_card', { gameId: state.id, card });
+        }
+      }
+    }, BotPlayer.getActionDelay());
+  };
+
   if (error) {
     return (
       <div className="min-h-screen bg-red-50 flex items-center justify-center">
@@ -134,12 +218,20 @@ function App() {
   }
 
   if (!gameState) {
-    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} />;
+    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onQuickPlay={handleQuickPlay} />;
   }
 
   // Debug controls (always available, even in production)
   const DebugControls = () => (
     <div className="fixed top-4 right-4 z-50 flex gap-2">
+      <button
+        onClick={() => setTestPanelOpen(true)}
+        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-colors flex items-center gap-2"
+        title="Open Test Panel"
+        aria-label="Open test panel for state manipulation"
+      >
+        🧪 Test
+      </button>
       <button
         onClick={() => setDebugPanelOpen(true)}
         className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-colors flex items-center gap-2"
@@ -161,11 +253,22 @@ function App() {
     </div>
   );
 
+  // Render TestPanel alongside other components
+  const renderTestPanel = () => (
+    <TestPanel
+      gameState={gameState}
+      socket={socket}
+      isOpen={testPanelOpen}
+      onClose={() => setTestPanelOpen(false)}
+    />
+  );
+
   // If debug mode is enabled, use the multi-player view
   if (debugMode && gameState.players.length === 4) {
     return (
       <>
         <DebugControls />
+        {renderTestPanel()}
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -189,6 +292,7 @@ function App() {
     return (
       <>
         <DebugControls />
+        {renderTestPanel()}
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -211,6 +315,7 @@ function App() {
     return (
       <>
         <DebugControls />
+        {renderTestPanel()}
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -235,6 +340,7 @@ function App() {
     return (
       <>
         <DebugControls />
+        {renderTestPanel()}
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -254,6 +360,7 @@ function App() {
     return (
       <>
         <DebugControls />
+        {renderTestPanel()}
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -301,6 +408,7 @@ function App() {
     return (
       <>
         <DebugControls />
+        {renderTestPanel()}
         <DebugPanel
           gameState={gameState}
           gameId={gameId}

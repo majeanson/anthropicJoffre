@@ -3,9 +3,10 @@ import { useState } from 'react';
 interface LobbyProps {
   onCreateGame: (playerName: string) => void;
   onJoinGame: (gameId: string, playerName: string) => void;
+  onQuickPlay: () => void;
 }
 
-export function Lobby({ onCreateGame, onJoinGame }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onQuickPlay }: LobbyProps) {
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState('');
   const [mode, setMode] = useState<'menu' | 'create' | 'join'>('menu');
@@ -44,6 +45,16 @@ export function Lobby({ onCreateGame, onJoinGame }: LobbyProps) {
             >
               Join Game
             </button>
+            <button
+              onClick={onQuickPlay}
+              className="w-full bg-purple-600 text-white py-4 rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2"
+            >
+              <span>⚡</span>
+              <span>Quick Play (1 Player + 3 Bots)</span>
+            </button>
+            <p className="text-center text-sm text-gray-300 mt-2">
+              Quick Play creates a game with AI bots for easy testing
+            </p>
           </div>
         </div>
       </div>
