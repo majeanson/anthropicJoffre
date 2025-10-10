@@ -504,16 +504,6 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Check if player has already played a card in this trick
-    const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === socket.id);
-    if (hasAlreadyPlayed) {
-      console.log(`Player ${socket.id} attempted to play multiple cards in same trick`);
-      socket.emit('invalid_move', {
-        message: 'You have already played a card this turn'
-      });
-      return;
-    }
-
     // Validate suit-following rule
     if (game.currentTrick.length > 0) {
       const ledSuit = game.currentTrick[0].card.color;
