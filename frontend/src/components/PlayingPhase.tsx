@@ -219,6 +219,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
           {showPreviousTrick && previousCardPositions ? (
             // Previous Trick View - Circular layout on both mobile and desktop
             <>
+              {/* Modal overlay background */}
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg z-0" />
+
               {/* Title - always visible */}
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-10">
                 <div className="text-yellow-400 text-sm md:text-2xl font-bold mb-1 md:mb-2">Previous Trick</div>
@@ -231,8 +234,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Circular Layout for both mobile and desktop */}
-              <div className="relative h-full md:h-[400px]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
+              <div className="relative h-full md:h-[400px] z-10">
+                {/* Bottom - You */}
+                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
@@ -241,7 +245,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </div>
                 </div>
 
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
+                {/* Left */}
+                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                   }`}>
@@ -250,7 +255,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
                 </div>
 
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
+                {/* Top */}
+                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                   }`}>
@@ -259,7 +265,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
                 </div>
 
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
+                {/* Right */}
+                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
                   {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
@@ -280,7 +287,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </div>
                 )}
 
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
+                {/* Bottom - You */}
+                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
                   {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId)}
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
@@ -289,7 +297,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </div>
                 </div>
 
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
+                {/* Left */}
+                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                   } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
@@ -298,7 +307,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId)}
                 </div>
 
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
+                {/* Top */}
+                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                   } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
@@ -307,7 +317,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId)}
                 </div>
 
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
+                {/* Right */}
+                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
                   {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId)}
                   <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
