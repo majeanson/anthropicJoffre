@@ -155,10 +155,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     .reduce((sum, p) => sum + p.pointsWon, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col p-2 md:p-6">
       {/* Score Board - 20% of screen height on mobile */}
-      <div className="w-full mb-1 md:mb-4 sticky top-0 z-10 pr-16 md:pr-0">
-        <div className="bg-white rounded-lg p-2 md:p-3 shadow-lg mx-2 md:mx-auto md:max-w-6xl">
+      <div className="w-full mb-3 md:mb-4 flex-shrink-0 pr-16 md:pr-0">
+        <div className="bg-white rounded-lg p-2 md:p-3 shadow-lg md:max-w-6xl md:mx-auto">
           <div className="flex justify-between items-start gap-2">
             {/* Team 1 */}
             <div className="flex-1">
@@ -197,8 +197,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       </div>
 
       {/* Circular Card Layout - 60% of screen height on mobile */}
-      <div className="flex-1 mx-2 md:mx-auto md:max-w-6xl mb-1 md:mb-8 relative min-h-0">
-        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 h-full relative min-h-[400px] md:min-h-[500px]">
+      <div className="flex-1 md:mx-auto md:max-w-6xl mb-3 md:mb-8 relative min-h-0 flex flex-col">
+        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 flex-1 relative">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
           <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
@@ -328,7 +328,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
 
       {/* Player Hand */}
-      <div className="max-w-6xl mx-auto">
+      <div className="md:max-w-6xl md:mx-auto flex-shrink-0">
         <div className="bg-white rounded-lg p-2 md:p-4 shadow-lg">
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
