@@ -16,7 +16,7 @@ const colorStyles: Record<CardColor, string> = {
 
 const sizeStyles = {
   tiny: 'w-12 h-20 text-base',
-  small: 'w-14 h-22 text-lg',
+  small: 'w-16 h-28 text-lg',
   medium: 'w-20 h-32 text-2xl',
   large: 'w-24 h-36 text-3xl',
 };

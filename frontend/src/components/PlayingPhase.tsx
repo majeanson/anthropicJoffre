@@ -117,15 +117,20 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false) => {
     if (!tc) {
       return (
-        <div className="w-20 h-28 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
-          <span className="text-white/40 text-xs">Empty</span>
+        <div className="w-12 h-20 md:w-20 md:h-28 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
+          <span className="text-white/40 text-[10px] md:text-xs">Empty</span>
         </div>
       );
     }
 
     return (
-      <div className={`transition-all duration-300 ${isWinner ? 'scale-110 ring-4 ring-yellow-400' : ''}`}>
-        <CardComponent card={tc.card} size="medium" />
+      <div className={`transition-all duration-300 ${isWinner ? 'scale-110 ring-2 md:ring-4 ring-yellow-400' : ''}`}>
+        <div className="md:hidden">
+          <CardComponent card={tc.card} size="tiny" />
+        </div>
+        <div className="hidden md:block">
+          <CardComponent card={tc.card} size="medium" />
+        </div>
       </div>
     );
   };
@@ -222,35 +227,21 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
           </div>
 
           {showPreviousTrick && previousCardPositions ? (
-            // Previous Trick View - Grid on mobile, circular on desktop
+            // Previous Trick View - Circular layout on both mobile and desktop
             <>
               {/* Title - always visible */}
-              <div className="text-center mb-4 md:absolute md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:mb-0">
-                <div className="text-yellow-400 text-xl md:text-2xl font-bold mb-2">Previous Trick</div>
-                <div className="text-white text-base md:text-lg">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-10">
+                <div className="text-yellow-400 text-sm md:text-2xl font-bold mb-1 md:mb-2">Previous Trick</div>
+                <div className="text-white text-xs md:text-lg">
                   Winner: {gameState.previousTrick ? gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name : ''}
                 </div>
-                <div className="text-white/80 text-sm">
+                <div className="text-white/80 text-xs md:text-sm">
                   +{gameState.previousTrick?.points || 0} points
                 </div>
               </div>
 
-              {/* Mobile Grid Layout */}
-              <div className="grid grid-cols-2 gap-4 md:hidden">
-                {[0, 1, 2, 3].map(pos => (
-                  <div key={pos} className="flex flex-col items-center gap-2">
-                    <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      getPlayerTeam(pos) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                    }`}>
-                      {getPlayerName(pos)}{pos === 0 ? ' (You)' : ''}
-                    </div>
-                    {renderCard(previousCardPositions[pos], previousCardPositions[pos]?.playerId === gameState.previousTrick?.winnerId)}
-                  </div>
-                ))}
-              </div>
-
-              {/* Desktop Circular Layout */}
-              <div className="hidden md:block relative h-[400px]">
+              {/* Circular Layout for both mobile and desktop */}
+              <div className="relative h-[180px] md:h-[400px]">
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
                   <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
@@ -289,30 +280,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
             </>
           ) : (
-            // Current Trick View - Grid on mobile, circular on desktop
+            // Current Trick View - Circular layout on both mobile and desktop
             <>
-              {/* Mobile Grid Layout */}
-              <div className="grid grid-cols-2 gap-4 md:hidden">
-                {gameState.currentTrick.length === 0 ? (
-                  <div className="col-span-2 text-white/60 text-center py-8">
-                    <p className="text-base">Waiting for first card...</p>
-                  </div>
-                ) : (
-                  [0, 1, 2, 3].map(pos => (
-                    <div key={pos} className="flex flex-col items-center gap-2">
-                      <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        getPlayerTeam(pos) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                      } ${cardPositions[pos]?.playerId === currentTrickWinnerId ? 'ring-2 ring-yellow-400' : ''}`}>
-                        {getPlayerName(pos)}{pos === 0 ? ' (You)' : ''}
-                      </div>
-                      {renderCard(cardPositions[pos], cardPositions[pos]?.playerId === currentTrickWinnerId)}
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {/* Desktop Circular Layout */}
-              <div className="hidden md:block relative h-[400px]">
+              {/* Circular Layout for both mobile and desktop */}
+              <div className="relative h-[180px] md:h-[400px]">
                 {gameState.currentTrick.length === 0 && (
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60 text-center">
                     <p className="text-xl">Waiting for first card...</p>
@@ -363,15 +334,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
       {/* Player Hand */}
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-lg p-3 md:p-6 shadow-lg">
-          <h3 className="text-sm md:text-lg font-semibold mb-2 md:mb-3">
-            {isSpectator ? (
-              <>Spectator <span className="text-purple-600 bg-purple-100 px-2 py-0.5 rounded text-xs">👁️</span></>
-            ) : (
-              <>Your Hand</>
-            )}
-          </h3>
-
+        <div className="bg-white rounded-lg p-2 md:p-4 shadow-lg">
           {validationMessage && (
             <div className="mb-2 bg-yellow-50 border border-yellow-200 text-yellow-800 px-2 py-1.5 md:px-4 md:py-2 rounded text-xs">
               {validationMessage}
@@ -395,7 +358,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto md:overflow-x-visible -mx-3 md:mx-0 px-3 md:px-0">
+              <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
                 <div className="flex gap-1.5 md:gap-4 md:flex-wrap md:justify-center min-w-min">
                   {currentPlayer.hand.map((card, index) => {
                     const playable = isCardPlayable(card);
@@ -407,11 +370,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                           onClick={() => handleCardClick(card)}
                           disabled={!isCurrentTurn || !playable}
                         />
-                        {isCurrentTurn && !playable && (
-                          <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
-                            <span className="text-white text-lg md:text-2xl font-bold">✕</span>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
