@@ -155,24 +155,24 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     .reduce((sum, p) => sum + p.pointsWon, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col p-2 md:p-6">
-      {/* Score Board - 20% of screen height on mobile */}
-      <div className="w-full mb-3 md:mb-4 flex-shrink-0 pr-16 md:pr-0">
-        <div className="bg-white rounded-lg p-2 md:p-3 shadow-lg md:max-w-6xl md:mx-auto">
+    <div className="h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col p-2 md:p-6 overflow-hidden">
+      {/* Score Board - Fixed height */}
+      <div className="w-full mb-2 md:mb-4 flex-shrink-0 pr-16 md:pr-0">
+        <div className="bg-white rounded-lg p-1.5 md:p-3 shadow-lg md:max-w-6xl md:mx-auto">
           <div className="flex justify-between items-start gap-2">
             {/* Team 1 */}
             <div className="flex-1">
-              <h3 className="text-xs text-gray-500">T1</h3>
-              <p className="text-3xl md:text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
-              <p className="text-sm md:text-xs font-semibold text-blue-500 mt-0.5">+{team1RoundScore}</p>
+              <h3 className="text-[10px] text-gray-500">T1</h3>
+              <p className="text-2xl md:text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+              <p className="text-xs font-semibold text-blue-500">+{team1RoundScore}</p>
             </div>
 
             {/* Center Info */}
             <div className="text-center flex-shrink-0">
-              <p className="text-xs text-gray-500">R{gameState.roundNumber}</p>
+              <p className="text-[10px] text-gray-500">R{gameState.roundNumber}</p>
 
               {/* Current Turn Indicator */}
-              <div className={`mt-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+              <div className={`mt-0.5 px-1.5 py-0.5 rounded-full text-[10px] md:text-xs font-bold ${
                 currentTurnTeam === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
               }`}>
                 {currentTurnPlayer?.name}
@@ -180,7 +180,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
               {/* Trump */}
               {gameState.trump && (
-                <p className={`text-sm md:text-base font-bold mt-1 ${getTrumpColor(gameState.trump)}`}>
+                <p className={`text-xs md:text-base font-bold mt-0.5 ${getTrumpColor(gameState.trump)}`}>
                   <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
                 </p>
               )}
@@ -188,17 +188,17 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
             {/* Team 2 */}
             <div className="flex-1 text-right">
-              <h3 className="text-xs text-gray-500">T2</h3>
-              <p className="text-3xl md:text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
-              <p className="text-sm md:text-xs font-semibold text-red-500 mt-0.5">+{team2RoundScore}</p>
+              <h3 className="text-[10px] text-gray-500">T2</h3>
+              <p className="text-2xl md:text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+              <p className="text-xs font-semibold text-red-500">+{team2RoundScore}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Circular Card Layout - 60% of screen height on mobile */}
-      <div className="flex-1 md:mx-auto md:max-w-6xl mb-3 md:mb-8 relative min-h-0 flex flex-col">
-        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 flex-1 relative">
+      {/* Circular Card Layout - Takes remaining space */}
+      <div className="flex-1 md:mx-auto md:max-w-6xl mb-2 md:mb-8 relative min-h-0 overflow-hidden">
+        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 h-full relative">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
           <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
