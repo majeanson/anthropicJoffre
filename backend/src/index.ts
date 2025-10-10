@@ -456,8 +456,18 @@ io.on('connection', (socket) => {
     const game = games.get(gameId);
     if (!game || game.phase !== 'playing') return;
 
+    // Check if player has already played a card in this trick FIRST (before any other checks)
+    const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === socket.id);
+    if (hasAlreadyPlayed) {
+      console.log(`Player ${socket.id} attempted to play multiple cards in same trick`);
+      socket.emit('invalid_move', {
+        message: 'You have already played a card this trick'
+      });
+      return;
+    }
+
     // Prevent playing when trick is complete (4 cards already played)
-    if (game.currentTrick.length >= 3) {
+    if (game.currentTrick.length >= 4) {
       console.log(`Player ${socket.id} attempted to play while trick is being resolved`);
       socket.emit('invalid_move', {
         message: 'Please wait for the current trick to be resolved'
