@@ -112,20 +112,15 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false) => {
     if (!tc) {
       return (
-        <div className="w-12 h-20 md:w-20 md:h-28 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
-          <span className="text-white/40 text-[10px] md:text-xs">Empty</span>
+        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
+          <span className="text-white/40 text-xs md:text-sm">Empty</span>
         </div>
       );
     }
 
     return (
       <div className={`transition-all duration-300 ${isWinner ? 'scale-110 ring-2 md:ring-4 ring-yellow-400' : ''}`}>
-        <div className="md:hidden">
-          <CardComponent card={tc.card} size="tiny" />
-        </div>
-        <div className="hidden md:block">
-          <CardComponent card={tc.card} size="medium" />
-        </div>
+        <CardComponent card={tc.card} size="small" />
       </div>
     );
   };
@@ -155,9 +150,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     .reduce((sum, p) => sum + p.pointsWon, 0);
 
   return (
-    <div className="h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col p-2 md:p-6 overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col overflow-hidden">
       {/* Score Board - Fixed height */}
-      <div className="w-full mb-2 md:mb-4 flex-shrink-0 pr-16 md:pr-0">
+      <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
         <div className="bg-white rounded-lg p-1.5 md:p-3 shadow-lg md:max-w-6xl md:mx-auto">
           <div className="flex justify-between items-start gap-2">
             {/* Team 1 */}
@@ -197,7 +192,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       </div>
 
       {/* Circular Card Layout - Takes remaining space */}
-      <div className="flex-1 md:mx-auto md:max-w-6xl mb-2 md:mb-8 relative min-h-0 overflow-hidden">
+      <div className="flex-1 md:mx-auto md:max-w-6xl mb-2 md:mb-8 relative min-h-0 overflow-hidden px-2 md:px-6">
         <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 h-full relative">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
           <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
@@ -328,7 +323,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
 
       {/* Player Hand */}
-      <div className="md:max-w-6xl md:mx-auto flex-shrink-0">
+      <div className="md:max-w-6xl md:mx-auto flex-shrink-0 px-2 md:px-6 pb-2 md:pb-6">
         <div className="bg-white rounded-lg p-2 md:p-4 shadow-lg">
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
