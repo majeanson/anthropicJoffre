@@ -160,10 +160,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     .reduce((sum, p) => sum + p.pointsWon, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-2 md:p-6">
-      {/* Score Board - Sticky on mobile, with padding to avoid debug menu */}
-      <div className="max-w-6xl mx-auto mb-2 md:mb-6 sticky top-0 z-10 pr-20 md:pr-0">
-        <div className="bg-white rounded-lg p-2 md:p-3 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col">
+      {/* Score Board - 20% of screen height on mobile */}
+      <div className="w-full mb-1 md:mb-4 sticky top-0 z-10 pr-16 md:pr-0">
+        <div className="bg-white rounded-lg p-2 md:p-3 shadow-lg mx-2 md:mx-auto md:max-w-6xl">
           <div className="flex justify-between items-start gap-2">
             {/* Team 1 */}
             <div className="flex-1">
@@ -201,9 +201,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         </div>
       </div>
 
-      {/* Circular Card Layout - Use grid on mobile, circular on desktop */}
-      <div className="max-w-6xl mx-auto mb-2 md:mb-8 relative">
-        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 min-h-[200px] md:min-h-[500px] relative">
+      {/* Circular Card Layout - 60% of screen height on mobile */}
+      <div className="flex-1 mx-2 md:mx-auto md:max-w-6xl mb-1 md:mb-8 relative min-h-0">
+        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 h-full relative min-h-[400px] md:min-h-[500px]">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
           <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
@@ -241,10 +241,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Circular Layout for both mobile and desktop */}
-              <div className="relative h-[180px] md:h-[400px]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+              <div className="relative h-full md:h-[400px]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
-                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
                   }`}>
                     {getPlayerName(0)} (You)
@@ -283,45 +283,45 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             // Current Trick View - Circular layout on both mobile and desktop
             <>
               {/* Circular Layout for both mobile and desktop */}
-              <div className="relative h-[180px] md:h-[400px]">
+              <div className="relative h-full md:h-[400px]">
                 {gameState.currentTrick.length === 0 && (
                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60 text-center">
                     <p className="text-xl">Waiting for first card...</p>
                   </div>
                 )}
 
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
                   {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId)}
-                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
+                  } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(0)} (You)
                   </div>
                 </div>
 
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
-                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
+                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
+                  } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
                   {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId)}
                 </div>
 
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
+                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
+                  } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
                   {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId)}
                 </div>
 
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
                   {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId)}
-                  <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
                     getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
+                  } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(3)}
                   </div>
                 </div>
@@ -335,19 +335,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       {/* Player Hand */}
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-lg p-2 md:p-4 shadow-lg">
-          {validationMessage && (
-            <div className="mb-2 bg-yellow-50 border border-yellow-200 text-yellow-800 px-2 py-1.5 md:px-4 md:py-2 rounded text-xs">
-              {validationMessage}
-            </div>
-          )}
-
-          {isCurrentTurn && gameState.currentTrick.length > 0 && (
-            <div className="mb-2 bg-blue-50 border border-blue-200 text-blue-800 px-2 py-1.5 md:px-4 md:py-2 rounded text-xs">
-              <strong>Led:</strong> <span className="capitalize">{gameState.currentTrick[0].card.color}</span>
-              {playableCards.length < currentPlayer.hand.length && ' - Must follow'}
-            </div>
-          )}
-
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
             <div className="text-center py-6">
