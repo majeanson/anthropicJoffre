@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Bet, Player } from '../types/game';
 
 interface BettingPhaseProps {
