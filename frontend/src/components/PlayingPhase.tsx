@@ -161,8 +161,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-2 md:p-6">
-      {/* Score Board - Sticky on mobile */}
-      <div className="max-w-6xl mx-auto mb-2 md:mb-6 sticky top-0 z-10">
+      {/* Score Board - Sticky on mobile, with padding to avoid debug menu */}
+      <div className="max-w-6xl mx-auto mb-2 md:mb-6 sticky top-0 z-10 pr-20 md:pr-0">
         <div className="bg-white rounded-lg p-2 md:p-3 shadow-lg">
           <div className="flex justify-between items-start gap-2">
             {/* Team 1 */}
@@ -204,8 +204,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       {/* Circular Card Layout - Use grid on mobile, circular on desktop */}
       <div className="max-w-6xl mx-auto mb-2 md:mb-8 relative">
         <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 min-h-[200px] md:min-h-[500px] relative">
-          {/* Floating Action Buttons - Bottom Right Corner */}
-          <div className="fixed bottom-20 right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
+          {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
+          <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
               onClick={() => setShowLeaderboard(true)}
               className="bg-yellow-500 bg-opacity-90 hover:bg-opacity-100 active:bg-yellow-700 text-white w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-xl md:text-sm font-semibold transition-all shadow-lg flex items-center justify-center backdrop-blur-sm"
