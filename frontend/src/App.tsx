@@ -395,34 +395,55 @@ function App() {
     return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} />;
   }
 
+  // Debug menu state
+  const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
+
   // Debug controls (always available, even in production)
   const DebugControls = () => (
-    <div className="fixed top-4 right-4 z-50 flex gap-2">
+    <div className="fixed top-4 right-4 z-50">
+      {/* Debug Menu Button */}
       <button
-        onClick={() => setTestPanelOpen(true)}
-        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-colors flex items-center gap-2"
-        title="Open Test Panel"
-        aria-label="Open test panel for state manipulation"
+        onClick={() => setDebugMenuOpen(!debugMenuOpen)}
+        className="bg-gray-800 bg-opacity-80 hover:bg-opacity-90 text-white px-3 py-2 rounded-lg shadow-lg font-bold transition-all flex items-center gap-2 backdrop-blur-sm"
+        title="Debug Menu"
+        aria-label="Open debug menu"
       >
-        🧪 Test
+        ⚙️ Debug
       </button>
-      <button
-        onClick={() => setDebugPanelOpen(true)}
-        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-colors flex items-center gap-2"
-        title="Open Debug Panel"
-        aria-label="Open debug panel to inspect game state"
-      >
-        🔍 State
-      </button>
-      {gameState && gameState.players.length === 4 && (
-        <button
-          onClick={() => setDebugMode(!debugMode)}
-          className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-colors"
-          title="Toggle 4-Player Debug View"
-          aria-label={debugMode ? 'Switch to single player view' : 'Switch to 4-player debug view'}
-        >
-          {debugMode ? '👤 Single' : '🐛 4-Player'}
-        </button>
+
+      {/* Dropdown Menu */}
+      {debugMenuOpen && (
+        <div className="absolute top-12 right-0 bg-white bg-opacity-95 rounded-lg shadow-2xl p-2 min-w-[160px] backdrop-blur-sm">
+          <button
+            onClick={() => {
+              setTestPanelOpen(true);
+              setDebugMenuOpen(false);
+            }}
+            className="w-full text-left px-3 py-2 rounded hover:bg-green-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700"
+          >
+            🧪 Test Panel
+          </button>
+          <button
+            onClick={() => {
+              setDebugPanelOpen(true);
+              setDebugMenuOpen(false);
+            }}
+            className="w-full text-left px-3 py-2 rounded hover:bg-purple-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700"
+          >
+            🔍 Game State
+          </button>
+          {gameState && gameState.players.length === 4 && (
+            <button
+              onClick={() => {
+                setDebugMode(!debugMode);
+                setDebugMenuOpen(false);
+              }}
+              className="w-full text-left px-3 py-2 rounded hover:bg-yellow-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700"
+            >
+              {debugMode ? '👤 Single View' : '🐛 4-Player View'}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

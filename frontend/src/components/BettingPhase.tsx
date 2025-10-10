@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Bet, Player } from '../types/game';
 
 interface BettingPhaseProps {
@@ -97,11 +97,11 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       </div>
 
       {!hasPlacedBet && (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {isMyTurn ? (
             <>
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
                   Select Your Bet:
                 </label>
 
@@ -110,65 +110,92 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                   <button
                     data-testid="skip-bet-button"
                     onClick={handleSkip}
-                    className="w-full py-3 px-4 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
+                    className="w-full py-2 px-3 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors text-sm"
                   >
                     SKIP
                   </button>
                 )}
 
-                {/* Bet buttons 7-12 */}
-                {[7, 8, 9, 10, 11, 12].map((amount) => {
-                  const withTrumpValid = isBetValid(amount, false);
-                  const withoutTrumpValid = isBetValid(amount, true);
+                {/* Compact Bet buttons - 3 columns on mobile */}
+                <div className="grid grid-cols-3 md:grid-cols-2 gap-1.5 md:gap-2">
+                  {[7, 8, 9, 10, 11, 12].map((amount) => {
+                    const withTrumpValid = isBetValid(amount, false);
+                    const withoutTrumpValid = isBetValid(amount, true);
 
-                  return (
-                    <div key={amount} className="flex gap-2">
-                      {/* With Trump */}
-                      <button
-                        data-testid={`bet-${amount}-with-trump`}
-                        onClick={() => handleBetClick(amount, false)}
-                        disabled={!withTrumpValid}
-                        className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
-                          withTrumpValid
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        }`}
-                      >
-                        {amount}
-                      </button>
+                    return (
+                      <div key={amount} className="contents">
+                        {/* With Trump - Mobile: Single column, Desktop: Left column */}
+                        <button
+                          data-testid={`bet-${amount}-with-trump`}
+                          onClick={() => handleBetClick(amount, false)}
+                          disabled={!withTrumpValid}
+                          className={`py-2 px-2 md:px-3 rounded-lg font-semibold transition-colors text-sm md:text-base ${
+                            withTrumpValid
+                              ? 'bg-blue-600 text-white hover:bg-blue-700'
+                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          }`}
+                        >
+                          {amount}
+                        </button>
 
-                      {/* Without Trump */}
-                      <button
-                        data-testid={`bet-${amount}-without-trump`}
-                        onClick={() => handleBetClick(amount, true)}
-                        disabled={!withoutTrumpValid}
-                        className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
-                          withoutTrumpValid
-                            ? 'bg-purple-600 text-white hover:bg-purple-700'
-                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                        }`}
-                      >
-                        {amount} (No Trump)
-                      </button>
-                    </div>
-                  );
-                })}
+                        {/* Without Trump - Hidden on mobile, shown on desktop */}
+                        <button
+                          data-testid={`bet-${amount}-without-trump`}
+                          onClick={() => handleBetClick(amount, true)}
+                          disabled={!withoutTrumpValid}
+                          className={`hidden md:block py-2 px-3 rounded-lg font-semibold transition-colors text-sm md:text-base ${
+                            withoutTrumpValid
+                              ? 'bg-purple-600 text-white hover:bg-purple-700'
+                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          }`}
+                        >
+                          {amount} (No Trump)
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Mobile: No Trump variants as separate row */}
+                <div className="md:hidden">
+                  <p className="text-xs text-gray-600 mb-1.5 font-medium">No Trump (2x):</p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[7, 8, 9, 10, 11, 12].map((amount) => {
+                      const withoutTrumpValid = isBetValid(amount, true);
+                      return (
+                        <button
+                          key={amount}
+                          data-testid={`bet-${amount}-without-trump`}
+                          onClick={() => handleBetClick(amount, true)}
+                          disabled={!withoutTrumpValid}
+                          className={`py-2 px-2 rounded-lg font-semibold transition-colors text-sm ${
+                            withoutTrumpValid
+                              ? 'bg-purple-600 text-white hover:bg-purple-700'
+                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                          }`}
+                        >
+                          {amount}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
 
               {isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) && (
-                <div className="bg-purple-50 border border-purple-200 text-purple-800 px-4 py-3 rounded-lg text-sm">
-                  <strong>Dealer Privilege:</strong> You can match the highest bet or raise it.
+                <div className="bg-purple-50 border border-purple-200 text-purple-800 px-3 py-2 rounded-lg text-xs">
+                  <strong>Dealer:</strong> You can match or raise
                 </div>
               )}
 
               {isDealer && !currentBets.some(b => !b.skipped) && (
-                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg text-sm">
-                  As dealer, you must bet at least 7 points when no one has bet.
+                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg text-xs">
+                  <strong>Dealer:</strong> Must bet (min 7 points)
                 </div>
               )}
             </>
           ) : (
-            <div className="text-center text-gray-600 font-medium py-3">
+            <div className="text-center text-gray-600 font-medium py-3 text-sm">
               Waiting for {players[currentPlayerIndex]?.name}'s bet...
             </div>
           )}

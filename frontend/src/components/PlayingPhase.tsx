@@ -130,49 +130,93 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     );
   };
 
+  // Get color class for trump suit
+  const getTrumpColor = (trump: string | null): string => {
+    if (!trump || trump === 'none') return 'text-gray-900';
+    switch (trump) {
+      case 'red': return 'text-red-600';
+      case 'green': return 'text-green-600';
+      case 'blue': return 'text-blue-600';
+      case 'yellow': return 'text-yellow-600';
+      default: return 'text-gray-900';
+    }
+  };
+
+  // Get current player and their team
+  const currentTurnPlayer = gameState.players[gameState.currentPlayerIndex];
+  const currentTurnTeam = currentTurnPlayer?.teamId || 1;
+
+  // Calculate round scores (points earned this round)
+  const team1RoundScore = gameState.players
+    .filter(p => p.teamId === 1)
+    .reduce((sum, p) => sum + p.pointsWon, 0);
+  const team2RoundScore = gameState.players
+    .filter(p => p.teamId === 2)
+    .reduce((sum, p) => sum + p.pointsWon, 0);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-3 md:p-6">
-      {/* Score Board */}
-      <div className="max-w-6xl mx-auto mb-4 md:mb-6">
-        <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-xs md:text-sm text-gray-600">Team 1</h3>
-              <p className="text-2xl md:text-3xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 p-2 md:p-6">
+      {/* Score Board - Sticky on mobile */}
+      <div className="max-w-6xl mx-auto mb-2 md:mb-6 sticky top-0 z-10">
+        <div className="bg-white rounded-lg p-2 md:p-3 shadow-lg">
+          <div className="flex justify-between items-start gap-2">
+            {/* Team 1 */}
+            <div className="flex-1">
+              <h3 className="text-xs text-gray-500">T1</h3>
+              <p className="text-3xl md:text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+              <p className="text-sm md:text-xs font-semibold text-blue-500 mt-0.5">+{team1RoundScore}</p>
             </div>
-            <div className="text-center">
-              <p className="text-xs md:text-sm text-gray-600">Round {gameState.roundNumber}</p>
+
+            {/* Center Info */}
+            <div className="text-center flex-shrink-0">
+              <p className="text-xs text-gray-500">R{gameState.roundNumber}</p>
+
+              {/* Current Turn Indicator */}
+              <div className={`mt-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+                currentTurnTeam === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+              }`}>
+                {currentTurnPlayer?.name}
+              </div>
+
+              {/* Trump */}
               {gameState.trump && (
-                <p className="text-sm md:text-lg font-semibold mt-1">
-                  Trump: <span className="capitalize">{gameState.trump}</span>
+                <p className={`text-sm md:text-base font-bold mt-1 ${getTrumpColor(gameState.trump)}`}>
+                  <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
                 </p>
               )}
             </div>
-            <div>
-              <h3 className="text-xs md:text-sm text-gray-600">Team 2</h3>
-              <p className="text-2xl md:text-3xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+
+            {/* Team 2 */}
+            <div className="flex-1 text-right">
+              <h3 className="text-xs text-gray-500">T2</h3>
+              <p className="text-3xl md:text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+              <p className="text-sm md:text-xs font-semibold text-red-500 mt-0.5">+{team2RoundScore}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Circular Card Layout - Use grid on mobile, circular on desktop */}
-      <div className="max-w-6xl mx-auto mb-4 md:mb-8 relative">
-        <div className="bg-white/10 backdrop-blur rounded-xl p-4 md:p-8 min-h-[300px] md:min-h-[500px] relative">
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 mb-4 md:absolute md:top-4 md:right-4 md:mb-0">
+      <div className="max-w-6xl mx-auto mb-2 md:mb-8 relative">
+        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 min-h-[200px] md:min-h-[500px] relative">
+          {/* Floating Action Buttons - Bottom Right Corner */}
+          <div className="fixed bottom-20 right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
               onClick={() => setShowLeaderboard(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors shadow-lg min-h-[44px] flex items-center justify-center flex-1 md:flex-initial"
+              className="bg-yellow-500 bg-opacity-90 hover:bg-opacity-100 active:bg-yellow-700 text-white w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-xl md:text-sm font-semibold transition-all shadow-lg flex items-center justify-center backdrop-blur-sm"
+              title="Leaderboard"
             >
-              🏆 Leaderboard
+              <span className="md:hidden">🏆</span>
+              <span className="hidden md:inline">🏆 Leaderboard</span>
             </button>
             {gameState.previousTrick && (
               <button
                 onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors min-h-[44px] flex items-center justify-center flex-1 md:flex-initial"
+                className="bg-purple-600 bg-opacity-90 hover:bg-opacity-100 active:bg-purple-800 text-white w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-xl md:text-sm font-semibold transition-all shadow-lg flex items-center justify-center backdrop-blur-sm"
+                title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
               >
-                {showPreviousTrick ? 'Current' : 'Previous'}
+                <span className="md:hidden">{showPreviousTrick ? '▶️' : '⏮️'}</span>
+                <span className="hidden md:inline">{showPreviousTrick ? 'Current' : 'Previous'}</span>
               </button>
             )}
           </div>
@@ -316,78 +360,56 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         </div>
       </div>
 
-      {/* Players Info */}
-      <div className="max-w-6xl mx-auto mb-4 md:mb-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-          {gameState.players.map((player, index) => (
-            <div
-              key={player.id}
-              className={`bg-white rounded-lg p-2 md:p-4 ${
-                gameState.currentPlayerIndex === index ? 'ring-2 md:ring-4 ring-yellow-400' : ''
-              }`}
-            >
-              <div className="flex items-center gap-1 md:gap-2 mb-1 md:mb-2">
-                <span className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
-                <span className="font-medium text-xs md:text-base truncate">{player.name}</span>
-              </div>
-              <div className="text-xs md:text-sm text-gray-600">
-                <p>Tricks: {player.tricksWon}</p>
-                <p>Cards: {player.hand.length}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Player Hand */}
       <div className="max-w-6xl mx-auto">
-        <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg">
-          <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">
+        <div className="bg-white rounded-lg p-3 md:p-6 shadow-lg">
+          <h3 className="text-sm md:text-lg font-semibold mb-2 md:mb-3">
             {isSpectator ? (
-              <>Spectator Mode <span className="text-purple-600 bg-purple-100 px-2 py-1 rounded text-sm">👁️ Watching</span></>
+              <>Spectator <span className="text-purple-600 bg-purple-100 px-2 py-0.5 rounded text-xs">👁️</span></>
             ) : (
-              <>Your Hand {isCurrentTurn && <span className="text-green-600">(Your Turn)</span>}</>
+              <>Your Hand</>
             )}
           </h3>
 
           {validationMessage && (
-            <div className="mb-3 md:mb-4 bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 md:px-4 md:py-3 rounded-lg text-xs md:text-sm">
+            <div className="mb-2 bg-yellow-50 border border-yellow-200 text-yellow-800 px-2 py-1.5 md:px-4 md:py-2 rounded text-xs">
               {validationMessage}
             </div>
           )}
 
           {isCurrentTurn && gameState.currentTrick.length > 0 && (
-            <div className="mb-3 md:mb-4 bg-blue-50 border border-blue-200 text-blue-800 px-3 py-2 md:px-4 md:py-3 rounded-lg text-xs md:text-sm">
-              <strong>Led suit:</strong> {gameState.currentTrick[0].card.color.charAt(0).toUpperCase() + gameState.currentTrick[0].card.color.slice(1)}
-              {playableCards.length < currentPlayer.hand.length &&
-                ` - You must play ${gameState.currentTrick[0].card.color}`}
+            <div className="mb-2 bg-blue-50 border border-blue-200 text-blue-800 px-2 py-1.5 md:px-4 md:py-2 rounded text-xs">
+              <strong>Led:</strong> <span className="capitalize">{gameState.currentTrick[0].card.color}</span>
+              {playableCards.length < currentPlayer.hand.length && ' - Must follow'}
             </div>
           )}
 
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
-            <div className="text-center py-8">
-              <div className="inline-block bg-gray-100 px-6 py-4 rounded-lg">
-                <span className="text-gray-600 text-lg">🔒 Player hands are hidden</span>
-                <p className="text-gray-500 text-sm mt-2">You are watching the game as a spectator</p>
+            <div className="text-center py-6">
+              <div className="inline-block bg-gray-100 px-4 py-3 rounded-lg">
+                <span className="text-gray-600 text-sm">🔒 Hands Hidden</span>
+                <p className="text-gray-500 text-xs mt-1">Spectator Mode</p>
               </div>
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto md:overflow-x-visible -mx-4 md:mx-0 px-4 md:px-0">
-                <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
+              <div className="overflow-x-auto md:overflow-x-visible -mx-3 md:mx-0 px-3 md:px-0">
+                <div className="flex gap-1.5 md:gap-4 md:flex-wrap md:justify-center min-w-min">
                   {currentPlayer.hand.map((card, index) => {
                     const playable = isCardPlayable(card);
                     return (
                       <div key={`${card.color}-${card.value}-${index}`} className="relative flex-shrink-0 md:flex-shrink">
                         <CardComponent
                           card={card}
+                          size="small"
                           onClick={() => handleCardClick(card)}
                           disabled={!isCurrentTurn || !playable}
                         />
                         {isCurrentTurn && !playable && (
                           <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
-                            <span className="text-white text-xl md:text-2xl font-bold">✕</span>
+                            <span className="text-white text-lg md:text-2xl font-bold">✕</span>
                           </div>
                         )}
                       </div>
@@ -396,7 +418,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 </div>
               </div>
               {!isCurrentTurn && (
-                <p className="text-center text-gray-500 mt-3 md:mt-4 text-sm md:text-base">
+                <p className="text-center text-gray-500 mt-2 text-xs md:text-sm">
                   Waiting for {gameState.players[gameState.currentPlayerIndex]?.name}...
                 </p>
               )}
