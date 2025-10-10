@@ -37,13 +37,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const currentPlayerIndex = gameState.players.findIndex(p => p.id === currentPlayerId);
 
   // Arrange cards in circular order relative to current player (bottom)
-  // Positions: [bottom, left, top, right]
+  // Positions: [bottom, right, top, left] - clockwise like a watch
   const getCardPositions = (trick: TrickCard[]): (TrickCard | null)[] => {
-    const positions: (TrickCard | null)[] = [null, null, null, null]; // bottom, left, top, right
+    const positions: (TrickCard | null)[] = [null, null, null, null]; // bottom, right, top, left
 
     trick.forEach(tc => {
       const playerIndex = gameState.players.findIndex(p => p.id === tc.playerId);
-      // Calculate relative position (0=bottom, 1=left, 2=top, 3=right)
+      // Calculate relative position (0=bottom, 1=right, 2=top, 3=left) - clockwise
       const relativePos = (playerIndex - currentPlayerIndex + 4) % 4;
       positions[relativePos] = tc;
     });
@@ -112,14 +112,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false) => {
     if (!tc) {
       return (
-        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center">
-          <span className="text-white/40 text-xs md:text-sm">Empty</span>
+        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center bg-white/5 backdrop-blur">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-white/30 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-white/20"></div>
+          </div>
         </div>
       );
     }
 
     return (
-      <div className={`transition-all duration-300 ${isWinner ? 'scale-110 ring-2 md:ring-4 ring-yellow-400' : ''}`}>
+      <div className={`transition-all duration-500 ${isWinner ? 'scale-110 ring-4 md:ring-6 ring-yellow-400 shadow-2xl shadow-yellow-400/50' : ''}`}>
         <CardComponent card={tc.card} size="small" />
       </div>
     );
@@ -152,53 +154,59 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   return (
     <div className="h-screen md:min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
-      <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
-        <div className="bg-white rounded-lg p-1.5 md:p-3 shadow-lg md:max-w-6xl md:mx-auto">
-          <div className="flex justify-between items-start gap-2">
+      <div className="w-full mb-3 md:mb-6 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3 md:p-6 shadow-2xl md:max-w-6xl md:mx-auto border border-white/20">
+          <div className="flex justify-between items-center gap-4 md:gap-8">
             {/* Team 1 */}
-            <div className="flex-1">
-              <h3 className="text-[10px] text-gray-500">T1</h3>
-              <p className="text-2xl md:text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
-              <p className="text-xs font-semibold text-blue-500">+{team1RoundScore}</p>
+            <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-2 md:p-4">
+              <h3 className="text-[10px] md:text-xs font-semibold text-blue-600/70 uppercase tracking-wider mb-1">Team 1</h3>
+              <p className="text-3xl md:text-5xl font-black text-blue-600 leading-none">{gameState.teamScores.team1}</p>
+              <p className="text-xs md:text-sm font-bold text-blue-500 mt-1">+{team1RoundScore} pts</p>
             </div>
 
             {/* Center Info */}
-            <div className="text-center flex-shrink-0">
-              <p className="text-[10px] text-gray-500">R{gameState.roundNumber}</p>
+            <div className="text-center flex-shrink-0 space-y-1.5 md:space-y-2">
+              <div className="bg-gradient-to-r from-gray-100 to-gray-50 px-2 md:px-3 py-1 rounded-lg">
+                <p className="text-[10px] md:text-xs font-bold text-gray-600">ROUND {gameState.roundNumber}</p>
+              </div>
 
               {/* Current Turn Indicator */}
-              <div className={`mt-0.5 px-1.5 py-0.5 rounded-full text-[10px] md:text-xs font-bold ${
-                currentTurnTeam === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
+              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg ${
+                currentTurnTeam === 1
+                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
+                  : 'bg-gradient-to-r from-red-500 to-red-600 text-white'
               }`}>
                 {currentTurnPlayer?.name}
               </div>
 
               {/* Trump */}
               {gameState.trump && (
-                <p className={`text-xs md:text-base font-bold mt-0.5 ${getTrumpColor(gameState.trump)}`}>
-                  <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
-                </p>
+                <div className="bg-white/60 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border border-gray-200">
+                  <p className={`text-xs md:text-base font-bold ${getTrumpColor(gameState.trump)}`}>
+                    <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
+                  </p>
+                </div>
               )}
             </div>
 
             {/* Team 2 */}
-            <div className="flex-1 text-right">
-              <h3 className="text-[10px] text-gray-500">T2</h3>
-              <p className="text-2xl md:text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
-              <p className="text-xs font-semibold text-red-500">+{team2RoundScore}</p>
+            <div className="flex-1 bg-gradient-to-br from-red-50 to-red-100/50 rounded-xl p-2 md:p-4 text-right">
+              <h3 className="text-[10px] md:text-xs font-semibold text-red-600/70 uppercase tracking-wider mb-1">Team 2</h3>
+              <p className="text-3xl md:text-5xl font-black text-red-600 leading-none">{gameState.teamScores.team2}</p>
+              <p className="text-xs md:text-sm font-bold text-red-500 mt-1">+{team2RoundScore} pts</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Circular Card Layout - Takes remaining space */}
-      <div className="flex-1 md:mx-auto md:max-w-6xl mb-2 md:mb-8 relative px-2 md:px-6 min-h-0 overflow-hidden md:overflow-visible">
-        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 h-full md:min-h-[500px] relative">
+      <div className="md:max-w-6xl mb-3 md:mb-8 relative px-2 md:px-6">
+        <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-4 md:p-10 md:min-h-[500px] relative border border-white/10 shadow-2xl">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
-          <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
+          <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-3 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
               onClick={() => setShowLeaderboard(true)}
-              className="bg-yellow-500 bg-opacity-90 hover:bg-opacity-100 active:bg-yellow-700 text-white w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-xl md:text-sm font-semibold transition-all shadow-lg flex items-center justify-center backdrop-blur-sm"
+              className="bg-gradient-to-br from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-yellow-500/50 flex items-center justify-center backdrop-blur-md border border-yellow-300/30"
               title="Leaderboard"
             >
               <span className="md:hidden">🏆</span>
@@ -207,11 +215,15 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {gameState.previousTrick && (
               <button
                 onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-                className="bg-purple-600 bg-opacity-90 hover:bg-opacity-100 active:bg-purple-800 text-white w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-xl md:text-sm font-semibold transition-all shadow-lg flex items-center justify-center backdrop-blur-sm"
+                className={`${
+                  showPreviousTrick
+                    ? 'bg-gradient-to-br from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 shadow-green-500/50'
+                    : 'bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 shadow-purple-500/50'
+                } active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border border-white/30`}
                 title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
               >
                 <span className="md:hidden">{showPreviousTrick ? '▶️' : '⏮️'}</span>
-                <span className="hidden md:inline">{showPreviousTrick ? 'Current' : 'Previous'}</span>
+                <span className="hidden md:inline">{showPreviousTrick ? '▶️ Current' : '⏮️ Previous'}</span>
               </button>
             )}
           </div>
@@ -236,43 +248,51 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               {/* Circular Layout for both mobile and desktop */}
               <div className="relative h-full md:h-[400px] z-10">
                 {/* Bottom - You */}
-                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
+                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(0) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(0)} (You)
                   </div>
                 </div>
 
-                {/* Left */}
-                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                {/* Right (clockwise from bottom) */}
+                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                  {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(1) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
-                  {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
                 </div>
 
                 {/* Top */}
-                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(2) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
                   {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
                 </div>
 
-                {/* Right */}
-                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
-                  {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                {/* Left (clockwise from top) */}
+                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(3) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(3)}
                   </div>
+                  {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
                 </div>
               </div>
             </>
@@ -282,49 +302,64 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               {/* Circular Layout for both mobile and desktop */}
               <div className="relative h-full md:h-[400px]">
                 {gameState.currentTrick.length === 0 && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white/60 text-center">
-                    <p className="text-xl">Waiting for first card...</p>
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+                    <div className="bg-white/10 backdrop-blur-lg rounded-2xl px-6 py-4 border border-white/20 shadow-xl">
+                      <p className="text-white/90 text-lg md:text-2xl font-semibold">Waiting for first card...</p>
+                      <div className="mt-2 flex gap-1 justify-center">
+                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                    </div>
                   </div>
                 )}
 
                 {/* Bottom - You */}
-                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
+                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId)}
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(0) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(0)} (You)
                   </div>
                 </div>
 
-                {/* Left */}
-                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
+                {/* Right (clockwise from bottom) */}
+                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                  {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId)}
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(1) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
-                  {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId)}
                 </div>
 
                 {/* Top */}
-                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-2">
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
+                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(2) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
                   {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId)}
                 </div>
 
-                {/* Right */}
-                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1 md:gap-2">
-                  {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId)}
-                  <div className={`px-2 md:px-3 py-0.5 md:py-1 rounded-full text-xs md:text-sm font-semibold ${
-                    getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-4 ring-yellow-400' : ''}`}>
+                {/* Left (clockwise from top) */}
+                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                    getPlayerTeam(3) === 1
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
+                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                  } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(3)}
                   </div>
+                  {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId)}
                 </div>
               </div>
             </>
@@ -334,24 +369,29 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
 
       {/* Player Hand */}
-      <div className="md:max-w-6xl md:mx-auto flex-shrink-0 px-2 md:px-6 pb-2 md:pb-6">
-        <div className="bg-white rounded-lg p-2 md:p-4 shadow-lg">
+      <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 mt-auto">
+        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3 md:p-6 shadow-2xl border border-white/20">
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
-            <div className="text-center py-6">
-              <div className="inline-block bg-gray-100 px-4 py-3 rounded-lg">
-                <span className="text-gray-600 text-sm">🔒 Hands Hidden</span>
-                <p className="text-gray-500 text-xs mt-1">Spectator Mode</p>
+            <div className="text-center py-8">
+              <div className="inline-block bg-gradient-to-br from-gray-100 to-gray-50 px-6 py-4 rounded-xl border border-gray-200 shadow-lg">
+                <span className="text-gray-700 text-base font-semibold">🔒 Hands Hidden</span>
+                <p className="text-gray-500 text-sm mt-1.5">Spectator Mode</p>
               </div>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
-                <div className="flex gap-1.5 md:gap-4 md:flex-wrap md:justify-center min-w-min">
+                <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
                   {currentPlayer.hand.map((card, index) => {
                     const playable = isCardPlayable(card);
                     return (
-                      <div key={`${card.color}-${card.value}-${index}`} className="relative flex-shrink-0 md:flex-shrink">
+                      <div
+                        key={`${card.color}-${card.value}-${index}`}
+                        className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
+                          playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
+                        }`}
+                      >
                         <CardComponent
                           card={card}
                           size="small"
@@ -364,9 +404,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 </div>
               </div>
               {!isCurrentTurn && (
-                <p className="text-center text-gray-500 mt-2 text-xs md:text-sm">
-                  Waiting for {gameState.players[gameState.currentPlayerIndex]?.name}...
-                </p>
+                <div className="text-center mt-3">
+                  <div className="inline-block bg-gradient-to-r from-blue-50 to-purple-50 px-4 py-2 rounded-lg border border-blue-100">
+                    <p className="text-gray-700 text-sm md:text-base font-medium">
+                      Waiting for <span className="font-bold text-blue-600">{gameState.players[gameState.currentPlayerIndex]?.name}</span>...
+                    </p>
+                  </div>
+                </div>
               )}
             </>
           )}

@@ -77,8 +77,8 @@ export async function placeAllBets(pages: Page[], bets: number[] = [9, 9, 7, 8],
     }
   }
 
-  // Wait for playing phase
-  await pages[0].waitForSelector('text=/your hand/i', { timeout: 10000 });
+  // Wait for playing phase - check for cards to be visible
+  await pages[0].locator('[data-card-value]').first().waitFor({ timeout: 10000 });
 }
 
 /**
@@ -88,8 +88,7 @@ export async function placeAllBets(pages: Page[], bets: number[] = [9, 9, 7, 8],
  * @param cardIndex - Index of the card to play (default: 0 for first card)
  */
 export async function playCard(page: Page, cardIndex: number = 0) {
-  const handArea = page.locator('text=/your hand/i').locator('..');
-  const cards = handArea.locator('[data-card-value]');
+  const cards = page.locator('[data-card-value]');
   const card = cards.nth(cardIndex);
   await card.click();
 }
@@ -145,8 +144,7 @@ export async function playFullTrick(pages: Page[]) {
     }
 
     const currentPage = pages[pageWithTurn];
-    const handArea = currentPage.locator('text=/your hand/i').locator('..');
-    const card = handArea.locator('[data-card-value]').first();
+    const card = currentPage.locator('[data-card-value]').first();
     await card.click({ force: true });
 
     await pages[0].waitForTimeout(300);
