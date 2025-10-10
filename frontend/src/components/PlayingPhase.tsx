@@ -150,7 +150,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     .reduce((sum, p) => sum + p.pointsWon, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col">
+    <div className="h-screen md:min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
       <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
         <div className="bg-white rounded-lg p-1.5 md:p-3 shadow-lg md:max-w-6xl md:mx-auto">
@@ -192,8 +192,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       </div>
 
       {/* Circular Card Layout - Takes remaining space */}
-      <div className="flex-1 md:mx-auto md:max-w-6xl mb-2 md:mb-8 relative px-2 md:px-6">
-        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 min-h-[400px] md:min-h-[500px] relative">
+      <div className="flex-1 md:mx-auto md:max-w-6xl mb-2 md:mb-8 relative px-2 md:px-6 min-h-0 overflow-hidden md:overflow-visible">
+        <div className="bg-white/10 backdrop-blur rounded-lg p-2 md:p-8 h-full md:min-h-[500px] relative">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
           <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-2 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
