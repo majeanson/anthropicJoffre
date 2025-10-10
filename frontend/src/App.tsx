@@ -22,6 +22,7 @@ function App() {
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
   const [reconnecting, setReconnecting] = useState<boolean>(false);
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
+  const [currentTrickWinnerId, setCurrentTrickWinnerId] = useState<string | null>(null);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
@@ -104,10 +105,16 @@ function App() {
 
     newSocket.on('game_updated', (gameState) => {
       setGameState(gameState);
+      // Clear winner ID when trick is cleared
+      if (gameState.currentTrick.length === 0) {
+        setCurrentTrickWinnerId(null);
+      }
     });
 
-    newSocket.on('trick_resolved', ({ gameState }) => {
+    newSocket.on('trick_resolved', ({ winnerId, gameState }) => {
       setGameState(gameState);
+      // Store the winner ID for highlighting during the 3-second delay
+      setCurrentTrickWinnerId(winnerId);
     });
 
     newSocket.on('round_ended', (gameState) => {
@@ -480,6 +487,7 @@ function App() {
           currentPlayerId={socket?.id || ''}
           onPlayCard={handlePlayCard}
           isSpectator={isSpectator}
+          currentTrickWinnerId={currentTrickWinnerId}
         />
       </>
     );

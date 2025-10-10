@@ -8,9 +8,10 @@ interface PlayingPhaseProps {
   currentPlayerId: string;
   onPlayCard: (card: CardType) => void;
   isSpectator?: boolean;
+  currentTrickWinnerId?: string | null;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false }: PlayingPhaseProps) {
+export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null }: PlayingPhaseProps) {
   const [validationMessage, setValidationMessage] = useState<string>('');
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
@@ -257,10 +258,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                     <div key={pos} className="flex flex-col items-center gap-2">
                       <div className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         getPlayerTeam(pos) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                      }`}>
+                      } ${cardPositions[pos]?.playerId === currentTrickWinnerId ? 'ring-2 ring-yellow-400' : ''}`}>
                         {getPlayerName(pos)}{pos === 0 ? ' (You)' : ''}
                       </div>
-                      {renderCard(cardPositions[pos])}
+                      {renderCard(cardPositions[pos], cardPositions[pos]?.playerId === currentTrickWinnerId)}
                     </div>
                   ))
                 )}
@@ -275,10 +276,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 )}
 
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-                  {renderCard(cardPositions[0])}
+                  {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId)}
                   <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     getPlayerTeam(0) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                  } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(0)} (You)
                   </div>
                 </div>
@@ -286,26 +287,26 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 <div className="absolute top-1/2 left-0 -translate-y-1/2 flex items-center gap-2">
                   <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     getPlayerTeam(1) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                  } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
-                  {renderCard(cardPositions[1])}
+                  {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId)}
                 </div>
 
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
                   <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     getPlayerTeam(2) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                  } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
-                  {renderCard(cardPositions[2])}
+                  {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId)}
                 </div>
 
                 <div className="absolute top-1/2 right-0 -translate-y-1/2 flex items-center gap-2">
-                  {renderCard(cardPositions[3])}
+                  {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId)}
                   <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
                     getPlayerTeam(3) === 1 ? 'bg-blue-500 text-white' : 'bg-red-500 text-white'
-                  }`}>
+                  } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-4 ring-yellow-400' : ''}`}>
                     {getPlayerName(3)}
                   </div>
                 </div>

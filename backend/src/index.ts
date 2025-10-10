@@ -916,9 +916,9 @@ async function endRound(gameId: string) {
     // Emit round ended and schedule next round
     broadcastGameUpdate(gameId, 'round_ended', game);
 
-    // Start next round after delay
+    // Start next round after delay (5 seconds to review scores)
     game.roundNumber += 1;
-    setTimeout(() => startNewRound(gameId), 3000);
+    setTimeout(() => startNewRound(gameId), 5000);
   }
 }
 
