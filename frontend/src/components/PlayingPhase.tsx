@@ -247,7 +247,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Circular Layout for both mobile and desktop - ANTI-CLOCKWISE */}
-              <div className="relative h-full h-[400px] z-10">
+              <div className="relative h-[400px] z-10">
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
@@ -301,7 +301,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             // Current Trick View - Circular layout on both mobile and desktop - ANTI-CLOCKWISE
             <>
               {/* Circular Layout for both mobile and desktop */}
-              <div className="relative h-full h-[400px]">
+              <div className="relative h-[400px]">
               
 
                 {/* Bottom - You (position 0) */}
