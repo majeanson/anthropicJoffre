@@ -456,10 +456,27 @@ io.on('connection', (socket) => {
     const game = games.get(gameId);
     if (!game || game.phase !== 'playing') return;
 
+    const currentPlayer = game.players[game.currentPlayerIndex];
+    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+
+    // Log current trick state and player's hand
+    console.log(`\n🃏 PLAY_CARD - Player: ${playerName} (${socket.id})`);
+    console.log(`   Current Trick (${game.currentTrick.length}/4):`);
+    game.currentTrick.forEach((tc, idx) => {
+      const player = game.players.find(p => p.id === tc.playerId);
+      console.log(`     ${idx + 1}. ${player?.name || tc.playerId}: ${tc.card.color} ${tc.card.value}`);
+    });
+    console.log(`   Player's Hand (${currentPlayer.hand.length} cards):`);
+    currentPlayer.hand.forEach((c, idx) => {
+      console.log(`     ${idx + 1}. ${c.color} ${c.value}`);
+    });
+    console.log(`   Card being played: ${card.color} ${card.value}`);
+    console.log(`   Current turn index: ${game.currentPlayerIndex} (${currentPlayer.name})`);
+
     // Check if player has already played a card in this trick FIRST (before any other checks)
     const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === socket.id);
     if (hasAlreadyPlayed) {
-      console.log(`Player ${socket.id} attempted to play multiple cards in same trick`);
+      console.log(`   ❌ REJECTED: Player has already played in this trick`);
       socket.emit('invalid_move', {
         message: 'You have already played a card this trick'
       });
@@ -468,15 +485,16 @@ io.on('connection', (socket) => {
 
     // Prevent playing when trick is complete (4 cards already played)
     if (game.currentTrick.length >= 4) {
-      console.log(`Player ${socket.id} attempted to play while trick is being resolved`);
+      console.log(`   ❌ REJECTED: Trick is complete (${game.currentTrick.length}/4 cards)`);
       socket.emit('invalid_move', {
         message: 'Please wait for the current trick to be resolved'
       });
       return;
     }
 
-    const currentPlayer = game.players[game.currentPlayerIndex];
     if (currentPlayer.id !== socket.id) {
+      console.log(`   ❌ REJECTED: Not player's turn (current: ${currentPlayer.name}, requestor: ${playerName})`);
+
       socket.emit('invalid_move', {
         message: 'It is not your turn'
       });
@@ -525,11 +543,16 @@ io.on('connection', (socket) => {
 
     // Add card to trick
     game.currentTrick.push({ playerId: socket.id, card });
+    console.log(`   ✅ ACCEPTED: Card added to trick (now ${game.currentTrick.length}/4 cards)`);
 
     // Remove card from player's hand
     currentPlayer.hand = currentPlayer.hand.filter(
       (c) => !(c.color === card.color && c.value === card.value)
     );
+    console.log(`   Updated hand (${currentPlayer.hand.length} cards remaining):`);
+    currentPlayer.hand.forEach((c, idx) => {
+      console.log(`     ${idx + 1}. ${c.color} ${c.value}`);
+    });
 
     // Move to next player IMMEDIATELY (before resolving trick)
     const previousIndex = game.currentPlayerIndex;
@@ -538,12 +561,18 @@ io.on('connection', (socket) => {
     // Check if trick is complete
     if (game.currentTrick.length === 4) {
       // Emit state with all 4 cards played and turn advanced
+      console.log(`   🎯 Trick complete! Turn advanced: ${game.players[previousIndex].name} → ${game.players[game.currentPlayerIndex].name}`);
+      console.log(`   Final trick state before resolution:`);
+      game.currentTrick.forEach((tc, idx) => {
+        const player = game.players.find(p => p.id === tc.playerId);
+        console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
+      });
       io.to(gameId).emit('game_updated', game);
-      console.log(`Trick complete with ${game.currentTrick.length} cards. Resolving...`);
+      console.log(`   ⏳ Resolving trick...\n`);
       resolveTrick(gameId);
     } else {
       // Emit updated state with turn advanced
-      console.log(`Turn advanced from player ${previousIndex} to player ${game.currentPlayerIndex}, trick has ${game.currentTrick.length} cards`);
+      console.log(`   ➡️  Turn advanced: ${game.players[previousIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
       io.to(gameId).emit('game_updated', game);
     }
   });
