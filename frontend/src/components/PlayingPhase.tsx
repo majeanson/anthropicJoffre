@@ -12,7 +12,6 @@ interface PlayingPhaseProps {
 }
 
 export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null }: PlayingPhaseProps) {
-  const [validationMessage, setValidationMessage] = useState<string>('');
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -85,17 +84,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     }
 
     if (!isCurrentTurn) {
-      setValidationMessage("Wait for your turn");
       return;
     }
 
     if (!isCardPlayable(card)) {
-      const ledSuit = gameState.currentTrick[0]?.card.color;
-      setValidationMessage(`You must follow suit (${ledSuit}) if you have it`);
       return;
     }
 
-    setValidationMessage('');
     setIsPlayingCard(true);
     onPlayCard(card);
   };
