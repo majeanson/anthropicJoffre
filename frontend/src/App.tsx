@@ -23,6 +23,7 @@ function App() {
   const [reconnecting, setReconnecting] = useState<boolean>(false);
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
   const [currentTrickWinnerId, setCurrentTrickWinnerId] = useState<string | null>(null);
+  const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
@@ -394,9 +395,6 @@ function App() {
   if (!gameState) {
     return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} />;
   }
-
-  // Debug menu state
-  const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
 
   // Debug controls (always available, even in production)
   const DebugControls = () => (
