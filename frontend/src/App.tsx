@@ -31,12 +31,22 @@ function App() {
 
     newSocket.on('connect', () => {
       console.log('Connected to server');
+      setError(''); // Clear any connection errors
 
       // Check for existing session and attempt reconnection
       const sessionData = localStorage.getItem('gameSession');
       if (sessionData) {
         try {
           const session: PlayerSession = JSON.parse(sessionData);
+
+          // Check if session is too old (older than 2 minutes)
+          const SESSION_TIMEOUT = 120000; // 2 minutes
+          if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
+            console.log('Session expired, clearing...');
+            localStorage.removeItem('gameSession');
+            return;
+          }
+
           console.log('Found existing session, attempting reconnection...');
           setReconnecting(true);
           newSocket.emit('reconnect_to_game', { token: session.token });
@@ -45,6 +55,31 @@ function App() {
           localStorage.removeItem('gameSession');
         }
       }
+    });
+
+    newSocket.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+      setReconnecting(false);
+
+      // If we have a stale session, clear it
+      const sessionData = localStorage.getItem('gameSession');
+      if (sessionData) {
+        try {
+          const session: PlayerSession = JSON.parse(sessionData);
+          const SESSION_TIMEOUT = 120000;
+          if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
+            localStorage.removeItem('gameSession');
+            setGameState(null);
+            setGameId('');
+          }
+        } catch (e) {
+          localStorage.removeItem('gameSession');
+        }
+      }
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('Disconnected from server');
     });
 
     newSocket.on('game_created', ({ gameId, gameState, session }: { gameId: string; gameState: GameState; session: PlayerSession }) => {
@@ -83,8 +118,12 @@ function App() {
       // Clear invalid session
       localStorage.removeItem('gameSession');
 
-      // Don't show error for expired sessions, just go back to lobby
-      if (!message.includes('expired')) {
+      // Reset game state to go back to lobby
+      setGameState(null);
+      setGameId('');
+
+      // Don't show error for expired sessions or invalid tokens, just go back to lobby silently
+      if (!message.includes('expired') && !message.includes('Invalid')) {
         setError(message);
       }
     });
