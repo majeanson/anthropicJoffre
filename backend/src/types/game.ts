@@ -112,3 +112,13 @@ export interface TimeoutConfig {
   bettingTimeout: number; // milliseconds
   playingTimeout: number; // milliseconds
 }
+
+export interface Spectator {
+  id: string;
+  name: string;
+  joinedAt: number;
+}
+
+export interface SpectatorGameState extends Omit<GameState, 'players'> {
+  players: Omit<Player, 'hand'>[];
+}

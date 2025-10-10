@@ -27,29 +27,28 @@ test.describe('Full Game Flow', () => {
       await page.goto('http://localhost:5173');
 
       if (i === 1) {
-        // Player 1 creates game
-        await page.getByRole('button', { name: /create/i }).click();
-        await page.fill('input[type="text"]', `Player ${i}`);
-        await page.getByRole('button', { name: /create/i }).click();
+        // Player 1 creates game using test IDs
+        await page.getByTestId('create-game-button').click();
+        await page.getByTestId('player-name-input').fill(`Player ${i}`);
+        await page.getByTestId('submit-create-button').click();
 
-        // Get game ID
-        await page.waitForSelector('.font-mono', { timeout: 10000 });
-        const gameIdElement = page.locator('.font-mono');
-        gameId = (await gameIdElement.textContent()) || '';
+        // Get game ID using test ID
+        await page.getByTestId('game-id').waitFor({ timeout: 10000 });
+        gameId = (await page.getByTestId('game-id').textContent()) || '';
         console.log(`Game created with ID: ${gameId}`);
       } else {
-        // Other players join
-        await page.getByRole('button', { name: /join/i }).first().click();
-        await page.fill('input[placeholder*="game id" i]', gameId);
-        await page.fill('input[placeholder*="name" i]', `Player ${i}`);
-        await page.getByRole('button', { name: /^join$/i }).click();
+        // Other players join using test IDs
+        await page.getByTestId('join-game-button').click();
+        await page.getByTestId('game-id-input').fill(gameId);
+        await page.getByTestId('player-name-input').fill(`Player ${i}`);
+        await page.getByTestId('submit-join-button').click();
         console.log(`Player ${i} joined`);
       }
     }
 
     // Wait for team selection
     await Promise.race(pages.map(page =>
-      page.waitForSelector('text=/team selection/i', { timeout: 15000 })
+      page.waitForSelector('text=/Team Selection/i', { timeout: 15000 })
     ));
 
     console.log('Teams auto-assigned, ready to start...');
@@ -58,8 +57,8 @@ test.describe('Full Game Flow', () => {
     // Wait a moment for all players to be on team selection screen
     await pages[0].waitForTimeout(1000);
 
-    // Start game (wait for it to be enabled - requires 4 players with balanced teams)
-    const startButton = pages[0].getByRole('button', { name: /start game/i });
+    // Start game using test ID (wait for it to be enabled - requires 4 players with balanced teams)
+    const startButton = pages[0].getByTestId('start-game-button');
     await expect(startButton).toBeEnabled({ timeout: 10000 });
     await startButton.click();
     console.log('Game started');
@@ -85,28 +84,28 @@ test.describe('Full Game Flow', () => {
     // Dealer is P2 (index 1) after rotation
     // Betting order: P3, P4, P1, P2 (dealer last)
 
-    // P3 (index 2) bets 9
+    // P3 (index 2) bets 9 using test ID
     console.log('P3 betting 9...');
-    await pages[2].waitForSelector('button:has-text("9")', { timeout: 15000 });
-    await pages[2].locator('button:has-text("9")').first().click();
+    await pages[2].getByTestId('bet-9-with-trump').waitFor({ timeout: 15000 });
+    await pages[2].getByTestId('bet-9-with-trump').click();
     await pages[2].waitForTimeout(500);
 
-    // P4 (index 3) bets 10
+    // P4 (index 3) bets 10 using test ID
     console.log('P4 betting 10...');
-    await pages[3].waitForSelector('button:has-text("10")', { timeout: 15000 });
-    await pages[3].locator('button:has-text("10")').first().click();
+    await pages[3].getByTestId('bet-10-with-trump').waitFor({ timeout: 15000 });
+    await pages[3].getByTestId('bet-10-with-trump').click();
     await pages[3].waitForTimeout(500);
 
-    // P1 (index 0) skips
+    // P1 (index 0) skips using test ID
     console.log('P1 skipping...');
-    await pages[0].waitForSelector('button:has-text("SKIP")', { timeout: 15000 });
-    await pages[0].locator('button:has-text("SKIP")').click();
+    await pages[0].getByTestId('skip-bet-button').waitFor({ timeout: 15000 });
+    await pages[0].getByTestId('skip-bet-button').click();
     await pages[0].waitForTimeout(500);
 
-    // P2 (index 1, dealer) matches with 10
+    // P2 (index 1, dealer) matches with 10 using test ID
     console.log('P2 (dealer) matching with 10...');
-    await pages[1].waitForSelector('button:has-text("10")', { timeout: 15000 });
-    await pages[1].locator('button:has-text("10")').first().click();
+    await pages[1].getByTestId('bet-10-with-trump').waitFor({ timeout: 15000 });
+    await pages[1].getByTestId('bet-10-with-trump').click();
     await pages[1].waitForTimeout(500);
 
     // === PHASE 3: Play rounds until a team reaches 41 points ===
@@ -147,8 +146,8 @@ test.describe('Full Game Flow', () => {
         await pages[0].waitForTimeout(500);
 
         const page = pages[i];
-        const skipBtn = page.locator('button:has-text("SKIP")');
-        const bet8Btn = page.locator('button:has-text("8")').first();
+        const skipBtn = page.getByTestId('skip-bet-button');
+        const bet8Btn = page.getByTestId('bet-8-with-trump');
 
         try {
           if (await skipBtn.isVisible({ timeout: 2000 })) {

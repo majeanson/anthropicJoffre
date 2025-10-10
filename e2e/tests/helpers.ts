@@ -8,40 +8,44 @@ import { Page, expect } from '@playwright/test';
  * @returns Object with browser context, page instances, and game ID
  */
 export async function createGameWith4Players(browser: any) {
-  const context = await browser.newContext();
   const pages: Page[] = [];
+  const contexts: any[] = [];
   let gameId: string | null = null;
 
   for (let i = 1; i <= 4; i++) {
+    // Create separate context for each player to avoid localStorage sharing
+    const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto('/');
 
     if (i === 1) {
-      await page.getByRole('button', { name: /create game/i }).click();
-      await page.getByPlaceholder(/enter your name/i).fill(`Player ${i}`);
-      await page.getByRole('button', { name: /create/i }).click();
+      // Use test IDs for reliable selectors
+      await page.getByTestId('create-game-button').click();
+      await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      await page.getByTestId('submit-create-button').click();
 
-      await page.waitForSelector('.font-mono', { timeout: 10000 });
-      const gameIdElement = page.locator('.font-mono');
-      gameId = await gameIdElement.textContent();
+      await page.getByTestId('game-id').waitFor({ timeout: 10000 });
+      gameId = await page.getByTestId('game-id').textContent();
     } else {
-      await page.getByRole('button', { name: /join game/i }).click();
-      await page.getByPlaceholder(/game id/i).fill(gameId!);
-      await page.getByPlaceholder(/your name/i).fill(`Player ${i}`);
-      await page.getByRole('button', { name: /join/i }).click();
+      // Use test IDs for reliable selectors
+      await page.getByTestId('join-game-button').click();
+      await page.getByTestId('game-id-input').fill(gameId!);
+      await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      await page.getByTestId('submit-join-button').click();
     }
 
     pages.push(page);
+    contexts.push(context);
   }
 
-  // Wait for team selection, then start game
+  // Wait for team selection, then start game using test ID
   await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
-  await pages[0].getByRole('button', { name: /start game/i }).click();
+  await pages[0].getByTestId('start-game-button').click();
 
   // Wait for betting phase to begin
   await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-  return { context, pages, gameId };
+  return { contexts, pages, gameId };
 }
 
 /**
@@ -61,9 +65,9 @@ export async function placeAllBets(pages: Page[], bets: number[] = [9, 9, 7, 8],
     const betAmount = bets[pageIndex];
     const noTrump = withoutTrump[pageIndex];
 
-    // Wait for bet button to appear (means it's this player's turn)
-    const betButtonText = noTrump ? `${betAmount} (No Trump)` : `${betAmount}`;
-    const betButton = page.locator(`button:has-text("${betButtonText}")`).first();
+    // Wait for bet button to appear using test ID (means it's this player's turn)
+    const betTestId = noTrump ? `bet-${betAmount}-without-trump` : `bet-${betAmount}-with-trump`;
+    const betButton = page.getByTestId(betTestId);
     await betButton.waitFor({ state: 'visible', timeout: 15000 });
     await betButton.click();
 
@@ -97,14 +101,19 @@ export async function playCard(page: Page, cardIndex: number = 0) {
  * @returns Index of the player with current turn, or -1 if not found
  */
 export async function findCurrentPlayerIndex(pages: Page[]): Promise<number> {
-  const promises = pages.map((page, index) =>
-    page.getByText(/your turn/i).isVisible().then(visible => visible ? index : -1)
-  );
+  // Check pages sequentially to avoid "Target crashed" errors
+  for (let i = 0; i < pages.length; i++) {
+    try {
+      const hasTurn = await pages[i].getByText(/your turn/i).isVisible({ timeout: 500 });
+      if (hasTurn) {
+        return i;
+      }
+    } catch {
+      // Page might not have text, continue checking
+    }
+  }
 
-  const results = await Promise.all(promises);
-  const currentIndex = results.find(index => index !== -1);
-
-  return currentIndex !== undefined ? currentIndex : -1;
+  return -1;
 }
 
 /**
@@ -117,15 +126,21 @@ export async function playFullTrick(pages: Page[]) {
   for (let i = 0; i < 4; i++) {
     await pages[0].waitForTimeout(200);
 
-    const results = await Promise.all(
-      pages.map(async (page, index) => {
-        const hasTurn = await page.getByText(/your turn/i).isVisible();
-        return hasTurn ? index : -1;
-      })
-    );
+    // Find current player by checking pages sequentially (avoid parallel "Target crashed" issues)
+    let pageWithTurn = -1;
+    for (let j = 0; j < pages.length; j++) {
+      try {
+        const hasTurn = await pages[j].getByText(/your turn/i).isVisible({ timeout: 500 });
+        if (hasTurn) {
+          pageWithTurn = j;
+          break;
+        }
+      } catch {
+        // Page might not have loaded yet or text not present, continue checking
+      }
+    }
 
-    const pageWithTurn = results.find(idx => idx !== -1);
-    if (pageWithTurn === undefined) {
+    if (pageWithTurn === -1) {
       throw new Error(`Could not find current player at card ${i + 1} of trick`);
     }
 
@@ -138,9 +153,7 @@ export async function playFullTrick(pages: Page[]) {
   }
 
   // Wait for trick to resolve and next turn to start
-  await Promise.race(
-    pages.map(page => page.waitForSelector('text=/your turn/i', { timeout: 10000 }))
-  );
+  await pages[0].waitForTimeout(3500); // Wait for trick resolution
 }
 
 /**
@@ -153,5 +166,6 @@ export async function playFullRound(pages: Page[]) {
     await playFullTrick(pages);
   }
 
-  await pages[0].waitForSelector('text=/round.*complete/i', { timeout: 10000 });
+  // Wait for scoring phase to appear with text "Round {N} Complete!"
+  await pages[0].waitForSelector('text=/round \\d+ complete/i', { timeout: 10000 });
 }

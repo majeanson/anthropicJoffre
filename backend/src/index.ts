@@ -85,6 +85,30 @@ function validateSessionToken(token: string): PlayerSession | null {
   return session;
 }
 
+// Helper to broadcast to both players and spectators
+function broadcastGameUpdate(gameId: string, event: string, data: any) {
+  // Send full data to players
+  io.to(gameId).emit(event, data);
+
+  // Send spectator-safe data to spectators (hide player hands)
+  if (data && data.players) {
+    const spectatorData = {
+      ...data,
+      players: data.players.map((player: Player) => ({
+        id: player.id,
+        name: player.name,
+        teamId: player.teamId,
+        hand: [], // Hide hands from spectators
+        tricksWon: player.tricksWon,
+        pointsWon: player.pointsWon,
+      }))
+    };
+    io.to(`${gameId}-spectators`).emit(event, spectatorData);
+  } else {
+    io.to(`${gameId}-spectators`).emit(event, data);
+  }
+}
+
 // REST endpoints
 app.get('/api/health', (req, res) => {
   res.json({
@@ -524,6 +548,58 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Spectator mode - join game as observer
+  socket.on('spectate_game', ({ gameId, spectatorName }: { gameId: string; spectatorName?: string }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Join spectator room
+    socket.join(`${gameId}-spectators`);
+    console.log(`Spectator ${socket.id} (${spectatorName || 'Anonymous'}) joined game ${gameId}`);
+
+    // Create spectator game state (hide player hands)
+    const spectatorGameState = {
+      ...game,
+      players: game.players.map(player => ({
+        id: player.id,
+        name: player.name,
+        teamId: player.teamId,
+        hand: [], // Hide hands from spectators
+        tricksWon: player.tricksWon,
+        pointsWon: player.pointsWon,
+      }))
+    };
+
+    // Send spectator game state
+    socket.emit('spectator_joined', {
+      gameState: spectatorGameState,
+      isSpectator: true
+    });
+
+    // Notify other players that a spectator joined
+    io.to(gameId).emit('spectator_update', {
+      message: `${spectatorName || 'A spectator'} is now watching`,
+      spectatorCount: io.sockets.adapter.rooms.get(`${gameId}-spectators`)?.size || 0
+    });
+  });
+
+  // Leave spectator mode
+  socket.on('leave_spectate', ({ gameId }: { gameId: string }) => {
+    socket.leave(`${gameId}-spectators`);
+    console.log(`Spectator ${socket.id} left game ${gameId}`);
+
+    // Notify remaining players
+    io.to(gameId).emit('spectator_update', {
+      message: 'A spectator left',
+      spectatorCount: io.sockets.adapter.rooms.get(`${gameId}-spectators`)?.size || 0
+    });
+
+    socket.emit('spectator_left', { success: true });
+  });
+
   // Test-only handler to set scores
   socket.on('__test_set_scores', ({ team1, team2 }: { team1: number; team2: number }) => {
     // Find game for this socket
@@ -664,7 +740,7 @@ function startNewRound(gameId: string) {
   // Betting starts with player after dealer
   game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
 
-  io.to(gameId).emit('round_started', game);
+  broadcastGameUpdate(gameId, 'round_started', game);
 }
 
 function resolveTrick(gameId: string) {
@@ -690,7 +766,7 @@ function resolveTrick(gameId: string) {
   };
 
   // Emit trick resolution with updated state (showing trick result for 3 seconds)
-  io.to(gameId).emit('trick_resolved', { winnerId, points: totalPoints, gameState: game });
+  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, points: totalPoints, gameState: game });
 
   // Wait 3 seconds before clearing trick and continuing
   setTimeout(() => {
@@ -806,10 +882,10 @@ async function endRound(gameId: string) {
       console.error('Error saving game history:', error);
     }
 
-    io.to(gameId).emit('game_over', { winningTeam, gameState: game });
+    broadcastGameUpdate(gameId, 'game_over', { winningTeam, gameState: game });
   } else {
     // Emit round ended and schedule next round
-    io.to(gameId).emit('round_ended', game);
+    broadcastGameUpdate(gameId, 'round_ended', game);
 
     // Start next round after delay
     game.roundNumber += 1;

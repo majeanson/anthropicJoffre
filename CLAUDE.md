@@ -32,6 +32,8 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 ```typescript
 'create_game': (playerName: string)
 'join_game': { gameId: string; playerName: string }
+'spectate_game': { gameId: string; spectatorName?: string }
+'leave_spectate': { gameId: string }
 'select_team': { gameId: string; teamId: 1 | 2 }
 'swap_position': { gameId: string; targetPlayerId: string }
 'start_game': { gameId: string }
@@ -41,8 +43,11 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 
 **Server → Client:**
 ```typescript
-'game_created': { gameId: string; gameState: GameState }
-'player_joined': { player: Player; gameState: GameState }
+'game_created': { gameId: string; gameState: GameState; session: PlayerSession }
+'player_joined': { player: Player; gameState: GameState; session?: PlayerSession }
+'spectator_joined': { gameState: SpectatorGameState; isSpectator: true }
+'spectator_left': { success: boolean }
+'spectator_update': { message: string; spectatorCount: number }
 'game_updated': (gameState: GameState)
 'round_started': (gameState: GameState)
 'trick_resolved': { winnerId: string; points: number; gameState: GameState }
@@ -52,6 +57,10 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 'invalid_move': { message: string }
 'invalid_bet': { message: string }
 'player_left': { playerId: string; gameState: GameState }
+'reconnection_successful': { gameState: GameState; session: PlayerSession }
+'reconnection_failed': { message: string }
+'player_reconnected': { playerName: string; playerId: string; oldSocketId: string }
+'player_disconnected': { playerId: string; waitingForReconnection: boolean }
 ```
 
 ### Adding New Events
@@ -537,6 +546,181 @@ gameState.roundHistory.slice().reverse().map(round => {
 
 ---
 
+## 👁️ Spectator Mode
+
+### Overview
+Spectator mode allows users to watch ongoing games without participating as players. Spectators can observe the game flow, scores, and tricks, but player hands remain hidden to preserve game integrity.
+
+**Purpose**:
+- Watch ongoing games to learn strategies
+- Wait for the next game while observing current one
+- Review friend's games without joining
+- Debug and test game flows from observer perspective
+
+### Implementation
+
+**Backend** (backend/src/index.ts:533-583):
+```typescript
+// Join game as spectator
+socket.on('spectate_game', ({ gameId, spectatorName }: { gameId: string; spectatorName?: string }) => {
+  const game = games.get(gameId);
+  if (!game) {
+    socket.emit('error', { message: 'Game not found' });
+    return;
+  }
+
+  // Join spectator room
+  socket.join(`${gameId}-spectators`);
+
+  // Create spectator-safe game state (hide player hands)
+  const spectatorGameState = {
+    ...game,
+    players: game.players.map(player => ({
+      ...player,
+      hand: []  // Hide hands from spectators
+    }))
+  };
+
+  socket.emit('spectator_joined', { gameState: spectatorGameState, isSpectator: true });
+
+  // Notify players
+  io.to(gameId).emit('spectator_update', {
+    message: `${spectatorName || 'A spectator'} is now watching`,
+    spectatorCount: io.sockets.adapter.rooms.get(`${gameId}-spectators`)?.size || 0
+  });
+});
+
+// Leave spectator mode
+socket.on('leave_spectate', ({ gameId }) => {
+  socket.leave(`${gameId}-spectators`);
+  socket.emit('spectator_left', { success: true });
+});
+```
+
+**Frontend Integration** (frontend/src/App.tsx):
+```typescript
+// Handle spectate request
+const handleSpectateGame = (gameId: string, spectatorName?: string) => {
+  if (socket) {
+    socket.emit('spectate_game', { gameId, spectatorName });
+    setGameId(gameId);
+  }
+};
+
+// Listen for spectator_joined event
+socket.on('spectator_joined', ({ gameState }: { gameState: GameState }) => {
+  setIsSpectator(true);
+  setGameId(gameState.id);
+  setGameState(gameState);
+});
+```
+
+### Spectator UI Features
+
+**Lobby Integration** (frontend/src/components/Lobby.tsx):
+- Orange "👁️ Spectate Game" button in main menu
+- Dedicated spectate form with:
+  - Game ID input (required)
+  - Spectator name input (optional)
+  - Info message explaining spectator mode restrictions
+
+**Playing Phase** (frontend/src/components/PlayingPhase.tsx):
+- **Spectator Label**: Purple "👁️ Watching" badge shown instead of "Your Turn"
+- **Hidden Hands**: Player hand section shows "🔒 Player hands are hidden" message
+- **Full Game View**: Spectators can see:
+  - Team scores and round number
+  - Current trick and cards played
+  - Trump suit
+  - Player info (tricks won, card count)
+  - Previous trick viewer
+  - Leaderboard and round history
+
+**What Spectators CAN See**:
+- ✅ Team scores
+- ✅ Round number and trump suit
+- ✅ Cards currently in trick
+- ✅ Player names, teams, tricks won
+- ✅ Leaderboard and round history
+- ✅ Game phase (betting, playing, scoring)
+
+**What Spectators CANNOT See**:
+- ❌ Player hands (hidden)
+- ❌ Betting controls (not interactive)
+- ❌ Card play controls (not interactive)
+
+### Real-time Updates
+
+**Server-Side Broadcasting** (backend/src/index.ts:88-110):
+```typescript
+function broadcastGameUpdate(gameId: string, event: string, data: any) {
+  // Send full data to players
+  io.to(gameId).emit(event, data);
+
+  // Send spectator-safe data to spectators (hide player hands)
+  if (data && data.players) {
+    const spectatorData = {
+      ...data,
+      players: data.players.map((player: Player) => ({
+        ...player,
+        hand: []  // Hide hands
+      }))
+    };
+    io.to(`${gameId}-spectators`).emit(event, spectatorData);
+  } else {
+    io.to(`${gameId}-spectators`).emit(event, data);
+  }
+}
+```
+
+All game events (game_updated, round_started, trick_resolved, etc.) are automatically broadcast to spectators with hands hidden.
+
+### Testing
+
+**E2E Tests** (e2e/tests/14-spectator.spec.ts):
+- `should allow joining game as spectator` - Verify spectator can join with game ID
+- `should hide player hands from spectators` - Verify hands are hidden and message shown
+- `should show game state to spectators` - Verify spectators see scores, tricks, players
+- `should update spectator view in real-time` - Verify spectators receive game updates
+- `should prevent spectators from playing cards or making bets` - Verify no interactive controls
+- `should allow spectators to view leaderboard` - Verify leaderboard access
+- `should handle invalid game ID` - Verify error handling
+- `should allow anonymous spectators` - Verify optional name field
+
+### Usage Examples
+
+**Spectate an Ongoing Game**:
+1. Click "👁️ Spectate Game" from lobby
+2. Enter game ID
+3. Optionally enter your name
+4. Click "Spectate" button
+5. Watch game in real-time with hands hidden
+
+**Leave Spectator Mode**:
+1. Navigate back to lobby (browser back)
+2. Or refresh page
+3. Socket automatically leaves spectator room on disconnect
+
+### Security Considerations
+
+**Hand Privacy**:
+- Player hands are stripped from game state BEFORE sending to spectators
+- Server-side validation ensures spectators cannot see hands
+- Both `spectator_joined` and `broadcastGameUpdate` enforce hand hiding
+
+**Interaction Prevention**:
+- Frontend: Spectator mode flag (`isSpectator`) disables all interactive elements
+- Backend: Spectators are not in player list, so server validation rejects their actions
+- Spectators cannot bet, play cards, or modify game state
+
+### Future Enhancements
+- [ ] Spectator chat room (separate from players)
+- [ ] Spectator count display to players
+- [ ] Spectator list modal
+- [ ] Ability to follow specific players
+- [ ] Replay mode for finished games
+
+---
+
 ## 🧪 Testing Strategy
 
 ### E2E Testing with Playwright
@@ -573,6 +757,7 @@ await page.getByRole('button', { name: /place bet/i }).waitFor({ timeout: 15000 
 - `04-game-flow.spec.ts` - Full round and scoring
 - `05-skip-bet.spec.ts` - Skip bet functionality and validation
 - `06-validation.spec.ts` - UI validation feedback across all phases
+- `14-spectator.spec.ts` - Spectator mode functionality
 
 ### Running Tests
 ```bash
@@ -757,12 +942,13 @@ npm run test:e2e     # Run E2E tests
 ✅ **Race condition prevention** (trick completion lock, duplicate play check)
 ✅ **Leaderboard with round history** (comprehensive game stats tracking)
 ✅ **Round-by-round analytics** (bets, points, outcomes)
+✅ **Spectator mode** (watch games without playing, hands hidden)
+✅ **Reconnection support** (2-minute grace period, session management)
 ✅ Comprehensive documentation (VALIDATION_SYSTEM.md, BOT_PLAYER_SYSTEM.md, IMPROVEMENT_SUGGESTIONS.md)
-✅ E2E test suite (27/35 tests passing - 77%)
+✅ E2E test suite (includes spectator mode tests)
 
 ### Future Enhancements
 - [ ] Backend handlers for Test Panel state manipulation
-- [ ] Spectator mode
 - [ ] Game replay functionality
 - [ ] Player statistics tracking
 - [ ] Tournament mode

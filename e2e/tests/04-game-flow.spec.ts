@@ -3,7 +3,7 @@ import { createGameWith4Players, placeAllBets, playFullRound, playFullTrick } fr
 
 test.describe('Game Flow and Scoring', () => {
   test('should complete a full round and show scoring phase', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     // Wait for betting phase
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
@@ -21,11 +21,13 @@ test.describe('Game Flow and Scoring', () => {
     await expect(pages[0].getByText(/team 1/i)).toBeVisible();
     await expect(pages[0].getByText(/team 2/i)).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should award points when bet is met', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -48,11 +50,13 @@ test.describe('Game Flow and Scoring', () => {
     const totalPoints = parseInt(team1Score || '0') + parseInt(team2Score || '0');
     expect(totalPoints).toBeGreaterThan(0);
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should deduct points when bet is not met', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -71,11 +75,13 @@ test.describe('Game Flow and Scoring', () => {
     const playerStats = pages[0].locator('text=/bet.*12.*won/i');
     await expect(playerStats.first()).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should double points for "without trump" bets', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -89,11 +95,13 @@ test.describe('Game Flow and Scoring', () => {
     // Check scoring screen shows without trump modifier
     await pages[0].waitForSelector('text=/round.*complete/i', { timeout: 15000 });
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should start new round after scoring', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
     await placeAllBets(pages);
@@ -111,7 +119,9 @@ test.describe('Game Flow and Scoring', () => {
     // Should show Round 2
     await expect(pages[0].getByText(/round 2/i)).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should end game when a team reaches 41 points', async ({ browser }) => {
@@ -128,7 +138,7 @@ test.describe('Game Flow and Scoring', () => {
   });
 
   test('should display trick winner correctly', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
     await placeAllBets(pages);
@@ -140,11 +150,13 @@ test.describe('Game Flow and Scoring', () => {
     const playerWithTrick = pages[0].locator('text=/tricks.*1/i');
     await expect(playerWithTrick.first()).toBeVisible({ timeout: 5000 });
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should track tricks won for each player', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
     await placeAllBets(pages);
@@ -177,11 +189,13 @@ test.describe('Game Flow and Scoring', () => {
     const tricksWon = pages[0].locator('text=/tricks.*[1-9]/i');
     await expect(tricksWon.first()).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should show correct card counts as game progresses', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
     await placeAllBets(pages);
@@ -211,6 +225,8 @@ test.describe('Game Flow and Scoring', () => {
     // After 1 trick: 7 cards
     await expect(pages[0].locator('text=/cards.*7/i').first()).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 });

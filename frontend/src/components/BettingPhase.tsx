@@ -108,6 +108,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                 {/* Skip Button */}
                 {canSkip() && (
                   <button
+                    data-testid="skip-bet-button"
                     onClick={handleSkip}
                     className="w-full py-3 px-4 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors"
                   >
@@ -124,6 +125,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                     <div key={amount} className="flex gap-2">
                       {/* With Trump */}
                       <button
+                        data-testid={`bet-${amount}-with-trump`}
                         onClick={() => handleBetClick(amount, false)}
                         disabled={!withTrumpValid}
                         className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
@@ -137,6 +139,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
 
                       {/* Without Trump */}
                       <button
+                        data-testid={`bet-${amount}-without-trump`}
                         onClick={() => handleBetClick(amount, true)}
                         disabled={!withoutTrumpValid}
                         className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${

@@ -21,6 +21,7 @@ function App() {
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
   const [reconnecting, setReconnecting] = useState<boolean>(false);
+  const [isSpectator, setIsSpectator] = useState<boolean>(false);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   useEffect(() => {
@@ -130,6 +131,13 @@ function App() {
       setGameState(gameState);
     });
 
+    newSocket.on('spectator_joined', ({ gameState }: { gameState: GameState }) => {
+      console.log('Joined game as spectator');
+      setIsSpectator(true);
+      setGameId(gameState.id);
+      setGameState(gameState);
+    });
+
     return () => {
       newSocket.close();
     };
@@ -144,6 +152,13 @@ function App() {
   const handleJoinGame = (gameId: string, playerName: string) => {
     if (socket) {
       socket.emit('join_game', { gameId, playerName });
+      setGameId(gameId);
+    }
+  };
+
+  const handleSpectateGame = (gameId: string, spectatorName?: string) => {
+    if (socket) {
+      socket.emit('spectate_game', { gameId, spectatorName });
       setGameId(gameId);
     }
   };
@@ -331,7 +346,7 @@ function App() {
   }
 
   if (!gameState) {
-    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onQuickPlay={handleQuickPlay} />;
+    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} />;
   }
 
   // Debug controls (always available, even in production)
@@ -464,6 +479,7 @@ function App() {
           gameState={gameState}
           currentPlayerId={socket?.id || ''}
           onPlayCard={handlePlayCard}
+          isSpectator={isSpectator}
         />
       </>
     );

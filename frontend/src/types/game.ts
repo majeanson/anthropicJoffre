@@ -86,3 +86,13 @@ export interface PlayerSession {
   token: string;
   timestamp: number;
 }
+
+export interface Spectator {
+  id: string;
+  name: string;
+  joinedAt: number;
+}
+
+export interface SpectatorGameState extends Omit<GameState, 'players'> {
+  players: Omit<Player, 'hand'>[];
+}

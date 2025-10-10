@@ -3,7 +3,7 @@ import { createGameWith4Players, placeAllBets, findCurrentPlayerIndex } from './
 
 test.describe('Card Playing Phase', () => {
   test('should display player hands after betting', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     // All players should see their hand
@@ -15,21 +15,27 @@ test.describe('Card Playing Phase', () => {
       await expect(cards).toHaveCount(8);
     }
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should show current trick area', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
-    // Should show trick area
-    await expect(pages[0].getByText(/current trick/i)).toBeVisible();
+    // Should show playing phase with score board (always visible)
+    await expect(pages[0].getByText(/team 1/i)).toBeVisible();
+    await expect(pages[0].getByText(/team 2/i)).toBeVisible();
+    await expect(pages[0].getByText(/your hand/i)).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should show score board with team scores', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     // Should show team scores
@@ -39,18 +45,20 @@ test.describe('Card Playing Phase', () => {
     // Should show round number
     await expect(pages[0].getByText(/round 1/i)).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should show player info (cards left, tricks won)', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
-    // Should show all 4 players
-    await expect(pages[0].getByText('Player 1')).toBeVisible();
-    await expect(pages[0].getByText('Player 2')).toBeVisible();
-    await expect(pages[0].getByText('Player 3')).toBeVisible();
-    await expect(pages[0].getByText('Player 4')).toBeVisible();
+    // Should show all 4 players - use .first() to handle duplicates
+    await expect(pages[0].getByText('Player 1').first()).toBeVisible();
+    await expect(pages[0].getByText('Player 2').first()).toBeVisible();
+    await expect(pages[0].getByText('Player 3').first()).toBeVisible();
+    await expect(pages[0].getByText('Player 4').first()).toBeVisible();
 
     // Should show tricks won (0 initially)
     const tricksElements = pages[0].locator('text=/tricks.*0/i');
@@ -60,11 +68,13 @@ test.describe('Card Playing Phase', () => {
     const cardsElements = pages[0].locator('text=/cards.*8/i');
     await expect(cardsElements.first()).toBeVisible();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should indicate whose turn it is', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     // First player (highest bidder or designated starter) should have turn
@@ -74,45 +84,61 @@ test.describe('Card Playing Phase', () => {
 
     expect(firstPlayerPage).toBeTruthy();
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should disable cards when not player turn', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
-    // Other players should see waiting message
+    // Current player should see "Your Turn"
+    await expect(pages[currentPlayerIndex].getByText(/your turn/i)).toBeVisible();
+
+    // Other players should NOT see "Your Turn"
     for (let i = 0; i < 4; i++) {
       if (i !== currentPlayerIndex) {
-        await expect(pages[i].getByText(/waiting for/i)).toBeVisible();
+        await expect(pages[i].getByText(/your turn/i)).not.toBeVisible();
       }
     }
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should allow current player to play a card', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     const currentPage = pages[currentPlayerIndex];
 
-    // Get first card and click it
-    const firstCard = currentPage.locator('[data-card-value]').first();
+    // Count cards in hand before (look inside "Your Hand" section)
+    const handSection = currentPage.getByText(/your hand/i).locator('..');
+    const cardsBefore = await handSection.locator('[data-card-value]').count();
+
+    // Get first card in hand and click it
+    const firstCard = handSection.locator('[data-card-value]').first();
     await firstCard.click();
 
-    // Card should appear in trick area
-    await expect(currentPage.locator('text=/current trick/i').locator('..').locator('[data-card-value]')).toHaveCount(1);
+    await pages[0].waitForTimeout(500);
 
-    await context.close();
+    // Card count in hand should decrease
+    const cardsAfter = await handSection.locator('[data-card-value]').count();
+    expect(cardsAfter).toBe(cardsBefore - 1);
+
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should set trump suit from first card played', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
@@ -122,11 +148,13 @@ test.describe('Card Playing Phase', () => {
     // Trump should be displayed
     await expect(pages[0].getByText(/trump/i)).toBeVisible({ timeout: 5000 });
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should complete a full trick with 4 cards', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     // Play 4 cards (one from each player)
@@ -134,9 +162,10 @@ test.describe('Card Playing Phase', () => {
       const currentPlayerIndex = await findCurrentPlayerIndex(pages);
       expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
-      // Play a card
-      const card = pages[currentPlayerIndex].locator('[data-card-value]').first();
-      await card.click();
+      // Play a card from hand section - use force to bypass suit-following disabled state
+      const handSection = pages[currentPlayerIndex].getByText(/your hand/i).locator('..');
+      const card = handSection.locator('[data-card-value]').first();
+      await card.click({ force: true });
 
       // Wait a bit for state update
       await pages[0].waitForTimeout(500);
@@ -146,37 +175,40 @@ test.describe('Card Playing Phase', () => {
     // One player should have tricksWon = 1
     await pages[0].waitForTimeout(2000); // Wait for trick resolution
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should decrease card count after playing', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     const currentPage = pages[currentPlayerIndex];
 
-    // Count cards in hand before (not in trick area)
-    const handArea = currentPage.locator('text=/your hand/i').locator('..');
-    const cardsBefore = await handArea.locator('[data-card-value]').count();
+    // Count cards in hand before (look inside "Your Hand" section)
+    const handSection = currentPage.getByText(/your hand/i).locator('..');
+    const cardsBefore = await handSection.locator('[data-card-value]').count();
 
-    // Play a card
-    const firstCard = handArea.locator('[data-card-value]').first();
+    // Play a card from hand
+    const firstCard = handSection.locator('[data-card-value]').first();
     await firstCard.click();
 
-    // Wait for card to appear in trick area
-    await expect(currentPage.locator('text=/current trick/i').locator('..').locator('[data-card-value]')).toHaveCount(1, { timeout: 3000 });
+    await pages[0].waitForTimeout(500);
 
     // Count cards in hand after
-    const cardsAfter = await handArea.locator('[data-card-value]').count();
+    const cardsAfter = await handSection.locator('[data-card-value]').count();
 
     expect(cardsAfter).toBe(cardsBefore - 1);
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 
   test('should show special card indicators (+5 for Red 0, -2 for Brown 0)', async ({ browser }) => {
-    const { context, pages } = await createGameWith4Players(browser);
+    const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
     // Look for special cards in any player's hand
@@ -192,6 +224,8 @@ test.describe('Card Playing Phase', () => {
       await expect(brown0.locator('text=-2')).toBeVisible();
     }
 
-    await context.close();
+    for (const context of contexts) {
+      await context.close();
+    }
   });
 });

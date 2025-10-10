@@ -8,15 +8,16 @@ test.describe('Reconnection Support', () => {
     await page.evaluate(() => localStorage.clear());
     await page.reload();
 
-    // Wait for lobby to load
-    await page.waitForSelector('input[placeholder="Enter your name"]', { timeout: 10000 });
+    // Wait for lobby to load using test ID
+    await page.getByTestId('create-game-button').waitFor({ timeout: 10000 });
 
     // Create a game
-    await page.fill('input[placeholder="Enter your name"]', 'TestPlayer');
-    await page.click('button:has-text("Create Game")');
+    await page.getByTestId('create-game-button').click();
+    await page.getByTestId('player-name-input').fill('TestPlayer');
+    await page.getByTestId('submit-create-button').click();
 
-    // Wait for game to be created
-    await page.waitForSelector('text=/Game Code:/i', { timeout: 10000 });
+    // Wait for game to be created (team selection phase)
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Check localStorage for session
     const session = await page.evaluate(() => {
@@ -39,15 +40,16 @@ test.describe('Reconnection Support', () => {
     await page.evaluate(() => localStorage.clear());
     await page.reload();
 
-    // Wait for lobby
-    await page.waitForSelector('input[placeholder="Enter your name"]', { timeout: 10000 });
+    // Wait for lobby using test ID
+    await page.getByTestId('create-game-button').waitFor({ timeout: 10000 });
 
     // Create a game
-    await page.fill('input[placeholder="Enter your name"]', 'Player1');
-    await page.click('button:has-text("Create Game")');
+    await page.getByTestId('create-game-button').click();
+    await page.getByTestId('player-name-input').fill('Player1');
+    await page.getByTestId('submit-create-button').click();
 
     // Wait for team selection
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Select a team
     await page.click('button:has-text("Team 1")');
@@ -56,7 +58,7 @@ test.describe('Reconnection Support', () => {
     await page.reload();
 
     // Should automatically reconnect
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Verify we're still in the same game
     await expect(page.locator('text=/Team 1/i')).toBeVisible();
@@ -65,10 +67,11 @@ test.describe('Reconnection Support', () => {
   test('should show reconnecting state during reconnection', async ({ page }) => {
     await page.goto('http://localhost:5173');
 
-    // Create a game
-    await page.fill('input[placeholder*="name" i]', 'Player1');
-    await page.click('button:has-text("Create Game")');
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    // Create a game using test IDs
+    await page.getByTestId('create-game-button').click();
+    await page.getByTestId('player-name-input').fill('Player1');
+    await page.getByTestId('submit-create-button').click();
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Reload page
     const reloadPromise = page.reload();
@@ -84,7 +87,7 @@ test.describe('Reconnection Support', () => {
     await reloadPromise;
 
     // Should successfully reconnect
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
   });
 
   test('should update socket ID on reconnection', async ({ context }) => {
@@ -92,22 +95,23 @@ test.describe('Reconnection Support', () => {
     const page1 = await context.newPage();
     await page1.goto('http://localhost:5173');
 
-    await page1.fill('input[placeholder*="name" i]', 'Player1');
-    await page1.click('button:has-text("Create Game")');
-    await page1.waitForSelector('text=/Game Code:/i');
+    await page1.getByTestId('create-game-button').click();
+    await page1.getByTestId('player-name-input').fill('Player1');
+    await page1.getByTestId('submit-create-button').click();
+    await page1.getByTestId('game-id').waitFor({ timeout: 10000 });
 
-    const gameCodeElement = await page1.locator('text=/Game Code:/i').textContent();
-    const gameCode = gameCodeElement?.match(/[A-Z0-9]{6}/)?.[0];
+    const gameCode = await page1.getByTestId('game-id').textContent();
     expect(gameCode).toBeTruthy();
 
     // Create second page (observer)
     const page2 = await context.newPage();
     await page2.goto('http://localhost:5173');
 
-    await page2.fill('input[placeholder*="name" i]', 'Player2');
-    await page2.fill('input[placeholder*="code" i]', gameCode!);
-    await page2.click('button:has-text("Join Game")');
-    await page2.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page2.getByTestId('join-game-button').click();
+    await page2.getByTestId('game-id-input').fill(gameCode!);
+    await page2.getByTestId('player-name-input').fill('Player2');
+    await page2.getByTestId('submit-join-button').click();
+    await page2.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Both players select teams
     await page1.click('button:has-text("Team 1")');
@@ -115,7 +119,7 @@ test.describe('Reconnection Support', () => {
 
     // Player1 reloads (reconnects)
     await page1.reload();
-    await page1.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page1.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Player1 should still be able to interact
     // Try swapping position or another action
@@ -129,27 +133,28 @@ test.describe('Reconnection Support', () => {
     const page1 = await context.newPage();
     await page1.goto('http://localhost:5173');
 
-    await page1.fill('input[placeholder*="name" i]', 'Player1');
-    await page1.click('button:has-text("Create Game")');
-    await page1.waitForSelector('text=/Game Code:/i');
+    await page1.getByTestId('create-game-button').click();
+    await page1.getByTestId('player-name-input').fill('Player1');
+    await page1.getByTestId('submit-create-button').click();
+    await page1.getByTestId('game-id').waitFor({ timeout: 10000 });
 
-    const gameCodeElement = await page1.locator('text=/Game Code:/i').textContent();
-    const gameCode = gameCodeElement?.match(/[A-Z0-9]{6}/)?.[0];
+    const gameCode = await page1.getByTestId('game-id').textContent();
 
     const page2 = await context.newPage();
     await page2.goto('http://localhost:5173');
 
-    await page2.fill('input[placeholder*="name" i]', 'Player2');
-    await page2.fill('input[placeholder*="code" i]', gameCode!);
-    await page2.click('button:has-text("Join Game")');
-    await page2.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page2.getByTestId('join-game-button').click();
+    await page2.getByTestId('game-id-input').fill(gameCode!);
+    await page2.getByTestId('player-name-input').fill('Player2');
+    await page2.getByTestId('submit-join-button').click();
+    await page2.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Player1 closes connection (simulating disconnect)
     await page1.context().clearCookies();
 
     // Player1 reconnects
     await page1.reload();
-    await page1.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page1.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Player2 should be notified (via game_updated or specific event)
     // For now, just verify Player1 is still visible in player list
@@ -176,16 +181,17 @@ test.describe('Reconnection Support', () => {
     // Reload page
     await page.reload();
 
-    // Should show lobby (not reconnect to expired session)
-    await expect(page.locator('text=/Create Game/i')).toBeVisible({ timeout: 5000 });
+    // Should show lobby (not reconnect to expired session) - use test ID
+    await expect(page.getByTestId('create-game-button')).toBeVisible({ timeout: 5000 });
   });
 
   test('should clear session on explicit disconnect', async ({ page }) => {
     await page.goto('http://localhost:5173');
 
-    await page.fill('input[placeholder*="name" i]', 'Player1');
-    await page.click('button:has-text("Create Game")');
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.getByTestId('create-game-button').click();
+    await page.getByTestId('player-name-input').fill('Player1');
+    await page.getByTestId('submit-create-button').click();
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Verify session exists
     let session = await page.evaluate(() => localStorage.getItem('gameSession'));
@@ -208,9 +214,10 @@ test.describe('Reconnection Support', () => {
 
     await page.goto('http://localhost:5173');
 
-    await page.fill('input[placeholder*="name" i]', 'Player1');
-    await page.click('button:has-text("Create Game")');
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.getByTestId('create-game-button').click();
+    await page.getByTestId('player-name-input').fill('Player1');
+    await page.getByTestId('submit-create-button').click();
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Store session
     const session = await page.evaluate(() => localStorage.getItem('gameSession'));
@@ -226,16 +233,16 @@ test.describe('Reconnection Support', () => {
     // Try to reconnect
     await page.reload();
 
-    // Should show lobby, not reconnect to finished game
-    await expect(page.locator('text=/Create Game/i')).toBeVisible({ timeout: 5000 });
+    // Should show lobby, not reconnect to finished game - use test ID
+    await expect(page.getByTestId('create-game-button')).toBeVisible({ timeout: 5000 });
   });
 
   test('should maintain game state after reconnection', async ({ page }) => {
     await page.goto('http://localhost:5173');
 
-    // Quick Play to get into a game quickly
-    await page.click('button:has-text("Quick Play")');
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    // Quick Play to get into a game quickly - use test ID
+    await page.getByTestId('quick-play-button').click();
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Select team
     await page.click('button:has-text("Team 1")');
@@ -250,7 +257,7 @@ test.describe('Reconnection Support', () => {
     await page.reload();
 
     // Should reconnect
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Game state should be preserved
     const playerCountAfter = await page.locator('[data-testid="player-card"]').count();

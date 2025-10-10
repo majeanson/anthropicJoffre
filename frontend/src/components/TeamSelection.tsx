@@ -46,19 +46,19 @@ export function TeamSelection({
 
         <div className="mb-6">
           <p className="text-sm text-gray-600 mb-2">Game ID:</p>
-          <div className="bg-gray-100 p-3 rounded-lg font-mono text-lg text-center">{gameId}</div>
+          <div data-testid="game-id" className="bg-gray-100 p-3 rounded-lg font-mono text-lg text-center">{gameId}</div>
         </div>
 
         <div className="mb-8">
           <p className="text-center text-gray-600 mb-4">
-            Players ({players.length}/4) - Choose your team and position
+            Players (<span data-testid="player-count">{players.length}</span>/4) - Choose your team and position
           </p>
         </div>
 
         {/* Team Selection */}
         <div className="grid grid-cols-2 gap-8 mb-8">
           {/* Team 1 */}
-          <div className="border-2 border-blue-300 rounded-lg p-6 bg-blue-50">
+          <div data-testid="team-1-container" className="border-2 border-blue-300 rounded-lg p-6 bg-blue-50">
             <h3 className="text-xl font-bold text-blue-800 mb-4 text-center">Team 1</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
@@ -112,7 +112,7 @@ export function TeamSelection({
           </div>
 
           {/* Team 2 */}
-          <div className="border-2 border-red-300 rounded-lg p-6 bg-red-50">
+          <div data-testid="team-2-container" className="border-2 border-red-300 rounded-lg p-6 bg-red-50">
             <h3 className="text-xl font-bold text-red-800 mb-4 text-center">Team 2</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
@@ -170,6 +170,7 @@ export function TeamSelection({
         <div className="text-center">
           {canStartGame() ? (
             <button
+              data-testid="start-game-button"
               onClick={onStartGame}
               className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-bold hover:bg-green-700 shadow-lg transition-colors"
             >
@@ -178,12 +179,13 @@ export function TeamSelection({
           ) : (
             <div className="space-y-3">
               <button
+                data-testid="start-game-button-disabled"
                 disabled
                 className="bg-gray-300 text-gray-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed"
               >
                 Start Game
               </button>
-              <p className="text-gray-600 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-lg">
+              <p data-testid="start-game-message" className="text-gray-600 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-lg">
                 {getStartGameMessage()}
               </p>
             </div>

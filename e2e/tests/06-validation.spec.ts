@@ -4,12 +4,13 @@ import { createGameWith4Players, placeAllBets, findCurrentPlayerIndex } from './
 test.describe('Validation Feedback', () => {
   test.describe('Team Selection Validation', () => {
     test('should disable Start Game when teams are unbalanced', async ({ browser }) => {
-      const context = await browser.newContext();
+      const contexts = [];
       const pages = [];
       let gameId: string | null = null;
 
       // Create game with only 3 players
       for (let i = 1; i <= 3; i++) {
+        const context = await browser.newContext();
         const page = await context.newPage();
         await page.goto('/');
 
@@ -29,6 +30,7 @@ test.describe('Validation Feedback', () => {
         }
 
         pages.push(page);
+        contexts.push(context);
       }
 
       // Wait for team selection
@@ -41,16 +43,19 @@ test.describe('Validation Feedback', () => {
       // Should show message about waiting for players
       await expect(pages[0].getByText(/waiting for.*more player/i)).toBeVisible();
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
 
     test('should show dealer indicator during team selection', async ({ browser }) => {
       // Create game but don't start it - stop at team selection
-      const context = await browser.newContext();
+      const contexts = [];
       const pages = [];
       let gameId: string | null = null;
 
       for (let i = 1; i <= 4; i++) {
+        const context = await browser.newContext();
         const page = await context.newPage();
         await page.goto('/');
 
@@ -70,6 +75,7 @@ test.describe('Validation Feedback', () => {
         }
 
         pages.push(page);
+        contexts.push(context);
       }
 
       // Should be at team selection
@@ -79,13 +85,15 @@ test.describe('Validation Feedback', () => {
       const startButton = pages[0].getByRole('button', { name: /start game/i });
       await expect(startButton).toBeEnabled();
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
   });
 
   test.describe('Betting Phase Validation', () => {
     test('should disable Place Bet button when bet is too low', async ({ browser }) => {
-      const { context, pages } = await createGameWith4Players(browser);
+      const { contexts, pages } = await createGameWith4Players(browser);
 
       await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -108,11 +116,13 @@ test.describe('Validation Feedback', () => {
       const bet10Button = page4.locator('button:has-text("10")').first();
       await expect(bet10Button).toBeEnabled();
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
 
     test('should show validation message explaining bet requirements', async ({ browser }) => {
-      const { context, pages } = await createGameWith4Players(browser);
+      const { contexts, pages } = await createGameWith4Players(browser);
 
       await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -135,11 +145,13 @@ test.describe('Validation Feedback', () => {
       const bet11Button = page4.locator('button:has-text("11")').first();
       await expect(bet11Button).toBeEnabled();
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
 
     test('should show dealer indicator during betting', async ({ browser }) => {
-      const { context, pages } = await createGameWith4Players(browser);
+      const { contexts, pages } = await createGameWith4Players(browser);
 
       await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -147,13 +159,15 @@ test.describe('Validation Feedback', () => {
       // Should see "(Dealer)" label
       await expect(pages[0].getByText(/dealer/i)).toBeVisible();
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
   });
 
   test.describe('Playing Phase Validation', () => {
     test('should show validation message when trying to play wrong suit', async ({ browser }) => {
-      const { context, pages } = await createGameWith4Players(browser);
+      const { contexts, pages } = await createGameWith4Players(browser);
       await placeAllBets(pages);
 
       // First player plays a card
@@ -167,11 +181,13 @@ test.describe('Validation Feedback', () => {
       const secondPlayerIndex = await findCurrentPlayerIndex(pages);
       await expect(pages[secondPlayerIndex].getByText(/led suit/i)).toBeVisible();
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
 
     test('should visually disable unplayable cards', async ({ browser }) => {
-      const { context, pages } = await createGameWith4Players(browser);
+      const { contexts, pages } = await createGameWith4Players(browser);
       await placeAllBets(pages);
 
       // Play one card to establish led suit
@@ -194,19 +210,23 @@ test.describe('Validation Feedback', () => {
       // Both scenarios are valid
       expect(count).toBeGreaterThanOrEqual(0);
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
 
     test('should show which player we are waiting for', async ({ browser }) => {
-      const { context, pages } = await createGameWith4Players(browser);
+      const { contexts, pages } = await createGameWith4Players(browser);
       await placeAllBets(pages);
 
-      // Other players should see "Waiting for [PlayerName]..."
+      // Other players should see "Waiting for [PlayerName]..." (more specific to avoid multiple matches)
       const currentPlayerIndex = await findCurrentPlayerIndex(pages);
       const otherPlayerIndex = (currentPlayerIndex + 1) % 4;
-      await expect(pages[otherPlayerIndex].getByText(/waiting for/i)).toBeVisible();
+      await expect(pages[otherPlayerIndex].getByText(/waiting for player \d+/i)).toBeVisible();
 
-      await context.close();
+      for (const context of contexts) {
+        await context.close();
+      }
     });
   });
 });

@@ -13,21 +13,21 @@ test.describe('Reconnection Support - Basic Tests', () => {
   });
 
   test('should save session to localStorage when creating game', async ({ page }) => {
-    // Wait for lobby buttons
-    await page.waitForSelector('button:has-text("Create Game")', { timeout: 10000 });
+    // Wait for lobby buttons using test IDs
+    await page.getByTestId('create-game-button').waitFor({ timeout: 10000 });
 
     // Click Create Game button to show form
-    await page.click('button:has-text("Create Game")');
+    await page.getByTestId('create-game-button').click();
 
-    // Wait for the create game form to appear
-    await page.waitForSelector('input[placeholder="Enter your name"]', { timeout: 5000 });
+    // Wait for the create game form to appear using test ID
+    await page.getByTestId('player-name-input').waitFor({ timeout: 5000 });
 
     // Fill in name and create game
-    await page.fill('input[placeholder="Enter your name"]', 'TestPlayer');
-    await page.click('button[type="submit"]:has-text("Create")');
+    await page.getByTestId('player-name-input').fill('TestPlayer');
+    await page.getByTestId('submit-create-button').click();
 
-    // Wait for game to be created
-    await page.waitForSelector('text=/Game Code:/i', { timeout: 10000 });
+    // Wait for game to be created (team selection phase)
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Check localStorage for session
     const session = await page.evaluate(() => {
@@ -44,19 +44,19 @@ test.describe('Reconnection Support - Basic Tests', () => {
   });
 
   test('should reconnect after page reload', async ({ page }) => {
-    // Wait for lobby buttons
-    await page.waitForSelector('button:has-text("Create Game")', { timeout: 10000 });
+    // Wait for lobby buttons using test IDs
+    await page.getByTestId('create-game-button').waitFor({ timeout: 10000 });
 
     // Click Create Game button
-    await page.click('button:has-text("Create Game")');
+    await page.getByTestId('create-game-button').click();
 
     // Wait for form and fill it
-    await page.waitForSelector('input[placeholder="Enter your name"]', { timeout: 5000 });
-    await page.fill('input[placeholder="Enter your name"]', 'Player1');
-    await page.click('button[type="submit"]:has-text("Create")');
+    await page.getByTestId('player-name-input').waitFor({ timeout: 5000 });
+    await page.getByTestId('player-name-input').fill('Player1');
+    await page.getByTestId('submit-create-button').click();
 
     // Wait for team selection
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Select a team
     await page.click('button:has-text("Team 1")');
@@ -66,7 +66,7 @@ test.describe('Reconnection Support - Basic Tests', () => {
     await page.reload();
 
     // Should show reconnecting briefly, then reconnect
-    await page.waitForSelector('text=/Select Team/i', { timeout: 10000 });
+    await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Verify we're still in the same game (Player1 should still be visible)
     await expect(page.locator('text=/Player1/i')).toBeVisible();
@@ -87,8 +87,8 @@ test.describe('Reconnection Support - Basic Tests', () => {
     // Reload page
     await page.reload();
 
-    // Should eventually show lobby (not stay in reconnecting state)
-    await page.waitForSelector('button:has-text("Create Game")', { timeout: 15000 });
+    // Should eventually show lobby (not stay in reconnecting state) - use test ID
+    await page.getByTestId('create-game-button').waitFor({ timeout: 15000 });
 
     // Session should be cleared
     const session = await page.evaluate(() => localStorage.getItem('gameSession'));

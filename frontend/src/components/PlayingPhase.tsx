@@ -7,16 +7,17 @@ interface PlayingPhaseProps {
   gameState: GameState;
   currentPlayerId: string;
   onPlayCard: (card: CardType) => void;
+  isSpectator?: boolean;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: PlayingPhaseProps) {
+export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false }: PlayingPhaseProps) {
   const [validationMessage, setValidationMessage] = useState<string>('');
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 
-  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
-  const isCurrentTurn = gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
+  const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
+  const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
 
   // Reset isPlayingCard flag when it's no longer the player's turn or when trick changes
   useEffect(() => {
@@ -341,7 +342,11 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
       <div className="max-w-6xl mx-auto">
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-lg">
           <h3 className="text-base md:text-lg font-semibold mb-3 md:mb-4">
-            Your Hand {isCurrentTurn && <span className="text-green-600">(Your Turn)</span>}
+            {isSpectator ? (
+              <>Spectator Mode <span className="text-purple-600 bg-purple-100 px-2 py-1 rounded text-sm">👁️ Watching</span></>
+            ) : (
+              <>Your Hand {isCurrentTurn && <span className="text-green-600">(Your Turn)</span>}</>
+            )}
           </h3>
 
           {validationMessage && (
@@ -358,32 +363,43 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard }: Playing
             </div>
           )}
 
-          {/* Card Hand - Horizontal scrollable on mobile */}
-          <div className="overflow-x-auto md:overflow-x-visible -mx-4 md:mx-0 px-4 md:px-0">
-            <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
-              {currentPlayer.hand.map((card, index) => {
-                const playable = isCardPlayable(card);
-                return (
-                  <div key={`${card.color}-${card.value}-${index}`} className="relative flex-shrink-0 md:flex-shrink">
-                    <CardComponent
-                      card={card}
-                      onClick={() => handleCardClick(card)}
-                      disabled={!isCurrentTurn || !playable}
-                    />
-                    {isCurrentTurn && !playable && (
-                      <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
-                        <span className="text-white text-xl md:text-2xl font-bold">✕</span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+          {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
+          {isSpectator ? (
+            <div className="text-center py-8">
+              <div className="inline-block bg-gray-100 px-6 py-4 rounded-lg">
+                <span className="text-gray-600 text-lg">🔒 Player hands are hidden</span>
+                <p className="text-gray-500 text-sm mt-2">You are watching the game as a spectator</p>
+              </div>
             </div>
-          </div>
-          {!isCurrentTurn && (
-            <p className="text-center text-gray-500 mt-3 md:mt-4 text-sm md:text-base">
-              Waiting for {gameState.players[gameState.currentPlayerIndex]?.name}...
-            </p>
+          ) : (
+            <>
+              <div className="overflow-x-auto md:overflow-x-visible -mx-4 md:mx-0 px-4 md:px-0">
+                <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
+                  {currentPlayer.hand.map((card, index) => {
+                    const playable = isCardPlayable(card);
+                    return (
+                      <div key={`${card.color}-${card.value}-${index}`} className="relative flex-shrink-0 md:flex-shrink">
+                        <CardComponent
+                          card={card}
+                          onClick={() => handleCardClick(card)}
+                          disabled={!isCurrentTurn || !playable}
+                        />
+                        {isCurrentTurn && !playable && (
+                          <div className="absolute inset-0 bg-gray-500 bg-opacity-50 rounded-lg flex items-center justify-center">
+                            <span className="text-white text-xl md:text-2xl font-bold">✕</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+              {!isCurrentTurn && (
+                <p className="text-center text-gray-500 mt-3 md:mt-4 text-sm md:text-base">
+                  Waiting for {gameState.players[gameState.currentPlayerIndex]?.name}...
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>
