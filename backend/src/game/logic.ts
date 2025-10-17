@@ -3,7 +3,7 @@ import { Card, CardColor, TrickCard, Player, Bet } from '../types/game';
 export const getCardPoints = (card: Card): number => {
   // Special cards
   if (card.color === 'red' && card.value === 0) return 5;
-  if (card.color === 'brown' && card.value === 0) return -2;
+  if (card.color === 'brown' && card.value === 0) return -3;
   return 0;
 };
 
