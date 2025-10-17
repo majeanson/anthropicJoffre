@@ -195,6 +195,14 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                     Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
                   </button>
                 </div>
+
+                {/* Validation message */}
+                {!isCurrentBetValid() && highestBet && (
+                  <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg text-xs">
+                    <strong>Too low:</strong> Current highest is {highestBet.amount} points{highestBet.withoutTrump ? ' (No Trump)' : ''}.
+                    {isDealer ? ' You can match or raise.' : ' You must raise.'}
+                  </div>
+                )}
               </div>
 
               {isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) && (

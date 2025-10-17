@@ -13,7 +13,7 @@ export const determineWinner = (
 ): string => {
   if (trick.length === 0) throw new Error('Empty trick');
 
-  const ledSuit = trick[0].card.color; // First card determines the led suit
+  const ledSuit = trick[0].card.color; // First card determines the led sui
   let winningCard = trick[0];
 
   for (let i = 1; i < trick.length; i++) {
