@@ -223,25 +223,23 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         </div>
       )}
 
-      {/* Player's Hand Display */}
+      {/* Player's Hand Display - 4x2 Grid */}
       {playerHand.length > 0 && (
         <div className="mt-6 pt-6 border-t border-gray-200">
           <h3 className="text-lg font-semibold mb-3 text-gray-700">Your Hand</h3>
-          <div className="overflow-x-auto -mx-2 md:mx-0 px-2 md:px-0">
-            <div className="flex gap-2 md:gap-3 md:flex-wrap md:justify-center min-w-min">
-              {playerHand.map((card, index) => (
-                <div
-                  key={`${card.color}-${card.value}-${index}`}
-                  className="flex-shrink-0 md:flex-shrink"
-                >
-                  <CardComponent
-                    card={card}
-                    size="small"
-                    disabled={true}
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="grid grid-cols-4 gap-2 md:gap-3 max-w-md mx-auto">
+            {playerHand.map((card, index) => (
+              <div
+                key={`${card.color}-${card.value}-${index}`}
+                className="flex justify-center"
+              >
+                <CardComponent
+                  card={card}
+                  size="small"
+                  disabled={true}
+                />
+              </div>
+            ))}
           </div>
         </div>
       )}
