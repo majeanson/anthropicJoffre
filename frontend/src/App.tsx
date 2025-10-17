@@ -178,6 +178,15 @@ function App() {
       setGameState(gameState);
     });
 
+    newSocket.on('leave_game_success', () => {
+      console.log('Successfully left game');
+      // Clear session and reset state
+      localStorage.removeItem('gameSession');
+      setGameState(null);
+      setGameId('');
+      setIsSpectator(false);
+    });
+
     newSocket.on('spectator_joined', ({ gameState }: { gameState: GameState }) => {
       console.log('Joined game as spectator');
       setIsSpectator(true);
@@ -237,6 +246,12 @@ function App() {
   const handleStartGame = () => {
     if (socket && gameId) {
       socket.emit('start_game', { gameId });
+    }
+  };
+
+  const handleLeaveGame = () => {
+    if (socket && gameId) {
+      socket.emit('leave_game', { gameId });
     }
   };
 
@@ -523,6 +538,7 @@ function App() {
             currentPlayerIndex={gameState.currentPlayerIndex}
             dealerIndex={gameState.dealerIndex}
             onPlaceBet={handlePlaceBet}
+            onLeaveGame={handleLeaveGame}
           />
         </div>
       </>
@@ -546,6 +562,7 @@ function App() {
           onPlayCard={handlePlayCard}
           isSpectator={isSpectator}
           currentTrickWinnerId={currentTrickWinnerId}
+          onLeaveGame={handleLeaveGame}
         />
       </>
     );

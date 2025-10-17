@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Bet, Player } from '../types/game';
+import { Card as CardComponent } from './Card';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -8,12 +9,17 @@ interface BettingPhaseProps {
   currentPlayerIndex: number;
   dealerIndex: number;
   onPlaceBet: (amount: number, withoutTrump: boolean, skipped?: boolean) => void;
+  onLeaveGame?: () => void;
 }
 
-export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet }: BettingPhaseProps) {
+export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame }: BettingPhaseProps) {
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
   const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
   const isDealer = currentPlayerIndex === dealerIndex;
+
+  // Get current player's hand
+  const currentPlayer = players.find(p => p.id === currentPlayerId);
+  const playerHand = currentPlayer?.hand || [];
 
   // Get highest valid bet (excluding skipped bets) - memoized
   const highestBet = useMemo((): Bet | null => {
@@ -59,7 +65,16 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg max-w-2xl mx-auto">
+    <div className="bg-white rounded-xl p-6 shadow-lg max-w-2xl mx-auto relative">
+      {onLeaveGame && (
+        <button
+          onClick={onLeaveGame}
+          className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
+          title="Leave Game"
+        >
+          🚪 Leave
+        </button>
+      )}
       <h2 className="text-2xl font-bold mb-6 text-gray-800">Betting Phase</h2>
 
       <div className="mb-6">
@@ -205,6 +220,29 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       {hasPlacedBet && (
         <div className="text-center text-green-600 font-medium">
           Waiting for other players to bet...
+        </div>
+      )}
+
+      {/* Player's Hand Display */}
+      {playerHand.length > 0 && (
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <h3 className="text-lg font-semibold mb-3 text-gray-700">Your Hand</h3>
+          <div className="overflow-x-auto -mx-2 md:mx-0 px-2 md:px-0">
+            <div className="flex gap-2 md:gap-3 md:flex-wrap md:justify-center min-w-min">
+              {playerHand.map((card, index) => (
+                <div
+                  key={`${card.color}-${card.value}-${index}`}
+                  className="flex-shrink-0 md:flex-shrink"
+                >
+                  <CardComponent
+                    card={card}
+                    size="small"
+                    disabled={true}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

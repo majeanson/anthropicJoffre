@@ -9,9 +9,10 @@ interface PlayingPhaseProps {
   onPlayCard: (card: CardType) => void;
   isSpectator?: boolean;
   currentTrickWinnerId?: string | null;
+  onLeaveGame?: () => void;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null }: PlayingPhaseProps) {
+export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame }: PlayingPhaseProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -213,6 +214,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <span className="md:hidden">🏆</span>
               <span className="hidden md:inline">🏆 Leaderboard</span>
             </button>
+            {onLeaveGame && (
+              <button
+                onClick={onLeaveGame}
+                className="bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-red-500/50 flex items-center justify-center backdrop-blur-md border border-red-300/30"
+                title="Leave Game"
+              >
+                <span className="md:hidden">🚪</span>
+                <span className="hidden md:inline">🚪 Leave</span>
+              </button>
+            )}
             {gameState.previousTrick && (
               <button
                 onClick={() => setShowPreviousTrick(!showPreviousTrick)}

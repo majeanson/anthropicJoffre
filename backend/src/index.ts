@@ -642,6 +642,43 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Leave game handler
+  socket.on('leave_game', ({ gameId }: { gameId: string }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    const player = game.players.find(p => p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    // Remove player from game
+    const playerIndex = game.players.findIndex(p => p.id === socket.id);
+    if (playerIndex !== -1) {
+      game.players.splice(playerIndex, 1);
+      console.log(`Player ${player.name} (${socket.id}) left game ${gameId}`);
+
+      // Leave the game room
+      socket.leave(gameId);
+
+      // Notify remaining players
+      io.to(gameId).emit('player_left', { playerId: socket.id, gameState: game });
+
+      // If game is empty, delete it
+      if (game.players.length === 0) {
+        games.delete(gameId);
+        console.log(`Game ${gameId} deleted (no players remaining)`);
+      }
+
+      // Confirm to the leaving player
+      socket.emit('leave_game_success', { success: true });
+    }
+  });
+
   // Reconnection handler
   socket.on('reconnect_to_game', ({ token }: { token: string }) => {
     console.log('Reconnection attempt with token:', token.substring(0, 10) + '...');
