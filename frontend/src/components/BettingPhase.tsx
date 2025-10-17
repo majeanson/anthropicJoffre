@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Bet, Player } from '../types/game';
 import { Card as CardComponent } from './Card';
 
@@ -21,6 +21,10 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const playerHand = currentPlayer?.hand || [];
 
+  // State for bet selection
+  const [selectedAmount, setSelectedAmount] = useState<number>(7);
+  const [withoutTrump, setWithoutTrump] = useState<boolean>(false);
+
   // Get highest valid bet (excluding skipped bets) - memoized
   const highestBet = useMemo((): Bet | null => {
     const validBets = currentBets.filter(b => !b.skipped);
@@ -42,25 +46,25 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
     return true; // Non-dealers can always skip
   };
 
-  const handleBetClick = (amount: number, withoutTrump: boolean) => {
-    onPlaceBet(amount, withoutTrump, false);
+  const handlePlaceBet = () => {
+    onPlaceBet(selectedAmount, withoutTrump, false);
   };
 
   const handleSkip = () => {
     onPlaceBet(0, false, true);
   };
 
-  // Check if a bet option is valid
-  const isBetValid = (amount: number, withoutTrump: boolean): boolean => {
+  // Check if current selection is valid
+  const isCurrentBetValid = (): boolean => {
     if (!highestBet) return true; // No bets yet, all valid
 
     if (isDealer) {
       // Dealer can match or raise
-      return amount >= highestBet.amount;
+      return selectedAmount >= highestBet.amount;
     } else {
       // Non-dealer must raise (higher amount or same with withoutTrump)
-      return amount > highestBet.amount ||
-             (amount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
+      return selectedAmount > highestBet.amount ||
+             (selectedAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
     }
   };
 
@@ -115,85 +119,81 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         <div className="space-y-3">
           {isMyTurn ? (
             <>
-              <div className="space-y-2">
-                <label className="block text-xs md:text-sm font-medium text-gray-700 mb-2">
-                  Select Your Bet:
-                </label>
-
-                {/* Skip Button */}
-                {canSkip() && (
-                  <button
-                    data-testid="skip-bet-button"
-                    onClick={handleSkip}
-                    className="w-full py-2 px-3 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors text-sm"
-                  >
-                    SKIP
-                  </button>
-                )}
-
-                {/* Compact Bet buttons - 3 columns on mobile */}
-                <div className="grid grid-cols-3 md:grid-cols-2 gap-1.5 md:gap-2">
-                  {[7, 8, 9, 10, 11, 12].map((amount) => {
-                    const withTrumpValid = isBetValid(amount, false);
-                    const withoutTrumpValid = isBetValid(amount, true);
-
-                    return (
-                      <div key={amount} className="contents">
-                        {/* With Trump - Mobile: Single column, Desktop: Left column */}
-                        <button
-                          data-testid={`bet-${amount}-with-trump`}
-                          onClick={() => handleBetClick(amount, false)}
-                          disabled={!withTrumpValid}
-                          className={`py-2 px-2 md:px-3 rounded-lg font-semibold transition-colors text-sm md:text-base ${
-                            withTrumpValid
-                              ? 'bg-blue-600 text-white hover:bg-blue-700'
-                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          }`}
-                        >
-                          {amount}
-                        </button>
-
-                        {/* Without Trump - Hidden on mobile, shown on desktop */}
-                        <button
-                          data-testid={`bet-${amount}-without-trump`}
-                          onClick={() => handleBetClick(amount, true)}
-                          disabled={!withoutTrumpValid}
-                          className={`hidden md:block py-2 px-3 rounded-lg font-semibold transition-colors text-sm md:text-base ${
-                            withoutTrumpValid
-                              ? 'bg-purple-600 text-white hover:bg-purple-700'
-                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          }`}
-                        >
-                          {amount} (No Trump)
-                        </button>
-                      </div>
-                    );
-                  })}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select Bet Amount:
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[7, 8, 9, 10, 11, 12].map((amount) => (
+                      <button
+                        key={amount}
+                        onClick={() => setSelectedAmount(amount)}
+                        className={`py-3 px-4 rounded-lg font-semibold transition-all text-base ${
+                          selectedAmount === amount
+                            ? 'bg-blue-600 text-white ring-2 ring-blue-400'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        }`}
+                      >
+                        {amount}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
-                {/* Mobile: No Trump variants as separate row */}
-                <div className="md:hidden">
-                  <p className="text-xs text-gray-600 mb-1.5 font-medium">No Trump (2x):</p>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {[7, 8, 9, 10, 11, 12].map((amount) => {
-                      const withoutTrumpValid = isBetValid(amount, true);
-                      return (
-                        <button
-                          key={amount}
-                          data-testid={`bet-${amount}-without-trump`}
-                          onClick={() => handleBetClick(amount, true)}
-                          disabled={!withoutTrumpValid}
-                          className={`py-2 px-2 rounded-lg font-semibold transition-colors text-sm ${
-                            withoutTrumpValid
-                              ? 'bg-purple-600 text-white hover:bg-purple-700'
-                              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          }`}
-                        >
-                          {amount}
-                        </button>
-                      );
-                    })}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Trump Option:
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                      <input
+                        type="radio"
+                        name="trump"
+                        checked={!withoutTrump}
+                        onChange={() => setWithoutTrump(false)}
+                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="ml-3 text-sm font-medium text-gray-700">
+                        With Trump (1x)
+                      </span>
+                    </label>
+                    <label className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                      <input
+                        type="radio"
+                        name="trump"
+                        checked={withoutTrump}
+                        onChange={() => setWithoutTrump(true)}
+                        className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                      />
+                      <span className="ml-3 text-sm font-medium text-gray-700">
+                        Without Trump (2x multiplier)
+                      </span>
+                    </label>
                   </div>
+                </div>
+
+                <div className="flex gap-2">
+                  {canSkip() && (
+                    <button
+                      data-testid="skip-bet-button"
+                      onClick={handleSkip}
+                      className="flex-1 py-3 px-4 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors text-sm"
+                    >
+                      SKIP
+                    </button>
+                  )}
+                  <button
+                    onClick={handlePlaceBet}
+                    disabled={!isCurrentBetValid()}
+                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors text-sm ${
+                      isCurrentBetValid()
+                        ? 'bg-green-600 text-white hover:bg-green-700'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
+                  </button>
                 </div>
               </div>
 
