@@ -60,7 +60,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                   <span className={`px-3 py-1 rounded-full font-semibold ${
                     gameState.phase === 'team_selection' ? 'bg-purple-100 text-purple-800' :
                     gameState.phase === 'betting' ? 'bg-orange-100 text-orange-800' :
-                    gameState.phase === 'playing' ? 'bg-blue-100 text-blue-800' :
+                    gameState.phase === 'playing' ? 'bg-orange-100 text-orange-800' :
                     gameState.phase === 'scoring' ? 'bg-green-100 text-green-800' :
                     'bg-gray-100 text-gray-800'
                   }`}>
@@ -85,17 +85,17 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
               🏆 Team Scores
             </h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 text-center">
-                <h4 className="text-sm font-semibold text-blue-700 mb-1">Team 1</h4>
-                <p className="text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
-                <p className="text-xs text-blue-600 mt-1">
+              <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-4 text-center">
+                <h4 className="text-sm font-semibold text-orange-700 mb-1">Team 1</h4>
+                <p className="text-4xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
+                <p className="text-xs text-orange-600 mt-1">
                   {gameState.teamScores.team1 >= 41 ? '✓ Winner!' : `${41 - gameState.teamScores.team1} to win`}
                 </p>
               </div>
-              <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4 text-center">
-                <h4 className="text-sm font-semibold text-red-700 mb-1">Team 2</h4>
-                <p className="text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
-                <p className="text-xs text-red-600 mt-1">
+              <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 text-center">
+                <h4 className="text-sm font-semibold text-purple-700 mb-1">Team 2</h4>
+                <p className="text-4xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
+                <p className="text-xs text-purple-600 mt-1">
                   {gameState.teamScores.team2 >= 41 ? '✓ Winner!' : `${41 - gameState.teamScores.team2} to win`}
                 </p>
               </div>
@@ -125,7 +125,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <span className={`w-4 h-4 rounded-full ${
-                          player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'
+                          player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
                         }`} aria-label={`Team ${player.teamId}`}></span>
                         <span className="font-bold text-gray-800">{player.name}</span>
                         {isDealer && (
@@ -185,7 +185,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                     <div key={index} className="bg-gray-50 rounded-lg p-3 text-center border-2 border-gray-200">
                       <p className="text-xs text-gray-600 mb-1">{player?.name}</p>
                       <div className={`inline-block px-3 py-2 rounded font-bold text-white ${
-                        trickCard.card.color === 'blue' ? 'bg-blue-500' :
+                        trickCard.card.color === 'blue' ? 'bg-orange-500' :
                         trickCard.card.color === 'green' ? 'bg-green-500' :
                         'bg-amber-700'
                       }`}>

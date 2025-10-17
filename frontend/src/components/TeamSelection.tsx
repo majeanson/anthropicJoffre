@@ -58,8 +58,8 @@ export function TeamSelection({
         {/* Team Selection */}
         <div className="grid grid-cols-2 gap-8 mb-8">
           {/* Team 1 */}
-          <div data-testid="team-1-container" className="border-2 border-blue-300 rounded-lg p-6 bg-blue-50">
-            <h3 className="text-xl font-bold text-blue-800 mb-4 text-center">Team 1</h3>
+          <div data-testid="team-1-container" className="border-2 border-orange-300 rounded-lg p-6 bg-orange-50">
+            <h3 className="text-xl font-bold text-orange-800 mb-4 text-center">Team 1</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
                 const playerAtPosition = team1Players[position];
@@ -70,9 +70,9 @@ export function TeamSelection({
                     key={`team1-${position}`}
                     className={`p-4 rounded-lg border-2 ${
                       isCurrentPlayer
-                        ? 'bg-blue-200 border-blue-500'
+                        ? 'bg-orange-200 border-orange-500'
                         : playerAtPosition
-                        ? 'bg-white border-blue-200'
+                        ? 'bg-white border-orange-200'
                         : 'bg-gray-100 border-dashed border-gray-300'
                     }`}
                   >
@@ -85,7 +85,7 @@ export function TeamSelection({
                         {!isCurrentPlayer && currentPlayer && (
                           <button
                             onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
+                            className="text-xs bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700"
                           >
                             Swap
                           </button>
@@ -96,7 +96,7 @@ export function TeamSelection({
                         {currentPlayer?.teamId !== 1 ? (
                           <button
                             onClick={() => onSelectTeam(1)}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-orange-600 hover:text-orange-800 font-medium"
                           >
                             Join Team 1
                           </button>
@@ -112,8 +112,8 @@ export function TeamSelection({
           </div>
 
           {/* Team 2 */}
-          <div data-testid="team-2-container" className="border-2 border-red-300 rounded-lg p-6 bg-red-50">
-            <h3 className="text-xl font-bold text-red-800 mb-4 text-center">Team 2</h3>
+          <div data-testid="team-2-container" className="border-2 border-purple-300 rounded-lg p-6 bg-purple-50">
+            <h3 className="text-xl font-bold text-purple-800 mb-4 text-center">Team 2</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
                 const playerAtPosition = team2Players[position];
@@ -124,9 +124,9 @@ export function TeamSelection({
                     key={`team2-${position}`}
                     className={`p-4 rounded-lg border-2 ${
                       isCurrentPlayer
-                        ? 'bg-red-200 border-red-500'
+                        ? 'bg-purple-200 border-purple-500'
                         : playerAtPosition
-                        ? 'bg-white border-red-200'
+                        ? 'bg-white border-purple-200'
                         : 'bg-gray-100 border-dashed border-gray-300'
                     }`}
                   >
@@ -139,7 +139,7 @@ export function TeamSelection({
                         {!isCurrentPlayer && currentPlayer && (
                           <button
                             onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-red-600 text-white px-2 py-1 rounded hover:bg-red-700"
+                            className="text-xs bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700"
                           >
                             Swap
                           </button>
@@ -150,7 +150,7 @@ export function TeamSelection({
                         {currentPlayer?.teamId !== 2 ? (
                           <button
                             onClick={() => onSelectTeam(2)}
-                            className="text-red-600 hover:text-red-800 font-medium"
+                            className="text-purple-600 hover:text-purple-800 font-medium"
                           >
                             Join Team 2
                           </button>

@@ -22,10 +22,31 @@ export const shuffleDeck = (deck: Card[]): Card[] => {
   return shuffled;
 };
 
+// Sort cards by color then value
+export const sortHand = (hand: Card[]): Card[] => {
+  const colorOrder: Record<CardColor, number> = {
+    'red': 0,
+    'brown': 1,
+    'green': 2,
+    'blue': 3,
+  };
+
+  return [...hand].sort((a, b) => {
+    // First sort by color
+    const colorDiff = colorOrder[a.color] - colorOrder[b.color];
+    if (colorDiff !== 0) return colorDiff;
+
+    // Then sort by value
+    return a.value - b.value;
+  });
+};
+
 export const dealCards = (deck: Card[], numPlayers: number = 4): Card[][] => {
   const hands: Card[][] = Array.from({ length: numPlayers }, () => []);
   deck.forEach((card, index) => {
     hands[index % numPlayers].push(card);
   });
-  return hands;
+
+  // Sort each hand by color then value
+  return hands.map(hand => sortHand(hand));
 };

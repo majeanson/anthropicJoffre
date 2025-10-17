@@ -44,7 +44,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay }:
             <button
               data-testid="create-game-button"
               onClick={() => setMode('create')}
-              className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="w-full bg-orange-600 text-white py-4 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
             >
               Create Game
             </button>
@@ -95,7 +95,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay }:
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="Enter your name"
                 required
               />
@@ -112,7 +112,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay }:
               <button
                 data-testid="submit-create-button"
                 type="submit"
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="flex-1 bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
               >
                 Create
               </button>

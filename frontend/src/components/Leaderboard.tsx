@@ -55,38 +55,38 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               {/* Team 1 */}
-              <div className={`bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 ${
+              <div className={`bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 ${
                 leadingTeam === 1 ? 'ring-4 ring-yellow-400' : ''
               }`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-2xl font-bold text-blue-800">Team 1</h4>
+                  <h4 className="text-2xl font-bold text-orange-800">Team 1</h4>
                   {leadingTeam === 1 && <span className="text-3xl">👑</span>}
                 </div>
-                <div className="text-5xl font-bold text-blue-600 mb-4">{team1Score}</div>
+                <div className="text-5xl font-bold text-orange-600 mb-4">{team1Score}</div>
                 <div className="space-y-2">
                   {team1Players.map(player => (
                     <div key={player.id} className="bg-white bg-opacity-60 rounded px-3 py-2">
-                      <p className="font-semibold text-blue-900">{player.name}</p>
-                      <p className="text-sm text-blue-700">Tricks: {player.tricksWon}</p>
+                      <p className="font-semibold text-orange-900">{player.name}</p>
+                      <p className="text-sm text-orange-700">Tricks: {player.tricksWon}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Team 2 */}
-              <div className={`bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-6 ${
+              <div className={`bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 ${
                 leadingTeam === 2 ? 'ring-4 ring-yellow-400' : ''
               }`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-2xl font-bold text-red-800">Team 2</h4>
+                  <h4 className="text-2xl font-bold text-purple-800">Team 2</h4>
                   {leadingTeam === 2 && <span className="text-3xl">👑</span>}
                 </div>
-                <div className="text-5xl font-bold text-red-600 mb-4">{team2Score}</div>
+                <div className="text-5xl font-bold text-purple-600 mb-4">{team2Score}</div>
                 <div className="space-y-2">
                   {team2Players.map(player => (
                     <div key={player.id} className="bg-white bg-opacity-60 rounded px-3 py-2">
-                      <p className="font-semibold text-red-900">{player.name}</p>
-                      <p className="text-sm text-red-700">Tricks: {player.tricksWon}</p>
+                      <p className="font-semibold text-purple-900">{player.name}</p>
+                      <p className="text-sm text-purple-700">Tricks: {player.tricksWon}</p>
                     </div>
                   ))}
                 </div>
@@ -156,7 +156,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                         <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                           round.betMade
                             ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
+                            : 'bg-purple-100 text-purple-800'
                         }`}>
                           {round.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
                         </span>
@@ -187,9 +187,9 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                         <div>
                           <p className="text-gray-600 font-semibold">Round Score</p>
                           <p className="font-bold">
-                            <span className="text-blue-600">{round.roundScore.team1 >= 0 ? '+' : ''}{round.roundScore.team1}</span>
+                            <span className="text-orange-600">{round.roundScore.team1 >= 0 ? '+' : ''}{round.roundScore.team1}</span>
                             {' / '}
-                            <span className="text-red-600">{round.roundScore.team2 >= 0 ? '+' : ''}{round.roundScore.team2}</span>
+                            <span className="text-purple-600">{round.roundScore.team2 >= 0 ? '+' : ''}{round.roundScore.team2}</span>
                           </p>
                           <p className="text-xs text-gray-500">
                             Total: {round.cumulativeScore.team1} - {round.cumulativeScore.team2}

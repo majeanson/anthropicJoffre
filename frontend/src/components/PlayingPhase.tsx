@@ -133,9 +133,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const getTrumpColor = (trump: string | null): string => {
     if (!trump || trump === 'none') return 'text-gray-900';
     switch (trump) {
-      case 'red': return 'text-red-600';
+      case 'red': return 'text-purple-600';
       case 'green': return 'text-green-600';
-      case 'blue': return 'text-blue-600';
+      case 'blue': return 'text-orange-600';
       case 'yellow': return 'text-yellow-600';
       default: return 'text-gray-900';
     }
@@ -160,10 +160,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3 md:p-6 shadow-2xlborder border-white/20">
           <div className="flex justify-between items-center gap-4 md:gap-8">
             {/* Team 1 */}
-            <div className="flex-1 bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-2 md:p-4">
-              <h3 className="text-[10px] md:text-xs font-semibold text-blue-600/70 uppercase tracking-wider mb-1">Team 1</h3>
-              <p className="text-3xl md:text-5xl font-black text-blue-600 leading-none">{gameState.teamScores.team1}</p>
-              <p className="text-xs md:text-sm font-bold text-blue-500 mt-1">+{team1RoundScore} pts</p>
+            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4">
+              <h3 className="text-[10px] md:text-xs font-semibold text-orange-600/70 uppercase tracking-wider mb-1">Team 1</h3>
+              <p className="text-3xl md:text-5xl font-black text-orange-600 leading-none">{gameState.teamScores.team1}</p>
+              <p className="text-xs md:text-sm font-bold text-orange-500 mt-1">+{team1RoundScore} pts</p>
             </div>
 
             {/* Center Info */}
@@ -175,8 +175,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               {/* Current Turn Indicator */}
               <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg ${
                 currentTurnTeam === 1
-                  ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
-                  : 'bg-gradient-to-r from-red-500 to-red-600 text-white'
+                  ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
+                  : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
               }`}>
                 {currentTurnPlayer?.name}
               </div>
@@ -192,10 +192,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </div>
 
             {/* Team 2 */}
-            <div className="flex-1 bg-gradient-to-br from-red-50 to-red-100/50 rounded-xl p-2 md:p-4 text-right">
-              <h3 className="text-[10px] md:text-xs font-semibold text-red-600/70 uppercase tracking-wider mb-1">Team 2</h3>
-              <p className="text-3xl md:text-5xl font-black text-red-600 leading-none">{gameState.teamScores.team2}</p>
-              <p className="text-xs md:text-sm font-bold text-red-500 mt-1">+{team2RoundScore} pts</p>
+            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-4 text-right">
+              <h3 className="text-[10px] md:text-xs font-semibold text-purple-600/70 uppercase tracking-wider mb-1">Team 2</h3>
+              <p className="text-3xl md:text-5xl font-black text-purple-600 leading-none">{gameState.teamScores.team2}</p>
+              <p className="text-xs md:text-sm font-bold text-purple-500 mt-1">+{team2RoundScore} pts</p>
             </div>
           </div>
         </div>
@@ -217,7 +217,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {onLeaveGame && (
               <button
                 onClick={onLeaveGame}
-                className="bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-red-500/50 flex items-center justify-center backdrop-blur-md border border-red-300/30"
+                className="bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-purple-500/50 flex items-center justify-center backdrop-blur-md border border-purple-300/30"
                 title="Leave Game"
               >
                 <span className="md:hidden">🚪</span>
@@ -264,8 +264,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(0)} (You)
                   </div>
@@ -275,8 +275,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(1) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
@@ -287,8 +287,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(2) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
@@ -300,8 +300,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(3)}
                   </div>
@@ -320,8 +320,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(0)} (You)
                   </div>
@@ -331,8 +331,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(1) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
@@ -343,8 +343,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(2) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
@@ -356,8 +356,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
-                      ? 'bg-gradient-to-br from-blue-500 to-blue-700 text-white'
-                      : 'bg-gradient-to-br from-red-500 to-red-700 text-white'
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                      : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(3)}
                   </div>

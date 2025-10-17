@@ -73,7 +73,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       {onLeaveGame && (
         <button
           onClick={onLeaveGame}
-          className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
+          className="absolute top-4 right-4 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
           title="Leave Game"
         >
           🚪 Leave
@@ -90,7 +90,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             return (
               <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
+                  <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
                   <span className="font-medium">
                     {player.name}
                     {isDealerPlayer && <span className="ml-2 text-xs text-purple-600">(Dealer)</span>}
@@ -131,7 +131,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                         onClick={() => setSelectedAmount(amount)}
                         className={`py-3 px-4 rounded-lg font-semibold transition-all text-base ${
                           selectedAmount === amount
-                            ? 'bg-blue-600 text-white ring-2 ring-blue-400'
+                            ? 'bg-orange-600 text-white ring-2 ring-orange-400'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -152,7 +152,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                         name="trump"
                         checked={!withoutTrump}
                         onChange={() => setWithoutTrump(false)}
-                        className="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                        className="w-4 h-4 text-orange-600 focus:ring-orange-500"
                       />
                       <span className="ml-3 text-sm font-medium text-gray-700">
                         With Trump (1x)

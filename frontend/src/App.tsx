@@ -375,9 +375,9 @@ function App() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-red-50 flex items-center justify-center">
+      <div className="min-h-screen bg-purple-50 flex items-center justify-center">
         <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold text-red-600 mb-2">Error</h2>
+          <h2 className="text-xl font-bold text-purple-600 mb-2">Error</h2>
           <p className="text-gray-700">{error}</p>
           <button
             onClick={() => {
@@ -385,7 +385,7 @@ function App() {
               setGameState(null);
               setGameId('');
             }}
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+            className="mt-4 bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
           >
             Back to Lobby
           </button>
@@ -397,7 +397,7 @@ function App() {
   // Show reconnecting UI
   if (reconnecting) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-900 to-purple-900 flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-2xl text-center">
           <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Reconnecting...</h2>
@@ -583,13 +583,13 @@ function App() {
         <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full">
           <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Round {gameState.roundNumber} Complete!</h2>
           <div className="grid grid-cols-2 gap-6 mb-6">
-            <div className="text-center p-6 bg-blue-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-blue-800 mb-2">Team 1</h3>
-              <p className="text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+            <div className="text-center p-6 bg-orange-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
+              <p className="text-4xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
             </div>
-            <div className="text-center p-6 bg-red-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Team 2</h3>
-              <p className="text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+            <div className="text-center p-6 bg-purple-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
+              <p className="text-4xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
             </div>
           </div>
           <div className="space-y-2">
@@ -598,7 +598,7 @@ function App() {
               return (
                 <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
+                    <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
                     <span className="font-medium">{player.name}</span>
                   </div>
                   <div className="text-sm">
@@ -630,17 +630,17 @@ function App() {
         <div className="min-h-screen bg-gradient-to-br from-yellow-900 to-orange-900 flex items-center justify-center p-6">
         <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full text-center">
           <h2 className="text-4xl font-bold mb-6 text-gray-800">Game Over!</h2>
-          <div className={`text-6xl font-bold mb-6 ${winningTeam === 1 ? 'text-blue-600' : 'text-red-600'}`}>
+          <div className={`text-6xl font-bold mb-6 ${winningTeam === 1 ? 'text-orange-600' : 'text-purple-600'}`}>
             Team {winningTeam} Wins!
           </div>
           <div className="grid grid-cols-2 gap-6 mb-6">
-            <div className="text-center p-6 bg-blue-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-blue-800 mb-2">Team 1</h3>
-              <p className="text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+            <div className="text-center p-6 bg-orange-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
+              <p className="text-4xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
             </div>
-            <div className="text-center p-6 bg-red-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-red-800 mb-2">Team 2</h3>
-              <p className="text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+            <div className="text-center p-6 bg-purple-50 rounded-lg">
+              <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
+              <p className="text-4xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
             </div>
           </div>
           <button
@@ -648,7 +648,7 @@ function App() {
               setGameState(null);
               setGameId('');
             }}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
           >
             Back to Lobby
           </button>

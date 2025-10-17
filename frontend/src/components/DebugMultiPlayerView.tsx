@@ -85,11 +85,11 @@ export function DebugMultiPlayerView({
       {gameState.phase === 'playing' && (
         <div className="grid grid-cols-2 gap-4">
           {players.map((player) => (
-            <div key={player.id} className="border-4 border-blue-500 rounded-lg overflow-hidden">
+            <div key={player.id} className="border-4 border-green-500 rounded-lg overflow-hidden">
               <div className={`px-4 py-2 font-bold text-white ${
                 gameState.currentPlayerIndex === players.indexOf(player)
                   ? 'bg-green-600 animate-pulse'
-                  : 'bg-blue-600'
+                  : 'bg-orange-600'
               }`}>
                 {player.name} {gameState.currentPlayerIndex === players.indexOf(player) ? '(TURN)' : ''}
               </div>
@@ -113,13 +113,13 @@ export function DebugMultiPlayerView({
               Round {gameState.roundNumber} Complete!
             </h2>
             <div className="grid grid-cols-2 gap-6 mb-6">
-              <div className="text-center p-6 bg-blue-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">Team 1</h3>
-                <p className="text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+              <div className="text-center p-6 bg-orange-50 rounded-lg">
+                <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
+                <p className="text-4xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
               </div>
-              <div className="text-center p-6 bg-red-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-red-800 mb-2">Team 2</h3>
-                <p className="text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+              <div className="text-center p-6 bg-purple-50 rounded-lg">
+                <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
+                <p className="text-4xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
               </div>
             </div>
             <div className="space-y-2">
@@ -128,7 +128,7 @@ export function DebugMultiPlayerView({
                 return (
                   <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-3">
-                      <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-blue-500' : 'bg-red-500'}`}></span>
+                      <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
                       <span className="font-medium">{player.name}</span>
                     </div>
                     <div className="text-sm">
@@ -149,18 +149,18 @@ export function DebugMultiPlayerView({
           <div className="bg-white rounded-xl p-8 shadow-2xl text-center">
             <h2 className="text-4xl font-bold mb-6 text-gray-800">Game Over!</h2>
             <div className={`text-6xl font-bold mb-6 ${
-              gameState.teamScores.team1 >= 41 ? 'text-blue-600' : 'text-red-600'
+              gameState.teamScores.team1 >= 41 ? 'text-orange-600' : 'text-purple-600'
             }`}>
               Team {gameState.teamScores.team1 >= 41 ? 1 : 2} Wins!
             </div>
             <div className="grid grid-cols-2 gap-6 mb-6">
-              <div className="text-center p-6 bg-blue-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">Team 1</h3>
-                <p className="text-4xl font-bold text-blue-600">{gameState.teamScores.team1}</p>
+              <div className="text-center p-6 bg-orange-50 rounded-lg">
+                <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
+                <p className="text-4xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
               </div>
-              <div className="text-center p-6 bg-red-50 rounded-lg">
-                <h3 className="text-lg font-semibold text-red-800 mb-2">Team 2</h3>
-                <p className="text-4xl font-bold text-red-600">{gameState.teamScores.team2}</p>
+              <div className="text-center p-6 bg-purple-50 rounded-lg">
+                <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
+                <p className="text-4xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
               </div>
             </div>
           </div>

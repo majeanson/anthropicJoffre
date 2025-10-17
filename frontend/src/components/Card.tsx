@@ -8,10 +8,10 @@ interface CardProps {
 }
 
 const colorStyles: Record<CardColor, string> = {
-  red: 'bg-red-500 border-red-700',
+  red: 'bg-purple-500 border-red-700',
   brown: 'bg-amber-700 border-amber-900',
   green: 'bg-green-500 border-green-700',
-  blue: 'bg-blue-500 border-blue-700',
+  blue: 'bg-orange-500 border-blue-700',
 };
 
 const sizeStyles = {

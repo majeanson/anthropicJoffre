@@ -67,11 +67,11 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                 </div>
                 <div>
                   <span className="text-sm font-semibold text-gray-600">Team 1 Score:</span>
-                  <p className="text-lg font-bold text-blue-600">{gameState.teamScores.team1}</p>
+                  <p className="text-lg font-bold text-orange-600">{gameState.teamScores.team1}</p>
                 </div>
                 <div>
                   <span className="text-sm font-semibold text-gray-600">Team 2 Score:</span>
-                  <p className="text-lg font-bold text-red-600">{gameState.teamScores.team2}</p>
+                  <p className="text-lg font-bold text-purple-600">{gameState.teamScores.team2}</p>
                 </div>
               </div>
             </div>
@@ -94,7 +94,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                     max="100"
                     value={team1Score}
                     onChange={(e) => setTeam1Score(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
                 <div>
@@ -107,7 +107,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                     max="100"
                     value={team2Score}
                     onChange={(e) => setTeam2Score(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   />
                 </div>
               </div>
@@ -131,7 +131,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                   setTeam1Score(40);
                   setTeam2Score(0);
                 }}
-                className="bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold py-3 px-4 rounded-lg transition-colors"
+                className="bg-orange-100 hover:bg-orange-200 text-orange-800 font-semibold py-3 px-4 rounded-lg transition-colors"
               >
                 Team 1 Near Win (40-0)
               </button>
@@ -140,7 +140,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                   setTeam1Score(0);
                   setTeam2Score(40);
                 }}
-                className="bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-3 px-4 rounded-lg transition-colors"
+                className="bg-purple-100 hover:bg-purple-200 text-purple-800 font-semibold py-3 px-4 rounded-lg transition-colors"
               >
                 Team 2 Near Win (0-40)
               </button>
