@@ -121,7 +121,7 @@ class SoundManager {
     });
   }
 
-  // Trick collection sound - swoosh gathering
+  // Trick collection sound - descending cascade with multiple tones
   playTrickCollect() {
     if (!this.enabled) return;
     this.ensureContext();
@@ -130,23 +130,28 @@ class SoundManager {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    // Three descending notes for a "gathering" effect
+    const frequencies = [880, 660, 440]; // A5, E5, A4
 
-    osc.frequency.setValueAtTime(400, now);
-    osc.frequency.exponentialRampToValueAtTime(150, now + 0.3);
+    frequencies.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
 
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(this.masterVolume * 0.2, now + 0.05);
-    gain.gain.linearRampToValueAtTime(this.masterVolume * 0.15, now + 0.15);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      const delay = i * 0.08;
+      osc.frequency.setValueAtTime(freq, now + delay);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.8, now + delay + 0.2);
 
-    osc.type = 'sawtooth';
-    osc.connect(gain);
-    gain.connect(ctx.destination);
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.15, now + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.25);
 
-    osc.start(now);
-    osc.stop(now + 0.3);
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.25);
+    });
   }
 
   // Round start sound - pleasant chime
