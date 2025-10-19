@@ -240,13 +240,16 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                           <div className="space-y-3">
                             {round.tricks.map((trick, trickIndex) => {
                               const winner = gameState.players.find(p => p.id === trick.winnerId);
+                              const winnerTeamColor = winner?.teamId === 1
+                                ? 'bg-orange-500 text-white'
+                                : 'bg-purple-500 text-white';
                               return (
                                 <div key={trickIndex} className="bg-gray-50 rounded-lg p-3">
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm font-semibold text-gray-700">
                                       Trick {trickIndex + 1}
                                     </span>
-                                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-semibold">
+                                    <span className={`text-xs px-2 py-1 rounded-full font-semibold ${winnerTeamColor}`}>
                                       👑 {winner?.name || 'Unknown'} (+{trick.points}pts)
                                     </span>
                                   </div>
