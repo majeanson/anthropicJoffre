@@ -3,6 +3,7 @@ import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
+import { sounds } from '../utils/sounds';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -21,9 +22,20 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [dealingCardIndex, setDealingCardIndex] = useState<number>(0);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
   const [lastTrickLength, setLastTrickLength] = useState<number>(0);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
 
   const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
+
+  // Toggle sound on/off
+  const toggleSound = () => {
+    const newState = !soundEnabled;
+    setSoundEnabled(newState);
+    sounds.setEnabled(newState);
+    if (newState) {
+      sounds.buttonClick(); // Play test sound when enabling
+    }
+  };
 
   // Reset isPlayingCard flag when it's no longer the player's turn or when trick changes
   useEffect(() => {
@@ -42,6 +54,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     if (currentPlayer && currentPlayer.hand.length > 0 && gameState.currentTrick.length === 0) {
       setShowDealingAnimation(true);
       setDealingCardIndex(0);
+      sounds.roundStart(); // Play round start sound
 
       const dealInterval = setInterval(() => {
         setDealingCardIndex(prev => {
@@ -50,6 +63,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             setTimeout(() => setShowDealingAnimation(false), 300);
             return prev;
           }
+          sounds.cardDeal(prev + 1); // Play card deal sound for each card
           return prev + 1;
         });
       }, 80); // 80ms between each card
@@ -62,12 +76,23 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   useEffect(() => {
     if (gameState.currentTrick.length === 4 && lastTrickLength !== 4) {
       setTrickCollectionAnimation(true);
+      sounds.trickWon(); // Play trick won sound
+      setTimeout(() => {
+        sounds.trickCollect(); // Play collection sound after 1s
+      }, 1000);
       setTimeout(() => {
         setTrickCollectionAnimation(false);
       }, 3000); // Match the backend 3-second delay
     }
     setLastTrickLength(gameState.currentTrick.length);
   }, [gameState.currentTrick.length]);
+
+  // Your turn notification sound
+  useEffect(() => {
+    if (isCurrentTurn && gameState.currentTrick.length > 0) {
+      sounds.yourTurn();
+    }
+  }, [isCurrentTurn, gameState.currentPlayerIndex]);
 
   if (!currentPlayer) return null;
 
@@ -131,6 +156,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     }
 
     setIsPlayingCard(true);
+    sounds.cardPlay(); // Play card play sound
     onPlayCard(card);
   };
 
@@ -275,6 +301,20 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         <div className="bg-parchment-100/30 backdrop-blur-xl rounded-3xl p-4 md:p-10 md:min-h-[500px] relative border-2 border-parchment-400 shadow-2xl">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
           <div className="fixed bottom-[140px] right-4 z-50 flex flex-col gap-3 md:absolute md:bottom-auto md:top-4 md:right-4">
+            {/* Sound Toggle Button */}
+            <button
+              onClick={toggleSound}
+              className={`${
+                soundEnabled
+                  ? 'bg-gradient-to-br from-sapphire-500 to-sapphire-700 hover:from-sapphire-600 hover:to-sapphire-800 border-sapphire-800'
+                  : 'bg-gradient-to-br from-parchment-400 to-parchment-500 hover:from-parchment-500 hover:to-parchment-600 border-parchment-600'
+              } active:scale-95 text-parchment-50 w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
+              title={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
+            >
+              <span className="md:hidden">{soundEnabled ? '🔊' : '🔇'}</span>
+              <span className="hidden md:inline">{soundEnabled ? '🔊 Sound On' : '🔇 Muted'}</span>
+            </button>
+
             <button
               onClick={() => setShowLeaderboard(true)}
               className="bg-gradient-to-br from-umber-500 to-umber-700 hover:from-umber-600 hover:to-umber-800 active:scale-95 text-parchment-50 w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-umber-500/50 flex items-center justify-center backdrop-blur-md border-2 border-umber-800"
