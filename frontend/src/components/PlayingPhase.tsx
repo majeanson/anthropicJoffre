@@ -173,14 +173,17 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 <p className="text-[10px] md:text-xs font-bold text-gray-600">ROUND {gameState.roundNumber}</p>
               </div>
 
-              {/* Current Turn Indicator */}
-              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg ${
+              {/* Current Turn Indicator with Timeout */}
+              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap ${
                 currentTurnTeam === 1
                   ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
                   : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
               }`}>
-                {"Waiting for : "}
-                {currentTurnPlayer?.name}
+                <span>Waiting for: {currentTurnPlayer?.name}</span>
+                <TimeoutIndicator
+                  duration={60000}
+                  isActive={gameState.currentTrick.length < 4}
+                />
               </div>
 
               {/* Trump */}
@@ -232,7 +235,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 className={`${
                   showPreviousTrick
                     ? 'bg-gradient-to-br from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 shadow-green-500/50'
-                    : 'bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 shadow-purple-500/50'
+                    : 'bg-gradient-to-br from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 shadow-gray-400/50'
                 } active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border border-white/30`}
                 title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
               >
@@ -396,16 +399,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </div>
           ) : (
             <>
-              {/* Timeout Indicator - Show when it's player's turn */}
-              {isCurrentTurn && gameState.currentTrick.length < 4 && (
-                <div className="mb-4">
-                  <TimeoutIndicator
-                    duration={60000}
-                    isActive={isCurrentTurn && gameState.currentTrick.length < 4}
-                  />
-                </div>
-              )}
-
               <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
                 <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
                   {currentPlayer.hand.map((card, index) => {

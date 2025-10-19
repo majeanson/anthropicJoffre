@@ -120,12 +120,6 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         <div className="space-y-3">
           {isMyTurn ? (
             <>
-              {/* Timeout Indicator */}
-              <TimeoutIndicator
-                duration={60000}
-                isActive={isMyTurn && !hasPlacedBet}
-              />
-
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
@@ -225,8 +219,12 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
               )}
             </>
           ) : (
-            <div className="text-center text-gray-600 font-medium py-3 text-sm">
-              Waiting for {players[currentPlayerIndex]?.name}'s bet...
+            <div className="text-center text-gray-600 font-medium py-3 text-sm flex items-center justify-center gap-2 flex-wrap">
+              <span>Waiting for {players[currentPlayerIndex]?.name}'s bet...</span>
+              <TimeoutIndicator
+                duration={60000}
+                isActive={!hasPlacedBet}
+              />
             </div>
           )}
         </div>
