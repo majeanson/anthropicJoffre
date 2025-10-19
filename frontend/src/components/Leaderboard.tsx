@@ -259,7 +259,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                                       const isWinner = trickCard.playerId === trick.winnerId;
                                       return (
                                         <div key={cardIndex} className="text-center">
-                                          <div className={`mb-1 ${isWinner ? 'ring-2 ring-yellow-400 rounded-lg' : ''}`}>
+                                          <div className={`mb-1 inline-block ${isWinner ? 'ring-2 ring-yellow-400 rounded-lg' : ''}`}>
                                             <CardComponent card={trickCard.card} size="tiny" disabled={true} />
                                           </div>
                                           <p className="text-xs font-medium text-umber-700 truncate">
