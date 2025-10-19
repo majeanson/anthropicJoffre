@@ -24,7 +24,27 @@ function App() {
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
   const [currentTrickWinnerId, setCurrentTrickWinnerId] = useState<string | null>(null);
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
+  const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+
+  // Helper function to check if there's a valid session
+  const checkValidSession = (): boolean => {
+    const sessionData = localStorage.getItem('gameSession');
+    if (!sessionData) return false;
+
+    try {
+      const session: PlayerSession = JSON.parse(sessionData);
+      const SESSION_TIMEOUT = 120000; // 2 minutes
+      if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
+        localStorage.removeItem('gameSession');
+        return false;
+      }
+      return true;
+    } catch (e) {
+      localStorage.removeItem('gameSession');
+      return false;
+    }
+  };
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
@@ -255,6 +275,28 @@ function App() {
     }
   };
 
+  const handleRejoinGame = () => {
+    const sessionData = localStorage.getItem('gameSession');
+    if (!sessionData || !socket) return;
+
+    try {
+      const session: PlayerSession = JSON.parse(sessionData);
+      setReconnecting(true);
+      socket.emit('reconnect_to_game', { token: session.token });
+    } catch (e) {
+      console.error('Failed to rejoin game:', e);
+      localStorage.removeItem('gameSession');
+      setHasValidSession(false);
+    }
+  };
+
+  // Check for valid session when in lobby
+  useEffect(() => {
+    if (!gameState) {
+      setHasValidSession(checkValidSession());
+    }
+  }, [gameState]);
+
   // Bot player functionality
   const handleQuickPlay = () => {
     if (!socket) return;
@@ -408,7 +450,7 @@ function App() {
   }
 
   if (!gameState) {
-    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} />;
+    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} />;
   }
 
   // Debug controls (always available, even in production)
