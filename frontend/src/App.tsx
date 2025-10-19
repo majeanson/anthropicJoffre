@@ -514,6 +514,7 @@ function App() {
           onSelectTeam={handleSelectTeam}
           onSwapPosition={handleSwapPosition}
           onStartGame={handleStartGame}
+          onLeaveGame={handleLeaveGame}
         />
       </>
     );

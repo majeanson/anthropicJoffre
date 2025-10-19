@@ -7,6 +7,7 @@ interface TeamSelectionProps {
   onSelectTeam: (teamId: 1 | 2) => void;
   onSwapPosition: (targetPlayerId: string) => void;
   onStartGame: () => void;
+  onLeaveGame?: () => void;
 }
 
 export function TeamSelection({
@@ -16,6 +17,7 @@ export function TeamSelection({
   onSelectTeam,
   onSwapPosition,
   onStartGame,
+  onLeaveGame,
 }: TeamSelectionProps) {
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const team1Players = players.filter(p => p.teamId === 1);
@@ -41,7 +43,16 @@ export function TeamSelection({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center p-6">
-      <div className="bg-white rounded-xl p-8 shadow-2xl max-w-4xl w-full">
+      <div className="bg-white rounded-xl p-8 shadow-2xl max-w-4xl w-full relative">
+        {onLeaveGame && (
+          <button
+            onClick={onLeaveGame}
+            className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
+            title="Leave Game"
+          >
+            🚪 Leave
+          </button>
+        )}
         <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Team Selection</h2>
 
         <div className="mb-6">
