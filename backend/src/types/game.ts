@@ -58,6 +58,8 @@ export interface RoundHistory {
     team1: number;
     team2: number;
   };
+  tricks: TrickResult[]; // All tricks played in this round
+  trump: CardColor | null; // Trump suit for this round
 }
 
 export interface GameState {
@@ -77,6 +79,7 @@ export interface GameState {
   };
   roundNumber: number;
   roundHistory: RoundHistory[];
+  currentRoundTricks: TrickResult[]; // Tricks completed in current round (before endRound)
 }
 
 export interface GameHistory {

@@ -73,7 +73,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       {onLeaveGame && (
         <button
           onClick={onLeaveGame}
-          className="absolute top-4 right-4 bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
+          className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
           title="Leave Game"
         >
           🚪 Leave

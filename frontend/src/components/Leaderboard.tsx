@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { GameState } from '../types/game';
+import { Card as CardComponent } from './Card';
 
 interface LeaderboardProps {
   gameState: GameState;
@@ -7,6 +9,8 @@ interface LeaderboardProps {
 }
 
 export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
+  const [expandedRounds, setExpandedRounds] = useState<Set<number>>(new Set());
+
   if (!isOpen) return null;
 
   // Determine which team is leading
@@ -17,6 +21,16 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
   // Get team members
   const team1Players = gameState.players.filter(p => p.teamId === 1);
   const team2Players = gameState.players.filter(p => p.teamId === 2);
+
+  const toggleRound = (roundNumber: number) => {
+    const newExpanded = new Set(expandedRounds);
+    if (newExpanded.has(roundNumber)) {
+      newExpanded.delete(roundNumber);
+    } else {
+      newExpanded.add(roundNumber);
+    }
+    setExpandedRounds(newExpanded);
+  };
 
   return (
     <div
@@ -144,58 +158,120 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               <div className="space-y-3">
                 {gameState.roundHistory.slice().reverse().map((round) => {
                   const betPlayer = gameState.players.find(p => p.id === round.highestBet.playerId);
+                  const isExpanded = expandedRounds.has(round.roundNumber);
+                  const hasTricks = round.tricks && round.tricks.length > 0;
+
                   return (
                     <div
                       key={round.roundNumber}
-                      className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors"
+                      className="bg-gray-50 rounded-lg overflow-hidden transition-colors"
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <h4 className="text-lg font-bold text-gray-800">
-                          Round {round.roundNumber}
-                        </h4>
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                          round.betMade
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-purple-100 text-purple-800'
-                        }`}>
-                          {round.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
-                        </span>
+                      <div className="p-4 hover:bg-gray-100">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <h4 className="text-lg font-bold text-gray-800">
+                              Round {round.roundNumber}
+                            </h4>
+                            {hasTricks && (
+                              <button
+                                onClick={() => toggleRound(round.roundNumber)}
+                                className="text-sm text-purple-600 hover:text-purple-800 font-semibold flex items-center gap-1"
+                              >
+                                {isExpanded ? '▼ Hide Tricks' : '▶ Show Tricks'}
+                              </button>
+                            )}
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+                            round.betMade
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-purple-100 text-purple-800'
+                          }`}>
+                            {round.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-600 font-semibold">Bidder</p>
+                            <p className="font-bold">{betPlayer?.name || 'Unknown'}</p>
+                            <p className="text-xs text-gray-500">Team {round.offensiveTeam}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 font-semibold">Bet</p>
+                            <p className="font-bold">{round.betAmount} points</p>
+                            <p className="text-xs text-gray-500">
+                              {round.withoutTrump ? 'Without Trump (2x)' : 'With Trump'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 font-semibold">Points Earned</p>
+                            <p className="font-bold">
+                              {round.offensivePoints} / {round.betAmount}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Defensive: {round.defensivePoints}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600 font-semibold">Round Score</p>
+                            <p className="font-bold">
+                              <span className="text-orange-600">{round.roundScore.team1 >= 0 ? '+' : ''}{round.roundScore.team1}</span>
+                              {' / '}
+                              <span className="text-purple-600">{round.roundScore.team2 >= 0 ? '+' : ''}{round.roundScore.team2}</span>
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Total: {round.cumulativeScore.team1} - {round.cumulativeScore.team2}
+                            </p>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <p className="text-gray-600 font-semibold">Bidder</p>
-                          <p className="font-bold">{betPlayer?.name || 'Unknown'}</p>
-                          <p className="text-xs text-gray-500">Team {round.offensiveTeam}</p>
+                      {/* Expandable Trick History */}
+                      {isExpanded && hasTricks && (
+                        <div className="bg-white border-t border-gray-200 p-4">
+                          <div className="mb-3 flex items-center gap-2">
+                            <h5 className="text-sm font-bold text-gray-700">🃏 Tricks Played</h5>
+                            {round.trump && (
+                              <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-semibold">
+                                Trump: <span className="capitalize">{round.trump}</span>
+                              </span>
+                            )}
+                          </div>
+                          <div className="space-y-3">
+                            {round.tricks.map((trick, trickIndex) => {
+                              const winner = gameState.players.find(p => p.id === trick.winnerId);
+                              return (
+                                <div key={trickIndex} className="bg-gray-50 rounded-lg p-3">
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="text-sm font-semibold text-gray-700">
+                                      Trick {trickIndex + 1}
+                                    </span>
+                                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-semibold">
+                                      👑 {winner?.name || 'Unknown'} (+{trick.points}pts)
+                                    </span>
+                                  </div>
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {trick.trick.map((trickCard, cardIndex) => {
+                                      const player = gameState.players.find(p => p.id === trickCard.playerId);
+                                      const isWinner = trickCard.playerId === trick.winnerId;
+                                      return (
+                                        <div key={cardIndex} className="text-center">
+                                          <div className={`mb-1 ${isWinner ? 'ring-2 ring-yellow-400 rounded-lg' : ''}`}>
+                                            <CardComponent card={trickCard.card} size="tiny" disabled={true} />
+                                          </div>
+                                          <p className="text-xs font-medium text-gray-600 truncate">
+                                            {player?.name || 'Unknown'}
+                                          </p>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-gray-600 font-semibold">Bet</p>
-                          <p className="font-bold">{round.betAmount} points</p>
-                          <p className="text-xs text-gray-500">
-                            {round.withoutTrump ? 'Without Trump (2x)' : 'With Trump'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 font-semibold">Points Earned</p>
-                          <p className="font-bold">
-                            {round.offensivePoints} / {round.betAmount}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Defensive: {round.defensivePoints}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-gray-600 font-semibold">Round Score</p>
-                          <p className="font-bold">
-                            <span className="text-orange-600">{round.roundScore.team1 >= 0 ? '+' : ''}{round.roundScore.team1}</span>
-                            {' / '}
-                            <span className="text-purple-600">{round.roundScore.team2 >= 0 ? '+' : ''}{round.roundScore.team2}</span>
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Total: {round.cumulativeScore.team1} - {round.cumulativeScore.team2}
-                          </p>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   );
                 })}

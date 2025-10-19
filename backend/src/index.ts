@@ -172,6 +172,7 @@ io.on('connection', (socket) => {
       teamScores: { team1: 0, team2: 0 },
       roundNumber: 1,
       roundHistory: [],
+      currentRoundTricks: [],
     };
 
     games.set(gameId, gameState);
@@ -803,6 +804,7 @@ function startNewRound(gameId: string) {
   game.trump = null;
   game.currentTrick = [];
   game.previousTrick = null;
+  game.currentRoundTricks = []; // Reset tricks for new round
   // Betting starts with player after dealer
   game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
 
@@ -825,11 +827,15 @@ function resolveTrick(gameId: string) {
   }
 
   // Store current trick as previous trick before clearing
-  game.previousTrick = {
+  const trickResult = {
     trick: [...game.currentTrick],
     winnerId,
     points: totalPoints,
   };
+  game.previousTrick = trickResult;
+
+  // Add trick to current round's trick history
+  game.currentRoundTricks.push(trickResult);
 
   // Emit trick resolution with updated state (showing trick result for 3 seconds)
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, points: totalPoints, gameState: game });
@@ -929,6 +935,8 @@ async function endRound(gameId: string) {
       team1: game.teamScores.team1,
       team2: game.teamScores.team2,
     },
+    tricks: [...game.currentRoundTricks], // Store all tricks from this round
+    trump: game.trump, // Store trump suit for this round
   });
 
   // Check for game over

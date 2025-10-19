@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
-import { GameState, Card as CardType, TrickCard } from '../types/game';
+import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -130,13 +130,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   };
 
   // Get color class for trump suit
-  const getTrumpColor = (trump: string | null): string => {
-    if (!trump || trump === 'none') return 'text-gray-900';
+  const getTrumpColor = (trump: CardColor | null): string => {
+    if (!trump) return 'text-gray-900';
     switch (trump) {
-      case 'red': return 'text-purple-600';
+      case 'red': return 'text-red-600';
       case 'green': return 'text-green-600';
-      case 'blue': return 'text-orange-600';
-      case 'yellow': return 'text-yellow-600';
+      case 'blue': return 'text-blue-600';
+      case 'brown': return 'text-brown-600';
       default: return 'text-gray-900';
     }
   };
@@ -178,6 +178,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
                   : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
               }`}>
+                {"Waiting for : "}
                 {currentTurnPlayer?.name}
               </div>
 
@@ -217,7 +218,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {onLeaveGame && (
               <button
                 onClick={onLeaveGame}
-                className="bg-gradient-to-br from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-purple-500/50 flex items-center justify-center backdrop-blur-md border border-purple-300/30"
+                className="bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-red-500/50 flex items-center justify-center backdrop-blur-md border border-red-300/30"
                 title="Leave Game"
               >
                 <span className="md:hidden">🚪</span>
