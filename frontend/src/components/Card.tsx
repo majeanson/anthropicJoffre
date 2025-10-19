@@ -21,11 +21,28 @@ const sizeStyles = {
   large: 'w-24 h-36 text-3xl',
 };
 
+const emblemSizeStyles = {
+  tiny: 'w-6 h-6',
+  small: 'w-10 h-10',
+  medium: 'w-12 h-12',
+  large: 'w-16 h-16',
+};
+
 export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
   const isSpecial = (card.color === 'red' || card.color === 'brown') && card.value === 0;
   const badgeSize = size === 'tiny' ? 'text-[8px] px-0.5' : size === 'small' ? 'text-[9px] px-0.5' : 'text-xs px-1';
   const borderWidth = size === 'tiny' ? 'border-2' : size === 'small' ? 'border-3' : 'border-4';
   const ringWidth = size === 'tiny' ? 'ring-2' : size === 'small' ? 'ring-2' : 'ring-4';
+
+  // Determine which image to show
+  const getCardImage = () => {
+    if (isSpecial) {
+      // Use special bon images for red 0 and brown 0
+      return `/cards/${card.color}_bon.jpg`;
+    }
+    // Use emblem for regular cards
+    return `/cards/${card.color}_emblem.jpg`;
+  };
 
   return (
     <button
@@ -38,17 +55,38 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
         ${colorStyles[card.color]}
         ${sizeStyles[size]}
         ${borderWidth} rounded-lg font-bold text-white
-        flex items-center justify-center
+        flex flex-col items-center justify-center gap-1
         transition-all duration-200
         ${!disabled && onClick ? 'hover:scale-105 hover:shadow-xl cursor-pointer' : 'cursor-default'}
         ${disabled ? 'opacity-50' : ''}
         ${isSpecial ? `${ringWidth} ring-yellow-400` : ''}
-        relative
+        relative overflow-hidden
       `}
     >
-      <span>{card.value}</span>
+      {/* Top value number */}
+      {!isSpecial && (
+        <span className="absolute top-1 left-1 text-white font-bold drop-shadow-lg">
+          {card.value}
+        </span>
+      )}
+
+      {/* Center emblem or special card image */}
+      <img
+        src={getCardImage()}
+        alt={`${card.color} ${isSpecial ? 'bon' : 'emblem'}`}
+        className={`${emblemSizeStyles[size]} object-contain ${isSpecial ? '' : 'opacity-90'}`}
+      />
+
+      {/* Bottom value number */}
+      {!isSpecial && (
+        <span className="absolute bottom-1 right-1 text-white font-bold drop-shadow-lg rotate-180">
+          {card.value}
+        </span>
+      )}
+
+      {/* Special card badge */}
       {isSpecial && (
-        <span className={`absolute top-0.5 right-0.5 ${badgeSize} bg-yellow-400 text-black rounded`}>
+        <span className={`absolute top-0.5 right-0.5 ${badgeSize} bg-yellow-400 text-black rounded font-bold`}>
           {card.color === 'red' ? '+5' : '-2'}
         </span>
       )}
