@@ -7,13 +7,15 @@ interface CardProps {
   size?: 'tiny' | 'small' | 'medium' | 'large';
 }
 
-// Card background colors match emblem parchment/beige backgrounds
+// Card background color: #d6ccba (custom beige matching emblem aesthetics)
 // Border colors use the actual card suit colors
-const colorStyles: Record<CardColor, string> = {
-  red: 'bg-parchment-200 border-red-700',
-  brown: 'bg-parchment-200 border-amber-900',
-  green: 'bg-parchment-200 border-green-700',
-  blue: 'bg-parchment-200 border-blue-700',
+const cardBackgroundColor = '#d6ccba';
+
+const borderColorStyles: Record<CardColor, string> = {
+  red: 'border-red-700',
+  brown: 'border-amber-900',
+  green: 'border-green-700',
+  blue: 'border-blue-700',
 };
 
 // Number colors use the old vibrant card colors
@@ -61,8 +63,9 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
       data-testid={`card-${card.color}-${card.value}`}
       data-card-value={card.value}
       data-card-color={card.color}
+      style={{ backgroundColor: cardBackgroundColor }}
       className={`
-        ${colorStyles[card.color]}
+        ${borderColorStyles[card.color]}
         ${sizeStyles[size]}
         ${borderWidth} rounded-lg font-bold
         flex flex-col items-center justify-center gap-1

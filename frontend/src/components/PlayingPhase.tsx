@@ -17,6 +17,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+  const [showDealingAnimation, setShowDealingAnimation] = useState<boolean>(false);
+  const [dealingCardIndex, setDealingCardIndex] = useState<number>(0);
+  const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
+  const [lastTrickLength, setLastTrickLength] = useState<number>(0);
 
   const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
@@ -31,6 +35,38 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   // Also reset when currentTrick length changes (new trick started or card was played)
   useEffect(() => {
     setIsPlayingCard(false);
+  }, [gameState.currentTrick.length]);
+
+  // Card dealing animation when round starts or hand changes
+  useEffect(() => {
+    if (currentPlayer && currentPlayer.hand.length > 0 && gameState.currentTrick.length === 0) {
+      setShowDealingAnimation(true);
+      setDealingCardIndex(0);
+
+      const dealInterval = setInterval(() => {
+        setDealingCardIndex(prev => {
+          if (prev >= currentPlayer.hand.length - 1) {
+            clearInterval(dealInterval);
+            setTimeout(() => setShowDealingAnimation(false), 300);
+            return prev;
+          }
+          return prev + 1;
+        });
+      }, 80); // 80ms between each card
+
+      return () => clearInterval(dealInterval);
+    }
+  }, [gameState.roundNumber]);
+
+  // Trick collection animation when trick is completed
+  useEffect(() => {
+    if (gameState.currentTrick.length === 4 && lastTrickLength !== 4) {
+      setTrickCollectionAnimation(true);
+      setTimeout(() => {
+        setTrickCollectionAnimation(false);
+      }, 3000); // Match the backend 3-second delay
+    }
+    setLastTrickLength(gameState.currentTrick.length);
   }, [gameState.currentTrick.length]);
 
   if (!currentPlayer) return null;
@@ -112,7 +148,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     return gameState.players[playerIndex]?.teamId || 1;
   };
 
-  const renderCard = (tc: TrickCard | null, isWinner: boolean = false) => {
+  const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
       return (
         <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400/40 rounded-xl flex items-center justify-center bg-parchment-200/20 backdrop-blur">
@@ -123,8 +159,27 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       );
     }
 
+    // Determine animation classes
+    let animationClass = '';
+
+    // Card play animation - cards slide in from their position
+    if (positionIndex !== undefined) {
+      const slideDirections = ['animate-slide-from-bottom', 'animate-slide-from-left', 'animate-slide-from-top', 'animate-slide-from-right'];
+      animationClass = slideDirections[positionIndex];
+    }
+
+    // Trick collection animation - all cards move to winner
+    if (trickCollectionAnimation && gameState.currentTrick.length === 4) {
+      const winnerPosition = cardPositions.findIndex(cp => cp?.playerId === currentTrickWinnerId);
+      if (winnerPosition !== -1 && positionIndex !== undefined) {
+        const directions = ['bottom', 'left', 'top', 'right'];
+        const winnerDir = directions[winnerPosition];
+        animationClass = `animate-collect-to-${winnerDir}`;
+      }
+    }
+
     return (
-      <div className={`transition-all duration-500 ${isWinner ? 'scale-110 ring-4 md:ring-6 ring-yellow-400 shadow-2xl shadow-yellow-400/50' : ''}`}>
+      <div className={`transition-all duration-500 ${isWinner ? 'scale-110 ring-4 md:ring-6 ring-yellow-400 shadow-2xl shadow-yellow-400/50' : ''} ${animationClass}`}>
         <CardComponent card={tc.card} size="small" />
       </div>
     );
@@ -275,7 +330,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <div className="relative h-[400px] z-40">
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
-                  {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
+                  {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
@@ -294,7 +349,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   } ${previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
-                  {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId)}
+                  {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId, 1)}
                 </div>
 
                 {/* Top - Opposite player (position 2) */}
@@ -306,12 +361,12 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   } ${previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
-                  {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId)}
+                  {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId, 2)}
                 </div>
 
                 {/* Right - Previous player anti-clockwise (position 3) */}
                 <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
-                  {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId)}
+                  {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId, 3)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
@@ -331,7 +386,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
-                  {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId)}
+                  {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
@@ -350,7 +405,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
-                  {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId)}
+                  {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
                 </div>
 
                 {/* Top - Opposite player (position 2) */}
@@ -362,12 +417,12 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(2)}
                   </div>
-                  {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId)}
+                  {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId, 2)}
                 </div>
 
                 {/* Right - Previous player anti-clockwise (position 3) */}
                 <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
-                  {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId)}
+                  {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
                   <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
@@ -412,12 +467,18 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
                   {currentPlayer.hand.map((card, index) => {
                     const playable = isCardPlayable(card);
+                    const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
+                    const dealDelay = index * 80; // Stagger animation for each card
+
                     return (
                       <div
                         key={`${card.color}-${card.value}-${index}`}
                         className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
                           playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
-                        }`}
+                        } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
+                        style={{
+                          transition: `opacity 200ms ease-out ${dealDelay}ms, transform 200ms ease-out ${dealDelay}ms`
+                        }}
                       >
                         <CardComponent
                           card={card}

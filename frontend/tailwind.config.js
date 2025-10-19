@@ -72,6 +72,54 @@ export default {
       fontFamily: {
         serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
       },
+      keyframes: {
+        'slide-from-bottom': {
+          '0%': { transform: 'translateY(300px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        'slide-from-top': {
+          '0%': { transform: 'translateY(-300px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        'slide-from-left': {
+          '0%': { transform: 'translateX(-300px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        'slide-from-right': {
+          '0%': { transform: 'translateX(300px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        'collect-to-bottom': {
+          '0%': { transform: 'translate(0, 0) scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.1)', opacity: '1' },
+          '100%': { transform: 'translateY(200px) scale(0.5)', opacity: '0' },
+        },
+        'collect-to-top': {
+          '0%': { transform: 'translate(0, 0) scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.1)', opacity: '1' },
+          '100%': { transform: 'translateY(-200px) scale(0.5)', opacity: '0' },
+        },
+        'collect-to-left': {
+          '0%': { transform: 'translate(0, 0) scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.1)', opacity: '1' },
+          '100%': { transform: 'translateX(-200px) scale(0.5)', opacity: '0' },
+        },
+        'collect-to-right': {
+          '0%': { transform: 'translate(0, 0) scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.1)', opacity: '1' },
+          '100%': { transform: 'translateX(200px) scale(0.5)', opacity: '0' },
+        },
+      },
+      animation: {
+        'slide-from-bottom': 'slide-from-bottom 0.4s ease-out',
+        'slide-from-top': 'slide-from-top 0.4s ease-out',
+        'slide-from-left': 'slide-from-left 0.4s ease-out',
+        'slide-from-right': 'slide-from-right 0.4s ease-out',
+        'collect-to-bottom': 'collect-to-bottom 1s ease-in-out forwards',
+        'collect-to-top': 'collect-to-top 1s ease-in-out forwards',
+        'collect-to-left': 'collect-to-left 1s ease-in-out forwards',
+        'collect-to-right': 'collect-to-right 1s ease-in-out forwards',
+      },
     },
   },
   plugins: [],
