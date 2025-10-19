@@ -51,6 +51,13 @@ const games = new Map<string, GameState>();
 // Session storage for reconnection (maps token to session data)
 const playerSessions = new Map<string, PlayerSession>();
 
+// Timeout storage (maps gameId-playerId to timeout ID)
+const activeTimeouts = new Map<string, NodeJS.Timeout>();
+
+// Timeout configuration
+const BETTING_TIMEOUT = 60000; // 60 seconds
+const PLAYING_TIMEOUT = 60000; // 60 seconds
+
 // Helper to generate secure random token
 function generateSessionToken(): string {
   return crypto.randomBytes(32).toString('hex');
@@ -83,6 +90,169 @@ function validateSessionToken(token: string): PlayerSession | null {
   }
 
   return session;
+}
+
+// Helper to clear timeout for a player
+function clearPlayerTimeout(gameId: string, playerId: string) {
+  const key = `${gameId}-${playerId}`;
+  const timeout = activeTimeouts.get(key);
+  if (timeout) {
+    clearTimeout(timeout);
+    activeTimeouts.delete(key);
+  }
+}
+
+// Helper to start timeout for current player
+function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' | 'playing') {
+  const key = `${gameId}-${playerId}`;
+
+  // Clear any existing timeout for this player
+  clearPlayerTimeout(gameId, playerId);
+
+  const timeoutDuration = phase === 'betting' ? BETTING_TIMEOUT : PLAYING_TIMEOUT;
+
+  const timeout = setTimeout(() => {
+    const game = games.get(gameId);
+    if (!game) return;
+
+    const player = game.players.find(p => p.id === playerId);
+    if (!player) return;
+
+    console.log(`⏰ Timeout: ${player.name} (${playerId}) in ${phase} phase`);
+
+    if (phase === 'betting') {
+      handleBettingTimeout(gameId, playerId);
+    } else {
+      handlePlayingTimeout(gameId, playerId);
+    }
+  }, timeoutDuration);
+
+  activeTimeouts.set(key, timeout);
+}
+
+// Handle betting timeout - auto-skip bet
+function handleBettingTimeout(gameId: string, playerId: string) {
+  const game = games.get(gameId);
+  if (!game || game.phase !== 'betting') return;
+
+  const currentPlayer = game.players[game.currentPlayerIndex];
+  if (currentPlayer.id !== playerId) return; // Not their turn anymore
+
+  const hasAlreadyBet = game.currentBets.some(b => b.playerId === playerId);
+  if (hasAlreadyBet) return; // Already bet
+
+  console.log(`Auto-skipping bet for ${currentPlayer.name} due to timeout`);
+
+  const isDealer = game.currentPlayerIndex === game.dealerIndex;
+  const hasValidBets = game.currentBets.some(b => !b.skipped);
+
+  // If dealer and no valid bets, must bet minimum 7
+  if (isDealer && !hasValidBets) {
+    const bet: Bet = {
+      playerId,
+      amount: 7,
+      withoutTrump: false,
+      skipped: false,
+    };
+    game.currentBets.push(bet);
+    console.log(`Auto-bet 7 points for dealer ${currentPlayer.name}`);
+  } else {
+    // Skip the bet
+    const bet: Bet = {
+      playerId,
+      amount: -1,
+      withoutTrump: false,
+      skipped: true,
+    };
+    game.currentBets.push(bet);
+  }
+
+  // Check if all 4 players have bet
+  if (game.currentBets.length === 4) {
+    // Check if all skipped
+    if (game.currentBets.every(b => b.skipped)) {
+      game.currentBets = [];
+      game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
+      io.to(gameId).emit('game_updated', game);
+      io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
+      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
+      return;
+    }
+
+    game.highestBet = getHighestBet(game.currentBets);
+    game.phase = 'playing';
+    const highestBidderIndex = game.players.findIndex(
+      (p) => p.id === game.highestBet?.playerId
+    );
+    game.currentPlayerIndex = highestBidderIndex;
+    io.to(gameId).emit('game_updated', game);
+    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
+  } else {
+    game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+    io.to(gameId).emit('game_updated', game);
+    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
+  }
+}
+
+// Handle playing timeout - auto-play random valid card
+function handlePlayingTimeout(gameId: string, playerId: string) {
+  const game = games.get(gameId);
+  if (!game || game.phase !== 'playing') return;
+
+  const currentPlayer = game.players[game.currentPlayerIndex];
+  if (currentPlayer.id !== playerId) return; // Not their turn anymore
+
+  const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === playerId);
+  if (hasAlreadyPlayed) return; // Already played
+
+  if (game.currentTrick.length >= 4) return; // Trick complete
+
+  console.log(`Auto-playing card for ${currentPlayer.name} due to timeout`);
+
+  // Determine valid cards
+  let validCards = currentPlayer.hand;
+  if (game.currentTrick.length > 0) {
+    const ledSuit = game.currentTrick[0].card.color;
+    const cardsInLedSuit = currentPlayer.hand.filter(c => c.color === ledSuit);
+    if (cardsInLedSuit.length > 0) {
+      validCards = cardsInLedSuit;
+    }
+  }
+
+  // Pick random valid card
+  const randomCard = validCards[Math.floor(Math.random() * validCards.length)];
+
+  if (!randomCard) {
+    console.error(`No valid cards found for ${currentPlayer.name}`);
+    return;
+  }
+
+  console.log(`Auto-playing: ${randomCard.color} ${randomCard.value}`);
+
+  // Set trump on first card
+  if (game.currentTrick.length === 0 && !game.trump) {
+    game.trump = randomCard.color;
+  }
+
+  // Add card to trick
+  game.currentTrick.push({ playerId, card: randomCard });
+
+  // Remove card from player's hand
+  currentPlayer.hand = currentPlayer.hand.filter(
+    (c) => !(c.color === randomCard.color && c.value === randomCard.value)
+  );
+
+  // Move to next player
+  game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+
+  // Check if trick is complete
+  if (game.currentTrick.length === 4) {
+    io.to(gameId).emit('game_updated', game);
+    resolveTrick(gameId);
+  } else {
+    io.to(gameId).emit('game_updated', game);
+    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
+  }
 }
 
 // Helper to broadcast to both players and spectators
@@ -341,6 +511,9 @@ io.on('connection', (socket) => {
       return;
     }
 
+    // Clear timeout for current player (they took action)
+    clearPlayerTimeout(gameId, socket.id);
+
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
 
     // Validate bet amount range (only for non-skip bets)
@@ -380,6 +553,8 @@ io.on('connection', (socket) => {
         game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
         io.to(gameId).emit('game_updated', game);
         io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
+        // Start timeout for first player after betting restart
+        startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
         return;
       }
 
@@ -392,12 +567,16 @@ io.on('connection', (socket) => {
         );
         game.currentPlayerIndex = highestBidderIndex;
         io.to(gameId).emit('game_updated', game);
+        // Start timeout for first card play
+        startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
         return;
       }
 
       // Move to next player
       game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
       io.to(gameId).emit('game_updated', game);
+      // Start timeout for next player's bet
+      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
       return;
     }
 
@@ -445,12 +624,16 @@ io.on('connection', (socket) => {
         (p) => p.id === game.highestBet?.playerId
       );
       game.currentPlayerIndex = highestBidderIndex;
+      io.to(gameId).emit('game_updated', game);
+      // Start timeout for first card play
+      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
     } else {
       // Move to next player
       game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+      io.to(gameId).emit('game_updated', game);
+      // Start timeout for next player's bet
+      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
     }
-
-    io.to(gameId).emit('game_updated', game);
   });
 
   socket.on('play_card', ({ gameId, card }: { gameId: string; card: Card }) => {
@@ -501,6 +684,9 @@ io.on('connection', (socket) => {
       });
       return;
     }
+
+    // Clear timeout for current player (they took action)
+    clearPlayerTimeout(gameId, socket.id);
 
     // Validate card data structure
     if (!card || !card.color || card.value === undefined) {
@@ -571,10 +757,13 @@ io.on('connection', (socket) => {
       io.to(gameId).emit('game_updated', game);
       console.log(`   ⏳ Resolving trick...\n`);
       resolveTrick(gameId);
+      // Note: timeout will be started by resolveTrick after 3-second delay
     } else {
       // Emit updated state with turn advanced
       console.log(`   ➡️  Turn advanced: ${game.players[previousIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
       io.to(gameId).emit('game_updated', game);
+      // Start timeout for next player
+      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
     }
   });
 
@@ -809,6 +998,12 @@ function startNewRound(gameId: string) {
   game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
 
   broadcastGameUpdate(gameId, 'round_started', game);
+
+  // Start timeout for first player's bet
+  const currentPlayer = game.players[game.currentPlayerIndex];
+  if (currentPlayer) {
+    startPlayerTimeout(gameId, currentPlayer.id, 'betting');
+  }
 }
 
 function resolveTrick(gameId: string) {
@@ -851,6 +1046,8 @@ function resolveTrick(gameId: string) {
     } else {
       // Continue playing - emit game state for next turn
       io.to(gameId).emit('game_updated', game);
+      // Start timeout for trick winner's next card
+      startPlayerTimeout(gameId, winnerId, 'playing');
     }
   }, 3000);
 }

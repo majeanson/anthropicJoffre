@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Bet, Player } from '../types/game';
 import { Card as CardComponent } from './Card';
+import { TimeoutIndicator } from './TimeoutIndicator';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -119,6 +120,12 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         <div className="space-y-3">
           {isMyTurn ? (
             <>
+              {/* Timeout Indicator */}
+              <TimeoutIndicator
+                duration={60000}
+                isActive={isMyTurn && !hasPlacedBet}
+              />
+
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">

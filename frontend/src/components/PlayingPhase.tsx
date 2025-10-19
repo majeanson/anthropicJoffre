@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
+import { TimeoutIndicator } from './TimeoutIndicator';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 
 interface PlayingPhaseProps {
@@ -395,6 +396,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </div>
           ) : (
             <>
+              {/* Timeout Indicator - Show when it's player's turn */}
+              {isCurrentTurn && gameState.currentTrick.length < 4 && (
+                <div className="mb-4">
+                  <TimeoutIndicator
+                    duration={60000}
+                    isActive={isCurrentTurn && gameState.currentTrick.length < 4}
+                  />
+                </div>
+              )}
+
               <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
                 <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
                   {currentPlayer.hand.map((card, index) => {
