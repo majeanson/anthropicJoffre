@@ -1,0 +1,47 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - button "Open debug menu" [ref=e4] [cursor=pointer]: ⚙️ Debug
+  - generic [ref=e6]:
+    - button "🚪 Leave" [ref=e7] [cursor=pointer]
+    - heading "Betting Phase" [level=2] [ref=e8]
+    - generic [ref=e9]:
+      - generic [ref=e10]: "Waiting for: Bot 3"
+      - generic [ref=e11]: ⏱️ 5s
+    - generic [ref=e12]:
+      - heading "Players & Bets" [level=3] [ref=e13]
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - generic [ref=e18]: You
+          - generic [ref=e19]: Waiting...
+        - generic [ref=e20]:
+          - generic [ref=e23]: Bot 1(Dealer)
+          - generic [ref=e24]: Waiting...
+        - generic [ref=e25]:
+          - generic [ref=e28]: Bot 2
+          - generic [ref=e29]: 9 points
+        - generic [ref=e30]:
+          - generic [ref=e33]: Bot 3
+          - generic [ref=e34]: Waiting...
+    - generic [ref=e37]: It's Bot 3's turn to bet
+    - generic [ref=e38]:
+      - heading "Your Hand" [level=3] [ref=e39]
+      - generic [ref=e40]:
+        - button "6" [disabled] [ref=e42]:
+          - generic [ref=e43]: "6"
+        - button "2" [disabled] [ref=e45]:
+          - generic [ref=e46]: "2"
+        - button "4" [disabled] [ref=e48]:
+          - generic [ref=e49]: "4"
+        - button "6" [disabled] [ref=e51]:
+          - generic [ref=e52]: "6"
+        - button "1" [disabled] [ref=e54]:
+          - generic [ref=e55]: "1"
+        - button "3" [disabled] [ref=e57]:
+          - generic [ref=e58]: "3"
+        - button "5" [disabled] [ref=e60]:
+          - generic [ref=e61]: "5"
+        - button "7" [disabled] [ref=e63]:
+          - generic [ref=e64]: "7"
+```

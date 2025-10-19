@@ -219,7 +219,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       <div className="mb-3 md:mb-8 relative px-2 md:px-6">
         <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-4 md:p-10 md:min-h-[500px] relative border border-white/10 shadow-2xl">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
-          <div className="fixed bottom-[140px] right-4 z-40 flex flex-col gap-3 absolute  bottom-auto top-4 right-4">
+          <div className="fixed bottom-[140px] right-4 z-400 flex flex-col gap-3 absolute  bottom-auto top-4 right-4">
             <button
               onClick={() => setShowLeaderboard(true)}
               className="bg-gradient-to-br from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-yellow-500/50 flex items-center justify-center backdrop-blur-md border border-yellow-300/30"
@@ -385,7 +385,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
       {/* Player Hand */}
       <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 mt-auto">
-        {gameState.currentTrick.length === 0 && (
+        {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                   <div className="bg-black/80 rounded-2xl px-6 py-4 border border-white/20 shadow-xl">
                     <p className="text-white/90 text-lg md:text-2xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>

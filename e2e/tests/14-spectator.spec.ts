@@ -36,17 +36,23 @@ test.describe('Spectator Mode', () => {
     // Navigate to lobby on spectator page
     await spectatorPage.goto('/');
 
-    // Click Spectate Game button using test ID
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    // Click Join Game button using test ID
+    await spectatorPage.getByTestId('join-game-button').click();
+
+    // Wait for join form to appear
+    await spectatorPage.waitForSelector('text=/join as:/i', { timeout: 5000 });
+
+    // Select spectator radio button
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
 
     // Enter game ID
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
 
     // Optionally enter spectator name
-    await spectatorPage.getByPlaceholder(/enter your name \(optional\)/i).fill('TestSpectator');
+    await spectatorPage.getByPlaceholder(/enter your name/i).fill('TestSpectator');
 
-    // Click Spectate button
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    // Click Join as Guest button
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     // Verify spectator joined the game
     await expect(spectatorPage.locator('text=/spectator mode/i')).toBeVisible({ timeout: 5000 });
@@ -56,9 +62,10 @@ test.describe('Spectator Mode', () => {
   test('should hide player hands from spectators', async () => {
     // Join as spectator
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     // Wait for game to load
     await spectatorPage.waitForSelector('text=/spectator mode/i', { timeout: 5000 });
@@ -75,9 +82,10 @@ test.describe('Spectator Mode', () => {
   test('should show game state to spectators (scores, tricks, current player)', async () => {
     // Join as spectator
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     await spectatorPage.waitForSelector('text=/spectator mode/i', { timeout: 5000 });
 
@@ -100,9 +108,10 @@ test.describe('Spectator Mode', () => {
   test('should update spectator view in real-time as game progresses', async () => {
     // Join as spectator
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     await spectatorPage.waitForSelector('text=/spectator mode/i', { timeout: 5000 });
 
@@ -126,9 +135,10 @@ test.describe('Spectator Mode', () => {
   test('should prevent spectators from playing cards or making bets', async () => {
     // Join as spectator
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     await spectatorPage.waitForSelector('text=/spectator mode/i', { timeout: 5000 });
 
@@ -147,9 +157,10 @@ test.describe('Spectator Mode', () => {
   test('should allow spectators to view leaderboard', async () => {
     // Join as spectator
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     await spectatorPage.waitForSelector('text=/spectator mode/i', { timeout: 5000 });
 
@@ -173,10 +184,11 @@ test.describe('Spectator Mode', () => {
 
     // Join as spectator
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
-    await spectatorPage.getByPlaceholder(/enter your name \(optional\)/i).fill('Alice');
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByPlaceholder(/enter your name/i).fill('Alice');
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     // Wait for spectator to join
     await spectatorPage.waitForSelector('text=/spectator mode/i', { timeout: 5000 });
@@ -193,9 +205,10 @@ test.describe('Spectator Mode', () => {
   test('should handle spectator joining during different game phases', async () => {
     // Test joining during betting phase
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     // Should successfully join regardless of phase
     await spectatorPage.waitForSelector('text=/spectator mode|watching|team 1/i', { timeout: 5000 });
@@ -207,9 +220,10 @@ test.describe('Spectator Mode', () => {
 
   test('should not allow spectator to join with invalid game ID', async () => {
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill('INVALID123');
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     // Should show error
     await expect(spectatorPage.locator('text=/game not found|error/i')).toBeVisible({ timeout: 3000 });
@@ -217,9 +231,12 @@ test.describe('Spectator Mode', () => {
 
   test('should show spectator info message on spectate form', async () => {
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
 
-    // Verify info message about spectator mode
+    // Select spectator mode to see info message
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
+
+    // Verify info message about spectator mode appears after selecting spectator
     await expect(spectatorPage.locator('text=/as a spectator/i')).toBeVisible();
     await expect(spectatorPage.locator('text=/watch the game/i')).toBeVisible();
     await expect(spectatorPage.locator('text=/player hands will be hidden/i')).toBeVisible();
@@ -227,12 +244,13 @@ test.describe('Spectator Mode', () => {
 
   test('should allow anonymous spectators (no name provided)', async () => {
     await spectatorPage.goto('/');
-    await spectatorPage.getByTestId('spectate-game-button').click();
+    await spectatorPage.getByTestId('join-game-button').click();
+    await spectatorPage.getByRole('radio', { name: /guest \(spectator\)/i }).click();
     await spectatorPage.getByPlaceholder(/enter game id/i).fill(gameId);
 
     // Don't fill in name (leave it empty)
 
-    await spectatorPage.getByRole('button', { name: /^spectate$/i }).click();
+    await spectatorPage.getByRole('button', { name: /join as guest/i }).click();
 
     // Should still join successfully
     await expect(spectatorPage.locator('text=/spectator mode/i')).toBeVisible({ timeout: 5000 });
