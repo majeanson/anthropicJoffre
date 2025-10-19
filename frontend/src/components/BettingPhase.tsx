@@ -80,7 +80,22 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
           🚪 Leave
         </button>
       )}
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Betting Phase</h2>
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Betting Phase</h2>
+
+      {/* Current Turn Indicator with Timeout */}
+      {!hasPlacedBet && (
+        <div className={`mb-6 px-3 md:px-4 py-2 md:py-3 rounded-xl text-sm md:text-base font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap ${
+          players[currentPlayerIndex]?.teamId === 1
+            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
+            : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
+        }`}>
+          <span>Waiting for: {players[currentPlayerIndex]?.name}</span>
+          <TimeoutIndicator
+            duration={60000}
+            isActive={!hasPlacedBet}
+          />
+        </div>
+      )}
 
       <div className="mb-6">
         <h3 className="text-lg font-semibold mb-3 text-gray-700">Players & Bets</h3>
@@ -219,12 +234,8 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
               )}
             </>
           ) : (
-            <div className="text-center text-gray-600 font-medium py-3 text-sm flex items-center justify-center gap-2 flex-wrap">
-              <span>Waiting for {players[currentPlayerIndex]?.name}'s bet...</span>
-              <TimeoutIndicator
-                duration={60000}
-                isActive={!hasPlacedBet}
-              />
+            <div className="text-center text-gray-600 font-medium py-3 text-sm">
+              <span>It's {players[currentPlayerIndex]?.name}'s turn to bet</span>
             </div>
           )}
         </div>

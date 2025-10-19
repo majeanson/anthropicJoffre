@@ -249,10 +249,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             // Previous Trick View - Circular layout on both mobile and desktop
             <>
               {/* Modal overlay background */}
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg z-0" />
+              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg z-30" />
 
               {/* Title - always visible */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-10">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-40">
                 <div className="text-yellow-400 text-sm md:text-2xl font-bold mb-1 md:mb-2">Previous Trick</div>
                 <div className="text-white text-xs md:text-lg">
                   Winner: {gameState.previousTrick ? gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name : ''}
@@ -263,7 +263,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Circular Layout for both mobile and desktop - ANTI-CLOCKWISE */}
-              <div className="relative h-[400px] z-10">
+              <div className="relative h-[400px] z-40">
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId)}
