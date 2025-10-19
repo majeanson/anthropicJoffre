@@ -70,17 +70,17 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   };
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg max-w-2xl mx-auto relative">
+    <div className="bg-parchment-50 rounded-xl p-6 shadow-lg max-w-2xl mx-auto relative border-2 border-parchment-400">
       {onLeaveGame && (
         <button
           onClick={onLeaveGame}
-          className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
+          className="absolute top-4 right-4 bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2 border-2 border-crimson-700"
           title="Leave Game"
         >
           🚪 Leave
         </button>
       )}
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">Betting Phase</h2>
+      <h2 className="text-2xl font-bold mb-4 text-umber-900 font-serif">Betting Phase</h2>
 
       {/* Current Turn Indicator with Timeout */}
       {!hasPlacedBet && (
@@ -99,32 +99,32 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       )}
 
       <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">Players & Bets</h3>
+        <h3 className="text-lg font-semibold mb-3 text-umber-800">Players & Bets</h3>
         <div className="space-y-2">
           {players.map((player, index) => {
             const bet = currentBets.find(b => b.playerId === player.id);
             const isDealerPlayer = index === dealerIndex;
             return (
-              <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={player.id} className="flex items-center justify-between p-3 bg-parchment-100 rounded-lg border border-parchment-300">
                 <div className="flex items-center gap-3">
                   <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
-                  <span className="font-medium">
+                  <span className="font-medium text-umber-900">
                     {player.name}
-                    {isDealerPlayer && <span className="ml-2 text-xs text-purple-600">(Dealer)</span>}
+                    {isDealerPlayer && <span className="ml-2 text-xs text-umber-600">(Dealer)</span>}
                   </span>
                 </div>
                 {bet ? (
                   bet.skipped ? (
-                    <span className="text-sm bg-gray-200 text-gray-600 px-3 py-1 rounded-full">
+                    <span className="text-sm bg-parchment-300 text-umber-600 px-3 py-1 rounded-full border border-umber-300">
                       Skipped
                     </span>
                   ) : (
-                    <span className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                    <span className="text-sm bg-forest-100 text-forest-800 px-3 py-1 rounded-full border border-forest-300">
                       {bet.amount} points {bet.withoutTrump ? '(No Trump)' : ''}
                     </span>
                   )
                 ) : (
-                  <span className="text-sm text-gray-500">Waiting...</span>
+                  <span className="text-sm text-umber-500">Waiting...</span>
                 )}
               </div>
             );
@@ -138,7 +138,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             <>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-umber-800 mb-3">
                     Select Bet Amount:
                   </label>
                   <div className="grid grid-cols-3 gap-2">
@@ -146,10 +146,10 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                       <button
                         key={amount}
                         onClick={() => setSelectedAmount(amount)}
-                        className={`py-3 px-4 rounded-lg font-semibold transition-all text-base ${
+                        className={`py-3 px-4 rounded-lg font-semibold transition-all text-base border-2 ${
                           selectedAmount === amount
-                            ? 'bg-orange-600 text-white ring-2 ring-orange-400'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-umber-600 text-parchment-50 ring-2 ring-umber-400 border-umber-700'
+                            : 'bg-parchment-100 text-umber-800 hover:bg-parchment-200 border-parchment-400'
                         }`}
                       >
                         {amount}
@@ -159,31 +159,31 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium text-umber-800 mb-3">
                     Trump Option:
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                    <label className="flex items-center p-3 bg-parchment-100 rounded-lg cursor-pointer hover:bg-parchment-200 transition-colors border border-parchment-300">
                       <input
                         type="radio"
                         name="trump"
                         checked={!withoutTrump}
                         onChange={() => setWithoutTrump(false)}
-                        className="w-4 h-4 text-orange-600 focus:ring-orange-500"
+                        className="w-4 h-4 text-umber-600 focus:ring-umber-500"
                       />
-                      <span className="ml-3 text-sm font-medium text-gray-700">
+                      <span className="ml-3 text-sm font-medium text-umber-800">
                         With Trump (1x)
                       </span>
                     </label>
-                    <label className="flex items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+                    <label className="flex items-center p-3 bg-parchment-100 rounded-lg cursor-pointer hover:bg-parchment-200 transition-colors border border-parchment-300">
                       <input
                         type="radio"
                         name="trump"
                         checked={withoutTrump}
                         onChange={() => setWithoutTrump(true)}
-                        className="w-4 h-4 text-purple-600 focus:ring-purple-500"
+                        className="w-4 h-4 text-umber-600 focus:ring-umber-500"
                       />
-                      <span className="ml-3 text-sm font-medium text-gray-700">
+                      <span className="ml-3 text-sm font-medium text-umber-800">
                         Without Trump (2x multiplier)
                       </span>
                     </label>
@@ -195,7 +195,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                     <button
                       data-testid="skip-bet-button"
                       onClick={handleSkip}
-                      className="flex-1 py-3 px-4 rounded-lg font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-colors text-sm"
+                      className="flex-1 py-3 px-4 rounded-lg font-semibold bg-parchment-300 text-umber-800 hover:bg-parchment-400 transition-colors text-sm border-2 border-parchment-400"
                     >
                       SKIP
                     </button>
@@ -203,10 +203,10 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                   <button
                     onClick={handlePlaceBet}
                     disabled={!isCurrentBetValid()}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors text-sm ${
+                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors text-sm border-2 ${
                       isCurrentBetValid()
-                        ? 'bg-green-600 text-white hover:bg-green-700'
-                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        ? 'bg-forest-600 text-parchment-50 hover:bg-forest-700 border-forest-700'
+                        : 'bg-parchment-300 text-umber-500 cursor-not-allowed border-parchment-400'
                     }`}
                   >
                     Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
@@ -215,7 +215,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
 
                 {/* Validation message */}
                 {!isCurrentBetValid() && highestBet && (
-                  <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg text-xs">
+                  <div className="bg-parchment-200 border-2 border-umber-400 text-umber-800 px-3 py-2 rounded-lg text-xs">
                     <strong>Too low:</strong> Current highest is {highestBet.amount} points{highestBet.withoutTrump ? ' (No Trump)' : ''}.
                     {isDealer ? ' You can match or raise.' : ' You must raise.'}
                   </div>
@@ -223,19 +223,19 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
               </div>
 
               {isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) && (
-                <div className="bg-purple-50 border border-purple-200 text-purple-800 px-3 py-2 rounded-lg text-xs">
+                <div className="bg-sapphire-50 border-2 border-sapphire-300 text-sapphire-800 px-3 py-2 rounded-lg text-xs">
                   <strong>Dealer:</strong> You can match or raise
                 </div>
               )}
 
               {isDealer && !currentBets.some(b => !b.skipped) && (
-                <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-3 py-2 rounded-lg text-xs">
+                <div className="bg-parchment-200 border-2 border-umber-400 text-umber-800 px-3 py-2 rounded-lg text-xs">
                   <strong>Dealer:</strong> Must bet (min 7 points)
                 </div>
               )}
             </>
           ) : (
-            <div className="text-center text-gray-600 font-medium py-3 text-sm">
+            <div className="text-center text-umber-700 font-medium py-3 text-sm">
               <span>It's {players[currentPlayerIndex]?.name}'s turn to bet</span>
             </div>
           )}
@@ -243,15 +243,15 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       )}
 
       {hasPlacedBet && (
-        <div className="text-center text-green-600 font-medium">
+        <div className="text-center text-forest-700 font-medium">
           Waiting for other players to bet...
         </div>
       )}
 
       {/* Player's Hand Display - 4x2 Grid */}
       {playerHand.length > 0 && (
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <h3 className="text-lg font-semibold mb-3 text-gray-700">Your Hand</h3>
+        <div className="mt-6 pt-6 border-t-2 border-parchment-400">
+          <h3 className="text-lg font-semibold mb-3 text-umber-800">Your Hand</h3>
           <div className="grid grid-cols-4 gap-2 md:gap-3 max-w-md mx-auto">
             {playerHand.map((card, index) => (
               <div

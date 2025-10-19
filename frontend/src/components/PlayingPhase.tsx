@@ -115,9 +115,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false) => {
     if (!tc) {
       return (
-        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-white/20 rounded-xl flex items-center justify-center bg-white/5 backdrop-blur">
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-white/30 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-white/20"></div>
+        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400/40 rounded-xl flex items-center justify-center bg-parchment-200/20 backdrop-blur">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-parchment-400/50 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-parchment-400/30"></div>
           </div>
         </div>
       );
@@ -132,13 +132,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
   // Get color class for trump suit
   const getTrumpColor = (trump: CardColor | null): string => {
-    if (!trump) return 'text-gray-900';
+    if (!trump) return 'text-umber-900';
     switch (trump) {
       case 'red': return 'text-red-600';
       case 'green': return 'text-green-600';
       case 'blue': return 'text-blue-600';
-      case 'brown': return 'text-brown-600';
-      default: return 'text-gray-900';
+      case 'brown': return 'text-amber-700';
+      default: return 'text-umber-900';
     }
   };
 
@@ -155,13 +155,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     .reduce((sum, p) => sum + p.pointsWon, 0);
 
   return (
-    <div className="h-screen md:min-h-screen bg-gradient-to-br from-green-900 to-teal-900 flex flex-col overflow-hidden md:overflow-visible">
+    <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
       <div className="w-full mb-3 md:mb-6 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
-        <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3 md:p-6 shadow-2xlborder border-white/20">
+        <div className="bg-parchment-50/95 backdrop-blur-md rounded-2xl p-3 md:p-6 shadow-2xl border-2 border-parchment-400">
           <div className="flex justify-between items-center gap-4 md:gap-8">
             {/* Team 1 */}
-            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4">
+            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200">
               <h3 className="text-[10px] md:text-xs font-semibold text-orange-600/70 uppercase tracking-wider mb-1">Team 1</h3>
               <p className="text-3xl md:text-5xl font-black text-orange-600 leading-none">{gameState.teamScores.team1}</p>
               <p className="text-xs md:text-sm font-bold text-orange-500 mt-1">+{team1RoundScore} pts</p>
@@ -169,17 +169,17 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
             {/* Center Info */}
             <div className="text-center flex-shrink-0 space-y-1.5 md:space-y-2">
-              <div className="bg-gradient-to-r from-gray-100 to-gray-50 px-2 md:px-3 py-1 rounded-lg">
-                <p className="text-[10px] md:text-xs font-bold text-gray-600">ROUND {gameState.roundNumber}</p>
+              <div className="bg-gradient-to-r from-parchment-200 to-parchment-100 px-2 md:px-3 py-1 rounded-lg border border-parchment-400">
+                <p className="text-[10px] md:text-xs font-bold text-umber-800">ROUND {gameState.roundNumber}</p>
               </div>
 
               {/* Current Turn Indicator with Timeout */}
-              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap ${
+              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap border-2 ${
                 gameState.currentTrick.length >= 4
-                  ? 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
+                  ? 'bg-gradient-to-r from-umber-500 to-umber-600 text-parchment-50 border-umber-700'
                   : currentTurnTeam === 1
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-                    : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-orange-700'
+                    : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-700'
               }`}>
                 {gameState.currentTrick.length >= 4 ? (
                   <span>Waiting for trick to end...</span>
@@ -197,7 +197,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
               {/* Trump */}
               {gameState.trump && (
-                <div className="bg-white/60 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border border-gray-200">
+                <div className="bg-parchment-50/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400">
                   <p className={`text-xs md:text-base font-bold ${getTrumpColor(gameState.trump)}`}>
                     <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
                   </p>
@@ -206,7 +206,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </div>
 
             {/* Team 2 */}
-            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-4 text-right">
+            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-4 text-right border border-purple-200">
               <h3 className="text-[10px] md:text-xs font-semibold text-purple-600/70 uppercase tracking-wider mb-1">Team 2</h3>
               <p className="text-3xl md:text-5xl font-black text-purple-600 leading-none">{gameState.teamScores.team2}</p>
               <p className="text-xs md:text-sm font-bold text-purple-500 mt-1">+{team2RoundScore} pts</p>
@@ -217,12 +217,12 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
       {/* Circular Card Layout - Takes remaining space */}
       <div className="mb-3 md:mb-8 relative px-2 md:px-6">
-        <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-4 md:p-10 md:min-h-[500px] relative border border-white/10 shadow-2xl">
+        <div className="bg-parchment-100/30 backdrop-blur-xl rounded-3xl p-4 md:p-10 md:min-h-[500px] relative border-2 border-parchment-400 shadow-2xl">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
           <div className="fixed bottom-[140px] right-4 z-400 flex flex-col gap-3 absolute  bottom-auto top-4 right-4">
             <button
               onClick={() => setShowLeaderboard(true)}
-              className="bg-gradient-to-br from-yellow-400 to-yellow-600 hover:from-yellow-500 hover:to-yellow-700 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-yellow-500/50 flex items-center justify-center backdrop-blur-md border border-yellow-300/30"
+              className="bg-gradient-to-br from-umber-500 to-umber-700 hover:from-umber-600 hover:to-umber-800 active:scale-95 text-parchment-50 w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-umber-500/50 flex items-center justify-center backdrop-blur-md border-2 border-umber-800"
               title="Leaderboard"
             >
               <span className="md:hidden">🏆</span>
@@ -231,7 +231,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {onLeaveGame && (
               <button
                 onClick={onLeaveGame}
-                className="bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-red-500/50 flex items-center justify-center backdrop-blur-md border border-red-300/30"
+                className="bg-gradient-to-br from-crimson-600 to-crimson-800 hover:from-crimson-700 hover:to-crimson-900 active:scale-95 text-parchment-50 w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-crimson-500/50 flex items-center justify-center backdrop-blur-md border-2 border-crimson-900"
                 title="Leave Game"
               >
                 <span className="md:hidden">🚪</span>
@@ -243,9 +243,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 onClick={() => setShowPreviousTrick(!showPreviousTrick)}
                 className={`${
                   showPreviousTrick
-                    ? 'bg-gradient-to-br from-green-500 to-green-700 hover:from-green-600 hover:to-green-800 shadow-green-500/50'
-                    : 'bg-gradient-to-br from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 shadow-gray-400/50'
-                } active:scale-95 text-white w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border border-white/30`}
+                    ? 'bg-gradient-to-br from-forest-600 to-forest-800 hover:from-forest-700 hover:to-forest-900 shadow-forest-500/50 border-forest-900'
+                    : 'bg-gradient-to-br from-umber-400 to-umber-500 hover:from-umber-500 hover:to-umber-600 shadow-umber-400/50 border-umber-600'
+                } active:scale-95 text-parchment-50 w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
                 title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
               >
                 <span className="md:hidden">{showPreviousTrick ? '▶️' : '⏮️'}</span>
@@ -387,23 +387,23 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 mt-auto">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="bg-black/80 rounded-2xl px-6 py-4 border border-white/20 shadow-xl">
-                    <p className="text-white/90 text-lg md:text-2xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
+                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 shadow-xl">
+                    <p className="text-parchment-50 text-lg md:text-2xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
                     <div className="mt-2 flex gap-1 justify-center">
-                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
                   </div>
                 </div>
               )}
-        <div className="bg-white/5 backdrop-blur-xl rounded-2xl p-3 md:p-6 shadow-2xl border border-white/20">
+        <div className="bg-parchment-100/20 backdrop-blur-xl rounded-2xl p-3 md:p-6 shadow-2xl border-2 border-parchment-400">
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
             <div className="text-center py-8">
-              <div className="inline-block bg-gradient-to-br from-gray-100 to-gray-50 px-6 py-4 rounded-xl border border-gray-200 shadow-lg">
-                <span className="text-gray-700 text-base font-semibold">🔒 Hands Hidden</span>
-                <p className="text-gray-500 text-sm mt-1.5">Spectator Mode</p>
+              <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 shadow-lg">
+                <span className="text-umber-800 text-base font-semibold">🔒 Hands Hidden</span>
+                <p className="text-umber-600 text-sm mt-1.5">Spectator Mode</p>
               </div>
             </div>
           ) : (

@@ -42,26 +42,26 @@ export function TeamSelection({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center p-6">
-      <div className="bg-white rounded-xl p-8 shadow-2xl max-w-4xl w-full relative">
+    <div className="min-h-screen bg-gradient-to-br from-parchment-300 to-parchment-400 flex items-center justify-center p-6">
+      <div className="bg-parchment-50 rounded-xl p-8 shadow-2xl max-w-4xl w-full relative border-2 border-parchment-400">
         {onLeaveGame && (
           <button
             onClick={onLeaveGame}
-            className="absolute top-4 right-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2"
+            className="absolute top-4 right-4 bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2 border-2 border-crimson-700"
             title="Leave Game"
           >
             🚪 Leave
           </button>
         )}
-        <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Team Selection</h2>
+        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif">Team Selection</h2>
 
         <div className="mb-6">
-          <p className="text-sm text-gray-600 mb-2">Game ID:</p>
-          <div data-testid="game-id" className="bg-gray-100 p-3 rounded-lg font-mono text-lg text-center">{gameId}</div>
+          <p className="text-sm text-umber-700 mb-2">Game ID:</p>
+          <div data-testid="game-id" className="bg-parchment-100 p-3 rounded-lg font-mono text-lg text-center border-2 border-parchment-400 text-umber-900">{gameId}</div>
         </div>
 
         <div className="mb-8">
-          <p className="text-center text-gray-600 mb-4">
+          <p className="text-center text-umber-700 mb-4">
             Players (<span data-testid="player-count">{players.length}</span>/4) - Choose your team and position
           </p>
         </div>
@@ -83,20 +83,20 @@ export function TeamSelection({
                       isCurrentPlayer
                         ? 'bg-orange-200 border-orange-500'
                         : playerAtPosition
-                        ? 'bg-white border-orange-200'
-                        : 'bg-gray-100 border-dashed border-gray-300'
+                        ? 'bg-parchment-50 border-orange-200'
+                        : 'bg-parchment-100 border-dashed border-parchment-300'
                     }`}
                   >
                     {playerAtPosition ? (
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">
+                        <span className="font-medium text-umber-900">
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
                         {!isCurrentPlayer && currentPlayer && (
                           <button
                             onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700"
+                            className="text-xs bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700 border border-orange-700"
                           >
                             Swap
                           </button>
@@ -112,7 +112,7 @@ export function TeamSelection({
                             Join Team 1
                           </button>
                         ) : (
-                          <span className="text-gray-400">Empty Seat</span>
+                          <span className="text-umber-400">Empty Seat</span>
                         )}
                       </div>
                     )}
@@ -137,20 +137,20 @@ export function TeamSelection({
                       isCurrentPlayer
                         ? 'bg-purple-200 border-purple-500'
                         : playerAtPosition
-                        ? 'bg-white border-purple-200'
-                        : 'bg-gray-100 border-dashed border-gray-300'
+                        ? 'bg-parchment-50 border-purple-200'
+                        : 'bg-parchment-100 border-dashed border-parchment-300'
                     }`}
                   >
                     {playerAtPosition ? (
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">
+                        <span className="font-medium text-umber-900">
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
                         {!isCurrentPlayer && currentPlayer && (
                           <button
                             onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700"
+                            className="text-xs bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700 border border-purple-700"
                           >
                             Swap
                           </button>
@@ -166,7 +166,7 @@ export function TeamSelection({
                             Join Team 2
                           </button>
                         ) : (
-                          <span className="text-gray-400">Empty Seat</span>
+                          <span className="text-umber-400">Empty Seat</span>
                         )}
                       </div>
                     )}
@@ -183,7 +183,7 @@ export function TeamSelection({
             <button
               data-testid="start-game-button"
               onClick={onStartGame}
-              className="bg-green-600 text-white px-8 py-3 rounded-lg text-lg font-bold hover:bg-green-700 shadow-lg transition-colors"
+              className="bg-forest-600 text-parchment-50 px-8 py-3 rounded-lg text-lg font-bold hover:bg-forest-700 shadow-lg transition-colors border-2 border-forest-700"
             >
               Start Game
             </button>
@@ -192,20 +192,20 @@ export function TeamSelection({
               <button
                 data-testid="start-game-button-disabled"
                 disabled
-                className="bg-gray-300 text-gray-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed"
+                className="bg-parchment-300 text-umber-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed border-2 border-parchment-400"
               >
                 Start Game
               </button>
-              <p data-testid="start-game-message" className="text-gray-600 bg-yellow-50 border border-yellow-200 px-4 py-2 rounded-lg">
+              <p data-testid="start-game-message" className="text-umber-800 bg-parchment-200 border-2 border-umber-400 px-4 py-2 rounded-lg">
                 {getStartGameMessage()}
               </p>
             </div>
           )}
         </div>
 
-        <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-          <h4 className="font-semibold text-gray-700 mb-2">How to Play:</h4>
-          <ul className="text-sm text-gray-600 space-y-1">
+        <div className="mt-6 p-4 bg-parchment-100 rounded-lg border-2 border-parchment-400">
+          <h4 className="font-semibold text-umber-800 mb-2">How to Play:</h4>
+          <ul className="text-sm text-umber-700 space-y-1">
             <li>• Teams play opposite each other (Team 1 vs Team 2)</li>
             <li>• You can swap positions with other players before starting</li>
             <li>• Position affects turn order during the game</li>
