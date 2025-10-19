@@ -325,7 +325,11 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </button>
             {onLeaveGame && (
               <button
-                onClick={onLeaveGame}
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to leave the game? You will lose your progress.')) {
+                    onLeaveGame();
+                  }
+                }}
                 className="bg-gradient-to-br from-crimson-600 to-crimson-800 hover:from-crimson-700 hover:to-crimson-900 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-crimson-500/50 flex items-center justify-center backdrop-blur-md border-2 border-crimson-900"
                 title="Leave Game"
               >
