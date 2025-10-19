@@ -3,14 +3,15 @@ import { useEffect, useState } from 'react';
 interface TimeoutIndicatorProps {
   duration: number; // Duration in milliseconds
   isActive: boolean; // Whether the timer is currently counting down
+  resetKey?: string | number; // Key to trigger timer reset (e.g., playerId or turnIndex)
   onTimeout?: () => void; // Optional callback when timer reaches 0
 }
 
-export function TimeoutIndicator({ duration, isActive, onTimeout }: TimeoutIndicatorProps) {
+export function TimeoutIndicator({ duration, isActive, resetKey, onTimeout }: TimeoutIndicatorProps) {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const [startTime, setStartTime] = useState<number | null>(null);
 
-  // Reset timer when isActive changes or duration changes
+  // Reset timer when isActive changes, duration changes, or resetKey changes
   useEffect(() => {
     if (isActive) {
       setTimeRemaining(duration);
@@ -18,7 +19,7 @@ export function TimeoutIndicator({ duration, isActive, onTimeout }: TimeoutIndic
     } else {
       setStartTime(null);
     }
-  }, [isActive, duration]);
+  }, [isActive, duration, resetKey]);
 
   // Countdown logic
   useEffect(() => {

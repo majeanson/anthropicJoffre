@@ -93,6 +93,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
           <TimeoutIndicator
             duration={60000}
             isActive={!hasPlacedBet}
+            resetKey={currentPlayerIndex}
           />
         </div>
       )}
