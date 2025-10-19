@@ -629,33 +629,47 @@ function App() {
         <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-6">
         <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full">
           <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Round {gameState.roundNumber} Complete!</h2>
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            <div className="text-center p-6 bg-orange-50 rounded-lg">
+
+          {/* Team Scores - Large and Clear */}
+          <div className="grid grid-cols-2 gap-6 mb-8">
+            <div className="text-center p-6 bg-orange-50 rounded-lg border-2 border-orange-200">
               <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
-              <p className="text-4xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
+              <p className="text-5xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
+              <p className="text-xs text-orange-700 mt-2">Total Score</p>
             </div>
-            <div className="text-center p-6 bg-purple-50 rounded-lg">
+            <div className="text-center p-6 bg-purple-50 rounded-lg border-2 border-purple-200">
               <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
-              <p className="text-4xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
+              <p className="text-5xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
+              <p className="text-xs text-purple-700 mt-2">Total Score</p>
             </div>
           </div>
-          <div className="space-y-2">
-            {gameState.players.map((player) => {
-              const bet = gameState.currentBets.find(b => b.playerId === player.id);
-              return (
-                <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
-                    <span className="font-medium">{player.name}</span>
+
+          {/* Round Summary - Simplified */}
+          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 mb-4 border border-gray-200">
+            <h3 className="text-center font-bold text-gray-700 mb-3">Round Summary</h3>
+            <div className="space-y-2">
+              {gameState.players.map((player) => {
+                const bet = gameState.currentBets.find(b => b.playerId === player.id);
+                const highestBet = gameState.highestBet;
+                const isHighestBidder = highestBet && highestBet.playerId === player.id;
+
+                return (
+                  <div key={player.id} className={`flex items-center justify-between p-2 rounded ${isHighestBidder ? 'bg-white border border-yellow-400' : 'bg-white/50'}`}>
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
+                      <span className="font-medium text-sm">{player.name}</span>
+                      {isHighestBidder && <span className="text-xs text-yellow-600">⭐ Bidder</span>}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700">
+                      {player.tricksWon} tricks ({player.pointsWon} pts)
+                    </div>
                   </div>
-                  <div className="text-sm">
-                    <span>Bet: {bet?.amount} pts | Earned: {player.pointsWon} pts ({player.tricksWon} tricks)</span>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-          <p className="mt-6 text-center text-gray-600">Next round starting soon...</p>
+
+          <p className="text-center text-gray-600 text-sm">Next round starting soon...</p>
         </div>
         </div>
       </>

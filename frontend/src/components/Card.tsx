@@ -44,7 +44,6 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
   const isSpecial = (card.color === 'red' || card.color === 'brown') && card.value === 0;
   const badgeSize = size === 'tiny' ? 'text-[8px] px-0.5' : size === 'small' ? 'text-[9px] px-0.5' : 'text-xs px-1';
   const borderWidth = size === 'tiny' ? 'border-2' : size === 'small' ? 'border-3' : 'border-4';
-  const ringWidth = size === 'tiny' ? 'ring-2' : size === 'small' ? 'ring-2' : 'ring-4';
 
   // Determine which image to show
   const getCardImage = () => {
@@ -72,7 +71,6 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
         transition-all duration-200
         ${!disabled && onClick ? 'hover:scale-105 hover:shadow-xl cursor-pointer' : 'cursor-default'}
         ${disabled ? 'opacity-50' : ''}
-        ${isSpecial ? `${ringWidth} ring-yellow-400` : ''}
         relative overflow-hidden
       `}
     >

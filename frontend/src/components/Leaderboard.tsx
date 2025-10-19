@@ -45,7 +45,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-umber-600 to-umber-700 text-parchment-50 px-6 py-4 flex items-center justify-between rounded-t-lg border-b-2 border-umber-800">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-umber-600 to-umber-700 text-parchment-50 px-6 py-4 flex items-center justify-between rounded-t-lg border-b-2 border-umber-800">
           <div>
             <h2 id="leaderboard-title" className="text-2xl font-bold flex items-center gap-2 font-serif">
               🏆 Leaderboard

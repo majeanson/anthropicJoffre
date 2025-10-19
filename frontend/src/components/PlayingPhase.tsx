@@ -76,16 +76,32 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   useEffect(() => {
     if (gameState.currentTrick.length === 4 && lastTrickLength !== 4) {
       setTrickCollectionAnimation(true);
-      sounds.trickWon(); // Play trick won sound
-      setTimeout(() => {
-        sounds.trickCollect(); // Play collection sound after 1s
-      }, 1000);
       setTimeout(() => {
         setTrickCollectionAnimation(false);
       }, 3000); // Match the backend 3-second delay
     }
     setLastTrickLength(gameState.currentTrick.length);
   }, [gameState.currentTrick.length]);
+
+  // Play win/loss sounds based on previousTrick outcome
+  useEffect(() => {
+    if (gameState.previousTrick && gameState.previousTrick.winnerId) {
+      const winner = gameState.players.find(p => p.id === gameState.previousTrick?.winnerId);
+      const currentPlayerTeam = currentPlayer?.teamId;
+
+      if (winner && currentPlayerTeam) {
+        if (winner.teamId === currentPlayerTeam) {
+          // Current player's team won - play win sound
+          sounds.trickWon();
+        } else {
+          // Current player's team lost - play loss sound
+          setTimeout(() => {
+            sounds.trickCollect(); // Play collection sound for losses
+          }, 500);
+        }
+      }
+    }
+  }, [gameState.previousTrick?.winnerId]);
 
   // Your turn notification sound
   useEffect(() => {
@@ -205,7 +221,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     }
 
     return (
-      <div className={`inline-block transition-all duration-500 ${isWinner ? 'scale-110 ring-4 md:ring-6 ring-yellow-400 shadow-2xl shadow-yellow-400/50' : ''} ${animationClass}`}>
+      <div className={`inline-block transition-all duration-500 ${isWinner ? 'scale-110 ring-4 md:ring-6 ring-yellow-400 rounded-lg shadow-2xl shadow-yellow-400/50' : ''} ${animationClass}`}>
         <CardComponent card={tc.card} size="small" />
       </div>
     );
@@ -266,6 +282,20 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 >
                   {soundEnabled ? '🔊' : '🔇'}
                 </button>
+                {/* Leave Game Button - Compact */}
+                {onLeaveGame && (
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to leave the game?')) {
+                        onLeaveGame();
+                      }
+                    }}
+                    className="bg-crimson-600 hover:bg-crimson-700 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400"
+                    title="Leave Game"
+                  >
+                    🚪
+                  </button>
+                )}
               </div>
 
               {/* Current Turn Indicator with Timeout */}
@@ -323,20 +353,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <span className="md:hidden">🏆</span>
               <span className="hidden md:inline">🏆 Leaderboard</span>
             </button>
-            {onLeaveGame && (
-              <button
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to leave the game?')) {
-                    onLeaveGame();
-                  }
-                }}
-                className="bg-gradient-to-br from-crimson-600 to-crimson-800 hover:from-crimson-700 hover:to-crimson-900 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-crimson-500/50 flex items-center justify-center backdrop-blur-md border-2 border-crimson-900"
-                title="Leave Game"
-              >
-                <span className="md:hidden">🚪</span>
-                <span className="hidden md:inline">🚪 Leave</span>
-              </button>
-            )}
             {gameState.previousTrick && (
               <button
                 onClick={() => setShowPreviousTrick(!showPreviousTrick)}
