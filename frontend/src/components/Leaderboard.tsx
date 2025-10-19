@@ -250,7 +250,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                                       Trick {trickIndex + 1}
                                     </span>
                                     <span className={`text-xs px-2 py-1 rounded-full font-semibold ${winnerTeamColor}`}>
-                                      👑 {winner?.name || 'Unknown'} (+{trick.points}pts)
+                                      👑 {winner?.name || 'Unknown'} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
                                     </span>
                                   </div>
                                   <div className="grid grid-cols-4 gap-2">

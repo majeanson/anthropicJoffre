@@ -164,7 +164,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200">
               <h3 className="text-[10px] md:text-xs font-semibold text-orange-600/70 uppercase tracking-wider mb-1">Team 1</h3>
               <p className="text-3xl md:text-5xl font-black text-orange-600 leading-none">{gameState.teamScores.team1}</p>
-              <p className="text-xs md:text-sm font-bold text-orange-500 mt-1">+{team1RoundScore} pts</p>
+              <p className="text-xs md:text-sm font-bold text-orange-500 mt-1">{team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts</p>
             </div>
 
             {/* Center Info */}
@@ -209,7 +209,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-4 text-right border border-purple-200">
               <h3 className="text-[10px] md:text-xs font-semibold text-purple-600/70 uppercase tracking-wider mb-1">Team 2</h3>
               <p className="text-3xl md:text-5xl font-black text-purple-600 leading-none">{gameState.teamScores.team2}</p>
-              <p className="text-xs md:text-sm font-bold text-purple-500 mt-1">+{team2RoundScore} pts</p>
+              <p className="text-xs md:text-sm font-bold text-purple-500 mt-1">{team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts</p>
             </div>
           </div>
         </div>
@@ -219,7 +219,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       <div className="mb-3 md:mb-8 relative px-2 md:px-6">
         <div className="bg-parchment-100/30 backdrop-blur-xl rounded-3xl p-4 md:p-10 md:min-h-[500px] relative border-2 border-parchment-400 shadow-2xl">
           {/* Floating Action Buttons - Bottom Right Corner, above hand cards */}
-          <div className="fixed bottom-[140px] right-4 z-400 flex flex-col gap-3 absolute  bottom-auto top-4 right-4">
+          <div className="fixed bottom-[140px] right-4 z-50 flex flex-col gap-3 md:absolute md:bottom-auto md:top-4 md:right-4">
             <button
               onClick={() => setShowLeaderboard(true)}
               className="bg-gradient-to-br from-umber-500 to-umber-700 hover:from-umber-600 hover:to-umber-800 active:scale-95 text-parchment-50 w-14 h-14 md:w-auto md:h-auto md:px-5 md:py-3 rounded-full md:rounded-xl text-xl md:text-base font-bold transition-all duration-200 shadow-2xl hover:shadow-umber-500/50 flex items-center justify-center backdrop-blur-md border-2 border-umber-800"

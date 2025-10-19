@@ -7,11 +7,21 @@ interface CardProps {
   size?: 'tiny' | 'small' | 'medium' | 'large';
 }
 
+// Card background colors match emblem parchment/beige backgrounds
+// Border colors use the actual card suit colors
 const colorStyles: Record<CardColor, string> = {
-  red: 'bg-red-500 border-red-700',
-  brown: 'bg-amber-700 border-amber-900',
-  green: 'bg-green-500 border-green-700',
-  blue: 'bg-blue-500 border-blue-700',
+  red: 'bg-parchment-200 border-red-700',
+  brown: 'bg-parchment-200 border-amber-900',
+  green: 'bg-parchment-200 border-green-700',
+  blue: 'bg-parchment-200 border-blue-700',
+};
+
+// Number colors use the old vibrant card colors
+const numberColorStyles: Record<CardColor, string> = {
+  red: 'text-red-600',
+  brown: 'text-amber-800',
+  green: 'text-green-600',
+  blue: 'text-blue-700',
 };
 
 const sizeStyles = {
@@ -54,7 +64,7 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
       className={`
         ${colorStyles[card.color]}
         ${sizeStyles[size]}
-        ${borderWidth} rounded-lg font-bold text-white
+        ${borderWidth} rounded-lg font-bold
         flex flex-col items-center justify-center gap-1
         transition-all duration-200
         ${!disabled && onClick ? 'hover:scale-105 hover:shadow-xl cursor-pointer' : 'cursor-default'}
@@ -65,7 +75,7 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
     >
       {/* Top value number */}
       {!isSpecial && (
-        <span className="absolute top-1 left-1 text-white font-bold drop-shadow-lg">
+        <span className={`absolute top-1 left-1 font-bold drop-shadow-sm ${numberColorStyles[card.color]}`}>
           {card.value}
         </span>
       )}
@@ -79,7 +89,7 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
 
       {/* Bottom value number */}
       {!isSpecial && (
-        <span className="absolute bottom-1 right-1 text-white font-bold drop-shadow-lg rotate-180">
+        <span className={`absolute bottom-1 right-1 font-bold drop-shadow-sm rotate-180 ${numberColorStyles[card.color]}`}>
           {card.value}
         </span>
       )}

@@ -453,18 +453,22 @@ function App() {
     return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} />;
   }
 
-  // Debug controls (always available, even in production)
+  // Debug controls (hidden for now, but code kept for future use)
+  const DEBUG_ENABLED = false; // Set to true to show debug controls
+
   const DebugControls = () => (
     <div className="fixed top-4 right-4 z-50">
       {/* Debug Menu Button */}
-      <button
-        onClick={() => setDebugMenuOpen(!debugMenuOpen)}
-        className="bg-gray-800 bg-opacity-80 hover:bg-opacity-90 text-white px-3 py-2 rounded-lg shadow-lg font-bold transition-all flex items-center gap-2 backdrop-blur-sm"
-        title="Debug Menu"
-        aria-label="Open debug menu"
-      >
-        ⚙️ Debug
-      </button>
+      {DEBUG_ENABLED && (
+        <button
+          onClick={() => setDebugMenuOpen(!debugMenuOpen)}
+          className="bg-gray-800 bg-opacity-80 hover:bg-opacity-90 text-white px-3 py-2 rounded-lg shadow-lg font-bold transition-all flex items-center gap-2 backdrop-blur-sm"
+          title="Debug Menu"
+          aria-label="Open debug menu"
+        >
+          ⚙️ Debug
+        </button>
+      )}
 
       {/* Dropdown Menu */}
       {debugMenuOpen && (
