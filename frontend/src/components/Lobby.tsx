@@ -9,11 +9,130 @@ interface LobbyProps {
   hasValidSession?: boolean;
 }
 
+// Rules Modal Component
+interface RulesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function RulesModal({ isOpen, onClose }: RulesModalProps) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-parchment-50 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-umber-600" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-4xl font-bold text-umber-900 font-serif">Game Rules</h2>
+          <button
+            onClick={onClose}
+            className="text-umber-600 hover:text-umber-800 text-3xl font-bold leading-none"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="space-y-6 text-umber-800">
+          {/* Overview */}
+          <section>
+            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+              🎯 Overview
+            </h3>
+            <p className="text-lg leading-relaxed">
+              Joffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
+              The first team to reach 41 points wins the game!
+            </p>
+          </section>
+
+          {/* Betting Phase */}
+          <section className="bg-yellow-50 rounded-lg p-4 border-2 border-yellow-300">
+            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+              💰 Betting Phase
+            </h3>
+            <ul className="space-y-2 text-lg">
+              <li>• Each round starts with betting (7-12 points)</li>
+              <li>• Players take turns bidding after the dealer</li>
+              <li>• <strong>Non-dealers must raise</strong> or skip (if no bets yet)</li>
+              <li>• <strong>Dealer can equalize or raise</strong> - dealer wins ties!</li>
+              <li>• "Without Trump" doubles the bet stakes</li>
+              <li>• Highest bidder becomes the offensive team</li>
+            </ul>
+          </section>
+
+          {/* Playing Phase */}
+          <section className="bg-blue-50 rounded-lg p-4 border-2 border-blue-300">
+            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+              🃏 Playing Phase
+            </h3>
+            <ul className="space-y-2 text-lg">
+              <li>• Highest bidder leads the first trick</li>
+              <li>• <strong>You must follow suit</strong> if you have the led color</li>
+              <li>• Trump (bet color) beats non-trump cards</li>
+              <li>• Highest card in led suit wins if no trump played</li>
+              <li>• Winner of each trick leads the next</li>
+            </ul>
+          </section>
+
+          {/* Special Cards */}
+          <section className="bg-green-50 rounded-lg p-4 border-2 border-green-300">
+            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+              ⭐ Special Cards
+            </h3>
+            <ul className="space-y-2 text-lg">
+              <li>• <strong className="text-red-600">Red 0:</strong> +5 bonus points (6 total for that trick)</li>
+              <li>• <strong className="text-amber-800">Brown 0:</strong> -2 penalty points (-1 total for that trick)</li>
+              <li>• All other tricks worth 1 point</li>
+            </ul>
+          </section>
+
+          {/* Scoring */}
+          <section className="bg-purple-50 rounded-lg p-4 border-2 border-purple-300">
+            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+              📊 Scoring
+            </h3>
+            <ul className="space-y-2 text-lg">
+              <li>• Offensive team wins if they meet their bet</li>
+              <li>• They gain points equal to their bet</li>
+              <li>• Defensive team gains points from tricks won</li>
+              <li>• If offensive fails, they lose bet points</li>
+              <li>• "Without Trump" bets are worth 2x</li>
+            </ul>
+          </section>
+
+          {/* Teams */}
+          <section>
+            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+              👥 Teams
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-orange-100 rounded-lg p-4 border-2 border-orange-400">
+                <p className="text-lg font-bold text-orange-800">Team 1 (Orange)</p>
+                <p className="text-sm text-orange-700 mt-1">Players 1 & 3</p>
+              </div>
+              <div className="bg-purple-100 rounded-lg p-4 border-2 border-purple-400">
+                <p className="text-lg font-bold text-purple-800">Team 2 (Purple)</p>
+                <p className="text-sm text-purple-700 mt-1">Players 2 & 4</p>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full mt-8 bg-umber-600 text-parchment-50 py-4 rounded-lg font-bold hover:bg-umber-700 transition-colors border-2 border-umber-700 text-lg"
+        >
+          Got it!
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession }: LobbyProps) {
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState('');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>('menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
+  const [showRules, setShowRules] = useState(false);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,50 +157,81 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
   if (mode === 'menu') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-parchment-300 to-parchment-400 flex items-center justify-center">
-        <div className="bg-parchment-50 rounded-xl p-8 shadow-2xl max-w-md w-full border-2 border-parchment-400">
-          <h1 className="text-4xl font-bold text-center mb-8 text-umber-900 font-serif">
-            Trick Card Game
-          </h1>
-          <div className="space-y-4">
-            {hasValidSession && onRejoinGame && (
+      <>
+        <RulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
+        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
+          {/* Animated background cards */}
+          <div className="absolute inset-0 opacity-10 pointer-events-none">
+            <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
+            <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
+            <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
+            <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
+          </div>
+
+          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-10 shadow-2xl max-w-md w-full border-4 border-amber-700 relative">
+            {/* Decorative corners */}
+            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 rounded-tl-xl"></div>
+            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 rounded-tr-xl"></div>
+            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
+            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
+
+            {/* Title */}
+            <div className="text-center mb-10">
+              <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 font-serif tracking-wider animate-pulse" style={{ animationDuration: '2s' }}>
+                Joffre
+              </h1>
+              <p className="text-umber-600 text-sm mt-2 font-semibold">A Classic Trick-Taking Card Game</p>
+            </div>
+
+            {/* Buttons */}
+            <div className="space-y-3">
+              {hasValidSession && onRejoinGame && (
+                <button
+                  data-testid="rejoin-game-button"
+                  onClick={onRejoinGame}
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center gap-2 ring-4 ring-blue-300 animate-pulse border-2 border-blue-800 shadow-lg transform hover:scale-105"
+                >
+                  <span>🔄</span>
+                  <span>Rejoin Game</span>
+                </button>
+              )}
               <button
-                data-testid="rejoin-game-button"
-                onClick={onRejoinGame}
-                className="w-full bg-sapphire-600 text-white py-4 rounded-lg font-semibold hover:bg-sapphire-700 transition-colors flex items-center justify-center gap-2 ring-4 ring-sapphire-300 animate-pulse border-2 border-sapphire-700"
+                data-testid="create-game-button"
+                onClick={() => setMode('create')}
+                className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105"
               >
-                <span>🔄</span>
-                <span>Rejoin Previous Game</span>
+                🎮 Create Game
               </button>
-            )}
-            <button
-              data-testid="create-game-button"
-              onClick={() => setMode('create')}
-              className="w-full bg-umber-600 text-parchment-50 py-4 rounded-lg font-semibold hover:bg-umber-700 transition-colors border-2 border-umber-700"
-            >
-              Create Game
-            </button>
-            <button
-              data-testid="join-game-button"
-              onClick={() => setMode('join')}
-              className="w-full bg-umber-700 text-parchment-50 py-4 rounded-lg font-semibold hover:bg-umber-800 transition-colors border-2 border-umber-800"
-            >
-              Join Game
-            </button>
-            <button
-              data-testid="quick-play-button"
-              onClick={onQuickPlay}
-              className="w-full bg-parchment-600 text-umber-900 py-4 rounded-lg font-semibold hover:bg-parchment-700 transition-colors flex items-center justify-center gap-2 border-2 border-parchment-700"
-            >
-              <span>⚡</span>
-              <span>Quick Play (1 Player + 3 Bots)</span>
-            </button>
-            <p className="text-center text-sm text-umber-700 mt-2">
-              Quick Play creates a game with AI bots for easy testing
+              <button
+                data-testid="join-game-button"
+                onClick={() => setMode('join')}
+                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105"
+              >
+                🚪 Join Game
+              </button>
+              <button
+                data-testid="quick-play-button"
+                onClick={onQuickPlay}
+                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 flex items-center justify-center gap-2 border-2 border-orange-700 shadow-lg transform hover:scale-105"
+              >
+                <span>⚡</span>
+                <span>Quick Play</span>
+              </button>
+              <button
+                onClick={() => setShowRules(true)}
+                className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 transition-all duration-300 border-2 border-amber-800 shadow-lg transform hover:scale-105"
+              >
+                📖 Rules
+              </button>
+            </div>
+
+            {/* Footer */}
+            <p className="text-center text-xs text-umber-600 mt-6 opacity-75">
+              4 Players • 2 Teams • First to 41 Points Wins
             </p>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
