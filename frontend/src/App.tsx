@@ -759,8 +759,15 @@ function App() {
                       <span className="font-medium text-sm">{player.name}</span>
                       {isHighestBidder && <span className="text-xs text-yellow-600">⭐ Bidder</span>}
                     </div>
-                    <div className="text-sm font-semibold text-gray-700">
-                      {player.tricksWon} tricks ({player.pointsWon} pts)
+                    <div className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                      <span>{player.tricksWon} tricks ({player.pointsWon} pts)</span>
+                      {player.pointsWon > 0 && (
+                        <span className={`px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs ${
+                          player.pointsWon >= 0 ? 'bg-green-500 border-green-300' : 'bg-red-500 border-red-300'
+                        }`}>
+                          +{player.pointsWon}
+                        </span>
+                      )}
                     </div>
                   </div>
                 );

@@ -192,7 +192,8 @@ function handleBettingTimeout(gameId: string, playerId: string) {
       return;
     }
 
-    game.highestBet = getHighestBet(game.currentBets);
+    const dealerPlayerId = game.players[game.dealerIndex].id;
+    game.highestBet = getHighestBet(game.currentBets, dealerPlayerId);
     game.phase = 'playing';
     const highestBidderIndex = game.players.findIndex(
       (p) => p.id === game.highestBet?.playerId
@@ -582,7 +583,8 @@ io.on('connection', (socket) => {
 
       // Check if all 4 players have bet (including skips)
       if (game.currentBets.length === 4) {
-        game.highestBet = getHighestBet(game.currentBets);
+        const dealerPlayerId = game.players[game.dealerIndex].id;
+        game.highestBet = getHighestBet(game.currentBets, dealerPlayerId);
         game.phase = 'playing';
         const highestBidderIndex = game.players.findIndex(
           (p) => p.id === game.highestBet?.playerId
@@ -604,7 +606,8 @@ io.on('connection', (socket) => {
 
     // Validate betting rules for non-skip bets
     if (game.currentBets.length > 0) {
-      const currentHighest = getHighestBet(game.currentBets);
+      const dealerPlayerId = game.players[game.dealerIndex].id;
+      const currentHighest = getHighestBet(game.currentBets, dealerPlayerId);
       if (currentHighest) {
         const newBet: Bet = { playerId: socket.id, amount, withoutTrump };
 
@@ -640,7 +643,8 @@ io.on('connection', (socket) => {
     game.currentBets.push(bet);
 
     if (game.currentBets.length === 4) {
-      game.highestBet = getHighestBet(game.currentBets);
+      const dealerPlayerId = game.players[game.dealerIndex].id;
+      game.highestBet = getHighestBet(game.currentBets, dealerPlayerId);
       game.phase = 'playing';
       const highestBidderIndex = game.players.findIndex(
         (p) => p.id === game.highestBet?.playerId

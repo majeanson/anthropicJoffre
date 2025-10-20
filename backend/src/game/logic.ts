@@ -80,7 +80,7 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
   return false;
 };
 
-export const getHighestBet = (bets: Bet[]): Bet | null => {
+export const getHighestBet = (bets: Bet[], dealerPlayerId?: string): Bet | null => {
   if (bets.length === 0) return null;
 
   // Filter out skipped bets
@@ -89,6 +89,17 @@ export const getHighestBet = (bets: Bet[]): Bet | null => {
 
   return validBets.reduce((highest, current) => {
     if (isBetHigher(current, highest)) return current;
+
+    // If bets are exactly equal (same amount and withoutTrump status), dealer wins
+    if (
+      current.amount === highest.amount &&
+      current.withoutTrump === highest.withoutTrump &&
+      dealerPlayerId &&
+      current.playerId === dealerPlayerId
+    ) {
+      return current;
+    }
+
     return highest;
   });
 };
