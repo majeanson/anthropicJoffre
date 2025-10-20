@@ -419,7 +419,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Current Turn Indicator with Timeout */}
-              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap border-2 min-h-[2.5rem] md:min-h-[3rem] ${
+              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-1 md:gap-2 border-2 min-h-[2.5rem] md:min-h-[3rem] ${
                 gameState.currentTrick.length >= 4
                   ? 'bg-gradient-to-r from-umber-500 to-umber-600 text-parchment-50 border-umber-700'
                   : currentTurnTeam === 1
@@ -427,10 +427,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                     : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-700'
               }`}>
                 {gameState.currentTrick.length >= 4 ? (
-                  <span>Waiting for trick to end...</span>
+                  <span className="whitespace-nowrap">Waiting for trick to end...</span>
                 ) : (
                   <>
-                    <span>Waiting for: {currentTurnPlayer?.name}</span>
+                    <span className="whitespace-nowrap">Waiting for: {currentTurnPlayer?.name}</span>
                     <TimeoutIndicator
                       duration={60000}
                       isActive={gameState.currentTrick.length < 4}
