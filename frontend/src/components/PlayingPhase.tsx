@@ -23,6 +23,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
   const [lastTrickLength, setLastTrickLength] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [previousScores, setPreviousScores] = useState<{team1: number, team2: number}>({team1: 0, team2: 0});
+  const [scoreAnimation, setScoreAnimation] = useState<{team1: boolean, team2: boolean}>({team1: false, team2: false});
+  const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
 
   const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
@@ -109,6 +112,32 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       sounds.yourTurn();
     }
   }, [isCurrentTurn, gameState.currentPlayerIndex]);
+
+  // Score change animation
+  useEffect(() => {
+    const team1Delta = gameState.teamScores.team1 - previousScores.team1;
+    const team2Delta = gameState.teamScores.team2 - previousScores.team2;
+
+    if (team1Delta !== 0) {
+      setFloatingPoints(prev => ({ ...prev, team1: team1Delta }));
+      setScoreAnimation(prev => ({ ...prev, team1: true }));
+      setTimeout(() => {
+        setScoreAnimation(prev => ({ ...prev, team1: false }));
+        setTimeout(() => setFloatingPoints(prev => ({ ...prev, team1: null })), 2000);
+      }, 500);
+    }
+
+    if (team2Delta !== 0) {
+      setFloatingPoints(prev => ({ ...prev, team2: team2Delta }));
+      setScoreAnimation(prev => ({ ...prev, team2: true }));
+      setTimeout(() => {
+        setScoreAnimation(prev => ({ ...prev, team2: false }));
+        setTimeout(() => setFloatingPoints(prev => ({ ...prev, team2: null })), 2000);
+      }, 500);
+    }
+
+    setPreviousScores({ team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 });
+  }, [gameState.teamScores]);
 
   if (!currentPlayer) return null;
 
@@ -258,10 +287,19 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         <div className="bg-umber-900/40 md:bg-parchment-50/95 backdrop-blur-md rounded-2xl p-2 md:p-6 shadow-2xl border-2 border-parchment-400">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
-            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200">
+            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200 relative overflow-visible">
               <h3 className="text-[10px] md:text-xs font-semibold text-orange-600/70 uppercase tracking-wider mb-1">Team 1</h3>
-              <p className="text-3xl md:text-5xl font-black text-orange-600 leading-none">{gameState.teamScores.team1}</p>
+              <p className={`text-3xl md:text-5xl font-black text-orange-600 leading-none ${scoreAnimation.team1 ? 'animate-score-pop' : ''}`}>
+                {gameState.teamScores.team1}
+              </p>
               <p className="text-xs md:text-sm font-bold text-orange-500 mt-1">{team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts</p>
+              {floatingPoints.team1 !== null && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 animate-points-float-up">
+                  <span className={`text-lg md:text-2xl font-black ${floatingPoints.team1 >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {floatingPoints.team1 >= 0 ? '+' : ''}{floatingPoints.team1}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Center Info */}
@@ -320,6 +358,14 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 )}
               </div>
 
+              {/* Current Bet & Trump */}
+              {gameState.highestBet && (
+                <div className="bg-yellow-50/90 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-yellow-400 shadow-md">
+                  <p className="text-xs md:text-base font-black text-yellow-800">
+                    🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : 'TRUMP'}
+                  </p>
+                </div>
+              )}
               {/* Trump */}
               {gameState.trump && (
                 <div className="bg-parchment-50/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400">
@@ -331,10 +377,19 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </div>
 
             {/* Team 2 */}
-            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-4 text-right border border-purple-200">
+            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-4 text-right border border-purple-200 relative overflow-visible">
               <h3 className="text-[10px] md:text-xs font-semibold text-purple-600/70 uppercase tracking-wider mb-1">Team 2</h3>
-              <p className="text-3xl md:text-5xl font-black text-purple-600 leading-none">{gameState.teamScores.team2}</p>
+              <p className={`text-3xl md:text-5xl font-black text-purple-600 leading-none ${scoreAnimation.team2 ? 'animate-score-pop' : ''}`}>
+                {gameState.teamScores.team2}
+              </p>
               <p className="text-xs md:text-sm font-bold text-purple-500 mt-1">{team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts</p>
+              {floatingPoints.team2 !== null && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 animate-points-float-up">
+                  <span className={`text-lg md:text-2xl font-black ${floatingPoints.team2 >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {floatingPoints.team2 >= 0 ? '+' : ''}{floatingPoints.team2}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -498,8 +553,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       </div>
 
 
-      {/* Player Hand */}
-      <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 mt-auto">
+      {/* Player Hand - Sticky at bottom on mobile */}
+      <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 mt-auto sticky bottom-0 z-10">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                   <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 shadow-xl">
