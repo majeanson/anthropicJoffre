@@ -23,6 +23,7 @@ const httpServer = createServer(app);
 // Configure CORS for Socket.io
 const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, ''); // Remove trailing slash
 const allowedOrigins: string[] = [
+  'https://jaffre.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
   clientUrl || '',
