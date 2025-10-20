@@ -132,8 +132,29 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         </div>
       </div>
 
+      {/* Player's Hand Display - 4x2 Grid */}
+      {playerHand.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-3 text-umber-800">Your Hand</h3>
+          <div className="grid grid-cols-4 gap-2 md:gap-3 max-w-md mx-auto">
+            {playerHand.map((card, index) => (
+              <div
+                key={`${card.color}-${card.value}-${index}`}
+                className="flex justify-center"
+              >
+                <CardComponent
+                  card={card}
+                  size="small"
+                  disabled={true}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!hasPlacedBet && (
-        <div className="space-y-3">
+        <div className="space-y-3 mt-6 pt-6 border-t-2 border-parchment-400">
           {isMyTurn ? (
             <>
               <div className="space-y-4">
@@ -243,29 +264,8 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
       )}
 
       {hasPlacedBet && (
-        <div className="text-center text-forest-700 font-medium">
+        <div className="text-center text-forest-700 font-medium mt-6 pt-6 border-t-2 border-parchment-400">
           Waiting for other players to bet...
-        </div>
-      )}
-
-      {/* Player's Hand Display - 4x2 Grid */}
-      {playerHand.length > 0 && (
-        <div className="mt-6 pt-6 border-t-2 border-parchment-400">
-          <h3 className="text-lg font-semibold mb-3 text-umber-800">Your Hand</h3>
-          <div className="grid grid-cols-4 gap-2 md:gap-3 max-w-md mx-auto">
-            {playerHand.map((card, index) => (
-              <div
-                key={`${card.color}-${card.value}-${index}`}
-                className="flex justify-center"
-              >
-                <CardComponent
-                  card={card}
-                  size="small"
-                  disabled={true}
-                />
-              </div>
-            ))}
-          </div>
         </div>
       )}
     </div>

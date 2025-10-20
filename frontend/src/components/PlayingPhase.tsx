@@ -254,8 +254,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   return (
     <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
-      <div className="w-full mb-3 md:mb-6 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
-        <div className="bg-umber-900/40 md:bg-parchment-50/95 backdrop-blur-md rounded-2xl p-3 md:p-6 shadow-2xl border-2 border-parchment-400">
+      <div className="w-full mb-2 md:mb-6 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
+        <div className="bg-umber-900/40 md:bg-parchment-50/95 backdrop-blur-md rounded-2xl p-2 md:p-6 shadow-2xl border-2 border-parchment-400">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200">
@@ -341,8 +341,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       </div>
 
       {/* Circular Card Layout - Takes remaining space */}
-      <div className="mb-3 md:mb-8 relative px-2 md:px-6">
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-4 md:p-10 md:min-h-[500px] relative border-2 border-parchment-400 shadow-2xl">
+      <div className="mb-2 md:mb-8 relative px-2 md:px-6">
+        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-10 md:min-h-[500px] relative border-2 border-parchment-400 shadow-2xl">
           {/* Floating Action Buttons - Top Right Corner */}
           <div className="absolute top-4 right-4 z-50 flex flex-col gap-2">
             <button
@@ -512,7 +512,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </div>
                 </div>
               )}
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-3 md:p-6 shadow-2xl border-2 border-parchment-400">
+        <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-6 shadow-2xl border-2 border-parchment-400">
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
             <div className="text-center py-8">

@@ -649,7 +649,6 @@ function App() {
             <h3 className="text-center font-bold text-gray-700 mb-3">Round Summary</h3>
             <div className="space-y-2">
               {gameState.players.map((player) => {
-                const bet = gameState.currentBets.find(b => b.playerId === player.id);
                 const highestBet = gameState.highestBet;
                 const isHighestBidder = highestBet && highestBet.playerId === player.id;
 
