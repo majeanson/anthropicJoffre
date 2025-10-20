@@ -177,10 +177,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
             {/* Title */}
             <div className="text-center mb-10">
-              <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 font-serif tracking-wider animate-pulse" style={{ animationDuration: '2s' }}>
+              <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
                 Joffre
               </h1>
-              <p className="text-umber-600 text-sm mt-2 font-semibold">A Classic Trick-Taking Card Game</p>
             </div>
 
             {/* Buttons */}
@@ -200,35 +199,29 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 onClick={() => setMode('create')}
                 className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105"
               >
-                🎮 Create Game
+                Create Game
               </button>
               <button
                 data-testid="join-game-button"
                 onClick={() => setMode('join')}
                 className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105"
               >
-                🚪 Join Game
+                Join Game
               </button>
               <button
                 data-testid="quick-play-button"
                 onClick={onQuickPlay}
                 className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 flex items-center justify-center gap-2 border-2 border-orange-700 shadow-lg transform hover:scale-105"
               >
-                <span>⚡</span>
-                <span>Quick Play</span>
+                Quick Play (bots)
               </button>
               <button
                 onClick={() => setShowRules(true)}
                 className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 transition-all duration-300 border-2 border-amber-800 shadow-lg transform hover:scale-105"
               >
-                📖 Rules
+                Rules
               </button>
             </div>
-
-            {/* Footer */}
-            <p className="text-center text-xs text-umber-600 mt-6 opacity-75">
-              4 Players • 2 Teams • First to 41 Points Wins
-            </p>
           </div>
         </div>
       </>
@@ -237,9 +230,23 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
   if (mode === 'create') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-parchment-300 to-parchment-400 flex items-center justify-center">
-        <div className="bg-parchment-50 rounded-xl p-8 shadow-2xl max-w-md w-full border-2 border-parchment-400">
-          <h2 className="text-3xl font-bold mb-6 text-umber-900 font-serif">Create Game</h2>
+      <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Animated background cards */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
+          <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
+          <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
+          <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
+        </div>
+
+        <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 relative">
+          {/* Decorative corners */}
+          <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 rounded-tl-xl"></div>
+          <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 rounded-tr-xl"></div>
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
+
+          <h2 className="text-4xl font-bold mb-6 text-umber-900 font-serif text-center">Create Game</h2>
           <form onSubmit={handleCreate} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-umber-800 mb-2">
@@ -260,14 +267,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 data-testid="back-button"
                 type="button"
                 onClick={() => setMode('menu')}
-                className="flex-1 bg-parchment-400 text-umber-900 py-3 rounded-lg font-semibold hover:bg-parchment-500 transition-colors border-2 border-parchment-500"
+                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
               >
                 Back
               </button>
               <button
                 data-testid="submit-create-button"
                 type="submit"
-                className="flex-1 bg-umber-600 text-parchment-50 py-3 rounded-lg font-semibold hover:bg-umber-700 transition-colors border-2 border-umber-700"
+                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105"
               >
                 Create
               </button>
@@ -279,9 +286,23 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-parchment-300 to-parchment-400 flex items-center justify-center">
-      <div className="bg-parchment-50 rounded-xl p-8 shadow-2xl max-w-md w-full border-2 border-parchment-400">
-        <h2 className="text-3xl font-bold mb-6 text-umber-900 font-serif">Join Game</h2>
+    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Animated background cards */}
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
+        <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
+        <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
+        <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
+      </div>
+
+      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 relative">
+        {/* Decorative corners */}
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 rounded-tl-xl"></div>
+        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 rounded-tr-xl"></div>
+        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
+
+        <h2 className="text-4xl font-bold mb-6 text-umber-900 font-serif text-center">Join Game</h2>
         <form onSubmit={handleJoin} className="space-y-4">
           {/* Join Type Selection */}
           <div className="bg-parchment-100 rounded-lg p-4 border-2 border-parchment-400">
@@ -357,17 +378,17 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               data-testid="back-button"
               type="button"
               onClick={() => setMode('menu')}
-              className="flex-1 bg-parchment-400 text-umber-900 py-3 rounded-lg font-semibold hover:bg-parchment-500 transition-colors border-2 border-parchment-500"
+              className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
             >
               Back
             </button>
             <button
               data-testid="submit-join-button"
               type="submit"
-              className={`flex-1 text-parchment-50 py-3 rounded-lg font-semibold transition-colors border-2 ${
+              className={`flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
                 joinType === 'player'
-                  ? 'bg-umber-700 hover:bg-umber-800 border-umber-800'
-                  : 'bg-umber-600 hover:bg-umber-700 border-umber-700'
+                  ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-purple-800'
+                  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-blue-800'
               }`}
             >
               {joinType === 'player' ? 'Join as Player' : 'Join as Guest'}
