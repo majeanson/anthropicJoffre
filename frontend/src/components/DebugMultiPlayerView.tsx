@@ -74,6 +74,7 @@ export function DebugMultiPlayerView({
                   currentPlayerIndex={gameState.currentPlayerIndex}
                   dealerIndex={gameState.dealerIndex}
                   onPlaceBet={onPlaceBet}
+                  gameState={gameState}
                 />
               </div>
             </div>

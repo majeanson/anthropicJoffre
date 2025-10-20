@@ -169,12 +169,24 @@ All game phases implement validation feedback to guide players:
   - Gray text: "Waiting for [PlayerName]..."
 - **Visual**: Your turn indicated with green "(Your Turn)" text
 
+### Scoring Phase (Between Rounds)
+- **Round Summary Panel**: Team-based display with color-coded sections
+  - **Team 1** (orange background): Shows total team tricks and points
+  - **Team 2** (purple background): Shows total team tricks and points
+  - **+Points Badges**: Green badges appear next to team names (not individual players)
+  - **Individual Breakdown**: Each team section shows player-by-player stats
+  - **Bidder Indicator**: ⭐ star icon marks the player who won the bet
+- **Consistent Height**: Top panel waiting badge maintains fixed height regardless of content
+  - "Waiting for trick to end..." vs "Waiting for: [name] ⏱️ 60s" have same height
+  - Uses `min-h-[2.5rem] md:min-h-[3rem]` for consistent spacing
+
 ### General Principles
 1. **Proactive Feedback**: Show requirements BEFORE user tries invalid action
 2. **Clear Messaging**: Explain WHY action is blocked, not just THAT it's blocked
 3. **Visual Hierarchy**: Use color-coded messages (yellow=warning, blue=info, purple=special rule)
 4. **Disabled States**: Gray out unavailable options with visual indicators
 5. **Contextual Help**: Show relevant rules/constraints for current situation
+6. **Consistent Layout**: Fixed heights for dynamic content to prevent UI jumping
 
 ---
 
@@ -208,10 +220,30 @@ class BotPlayer {
   - Random bet amount between 7-12
   - 20% chance for "without trump" modifier
   - Dealer always bets if no one else has
-- **Card Playing**:
-  - Follows suit-following rules strictly
-  - Random selection among valid playable cards
-  - Respects trump and led suit requirements
+- **Card Playing** (Strategic AI):
+  1. **Always play the highest valid card**, unless it's trump winning on a non-trump color
+  2. **Always try to get the red 0** (5-point bonus card) by all means
+  3. **Always try to NEVER have the brown 0** (-2 point penalty card)
+  4. **If partner is winning**, play the lowest valid card to conserve high cards
+
+### Autoplay Feature
+**Access**: Toggle button in top panel during betting and playing phases
+- **Betting Phase**: Top-right button shows "🎮 Manual" or "🤖 Auto"
+- **Playing Phase**: Compact button in center top panel shows 🎮 or 🤖 (with pulse animation when active)
+
+**Purpose**: Allows human players to temporarily let the bot AI play for them
+
+**Implementation**: `frontend/src/App.tsx:557-594`
+- Uses the same `BotPlayer` AI strategy as bot players
+- Automatically makes bets and plays cards when it's the player's turn
+- Can be toggled on/off at any time during gameplay
+- Respects the same strategic rules (high cards, red 0 priority, brown 0 avoidance, partner support)
+
+**Use Cases**:
+- Testing full game flows without manual input
+- Stepping away briefly while keeping the game moving
+- Learning optimal bot strategy by observation
+- Quick playtesting of game mechanics
 
 ### Quick Play Feature
 **Location**: Lobby screen (purple button with ⚡ icon)
@@ -431,7 +463,9 @@ useEffect(() => {
 ### Leaderboard Feature
 **Location**: `frontend/src/components/Leaderboard.tsx`
 
-**Access**: Click "🏆 Leaderboard" button during gameplay (top-right of playing phase)
+**Access**: Click "🏆 Leaderboard" button during gameplay
+- **Betting Phase**: Top-right corner yellow button
+- **Playing Phase**: Bottom action bar yellow button
 
 **Features**:
 - **Current Standings**: Live team scores with leading team indicator (crown icon)

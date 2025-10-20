@@ -12,9 +12,11 @@ interface PlayingPhaseProps {
   isSpectator?: boolean;
   currentTrickWinnerId?: string | null;
   onLeaveGame?: () => void;
+  autoplayEnabled?: boolean;
+  onAutoplayToggle?: () => void;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame }: PlayingPhaseProps) {
+export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle }: PlayingPhaseProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -386,6 +388,20 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 >
                   {soundEnabled ? '🔊' : '🔇'}
                 </button>
+                {/* Autoplay Toggle Button - Compact */}
+                {!isSpectator && onAutoplayToggle && (
+                  <button
+                    onClick={onAutoplayToggle}
+                    className={`${
+                      autoplayEnabled
+                        ? 'bg-green-500 hover:bg-green-600 animate-pulse'
+                        : 'bg-purple-500 hover:bg-purple-600'
+                    } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400`}
+                    title={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}
+                  >
+                    {autoplayEnabled ? '🤖' : '🎮'}
+                  </button>
+                )}
                 {/* Leave Game Button - Compact */}
                 {onLeaveGame && (
                   <button
@@ -403,7 +419,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Current Turn Indicator with Timeout */}
-              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap border-2 ${
+              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap border-2 min-h-[2.5rem] md:min-h-[3rem] ${
                 gameState.currentTrick.length >= 4
                   ? 'bg-gradient-to-r from-umber-500 to-umber-600 text-parchment-50 border-umber-700'
                   : currentTurnTeam === 1

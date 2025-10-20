@@ -26,7 +26,9 @@ function App() {
   const [currentTrickWinnerId, setCurrentTrickWinnerId] = useState<string | null>(null);
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
+  const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     preloadCardImages();
@@ -552,6 +554,45 @@ function App() {
     botTimeoutsRef.current.set(botId, timeout);
   };
 
+  // Autoplay effect: when enabled and it's the player's turn, act as a bot
+  useEffect(() => {
+    if (!autoplayEnabled || !gameState || !socket) return;
+    if (gameState.phase !== 'betting' && gameState.phase !== 'playing') return;
+
+    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+    const myPlayerId = socket.id || '';
+
+    // Only act if it's my turn
+    if (!currentPlayer || currentPlayer.id !== myPlayerId) return;
+
+    // Clear any existing autoplay timeout
+    if (autoplayTimeoutRef.current) {
+      clearTimeout(autoplayTimeoutRef.current);
+      autoplayTimeoutRef.current = null;
+    }
+
+    // Schedule autoplay action with bot delay
+    autoplayTimeoutRef.current = setTimeout(() => {
+      if (gameState.phase === 'betting') {
+        const bet = BotPlayer.makeBet(gameState, myPlayerId);
+        handlePlaceBet(bet.amount, bet.withoutTrump, bet.skipped);
+      } else if (gameState.phase === 'playing') {
+        const card = BotPlayer.playCard(gameState, myPlayerId);
+        if (card) {
+          handlePlayCard(card);
+        }
+      }
+      autoplayTimeoutRef.current = null;
+    }, BotPlayer.getActionDelay());
+
+    return () => {
+      if (autoplayTimeoutRef.current) {
+        clearTimeout(autoplayTimeoutRef.current);
+        autoplayTimeoutRef.current = null;
+      }
+    };
+  }, [autoplayEnabled, gameState, socket]);
+
   if (error) {
     return (
       <div className="min-h-screen bg-purple-50 flex items-center justify-center">
@@ -724,6 +765,9 @@ function App() {
             dealerIndex={gameState.dealerIndex}
             onPlaceBet={handlePlaceBet}
             onLeaveGame={handleLeaveGame}
+            gameState={gameState}
+            autoplayEnabled={autoplayEnabled}
+            onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
           />
         </div>
       </>
@@ -748,6 +792,8 @@ function App() {
           isSpectator={isSpectator}
           currentTrickWinnerId={currentTrickWinnerId}
           onLeaveGame={handleLeaveGame}
+          autoplayEnabled={autoplayEnabled}
+          onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
         />
       </>
     );
@@ -782,34 +828,83 @@ function App() {
             </div>
           </div>
 
-          {/* Round Summary - Simplified */}
+          {/* Round Summary - Team-based */}
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 mb-4 border border-gray-200">
             <h3 className="text-center font-bold text-gray-700 mb-3">Round Summary</h3>
-            <div className="space-y-2">
-              {gameState.players.map((player) => {
-                const highestBet = gameState.highestBet;
-                const isHighestBidder = highestBet && highestBet.playerId === player.id;
+            <div className="space-y-4">
+              {/* Team 1 */}
+              {(() => {
+                const team1Players = gameState.players.filter(p => p.teamId === 1);
+                const team1Points = team1Players.reduce((sum, p) => sum + p.pointsWon, 0);
+                const team1Tricks = team1Players.reduce((sum, p) => sum + p.tricksWon, 0);
 
                 return (
-                  <div key={player.id} className={`flex items-center justify-between p-2 rounded ${isHighestBidder ? 'bg-white border border-yellow-400' : 'bg-white/50'}`}>
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
-                      <span className="font-medium text-sm">{player.name}</span>
-                      {isHighestBidder && <span className="text-xs text-yellow-600">⭐ Bidder</span>}
+                  <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-bold text-orange-800 flex items-center gap-2">
+                        Team 1
+                        {team1Points > 0 && (
+                          <span className="px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs bg-green-500 border-green-300">
+                            +{team1Points}
+                          </span>
+                        )}
+                      </h4>
+                      <span className="text-sm font-semibold text-orange-700">{team1Tricks} tricks ({team1Points} pts)</span>
                     </div>
-                    <div className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                      <span>{player.tricksWon} tricks ({player.pointsWon} pts)</span>
-                      {player.pointsWon > 0 && (
-                        <span className={`px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs ${
-                          player.pointsWon >= 0 ? 'bg-green-500 border-green-300' : 'bg-red-500 border-red-300'
-                        }`}>
-                          +{player.pointsWon}
-                        </span>
-                      )}
+                    <div className="space-y-1">
+                      {team1Players.map((player) => {
+                        const isHighestBidder = gameState.highestBet && gameState.highestBet.playerId === player.id;
+                        return (
+                          <div key={player.id} className="flex items-center justify-between text-sm">
+                            <span className="flex items-center gap-1">
+                              {player.name}
+                              {isHighestBidder && <span className="text-xs text-yellow-600">⭐</span>}
+                            </span>
+                            <span className="text-gray-600">{player.tricksWon} tricks ({player.pointsWon} pts)</span>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 );
-              })}
+              })()}
+
+              {/* Team 2 */}
+              {(() => {
+                const team2Players = gameState.players.filter(p => p.teamId === 2);
+                const team2Points = team2Players.reduce((sum, p) => sum + p.pointsWon, 0);
+                const team2Tricks = team2Players.reduce((sum, p) => sum + p.tricksWon, 0);
+
+                return (
+                  <div className="bg-purple-50 border border-purple-300 rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-bold text-purple-800 flex items-center gap-2">
+                        Team 2
+                        {team2Points > 0 && (
+                          <span className="px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs bg-green-500 border-green-300">
+                            +{team2Points}
+                          </span>
+                        )}
+                      </h4>
+                      <span className="text-sm font-semibold text-purple-700">{team2Tricks} tricks ({team2Points} pts)</span>
+                    </div>
+                    <div className="space-y-1">
+                      {team2Players.map((player) => {
+                        const isHighestBidder = gameState.highestBet && gameState.highestBet.playerId === player.id;
+                        return (
+                          <div key={player.id} className="flex items-center justify-between text-sm">
+                            <span className="flex items-center gap-1">
+                              {player.name}
+                              {isHighestBidder && <span className="text-xs text-yellow-600">⭐</span>}
+                            </span>
+                            <span className="text-gray-600">{player.tricksWon} tricks ({player.pointsWon} pts)</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

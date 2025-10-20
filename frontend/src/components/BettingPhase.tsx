@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Bet, Player } from '../types/game';
+import { Bet, Player, GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
 import { TimeoutIndicator } from './TimeoutIndicator';
+import { Leaderboard } from './Leaderboard';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -11,9 +12,12 @@ interface BettingPhaseProps {
   dealerIndex: number;
   onPlaceBet: (amount: number, withoutTrump: boolean, skipped?: boolean) => void;
   onLeaveGame?: () => void;
+  gameState: GameState;
+  autoplayEnabled?: boolean;
+  onAutoplayToggle?: () => void;
 }
 
-export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame }: BettingPhaseProps) {
+export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle }: BettingPhaseProps) {
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
   const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
   const isDealer = currentPlayerIndex === dealerIndex;
@@ -25,6 +29,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   // State for bet selection
   const [selectedAmount, setSelectedAmount] = useState<number>(7);
   const [withoutTrump, setWithoutTrump] = useState<boolean>(false);
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
 
   // Get highest valid bet (excluding skipped bets) - memoized
   const highestBet = useMemo((): Bet | null => {
@@ -70,17 +75,43 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   };
 
   return (
-    <div className="bg-parchment-50 rounded-xl p-6 shadow-lg max-w-2xl mx-auto relative border-2 border-parchment-400">
-      {onLeaveGame && (
-        <button
-          onClick={onLeaveGame}
-          className="absolute top-4 right-4 bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2 border-2 border-crimson-700"
-          title="Leave Game"
-        >
-          🚪 Leave
-        </button>
-      )}
-      <h2 className="text-2xl font-bold mb-4 text-umber-900 font-serif">Betting Phase</h2>
+    <>
+      <div className="bg-parchment-50 rounded-xl p-6 shadow-lg max-w-2xl mx-auto relative border-2 border-parchment-400">
+        {/* Top right buttons */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          <button
+            onClick={() => setShowLeaderboard(true)}
+            className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-yellow-600 shadow-md"
+            title="View Leaderboard"
+          >
+            🏆 Leaderboard
+          </button>
+          {onAutoplayToggle && (
+            <button
+              onClick={onAutoplayToggle}
+              className={`${
+                autoplayEnabled
+                  ? 'bg-green-500 hover:bg-green-600 animate-pulse'
+                  : 'bg-purple-500 hover:bg-purple-600'
+              } text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 shadow-md ${
+                autoplayEnabled ? 'border-green-600' : 'border-purple-600'
+              }`}
+              title={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}
+            >
+              {autoplayEnabled ? '🤖 Auto' : '🎮 Manual'}
+            </button>
+          )}
+          {onLeaveGame && (
+            <button
+              onClick={onLeaveGame}
+              className="bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2 border-2 border-crimson-700"
+              title="Leave Game"
+            >
+              🚪 Leave
+            </button>
+          )}
+        </div>
+        <h2 className="text-2xl font-bold mb-4 text-umber-900 font-serif">Betting Phase</h2>
 
       {/* Current Turn Indicator with Timeout */}
       {!hasPlacedBet && (
@@ -268,5 +299,12 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         </div>
       )}
     </div>
+
+      <Leaderboard
+        gameState={gameState}
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
+    </>
   );
 }
