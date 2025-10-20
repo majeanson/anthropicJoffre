@@ -78,7 +78,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
     <>
       <div className="bg-parchment-50 rounded-xl p-6 shadow-lg max-w-2xl mx-auto relative border-2 border-parchment-400">
         {/* Top right buttons */}
-        <div className="absolute top-4 right-4 flex gap-2">
+        <div className="absolute top-4 right-4 flex gap-2 flex-wrap justify-end max-w-[calc(100%-8rem)]">
           <button
             onClick={() => setShowLeaderboard(true)}
             className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-yellow-600 shadow-md"
@@ -111,7 +111,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             </button>
           )}
         </div>
-        <h2 className="text-2xl font-bold mb-4 text-umber-900 font-serif">Betting Phase</h2>
+        <h2 className="text-2xl font-bold mb-4 text-umber-900 font-serif pt-2">Betting Phase</h2>
 
       {/* Current Turn Indicator with Timeout */}
       {!hasPlacedBet && (
