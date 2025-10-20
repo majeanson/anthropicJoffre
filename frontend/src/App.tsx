@@ -552,7 +552,7 @@ function App() {
   }
 
   // Debug controls
-  const DEBUG_ENABLED = true; // Set to true to show debug controls
+  const DEBUG_ENABLED = false; // Set to true to show debug controls
 
   const DebugControls = () => (
     <div className="fixed top-4 right-4 z-50">

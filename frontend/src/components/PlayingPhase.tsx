@@ -331,7 +331,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
       <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-4 pt-2 md:pt-4">
-        <div className="bg-umber-900/40 md:bg-parchment-50/95 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
+        <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200 relative overflow-visible">
@@ -658,48 +658,51 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </div>
                 </div>
               )}
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
-          {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
-          {isSpectator ? (
-            <div className="text-center py-8">
-              <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 shadow-lg">
-                <span className="text-umber-800 text-base font-semibold">🔒 Hands Hidden</span>
-                <p className="text-umber-600 text-sm mt-1.5">Spectator Mode</p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
-                <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
-                  {currentPlayer.hand.map((card, index) => {
-                    const playable = isCardPlayable(card);
-                    const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
-                    const dealDelay = index * 80; // Stagger animation for each card
-
-                    return (
-                      <div
-                        key={`${card.color}-${card.value}-${index}`}
-                        className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
-                          playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
-                        } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
-                        style={{
-                          transition: `opacity 200ms ease-out ${dealDelay}ms, transform 200ms ease-out ${dealDelay}ms`
-                        }}
-                      >
-                        <CardComponent
-                          card={card}
-                          size="small"
-                          onClick={() => handleCardClick(card)}
-                          disabled={!isCurrentTurn || !playable}
-                        />
-                      </div>
-                    );
-                  })}
+        {/* Only show player hand section if spectator OR if player has cards */}
+        {(isSpectator || (currentPlayer && currentPlayer.hand.length > 0)) && (
+          <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
+            {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
+            {isSpectator ? (
+              <div className="text-center py-8">
+                <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 shadow-lg">
+                  <span className="text-umber-800 text-base font-semibold">🔒 Hands Hidden</span>
+                  <p className="text-umber-600 text-sm mt-1.5">Spectator Mode</p>
                 </div>
               </div>
-            </>
-          )}
-        </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
+                  <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
+                    {currentPlayer.hand.map((card, index) => {
+                      const playable = isCardPlayable(card);
+                      const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
+                      const dealDelay = index * 80; // Stagger animation for each card
+
+                      return (
+                        <div
+                          key={`${card.color}-${card.value}-${index}`}
+                          className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
+                            playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
+                          } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
+                          style={{
+                            transition: `opacity 200ms ease-out ${dealDelay}ms, transform 200ms ease-out ${dealDelay}ms`
+                          }}
+                        >
+                          <CardComponent
+                            card={card}
+                            size="small"
+                            onClick={() => handleCardClick(card)}
+                            disabled={!isCurrentTurn || !playable}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Leaderboard Modal */}
