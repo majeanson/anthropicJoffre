@@ -389,6 +389,41 @@ function App() {
     });
   };
 
+  // Add a single bot to existing game
+  const handleAddBot = () => {
+    if (!socket || !gameId) return;
+
+    // Count existing bots
+    const existingBots = gameState?.players.filter(p => p.name.startsWith('Bot ')).length || 0;
+    const botName = `Bot ${existingBots + 1}`;
+
+    const botSocket = io(SOCKET_URL);
+
+    botSocket.on('connect', () => {
+      botSocket.emit('join_game', { gameId, playerName: botName, isBot: true });
+    });
+
+    botSocket.on('player_joined', ({ gameState: state }: { gameState: GameState }) => {
+      handleBotAction(botSocket, state, botSocket.id || '');
+    });
+
+    botSocket.on('game_updated', (state: GameState) => {
+      handleBotAction(botSocket, state, botSocket.id || '');
+    });
+
+    botSocket.on('round_started', (state: GameState) => {
+      handleBotAction(botSocket, state, botSocket.id || '');
+    });
+
+    botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) => {
+      handleBotAction(botSocket, newState, botSocket.id || '');
+    });
+
+    botSocket.on('round_ended', (state: GameState) => {
+      handleBotAction(botSocket, state, botSocket.id || '');
+    });
+  };
+
   // Bot player functionality
   const handleQuickPlay = () => {
     if (!socket) return;
@@ -659,6 +694,7 @@ function App() {
           onSwapPosition={handleSwapPosition}
           onStartGame={handleStartGame}
           onLeaveGame={handleLeaveGame}
+          onAddBot={handleAddBot}
         />
       </>
     );

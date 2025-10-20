@@ -70,7 +70,7 @@ export class BotPlayer {
   }
 
   /**
-   * Select a card to play
+   * Select a card to play using smart strategy
    */
   static playCard(gameState: GameState, playerId: string): Card | null {
     const player = gameState.players.find(p => p.id === playerId);
@@ -81,10 +81,75 @@ export class BotPlayer {
 
     if (playableCards.length === 0) return null;
 
-    // Simple strategy: random playable card
-    // TODO: Could add more sophisticated AI here
-    const randomIndex = Math.floor(Math.random() * playableCards.length);
-    return playableCards[randomIndex];
+    // Get current trick info
+    const currentTrick = gameState.currentTrick;
+    const isFirstCard = currentTrick.length === 0;
+    const trump = gameState.trump;
+
+    // RULE 2 & 3: Prioritize getting red 0 and avoiding brown 0
+    const redZero = playableCards.find(c => c.color === 'red' && c.value === 0);
+    const brownZero = playableCards.find(c => c.color === 'brown' && c.value === 0);
+
+    // If we have brown 0 and can play it, do so to get rid of it
+    if (brownZero && currentTrick.length > 0) {
+      const ledSuit = currentTrick[0].card.color;
+      // Play brown 0 if it's the led suit or if we're out of led suit
+      if (brownZero.color === ledSuit || playableCards.every(c => c.color !== ledSuit)) {
+        return brownZero;
+      }
+    }
+
+    // RULE 4: If partner is winning and we're playing 3rd or 4th, play lowest card
+    if (currentTrick.length >= 2) {
+      const partner = this.getPartner(gameState, playerId);
+      const currentWinner = this.getCurrentTrickWinner(gameState);
+
+      if (partner && currentWinner === partner.id) {
+        // Partner is winning, play lowest card
+        const lowestCard = playableCards.reduce((lowest, card) =>
+          card.value < lowest.value ? card : lowest
+        );
+        return lowestCard;
+      }
+    }
+
+    // RULE 2: Try to win red 0 if it's in the trick
+    const redZeroInTrick = currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
+    if (redZeroInTrick && !isFirstCard) {
+      // Try to win the trick to get red 0
+      const winningCard = this.selectWinningCard(gameState, playableCards);
+      if (winningCard) return winningCard;
+    }
+
+    // RULE 1: Play highest valid card, unless it's trump winning on non-trump
+    if (!isFirstCard) {
+      const ledSuit = currentTrick[0].card.color;
+      const isTrumpLed = ledSuit === trump;
+
+      // If led suit is not trump, and we can win with a non-trump card
+      if (!isTrumpLed) {
+        const nonTrumpCards = playableCards.filter(c => c.color !== trump);
+        if (nonTrumpCards.length > 0) {
+          // Play highest non-trump card
+          const highestNonTrump = nonTrumpCards.reduce((highest, card) =>
+            card.value > highest.value ? card : highest
+          );
+          return highestNonTrump;
+        }
+      }
+
+      // Otherwise play highest card (including trump if needed)
+      const highestCard = playableCards.reduce((highest, card) =>
+        card.value > highest.value ? card : highest
+      );
+      return highestCard;
+    }
+
+    // First card: avoid leading with valuable cards unless necessary
+    // Prefer to lead with medium cards
+    const sortedCards = [...playableCards].sort((a, b) => a.value - b.value);
+    const midIndex = Math.floor(sortedCards.length / 2);
+    return sortedCards[midIndex];
   }
 
   /**
@@ -105,6 +170,98 @@ export class BotPlayer {
 
     // Otherwise, all cards are playable
     return hand;
+  }
+
+  /**
+   * Get the bot's partner player
+   */
+  private static getPartner(gameState: GameState, playerId: string): { id: string; teamId: number } | null {
+    const player = gameState.players.find(p => p.id === playerId);
+    if (!player) return null;
+
+    const partner = gameState.players.find(p => p.id !== playerId && p.teamId === player.teamId);
+    return partner || null;
+  }
+
+  /**
+   * Determine who is currently winning the trick
+   */
+  private static getCurrentTrickWinner(gameState: GameState): string | null {
+    const trick = gameState.currentTrick;
+    if (trick.length === 0) return null;
+
+    const trump = gameState.trump;
+    const ledSuit = trick[0].card.color;
+
+    let winner = trick[0];
+
+    for (let i = 1; i < trick.length; i++) {
+      const current = trick[i];
+
+      // Trump beats non-trump
+      if (current.card.color === trump && winner.card.color !== trump) {
+        winner = current;
+        continue;
+      }
+
+      // If winner is trump but current isn't, winner stays
+      if (winner.card.color === trump && current.card.color !== trump) {
+        continue;
+      }
+
+      // Both trump or both non-trump: higher value wins (within led suit)
+      if (current.card.color === winner.card.color) {
+        if (current.card.value > winner.card.value) {
+          winner = current;
+        }
+      } else if (current.card.color === ledSuit && winner.card.color !== ledSuit && winner.card.color !== trump) {
+        // Led suit beats off-suit (when neither is trump)
+        winner = current;
+      }
+    }
+
+    return winner.playerId;
+  }
+
+  /**
+   * Select a card that will win the current trick
+   */
+  private static selectWinningCard(gameState: GameState, playableCards: Card[]): Card | null {
+    const trick = gameState.currentTrick;
+    if (trick.length === 0) return null;
+
+    const trump = gameState.trump;
+    const ledSuit = trick[0].card.color;
+
+    // Find current highest card
+    let currentBest = trick[0].card;
+    for (const tc of trick) {
+      if (tc.card.color === trump && currentBest.color !== trump) {
+        currentBest = tc.card;
+      } else if (tc.card.color === currentBest.color && tc.card.value > currentBest.value) {
+        currentBest = tc.card;
+      } else if (tc.card.color === ledSuit && currentBest.color !== ledSuit && currentBest.color !== trump) {
+        currentBest = tc.card;
+      }
+    }
+
+    // Find a card that beats the current best
+    const trumpCards = playableCards.filter(c => c.color === trump);
+    const ledSuitCards = playableCards.filter(c => c.color === ledSuit);
+
+    // If current best is not trump, try trump first
+    if (currentBest.color !== trump && trumpCards.length > 0) {
+      return trumpCards.reduce((highest, card) => card.value > highest.value ? card : highest);
+    }
+
+    // Try to beat with led suit
+    const beatingCards = ledSuitCards.filter(c => c.value > currentBest.value);
+    if (beatingCards.length > 0) {
+      return beatingCards.reduce((highest, card) => card.value > highest.value ? card : highest);
+    }
+
+    // Can't beat, return null
+    return null;
   }
 
   /**

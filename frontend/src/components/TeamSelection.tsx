@@ -8,6 +8,7 @@ interface TeamSelectionProps {
   onSwapPosition: (targetPlayerId: string) => void;
   onStartGame: () => void;
   onLeaveGame?: () => void;
+  onAddBot?: () => void;
 }
 
 export function TeamSelection({
@@ -18,6 +19,7 @@ export function TeamSelection({
   onSwapPosition,
   onStartGame,
   onLeaveGame,
+  onAddBot,
 }: TeamSelectionProps) {
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const team1Players = players.filter(p => p.teamId === 1);
@@ -194,17 +196,28 @@ export function TeamSelection({
         </div>
 
         {/* Start Game Button */}
-        <div className="text-center">
-          {canStartGame() ? (
-            <button
-              data-testid="start-game-button"
-              onClick={onStartGame}
-              className="bg-forest-600 text-parchment-50 px-8 py-3 rounded-lg text-lg font-bold hover:bg-forest-700 shadow-lg transition-colors border-2 border-forest-700"
-            >
-              Start Game
-            </button>
-          ) : (
-            <div className="space-y-3">
+        <div className="text-center space-y-3">
+          <div className="flex gap-3 justify-center items-center">
+            {/* Add Bot Button - only show if less than 4 players and onAddBot is provided */}
+            {players.length < 4 && onAddBot && (
+              <button
+                onClick={onAddBot}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center gap-2"
+                title="Add a bot player"
+              >
+                🤖 Add Bot
+              </button>
+            )}
+
+            {canStartGame() ? (
+              <button
+                data-testid="start-game-button"
+                onClick={onStartGame}
+                className="bg-forest-600 text-parchment-50 px-8 py-3 rounded-lg text-lg font-bold hover:bg-forest-700 shadow-lg transition-colors border-2 border-forest-700"
+              >
+                Start Game
+              </button>
+            ) : (
               <button
                 data-testid="start-game-button-disabled"
                 disabled
@@ -212,10 +225,13 @@ export function TeamSelection({
               >
                 Start Game
               </button>
-              <p data-testid="start-game-message" className="text-umber-800 bg-parchment-200 border-2 border-umber-400 px-4 py-2 rounded-lg">
-                {getStartGameMessage()}
-              </p>
-            </div>
+            )}
+          </div>
+
+          {!canStartGame() && (
+            <p data-testid="start-game-message" className="text-umber-800 bg-parchment-200 border-2 border-umber-400 px-4 py-2 rounded-lg">
+              {getStartGameMessage()}
+            </p>
           )}
         </div>
 
