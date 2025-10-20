@@ -57,16 +57,18 @@ export function TeamSelection({
         <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 rounded-tr-xl"></div>
         <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
+
+        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif">Team Selection</h2>
+
         {onLeaveGame && (
           <button
             onClick={onLeaveGame}
-            className="absolute top-4 right-4 bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2 border-2 border-crimson-700"
+            className="absolute top-8 left-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm flex items-center gap-2 border-2 border-red-800 shadow-lg transform hover:scale-105"
             title="Leave Game"
           >
             🚪 Leave
           </button>
         )}
-        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif">Team Selection</h2>
 
         <div className="mb-6">
           <p className="text-sm text-umber-700 mb-2">Game ID:</p>
@@ -101,15 +103,15 @@ export function TeamSelection({
                     }`}
                   >
                     {playerAtPosition ? (
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-umber-900">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <span className="font-medium text-umber-900 text-center sm:text-left">
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
                         {!isCurrentPlayer && currentPlayer && (
                           <button
                             onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-orange-600 text-white px-2 py-1 rounded hover:bg-orange-700 border border-orange-700"
+                            className="text-xs bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0"
                           >
                             Swap
                           </button>
@@ -155,15 +157,15 @@ export function TeamSelection({
                     }`}
                   >
                     {playerAtPosition ? (
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-umber-900">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+                        <span className="font-medium text-umber-900 text-center sm:text-left">
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
                         {!isCurrentPlayer && currentPlayer && (
                           <button
                             onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700 border border-purple-700"
+                            className="text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0"
                           >
                             Swap
                           </button>

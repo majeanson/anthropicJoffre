@@ -784,6 +784,9 @@ function App() {
 
   if (gameState.phase === 'game_over') {
     const winningTeam = gameState.teamScores.team1 >= 41 ? 1 : 2;
+    const team1Players = gameState.players.filter(p => p.teamId === 1);
+    const team2Players = gameState.players.filter(p => p.teamId === 2);
+
     return (
       <>
         <DebugControls />
@@ -794,32 +797,96 @@ function App() {
           isOpen={debugPanelOpen}
           onClose={() => setDebugPanelOpen(false)}
         />
-        <div className="min-h-screen bg-gradient-to-br from-yellow-900 to-orange-900 flex items-center justify-center p-6">
-        <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full text-center">
-          <h2 className="text-4xl font-bold mb-6 text-gray-800">Game Over!</h2>
-          <div className={`text-6xl font-bold mb-6 ${winningTeam === 1 ? 'text-orange-600' : 'text-purple-600'}`}>
-            Team {winningTeam} Wins!
-          </div>
-          <div className="grid grid-cols-2 gap-6 mb-6">
-            <div className="text-center p-6 bg-orange-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
-              <p className="text-4xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
+        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-6">
+          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-8 shadow-2xl max-w-4xl w-full border-4 border-amber-700">
+            {/* Victory Banner */}
+            <div className="text-center mb-8">
+              <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 mb-4 animate-pulse">
+                🏆 Game Over! 🏆
+              </h2>
+              <div className={`text-6xl font-black mb-2 ${winningTeam === 1 ? 'text-orange-600' : 'text-purple-600'}`}>
+                Team {winningTeam} Wins!
+              </div>
+              <p className="text-umber-600 font-semibold">Round {gameState.roundNumber}</p>
             </div>
-            <div className="text-center p-6 bg-purple-50 rounded-lg">
-              <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
-              <p className="text-4xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
+
+            {/* Final Scores */}
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              <div className={`text-center p-6 rounded-xl border-4 ${winningTeam === 1 ? 'bg-orange-100 border-orange-400 ring-4 ring-yellow-400' : 'bg-orange-50 border-orange-200'}`}>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  {winningTeam === 1 && <span className="text-3xl">👑</span>}
+                  <h3 className="text-2xl font-bold text-orange-800">Team 1</h3>
+                </div>
+                <p className="text-6xl font-black text-orange-600">{gameState.teamScores.team1}</p>
+                <p className="text-sm text-orange-700 mt-2">Final Score</p>
+              </div>
+              <div className={`text-center p-6 rounded-xl border-4 ${winningTeam === 2 ? 'bg-purple-100 border-purple-400 ring-4 ring-yellow-400' : 'bg-purple-50 border-purple-200'}`}>
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  {winningTeam === 2 && <span className="text-3xl">👑</span>}
+                  <h3 className="text-2xl font-bold text-purple-800">Team 2</h3>
+                </div>
+                <p className="text-6xl font-black text-purple-600">{gameState.teamScores.team2}</p>
+                <p className="text-sm text-purple-700 mt-2">Final Score</p>
+              </div>
+            </div>
+
+            {/* Player Stats */}
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              {/* Team 1 Players */}
+              <div className="bg-orange-50 rounded-lg p-4 border-2 border-orange-200">
+                <h4 className="text-lg font-bold text-orange-800 mb-3 text-center">Team 1 Players</h4>
+                <div className="space-y-2">
+                  {team1Players.map(player => (
+                    <div key={player.id} className="bg-white rounded-lg p-3 border border-orange-200">
+                      <div className="font-semibold text-umber-900">{player.name}</div>
+                      <div className="text-sm text-umber-700">
+                        {player.tricksWon} tricks • {player.pointsWon} pts
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Team 2 Players */}
+              <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
+                <h4 className="text-lg font-bold text-purple-800 mb-3 text-center">Team 2 Players</h4>
+                <div className="space-y-2">
+                  {team2Players.map(player => (
+                    <div key={player.id} className="bg-white rounded-lg p-3 border border-purple-200">
+                      <div className="font-semibold text-umber-900">{player.name}</div>
+                      <div className="text-sm text-umber-700">
+                        {player.tricksWon} tricks • {player.pointsWon} pts
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => {
+                  // Reset game state to allow creating a new game with same players
+                  if (socket) {
+                    socket.emit('create_game', myPlayerId || 'Player');
+                  }
+                }}
+                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 flex items-center gap-2"
+              >
+                🔄 Rematch
+              </button>
+              <button
+                onClick={() => {
+                  setGameState(null);
+                  setGameId('');
+                }}
+                className="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-8 py-4 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
+              >
+                🏠 Back to Lobby
+              </button>
             </div>
           </div>
-          <button
-            onClick={() => {
-              setGameState(null);
-              setGameId('');
-            }}
-            className="bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
-          >
-            Back to Lobby
-          </button>
-        </div>
         </div>
       </>
     );

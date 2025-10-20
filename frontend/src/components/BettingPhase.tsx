@@ -210,26 +210,26 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex gap-3">
                   {canSkip() && (
                     <button
                       data-testid="skip-bet-button"
                       onClick={handleSkip}
-                      className="flex-1 py-3 px-4 rounded-lg font-semibold bg-parchment-300 text-umber-800 hover:bg-parchment-400 transition-colors text-sm border-2 border-parchment-400"
+                      className="flex-1 py-4 px-6 rounded-xl font-black text-base bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
                     >
-                      SKIP
+                      ⏭️ SKIP
                     </button>
                   )}
                   <button
                     onClick={handlePlaceBet}
                     disabled={!isCurrentBetValid()}
-                    className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors text-sm border-2 ${
+                    className={`flex-1 py-4 px-6 rounded-xl font-black text-base transition-all duration-300 border-2 shadow-lg transform ${
                       isCurrentBetValid()
-                        ? 'bg-forest-600 text-parchment-50 hover:bg-forest-700 border-forest-700'
-                        : 'bg-parchment-300 text-umber-500 cursor-not-allowed border-parchment-400'
+                        ? 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 border-green-800 hover:scale-105'
+                        : 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed border-gray-400 opacity-60'
                     }`}
                   >
-                    Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
+                    💰 Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
                   </button>
                 </div>
 
