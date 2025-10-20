@@ -35,7 +35,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           {/* Overview */}
           <section>
             <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
-              🎯 Overview
+              Overview
             </h3>
             <p className="text-lg leading-relaxed">
               J⋀ffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
@@ -46,7 +46,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           {/* Betting Phase */}
           <section className="bg-yellow-50 rounded-lg p-4 border-2 border-yellow-300">
             <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
-              💰 Betting Phase
+              Betting Phase
             </h3>
             <ul className="space-y-2 text-lg">
               <li>• Each round starts with betting (7-12 points)</li>
@@ -61,7 +61,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           {/* Playing Phase */}
           <section className="bg-blue-50 rounded-lg p-4 border-2 border-blue-300">
             <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
-              🃏 Playing Phase
+              Playing Phase
             </h3>
             <ul className="space-y-2 text-lg">
               <li>• Highest bidder leads the first trick</li>
@@ -75,7 +75,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           {/* Special Cards */}
           <section className="bg-green-50 rounded-lg p-4 border-2 border-green-300">
             <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
-              ⭐ Special Cards
+              Special Cards
             </h3>
             <ul className="space-y-2 text-lg">
               <li>• <strong className="text-red-600">Red 0:</strong> +5 bonus points (6 total for that trick)</li>
@@ -87,21 +87,20 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           {/* Scoring */}
           <section className="bg-purple-50 rounded-lg p-4 border-2 border-purple-300">
             <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
-              📊 Scoring
+              Scoring
             </h3>
             <ul className="space-y-2 text-lg">
               <li>• Offensive team wins if they meet their bet</li>
               <li>• They gain points equal to their bet</li>
               <li>• Defensive team gains points from tricks won</li>
               <li>• If offensive fails, they lose bet points</li>
-              <li>• "Without Trump" bets are worth 2x</li>
             </ul>
           </section>
 
           {/* Teams */}
           <section>
             <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
-              👥 Teams
+              Teams
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-orange-100 rounded-lg p-4 border-2 border-orange-400">

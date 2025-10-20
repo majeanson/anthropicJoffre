@@ -9,6 +9,7 @@ import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
 import { DebugPanel } from './components/DebugPanel';
 import { TestPanel } from './components/TestPanel';
 import { BotPlayer } from './utils/botPlayer';
+import { preloadCardImages } from './utils/imagePreloader';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -27,6 +28,9 @@ function App() {
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
+  useEffect(() => {
+    preloadCardImages();
+  }, [])
   // Helper function to check if there's a valid session
   const checkValidSession = (): boolean => {
     const sessionData = localStorage.getItem('gameSession');
