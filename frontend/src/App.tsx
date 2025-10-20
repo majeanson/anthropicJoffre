@@ -869,7 +869,9 @@ function App() {
                 onClick={() => {
                   // Reset game state to allow creating a new game with same players
                   if (socket) {
-                    socket.emit('create_game', myPlayerId || 'Player');
+                    const currentPlayer = gameState.players.find(p => p.id === socket.id);
+                    const playerName = currentPlayer?.name || 'Player';
+                    socket.emit('create_game', playerName);
                   }
                 }}
                 className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 flex items-center gap-2"
