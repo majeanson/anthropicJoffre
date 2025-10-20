@@ -38,7 +38,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
               🎯 Overview
             </h3>
             <p className="text-lg leading-relaxed">
-              Joffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
+              J⋀ffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
               The first team to reach 41 points wins the game!
             </p>
           </section>
@@ -178,7 +178,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             {/* Title */}
             <div className="text-center mb-10">
               <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
-                Joffre
+                J⋀ffre
               </h1>
             </div>
 
