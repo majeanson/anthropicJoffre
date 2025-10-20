@@ -47,7 +47,15 @@ function App() {
   };
 
   useEffect(() => {
-    const newSocket = io(SOCKET_URL);
+    const newSocket = io(SOCKET_URL, {
+      // Enable automatic reconnection with exponential backoff
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      // Connection timeout
+      timeout: 10000,
+    });
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
@@ -99,8 +107,31 @@ function App() {
       }
     });
 
-    newSocket.on('disconnect', () => {
-      console.log('Disconnected from server');
+    newSocket.on('disconnect', (reason) => {
+      console.log('Disconnected from server:', reason);
+      // Don't immediately clear state - allow for reconnection
+      if (reason === 'io server disconnect') {
+        // Server forcefully disconnected, clear session
+        localStorage.removeItem('gameSession');
+        setGameState(null);
+        setGameId('');
+      }
+    });
+
+    newSocket.on('reconnect_attempt', (attemptNumber) => {
+      console.log(`Reconnection attempt #${attemptNumber}`);
+      setReconnecting(true);
+    });
+
+    newSocket.on('reconnect', (attemptNumber) => {
+      console.log(`Reconnected after ${attemptNumber} attempts`);
+      setReconnecting(false);
+    });
+
+    newSocket.on('reconnect_failed', () => {
+      console.error('Reconnection failed');
+      setReconnecting(false);
+      setError('Unable to reconnect to server. Please refresh the page.');
     });
 
     newSocket.on('game_created', ({ gameId, gameState, session }: { gameId: string; gameState: GameState; session: PlayerSession }) => {

@@ -36,6 +36,16 @@ const io = new Server(httpServer, {
     methods: ['GET', 'POST'],
     credentials: true,
   },
+  // Enable connection state recovery for better stability
+  connectionStateRecovery: {
+    // Max disconnection duration (2 minutes = 120000ms)
+    maxDisconnectionDuration: 120000,
+    // Skip middleware on recovery
+    skipMiddlewares: true,
+  },
+  // Ping timeout and interval for faster disconnect detection
+  pingTimeout: 10000, // 10 seconds
+  pingInterval: 5000,  // 5 seconds
 });
 
 // Configure CORS for Express
@@ -53,6 +63,9 @@ const playerSessions = new Map<string, PlayerSession>();
 
 // Timeout storage (maps gameId-playerId to timeout ID)
 const activeTimeouts = new Map<string, NodeJS.Timeout>();
+
+// Disconnect timeout storage (maps socket.id to timeout ID)
+const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
 // Timeout configuration
 const BETTING_TIMEOUT = 60000; // 60 seconds
@@ -378,6 +391,14 @@ io.on('connection', (socket) => {
 
     game.players.push(player);
     socket.join(gameId);
+
+    // Cancel any pending disconnect timeout for this socket
+    const disconnectTimeout = disconnectTimeouts.get(socket.id);
+    if (disconnectTimeout) {
+      clearTimeout(disconnectTimeout);
+      disconnectTimeouts.delete(socket.id);
+      console.log(`Cancelled disconnect timeout for rejoining player ${socket.id}`);
+    }
 
     // Create session for reconnection
     const session = createPlayerSession(gameId, socket.id, playerName);
@@ -953,9 +974,12 @@ io.on('connection', (socket) => {
     });
 
     // Set timeout to remove player if they don't reconnect
-    setTimeout(() => {
+    const disconnectTimeout = setTimeout(() => {
       const game = games.get(playerGameId!);
-      if (!game) return;
+      if (!game) {
+        disconnectTimeouts.delete(socket.id);
+        return;
+      }
 
       const player = game.players.find((p) => p.id === socket.id);
       if (player) {
@@ -967,7 +991,11 @@ io.on('connection', (socket) => {
           console.log(`Player ${socket.id} removed from game ${playerGameId} (no reconnection)`);
         }
       }
+      disconnectTimeouts.delete(socket.id);
     }, 120000); // 2 minutes
+
+    // Store the timeout so it can be cancelled on reconnection
+    disconnectTimeouts.set(socket.id, disconnectTimeout);
   });
 });
 
