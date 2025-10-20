@@ -32,6 +32,15 @@ function App() {
 
   useEffect(() => {
     preloadCardImages();
+
+    // Clean up any old bot sessions from localStorage
+    // Bot sessions should not persist and can interfere with human player reconnection
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('botSession_')) {
+        console.log(`Removing old bot session: ${key}`);
+        localStorage.removeItem(key);
+      }
+    });
   }, [])
   // Helper function to check if there's a valid session
   const checkValidSession = (): boolean => {
@@ -341,38 +350,26 @@ function App() {
 
     if (botPlayers.length === 0) return;
 
-    console.log(`Found ${botPlayers.length} bot players, respawning sockets...`);
+    console.log(`Found ${botPlayers.length} bot players, spawning fresh bot sockets...`);
+
+    // Note: We don't try to reconnect bots with sessions because:
+    // 1. Bot sessions are ephemeral and shouldn't be saved
+    // 2. Fresh bot connections work fine and don't interfere with human player sessions
+    // 3. Bots will be marked as disconnected but can continue playing when respawned
 
     botPlayers.forEach(botPlayer => {
-      // Get the bot's session from localStorage
-      const botSessionKey = `botSession_${botPlayer.name}_${gameState.id}`;
-      const botSessionData = localStorage.getItem(botSessionKey);
-
-      if (!botSessionData) {
-        console.warn(`No session found for bot ${botPlayer.name}, cannot respawn`);
-        return;
-      }
-
-      const botSession: PlayerSession = JSON.parse(botSessionData);
-
       // Create new socket for the bot
-      const botSocket = io(SOCKET_URL, {
-        reconnection: true,
-        reconnectionAttempts: 10,
-        reconnectionDelay: 1000,
-        reconnectionDelayMax: 5000,
-        timeout: 10000,
-      });
+      const botSocket = io(SOCKET_URL);
+      const botName = botPlayer.name;
 
       botSocket.on('connect', () => {
-        console.log(`Bot ${botPlayer.name} socket connected, attempting reconnection...`);
-        // Reconnect the bot using its session token
-        botSocket.emit('reconnect_to_game', { token: botSession.token });
+        console.log(`Bot ${botName} socket connected, joining game...`);
+        // Join as a fresh bot connection (server will handle reconnection internally)
+        botSocket.emit('join_game', { gameId: gameState.id, playerName: botName, isBot: true });
       });
 
-      botSocket.on('reconnection_successful', ({ gameState: newState }: { gameState: GameState }) => {
-        console.log(`Bot ${botPlayer.name} reconnected successfully!`);
-        // Start handling actions with the new socket
+      botSocket.on('player_joined', ({ gameState: newState }: { gameState: GameState; session?: PlayerSession }) => {
+        console.log(`Bot ${botName} joined/reconnected successfully!`);
         handleBotAction(botSocket, newState, botSocket.id || '');
       });
 
@@ -447,13 +444,9 @@ function App() {
           });
 
           // Listen to all game state updates
-          botSocket.on('player_joined', ({ gameState, session }: { gameState: GameState; session?: PlayerSession }) => {
-            // Save bot's session to localStorage for reconnection
-            if (session && session.playerName === botName) {
-              const botSessionKey = `botSession_${botName}_${gameState.id}`;
-              localStorage.setItem(botSessionKey, JSON.stringify(session));
-              console.log(`Saved session for ${botName}`);
-            }
+          botSocket.on('player_joined', ({ gameState }: { gameState: GameState; session?: PlayerSession }) => {
+            // Don't save bot sessions to localStorage - they are ephemeral
+            // and should not interfere with human player reconnection
             handleBotAction(botSocket, gameState, botSocket.id || '');
           });
 
