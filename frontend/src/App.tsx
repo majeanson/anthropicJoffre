@@ -159,6 +159,9 @@ function App() {
       setGameId(gameState.id);
       setGameState(gameState);
 
+      // Respawn bot sockets if there are bot players
+      spawnBotsForGame(gameState);
+
       // Update session in localStorage
       localStorage.setItem('gameSession', JSON.stringify(session));
     });
@@ -328,6 +331,66 @@ function App() {
     }
   }, [gameState]);
 
+  // Helper function to spawn bot sockets for existing bot players
+  const spawnBotsForGame = (gameState: GameState) => {
+    const botPlayers = gameState.players.filter(p => p.isBot);
+
+    if (botPlayers.length === 0) return;
+
+    console.log(`Found ${botPlayers.length} bot players, respawning sockets...`);
+
+    botPlayers.forEach(botPlayer => {
+      // Get the bot's session from localStorage
+      const botSessionKey = `botSession_${botPlayer.name}_${gameState.id}`;
+      const botSessionData = localStorage.getItem(botSessionKey);
+
+      if (!botSessionData) {
+        console.warn(`No session found for bot ${botPlayer.name}, cannot respawn`);
+        return;
+      }
+
+      const botSession: PlayerSession = JSON.parse(botSessionData);
+
+      // Create new socket for the bot
+      const botSocket = io(SOCKET_URL, {
+        reconnection: true,
+        reconnectionAttempts: 10,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        timeout: 10000,
+      });
+
+      botSocket.on('connect', () => {
+        console.log(`Bot ${botPlayer.name} socket connected, attempting reconnection...`);
+        // Reconnect the bot using its session token
+        botSocket.emit('reconnect_to_game', { token: botSession.token });
+      });
+
+      botSocket.on('reconnection_successful', ({ gameState: newState }: { gameState: GameState }) => {
+        console.log(`Bot ${botPlayer.name} reconnected successfully!`);
+        // Start handling actions with the new socket
+        handleBotAction(botSocket, newState, botSocket.id || '');
+      });
+
+      // Listen to all game state updates
+      botSocket.on('game_updated', (state: GameState) => {
+        handleBotAction(botSocket, state, botSocket.id || '');
+      });
+
+      botSocket.on('round_started', (state: GameState) => {
+        handleBotAction(botSocket, state, botSocket.id || '');
+      });
+
+      botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) => {
+        handleBotAction(botSocket, newState, botSocket.id || '');
+      });
+
+      botSocket.on('round_ended', (state: GameState) => {
+        handleBotAction(botSocket, state, botSocket.id || '');
+      });
+    });
+  };
+
   // Bot player functionality
   const handleQuickPlay = () => {
     if (!socket) return;
@@ -341,11 +404,17 @@ function App() {
           const botName = `Bot ${i + 1}`;
 
           botSocket.on('connect', () => {
-            botSocket.emit('join_game', { gameId: createdGameId, playerName: botName });
+            botSocket.emit('join_game', { gameId: createdGameId, playerName: botName, isBot: true });
           });
 
           // Listen to all game state updates
-          botSocket.on('player_joined', ({ gameState }: { gameState: GameState }) => {
+          botSocket.on('player_joined', ({ gameState, session }: { gameState: GameState; session?: PlayerSession }) => {
+            // Save bot's session to localStorage for reconnection
+            if (session && session.playerName === botName) {
+              const botSessionKey = `botSession_${botName}_${gameState.id}`;
+              localStorage.setItem(botSessionKey, JSON.stringify(session));
+              console.log(`Saved session for ${botName}`);
+            }
             handleBotAction(botSocket, gameState, botSocket.id || '');
           });
 

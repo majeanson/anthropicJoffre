@@ -367,7 +367,7 @@ io.on('connection', (socket) => {
     socket.emit('game_created', { gameId, gameState, session });
   });
 
-  socket.on('join_game', ({ gameId, playerName }: { gameId: string; playerName: string }) => {
+  socket.on('join_game', ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -387,6 +387,7 @@ io.on('connection', (socket) => {
       hand: [],
       tricksWon: 0,
       pointsWon: 0,
+      isBot: isBot || false,
     };
 
     game.players.push(player);

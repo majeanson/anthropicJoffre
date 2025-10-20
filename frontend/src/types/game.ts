@@ -13,6 +13,7 @@ export interface Player {
   hand: Card[];
   tricksWon: number;
   pointsWon: number;
+  isBot?: boolean; // True if this player is a bot
 }
 
 export interface Bet {
