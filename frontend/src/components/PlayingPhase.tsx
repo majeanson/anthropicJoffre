@@ -280,6 +280,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     .filter(p => p.teamId === 2)
     .reduce((sum, p) => sum + p.pointsWon, 0);
 
+  // Get betting team
+  const bettingPlayer = gameState.highestBet ? gameState.players.find(p => p.id === gameState.highestBet?.playerId) : null;
+  const bettingTeam = bettingPlayer?.teamId || null;
+
   return (
     <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
@@ -294,10 +298,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </p>
               <p className="text-xs md:text-sm font-bold text-orange-500 mt-1">{team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts</p>
               {floatingPoints.team1 !== null && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 animate-points-float-up">
-                  <span className={`text-lg md:text-2xl font-black ${floatingPoints.team1 >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {floatingPoints.team1 >= 0 ? '+' : ''}{floatingPoints.team1}
-                  </span>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-20">
+                  <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
+                    floatingPoints.team1 >= 0
+                      ? 'bg-green-500 border-green-300'
+                      : 'bg-red-500 border-red-300'
+                  }`}>
+                    <span className="text-base md:text-xl">
+                      {floatingPoints.team1 >= 0 ? '+' : ''}{floatingPoints.team1}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
@@ -359,9 +369,15 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Current Bet & Trump */}
-              {gameState.highestBet && (
-                <div className="bg-yellow-50/90 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-yellow-400 shadow-md">
-                  <p className="text-xs md:text-base font-black text-yellow-800">
+              {gameState.highestBet && bettingTeam && (
+                <div className={`backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 shadow-md ${
+                  bettingTeam === 1
+                    ? 'bg-orange-100/90 border-orange-400'
+                    : 'bg-purple-100/90 border-purple-400'
+                }`}>
+                  <p className={`text-xs md:text-base font-black ${
+                    bettingTeam === 1 ? 'text-orange-800' : 'text-purple-800'
+                  }`}>
                     🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : 'TRUMP'}
                   </p>
                 </div>
@@ -384,10 +400,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </p>
               <p className="text-xs md:text-sm font-bold text-purple-500 mt-1">{team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts</p>
               {floatingPoints.team2 !== null && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 animate-points-float-up">
-                  <span className={`text-lg md:text-2xl font-black ${floatingPoints.team2 >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {floatingPoints.team2 >= 0 ? '+' : ''}{floatingPoints.team2}
-                  </span>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-20">
+                  <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
+                    floatingPoints.team2 >= 0
+                      ? 'bg-green-500 border-green-300'
+                      : 'bg-red-500 border-red-300'
+                  }`}>
+                    <span className="text-base md:text-xl">
+                      {floatingPoints.team2 >= 0 ? '+' : ''}{floatingPoints.team2}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
@@ -553,8 +575,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       </div>
 
 
-      {/* Player Hand - Sticky at bottom on mobile */}
-      <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 mt-auto sticky bottom-0 z-10">
+      {/* Player Hand */}
+      <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 z-10">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
                   <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 shadow-xl">
