@@ -145,7 +145,6 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                 <CardComponent
                   card={card}
                   size="small"
-                  disabled={true}
                 />
               </div>
             ))}

@@ -23,7 +23,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
   const [lastTrickLength, setLastTrickLength] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
-  const [previousScores, setPreviousScores] = useState<{team1: number, team2: number}>({team1: 0, team2: 0});
+  const [previousScores, setPreviousScores] = useState<{team1: number, team2: number} | null>(null);
   const [scoreAnimation, setScoreAnimation] = useState<{team1: boolean, team2: boolean}>({team1: false, team2: false});
   const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
 
@@ -115,6 +115,12 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
   // Score change animation
   useEffect(() => {
+    // Initialize previousScores on first render
+    if (previousScores === null) {
+      setPreviousScores({ team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 });
+      return;
+    }
+
     const team1Delta = gameState.teamScores.team1 - previousScores.team1;
     const team2Delta = gameState.teamScores.team2 - previousScores.team2;
 
@@ -137,7 +143,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     }
 
     setPreviousScores({ team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 });
-  }, [gameState.teamScores]);
+  }, [gameState.teamScores.team1, gameState.teamScores.team2]);
 
   if (!currentPlayer) return null;
 
@@ -378,7 +384,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   <p className={`text-xs md:text-base font-black ${
                     bettingTeam === 1 ? 'text-orange-800' : 'text-purple-800'
                   }`}>
-                    🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : 'TRUMP'}
+                    🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : ''}
                   </p>
                 </div>
               )}
