@@ -38,8 +38,8 @@ const io = new Server(httpServer, {
   },
   // Enable connection state recovery for better stability
   connectionStateRecovery: {
-    // Max disconnection duration (2 minutes = 120000ms)
-    maxDisconnectionDuration: 120000,
+    // Max disconnection duration (15 minutes = 900000ms for mobile AFK)
+    maxDisconnectionDuration: 900000,
     // Skip middleware on recovery
     skipMiddlewares: true,
   },
@@ -95,8 +95,8 @@ function validateSessionToken(token: string): PlayerSession | null {
   const session = playerSessions.get(token);
   if (!session) return null;
 
-  // Check if session is expired (2 minutes = 120000ms)
-  const SESSION_TIMEOUT = 120000;
+  // Check if session is expired (15 minutes = 900000ms for mobile AFK)
+  const SESSION_TIMEOUT = 900000;
   if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
     playerSessions.delete(token);
     return null;
@@ -965,7 +965,7 @@ io.on('connection', (socket) => {
       return; // Player not in any game
     }
 
-    // Don't immediately remove player - give 2 minutes grace period for reconnection
+    // Don't immediately remove player - give 15 minutes grace period for reconnection (mobile AFK)
     console.log(`Player ${socket.id} disconnected. Waiting for reconnection...`);
 
     // Notify other players of disconnection
@@ -993,7 +993,7 @@ io.on('connection', (socket) => {
         }
       }
       disconnectTimeouts.delete(socket.id);
-    }, 120000); // 2 minutes
+    }, 900000); // 15 minutes
 
     // Store the timeout so it can be cancelled on reconnection
     disconnectTimeouts.set(socket.id, disconnectTimeout);

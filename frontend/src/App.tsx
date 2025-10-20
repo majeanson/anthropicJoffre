@@ -68,8 +68,8 @@ function App() {
         try {
           const session: PlayerSession = JSON.parse(sessionData);
 
-          // Check if session is too old (older than 2 minutes)
-          const SESSION_TIMEOUT = 120000; // 2 minutes
+          // Check if session is too old (older than 15 minutes - for mobile AFK)
+          const SESSION_TIMEOUT = 900000; // 15 minutes
           if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
             console.log('Session expired, clearing...');
             localStorage.removeItem('gameSession');
@@ -95,7 +95,7 @@ function App() {
       if (sessionData) {
         try {
           const session: PlayerSession = JSON.parse(sessionData);
-          const SESSION_TIMEOUT = 120000;
+          const SESSION_TIMEOUT = 900000; // 15 minutes
           if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
             localStorage.removeItem('gameSession');
             setGameState(null);
