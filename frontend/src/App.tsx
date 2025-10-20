@@ -553,8 +553,8 @@ function App() {
     return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} />;
   }
 
-  // Debug controls (hidden for now, but code kept for future use)
-  const DEBUG_ENABLED = false; // Set to true to show debug controls
+  // Debug controls
+  const DEBUG_ENABLED = true; // Set to true to show debug controls
 
   const DebugControls = () => (
     <div className="fixed top-4 right-4 z-50">

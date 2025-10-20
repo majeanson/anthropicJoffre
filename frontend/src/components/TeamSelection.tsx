@@ -58,17 +58,18 @@ export function TeamSelection({
         <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
 
-        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif">Team Selection</h2>
-
+        {/* Leave Button - positioned above everything */}
         {onLeaveGame && (
           <button
             onClick={onLeaveGame}
-            className="absolute top-8 left-8 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-4 py-2 rounded-xl font-bold transition-all duration-300 text-sm flex items-center gap-2 border-2 border-red-800 shadow-lg transform hover:scale-105"
+            className="absolute top-4 left-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-red-800 shadow-lg transform hover:scale-105 z-10"
             title="Leave Game"
           >
             🚪 Leave
           </button>
         )}
+
+        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif">Team Selection</h2>
 
         <div className="mb-6">
           <p className="text-sm text-umber-700 mb-2">Game ID:</p>

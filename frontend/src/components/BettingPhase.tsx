@@ -217,7 +217,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                       onClick={handleSkip}
                       className="flex-1 py-4 px-6 rounded-xl font-black text-base bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
                     >
-                      ⏭️ SKIP
+                      SKIP
                     </button>
                   )}
                   <button
@@ -229,7 +229,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
                         : 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed border-gray-400 opacity-60'
                     }`}
                   >
-                    💰 Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
+                    Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
                   </button>
                 </div>
 
