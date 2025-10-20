@@ -26,6 +26,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [previousScores, setPreviousScores] = useState<{team1: number, team2: number} | null>(null);
   const [scoreAnimation, setScoreAnimation] = useState<{team1: boolean, team2: boolean}>({team1: false, team2: false});
   const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
+  const [previousRoundScores, setPreviousRoundScores] = useState<{team1: number, team2: number} | null>(null);
+  const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
 
   const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
@@ -113,7 +115,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     }
   }, [isCurrentTurn, gameState.currentPlayerIndex]);
 
-  // Score change animation
+  // Score change animation (for cumulative scores at round end)
   useEffect(() => {
     // Initialize previousScores on first render
     if (previousScores === null) {
@@ -144,6 +146,41 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
     setPreviousScores({ team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 });
   }, [gameState.teamScores.team1, gameState.teamScores.team2]);
+
+  // Round score change animation (for trick points during the round)
+  useEffect(() => {
+    const team1RoundScore = gameState.players
+      .filter(p => p.teamId === 1)
+      .reduce((sum, p) => sum + p.pointsWon, 0);
+    const team2RoundScore = gameState.players
+      .filter(p => p.teamId === 2)
+      .reduce((sum, p) => sum + p.pointsWon, 0);
+
+    // Initialize previousRoundScores on first render
+    if (previousRoundScores === null) {
+      setPreviousRoundScores({ team1: team1RoundScore, team2: team2RoundScore });
+      return;
+    }
+
+    const team1Delta = team1RoundScore - previousRoundScores.team1;
+    const team2Delta = team2RoundScore - previousRoundScores.team2;
+
+    if (team1Delta !== 0) {
+      setFloatingTrickPoints(prev => ({ ...prev, team1: team1Delta }));
+      setTimeout(() => {
+        setFloatingTrickPoints(prev => ({ ...prev, team1: null }));
+      }, 2000);
+    }
+
+    if (team2Delta !== 0) {
+      setFloatingTrickPoints(prev => ({ ...prev, team2: team2Delta }));
+      setTimeout(() => {
+        setFloatingTrickPoints(prev => ({ ...prev, team2: null }));
+      }, 2000);
+    }
+
+    setPreviousRoundScores({ team1: team1RoundScore, team2: team2RoundScore });
+  }, [gameState.players]);
 
   if (!currentPlayer) return null;
 
@@ -302,7 +339,20 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <p className={`text-3xl md:text-5xl font-black text-orange-600 leading-none ${scoreAnimation.team1 ? 'animate-score-pop' : ''}`}>
                 {gameState.teamScores.team1}
               </p>
-              <p className="text-xs md:text-sm font-bold text-orange-500 mt-1">{team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts</p>
+              <p className="text-xs md:text-sm font-bold text-orange-500 mt-1 relative">
+                {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
+                {floatingTrickPoints.team1 !== null && (
+                  <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 animate-points-float-up">
+                    <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
+                      floatingTrickPoints.team1 >= 0
+                        ? 'bg-green-500 border-green-300'
+                        : 'bg-red-500 border-red-300'
+                    }`}>
+                      {floatingTrickPoints.team1 >= 0 ? '+' : ''}{floatingTrickPoints.team1}
+                    </span>
+                  </span>
+                )}
+              </p>
               {floatingPoints.team1 !== null && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-20">
                   <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
@@ -404,7 +454,20 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <p className={`text-3xl md:text-5xl font-black text-purple-600 leading-none ${scoreAnimation.team2 ? 'animate-score-pop' : ''}`}>
                 {gameState.teamScores.team2}
               </p>
-              <p className="text-xs md:text-sm font-bold text-purple-500 mt-1">{team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts</p>
+              <p className="text-xs md:text-sm font-bold text-purple-500 mt-1 relative">
+                {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
+                {floatingTrickPoints.team2 !== null && (
+                  <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 animate-points-float-up">
+                    <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
+                      floatingTrickPoints.team2 >= 0
+                        ? 'bg-green-500 border-green-300'
+                        : 'bg-red-500 border-red-300'
+                    }`}>
+                      {floatingTrickPoints.team2 >= 0 ? '+' : ''}{floatingTrickPoints.team2}
+                    </span>
+                  </span>
+                )}
+              </p>
               {floatingPoints.team2 !== null && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-20">
                   <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
