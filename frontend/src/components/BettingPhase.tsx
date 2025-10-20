@@ -76,42 +76,46 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
 
   return (
     <>
-      <div className="bg-parchment-50 rounded-xl p-6 shadow-lg max-w-2xl mx-auto relative border-2 border-parchment-400">
-        {/* Top right buttons */}
-        <div className="absolute top-4 right-4 flex gap-2 flex-wrap justify-end max-w-[calc(100%-8rem)]">
-          <button
-            onClick={() => setShowLeaderboard(true)}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-yellow-600 shadow-md"
-            title="View Leaderboard"
-          >
-            🏆 Leaderboard
-          </button>
-          {onAutoplayToggle && (
+      <div className="bg-parchment-50 rounded-xl p-6 shadow-lg max-w-2xl mx-auto border-2 border-parchment-400">
+        {/* Header with title and buttons */}
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+          <h2 className="text-2xl font-bold text-umber-900 font-serif">Betting Phase</h2>
+
+          {/* Action buttons */}
+          <div className="flex gap-2 flex-wrap">
             <button
-              onClick={onAutoplayToggle}
-              className={`${
-                autoplayEnabled
-                  ? 'bg-green-500 hover:bg-green-600 animate-pulse'
-                  : 'bg-purple-500 hover:bg-purple-600'
-              } text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 shadow-md ${
-                autoplayEnabled ? 'border-green-600' : 'border-purple-600'
-              }`}
-              title={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}
+              onClick={() => setShowLeaderboard(true)}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-yellow-600 shadow-md"
+              title="View Leaderboard"
             >
-              {autoplayEnabled ? '🤖 Auto' : '🎮 Manual'}
+              🏆
             </button>
-          )}
-          {onLeaveGame && (
-            <button
-              onClick={onLeaveGame}
-              className="bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-4 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-2 border-2 border-crimson-700"
-              title="Leave Game"
-            >
-              🚪 Leave
-            </button>
-          )}
+            {onAutoplayToggle && (
+              <button
+                onClick={onAutoplayToggle}
+                className={`${
+                  autoplayEnabled
+                    ? 'bg-green-500 hover:bg-green-600 animate-pulse'
+                    : 'bg-purple-500 hover:bg-purple-600'
+                } text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 shadow-md ${
+                  autoplayEnabled ? 'border-green-600' : 'border-purple-600'
+                }`}
+                title={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}
+              >
+                {autoplayEnabled ? '🤖' : '🎮'}
+              </button>
+            )}
+            {onLeaveGame && (
+              <button
+                onClick={onLeaveGame}
+                className="bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-crimson-700"
+                title="Leave Game"
+              >
+                🚪
+              </button>
+            )}
+          </div>
         </div>
-        <h2 className="text-2xl font-bold mb-4 text-umber-900 font-serif pt-2">Betting Phase</h2>
 
       {/* Current Turn Indicator with Timeout */}
       {!hasPlacedBet && (

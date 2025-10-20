@@ -71,7 +71,7 @@ export function TeamSelection({
           </button>
         )}
 
-        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif pt-2">Team Selection</h2>
+        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif mt-12">Team Selection</h2>
 
         <div className="mb-6">
           <p className="text-sm text-umber-700 mb-2">Game ID:</p>
