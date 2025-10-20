@@ -330,8 +330,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   return (
     <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
-      <div className="w-full mb-2 md:mb-6 flex-shrink-0 px-2 md:px-6 pt-2 md:pt-6">
-        <div className="bg-umber-900/40 md:bg-parchment-50/95 backdrop-blur-md rounded-2xl p-2 md:p-6 shadow-2xl border-2 border-parchment-400">
+      <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-4 pt-2 md:pt-4">
+        <div className="bg-umber-900/40 md:bg-parchment-50/95 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200 relative overflow-visible">
@@ -487,8 +487,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       </div>
 
       {/* Circular Card Layout - Takes remaining space */}
-      <div className="mb-2 md:mb-8 relative px-2 md:px-6">
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-10 md:min-h-[500px] relative border-2 border-parchment-400 shadow-2xl">
+      <div className="mb-2 md:mb-4 relative px-2 md:px-4">
+        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 shadow-2xl">
           {/* Floating Action Buttons - Top Right Corner */}
           <div className="absolute top-4 right-4 z-50 flex flex-col gap-2">
             <button
@@ -533,7 +533,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Circular Layout for both mobile and desktop - ANTI-CLOCKWISE */}
-              <div className="relative h-[400px] z-40">
+              <div className="relative h-[320px] md:h-[350px] z-40">
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
@@ -587,7 +587,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             // Current Trick View - Circular layout on both mobile and desktop - ANTI-CLOCKWISE
             <>
               {/* Circular Layout for both mobile and desktop */}
-              <div className="relative h-[400px]">
+              <div className="relative h-[320px] md:h-[350px]">
               
 
                 {/* Bottom - You (position 0) */}
@@ -658,7 +658,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </div>
                 </div>
               )}
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-6 shadow-2xl border-2 border-parchment-400">
+        <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
           {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
           {isSpectator ? (
             <div className="text-center py-8">
