@@ -215,7 +215,7 @@ function App() {
       setGameState(gameState);
     });
 
-    newSocket.on('game_over', ({ winningTeam, gameState }) => {
+    newSocket.on('game_over', ({ gameState }: { gameState: GameState }) => {
       setGameState(gameState);
 
       // Clear session on game over

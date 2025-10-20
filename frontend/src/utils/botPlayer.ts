@@ -87,7 +87,6 @@ export class BotPlayer {
     const trump = gameState.trump;
 
     // RULE 2 & 3: Prioritize getting red 0 and avoiding brown 0
-    const redZero = playableCards.find(c => c.color === 'red' && c.value === 0);
     const brownZero = playableCards.find(c => c.color === 'brown' && c.value === 0);
 
     // If we have brown 0 and can play it, do so to get rid of it
