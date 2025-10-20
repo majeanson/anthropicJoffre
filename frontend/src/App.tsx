@@ -220,8 +220,6 @@ function App() {
 
       // Clear session on game over
       localStorage.removeItem('gameSession');
-
-      alert(`Game Over! Team ${winningTeam} wins!`);
     });
 
     newSocket.on('error', ({ message }) => {
@@ -862,6 +860,75 @@ function App() {
                 </div>
               </div>
             </div>
+
+            {/* Round History */}
+            {gameState.roundHistory.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-2xl font-bold text-umber-900 mb-4 border-b-2 border-umber-400 pb-2 font-serif">
+                  📜 Game History
+                </h3>
+                <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
+                  {gameState.roundHistory.slice().reverse().map((round) => {
+                    const betPlayer = gameState.players.find(p => p.id === round.highestBet.playerId);
+
+                    return (
+                      <div
+                        key={round.roundNumber}
+                        className="bg-parchment-100 rounded-lg p-4 border-2 border-parchment-400 hover:bg-parchment-200 transition-colors"
+                      >
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-lg font-bold text-umber-900">
+                            Round {round.roundNumber}
+                          </h4>
+                          <span className={`px-3 py-1 rounded-full text-sm font-semibold border-2 ${
+                            round.betMade
+                              ? 'bg-green-100 text-green-800 border-green-400'
+                              : 'bg-red-100 text-red-800 border-red-400'
+                          }`}>
+                            {round.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                          <div className="bg-parchment-50 rounded p-2">
+                            <p className="text-umber-600 font-semibold text-xs">Bidder</p>
+                            <p className="font-bold text-umber-900">{betPlayer?.name || 'Unknown'}</p>
+                            <p className="text-xs text-umber-600">Team {round.offensiveTeam}</p>
+                          </div>
+                          <div className="bg-parchment-50 rounded p-2">
+                            <p className="text-umber-600 font-semibold text-xs">Bet</p>
+                            <p className="font-bold text-umber-900">{round.betAmount} points</p>
+                            <p className="text-xs text-umber-600">
+                              {round.withoutTrump ? 'No Trump (2x)' : 'With Trump'}
+                            </p>
+                          </div>
+                          <div className="bg-parchment-50 rounded p-2">
+                            <p className="text-umber-600 font-semibold text-xs">Points Earned</p>
+                            <p className="font-bold text-umber-900">
+                              {round.offensivePoints} / {round.betAmount}
+                            </p>
+                            <p className="text-xs text-umber-600">
+                              Defensive: {round.defensivePoints}
+                            </p>
+                          </div>
+                          <div className="bg-parchment-50 rounded p-2">
+                            <p className="text-umber-600 font-semibold text-xs">Round Score</p>
+                            <p className="font-bold">
+                              <span className="text-orange-600">{round.roundScore.team1 >= 0 ? '+' : ''}{round.roundScore.team1}</span>
+                              {' / '}
+                              <span className="text-purple-600">{round.roundScore.team2 >= 0 ? '+' : ''}{round.roundScore.team2}</span>
+                            </p>
+                            <p className="text-xs text-umber-600">
+                              Total: {round.cumulativeScore.team1} - {round.cumulativeScore.team2}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex gap-4 justify-center">
