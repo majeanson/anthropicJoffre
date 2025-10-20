@@ -60,7 +60,7 @@ export function TeamSelection({
         <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
 
-        {/* Leave Button - positioned above everything */}
+        {/* Leave Button - positioned above everything with more top margin to avoid overlap */}
         {onLeaveGame && (
           <button
             onClick={onLeaveGame}
@@ -71,7 +71,7 @@ export function TeamSelection({
           </button>
         )}
 
-        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif">Team Selection</h2>
+        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif pt-2">Team Selection</h2>
 
         <div className="mb-6">
           <p className="text-sm text-umber-700 mb-2">Game ID:</p>

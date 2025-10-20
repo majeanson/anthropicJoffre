@@ -123,8 +123,15 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
           <span>Waiting for: {players[currentPlayerIndex]?.name}</span>
           <TimeoutIndicator
             duration={60000}
-            isActive={!hasPlacedBet}
+            isActive={!hasPlacedBet && isMyTurn}
             resetKey={currentPlayerIndex}
+            onTimeout={() => {
+              // Auto-enable autoplay when timeout expires (only for current player)
+              if (isMyTurn && onAutoplayToggle && !autoplayEnabled) {
+                console.log('Betting timeout expired - enabling autoplay');
+                onAutoplayToggle();
+              }
+            }}
           />
         </div>
       )}

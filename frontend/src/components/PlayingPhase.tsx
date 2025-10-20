@@ -21,6 +21,14 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [showDealingAnimation, setShowDealingAnimation] = useState<boolean>(false);
+
+  // Debug: Log autoplay button visibility conditions
+  console.log('Autoplay button conditions:', {
+    isSpectator,
+    hasOnAutoplayToggle: !!onAutoplayToggle,
+    autoplayEnabled,
+    shouldShow: !isSpectator && !!onAutoplayToggle
+  });
   const [dealingCardIndex, setDealingCardIndex] = useState<number>(0);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
   const [lastTrickLength, setLastTrickLength] = useState<number>(0);
@@ -433,8 +441,15 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                     <span className="whitespace-nowrap">Waiting for: {currentTurnPlayer?.name}</span>
                     <TimeoutIndicator
                       duration={60000}
-                      isActive={gameState.currentTrick.length < 4}
+                      isActive={gameState.currentTrick.length < 4 && isCurrentTurn}
                       resetKey={gameState.currentPlayerIndex}
+                      onTimeout={() => {
+                        // Auto-enable autoplay when timeout expires (only for current player)
+                        if (isCurrentTurn && onAutoplayToggle && !autoplayEnabled) {
+                          console.log('Timeout expired - enabling autoplay');
+                          onAutoplayToggle();
+                        }
+                      }}
                     />
                   </>
                 )}
