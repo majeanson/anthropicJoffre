@@ -116,15 +116,15 @@ export function ScoringPhase({
         </h2>
 
         {/* Timer and Ready Status */}
-        <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border-2 border-blue-200">
+        <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="text-4xl font-bold text-blue-600">
+              <div className="text-4xl font-bold text-blue-600 dark:text-blue-300">
                 {timeRemaining}s
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
                 {readyCount}/4 players ready
               </span>
               <button
@@ -155,21 +155,21 @@ export function ScoringPhase({
 
         {/* Team Scores - Large and Clear */}
         <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="text-center p-6 bg-orange-50 rounded-lg border-2 border-orange-200">
-            <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
-            <p className="text-5xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
-            <p className="text-xs text-orange-700 mt-2">Total Score</p>
+          <div className="text-center p-6 bg-orange-50 dark:bg-orange-900/40 rounded-lg border-2 border-orange-200 dark:border-orange-600">
+            <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">Team 1</h3>
+            <p className="text-5xl font-bold text-orange-600 dark:text-orange-300">{gameState.teamScores.team1}</p>
+            <p className="text-xs text-orange-700 dark:text-orange-300 mt-2">Total Score</p>
           </div>
-          <div className="text-center p-6 bg-purple-50 rounded-lg border-2 border-purple-200">
-            <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
-            <p className="text-5xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
-            <p className="text-xs text-purple-700 mt-2">Total Score</p>
+          <div className="text-center p-6 bg-purple-50 dark:bg-purple-900/40 rounded-lg border-2 border-purple-200 dark:border-purple-600">
+            <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">Team 2</h3>
+            <p className="text-5xl font-bold text-purple-600 dark:text-purple-300">{gameState.teamScores.team2}</p>
+            <p className="text-xs text-purple-700 dark:text-purple-300 mt-2">Total Score</p>
           </div>
         </div>
 
         {/* Round Summary - Team-based */}
-        <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 mb-6 border border-gray-200">
-          <h3 className="text-center font-bold text-gray-700 mb-3">Round Summary</h3>
+        <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 mb-6 border border-gray-200 dark:border-gray-600">
+          <h3 className="text-center font-bold text-gray-700 dark:text-gray-200 mb-3">Round Summary</h3>
           <div className="space-y-4">
             {/* Team 1 */}
             {(() => {
@@ -178,9 +178,9 @@ export function ScoringPhase({
               const team1Tricks = team1Players.reduce((sum, p) => sum + p.tricksWon, 0);
 
               return (
-                <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
+                <div className="bg-orange-50 dark:bg-orange-900/40 border border-orange-300 dark:border-orange-600 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-bold text-orange-800 flex items-center gap-2">
+                    <h4 className="font-bold text-orange-800 dark:text-orange-200 flex items-center gap-2">
                       Team 1
                       {team1Points > 0 && (
                         <span className="px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs bg-green-500 border-green-300">
@@ -188,7 +188,7 @@ export function ScoringPhase({
                         </span>
                       )}
                     </h4>
-                    <span className="text-sm font-semibold text-orange-700">
+                    <span className="text-sm font-semibold text-orange-700 dark:text-orange-300">
                       {team1Tricks} tricks ({team1Points} pts)
                     </span>
                   </div>
@@ -197,11 +197,11 @@ export function ScoringPhase({
                       const isHighestBidder = gameState.highestBet && gameState.highestBet.playerId === player.id;
                       return (
                         <div key={player.id} className="flex items-center justify-between text-sm">
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 text-gray-800 dark:text-gray-200">
                             {player.name}
                             {isHighestBidder && <span className="text-xs text-yellow-600">⭐</span>}
                           </span>
-                          <span className="text-gray-600">
+                          <span className="text-gray-600 dark:text-gray-400">
                             {player.tricksWon} tricks ({player.pointsWon} pts)
                           </span>
                         </div>
@@ -219,9 +219,9 @@ export function ScoringPhase({
               const team2Tricks = team2Players.reduce((sum, p) => sum + p.tricksWon, 0);
 
               return (
-                <div className="bg-purple-50 border border-purple-300 rounded-lg p-3">
+                <div className="bg-purple-50 dark:bg-purple-900/40 border border-purple-300 dark:border-purple-600 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-bold text-purple-800 flex items-center gap-2">
+                    <h4 className="font-bold text-purple-800 dark:text-purple-200 flex items-center gap-2">
                       Team 2
                       {team2Points > 0 && (
                         <span className="px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs bg-green-500 border-green-300">
@@ -229,7 +229,7 @@ export function ScoringPhase({
                         </span>
                       )}
                     </h4>
-                    <span className="text-sm font-semibold text-purple-700">
+                    <span className="text-sm font-semibold text-purple-700 dark:text-purple-300">
                       {team2Tricks} tricks ({team2Points} pts)
                     </span>
                   </div>
@@ -238,11 +238,11 @@ export function ScoringPhase({
                       const isHighestBidder = gameState.highestBet && gameState.highestBet.playerId === player.id;
                       return (
                         <div key={player.id} className="flex items-center justify-between text-sm">
-                          <span className="flex items-center gap-1">
+                          <span className="flex items-center gap-1 text-gray-800 dark:text-gray-200">
                             {player.name}
                             {isHighestBidder && <span className="text-xs text-yellow-600">⭐</span>}
                           </span>
-                          <span className="text-gray-600">
+                          <span className="text-gray-600 dark:text-gray-400">
                             {player.tricksWon} tricks ({player.pointsWon} pts)
                           </span>
                         </div>
@@ -257,7 +257,7 @@ export function ScoringPhase({
 
         {/* Round Statistics */}
         {statistics && (
-          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg p-4 border-2 border-amber-200 mb-4">
+          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600 mb-4">
             <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center">🏅 Round Highlights</h3>
             <div className="grid grid-cols-2 gap-4">
               {statistics.fastestPlay && (

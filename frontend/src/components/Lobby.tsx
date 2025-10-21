@@ -248,7 +248,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
                       activeTab === 'recent'
                         ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                        : 'bg-parchment-200 text-umber-700 dark:text-gray-300 hover:bg-parchment-300'
+                        : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                     }`}
                   >
                     Recent Players
@@ -258,7 +258,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
                       activeTab === 'online'
                         ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
-                        : 'bg-parchment-200 text-umber-700 dark:text-gray-300 hover:bg-parchment-300'
+                        : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                     }`}
                   >
                     Online Now ({onlinePlayers.length})
@@ -266,11 +266,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 </div>
 
               {/* Tab Content */}
-              <div className="bg-parchment-200 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-500 min-h-[200px] max-h-[200px] overflow-y-auto">
+              <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 min-h-[200px] max-h-[200px] overflow-y-auto">
                 {activeTab === 'recent' && (
                   <div className="space-y-2">
                     {recentPlayers.length === 0 ? (
-                      <div className="text-center text-umber-600 py-8">
+                      <div className="text-center text-umber-600 dark:text-gray-400 py-8">
                         <p className="text-lg">No recent players yet</p>
                         <p className="text-sm mt-2">Players you've played with will appear here</p>
                       </div>
@@ -297,7 +297,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 {activeTab === 'online' && (
                   <div className="space-y-2">
                     {onlinePlayers.length === 0 ? (
-                      <div className="text-center text-umber-600 py-8">
+                      <div className="text-center text-umber-600 dark:text-gray-400 py-8">
                         <p className="text-lg">No players online</p>
                         <p className="text-sm mt-2">Online players will appear here</p>
                       </div>

@@ -69,38 +69,38 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               {/* Team 1 */}
-              <div className={`bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border-2 border-orange-200 ${
+              <div className={`bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/40 dark:to-orange-800/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600 ${
                 leadingTeam === 1 ? 'ring-4 ring-yellow-400' : ''
               }`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-2xl font-bold text-orange-800">Team 1</h4>
+                  <h4 className="text-2xl font-bold text-orange-800 dark:text-orange-200">Team 1</h4>
                   {leadingTeam === 1 && <span className="text-3xl">👑</span>}
                 </div>
-                <div className="text-5xl font-bold text-orange-600 mb-4">{team1Score}</div>
+                <div className="text-5xl font-bold text-orange-600 dark:text-orange-300 mb-4">{team1Score}</div>
                 <div className="space-y-2">
                   {team1Players.map(player => (
-                    <div key={player.id} className="bg-parchment-50 dark:bg-gray-800 bg-opacity-80 rounded px-3 py-2 border border-orange-200">
-                      <p className="font-semibold text-orange-900">{player.name}</p>
-                      <p className="text-sm text-orange-700">Tricks: {player.tricksWon}</p>
+                    <div key={player.id} className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 rounded px-3 py-2 border border-orange-200 dark:border-orange-700">
+                      <p className="font-semibold text-orange-900 dark:text-orange-200">{player.name}</p>
+                      <p className="text-sm text-orange-700 dark:text-orange-300">Tricks: {player.tricksWon}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Team 2 */}
-              <div className={`bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border-2 border-purple-200 ${
+              <div className={`bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/40 dark:to-purple-800/40 rounded-lg p-6 border-2 border-purple-200 dark:border-purple-600 ${
                 leadingTeam === 2 ? 'ring-4 ring-yellow-400' : ''
               }`}>
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-2xl font-bold text-purple-800">Team 2</h4>
+                  <h4 className="text-2xl font-bold text-purple-800 dark:text-purple-200">Team 2</h4>
                   {leadingTeam === 2 && <span className="text-3xl">👑</span>}
                 </div>
-                <div className="text-5xl font-bold text-purple-600 mb-4">{team2Score}</div>
+                <div className="text-5xl font-bold text-purple-600 dark:text-purple-300 mb-4">{team2Score}</div>
                 <div className="space-y-2">
                   {team2Players.map(player => (
-                    <div key={player.id} className="bg-parchment-50 dark:bg-gray-800 bg-opacity-80 rounded px-3 py-2 border border-purple-200">
-                      <p className="font-semibold text-purple-900">{player.name}</p>
-                      <p className="text-sm text-purple-700">Tricks: {player.tricksWon}</p>
+                    <div key={player.id} className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 rounded px-3 py-2 border border-purple-200 dark:border-purple-700">
+                      <p className="font-semibold text-purple-900 dark:text-purple-200">{player.name}</p>
+                      <p className="text-sm text-purple-700 dark:text-purple-300">Tricks: {player.tricksWon}</p>
                     </div>
                   ))}
                 </div>
@@ -120,7 +120,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
                 🎲 Current Bet
               </h3>
-              <div className="bg-gradient-to-r from-parchment-100 to-parchment-50 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600">
+              <div className="bg-gradient-to-r from-parchment-100 to-parchment-50 dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <p className="text-sm text-umber-700 dark:text-gray-300 font-semibold">Highest Bidder</p>
