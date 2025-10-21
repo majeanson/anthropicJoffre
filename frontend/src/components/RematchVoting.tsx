@@ -25,17 +25,17 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
           Play Again?
         </h2>
 
-        <div className="bg-white/50 rounded-xl p-6 border-2 border-amber-600">
+        <div className="bg-white dark:bg-gray-800/50 rounded-xl p-6 border-2 border-amber-600">
           <div className="text-6xl mb-4">
             {rematchVotes.length === 4 ? '🎉' : '🔄'}
           </div>
 
           <div className="space-y-2">
-            <p className="text-2xl font-bold text-umber-900">
+            <p className="text-2xl font-bold text-umber-900 dark:text-gray-100">
               {rematchVotes.length} / 4 votes
             </p>
             {votesNeeded > 0 ? (
-              <p className="text-lg text-umber-700">
+              <p className="text-lg text-umber-700 dark:text-gray-300">
                 {votesNeeded === 1 ? '1 more vote needed!' : `${votesNeeded} more votes needed`}
               </p>
             ) : (
@@ -57,7 +57,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
                   className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
                     voted
                       ? 'bg-forest-100 border-forest-400'
-                      : 'bg-parchment-200 border-parchment-400 dark:border-gray-500 opacity-60'
+                      : 'bg-parchment-200 dark:bg-gray-600 border-parchment-400 dark:border-gray-600 dark:border-gray-500 opacity-60'
                   }`}
                   title={player.name}
                 >

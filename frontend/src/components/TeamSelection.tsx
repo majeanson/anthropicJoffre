@@ -140,7 +140,7 @@ export function TeamSelection({
 
         <div className="mb-6">
           <p className="text-sm text-umber-700 dark:text-gray-300 mb-2">Game ID:</p>
-          <div data-testid="game-id" className="bg-parchment-100 dark:bg-gray-700 p-3 rounded-lg font-mono text-lg text-center border-2 border-parchment-400 dark:border-gray-500 text-umber-900">{gameId}</div>
+          <div data-testid="game-id" className="bg-parchment-100 dark:bg-gray-700 p-3 rounded-lg font-mono text-lg text-center border-2 border-parchment-400 dark:border-gray-600 text-umber-900 dark:text-gray-100">{gameId}</div>
 
           {/* Copy Game Link Button */}
           <button
@@ -185,7 +185,7 @@ export function TeamSelection({
                         ? 'bg-orange-200 border-orange-500'
                         : playerAtPosition
                         ? 'bg-parchment-50 dark:bg-gray-800 border-orange-200'
-                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300'
+                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
                     }`}
                   >
                     {playerAtPosition ? (
@@ -250,7 +250,7 @@ export function TeamSelection({
                         ? 'bg-purple-200 border-purple-500'
                         : playerAtPosition
                         ? 'bg-parchment-50 dark:bg-gray-800 border-purple-200'
-                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300'
+                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
                     }`}
                   >
                     {playerAtPosition ? (
@@ -302,13 +302,13 @@ export function TeamSelection({
 
         {/* Chat Box */}
         {socket && (
-          <div className="mb-6 border-2 border-parchment-400 dark:border-gray-500 rounded-lg p-4 bg-parchment-100">
+          <div className="mb-6 border-2 border-parchment-400 dark:border-gray-600 rounded-lg p-4 bg-parchment-100 dark:bg-gray-700">
             <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               💬 Team Chat
             </h3>
 
             {/* Messages */}
-            <div className="bg-parchment-50 dark:bg-gray-800 rounded-lg p-3 mb-3 max-h-40 overflow-y-auto border border-parchment-300">
+            <div className="bg-parchment-50 dark:bg-gray-800 rounded-lg p-3 mb-3 max-h-40 overflow-y-auto border border-parchment-300 dark:border-gray-600">
               {messages.length === 0 ? (
                 <p className="text-sm text-umber-500 text-center py-4">No messages yet. Say hi!</p>
               ) : (
@@ -321,10 +321,10 @@ export function TeamSelection({
                           ? 'bg-orange-100 border-l-4 border-orange-400'
                           : msg.teamId === 2
                           ? 'bg-purple-100 border-l-4 border-purple-400'
-                          : 'bg-parchment-200 border-l-4 border-parchment-400'
+                          : 'bg-parchment-200 dark:bg-gray-600 border-l-4 border-parchment-400 dark:border-gray-600'
                       }`}
                     >
-                      <div className="font-bold text-umber-900">
+                      <div className="font-bold text-umber-900 dark:text-gray-100">
                         {msg.playerName}
                         {msg.playerId === currentPlayerId && ' (You)'}:
                       </div>
@@ -345,7 +345,7 @@ export function TeamSelection({
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type a message... (max 200 chars)"
                 maxLength={200}
-                className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 dark:bg-gray-800 text-umber-900 dark:text-gray-100 text-sm"
+                className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 dark:bg-gray-800 text-umber-900 dark:text-gray-100 text-sm"
               />
               <button
                 type="submit"
@@ -384,7 +384,7 @@ export function TeamSelection({
               <button
                 data-testid="start-game-button-disabled"
                 disabled
-                className="bg-parchment-300 text-umber-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed border-2 border-parchment-400"
+                className="bg-parchment-300 text-umber-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed border-2 border-parchment-400 dark:border-gray-600"
               >
                 Start Game
               </button>
@@ -392,13 +392,13 @@ export function TeamSelection({
           </div>
 
           {!canStartGame() && (
-            <p data-testid="start-game-message" className="text-umber-800 dark:text-gray-200 bg-parchment-200 border-2 border-umber-400 px-4 py-2 rounded-lg">
+            <p data-testid="start-game-message" className="text-umber-800 dark:text-gray-200 bg-parchment-200 dark:bg-gray-600 border-2 border-umber-400 px-4 py-2 rounded-lg">
               {getStartGameMessage()}
             </p>
           )}
         </div>
 
-        <div className="mt-6 p-4 bg-parchment-100 dark:bg-gray-700 rounded-lg border-2 border-parchment-400">
+        <div className="mt-6 p-4 bg-parchment-100 dark:bg-gray-700 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
           <h4 className="font-semibold text-umber-800 dark:text-gray-200 mb-2">How to Play:</h4>
           <ul className="text-sm text-umber-700 dark:text-gray-300 space-y-1">
             <li>• Teams play opposite each other (Team 1 vs Team 2)</li>

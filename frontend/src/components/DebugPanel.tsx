@@ -51,30 +51,30 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
             </h3>
             <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
               <div>
-                <span className="text-sm font-semibold text-gray-600">Game ID:</span>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Game ID:</span>
                 <p className="font-mono text-lg text-purple-600 font-bold">{gameId}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600">Phase:</span>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Phase:</span>
                 <p className="text-lg">
                   <span className={`px-3 py-1 rounded-full font-semibold ${
                     gameState.phase === 'team_selection' ? 'bg-purple-100 text-purple-800' :
                     gameState.phase === 'betting' ? 'bg-orange-100 text-orange-800' :
                     gameState.phase === 'playing' ? 'bg-orange-100 text-orange-800' :
                     gameState.phase === 'scoring' ? 'bg-green-100 text-green-800' :
-                    'bg-gray-100 text-gray-800'
+                    'bg-gray-100 text-gray-800 dark:text-gray-200'
                   }`}>
                     {gameState.phase.replace('_', ' ').toUpperCase()}
                   </span>
                 </p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600">Round:</span>
-                <p className="text-lg font-bold text-gray-800">{gameState.roundNumber}</p>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Round:</span>
+                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{gameState.roundNumber}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600">Trump Suit:</span>
-                <p className="text-lg font-bold text-gray-800">{gameState.trump || 'Not set'}</p>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Trump Suit:</span>
+                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{gameState.trump || 'Not set'}</p>
               </div>
             </div>
           </section>
@@ -127,7 +127,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                         <span className={`w-4 h-4 rounded-full ${
                           player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
                         }`} aria-label={`Team ${player.teamId}`}></span>
-                        <span className="font-bold text-gray-800">{player.name}</span>
+                        <span className="font-bold text-gray-800 dark:text-gray-200">{player.name}</span>
                         {isDealer && (
                           <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs font-semibold rounded-full">
                             DEALER
@@ -146,21 +146,21 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
 
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-gray-600">Cards in hand:</span>
-                        <span className="ml-2 font-semibold text-gray-800">{player.hand.length}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Cards in hand:</span>
+                        <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">{player.hand.length}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Tricks won:</span>
-                        <span className="ml-2 font-semibold text-gray-800">{player.tricksWon}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Tricks won:</span>
+                        <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">{player.tricksWon}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Points won:</span>
-                        <span className="ml-2 font-semibold text-gray-800">{player.pointsWon}</span>
+                        <span className="text-gray-600 dark:text-gray-400">Points won:</span>
+                        <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">{player.pointsWon}</span>
                       </div>
                       {bet && (
                         <div>
-                          <span className="text-gray-600">Bet:</span>
-                          <span className="ml-2 font-semibold text-gray-800">
+                          <span className="text-gray-600 dark:text-gray-400">Bet:</span>
+                          <span className="ml-2 font-semibold text-gray-800 dark:text-gray-200">
                             {bet.skipped ? 'Skipped' : `${bet.amount} ${bet.withoutTrump ? '(No Trump)' : ''}`}
                           </span>
                         </div>
@@ -183,7 +183,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                   const player = gameState.players.find(p => p.id === trickCard.playerId);
                   return (
                     <div key={index} className="bg-gray-50 rounded-lg p-3 text-center border-2 border-gray-200">
-                      <p className="text-xs text-gray-600 mb-1">{player?.name}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{player?.name}</p>
                       <div className={`inline-block px-3 py-2 rounded font-bold text-white ${
                         trickCard.card.color === 'blue' ? 'bg-orange-500' :
                         trickCard.card.color === 'green' ? 'bg-green-500' :
@@ -218,7 +218,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                     const player = gameState.players.find(p => p.id === bet.playerId);
                     return (
                       <div key={bet.playerId} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded p-2 border border-gray-200">
-                        <span className="font-medium text-gray-700">{player?.name}</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">{player?.name}</span>
                         <span className={`text-sm font-semibold ${bet.skipped ? 'text-gray-500' : 'text-purple-600'}`}>
                           {bet.skipped ? 'Skipped' : `${bet.amount}${bet.withoutTrump ? ' 🚫' : ''}`}
                         </span>
@@ -232,7 +232,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
 
           {/* Raw State */}
           <details className="bg-gray-50 rounded-lg border-2 border-gray-200">
-            <summary className="cursor-pointer p-4 font-semibold text-gray-700 hover:bg-gray-100">
+            <summary className="cursor-pointer p-4 font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100">
               🔧 Raw Game State (JSON)
             </summary>
             <pre className="p-4 text-xs overflow-x-auto bg-gray-900 text-green-400 rounded-b-lg font-mono">

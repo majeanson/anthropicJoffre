@@ -58,19 +58,19 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
             <div className="bg-gray-50 rounded-lg p-4 space-y-2">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-semibold text-gray-600">Phase:</span>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Phase:</span>
                   <p className="text-lg font-bold capitalize">{gameState.phase.replace('_', ' ')}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-gray-600">Round:</span>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Round:</span>
                   <p className="text-lg font-bold">{gameState.roundNumber}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-gray-600">Team 1 Score:</span>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Team 1 Score:</span>
                   <p className="text-lg font-bold text-orange-600">{gameState.teamScores.team1}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-gray-600">Team 2 Score:</span>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Team 2 Score:</span>
                   <p className="text-lg font-bold text-purple-600">{gameState.teamScores.team2}</p>
                 </div>
               </div>
@@ -85,7 +85,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
             <div className="bg-gray-50 rounded-lg p-4 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Team 1 Score
                   </label>
                   <input
@@ -94,11 +94,11 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                     max="100"
                     value={team1Score}
                     onChange={(e) => setTeam1Score(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                     Team 2 Score
                   </label>
                   <input
@@ -107,7 +107,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                     max="100"
                     value={team2Score}
                     onChange={(e) => setTeam2Score(parseInt(e.target.value) || 0)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                   />
                 </div>
               </div>

@@ -43,8 +43,8 @@ export function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: Ca
             <div className="flex items-center gap-3">
               <div className="text-3xl">📍</div>
               <div>
-                <p className="text-sm text-gray-600">Current Status</p>
-                <p className="text-lg font-bold text-gray-800">
+                <p className="text-sm text-gray-600 dark:text-gray-400">Current Status</p>
+                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
                   Round {gameState.roundNumber} - {phaseDisplayName}
                 </p>
               </div>
@@ -56,7 +56,7 @@ export function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: Ca
             <div className="flex items-center gap-3 mb-3">
               <div className="text-3xl">🏆</div>
               <div>
-                <p className="text-sm text-gray-600">Score</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Score</p>
                 {leadingTeam && (
                   <p className="text-lg font-bold text-green-600">
                     Team {leadingTeam} is leading!

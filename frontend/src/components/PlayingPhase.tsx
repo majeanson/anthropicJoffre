@@ -311,8 +311,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
       return (
-        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400/40 rounded-xl flex items-center justify-center bg-parchment-200/20 backdrop-blur">
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-parchment-400/50 flex items-center justify-center">
+        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400 dark:border-gray-600/40 rounded-xl flex items-center justify-center bg-parchment-200 dark:bg-gray-600/20 backdrop-blur">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-parchment-400 dark:border-gray-600/50 flex items-center justify-center">
             <div className="w-2 h-2 rounded-full bg-parchment-400/30"></div>
           </div>
         </div>
@@ -347,13 +347,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
   // Get color class for trump suit
   const getTrumpColor = (trump: CardColor | null): string => {
-    if (!trump) return 'text-umber-900';
+    if (!trump) return 'text-umber-900 dark:text-gray-100';
     switch (trump) {
       case 'red': return 'text-red-600';
       case 'green': return 'text-green-600';
       case 'blue': return 'text-blue-600';
       case 'brown': return 'text-amber-700';
-      default: return 'text-umber-900';
+      default: return 'text-umber-900 dark:text-gray-100';
     }
   };
 
@@ -377,7 +377,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 flex flex-col overflow-hidden md:overflow-visible">
       {/* Score Board - Fixed height */}
       <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-4 pt-2 md:pt-4">
-        <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
+        <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200 relative overflow-visible">
@@ -417,8 +417,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {/* Center Info */}
             <div className="text-center flex-shrink-0 space-y-1.5 md:space-y-2">
               <div className="flex items-center justify-center gap-2">
-                <div className="bg-gradient-to-r from-parchment-200 to-parchment-100 px-2 md:px-3 py-1 rounded-lg border border-parchment-400">
-                  <p className="text-[10px] md:text-xs font-bold text-umber-800">ROUND {gameState.roundNumber}</p>
+                <div className="bg-gradient-to-r from-parchment-200 to-parchment-100 px-2 md:px-3 py-1 rounded-lg border border-parchment-400 dark:border-gray-600">
+                  <p className="text-[10px] md:text-xs font-bold text-umber-800 dark:text-gray-200">ROUND {gameState.roundNumber}</p>
                 </div>
                 {/* Sound Toggle Button - Compact */}
                 <button
@@ -426,8 +426,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   className={`${
                     soundEnabled
                       ? 'bg-sapphire-500 hover:bg-sapphire-600'
-                      : 'bg-parchment-400 hover:bg-parchment-500'
-                  } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400`}
+                      : 'bg-parchment-400 hover:bg-parchment-50 dark:bg-gray-8000'
+                  } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600`}
                   title={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
                 >
                   {soundEnabled ? '🔊' : '🔇'}
@@ -440,7 +440,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                       autoplayEnabled
                         ? 'bg-green-500 hover:bg-green-600 animate-pulse'
                         : 'bg-purple-500 hover:bg-purple-600'
-                    } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400`}
+                    } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600`}
                     title={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}
                   >
                     {autoplayEnabled ? '🤖' : '🎮'}
@@ -454,7 +454,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                         onLeaveGame();
                       }
                     }}
-                    className="bg-crimson-600 hover:bg-crimson-700 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400"
+                    className="bg-crimson-600 hover:bg-crimson-700 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600"
                     title="Leave Game"
                   >
                     🚪
@@ -507,7 +507,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               )}
               {/* Trump */}
               {gameState.trump && (
-                <div className="bg-parchment-50/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400">
+                <div className="bg-parchment-50 dark:bg-gray-800/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
                   <p className={`text-xs md:text-base font-bold ${getTrumpColor(gameState.trump)}`}>
                     <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
                   </p>
@@ -555,7 +555,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
       {/* Circular Card Layout - Takes remaining space */}
       <div className="mb-2 md:mb-4 relative px-2 md:px-4">
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 dark:border-gray-500 shadow-2xl">
+        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 dark:border-gray-600 shadow-2xl">
           {/* Floating Action Buttons - Top Right Corner */}
           <div className="absolute top-4 right-4 z-50 flex flex-col gap-2">
             <button
@@ -587,7 +587,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 className={`${
                   showPreviousTrick
                     ? 'bg-gradient-to-br from-forest-600 to-forest-800 hover:from-forest-700 hover:to-forest-900 shadow-forest-500/50 border-forest-900'
-                    : 'bg-gradient-to-br from-umber-400 to-umber-500 hover:from-umber-500 hover:to-umber-600 shadow-umber-400/50 border-umber-600'
+                    : 'bg-gradient-to-br from-umber-400 to-umber-500 hover:from-umber-500 hover:to-umber-600 shadow-umber-400/50 border-umber-600 dark:border-gray-600'
                 } active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
                 title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
               >
@@ -730,7 +730,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 z-10">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 dark:border-gray-500 shadow-xl">
+                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 dark:border-gray-600 shadow-xl">
                     <p className="text-parchment-50 text-lg md:text-2xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
                     <div className="mt-2 flex gap-1 justify-center">
                       <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce"></div>
@@ -742,13 +742,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               )}
         {/* Only show player hand section if spectator OR if player has cards */}
         {(isSpectator || (currentPlayer && currentPlayer.hand.length > 0)) && (
-          <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400">
+          <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600">
             {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
             {isSpectator ? (
               <div className="text-center py-8">
-                <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 dark:border-gray-500 shadow-lg">
+                <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 dark:border-gray-600 shadow-lg">
                   <span className="text-umber-800 dark:text-gray-200 text-base font-semibold">🔒 Hands Hidden</span>
-                  <p className="text-umber-600 text-sm mt-1.5">Spectator Mode</p>
+                  <p className="text-umber-600 dark:text-gray-400 text-sm mt-1.5">Spectator Mode</p>
                 </div>
               </div>
             ) : (

@@ -108,7 +108,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
                     ? 'bg-orange-100 border-l-4 border-orange-400'
                     : msg.teamId === 2
                     ? 'bg-purple-100 border-l-4 border-purple-400'
-                    : 'bg-parchment-200 border-l-4 border-parchment-400'
+                    : 'bg-parchment-200 dark:bg-gray-600 border-l-4 border-parchment-400 dark:border-gray-600'
                 }`}
               >
                 <div className="font-bold text-umber-900 dark:text-gray-100 text-xs">
@@ -129,7 +129,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
           <button
             key={emoji}
             onClick={() => handleQuickEmoji(emoji)}
-            className="text-lg hover:bg-parchment-200 rounded px-2 py-1 transition-colors"
+            className="text-lg hover:bg-parchment-200 dark:bg-gray-600 rounded px-2 py-1 transition-colors"
             title={`Send ${emoji}`}
           >
             {emoji}
@@ -147,7 +147,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message... (max 200 chars)"
             maxLength={200}
-            className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 dark:bg-gray-800 text-umber-900 dark:text-gray-100 text-sm"
+            className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 dark:bg-gray-800 text-umber-900 dark:text-gray-100 text-sm"
           />
           <button
             type="submit"
