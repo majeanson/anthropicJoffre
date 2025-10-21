@@ -79,6 +79,15 @@ interface OnlinePlayer {
 
 const onlinePlayers = new Map<string, OnlinePlayer>();
 
+// Round statistics tracking
+interface RoundStatsData {
+  cardPlayTimes: Map<string, number[]>; // playerId -> array of play times in ms
+  trumpsPlayed: Map<string, number>; // playerId -> count of trump cards played
+  trickStartTime: number; // timestamp when trick started
+}
+
+const roundStats = new Map<string, RoundStatsData>(); // gameId -> stats data
+
 // Timeout configuration
 const BETTING_TIMEOUT = 60000; // 60 seconds
 const PLAYING_TIMEOUT = 60000; // 60 seconds
@@ -598,6 +607,39 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Player ready for next round
+  socket.on('player_ready', ({ gameId }: { gameId: string }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    if (game.phase !== 'scoring') {
+      socket.emit('error', { message: 'Not in scoring phase' });
+      return;
+    }
+
+    const player = game.players.find(p => p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    // Add player to ready list if not already ready
+    if (!game.playersReady) {
+      game.playersReady = [];
+    }
+
+    if (!game.playersReady.includes(socket.id)) {
+      game.playersReady.push(socket.id);
+      console.log(`Player ${player.name} is ready (${game.playersReady.length}/4)`);
+
+      // Broadcast updated game state
+      broadcastGameUpdate(gameId, 'game_updated', game);
+    }
+  });
+
   socket.on('start_game', ({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
     if (!game) {
@@ -872,6 +914,27 @@ io.on('connection', (socket) => {
     // Set trump on first card
     if (game.currentTrick.length === 0 && !game.trump) {
       game.trump = card.color;
+    }
+
+    // Track statistics for this card play
+    const stats = roundStats.get(gameId);
+    if (stats) {
+      // Track play time (time since trick started)
+      const playTime = Date.now() - stats.trickStartTime;
+      const playerTimes = stats.cardPlayTimes.get(socket.id) || [];
+      playerTimes.push(playTime);
+      stats.cardPlayTimes.set(socket.id, playerTimes);
+
+      // Track trump card usage
+      if (game.trump && card.color === game.trump) {
+        const trumpCount = stats.trumpsPlayed.get(socket.id) || 0;
+        stats.trumpsPlayed.set(socket.id, trumpCount + 1);
+      }
+
+      // Reset trick start time if this starts a new trick
+      if (game.currentTrick.length === 0) {
+        stats.trickStartTime = Date.now();
+      }
     }
 
     // Add card to trick
@@ -1153,6 +1216,20 @@ function startNewRound(gameId: string) {
   // Betting starts with player after dealer
   game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
 
+  // Initialize round statistics tracking
+  roundStats.set(gameId, {
+    cardPlayTimes: new Map(),
+    trumpsPlayed: new Map(),
+    trickStartTime: Date.now(),
+  });
+  game.players.forEach(player => {
+    const stats = roundStats.get(gameId);
+    if (stats) {
+      stats.cardPlayTimes.set(player.id, []);
+      stats.trumpsPlayed.set(player.id, 0);
+    }
+  });
+
   broadcastGameUpdate(gameId, 'round_started', game);
 
   // Start timeout for first player's bet
@@ -1206,6 +1283,102 @@ function resolveTrick(gameId: string) {
       startPlayerTimeout(gameId, winnerId, 'playing');
     }
   }, 3000);
+}
+
+function calculateRoundStatistics(gameId: string, game: GameState): any {
+  const stats = roundStats.get(gameId);
+  if (!stats) return undefined;
+
+  const statistics: any = {};
+
+  // 1. Fastest Play - player with fastest average card play time
+  let fastestPlayerId: string | null = null;
+  let fastestAvgTime = Infinity;
+
+  stats.cardPlayTimes.forEach((times, playerId) => {
+    if (times.length > 0) {
+      const avgTime = times.reduce((sum, t) => sum + t, 0) / times.length;
+      if (avgTime < fastestAvgTime) {
+        fastestAvgTime = avgTime;
+        fastestPlayerId = playerId;
+      }
+    }
+  });
+
+  if (fastestPlayerId) {
+    const player = game.players.find(p => p.id === fastestPlayerId);
+    if (player) {
+      statistics.fastestPlay = {
+        playerId: fastestPlayerId,
+        playerName: player.name,
+        timeMs: Math.round(fastestAvgTime),
+      };
+    }
+  }
+
+  // 2. Most Aggressive Bidder - highest bet amount
+  if (game.highestBet) {
+    const player = game.players.find(p => p.id === game.highestBet?.playerId);
+    if (player) {
+      statistics.mostAggressiveBidder = {
+        playerId: player.id,
+        playerName: player.name,
+        bidAmount: game.highestBet.amount,
+      };
+    }
+  }
+
+  // 3. Trump Master - player who played most trump cards
+  let trumpMasterId: string | null = null;
+  let maxTrumps = 0;
+
+  stats.trumpsPlayed.forEach((count, playerId) => {
+    if (count > maxTrumps) {
+      maxTrumps = count;
+      trumpMasterId = playerId;
+    }
+  });
+
+  if (trumpMasterId && maxTrumps > 0) {
+    const player = game.players.find(p => p.id === trumpMasterId);
+    if (player) {
+      statistics.trumpMaster = {
+        playerId: trumpMasterId,
+        playerName: player.name,
+        trumpsPlayed: maxTrumps,
+      };
+    }
+  }
+
+  // 4. Lucky Player - player who won most points with fewest tricks
+  let luckyPlayerId: string | null = null;
+  let bestPointsPerTrick = 0;
+
+  game.players.forEach(player => {
+    if (player.tricksWon > 0) {
+      const pointsPerTrick = player.pointsWon / player.tricksWon;
+      if (pointsPerTrick > bestPointsPerTrick) {
+        bestPointsPerTrick = pointsPerTrick;
+        luckyPlayerId = player.id;
+      }
+    }
+  });
+
+  if (luckyPlayerId && bestPointsPerTrick > 1.5) { // Only award if significantly lucky (>1.5 pts/trick)
+    const player = game.players.find(p => p.id === luckyPlayerId);
+    if (player) {
+      statistics.luckyPlayer = {
+        playerId: luckyPlayerId,
+        playerName: player.name,
+        reason: `${bestPointsPerTrick.toFixed(1)} pts/trick`,
+      };
+    }
+  }
+
+  // Clean up stats for this game
+  roundStats.delete(gameId);
+
+  return Object.keys(statistics).length > 0 ? statistics : undefined;
 }
 
 async function endRound(gameId: string) {
@@ -1267,6 +1440,9 @@ async function endRound(gameId: string) {
   console.log(`Defensive Team ${defensiveTeamId}: +${defensiveTeamPoints}`);
   console.log(`Round ${game.roundNumber} Scores - Team 1: ${game.teamScores.team1}, Team 2: ${game.teamScores.team2}`);
 
+  // Calculate round statistics
+  const statistics = calculateRoundStatistics(gameId, game);
+
   // Add round to history
   const roundScore = {
     team1: offensiveTeamId === 1 ? offensiveScore : defensiveTeamPoints,
@@ -1290,6 +1466,7 @@ async function endRound(gameId: string) {
     },
     tricks: [...game.currentRoundTricks], // Store all tricks from this round
     trump: game.trump, // Store trump suit for this round
+    statistics, // Add round statistics
   });
 
   // Check for game over
@@ -1311,12 +1488,30 @@ async function endRound(gameId: string) {
 
     broadcastGameUpdate(gameId, 'game_over', { winningTeam, gameState: game });
   } else {
-    // Emit round ended and schedule next round
+    // Initialize player ready tracking and round end timestamp
+    game.playersReady = [];
+    game.roundEndTimestamp = Date.now();
+
+    // Emit round ended
     broadcastGameUpdate(gameId, 'round_ended', game);
 
-    // Start next round after delay (5 seconds to review scores)
-    game.roundNumber += 1;
-    setTimeout(() => startNewRound(gameId), 5000);
+    // Check for ready or timeout every second
+    const roundSummaryInterval = setInterval(() => {
+      const currentGame = games.get(gameId);
+      if (!currentGame || currentGame.phase !== 'scoring') {
+        clearInterval(roundSummaryInterval);
+        return;
+      }
+
+      const allReady = currentGame.playersReady && currentGame.playersReady.length === 4;
+      const timeoutReached = currentGame.roundEndTimestamp && (Date.now() - currentGame.roundEndTimestamp >= 60000);
+
+      if (allReady || timeoutReached) {
+        clearInterval(roundSummaryInterval);
+        currentGame.roundNumber += 1;
+        startNewRound(gameId);
+      }
+    }, 1000);
   }
 }
 

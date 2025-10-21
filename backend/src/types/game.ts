@@ -41,6 +41,13 @@ export interface TrickResult {
   points: number;
 }
 
+export interface RoundStatistics {
+  fastestPlay?: { playerId: string; playerName: string; timeMs: number };
+  mostAggressiveBidder?: { playerId: string; playerName: string; bidAmount: number };
+  trumpMaster?: { playerId: string; playerName: string; trumpsPlayed: number };
+  luckyPlayer?: { playerId: string; playerName: string; reason: string };
+}
+
 export interface RoundHistory {
   roundNumber: number;
   bets: Bet[];
@@ -61,6 +68,7 @@ export interface RoundHistory {
   };
   tricks: TrickResult[]; // All tricks played in this round
   trump: CardColor | null; // Trump suit for this round
+  statistics?: RoundStatistics; // Fun stats for this round
 }
 
 export interface GameState {
@@ -81,6 +89,8 @@ export interface GameState {
   roundNumber: number;
   roundHistory: RoundHistory[];
   currentRoundTricks: TrickResult[]; // Tricks completed in current round (before endRound)
+  playersReady?: string[]; // Array of player IDs who are ready for next round
+  roundEndTimestamp?: number; // Timestamp when round ended (for 60s timer)
 }
 
 export interface GameHistory {

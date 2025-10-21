@@ -5,6 +5,7 @@ import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
 import { PlayingPhase } from './components/PlayingPhase';
 import { TeamSelection } from './components/TeamSelection';
+import { ScoringPhase } from './components/ScoringPhase';
 import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
 import { DebugPanel } from './components/DebugPanel';
 import { TestPanel } from './components/TestPanel';
@@ -844,107 +845,12 @@ function App() {
           isOpen={debugPanelOpen}
           onClose={() => setDebugPanelOpen(false)}
         />
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-6">
-        <div className="bg-white rounded-xl p-8 shadow-2xl max-w-2xl w-full">
-          <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Round {gameState.roundNumber} Complete!</h2>
-
-          {/* Team Scores - Large and Clear */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            <div className="text-center p-6 bg-orange-50 rounded-lg border-2 border-orange-200">
-              <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
-              <p className="text-5xl font-bold text-orange-600">{gameState.teamScores.team1}</p>
-              <p className="text-xs text-orange-700 mt-2">Total Score</p>
-            </div>
-            <div className="text-center p-6 bg-purple-50 rounded-lg border-2 border-purple-200">
-              <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
-              <p className="text-5xl font-bold text-purple-600">{gameState.teamScores.team2}</p>
-              <p className="text-xs text-purple-700 mt-2">Total Score</p>
-            </div>
-          </div>
-
-          {/* Round Summary - Team-based */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 mb-4 border border-gray-200">
-            <h3 className="text-center font-bold text-gray-700 mb-3">Round Summary</h3>
-            <div className="space-y-4">
-              {/* Team 1 */}
-              {(() => {
-                const team1Players = gameState.players.filter(p => p.teamId === 1);
-                const team1Points = team1Players.reduce((sum, p) => sum + p.pointsWon, 0);
-                const team1Tricks = team1Players.reduce((sum, p) => sum + p.tricksWon, 0);
-
-                return (
-                  <div className="bg-orange-50 border border-orange-300 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-orange-800 flex items-center gap-2">
-                        Team 1
-                        {team1Points > 0 && (
-                          <span className="px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs bg-green-500 border-green-300">
-                            +{team1Points}
-                          </span>
-                        )}
-                      </h4>
-                      <span className="text-sm font-semibold text-orange-700">{team1Tricks} tricks ({team1Points} pts)</span>
-                    </div>
-                    <div className="space-y-1">
-                      {team1Players.map((player) => {
-                        const isHighestBidder = gameState.highestBet && gameState.highestBet.playerId === player.id;
-                        return (
-                          <div key={player.id} className="flex items-center justify-between text-sm">
-                            <span className="flex items-center gap-1">
-                              {player.name}
-                              {isHighestBidder && <span className="text-xs text-yellow-600">⭐</span>}
-                            </span>
-                            <span className="text-gray-600">{player.tricksWon} tricks ({player.pointsWon} pts)</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* Team 2 */}
-              {(() => {
-                const team2Players = gameState.players.filter(p => p.teamId === 2);
-                const team2Points = team2Players.reduce((sum, p) => sum + p.pointsWon, 0);
-                const team2Tricks = team2Players.reduce((sum, p) => sum + p.tricksWon, 0);
-
-                return (
-                  <div className="bg-purple-50 border border-purple-300 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-purple-800 flex items-center gap-2">
-                        Team 2
-                        {team2Points > 0 && (
-                          <span className="px-2 py-0.5 rounded-full font-black text-white shadow-lg border-2 text-xs bg-green-500 border-green-300">
-                            +{team2Points}
-                          </span>
-                        )}
-                      </h4>
-                      <span className="text-sm font-semibold text-purple-700">{team2Tricks} tricks ({team2Points} pts)</span>
-                    </div>
-                    <div className="space-y-1">
-                      {team2Players.map((player) => {
-                        const isHighestBidder = gameState.highestBet && gameState.highestBet.playerId === player.id;
-                        return (
-                          <div key={player.id} className="flex items-center justify-between text-sm">
-                            <span className="flex items-center gap-1">
-                              {player.name}
-                              {isHighestBidder && <span className="text-xs text-yellow-600">⭐</span>}
-                            </span>
-                            <span className="text-gray-600">{player.tricksWon} tricks ({player.pointsWon} pts)</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-
-          <p className="text-center text-gray-600 text-sm">Next round starting soon...</p>
-        </div>
-        </div>
+        <ScoringPhase
+          gameState={gameState}
+          socket={socket || null}
+          gameId={gameId}
+          currentPlayerId={socket?.id || ''}
+        />
       </>
     );
   }

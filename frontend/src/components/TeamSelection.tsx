@@ -19,7 +19,7 @@ interface TeamSelectionProps {
   onStartGame: () => void;
   onLeaveGame?: () => void;
   onAddBot?: () => void;
-  socket?: Socket;
+  socket?: Socket | null;
 }
 
 export function TeamSelection({
