@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 
-interface ChatMessage {
+export interface ChatMessage {
   playerId: string;
   playerName: string;
   teamId: 1 | 2 | null;
@@ -15,10 +15,11 @@ interface ChatPanelProps {
   currentPlayerId: string;
   isOpen: boolean;
   onClose: () => void;
+  messages: ChatMessage[];
+  onNewMessage: (message: ChatMessage) => void;
 }
 
-export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose }: ChatPanelProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, messages, onNewMessage }: ChatPanelProps) {
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,7 +29,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose }: 
     if (!socket) return;
 
     const handleChatMessage = (msg: ChatMessage) => {
-      setMessages(prev => [...prev, msg]);
+      onNewMessage(msg);
     };
 
     socket.on('game_chat_message', handleChatMessage);
@@ -36,7 +37,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose }: 
     return () => {
       socket.off('game_chat_message', handleChatMessage);
     };
-  }, [socket]);
+  }, [socket, onNewMessage]);
 
   // Auto-scroll to bottom of messages
   useEffect(() => {

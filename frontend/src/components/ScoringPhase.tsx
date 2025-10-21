@@ -1,16 +1,25 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState, RoundStatistics } from '../types/game';
-import { ChatPanel } from './ChatPanel';
+import { ChatPanel, ChatMessage } from './ChatPanel';
 
 interface ScoringPhaseProps {
   gameState: GameState;
   socket: Socket | null;
   gameId: string;
   currentPlayerId: string;
+  chatMessages?: ChatMessage[];
+  onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-export function ScoringPhase({ gameState, socket, gameId, currentPlayerId }: ScoringPhaseProps) {
+export function ScoringPhase({
+  gameState,
+  socket,
+  gameId,
+  currentPlayerId,
+  chatMessages = [],
+  onNewChatMessage
+}: ScoringPhaseProps) {
   const [chatOpen, setChatOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(60);
@@ -71,13 +80,17 @@ export function ScoringPhase({ gameState, socket, gameId, currentPlayerId }: Sco
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-6">
       {/* Chat Panel */}
-      <ChatPanel
-        socket={socket}
-        gameId={gameId}
-        currentPlayerId={currentPlayerId}
-        isOpen={chatOpen}
-        onClose={() => setChatOpen(false)}
-      />
+      {socket && onNewChatMessage && (
+        <ChatPanel
+          socket={socket}
+          gameId={gameId}
+          currentPlayerId={currentPlayerId}
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+          messages={chatMessages}
+          onNewMessage={onNewChatMessage}
+        />
+      )}
 
       <div className="bg-white rounded-xl p-8 shadow-2xl max-w-4xl w-full relative">
         {/* Chat Button */}
@@ -103,13 +116,6 @@ export function ScoringPhase({ gameState, socket, gameId, currentPlayerId }: Sco
             <div className="flex items-center gap-3">
               <div className="text-4xl font-bold text-blue-600">
                 {timeRemaining}s
-              </div>
-              <div className="text-sm text-gray-600">
-                {timeRemaining > 0 ? (
-                  <>Next round starts in {timeRemaining}s</>
-                ) : (
-                  <>Starting next round...</>
-                )}
               </div>
             </div>
             <div className="flex items-center gap-3">

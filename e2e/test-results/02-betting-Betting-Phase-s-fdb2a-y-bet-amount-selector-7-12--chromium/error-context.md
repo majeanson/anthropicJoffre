@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - heading "Betting Phase" [level=2] [ref=e6]
+    - generic [ref=e7]:
+      - button "🏆" [ref=e8] [cursor=pointer]
+      - button "🎮" [ref=e9] [cursor=pointer]
+      - button "🚪" [ref=e10] [cursor=pointer]
+  - generic [ref=e12]: "Waiting for: Player 3"
+  - generic [ref=e13]:
+    - heading "Players & Bets" [level=3] [ref=e14]
+    - generic [ref=e15]:
+      - generic [ref=e16]:
+        - generic [ref=e19]: Player 1
+        - generic [ref=e20]: Waiting...
+      - generic [ref=e21]:
+        - generic [ref=e24]: Player 2(Dealer)
+        - generic [ref=e25]: Waiting...
+      - generic [ref=e26]:
+        - generic [ref=e29]: Player 3
+        - generic [ref=e30]: Waiting...
+      - generic [ref=e31]:
+        - generic [ref=e34]: Player 4
+        - generic [ref=e35]: Waiting...
+  - generic [ref=e36]:
+    - heading "Your Hand" [level=3] [ref=e37]
+    - generic [ref=e38]:
+      - button "red bon +5" [ref=e40]:
+        - img "red bon" [ref=e41]
+        - generic [ref=e42]: "+5"
+      - button "5 red emblem 5" [ref=e44]:
+        - generic [ref=e45]: "5"
+        - img "red emblem" [ref=e46]
+        - generic [ref=e47]: "5"
+      - button "7 red emblem 7" [ref=e49]:
+        - generic [ref=e50]: "7"
+        - img "red emblem" [ref=e51]
+        - generic [ref=e52]: "7"
+      - button "5 brown emblem 5" [ref=e54]:
+        - generic [ref=e55]: "5"
+        - img "brown emblem" [ref=e56]
+        - generic [ref=e57]: "5"
+      - button "2 green emblem 2" [ref=e59]:
+        - generic [ref=e60]: "2"
+        - img "green emblem" [ref=e61]
+        - generic [ref=e62]: "2"
+      - button "5 green emblem 5" [ref=e64]:
+        - generic [ref=e65]: "5"
+        - img "green emblem" [ref=e66]
+        - generic [ref=e67]: "5"
+      - button "3 blue emblem 3" [ref=e69]:
+        - generic [ref=e70]: "3"
+        - img "blue emblem" [ref=e71]
+        - generic [ref=e72]: "3"
+      - button "4 blue emblem 4" [ref=e74]:
+        - generic [ref=e75]: "4"
+        - img "blue emblem" [ref=e76]
+        - generic [ref=e77]: "4"
+  - generic [ref=e80]: It's Player 3's turn to bet
+```

@@ -12,6 +12,7 @@ import { TestPanel } from './components/TestPanel';
 import { ReconnectingBanner } from './components/ReconnectingBanner';
 import { CatchUpModal } from './components/CatchUpModal';
 import { Toast, ToastProps } from './components/Toast';
+import { ChatMessage } from './components/ChatPanel';
 import { BotPlayer } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { addRecentPlayers } from './utils/recentPlayers';
@@ -29,6 +30,7 @@ function App() {
   const [reconnecting, setReconnecting] = useState<boolean>(false);
   const [showCatchUpModal, setShowCatchUpModal] = useState<boolean>(false);
   const [toast, setToast] = useState<Omit<ToastProps, 'onClose'> | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
   const [currentTrickWinnerId, setCurrentTrickWinnerId] = useState<string | null>(null);
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
@@ -382,7 +384,13 @@ function App() {
   const handleLeaveGame = () => {
     if (socket && gameId) {
       socket.emit('leave_game', { gameId });
+      // Clear chat messages when leaving game
+      setChatMessages([]);
     }
+  };
+
+  const handleNewChatMessage = (message: ChatMessage) => {
+    setChatMessages(prev => [...prev, message]);
   };
 
   const handleRejoinGame = () => {
@@ -899,6 +907,8 @@ function App() {
           onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
           socket={socket}
           gameId={gameId}
+          chatMessages={chatMessages}
+          onNewChatMessage={handleNewChatMessage}
         />
       </>
     );
@@ -921,6 +931,8 @@ function App() {
           socket={socket || null}
           gameId={gameId}
           currentPlayerId={socket?.id || ''}
+          chatMessages={chatMessages}
+          onNewChatMessage={handleNewChatMessage}
         />
       </>
     );

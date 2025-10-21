@@ -3,7 +3,7 @@ import { Socket } from 'socket.io-client';
 import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
-import { ChatPanel } from './ChatPanel';
+import { ChatPanel, ChatMessage } from './ChatPanel';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
 
@@ -18,9 +18,11 @@ interface PlayingPhaseProps {
   onAutoplayToggle?: () => void;
   socket?: Socket | null;
   gameId?: string;
+  chatMessages?: ChatMessage[];
+  onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, socket, gameId }: PlayingPhaseProps) {
+export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -788,13 +790,15 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         onClose={() => setShowLeaderboard(false)}
       />
 
-      {socket && gameId && !isSpectator && (
+      {socket && gameId && !isSpectator && onNewChatMessage && (
         <ChatPanel
           socket={socket}
           gameId={gameId}
           currentPlayerId={currentPlayerId}
           isOpen={chatOpen}
           onClose={() => setChatOpen(false)}
+          messages={chatMessages}
+          onNewMessage={onNewChatMessage}
         />
       )}
     </div>
