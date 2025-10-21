@@ -149,24 +149,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showToast, setShowToast] = useState(false);
-  const [hasAutoJoined, setHasAutoJoined] = useState(false);
 
   // Load recent players on mount
   useEffect(() => {
     setRecentPlayers(getRecentPlayers());
   }, []);
 
-  // Auto-join when name is entered and we have autoJoinGameId from URL
-  useEffect(() => {
-    if (autoJoinGameId && playerName.trim() && gameId.trim() && mode === 'join' && joinType === 'player' && !hasAutoJoined) {
-      // Auto-submit the join after user finishes typing (debounce)
-      const timer = setTimeout(() => {
-        onJoinGame(gameId, playerName);
-        setHasAutoJoined(true);
-      }, 800); // Wait 800ms after last keystroke
-      return () => clearTimeout(timer);
-    }
-  }, [playerName, autoJoinGameId, gameId, mode, joinType, hasAutoJoined, onJoinGame]);
+  // Removed auto-submit for URL joins - user will click join button manually
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -483,9 +472,22 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
 
         <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Join Game</h2>
+
+        {/* Show message when joining from URL */}
+        {autoJoinGameId && (
+          <div className="mb-4 bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-4">
+            <p className="text-blue-800 dark:text-blue-200 font-semibold text-center">
+              🎮 Joining game: <span className="font-mono">{gameId}</span>
+            </p>
+            <p className="text-blue-600 dark:text-blue-300 text-sm text-center mt-1">
+              Enter your name to join!
+            </p>
+          </div>
+        )}
+
         <form onSubmit={handleJoin} className="space-y-4">
           {/* Join Type Selection */}
-          <div className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400">
+          <div className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600">
             <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3">
               Join as:
             </label>
@@ -554,18 +556,21 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           )}
 
           <div className="flex gap-3">
-            <button
-              data-testid="back-button"
-              type="button"
-              onClick={() => setMode('menu')}
-              className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
-            >
-              Back
-            </button>
+            {/* Hide back button when joining from URL */}
+            {!autoJoinGameId && (
+              <button
+                data-testid="back-button"
+                type="button"
+                onClick={() => setMode('menu')}
+                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
+              >
+                Back
+              </button>
+            )}
             <button
               data-testid="submit-join-button"
               type="submit"
-              className={`flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
+              className={`${autoJoinGameId ? 'w-full' : 'flex-1'} text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
                 joinType === 'player'
                   ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-purple-800'
                   : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-blue-800'

@@ -793,10 +793,10 @@ function App() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-purple-50 flex items-center justify-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          <h2 className="text-xl font-bold text-purple-600 mb-2">Error</h2>
-          <p className="text-gray-700">{error}</p>
+      <div className="min-h-screen bg-purple-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+          <h2 className="text-xl font-bold text-purple-600 dark:text-purple-400 mb-2">Error</h2>
+          <p className="text-gray-700 dark:text-gray-300">{error}</p>
           <button
             onClick={() => {
               setError('');
@@ -856,13 +856,13 @@ function App() {
 
       {/* Dropdown Menu */}
       {debugMenuOpen && (
-        <div className="absolute top-12 right-0 bg-white bg-opacity-95 rounded-lg shadow-2xl p-2 min-w-[160px] backdrop-blur-sm">
+        <div className="absolute top-12 right-0 bg-white dark:bg-gray-800 bg-opacity-95 dark:bg-opacity-95 rounded-lg shadow-2xl p-2 min-w-[160px] backdrop-blur-sm">
           <button
             onClick={() => {
               setTestPanelOpen(true);
               setDebugMenuOpen(false);
             }}
-            className="w-full text-left px-3 py-2 rounded hover:bg-green-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700"
+            className="w-full text-left px-3 py-2 rounded hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
           >
             🧪 Test Panel
           </button>
@@ -871,7 +871,7 @@ function App() {
               setDebugPanelOpen(true);
               setDebugMenuOpen(false);
             }}
-            className="w-full text-left px-3 py-2 rounded hover:bg-purple-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700"
+            className="w-full text-left px-3 py-2 rounded hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
           >
             🔍 Game State
           </button>
@@ -881,7 +881,7 @@ function App() {
                 setDebugMode(!debugMode);
                 setDebugMenuOpen(false);
               }}
-              className="w-full text-left px-3 py-2 rounded hover:bg-yellow-50 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700"
+              className="w-full text-left px-3 py-2 rounded hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
             >
               {debugMode ? '👤 Single View' : '🐛 4-Player View'}
             </button>
@@ -1095,13 +1095,13 @@ function App() {
             {/* Player Stats */}
             <div className="grid grid-cols-2 gap-6 mb-8">
               {/* Team 1 Players */}
-              <div className="bg-orange-50 rounded-lg p-4 border-2 border-orange-200">
-                <h4 className="text-lg font-bold text-orange-800 mb-3 text-center">Team 1 Players</h4>
+              <div className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border-2 border-orange-200 dark:border-orange-700">
+                <h4 className="text-lg font-bold text-orange-800 dark:text-orange-300 mb-3 text-center">Team 1 Players</h4>
                 <div className="space-y-2">
                   {team1Players.map(player => (
-                    <div key={player.id} className="bg-white rounded-lg p-3 border border-orange-200">
-                      <div className="font-semibold text-umber-900">{player.name}</div>
-                      <div className="text-sm text-umber-700">
+                    <div key={player.id} className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-orange-200 dark:border-orange-700">
+                      <div className="font-semibold text-umber-900 dark:text-gray-100">{player.name}</div>
+                      <div className="text-sm text-umber-700 dark:text-gray-300">
                         {player.tricksWon} tricks • {player.pointsWon} pts
                       </div>
                     </div>
@@ -1110,13 +1110,13 @@ function App() {
               </div>
 
               {/* Team 2 Players */}
-              <div className="bg-purple-50 rounded-lg p-4 border-2 border-purple-200">
-                <h4 className="text-lg font-bold text-purple-800 mb-3 text-center">Team 2 Players</h4>
+              <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-700">
+                <h4 className="text-lg font-bold text-purple-800 dark:text-purple-300 mb-3 text-center">Team 2 Players</h4>
                 <div className="space-y-2">
                   {team2Players.map(player => (
-                    <div key={player.id} className="bg-white rounded-lg p-3 border border-purple-200">
-                      <div className="font-semibold text-umber-900">{player.name}</div>
-                      <div className="text-sm text-umber-700">
+                    <div key={player.id} className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-purple-200 dark:border-purple-700">
+                      <div className="font-semibold text-umber-900 dark:text-gray-100">{player.name}</div>
+                      <div className="text-sm text-umber-700 dark:text-gray-300">
                         {player.tricksWon} tricks • {player.pointsWon} pts
                       </div>
                     </div>
