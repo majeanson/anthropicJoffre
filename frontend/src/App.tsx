@@ -373,6 +373,20 @@ function App() {
       setGameState(gameState);
     });
 
+    newSocket.on('kicked_from_game', ({ message }) => {
+      console.log('Kicked from game:', message);
+      setToast({
+        message,
+        type: 'error',
+        duration: 5000,
+      });
+      // Clear session and reset state
+      localStorage.removeItem('gameSession');
+      setGameState(null);
+      setGameId('');
+      setIsSpectator(false);
+    });
+
     newSocket.on('leave_game_success', () => {
       console.log('Successfully left game');
       // Clear session and reset state
@@ -465,6 +479,12 @@ function App() {
       socket.emit('leave_game', { gameId });
       // Clear chat messages when leaving game
       setChatMessages([]);
+    }
+  };
+
+  const handleKickPlayer = (playerId: string) => {
+    if (socket && gameId) {
+      socket.emit('kick_player', { gameId, playerId });
     }
   };
 
@@ -922,11 +942,13 @@ function App() {
           players={gameState.players}
           gameId={gameId}
           currentPlayerId={socket?.id || ''}
+          creatorId={gameState.creatorId}
           onSelectTeam={handleSelectTeam}
           onSwapPosition={handleSwapPosition}
           onStartGame={handleStartGame}
           onLeaveGame={handleLeaveGame}
           onAddBot={handleAddBot}
+          onKickPlayer={handleKickPlayer}
           socket={socket}
         />
       </>

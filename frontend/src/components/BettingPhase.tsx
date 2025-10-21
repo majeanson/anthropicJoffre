@@ -5,6 +5,7 @@ import { Card as CardComponent } from './Card';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { Leaderboard } from './Leaderboard';
 import { ChatPanel, ChatMessage } from './ChatPanel';
+import { sounds } from '../utils/sounds';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -43,9 +44,13 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   useEffect(() => {
     if (!socket) return;
 
-    const handleChatMessage = () => {
+    const handleChatMessage = (msg: ChatMessage) => {
       if (!chatOpen) {
         setUnreadChatCount(prev => prev + 1);
+        // Play notification sound if message is from another player
+        if (msg.playerId !== currentPlayerId) {
+          sounds.chatNotification();
+        }
       }
     };
 

@@ -14,11 +14,13 @@ interface TeamSelectionProps {
   players: Player[];
   gameId: string;
   currentPlayerId: string;
+  creatorId: string;
   onSelectTeam: (teamId: 1 | 2) => void;
   onSwapPosition: (targetPlayerId: string) => void;
   onStartGame: () => void;
   onLeaveGame?: () => void;
   onAddBot?: () => void;
+  onKickPlayer?: (playerId: string) => void;
   socket?: Socket | null;
 }
 
@@ -26,11 +28,13 @@ export function TeamSelection({
   players,
   gameId,
   currentPlayerId,
+  creatorId,
   onSelectTeam,
   onSwapPosition,
   onStartGame,
   onLeaveGame,
   onAddBot,
+  onKickPlayer,
   socket,
 }: TeamSelectionProps) {
   const currentPlayer = players.find(p => p.id === currentPlayerId);
@@ -190,14 +194,25 @@ export function TeamSelection({
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
-                        {!isCurrentPlayer && currentPlayer && (
-                          <button
-                            onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0"
-                          >
-                            Swap
-                          </button>
-                        )}
+                        <div className="flex gap-2">
+                          {!isCurrentPlayer && currentPlayer && (
+                            <button
+                              onClick={() => onSwapPosition(playerAtPosition.id)}
+                              className="text-xs bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0"
+                            >
+                              Swap
+                            </button>
+                          )}
+                          {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
+                            <button
+                              onClick={() => onKickPlayer(playerAtPosition.id)}
+                              className="text-xs bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0"
+                              title="Remove player from game"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <div className="text-center">
@@ -244,14 +259,25 @@ export function TeamSelection({
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
-                        {!isCurrentPlayer && currentPlayer && (
-                          <button
-                            onClick={() => onSwapPosition(playerAtPosition.id)}
-                            className="text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0"
-                          >
-                            Swap
-                          </button>
-                        )}
+                        <div className="flex gap-2">
+                          {!isCurrentPlayer && currentPlayer && (
+                            <button
+                              onClick={() => onSwapPosition(playerAtPosition.id)}
+                              className="text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0"
+                            >
+                              Swap
+                            </button>
+                          )}
+                          {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
+                            <button
+                              onClick={() => onKickPlayer(playerAtPosition.id)}
+                              className="text-xs bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0"
+                              title="Remove player from game"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <div className="text-center">

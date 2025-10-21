@@ -73,6 +73,7 @@ export interface RoundHistory {
 
 export interface GameState {
   id: string;
+  creatorId: string; // Socket ID of the player who created the game
   phase: GamePhase;
   players: Player[];
   currentBets: Bet[];

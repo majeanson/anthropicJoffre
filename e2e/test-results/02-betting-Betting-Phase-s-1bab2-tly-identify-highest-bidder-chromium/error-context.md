@@ -1,0 +1,68 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - heading "Team 1" [level=3] [ref=e8]
+      - paragraph [ref=e9]: "0"
+      - paragraph [ref=e10]: +0 pts
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - paragraph [ref=e14]: ROUND 1
+        - button "🔊" [ref=e15] [cursor=pointer]
+        - button "🎮" [ref=e16] [cursor=pointer]
+        - button "🚪" [ref=e17] [cursor=pointer]
+      - generic [ref=e19]: "Waiting for: Player 2"
+      - paragraph [ref=e21]: 🎲 12
+    - generic [ref=e22]:
+      - heading "Team 2" [level=3] [ref=e23]
+      - paragraph [ref=e24]: "0"
+      - paragraph [ref=e25]: +0 pts
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - button "🏆 Leaderboard" [ref=e29] [cursor=pointer]:
+        - generic [ref=e30]: 🏆 Leaderboard
+      - button "💬 Chat" [ref=e31] [cursor=pointer]:
+        - generic [ref=e32]: 💬 Chat
+    - generic [ref=e33]:
+      - generic [ref=e38]: Player 1 (You)
+      - generic [ref=e40]: Player 2
+      - generic [ref=e45]: Player 3
+      - generic [ref=e53]: Player 4
+  - generic [ref=e54]:
+    - paragraph [ref=e57]: Waiting for first card from Player 2...
+    - generic [ref=e64]:
+      - button "1 red emblem 1" [disabled] [ref=e66]:
+        - generic [ref=e67]: "1"
+        - img "red emblem" [ref=e68]
+        - generic [ref=e69]: "1"
+      - button "2 red emblem 2" [disabled] [ref=e71]:
+        - generic [ref=e72]: "2"
+        - img "red emblem" [ref=e73]
+        - generic [ref=e74]: "2"
+      - button "2 brown emblem 2" [disabled] [ref=e76]:
+        - generic [ref=e77]: "2"
+        - img "brown emblem" [ref=e78]
+        - generic [ref=e79]: "2"
+      - button "4 brown emblem 4" [disabled] [ref=e81]:
+        - generic [ref=e82]: "4"
+        - img "brown emblem" [ref=e83]
+        - generic [ref=e84]: "4"
+      - button "5 brown emblem 5" [disabled] [ref=e86]:
+        - generic [ref=e87]: "5"
+        - img "brown emblem" [ref=e88]
+        - generic [ref=e89]: "5"
+      - button "0 green emblem 0" [disabled] [ref=e91]:
+        - generic [ref=e92]: "0"
+        - img "green emblem" [ref=e93]
+        - generic [ref=e94]: "0"
+      - button "2 green emblem 2" [disabled] [ref=e96]:
+        - generic [ref=e97]: "2"
+        - img "green emblem" [ref=e98]
+        - generic [ref=e99]: "2"
+      - button "1 blue emblem 1" [disabled] [ref=e101]:
+        - generic [ref=e102]: "1"
+        - img "blue emblem" [ref=e103]
+        - generic [ref=e104]: "1"
+```

@@ -238,6 +238,34 @@ class SoundManager {
       osc.stop(now + delay + 0.08);
     });
   }
+
+  // Chat notification - friendly pop sound
+  playChatNotification() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Gentle ascending pop
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.frequency.setValueAtTime(600, now); // Starting frequency
+    osc.frequency.exponentialRampToValueAtTime(900, now + 0.08); // Quick rise
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(this.masterVolume * 0.25, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
 }
 
 // Create singleton instance
@@ -252,6 +280,7 @@ export const sounds = {
   roundStart: () => soundManager.playRoundStart(),
   buttonClick: () => soundManager.playButtonClick(),
   yourTurn: () => soundManager.playYourTurn(),
+  chatNotification: () => soundManager.playChatNotification(),
   setEnabled: (enabled: boolean) => soundManager.setEnabled(enabled),
   setVolume: (volume: number) => soundManager.setVolume(volume),
 };

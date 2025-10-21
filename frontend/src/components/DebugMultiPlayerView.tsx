@@ -44,6 +44,7 @@ export function DebugMultiPlayerView({
                   players={players}
                   gameId={gameId}
                   currentPlayerId={player.id}
+                  creatorId={gameState.creatorId}
                   onSelectTeam={onSelectTeam}
                   onSwapPosition={onSwapPosition}
                   onStartGame={onStartGame}

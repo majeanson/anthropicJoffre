@@ -54,9 +54,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   useEffect(() => {
     if (!socket) return;
 
-    const handleChatMessage = () => {
+    const handleChatMessage = (msg: ChatMessage) => {
       if (!chatOpen) {
         setUnreadChatCount(prev => prev + 1);
+        // Play notification sound if message is from another player
+        if (msg.playerId !== currentPlayerId) {
+          sounds.chatNotification();
+        }
       }
     };
 

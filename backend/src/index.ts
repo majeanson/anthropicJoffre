@@ -505,6 +505,7 @@ io.on('connection', (socket) => {
 
     const gameState: GameState = {
       id: gameId,
+      creatorId: socket.id, // Track who created the game
       phase: 'team_selection',
       players: [player],
       currentBets: [],
@@ -1204,6 +1205,72 @@ io.on('connection', (socket) => {
     }
   });
 
+  // Kick player handler
+  socket.on('kick_player', ({ gameId, playerId }: { gameId: string; playerId: string }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Only allow the game creator to kick players
+    if (socket.id !== game.creatorId) {
+      socket.emit('error', { message: 'Only the game creator can kick players' });
+      return;
+    }
+
+    // Cannot kick yourself
+    if (playerId === socket.id) {
+      socket.emit('error', { message: 'Cannot kick yourself' });
+      return;
+    }
+
+    // Only allow kicking during team selection phase
+    if (game.phase !== 'team_selection') {
+      socket.emit('error', { message: 'Can only kick players during team selection' });
+      return;
+    }
+
+    // Find player
+    const playerIndex = game.players.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) {
+      socket.emit('error', { message: 'Player not found' });
+      return;
+    }
+
+    const kickedPlayer = game.players[playerIndex];
+
+    // Remove player from game
+    game.players.splice(playerIndex, 1);
+
+    // Notify the kicked player
+    io.to(playerId).emit('kicked_from_game', {
+      message: 'You have been removed from the game by the host',
+      gameId
+    });
+
+    // Remove from socket room
+    const kickedSocket = io.sockets.sockets.get(playerId);
+    if (kickedSocket) {
+      kickedSocket.leave(gameId);
+    }
+
+    // Remove player session if it exists
+    for (const [token, session] of playerSessions.entries()) {
+      if (session.playerId === playerId && session.gameId === gameId) {
+        playerSessions.delete(token);
+        break;
+      }
+    }
+
+    // Update online player status
+    removeOnlinePlayer(playerId);
+
+    // Broadcast updated game state
+    io.to(gameId).emit('player_left', { playerId, gameState: game });
+    console.log(`Player ${kickedPlayer.name} was kicked from game ${gameId} by host`);
+  });
+
   // Reconnection handler
   socket.on('reconnect_to_game', ({ token }: { token: string }) => {
     console.log('Reconnection attempt with token:', token.substring(0, 10) + '...');
@@ -1252,6 +1319,23 @@ io.on('connection', (socket) => {
       clearTimeout(deletionTimeout);
       gameDeletionTimeouts.delete(session.gameId);
       console.log(`Cancelled deletion timeout for game ${session.gameId} (player returned)`);
+    }
+
+    // Update timeout if this player had an active timeout
+    // This fixes the bug where a reconnecting player on their turn gets stuck
+    const oldTimeoutKey = `${session.gameId}-${oldSocketId}`;
+    const existingTimeout = activeTimeouts.get(oldTimeoutKey);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+      activeTimeouts.delete(oldTimeoutKey);
+      console.log(`Cleared old timeout for ${oldSocketId}, restarting for ${socket.id}`);
+
+      // Restart timeout with new socket ID if it's their turn
+      const currentPlayer = game.players[game.currentPlayerIndex];
+      if (currentPlayer && currentPlayer.id === socket.id) {
+        const phase = game.phase === 'betting' ? 'betting' : 'playing';
+        startPlayerTimeout(session.gameId, socket.id, phase as 'betting' | 'playing');
+      }
     }
 
     console.log(`Player ${session.playerName} reconnected to game ${session.gameId}`);

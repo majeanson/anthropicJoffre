@@ -149,11 +149,24 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showToast, setShowToast] = useState(false);
+  const [hasAutoJoined, setHasAutoJoined] = useState(false);
 
   // Load recent players on mount
   useEffect(() => {
     setRecentPlayers(getRecentPlayers());
   }, []);
+
+  // Auto-join when name is entered and we have autoJoinGameId from URL
+  useEffect(() => {
+    if (autoJoinGameId && playerName.trim() && gameId.trim() && mode === 'join' && joinType === 'player' && !hasAutoJoined) {
+      // Auto-submit the join after user finishes typing (debounce)
+      const timer = setTimeout(() => {
+        onJoinGame(gameId, playerName);
+        setHasAutoJoined(true);
+      }, 800); // Wait 800ms after last keystroke
+      return () => clearTimeout(timer);
+    }
+  }, [playerName, autoJoinGameId, gameId, mode, joinType, hasAutoJoined, onJoinGame]);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();

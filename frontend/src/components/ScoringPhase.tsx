@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState, RoundStatistics } from '../types/game';
 import { ChatPanel, ChatMessage } from './ChatPanel';
+import { sounds } from '../utils/sounds';
 
 interface ScoringPhaseProps {
   gameState: GameState;
@@ -48,9 +49,13 @@ export function ScoringPhase({
   useEffect(() => {
     if (!socket) return;
 
-    const handleChatMessage = () => {
+    const handleChatMessage = (msg: ChatMessage) => {
       if (!chatOpen) {
         setUnreadCount(prev => prev + 1);
+        // Play notification sound if message is from another player
+        if (msg.playerId !== currentPlayerId) {
+          sounds.chatNotification();
+        }
       }
     };
 
