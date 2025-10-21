@@ -7,6 +7,7 @@ interface LobbyProps {
   onQuickPlay: () => void;
   onRejoinGame?: () => void;
   hasValidSession?: boolean;
+  autoJoinGameId?: string;
 }
 
 // Rules Modal Component
@@ -126,10 +127,10 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
   );
 }
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId }: LobbyProps) {
   const [playerName, setPlayerName] = useState('');
-  const [gameId, setGameId] = useState('');
-  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>('menu');
+  const [gameId, setGameId] = useState(autoJoinGameId || '');
+  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
 

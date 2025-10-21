@@ -1,4 +1,5 @@
 import { Player } from '../types/game';
+import { useState } from 'react';
 
 interface TeamSelectionProps {
   players: Player[];
@@ -24,6 +25,18 @@ export function TeamSelection({
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const team1Players = players.filter(p => p.teamId === 1);
   const team2Players = players.filter(p => p.teamId === 2);
+  const [showCopyToast, setShowCopyToast] = useState(false);
+
+  const handleCopyGameLink = async () => {
+    const gameUrl = `${window.location.origin}?join=${gameId}`;
+    try {
+      await navigator.clipboard.writeText(gameUrl);
+      setShowCopyToast(true);
+      setTimeout(() => setShowCopyToast(false), 3000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
+  };
 
   // Validation for starting game
   const canStartGame = (): boolean => {
@@ -76,7 +89,25 @@ export function TeamSelection({
         <div className="mb-6">
           <p className="text-sm text-umber-700 mb-2">Game ID:</p>
           <div data-testid="game-id" className="bg-parchment-100 p-3 rounded-lg font-mono text-lg text-center border-2 border-parchment-400 text-umber-900">{gameId}</div>
+
+          {/* Copy Game Link Button */}
+          <button
+            onClick={handleCopyGameLink}
+            className="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-lg font-bold transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
+            title="Copy shareable game link"
+          >
+            <span>🔗</span>
+            <span>Copy Game Link</span>
+          </button>
         </div>
+
+        {/* Toast Notification */}
+        {showCopyToast && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-2xl border-2 border-green-700 animate-bounce z-50 flex items-center gap-2">
+            <span>✅</span>
+            <span className="font-bold">Game link copied! Share with friends.</span>
+          </div>
+        )}
 
         <div className="mb-8">
           <p className="text-center text-umber-700 mb-4">

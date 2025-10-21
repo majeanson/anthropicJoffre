@@ -755,6 +755,161 @@ All game events (game_updated, round_started, trick_resolved, etc.) are automati
 
 ---
 
+## 🔗 Quick Copy Game Link
+
+### Overview
+Players can easily share games with friends using a one-click shareable link feature. The system generates URLs with embedded game IDs that automatically join players to the correct game.
+
+**Purpose**:
+- Simplify multiplayer invitation process
+- Enable seamless remote play with friends
+- Reduce friction in game joining workflow
+
+### Implementation
+
+**Frontend** (frontend/src/components/TeamSelection.tsx:28-39):
+```typescript
+const [showCopyToast, setShowCopyToast] = useState(false);
+
+const handleCopyGameLink = async () => {
+  const gameUrl = `${window.location.origin}?join=${gameId}`;
+  try {
+    await navigator.clipboard.writeText(gameUrl);
+    setShowCopyToast(true);
+    setTimeout(() => setShowCopyToast(false), 3000);
+  } catch (err) {
+    console.error('Failed to copy link:', err);
+  }
+};
+```
+
+**URL Parameter Parsing** (frontend/src/App.tsx:269-283):
+```typescript
+// URL parameter parsing for auto-join from shared links
+const [autoJoinGameId, setAutoJoinGameId] = useState<string>('');
+
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const joinGameId = urlParams.get('join');
+
+  if (joinGameId) {
+    console.log('Auto-join game from URL:', joinGameId);
+    setAutoJoinGameId(joinGameId);
+
+    // Clean the URL without reloading the page
+    window.history.replaceState({}, '', window.location.pathname);
+  }
+}, []);
+```
+
+**Lobby Auto-Population** (frontend/src/components/Lobby.tsx:130-133):
+```typescript
+export function Lobby({ ..., autoJoinGameId }: LobbyProps) {
+  const [gameId, setGameId] = useState(autoJoinGameId || '');
+  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(
+    autoJoinGameId ? 'join' : 'menu'
+  );
+  // ...
+}
+```
+
+### UI Components
+
+**Copy Button** (Team Selection Screen):
+- Blue gradient button below Game ID
+- 🔗 icon with "Copy Game Link" text
+- Full-width, prominent placement
+- hover:scale-105 animation
+
+**Toast Notification**:
+- Green success banner at top of screen
+- ✅ icon with "Game link copied! Share with friends." message
+- Auto-disappears after 3 seconds
+- Animate-bounce effect for visibility
+
+### User Flow
+
+**Sharing a Game**:
+1. Player creates a game and enters team selection
+2. Game ID displayed prominently
+3. Player clicks "Copy Game Link" button
+4. Toast notification confirms successful copy
+5. Shareable URL like `https://yourapp.com/?join=ABC123` copied to clipboard
+
+**Joining from Link**:
+1. Friend receives link (via text, Discord, etc.)
+2. Clicks link, opens app with `?join=ABC123` parameter
+3. App automatically navigates to Join Game screen
+4. Game ID field pre-populated with `ABC123`
+5. Friend enters their name and joins instantly
+6. URL cleaned to remove query parameter (prevents accidental re-joins)
+
+### Technical Details
+
+**URL Format**:
+```
+https://yourapp.com/?join=GAMEID
+```
+
+**Query Parameter Handling**:
+- Parameter name: `join`
+- Value: Game ID (e.g., `ABC123`)
+- Automatically parsed on app load
+- URL cleaned immediately after parsing using `window.history.replaceState()`
+- Prevents accidental multiple joins on page refresh
+
+**Copy to Clipboard**:
+- Uses native `navigator.clipboard.writeText()` API
+- Graceful error handling with console.error
+- Works on all modern browsers
+- Requires HTTPS in production
+
+### E2E Testing
+
+**Test Coverage** (e2e/tests/17-share-link.spec.ts):
+```typescript
+test('should copy shareable game link', async ({ page }) => {
+  // Create game
+  // Go to team selection
+  // Click "Copy Game Link" button
+  // Verify toast notification appears
+  // Verify clipboard contains correct URL
+});
+
+test('should auto-join from URL parameter', async ({ page }) => {
+  // Navigate to /?join=TESTGAMEID
+  // Verify lobby opens in join mode
+  // Verify game ID field is pre-populated
+  // Verify URL parameter is removed after parsing
+});
+
+test('should not re-join on page refresh', async ({ page }) => {
+  // Join game from URL parameter
+  // Refresh page
+  // Verify player doesn't re-join (URL was cleaned)
+});
+```
+
+### Security Considerations
+
+**No Sensitive Data**:
+- Game IDs are not secret (they're shareable by design)
+- No authentication tokens in URL
+- Game IDs are short-lived (games expire when empty)
+
+**Validation**:
+- Server validates game ID exists before allowing join
+- Invalid game IDs show appropriate error messages
+- No risk of URL manipulation attacks
+
+### Future Enhancements
+- [ ] QR code generation for in-person sharing
+- [ ] Share to social media buttons (Discord, WhatsApp)
+- [ ] Copy button in game over screen for rematch links
+- [ ] Shareable replay links for finished games
+
+---
+
 ## 🧪 Testing Strategy
 
 ### E2E Testing with Playwright
@@ -978,7 +1133,9 @@ npm run test:e2e     # Run E2E tests
 ✅ **Round-by-round analytics** (bets, points, outcomes)
 ✅ **Spectator mode** (watch games without playing, hands hidden)
 ✅ **Reconnection support** (2-minute grace period, session management)
-✅ Comprehensive documentation (VALIDATION_SYSTEM.md, BOT_PLAYER_SYSTEM.md, IMPROVEMENT_SUGGESTIONS.md)
+✅ **Quick Copy Game Link** (shareable URL with auto-join from URL parameter)
+✅ **Autoplay mode** (manual toggle + auto-enable on 60s timeout)
+✅ Comprehensive documentation (VALIDATION_SYSTEM.md, BOT_PLAYER_SYSTEM.md, IMPROVEMENT_SUGGESTIONS.md, IMPLEMENTATION_PLAN.md)
 ✅ E2E test suite (includes spectator mode tests)
 
 ### Future Enhancements

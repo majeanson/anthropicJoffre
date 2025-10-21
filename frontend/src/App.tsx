@@ -266,6 +266,22 @@ function App() {
     };
   }, []);
 
+  // URL parameter parsing for auto-join from shared links
+  const [autoJoinGameId, setAutoJoinGameId] = useState<string>('');
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const joinGameId = urlParams.get('join');
+
+    if (joinGameId) {
+      console.log('Auto-join game from URL:', joinGameId);
+      setAutoJoinGameId(joinGameId);
+
+      // Clean the URL without reloading the page
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   const handleCreateGame = (playerName: string) => {
     if (socket) {
       socket.emit('create_game', playerName);
@@ -621,7 +637,7 @@ function App() {
   }
 
   if (!gameState) {
-    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} />;
+    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} />;
   }
 
   // Debug controls

@@ -1,593 +1,581 @@
 # Implementation Plan
 
-## Overview
-This document outlines the systematic implementation of improvements from IMPROVEMENT_SUGGESTIONS.md, following a test-driven development approach. Each feature will be implemented with accompanying E2E tests before moving to the next.
-
-**Guiding Principles**:
-1. **TDD First** - Write E2E tests before implementing features
-2. **Incremental Progress** - Complete one feature fully before moving to next
-3. **Test Maintenance** - Keep test suite passing at all times
-4. **Documentation** - Update docs as features are added
-5. **Git Discipline** - Commit after each completed feature
+## Project Focus
+**Target Audience**: Casual remote multiplayer between friends
+**Platform**: Mobile & Desktop
+**Deployment**: Continuous deployment
+**Monetization**: None
+**AI Role**: Testing and handling AFKs
 
 ---
 
-## Phase 1: Critical Issues (Priority 1)
+## ✅ Completed Features
 
-### 1.1 Player Timeout / AFK Detection
-**Estimated Time**: 4-6 hours
-**Test Coverage Required**: 95%+
+### Quick Copy Game Link
+- **Date**: 2025-01-20
+- **Files**: TeamSelection.tsx, App.tsx, Lobby.tsx
+- **Features**:
+  - 🔗 Copy button with shareable URL (`?join=GAMEID`)
+  - ✅ Toast notification on successful copy
+  - 🔄 Auto-join from URL parameter
+  - 🧹 URL cleanup after parsing
 
-#### Implementation Steps
+### Autoplay Mode
+- **Date**: 2025-01-19
+- **Files**: App.tsx, PlayingPhase.tsx, BettingPhase.tsx
+- **Features**:
+  - 🤖 Manual toggle for bot mode
+  - ⏱️ Auto-enable on 60s timeout
+  - 🎮 Works in betting and playing phases
 
-**Step 1: Backend Types & Infrastructure** (30 min)
-- [ ] Add `PlayerTimeout` interface to `backend/src/types/game.ts`
-- [ ] Add `timeoutsEnabled: boolean` to GameState (for testing control)
-- [ ] Add `currentPlayerTimeout` to GameState
-- [ ] Update frontend types to match
+### Leaderboard & Round History
+- **Date**: 2025-01-18
+- **Files**: Leaderboard.tsx, backend/src/index.ts
+- **Features**:
+  - 🏆 Current standings with team composition
+  - 📜 Complete round history with detailed stats
+  - 📊 Bet success tracking
 
-**Step 2: Backend Timeout Logic** (1.5 hours)
-- [ ] Create `playerTimeouts` Map in `backend/src/index.ts`
-- [ ] Implement `startPlayerTimeout(gameId, playerId)` function
-- [ ] Implement `clearPlayerTimeout(playerId)` function
-- [ ] Implement `handlePlayerTimeout(gameId, playerId)` function
-- [ ] Add timeout start/clear to all action handlers (bet, play_card)
-- [ ] Add new socket events: `'player_timeout_update'`, `'player_timeout'`
+### Spectator Mode
+- **Date**: 2025-01-17
+- **Files**: backend/src/index.ts, PlayingPhase.tsx, Lobby.tsx
+- **Features**:
+  - 👁️ Watch games without playing
+  - 🔒 Player hands hidden for fairness
+  - 🎮 Full game visibility (scores, tricks, trump)
 
-**Step 3: Frontend UI Components** (1 hour)
-- [ ] Add timeout display to BettingPhase component (above current player)
-- [ ] Add timeout display to PlayingPhase component (above current player)
-- [ ] Style with urgent colors (yellow at 30s, red at 10s)
-- [ ] Add countdown animation
+### Reconnection Support
+- **Date**: 2025-01-16
+- **Files**: backend/src/index.ts, App.tsx
+- **Features**:
+  - 🔄 2-minute grace period
+  - 💾 Session token persistence in localStorage
+  - 🔌 Auto-reconnect on page refresh
 
-**Step 4: E2E Tests** (1.5 hours)
+---
+
+## 🚧 Priority #1: Social Features (Week 1-2)
+
+### 1.1 Recent Players List / All Online Players
+**Priority**: HIGH
+**Effort**: Medium (6-8 hours)
+**Status**: Not Started
+
+**Purpose**: Make it easy to play with the same friends repeatedly
+
+**Implementation**:
+
+**Backend** (3 hours):
 ```typescript
-// e2e/tests/08-timeouts.spec.ts
+// Track online players
+interface OnlinePlayer {
+  socketId: string;
+  playerName: string;
+  status: 'in_lobby' | 'in_game' | 'in_team_selection';
+  gameId?: string;
+  lastActivity: number;
+}
 
-test('should show timeout countdown for current player', async ({ page }) => {
-  // Create game with bots
-  // Wait for betting phase
-  // Verify timeout appears with 60s countdown
-  // Verify countdown decrements
+const onlinePlayers = new Map<string, OnlinePlayer>();
+
+// Update player status
+socket.on('update_status', ({ status }) => {
+  const player = onlinePlayers.get(socket.id);
+  if (player) {
+    player.status = status;
+    player.lastActivity = Date.now();
+  }
 });
 
-test('should auto-skip bet when player times out', async ({ page }) => {
-  // Create game, don't place bet
-  // Wait for 60+ seconds
-  // Verify bet was auto-skipped
-  // Verify turn advanced
-});
-
-test('should auto-play random card when player times out', async ({ page }) => {
-  // Create game, reach playing phase
-  // Don't play card
-  // Wait for 60+ seconds
-  // Verify random card was played
-  // Verify turn advanced
-});
-
-test('should clear timeout when action is taken', async ({ page }) => {
-  // Start timeout countdown
-  // Place bet before timeout
-  // Verify timeout cleared
-  // Verify no auto-action taken
-});
-
-test('should emit timeout event to all players', async () => {
-  // Create 4-player game
-  // Let one player timeout
-  // Verify all players receive 'player_timeout' event
-  // Verify UI shows timeout notification
-});
+// Emit online players list every 5 seconds
+setInterval(() => {
+  const active = Array.from(onlinePlayers.values())
+    .filter(p => Date.now() - p.lastActivity < 30000);
+  io.emit('online_players_update', active);
+}, 5000);
 ```
 
-**Step 5: Documentation** (30 min)
-- [ ] Update CLAUDE.md with timeout system documentation
-- [ ] Add timeout configuration section
-- [ ] Document timeout events in WebSocket section
-
-**Git Commit**: `feat: Add player timeout/AFK detection system`
-
----
-
-### 1.2 Reconnection Support
-**Estimated Time**: 6-8 hours
-**Test Coverage Required**: 90%+
-
-#### Implementation Steps
-
-**Step 1: Backend Session Management** (2 hours)
-- [ ] Add `PlayerCredential` interface to types
-- [ ] Create `playerSessions` Map to track credentials
-- [ ] Implement `generateSessionToken()` function
-- [ ] Implement `validateSessionToken()` function
-- [ ] Store player sessions on `join_game`
-- [ ] Add 2-minute grace period on disconnect
-- [ ] Add `'reconnect_to_game'` socket event handler
-
-**Step 2: Frontend Session Storage** (1 hour)
-- [ ] Save session token to localStorage on join
-- [ ] Check for existing session on app load
-- [ ] Implement auto-reconnect on app mount
-- [ ] Add manual "Reconnect" button on disconnect
-- [ ] Show "Reconnecting..." UI state
-
-**Step 3: Game State Sync** (1.5 hours)
-- [ ] On reconnect, emit full game state to player
-- [ ] Update player's socket ID in game
-- [ ] Notify other players of reconnection
-- [ ] Handle edge cases (game ended, player was kicked)
-
-**Step 4: E2E Tests** (2 hours)
+**Frontend** (3-4 hours):
 ```typescript
-// e2e/tests/09-reconnection.spec.ts
+// Store recent players in localStorage
+interface RecentPlayer {
+  name: string;
+  lastPlayed: number;
+  gamesPlayed: number;
+}
 
-test('should allow player to reconnect after disconnect', async ({ page, context }) => {
-  // Create game, join as player
-  // Store session token from localStorage
-  // Simulate disconnect (close connection)
-  // Reload page
-  // Verify auto-reconnection
-  // Verify game state restored
-});
+// Add tab in Lobby component
+<div className="tabs">
+  <button onClick={() => setTab('recent')}>Recent Players</button>
+  <button onClick={() => setTab('online')}>Online Now</button>
+</div>
 
-test('should update socket ID on reconnection', async () => {
+{tab === 'recent' && (
+  <div className="recent-players">
+    {recentPlayers.map(player => (
+      <div key={player.name} className="player-card">
+        <span>{player.name}</span>
+        <span className="games-count">{player.gamesPlayed} games</span>
+        <button onClick={() => copyInviteLink()}>📋 Invite</button>
+      </div>
+    ))}
+  </div>
+)}
+
+{tab === 'online' && (
+  <div className="online-players">
+    {onlinePlayers.map(player => (
+      <div key={player.socketId} className="player-card">
+        <span className="online-indicator">🟢</span>
+        <span>{player.name}</span>
+        <span className="status">{player.status}</span>
+        {player.status === 'in_game' && player.gameId && (
+          <button onClick={() => spectateGame(player.gameId)}>👁️ Watch</button>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+```
+
+**E2E Tests** (1 hour):
+```typescript
+test('should track recent players after game', async ({ page }) => {
   // Create game with 4 players
-  // Player 2 disconnects
-  // Player 2 reconnects with new socket
-  // Verify player 2 can take actions
-  // Verify other players see player 2's actions
+  // Complete game
+  // Go to lobby
+  // Verify recent players list shows 3 other players
 });
 
-test('should notify other players of reconnection', async () => {
-  // 4-player game
-  // Player 3 disconnects
-  // Other players see "Player 3 disconnected"
-  // Player 3 reconnects
-  // Other players see "Player 3 reconnected"
+test('should show online players in real-time', async () => {
+  const [page1, page2] = await Promise.all([
+    context.newPage(),
+    context.newPage(),
+  ]);
+
+  // Page 1 joins lobby
+  // Verify page 2 sees page 1 in online list
+  // Page 1 creates game
+  // Verify page 2 sees "in_game" status
+});
+```
+
+---
+
+### 1.2 Pre-lobby Chat (Team Selection Phase)
+**Priority**: HIGH
+**Effort**: Low (3-4 hours)
+**Status**: Not Started
+
+**Purpose**: Allow banter and coordination while waiting for players
+
+**Implementation**:
+
+**Backend** (1 hour):
+```typescript
+socket.on('send_team_selection_chat', ({ gameId, message }) => {
+  const game = games.get(gameId);
+  const player = game.players.find(p => p.id === socket.id);
+
+  if (!player || game.phase !== 'team_selection') return;
+
+  io.to(gameId).emit('team_selection_chat_message', {
+    playerId: socket.id,
+    playerName: player.name,
+    teamId: player.teamId,
+    message: message.trim().substring(0, 200), // Max 200 chars
+    timestamp: Date.now()
+  });
+});
+```
+
+**Frontend** (2-3 hours):
+```typescript
+// Add to TeamSelection.tsx
+<div className="chat-box">
+  <div className="messages max-h-40 overflow-y-auto">
+    {messages.map(msg => (
+      <div key={msg.timestamp} className={`message ${msg.teamId ? `team-${msg.teamId}` : ''}`}>
+        <strong>{msg.playerName}:</strong> {msg.message}
+      </div>
+    ))}
+  </div>
+  <input
+    type="text"
+    placeholder="Type a message..."
+    value={chatInput}
+    onChange={e => setChatInput(e.target.value)}
+    onKeyPress={e => e.key === 'Enter' && sendMessage()}
+    maxLength={200}
+  />
+</div>
+```
+
+**E2E Tests** (30 min):
+```typescript
+test('should send and receive team selection chat', async () => {
+  // Create game with 2 players
+  // Player 1 sends message
+  // Verify Player 2 receives it
+});
+```
+
+---
+
+### 1.3 In-game Chat
+**Priority**: MEDIUM
+**Effort**: Low (2-3 hours)
+**Status**: Not Started
+
+**Purpose**: Communication during gameplay
+
+**Implementation**:
+- Same backend logic as pre-lobby chat
+- Available in betting and playing phases
+- Collapsible sidebar (desktop) or bottom sheet (mobile)
+- Quick emoji reactions: 👍 👎 🔥 😂 GG
+
+**UI**:
+```typescript
+// Add chat icon in top panel
+<button onClick={() => setChatOpen(!chatOpen)} className="relative">
+  💬
+  {unreadCount > 0 && (
+    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4">
+      {unreadCount}
+    </span>
+  )}
+</button>
+
+// Slide-out panel
+{chatOpen && (
+  <div className="fixed right-0 top-0 h-full w-80 bg-white shadow-xl">
+    {/* Chat messages */}
+  </div>
+)}
+```
+
+---
+
+## 🚧 Priority #2: Game Stats After Each Round (Week 2-3)
+
+### 2.1 Round Statistics Panel
+**Priority**: MEDIUM
+**Effort**: Medium (5-6 hours)
+**Status**: Not Started
+
+**Purpose**: Make each round more engaging with fun stats
+
+**Implementation**:
+
+**Backend** (2 hours):
+```typescript
+interface RoundStatistics {
+  fastestPlay: { playerId: string; playerName: string; timeMs: number };
+  mostAggressiveBidder: { playerId: string; playerName: string; bidAmount: number };
+  trumpMaster: { playerId: string; playerName: string; trumpsPlayed: number };
+  luckyPlayer: { playerId: string; playerName: string; reason: string };
+}
+
+// Track card play times
+const cardPlayTimes = new Map<string, number>(); // playerId -> timestamp of trick start
+
+socket.on('play_card', ({ gameId, card }) => {
+  // ... existing logic ...
+
+  // Track play time
+  const playTime = Date.now() - (cardPlayTimes.get(socket.id) || Date.now());
+  // Store for statistics
 });
 
-test('should handle expired session token', async ({ page }) => {
+// In endRound(), calculate statistics
+function calculateRoundStats(game: GameState): RoundStatistics {
+  // Find fastest player
+  // Find most aggressive bidder
+  // Count trump cards played per player
+  // Determine "lucky" player (won with lowest average card value)
+}
+```
+
+**Frontend** (3-4 hours):
+```typescript
+// Add to round summary screen
+<div className="round-stats mt-6">
+  <h3 className="text-xl font-bold mb-4">Round Highlights</h3>
+  <div className="grid grid-cols-2 gap-4">
+    <div className="stat-card bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4">
+      <div className="text-3xl mb-2">⚡</div>
+      <p className="text-sm text-gray-600">Fastest Play</p>
+      <p className="font-bold text-lg">{stats.fastestPlay.playerName}</p>
+      <p className="text-xs text-gray-500">{(stats.fastestPlay.timeMs / 1000).toFixed(1)}s</p>
+    </div>
+
+    <div className="stat-card bg-red-50 border-2 border-red-300 rounded-lg p-4">
+      <div className="text-3xl mb-2">🎲</div>
+      <p className="text-sm text-gray-600">Most Aggressive</p>
+      <p className="font-bold text-lg">{stats.mostAggressiveBidder.playerName}</p>
+      <p className="text-xs text-gray-500">{stats.mostAggressiveBidder.bidAmount} pts</p>
+    </div>
+
+    <div className="stat-card bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
+      <div className="text-3xl mb-2">👑</div>
+      <p className="text-sm text-gray-600">Trump Master</p>
+      <p className="font-bold text-lg">{stats.trumpMaster.playerName}</p>
+      <p className="text-xs text-gray-500">{stats.trumpMaster.trumpsPlayed} trumps</p>
+    </div>
+
+    <div className="stat-card bg-green-50 border-2 border-green-300 rounded-lg p-4">
+      <div className="text-3xl mb-2">🍀</div>
+      <p className="text-sm text-gray-600">Lucky Player</p>
+      <p className="font-bold text-lg">{stats.luckyPlayer.playerName}</p>
+      <p className="text-xs text-gray-500">{stats.luckyPlayer.reason}</p>
+    </div>
+  </div>
+</div>
+```
+
+**E2E Tests** (1 hour):
+```typescript
+test('should display round statistics after round ends', async ({ page }) => {
+  // Play through full round
+  // Wait for round summary
+  // Verify stats panel appears
+  // Verify all 4 stats are shown
+});
+
+test('should calculate fastest play correctly', async ({ page }) => {
+  // Track timestamps of card plays
+  // Verify correct player is awarded "fastest play"
+});
+```
+
+---
+
+## 🚧 Priority #3: Smart Game Recovery & Resume (Week 3-4)
+
+### 3.1 Enhanced Reconnection UI
+**Priority**: MEDIUM
+**Effort**: Low (3-4 hours)
+**Status**: Partially Done (basic reconnection works)
+
+**Current**: Silent reconnection with 2-minute grace period
+**Need**: User-facing feedback and catch-up summary
+
+**Implementation**:
+
+**Frontend** (3-4 hours):
+```typescript
+// Show reconnecting banner
+{reconnecting && (
+  <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-2xl z-50 animate-pulse">
+    <div className="flex items-center gap-3">
+      <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+      <span className="font-bold">Reconnecting to game...</span>
+    </div>
+  </div>
+)}
+
+// After successful reconnect
+socket.on('reconnection_successful', ({ gameState }) => {
+  setReconnecting(false);
+  setGameState(gameState);
+
+  // Show catch-up modal
+  showCatchUpModal({
+    currentRound: gameState.roundNumber,
+    currentPhase: gameState.phase,
+    teamScores: gameState.teamScores,
+    yourTurn: gameState.players[gameState.currentPlayerIndex].id === socket.id,
+    leadingTeam: gameState.teamScores.team1 > gameState.teamScores.team2 ? 1 : 2
+  });
+});
+
+// Catch-up modal
+<div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+  <div className="bg-parchment-50 rounded-xl p-6 max-w-md border-4 border-amber-700">
+    <h2 className="text-2xl font-bold mb-4 text-umber-900">Welcome Back!</h2>
+    <div className="space-y-3 text-umber-800">
+      <p>📍 <strong>Round {catchUp.currentRound}</strong> - {catchUp.currentPhase} phase</p>
+      <p>🏆 <strong>Team {catchUp.leadingTeam} is leading!</strong></p>
+      <div className="flex gap-4 bg-parchment-100 rounded-lg p-3">
+        <div className="flex-1">
+          <p className="text-sm text-orange-600">Team 1</p>
+          <p className="text-2xl font-bold">{catchUp.teamScores.team1}</p>
+        </div>
+        <div className="flex-1">
+          <p className="text-sm text-purple-600">Team 2</p>
+          <p className="text-2xl font-bold">{catchUp.teamScores.team2}</p>
+        </div>
+      </div>
+      {catchUp.yourTurn && (
+        <p className="text-green-600 font-bold bg-green-50 border-2 border-green-300 rounded-lg p-2">
+          ✨ It's your turn!
+        </p>
+      )}
+    </div>
+    <button
+      onClick={() => setCatchUpModalOpen(false)}
+      className="w-full mt-4 bg-forest-600 text-white py-3 rounded-lg font-bold hover:bg-forest-700"
+    >
+      Continue Playing
+    </button>
+  </div>
+</div>
+
+// Show toast when other players reconnect
+socket.on('player_reconnected', ({ playerName }) => {
+  showToast(`${playerName} reconnected`, 'success');
+});
+```
+
+**E2E Tests** (30 min):
+```typescript
+test('should show reconnecting banner', async ({ page }) => {
   // Create game
-  // Wait 3+ minutes (past grace period)
-  // Try to reconnect
-  // Verify rejection with appropriate error
+  // Simulate disconnect
+  // Verify banner appears
+  // Verify reconnection successful
 });
 
-test('should prevent reconnection to finished game', async ({ page }) => {
-  // Create game, play to completion
+test('should show catch-up summary after reconnect', async ({ page }) => {
+  // Create game, play a few rounds
   // Disconnect
-  // Try to reconnect
-  // Verify rejection or redirect to lobby
-});
-
-test('should clear session on explicit leave', async ({ page }) => {
-  // Create game
-  // Click "Leave Game" button
-  // Verify session cleared from localStorage
-  // Verify cannot auto-reconnect
+  // Reconnect
+  // Verify modal shows current round, scores, phase
 });
 ```
 
-**Step 5: UI Polish** (1 hour)
-- [ ] Add connection status indicator (green/yellow/red dot)
-- [ ] Show "Player X disconnected" toast notifications
-- [ ] Show "Player X reconnected" toast notifications
-- [ ] Add reconnection progress bar
-
-**Step 6: Documentation** (30 min)
-- [ ] Update CLAUDE.md with reconnection system
-- [ ] Document session management
-- [ ] Document reconnection flow diagram
-
-**Git Commit**: `feat: Add reconnection support with session management`
-
 ---
 
-## Phase 2: Gameplay Enhancements (Priority 2-3)
+## 🚧 Priority #4: Quick Rematch & Lobby Persistence (Week 4-5)
 
-### 2.1 Improve Bot AI Intelligence
-**Estimated Time**: 5-7 hours
-**Test Coverage Required**: 85%+
+### 4.1 Rematch System
+**Priority**: MEDIUM
+**Effort**: Medium (4-5 hours)
+**Status**: Not Started
 
-#### Implementation Steps
+**Purpose**: Keep same group of friends playing together
 
-**Step 1: Create AI Difficulty System** (1 hour)
-- [ ] Add `BotDifficulty` enum: Easy, Medium, Hard
-- [ ] Add difficulty parameter to bot spawning
-- [ ] Create separate strategy classes for each difficulty
-- [ ] Update Quick Play to allow difficulty selection
+**Implementation**:
 
-**Step 2: Implement Medium AI** (2 hours)
-- [ ] **Betting**: Evaluate hand strength (count high cards)
-- [ ] **Card Playing**: Win tricks with lowest winning card
-- [ ] **Card Playing**: Dump low cards when can't win
-- [ ] Add tests for medium bot behavior
-
-**Step 3: Implement Hard AI** (2.5 hours)
-- [ ] **Card Tracking**: Track which cards have been played
-- [ ] **Card Playing**: Deduce which suits other players lack
-- [ ] **Card Playing**: Help partner win tricks
-- [ ] **Betting**: Account for partner's likely hand strength
-- [ ] Add tests for hard bot behavior
-
-**Step 4: E2E Tests** (1.5 hours)
+**Backend** (2-3 hours):
 ```typescript
-// e2e/tests/10-bot-ai.spec.ts
+const rematchVotes = new Map<string, Set<string>>(); // gameId -> playerIds
 
-test('easy bot should make random decisions', async ({ page }) => {
-  // Create game with Easy bot
-  // Verify bot makes random bets (no pattern)
-  // Verify bot plays random valid cards
-});
+socket.on('vote_rematch', ({ gameId }) => {
+  if (!rematchVotes.has(gameId)) {
+    rematchVotes.set(gameId, new Set());
+  }
 
-test('medium bot should try to win tricks efficiently', async ({ page }) => {
-  // Create game with Medium bot
-  // Track bot's card plays
-  // Verify bot uses lowest winning card
-  // Verify bot dumps low cards when losing
-});
+  const votes = rematchVotes.get(gameId);
+  votes.add(socket.id);
 
-test('hard bot should track cards and help partner', async ({ page }) => {
-  // Create game with Hard bot
-  // Bot's partner leads a suit
-  // Verify bot plays high card to help partner win
-  // Verify bot avoids winning when partner is winning
-});
+  io.to(gameId).emit('rematch_vote_update', {
+    votes: votes.size,
+    required: 4
+  });
 
-test('should allow difficulty selection in Quick Play', async ({ page }) => {
-  // Open Quick Play dialog
-  // Select "Hard" difficulty
-  // Start game
-  // Verify bots behave according to hard strategy
-});
+  if (votes.size === 4) {
+    const oldGame = games.get(gameId);
+    const newGameId = generateGameId();
 
-test('bots should still follow game rules regardless of difficulty', async ({ page }) => {
-  // Create games with each difficulty
-  // Verify all bots follow suit-following rules
-  // Verify all bots make valid bets
-  // Verify no invalid moves
+    const newGame = createNewGame(newGameId, oldGame.players);
+    games.set(newGameId, newGame);
+
+    // Move all players to new game
+    oldGame.players.forEach(p => {
+      const playerSocket = io.sockets.sockets.get(p.id);
+      if (playerSocket) {
+        playerSocket.leave(gameId);
+        playerSocket.join(newGameId);
+      }
+    });
+
+    io.to(newGameId).emit('rematch_started', { gameState: newGame });
+    rematchVotes.delete(gameId);
+    games.delete(gameId);
+  }
 });
 ```
 
-**Step 5: Documentation** (30 min)
-- [ ] Update BOT_PLAYER_SYSTEM.md with new AI strategies
-- [ ] Add decision flowcharts for each difficulty
-- [ ] Document AI limitations and future improvements
-
-**Git Commit**: `feat: Add difficulty levels to bot AI (Easy/Medium/Hard)`
-
----
-
-### 3.1 Add Animations
-**Estimated Time**: 4-6 hours
-**Test Coverage Required**: 70%+
-
-#### Implementation Steps
-
-**Step 1: Install Framer Motion** (15 min)
-```bash
-cd frontend
-npm install framer-motion
-```
-
-**Step 2: Card Play Animations** (2 hours)
-- [ ] Animate cards flying from hand to center
-- [ ] Add stagger effect for multiple cards
-- [ ] Animate trick collection (cards flying to winner)
-- [ ] Add scale/rotate effects on hover
-
-**Step 3: Score Update Animations** (1 hour)
-- [ ] Animate score numbers changing (count-up effect)
-- [ ] Add floating "+X" text above score
-- [ ] Pulse effect on score gain/loss
-
-**Step 4: Phase Transition Animations** (1 hour)
-- [ ] Fade in/out between phases
-- [ ] Slide in betting phase controls
-- [ ] Animate trump reveal
-
-**Step 5: E2E Tests** (1 hour)
+**Frontend** (2 hours):
 ```typescript
-// e2e/tests/11-animations.spec.ts
-
-test('cards should animate when played', async ({ page }) => {
-  // Create game with Quick Play
-  // Play a card
-  // Verify card animates to center
-  // Verify animation completes before next action
-});
-
-test('score should animate when updated', async ({ page }) => {
-  // Complete a round
-  // Verify score counts up with animation
-  // Verify "+X" floating text appears
-});
-
-test('animations should not block game flow', async ({ page }) => {
-  // Play through full round with animations
-  // Verify no delays in game progression
-  // Verify all animations complete properly
-});
-
-test('animations should be performant', async ({ page }) => {
-  // Measure FPS during animations
-  // Verify no significant frame drops
-  // Verify animations are smooth
-});
-```
-
-**Step 6: Add Animation Settings** (30 min)
-- [ ] Add "Reduce motion" toggle in settings
-- [ ] Respect `prefers-reduced-motion` media query
-- [ ] Disable animations if user prefers
-
-**Step 7: Documentation** (30 min)
-- [ ] Update CLAUDE.md with animation documentation
-- [ ] Document animation library choice
-- [ ] Document performance considerations
-
-**Git Commit**: `feat: Add animations using Framer Motion`
-
----
-
-### 3.2 Mobile Responsive Design
-**Estimated Time**: 6-8 hours
-**Test Coverage Required**: 80%+
-
-#### Implementation Steps
-
-**Step 1: Update Circular Card Layout** (2.5 hours)
-- [ ] Convert to grid layout on mobile
-- [ ] Keep circular layout on desktop (md: breakpoint)
-- [ ] Test on various screen sizes (iPhone SE, iPhone 14, iPad)
-- [ ] Ensure cards are readable on small screens
-
-**Step 2: Touch-Friendly Controls** (2 hours)
-- [ ] Increase button sizes on mobile (min-h-[44px])
-- [ ] Add larger tap targets for cards
-- [ ] Implement swipeable hand (horizontal scroll)
-- [ ] Add pull-to-refresh for game state
-
-**Step 3: Mobile Navigation** (1 hour)
-- [ ] Collapse debug controls into hamburger menu on mobile
-- [ ] Make leaderboard full-screen on mobile
-- [ ] Add bottom navigation for common actions
-
-**Step 4: E2E Tests** (2 hours)
-```typescript
-// e2e/tests/12-mobile-responsive.spec.ts
-
-test('should display cards in grid on mobile', async ({ page }) => {
-  // Set mobile viewport (375x667)
-  await page.setViewportSize({ width: 375, height: 667 });
-
-  // Create game with Quick Play
-  // Verify cards in 2x2 grid
-  // Verify readable card sizes
-});
-
-test('should have touch-friendly buttons', async ({ page }) => {
-  // Set mobile viewport
-  // Verify all buttons >= 44px height
-  // Verify tap targets don't overlap
-});
-
-test('should allow horizontal scrolling of hand', async ({ page }) => {
-  // Set mobile viewport
-  // Verify hand scrolls horizontally
-  // Verify all cards accessible via scroll
-});
-
-test('should collapse debug controls on mobile', async ({ page }) => {
-  // Set mobile viewport
-  // Verify debug buttons in hamburger menu
-  // Verify menu opens/closes properly
-});
-
-test('should maintain functionality on tablet', async ({ page }) => {
-  // Set tablet viewport (768x1024)
-  // Verify hybrid layout (some mobile, some desktop features)
-  // Verify all features accessible
-});
-
-test('should work in landscape orientation', async ({ page }) => {
-  // Set mobile landscape (667x375)
-  // Verify layout adapts
-  // Verify game is playable
-});
-```
-
-**Step 5: Documentation** (30 min)
-- [ ] Update CLAUDE.md with responsive design patterns
-- [ ] Document breakpoints used
-- [ ] Add screenshots of mobile layouts
-
-**Git Commit**: `feat: Add mobile responsive design`
-
----
-
-### 4.2 Add Chat System
-**Estimated Time**: 4-5 hours
-**Test Coverage Required**: 85%+
-
-#### Implementation Steps
-
-**Step 1: Backend Chat Infrastructure** (1.5 hours)
-- [ ] Add `ChatMessage` interface to types
-- [ ] Add `'send_chat'` socket event handler
-- [ ] Add message validation (length, rate limiting)
-- [ ] Broadcast messages to all players in game
-- [ ] Store last 50 messages per game (in memory)
-
-**Step 2: Frontend Chat Component** (2 hours)
-- [ ] Create `ChatBox.tsx` component
-- [ ] Add message input with Enter key support
-- [ ] Display messages with player names and timestamps
-- [ ] Auto-scroll to bottom on new messages
-- [ ] Add unread message indicator
-
-**Step 3: Chat UI Integration** (1 hour)
-- [ ] Add chat toggle button to game UI
-- [ ] Make chat collapsible/expandable
-- [ ] Position chat on side of game board (desktop)
-- [ ] Position chat as bottom sheet (mobile)
-
-**Step 4: E2E Tests** (1.5 hours)
-```typescript
-// e2e/tests/13-chat.spec.ts
-
-test('should send and receive chat messages', async () => {
-  // Create 4-player game (2 humans, 2 bots)
-  const [player1, player2] = pages;
-
-  // Player 1 sends message
-  await player1.fill('[data-testid="chat-input"]', 'Hello!');
-  await player1.press('[data-testid="chat-input"]', 'Enter');
-
-  // Verify Player 2 receives message
-  await expect(player2.getByText('Player 1: Hello!')).toBeVisible();
-});
-
-test('should show player names with messages', async ({ page }) => {
-  // Create game
-  // Send message
-  // Verify format: "Player Name: Message"
-  // Verify timestamp shown
-});
-
-test('should auto-scroll to new messages', async ({ page }) => {
-  // Create game
-  // Send 20+ messages (overflow chat)
-  // Verify scroll is at bottom
-  // Verify newest message visible
-});
-
-test('should prevent empty messages', async ({ page }) => {
-  // Try to send empty message
-  // Verify message not sent
-  // Verify no error shown
-});
-
-test('should limit message length', async ({ page }) => {
-  // Try to send 500+ character message
-  // Verify message truncated or rejected
-  // Verify appropriate feedback
-});
-
-test('should rate limit chat messages', async ({ page }) => {
-  // Send 10+ messages rapidly
-  // Verify rate limit kicks in
-  // Verify error message shown
-});
-
-test('should show unread message indicator', async () => {
-  const [player1, player2] = pages;
-
-  // Player 1 sends message
-  // Player 2 has chat closed
-  // Verify unread badge appears
-  // Player 2 opens chat
-  // Verify badge disappears
-});
-
-test('chat should work on mobile', async ({ page }) => {
-  // Set mobile viewport
-  // Verify chat opens as bottom sheet
-  // Verify keyboard doesn't cover input
-  // Verify messages readable
-});
-```
-
-**Step 5: Chat Enhancements** (1 hour)
-- [ ] Add emoji picker
-- [ ] Add @mention support
-- [ ] Add team-only chat option
-- [ ] Add chat history persistence (localStorage)
-
-**Step 6: Documentation** (30 min)
-- [ ] Update CLAUDE.md with chat system
-- [ ] Document chat events
-- [ ] Document rate limiting rules
-
-**Git Commit**: `feat: Add real-time chat system`
-
----
-
-## Phase 3: Code Quality & Testing
-
-### Test Suite Maintenance (Ongoing)
-
-**After Each Feature**:
-1. Run full E2E test suite: `npm run test:e2e`
-2. Fix any broken tests
-3. Update test snapshots if needed
-4. Document test coverage in CLAUDE.md
-
-**E2E Test Organization**:
-```
-e2e/tests/
-├── 01-lobby.spec.ts           # ✅ Existing
-├── 02-betting.spec.ts          # ✅ Existing
-├── 03-playing.spec.ts          # ✅ Existing
-├── 04-game-flow.spec.ts        # ✅ Existing
-├── 05-skip-bet.spec.ts         # ✅ Existing
-├── 06-validation.spec.ts       # ✅ Existing
-├── 07-full-game.spec.ts        # ✅ Existing
-├── 08-timeouts.spec.ts         # 🆕 Timeout/AFK tests
-├── 09-reconnection.spec.ts     # 🆕 Reconnection tests
-├── 10-bot-ai.spec.ts           # 🆕 Bot AI difficulty tests
-├── 11-animations.spec.ts       # 🆕 Animation tests
-├── 12-mobile-responsive.spec.ts # 🆕 Mobile/responsive tests
-└── 13-chat.spec.ts             # 🆕 Chat system tests
+// Add to game_over screen
+<div className="mt-6 bg-parchment-100 rounded-lg p-4 border-2 border-parchment-400">
+  <h3 className="text-lg font-bold mb-3 text-umber-900">Play Again?</h3>
+  <div className="flex flex-col gap-3">
+    <button
+      onClick={() => socket.emit('vote_rematch', { gameId })}
+      className="bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700"
+      disabled={hasVotedRematch}
+    >
+      {hasVotedRematch ? '✓ Ready for Rematch' : '🔄 Vote for Rematch'}
+    </button>
+    <div className="flex items-center justify-center gap-2 text-sm text-umber-600">
+      <span>{rematchVotes}/4 players ready</span>
+      {rematchVotes < 4 && (
+        <div className="flex gap-1">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className={`w-2 h-2 rounded-full ${i < rematchVotes ? 'bg-green-500' : 'bg-gray-300'}`} />
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+  <p className="text-xs text-umber-500 mt-2 text-center">
+    Game will start when all 4 players are ready
+  </p>
+</div>
 ```
 
 ---
 
-## Success Criteria
+## ❌ Out of Scope
 
-### Each Feature Must:
-- ✅ Have E2E tests with >80% coverage
-- ✅ Pass all existing tests
-- ✅ Be documented in CLAUDE.md
-- ✅ Follow existing code patterns
-- ✅ Have no TypeScript errors
-- ✅ Work in both dev and production builds
-
-### Phase Completion:
-- ✅ All features implemented
-- ✅ All tests passing (target: 95%+ suite-wide)
-- ✅ Documentation updated
-- ✅ Git commits are clean and descriptive
-- ✅ No regression bugs introduced
+### Not Planned (Keeps Project Simple)
+- ❌ User accounts / authentication
+- ❌ Friend system (use recent players instead)
+- ❌ Persistent database for game history
+- ❌ Monetization features
+- ❌ Advanced bot AI improvements
+- ❌ Tournament mode
+- ❌ Achievements/badges
 
 ---
 
 ## Timeline Estimate
 
-**Phase 1 (Critical)**: 10-14 hours (~2 work days)
-- 1.1 Timeout/AFK: 4-6 hours
-- 1.2 Reconnection: 6-8 hours
+**Week 1-2: Social Features**
+- Recent Players / Online Players: 6-8 hours
+- Pre-lobby Chat: 3-4 hours
+- In-game Chat: 2-3 hours
+- **Total**: 11-15 hours
 
-**Phase 2 (Enhancements)**: 19-26 hours (~4 work days)
-- 2.1 Bot AI: 5-7 hours
-- 3.1 Animations: 4-6 hours
-- 3.2 Mobile: 6-8 hours
-- 4.2 Chat: 4-5 hours
+**Week 2-3: Game Polish**
+- Round Statistics: 5-6 hours
+- Enhanced Reconnection UI: 3-4 hours
+- **Total**: 8-10 hours
 
-**Total**: 29-40 hours (~6 work days)
+**Week 3-4: Retention**
+- Rematch System: 4-5 hours
+- Best of 3/5 Series: 3-4 hours
+- **Total**: 7-9 hours
+
+**Overall**: 26-34 hours (~5-7 work days)
 
 ---
 
 ## Next Steps
 
-1. ✅ Create this plan
-2. Start with Priority 1.1 (Player Timeout/AFK Detection)
-3. Follow TDD approach: Write tests → Implement → Pass tests
-4. Move incrementally through each feature
-5. Update this plan as progress is made
+1. ✅ Quick Copy Game Link - DONE!
+2. 🚧 Recent Players List / Online Players - IN PROGRESS
+3. 🚧 Pre-lobby Chat
+4. 🚧 In-game Chat
+5. 🚧 Round Statistics
+6. 🚧 Enhanced Reconnection UI
+7. 🚧 Rematch System
 
 ---
 
-*Created: 2025-10-08*
-*Status: In Progress*
+*Last Updated: 2025-01-20*
+*Project: J⋀ffre Trick Card Game*
