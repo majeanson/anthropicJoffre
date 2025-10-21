@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
+import { Socket } from 'socket.io-client';
 import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
+import { ChatPanel } from './ChatPanel';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
 
@@ -14,13 +16,17 @@ interface PlayingPhaseProps {
   onLeaveGame?: () => void;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
+  socket?: Socket | null;
+  gameId?: string;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle }: PlayingPhaseProps) {
+export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, socket, gameId }: PlayingPhaseProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [showDealingAnimation, setShowDealingAnimation] = useState<boolean>(false);
+  const [chatOpen, setChatOpen] = useState<boolean>(false);
+  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
 
   // Debug: Log autoplay button visibility conditions
   console.log('Autoplay button conditions:', {
@@ -41,6 +47,30 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
   const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
+
+  // Listen for chat messages to update unread count
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleChatMessage = () => {
+      if (!chatOpen) {
+        setUnreadChatCount(prev => prev + 1);
+      }
+    };
+
+    socket.on('game_chat_message', handleChatMessage);
+
+    return () => {
+      socket.off('game_chat_message', handleChatMessage);
+    };
+  }, [socket, chatOpen]);
+
+  // Reset unread count when chat is opened
+  useEffect(() => {
+    if (chatOpen) {
+      setUnreadChatCount(0);
+    }
+  }, [chatOpen]);
 
   // Toggle sound on/off
   const toggleSound = () => {
@@ -530,6 +560,21 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <span className="md:hidden">🏆</span>
               <span className="hidden md:inline">🏆 Leaderboard</span>
             </button>
+            {socket && gameId && !isSpectator && (
+              <button
+                onClick={() => setChatOpen(!chatOpen)}
+                className="bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-blue-500/50 flex items-center justify-center backdrop-blur-md border-2 border-blue-800 relative"
+                title="Chat"
+              >
+                <span className="md:hidden">💬</span>
+                <span className="hidden md:inline">💬 Chat</span>
+                {unreadChatCount > 0 && !chatOpen && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    {unreadChatCount}
+                  </span>
+                )}
+              </button>
+            )}
             {gameState.previousTrick && (
               <button
                 onClick={() => setShowPreviousTrick(!showPreviousTrick)}
@@ -742,6 +787,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         isOpen={showLeaderboard}
         onClose={() => setShowLeaderboard(false)}
       />
+
+      {socket && gameId && !isSpectator && (
+        <ChatPanel
+          socket={socket}
+          gameId={gameId}
+          currentPlayerId={currentPlayerId}
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+        />
+      )}
     </div>
   );
 }

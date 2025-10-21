@@ -826,6 +826,8 @@ function App() {
           onLeaveGame={handleLeaveGame}
           autoplayEnabled={autoplayEnabled}
           onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
+          socket={socket}
+          gameId={gameId}
         />
       </>
     );
