@@ -62,9 +62,29 @@
   - 📋 Copy invite link from online players
   - 🎯 Tab interface for Recent/Online switching
 
+### Pre-lobby Chat
+- **Date**: 2025-01-20
+- **Files**: backend/src/index.ts, TeamSelection.tsx, App.tsx
+- **Features**:
+  - 💬 Real-time chat during team selection
+  - 🎨 Team-colored message bubbles (Orange/Purple)
+  - 📏 200 character limit
+  - ✨ Auto-scroll to latest messages
+  - 🚫 Input validation and sanitization
+
+### In-game Chat
+- **Date**: 2025-01-20
+- **Files**: backend/src/index.ts, ChatPanel.tsx, PlayingPhase.tsx, App.tsx
+- **Features**:
+  - 💬 Floating chat panel during gameplay
+  - 😊 Quick emoji reactions (👍 👎 🔥 😂 GG)
+  - 🔴 Unread message counter
+  - 🎨 Team-colored messages
+  - 📱 Responsive design (mobile & desktop)
+
 ---
 
-## 🚧 Priority #1: Social Features (Week 1-2)
+## ✅ Priority #1: Social Features (Week 1-2) - COMPLETED
 
 ### 1.1 Recent Players List / All Online Players ✅
 **Priority**: HIGH
@@ -172,10 +192,10 @@ test('should show online players in real-time', async () => {
 
 ---
 
-### 1.2 Pre-lobby Chat (Team Selection Phase)
+### 1.2 Pre-lobby Chat (Team Selection Phase) ✅
 **Priority**: HIGH
 **Effort**: Low (3-4 hours)
-**Status**: Not Started
+**Status**: COMPLETED (2025-01-20)
 
 **Purpose**: Allow banter and coordination while waiting for players
 
@@ -232,10 +252,10 @@ test('should send and receive team selection chat', async () => {
 
 ---
 
-### 1.3 In-game Chat
+### 1.3 In-game Chat ✅
 **Priority**: MEDIUM
 **Effort**: Low (2-3 hours)
-**Status**: Not Started
+**Status**: COMPLETED (2025-01-20)
 
 **Purpose**: Communication during gameplay
 
