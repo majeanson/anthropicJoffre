@@ -417,9 +417,62 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/api/health',
       history: '/api/games/history',
+      lobby: '/api/games/lobby',
       socket: '/socket.io'
     }
   });
+});
+
+// Get list of active games for lobby browser
+app.get('/api/games/lobby', (req, res) => {
+  try {
+    const activeGames = Array.from(games.values()).map(game => {
+      // Get actual player count (not including bots unless specified)
+      const humanPlayerCount = game.players.filter(p => !p.isBot).length;
+      const botPlayerCount = game.players.filter(p => p.isBot).length;
+
+      // Check if game is joinable
+      const isJoinable = game.phase === 'team_selection' && game.players.length < 4;
+
+      // Check if game is in progress
+      const isInProgress = game.phase === 'betting' || game.phase === 'playing' || game.phase === 'scoring';
+
+      return {
+        gameId: game.id,
+        phase: game.phase,
+        playerCount: game.players.length,
+        humanPlayerCount,
+        botPlayerCount,
+        isJoinable,
+        isInProgress,
+        teamScores: game.teamScores,
+        roundNumber: game.roundNumber,
+        createdAt: Date.now(), // TODO: Add actual creation timestamp to GameState
+        players: game.players.map(p => ({
+          name: p.name,
+          teamId: p.teamId,
+          isBot: p.isBot || false,
+        })),
+      };
+    });
+
+    // Sort by joinable first, then by creation time (newest first)
+    activeGames.sort((a, b) => {
+      if (a.isJoinable && !b.isJoinable) return -1;
+      if (!a.isJoinable && b.isJoinable) return 1;
+      return b.createdAt - a.createdAt;
+    });
+
+    res.json({
+      games: activeGames,
+      total: activeGames.length,
+      joinable: activeGames.filter(g => g.isJoinable).length,
+      inProgress: activeGames.filter(g => g.isInProgress).length,
+    });
+  } catch (error) {
+    console.error('Error fetching lobby games:', error);
+    res.status(500).json({ error: 'Failed to fetch lobby games' });
+  }
 });
 
 app.get('/api/games/history', async (req, res) => {

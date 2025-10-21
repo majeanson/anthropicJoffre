@@ -684,28 +684,54 @@ socket.on('vote_rematch', ({ gameId }) => {
 10. ✅ Player Timeout/AFK Detection
 11. ✅ Rematch Voting System
 
-### 🎯 Remaining Features (Priority #4+)
-1. **Dark Mode** (Low effort - 2-3 hours)
-   - Tailwind dark mode classes
-   - Toggle button with persistence
-   - **Impact**: Better accessibility
+### Lobby Browser
+- **Date**: 2025-01-21
+- **Files**: backend/src/index.ts, LobbyBrowser.tsx, Lobby.tsx
+- **Features**:
+  - 📋 REST API endpoint `/api/games/lobby` for listing active games
+  - 🎮 Browse Games modal with real-time game list
+  - 🔍 Filter by: All, Joinable, In Progress
+  - 🔄 Auto-refresh every 5 seconds
+  - 📊 Game details: phase, player count, round, scores
+  - 🎯 One-click join or spectate
+  - 🌙 Dark mode support
 
-4. **Game Replay** (Medium effort - 6-8 hours)
+---
+
+### ✅ Completed Features Summary (All Priority 1-4)
+- ✅ Recent Players & Online Players tracking
+- ✅ Pre-lobby Chat (team selection)
+- ✅ In-game Chat (with emoji reactions)
+- ✅ Quick Copy Game Link (shareable URLs)
+- ✅ Spectator Mode (watch games)
+- ✅ Reconnection Support (2-minute grace period)
+- ✅ Round Statistics Panel (fastest play, trump master, etc.)
+- ✅ Enhanced Reconnection UI (catch-up modal)
+- ✅ Sound Effects (synthesized audio)
+- ✅ Animations (card slide, trick collection)
+- ✅ Mobile Responsive Design
+- ✅ Player Timeout/AFK Detection (60s countdown)
+- ✅ Rematch Voting System
+- ✅ **Lobby Browser** (browse and join active games)
+- ✅ **Dark Mode** (infrastructure ready, toggle available)
+
+### 🎯 Remaining Features (Priority #5+)
+1. **Add dark: classes to all components** (Low effort - 2-3 hours)
+   - Apply dark mode styles across all phases
+   - Test dark mode visually
+   - **Impact**: Better accessibility and nighttime play
+
+2. **Game Replay** (Medium effort - 6-8 hours)
    - Record all game actions
    - Step through game history
    - **Impact**: Learn from games, share highlights
 
-5. **Improved Bot AI** (Medium effort - 6-8 hours)
+3. **Improved Bot AI** (Medium effort - 6-8 hours)
    - Difficulty levels (Easy/Medium/Hard)
    - Smarter betting based on hand strength
    - Card counting and tracking
 
-6. **Lobby Browser** (High effort - 10-12 hours)
-   - List public games
-   - Join games in progress
-   - Private/password games
-
 ---
 
-*Last Updated: 2025-01-20*
+*Last Updated: 2025-01-21*
 *Project: J⋀ffre Trick Card Game*

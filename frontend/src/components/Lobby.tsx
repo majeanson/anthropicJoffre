@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
 import { DarkModeToggle } from './DarkModeToggle';
+import { LobbyBrowser } from './LobbyBrowser';
 
 interface OnlinePlayer {
   socketId: string;
@@ -144,6 +145,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
+  const [showBrowser, setShowBrowser] = useState(false);
   const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showToast, setShowToast] = useState(false);
@@ -197,6 +199,20 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     return (
       <>
         <RulesModal isOpen={showRules} onClose={() => setShowRules(false)} />
+        {showBrowser && (
+          <LobbyBrowser
+            onJoinGame={(gameId) => {
+              setGameId(gameId);
+              setMode('join');
+            }}
+            onSpectateGame={(gameId) => {
+              setGameId(gameId);
+              setMode('join');
+              setJoinType('spectator');
+            }}
+            onClose={() => setShowBrowser(false)}
+          />
+        )}
         <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
           {/* Animated background cards */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -348,6 +364,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105"
               >
                 Join Game
+              </button>
+              <button
+                onClick={() => setShowBrowser(true)}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
+              >
+                <span className="text-xl">🎮</span>
+                Browse Games
               </button>
               <button
                 data-testid="quick-play-button"
