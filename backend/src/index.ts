@@ -68,6 +68,9 @@ const activeTimeouts = new Map<string, NodeJS.Timeout>();
 // Disconnect timeout storage (maps socket.id to timeout ID)
 const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
+// Game deletion timeouts (maps gameId to timeout ID)
+const gameDeletionTimeouts = new Map<string, NodeJS.Timeout>();
+
 // Online players tracking
 interface OnlinePlayer {
   socketId: string;
@@ -1177,10 +1180,23 @@ io.on('connection', (socket) => {
       // Notify remaining players
       io.to(gameId).emit('player_left', { playerId: socket.id, gameState: game });
 
-      // If game is empty, delete it
+      // If game is empty, schedule deletion after 5 minutes (allows reconnection)
       if (game.players.length === 0) {
-        games.delete(gameId);
-        console.log(`Game ${gameId} deleted (no players remaining)`);
+        console.log(`Game ${gameId} is now empty, scheduling deletion in 5 minutes`);
+
+        const deletionTimeout = setTimeout(() => {
+          if (games.has(gameId)) {
+            const currentGame = games.get(gameId);
+            // Only delete if still empty
+            if (currentGame && currentGame.players.length === 0) {
+              games.delete(gameId);
+              gameDeletionTimeouts.delete(gameId);
+              console.log(`Game ${gameId} deleted after timeout (no players returned)`);
+            }
+          }
+        }, 5 * 60 * 1000); // 5 minutes
+
+        gameDeletionTimeouts.set(gameId, deletionTimeout);
       }
 
       // Confirm to the leaving player
@@ -1229,6 +1245,14 @@ io.on('connection', (socket) => {
 
     // Join game room
     socket.join(session.gameId);
+
+    // Cancel game deletion timeout if it exists (player returned)
+    const deletionTimeout = gameDeletionTimeouts.get(session.gameId);
+    if (deletionTimeout) {
+      clearTimeout(deletionTimeout);
+      gameDeletionTimeouts.delete(session.gameId);
+      console.log(`Cancelled deletion timeout for game ${session.gameId} (player returned)`);
+    }
 
     console.log(`Player ${session.playerName} reconnected to game ${session.gameId}`);
 
