@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
+import { DarkModeToggle } from './DarkModeToggle';
 
 interface OnlinePlayer {
   socketId: string;
@@ -355,12 +356,15 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               >
                 Quick Play (bots)
               </button>
-              <button
-                onClick={() => setShowRules(true)}
-                className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 transition-all duration-300 border-2 border-amber-800 shadow-lg transform hover:scale-105"
-              >
-                Rules
-              </button>
+              <div className="flex gap-3">
+                <DarkModeToggle />
+                <button
+                  onClick={() => setShowRules(true)}
+                  className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 transition-all duration-300 border-2 border-amber-800 shadow-lg transform hover:scale-105"
+                >
+                  📖 Rules
+                </button>
+              </div>
             </div>
           </div>
         </div>

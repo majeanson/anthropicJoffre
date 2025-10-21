@@ -878,6 +878,10 @@ function App() {
             gameState={gameState}
             autoplayEnabled={autoplayEnabled}
             onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
+            socket={socket}
+            gameId={gameId}
+            chatMessages={chatMessages}
+            onNewChatMessage={handleNewChatMessage}
           />
         </div>
       </>

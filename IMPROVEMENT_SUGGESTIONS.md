@@ -1112,15 +1112,8 @@ export function determineWinner(trick: TrickCard[], trump: CardColor | null): st
    - Auto-play or kick AFK players
    - Prevents games from getting stuck
 
-### Should Have (Priority 2-3) - Remaining
-1. **Improved bot AI** (Priority 2.1)
-   - Difficulty levels
-   - Smarter betting
-   - Card tracking
-2. **Game replay** (Priority 2.2)
-   - Record all actions
-   - Step through history
-3. **Dark mode** (Priority 3.3)
+### Should Have (Priority 3) - Remaining
+1. **Dark mode** (Priority 3.3)
    - Tailwind dark classes
    - Toggle + persistence
 
@@ -1141,11 +1134,10 @@ export function determineWinner(trick: TrickCard[], trump: CardColor | null): st
    - Error tracking
 
 ### Future (Priority 7-8) - Remaining
-1. Tournament mode
-2. Achievements/badges
-3. Daily challenges
-4. Code refactoring
-5. Better documentation
+1. Achievements/badges
+2. Daily challenges
+3. Code refactoring
+4. Better documentation
 
 ---
 

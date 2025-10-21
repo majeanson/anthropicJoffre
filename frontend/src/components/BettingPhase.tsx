@@ -1,8 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { Socket } from 'socket.io-client';
 import { Bet, Player, GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { Leaderboard } from './Leaderboard';
+import { ChatPanel, ChatMessage } from './ChatPanel';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -15,9 +17,13 @@ interface BettingPhaseProps {
   gameState: GameState;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
+  socket?: Socket | null;
+  gameId?: string;
+  chatMessages?: ChatMessage[];
+  onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle }: BettingPhaseProps) {
+export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
   const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
   const isDealer = currentPlayerIndex === dealerIndex;
@@ -30,6 +36,32 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   const [selectedAmount, setSelectedAmount] = useState<number>(7);
   const [withoutTrump, setWithoutTrump] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+  const [chatOpen, setChatOpen] = useState<boolean>(false);
+  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
+
+  // Listen for chat messages and update unread count
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleChatMessage = () => {
+      if (!chatOpen) {
+        setUnreadChatCount(prev => prev + 1);
+      }
+    };
+
+    socket.on('game_chat_message', handleChatMessage);
+
+    return () => {
+      socket.off('game_chat_message', handleChatMessage);
+    };
+  }, [socket, chatOpen]);
+
+  // Reset unread count when chat is opened
+  useEffect(() => {
+    if (chatOpen) {
+      setUnreadChatCount(0);
+    }
+  }, [chatOpen]);
 
   // Get highest valid bet (excluding skipped bets) - memoized
   const highestBet = useMemo((): Bet | null => {
@@ -89,6 +121,18 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
               title="View Leaderboard"
             >
               🏆
+            </button>
+            <button
+              onClick={() => setChatOpen(!chatOpen)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-blue-700 shadow-md relative"
+              title="Chat"
+            >
+              💬
+              {unreadChatCount > 0 && !chatOpen && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {unreadChatCount}
+                </span>
+              )}
             </button>
             {onAutoplayToggle && (
               <button
@@ -316,6 +360,18 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         isOpen={showLeaderboard}
         onClose={() => setShowLeaderboard(false)}
       />
+
+      {socket && gameId && onNewChatMessage && (
+        <ChatPanel
+          socket={socket}
+          gameId={gameId}
+          currentPlayerId={currentPlayerId}
+          isOpen={chatOpen}
+          onClose={() => setChatOpen(false)}
+          messages={chatMessages}
+          onNewMessage={onNewChatMessage}
+        />
+      )}
     </>
   );
 }
