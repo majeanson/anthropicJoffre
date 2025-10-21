@@ -39,7 +39,7 @@ export function DebugMultiPlayerView({
               <div className="bg-purple-600 text-white px-4 py-2 font-bold">
                 {player.name}
               </div>
-              <div className="bg-white">
+              <div className="bg-white dark:bg-gray-800">
                 <TeamSelection
                   players={players}
                   gameId={gameId}
@@ -149,7 +149,7 @@ export function DebugMultiPlayerView({
       {gameState.phase === 'game_over' && (
         <div className="max-w-4xl mx-auto">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl text-center">
-            <h2 className="text-4xl font-bold mb-6 text-gray-800">Game Over!</h2>
+            <h2 className="text-4xl font-bold mb-6 text-gray-800 dark:text-gray-100">Game Over!</h2>
             <div className={`text-6xl font-bold mb-6 ${
               gameState.teamScores.team1 >= 41 ? 'text-orange-600' : 'text-purple-600'
             }`}>

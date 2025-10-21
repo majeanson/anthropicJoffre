@@ -282,8 +282,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
-                              <p className="font-bold text-umber-900">{player.name}</p>
-                              <p className="text-sm text-umber-600">
+                              <p className="font-bold text-umber-900 dark:text-gray-100">{player.name}</p>
+                              <p className="text-sm text-umber-600 dark:text-gray-400">
                                 {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} • {new Date(player.lastPlayed).toLocaleDateString()}
                               </p>
                             </div>
@@ -311,8 +311,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             <div className="flex items-center gap-2 flex-1">
                               <span className="text-green-500 text-xl">🟢</span>
                               <div>
-                                <p className="font-bold text-umber-900">{player.playerName}</p>
-                                <p className="text-sm text-umber-600">{getStatusLabel(player.status)}</p>
+                                <p className="font-bold text-umber-900 dark:text-gray-100">{player.playerName}</p>
+                                <p className="text-sm text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
                               </div>
                             </div>
                             {player.gameId && player.status !== 'in_lobby' && (
@@ -426,7 +426,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900"
+                className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
                 placeholder="Enter your name"
                 required
               />
@@ -526,7 +526,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               type="text"
               value={gameId}
               onChange={(e) => setGameId(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900"
+              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
               placeholder="Enter game ID"
               required
             />
@@ -540,7 +540,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               type="text"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900"
+              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
               placeholder="Enter your name"
               required={joinType === 'player'}
             />

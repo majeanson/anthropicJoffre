@@ -501,6 +501,7 @@ io.on('connection', (socket) => {
       hand: [],
       tricksWon: 0,
       pointsWon: 0,
+      isBot: false, // Game creator is always human
     };
 
     const gameState: GameState = {
@@ -567,8 +568,11 @@ io.on('connection', (socket) => {
       console.log(`Cancelled disconnect timeout for rejoining player ${socket.id}`);
     }
 
-    // Create session for reconnection
-    const session = createPlayerSession(gameId, socket.id, playerName);
+    // Create session for reconnection (only for human players, not bots)
+    let session: PlayerSession | undefined;
+    if (!isBot) {
+      session = createPlayerSession(gameId, socket.id, playerName);
+    }
 
     // Track online player status
     updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
@@ -1298,6 +1302,13 @@ io.on('connection', (socket) => {
     const player = game.players.find(p => p.name === session.playerName);
     if (!player) {
       socket.emit('reconnection_failed', { message: 'Player no longer in game' });
+      playerSessions.delete(token);
+      return;
+    }
+
+    // Don't allow reconnection to bot players (safety check)
+    if (player.isBot) {
+      socket.emit('reconnection_failed', { message: 'Cannot reconnect as bot player' });
       playerSessions.delete(token);
       return;
     }

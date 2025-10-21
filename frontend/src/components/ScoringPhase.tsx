@@ -263,11 +263,11 @@ export function ScoringPhase({
               {statistics.fastestPlay && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-yellow-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">⚡</div>
-                  <p className="text-sm text-gray-600 text-center">Fastest Play</p>
-                  <p className="font-bold text-lg text-center text-gray-800">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Fastest Play</p>
+                  <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
                     {statistics.fastestPlay.playerName}
                   </p>
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                     {(statistics.fastestPlay.timeMs / 1000).toFixed(1)}s avg
                   </p>
                 </div>
@@ -276,11 +276,11 @@ export function ScoringPhase({
               {statistics.mostAggressiveBidder && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">🎲</div>
-                  <p className="text-sm text-gray-600 text-center">Most Aggressive</p>
-                  <p className="font-bold text-lg text-center text-gray-800">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Most Aggressive</p>
+                  <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
                     {statistics.mostAggressiveBidder.playerName}
                   </p>
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                     {statistics.mostAggressiveBidder.bidAmount} pts
                   </p>
                 </div>
@@ -289,11 +289,11 @@ export function ScoringPhase({
               {statistics.trumpMaster && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-purple-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">👑</div>
-                  <p className="text-sm text-gray-600 text-center">Trump Master</p>
-                  <p className="font-bold text-lg text-center text-gray-800">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Trump Master</p>
+                  <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
                     {statistics.trumpMaster.playerName}
                   </p>
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                     {statistics.trumpMaster.trumpsPlayed} trumps played
                   </p>
                 </div>
@@ -302,11 +302,11 @@ export function ScoringPhase({
               {statistics.luckyPlayer && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-green-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">🍀</div>
-                  <p className="text-sm text-gray-600 text-center">Lucky Player</p>
-                  <p className="font-bold text-lg text-center text-gray-800">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Lucky Player</p>
+                  <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
                     {statistics.luckyPlayer.playerName}
                   </p>
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                     {statistics.luckyPlayer.reason}
                   </p>
                 </div>
