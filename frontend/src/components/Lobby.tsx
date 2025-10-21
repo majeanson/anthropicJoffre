@@ -57,7 +57,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           </section>
 
           {/* Betting Phase */}
-          <section className="bg-yellow-50 rounded-lg p-4 border-2 border-yellow-300">
+          <section className="bg-yellow-50 dark:bg-yellow-900/40 rounded-lg p-4 border-2 border-yellow-300 dark:border-yellow-600">
             <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Betting Phase
             </h3>
@@ -72,7 +72,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           </section>
 
           {/* Playing Phase */}
-          <section className="bg-blue-50 rounded-lg p-4 border-2 border-blue-300">
+          <section className="bg-blue-50 dark:bg-blue-900/40 rounded-lg p-4 border-2 border-blue-300 dark:border-blue-600">
             <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Playing Phase
             </h3>
@@ -86,7 +86,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           </section>
 
           {/* Special Cards */}
-          <section className="bg-green-50 rounded-lg p-4 border-2 border-green-300">
+          <section className="bg-green-50 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
             <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Special Cards
             </h3>
@@ -98,7 +98,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
           </section>
 
           {/* Scoring */}
-          <section className="bg-purple-50 rounded-lg p-4 border-2 border-purple-300">
+          <section className="bg-purple-50 dark:bg-purple-900/40 rounded-lg p-4 border-2 border-purple-300 dark:border-purple-600">
             <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Scoring
             </h3>

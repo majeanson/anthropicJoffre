@@ -417,7 +417,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {/* Center Info */}
             <div className="text-center flex-shrink-0 space-y-1.5 md:space-y-2">
               <div className="flex items-center justify-center gap-2">
-                <div className="bg-gradient-to-r from-parchment-200 to-parchment-100 px-2 md:px-3 py-1 rounded-lg border border-parchment-400 dark:border-gray-600">
+                <div className="bg-gradient-to-r from-parchment-200 to-parchment-100 dark:from-gray-700 dark:to-gray-800 px-2 md:px-3 py-1 rounded-lg border border-parchment-400 dark:border-gray-600">
                   <p className="text-[10px] md:text-xs font-bold text-umber-800 dark:text-gray-200">ROUND {gameState.roundNumber}</p>
                 </div>
                 {/* Sound Toggle Button - Compact */}
@@ -556,46 +556,48 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       {/* Circular Card Layout - Takes remaining space */}
       <div className="mb-2 md:mb-4 relative px-2 md:px-4">
         <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 dark:border-gray-600 shadow-2xl">
-          {/* Floating Action Buttons - Top Right Corner */}
-          <div className="absolute top-4 right-4 z-50 flex flex-col gap-2">
+          {/* Previous Trick Button - Top Left Corner */}
+          {gameState.previousTrick && (
             <button
-              onClick={() => setShowLeaderboard(true)}
-              className="bg-gradient-to-br from-umber-500 to-umber-700 hover:from-umber-600 hover:to-umber-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-umber-500/50 flex items-center justify-center backdrop-blur-md border-2 border-umber-800"
-              title="Leaderboard"
+              onClick={() => setShowPreviousTrick(!showPreviousTrick)}
+              className={`absolute top-4 left-4 z-50 ${
+                showPreviousTrick
+                  ? 'bg-gradient-to-br from-forest-600 to-forest-800 hover:from-forest-700 hover:to-forest-900 shadow-forest-500/50 border-forest-900'
+                  : 'bg-gradient-to-br from-umber-400 to-umber-500 hover:from-umber-500 hover:to-umber-600 shadow-umber-400/50 border-umber-600 dark:border-gray-600'
+              } active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
+              title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
             >
-              <span className="md:hidden">🏆</span>
-              <span className="hidden md:inline">🏆 Leaderboard</span>
+              <span className="md:hidden">{showPreviousTrick ? '▶️' : '⏮️'}</span>
+              <span className="hidden md:inline">{showPreviousTrick ? '▶️ Current' : '⏮️ Previous'}</span>
             </button>
-            {socket && gameId && !isSpectator && (
-              <button
-                onClick={() => setChatOpen(!chatOpen)}
-                className="bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-blue-500/50 flex items-center justify-center backdrop-blur-md border-2 border-blue-800 relative"
-                title="Chat"
-              >
-                <span className="md:hidden">💬</span>
-                <span className="hidden md:inline">💬 Chat</span>
-                {unreadChatCount > 0 && !chatOpen && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                    {unreadChatCount}
-                  </span>
-                )}
-              </button>
-            )}
-            {gameState.previousTrick && (
-              <button
-                onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-                className={`${
-                  showPreviousTrick
-                    ? 'bg-gradient-to-br from-forest-600 to-forest-800 hover:from-forest-700 hover:to-forest-900 shadow-forest-500/50 border-forest-900'
-                    : 'bg-gradient-to-br from-umber-400 to-umber-500 hover:from-umber-500 hover:to-umber-600 shadow-umber-400/50 border-umber-600 dark:border-gray-600'
-                } active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
-                title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
-              >
-                <span className="md:hidden">{showPreviousTrick ? '▶️' : '⏮️'}</span>
-                <span className="hidden md:inline">{showPreviousTrick ? '▶️ Current' : '⏮️ Previous'}</span>
-              </button>
-            )}
-          </div>
+          )}
+
+          {/* Leaderboard Button - Top Right Corner */}
+          <button
+            onClick={() => setShowLeaderboard(true)}
+            className="absolute top-4 right-4 z-50 bg-gradient-to-br from-umber-500 to-umber-700 hover:from-umber-600 hover:to-umber-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-umber-500/50 flex items-center justify-center backdrop-blur-md border-2 border-umber-800"
+            title="Leaderboard"
+          >
+            <span className="md:hidden">🏆</span>
+            <span className="hidden md:inline">🏆 Leaderboard</span>
+          </button>
+
+          {/* Chat Button - Bottom Right Corner */}
+          {socket && gameId && !isSpectator && (
+            <button
+              onClick={() => setChatOpen(!chatOpen)}
+              className="absolute bottom-4 right-4 z-50 bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-blue-500/50 flex items-center justify-center backdrop-blur-md border-2 border-blue-800 relative"
+              title="Chat"
+            >
+              <span className="md:hidden">💬</span>
+              <span className="hidden md:inline">💬 Chat</span>
+              {unreadChatCount > 0 && !chatOpen && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                  {unreadChatCount}
+                </span>
+              )}
+            </button>
+          )}
 
           {showPreviousTrick && previousCardPositions ? (
             // Previous Trick View - Circular layout on both mobile and desktop

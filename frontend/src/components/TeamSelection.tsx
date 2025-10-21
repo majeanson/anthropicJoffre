@@ -170,8 +170,8 @@ export function TeamSelection({
         {/* Team Selection */}
         <div className="grid grid-cols-2 gap-8 mb-8">
           {/* Team 1 */}
-          <div data-testid="team-1-container" className="border-2 border-orange-300 rounded-lg p-6 bg-orange-50">
-            <h3 className="text-xl font-bold text-orange-800 mb-4 text-center">Team 1</h3>
+          <div data-testid="team-1-container" className="border-2 border-orange-300 dark:border-orange-600 rounded-lg p-6 bg-orange-50 dark:bg-orange-900/40">
+            <h3 className="text-xl font-bold text-orange-800 dark:text-orange-200 mb-4 text-center">Team 1</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
                 const playerAtPosition = team1Players[position];
@@ -182,9 +182,9 @@ export function TeamSelection({
                     key={`team1-${position}`}
                     className={`p-4 rounded-lg border-2 ${
                       isCurrentPlayer
-                        ? 'bg-orange-200 border-orange-500'
+                        ? 'bg-orange-200 dark:bg-orange-700/60 border-orange-500 dark:border-orange-500'
                         : playerAtPosition
-                        ? 'bg-parchment-50 dark:bg-gray-800 border-orange-200'
+                        ? 'bg-parchment-50 dark:bg-gray-700 border-orange-200 dark:border-orange-700'
                         : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
                     }`}
                   >
@@ -219,12 +219,12 @@ export function TeamSelection({
                         {currentPlayer?.teamId !== 1 ? (
                           <button
                             onClick={() => onSelectTeam(1)}
-                            className="text-orange-600 hover:text-orange-800 font-medium"
+                            className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 font-medium"
                           >
                             Join Team 1
                           </button>
                         ) : (
-                          <span className="text-umber-400">Empty Seat</span>
+                          <span className="text-umber-400 dark:text-gray-500">Empty Seat</span>
                         )}
                       </div>
                     )}
@@ -235,8 +235,8 @@ export function TeamSelection({
           </div>
 
           {/* Team 2 */}
-          <div data-testid="team-2-container" className="border-2 border-purple-300 rounded-lg p-6 bg-purple-50">
-            <h3 className="text-xl font-bold text-purple-800 mb-4 text-center">Team 2</h3>
+          <div data-testid="team-2-container" className="border-2 border-purple-300 dark:border-purple-600 rounded-lg p-6 bg-purple-50 dark:bg-purple-900/40">
+            <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-4 text-center">Team 2</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
                 const playerAtPosition = team2Players[position];
@@ -247,9 +247,9 @@ export function TeamSelection({
                     key={`team2-${position}`}
                     className={`p-4 rounded-lg border-2 ${
                       isCurrentPlayer
-                        ? 'bg-purple-200 border-purple-500'
+                        ? 'bg-purple-200 dark:bg-purple-700/60 border-purple-500 dark:border-purple-500'
                         : playerAtPosition
-                        ? 'bg-parchment-50 dark:bg-gray-800 border-purple-200'
+                        ? 'bg-parchment-50 dark:bg-gray-700 border-purple-200 dark:border-purple-700'
                         : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
                     }`}
                   >
@@ -284,12 +284,12 @@ export function TeamSelection({
                         {currentPlayer?.teamId !== 2 ? (
                           <button
                             onClick={() => onSelectTeam(2)}
-                            className="text-purple-600 hover:text-purple-800 font-medium"
+                            className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium"
                           >
                             Join Team 2
                           </button>
                         ) : (
-                          <span className="text-umber-400">Empty Seat</span>
+                          <span className="text-umber-400 dark:text-gray-500">Empty Seat</span>
                         )}
                       </div>
                     )}
