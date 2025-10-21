@@ -206,8 +206,10 @@ function App() {
         catchUpModalTimeoutRef.current = null;
       }, 5000);
 
-      // Respawn bot sockets if there are bot players
-      spawnBotsForGame(gameState);
+      // Don't respawn bot sockets - they share localStorage with human player and cause session conflicts
+      // Bots will remain disconnected until a full page reload with Quick Play
+      // TODO: Implement server-side bot AI that doesn't require frontend socket connections
+      // spawnBotsForGame(gameState);
 
       // Update session in localStorage
       localStorage.setItem('gameSession', JSON.stringify(session));
