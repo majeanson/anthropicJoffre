@@ -123,6 +123,27 @@
   - 🍀 Lucky Player (won tricks with lowest card values)
   - 🎨 Beautiful stat cards with color-coded borders
 
+### Player Timeout/AFK Detection
+- **Date**: 2025-01-21
+- **Files**: backend/src/index.ts, TimeoutCountdown.tsx, App.tsx
+- **Features**:
+  - ⏰ 60-second countdown timer for betting and playing
+  - 🔔 Warning notifications at 15 seconds
+  - 🤖 Auto-action after timeout (auto-bet or auto-play)
+  - 📢 Toast notifications for timeout events
+  - 🎨 Visual countdown with color-coded urgency (blue → yellow → red)
+  - ✨ Pulse animation when time is critical
+
+### Rematch Voting System
+- **Date**: 2025-01-21
+- **Files**: backend/src/index.ts, RematchVoting.tsx, App.tsx
+- **Features**:
+  - 🗳️ Vote for rematch on game over screen
+  - 👥 Visual vote tracking for all 4 players
+  - ✅ Team-colored vote indicators
+  - 🎉 Automatic game restart when all vote
+  - 🔄 Session management for rematch games
+
 ---
 
 ## ✅ Priority #1: Social Features (Week 1-2) - COMPLETED
@@ -530,12 +551,12 @@ test('should show catch-up summary after reconnect', async ({ page }) => {
 
 ---
 
-## 🚧 Priority #4: Quick Rematch & Lobby Persistence (Week 4-5)
+## ✅ Priority #4: Quick Rematch & Lobby Persistence (Week 4-5) - COMPLETED
 
-### 4.1 Rematch System
+### 4.1 Rematch System ✅
 **Priority**: MEDIUM
 **Effort**: Medium (4-5 hours)
-**Status**: Not Started
+**Status**: COMPLETED (2025-01-21)
 
 **Purpose**: Keep same group of friends playing together
 
@@ -650,7 +671,7 @@ socket.on('vote_rematch', ({ gameId }) => {
 
 ## Next Steps
 
-### ✅ Completed (All Priority 1-3 Features)
+### ✅ Completed (All Priority 1-4 Features)
 1. ✅ Quick Copy Game Link
 2. ✅ Recent Players List / Online Players
 3. ✅ Pre-lobby Chat
@@ -660,19 +681,11 @@ socket.on('vote_rematch', ({ gameId }) => {
 7. ✅ Sound Effects
 8. ✅ Animations
 9. ✅ Mobile Responsive Design
+10. ✅ Player Timeout/AFK Detection
+11. ✅ Rematch Voting System
 
 ### 🎯 Remaining Features (Priority #4+)
-1. **Rematch System** (Medium effort - 4-5 hours)
-   - Vote for rematch on game over screen
-   - Seamless new game with same players
-   - **Impact**: Keeps friend groups playing together
-
-2. **Player Timeout/AFK Detection** (Medium effort - 5-6 hours)
-   - 60s countdown timer when it's a player's turn
-   - Auto-play or kick AFK players
-   - **Impact**: Prevents games from getting stuck
-
-3. **Dark Mode** (Low effort - 2-3 hours)
+1. **Dark Mode** (Low effort - 2-3 hours)
    - Tailwind dark mode classes
    - Toggle button with persistence
    - **Impact**: Better accessibility

@@ -13,6 +13,7 @@ import { TestPanel } from './components/TestPanel';
 import { ReconnectingBanner } from './components/ReconnectingBanner';
 import { CatchUpModal } from './components/CatchUpModal';
 import { Toast, ToastProps } from './components/Toast';
+import { TimeoutCountdown } from './components/TimeoutCountdown';
 import { ChatMessage } from './components/ChatPanel';
 import { BotPlayer } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
@@ -44,6 +45,11 @@ function App() {
     gameId?: string;
     lastActivity: number;
   }>>([]);
+  const [timeoutCountdown, setTimeoutCountdown] = useState<{
+    playerName: string;
+    secondsRemaining: number;
+    phase: 'betting' | 'playing';
+  } | null>(null);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -315,6 +321,30 @@ function App() {
     // Listen for online players updates
     newSocket.on('online_players_update', (players: typeof onlinePlayers) => {
       setOnlinePlayers(players);
+    });
+
+    // Listen for timeout events
+    newSocket.on('timeout_countdown', ({ playerName, secondsRemaining, phase }: { playerName: string; secondsRemaining: number; phase: 'betting' | 'playing' }) => {
+      setTimeoutCountdown({ playerName, secondsRemaining, phase });
+    });
+
+    newSocket.on('timeout_warning', ({ playerName, secondsRemaining }: { playerName: string; secondsRemaining: number }) => {
+      console.log(`⚠️ Timeout warning: ${playerName} has ${secondsRemaining} seconds remaining`);
+      setToast({
+        message: `⏰ ${playerName === (gameState?.players.find(p => p.id === newSocket.id)?.name) ? 'You have' : `${playerName} has`} ${secondsRemaining} seconds!`,
+        type: 'warning',
+        duration: 3000,
+      });
+    });
+
+    newSocket.on('auto_action_taken', ({ playerName, phase }: { playerName: string; phase: 'betting' | 'playing' }) => {
+      console.log(`🤖 Auto-action taken for ${playerName} in ${phase} phase`);
+      setTimeoutCountdown(null); // Clear countdown
+      setToast({
+        message: `🤖 Auto-${phase === 'betting' ? 'bet' : 'play'} for ${playerName}`,
+        type: 'info',
+        duration: 3000,
+      });
     });
 
     newSocket.on('error', ({ message }) => {
@@ -749,6 +779,13 @@ function App() {
     <>
       {reconnecting && <ReconnectingBanner />}
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
+      {timeoutCountdown && gameState && (
+        <TimeoutCountdown
+          playerName={timeoutCountdown.playerName}
+          secondsRemaining={timeoutCountdown.secondsRemaining}
+          isYourTurn={gameState.players[gameState.currentPlayerIndex]?.id === socket?.id}
+        />
+      )}
       {gameState && (
         <CatchUpModal
           gameState={gameState}

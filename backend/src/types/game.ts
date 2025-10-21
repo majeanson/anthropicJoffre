@@ -92,6 +92,8 @@ export interface GameState {
   playersReady?: string[]; // Array of player IDs who are ready for next round
   roundEndTimestamp?: number; // Timestamp when round ended (for 60s timer)
   rematchVotes?: string[]; // Array of player IDs who voted for rematch
+  currentTimeout?: PlayerTimeout; // Current active timeout for turn-based phases
+  afkWarnings?: Map<string, number>; // playerId -> warning count (kick after 3)
 }
 
 export interface GameHistory {
