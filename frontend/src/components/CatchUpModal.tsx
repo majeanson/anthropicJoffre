@@ -39,7 +39,7 @@ export function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: Ca
         {/* Game Status */}
         <div className="space-y-4 mb-6">
           {/* Round and Phase */}
-          <div className="bg-white rounded-lg p-4 border-2 border-amber-300">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-amber-300">
             <div className="flex items-center gap-3">
               <div className="text-3xl">📍</div>
               <div>
@@ -52,7 +52,7 @@ export function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: Ca
           </div>
 
           {/* Team Scores */}
-          <div className="bg-white rounded-lg p-4 border-2 border-amber-300">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-amber-300">
             <div className="flex items-center gap-3 mb-3">
               <div className="text-3xl">🏆</div>
               <div>

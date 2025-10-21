@@ -70,8 +70,8 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
       case 'betting': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
       case 'playing': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
       case 'scoring': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'game_over': return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+      case 'game_over': return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
+      default: return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
     }
   };
 
@@ -109,13 +109,13 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
         </div>
 
         {/* Filters */}
-        <div className="p-4 bg-parchment-100 dark:bg-gray-700 border-b-2 border-parchment-300 dark:border-gray-600 flex gap-2">
+        <div className="p-4 bg-parchment-100 dark:bg-gray-700 dark:bg-gray-700 border-b-2 border-parchment-300 dark:border-gray-600 flex gap-2">
           <button
             onClick={() => setFilter('all')}
             className={`px-4 py-2 rounded-lg font-semibold transition-all ${
               filter === 'all'
                 ? 'bg-amber-600 text-white'
-                : 'bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                : 'bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-100 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500'
             }`}
           >
             All Games ({games.length})
@@ -125,7 +125,7 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
             className={`px-4 py-2 rounded-lg font-semibold transition-all ${
               filter === 'joinable'
                 ? 'bg-green-600 text-white'
-                : 'bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                : 'bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-100 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500'
             }`}
           >
             Joinable ({games.filter(g => g.isJoinable).length})
@@ -135,14 +135,14 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
             className={`px-4 py-2 rounded-lg font-semibold transition-all ${
               filter === 'in_progress'
                 ? 'bg-blue-600 text-white'
-                : 'bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                : 'bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-100 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500'
             }`}
           >
             In Progress ({games.filter(g => g.isInProgress).length})
           </button>
           <button
             onClick={fetchGames}
-            className="ml-auto px-4 py-2 rounded-lg font-semibold bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500 transition-all flex items-center gap-2"
+            className="ml-auto px-4 py-2 rounded-lg font-semibold bg-parchment-200 dark:bg-gray-600 text-umber-900 dark:text-gray-100 dark:text-gray-200 hover:bg-parchment-300 dark:hover:bg-gray-500 transition-all flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -156,7 +156,7 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
           {loading && (
             <div className="text-center py-12">
               <div className="animate-spin h-12 w-12 border-4 border-amber-600 dark:border-gray-500 border-t-transparent rounded-full mx-auto"></div>
-              <p className="text-umber-700 dark:text-gray-300 mt-4">Loading games...</p>
+              <p className="text-umber-700 dark:text-gray-300 dark:text-gray-300 mt-4">Loading games...</p>
             </div>
           )}
 
@@ -169,7 +169,7 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
           {!loading && !error && filteredGames.length === 0 && (
             <div className="text-center py-12">
               <p className="text-2xl mb-2">🎮</p>
-              <p className="text-umber-700 dark:text-gray-300 font-semibold">
+              <p className="text-umber-700 dark:text-gray-300 dark:text-gray-300 font-semibold">
                 {filter === 'all' ? 'No games available' : `No ${filter.replace('_', ' ')} games`}
               </p>
               <p className="text-umber-600 dark:text-gray-400 text-sm mt-1">
@@ -181,7 +181,7 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
           {!loading && !error && filteredGames.map(game => (
             <div
               key={game.gameId}
-              className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow-md"
+              className="bg-white dark:bg-gray-800 dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow-md"
             >
               <div className="flex items-start justify-between mb-3">
                 <div>

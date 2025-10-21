@@ -109,8 +109,8 @@ export function DebugMultiPlayerView({
       {/* Scoring Phase */}
       {gameState.phase === 'scoring' && (
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl p-8 shadow-2xl">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl">
+            <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 text-center">
               Round {gameState.roundNumber} Complete!
             </h2>
             <div className="grid grid-cols-2 gap-6 mb-6">
@@ -147,7 +147,7 @@ export function DebugMultiPlayerView({
       {/* Game Over Phase */}
       {gameState.phase === 'game_over' && (
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-xl p-8 shadow-2xl text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl text-center">
             <h2 className="text-4xl font-bold mb-6 text-gray-800">Game Over!</h2>
             <div className={`text-6xl font-bold mb-6 ${
               gameState.teamScores.team1 >= 41 ? 'text-orange-600' : 'text-purple-600'

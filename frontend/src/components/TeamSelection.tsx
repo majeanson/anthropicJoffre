@@ -132,11 +132,11 @@ export function TeamSelection({
           </button>
         )}
 
-        <h2 className="text-3xl font-bold mb-6 text-umber-900 text-center font-serif mt-12">Team Selection</h2>
+        <h2 className="text-3xl font-bold mb-6 text-umber-900 dark:text-gray-100 text-center font-serif mt-12">Team Selection</h2>
 
         <div className="mb-6">
-          <p className="text-sm text-umber-700 mb-2">Game ID:</p>
-          <div data-testid="game-id" className="bg-parchment-100 p-3 rounded-lg font-mono text-lg text-center border-2 border-parchment-400 text-umber-900">{gameId}</div>
+          <p className="text-sm text-umber-700 dark:text-gray-300 mb-2">Game ID:</p>
+          <div data-testid="game-id" className="bg-parchment-100 dark:bg-gray-700 p-3 rounded-lg font-mono text-lg text-center border-2 border-parchment-400 dark:border-gray-500 text-umber-900">{gameId}</div>
 
           {/* Copy Game Link Button */}
           <button
@@ -158,7 +158,7 @@ export function TeamSelection({
         )}
 
         <div className="mb-8">
-          <p className="text-center text-umber-700 mb-4">
+          <p className="text-center text-umber-700 dark:text-gray-300 mb-4">
             Players (<span data-testid="player-count">{players.length}</span>/4) - Choose your team and position
           </p>
         </div>
@@ -180,13 +180,13 @@ export function TeamSelection({
                       isCurrentPlayer
                         ? 'bg-orange-200 border-orange-500'
                         : playerAtPosition
-                        ? 'bg-parchment-50 border-orange-200'
-                        : 'bg-parchment-100 border-dashed border-parchment-300'
+                        ? 'bg-parchment-50 dark:bg-gray-800 border-orange-200'
+                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300'
                     }`}
                   >
                     {playerAtPosition ? (
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <span className="font-medium text-umber-900 text-center sm:text-left">
+                        <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
@@ -234,13 +234,13 @@ export function TeamSelection({
                       isCurrentPlayer
                         ? 'bg-purple-200 border-purple-500'
                         : playerAtPosition
-                        ? 'bg-parchment-50 border-purple-200'
-                        : 'bg-parchment-100 border-dashed border-parchment-300'
+                        ? 'bg-parchment-50 dark:bg-gray-800 border-purple-200'
+                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300'
                     }`}
                   >
                     {playerAtPosition ? (
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <span className="font-medium text-umber-900 text-center sm:text-left">
+                        <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
                           {playerAtPosition.name}
                           {isCurrentPlayer && ' (You)'}
                         </span>
@@ -276,13 +276,13 @@ export function TeamSelection({
 
         {/* Chat Box */}
         {socket && (
-          <div className="mb-6 border-2 border-parchment-400 rounded-lg p-4 bg-parchment-100">
-            <h3 className="text-lg font-bold text-umber-900 mb-3 flex items-center gap-2">
+          <div className="mb-6 border-2 border-parchment-400 dark:border-gray-500 rounded-lg p-4 bg-parchment-100">
+            <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               💬 Team Chat
             </h3>
 
             {/* Messages */}
-            <div className="bg-parchment-50 rounded-lg p-3 mb-3 max-h-40 overflow-y-auto border border-parchment-300">
+            <div className="bg-parchment-50 dark:bg-gray-800 rounded-lg p-3 mb-3 max-h-40 overflow-y-auto border border-parchment-300">
               {messages.length === 0 ? (
                 <p className="text-sm text-umber-500 text-center py-4">No messages yet. Say hi!</p>
               ) : (
@@ -302,7 +302,7 @@ export function TeamSelection({
                         {msg.playerName}
                         {msg.playerId === currentPlayerId && ' (You)'}:
                       </div>
-                      <div className="text-umber-800 mt-1">{msg.message}</div>
+                      <div className="text-umber-800 dark:text-gray-200 mt-1">{msg.message}</div>
                     </div>
                   ))}
                   <div ref={messagesEndRef} />
@@ -319,7 +319,7 @@ export function TeamSelection({
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder="Type a message... (max 200 chars)"
                 maxLength={200}
-                className="flex-1 px-3 py-2 border-2 border-parchment-400 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 text-umber-900 text-sm"
+                className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 dark:bg-gray-800 text-umber-900 dark:text-gray-100 text-sm"
               />
               <button
                 type="submit"
@@ -366,15 +366,15 @@ export function TeamSelection({
           </div>
 
           {!canStartGame() && (
-            <p data-testid="start-game-message" className="text-umber-800 bg-parchment-200 border-2 border-umber-400 px-4 py-2 rounded-lg">
+            <p data-testid="start-game-message" className="text-umber-800 dark:text-gray-200 bg-parchment-200 border-2 border-umber-400 px-4 py-2 rounded-lg">
               {getStartGameMessage()}
             </p>
           )}
         </div>
 
-        <div className="mt-6 p-4 bg-parchment-100 rounded-lg border-2 border-parchment-400">
-          <h4 className="font-semibold text-umber-800 mb-2">How to Play:</h4>
-          <ul className="text-sm text-umber-700 space-y-1">
+        <div className="mt-6 p-4 bg-parchment-100 dark:bg-gray-700 rounded-lg border-2 border-parchment-400">
+          <h4 className="font-semibold text-umber-800 dark:text-gray-200 mb-2">How to Play:</h4>
+          <ul className="text-sm text-umber-700 dark:text-gray-300 space-y-1">
             <li>• Teams play opposite each other (Team 1 vs Team 2)</li>
             <li>• You can swap positions with other players before starting</li>
             <li>• Position affects turn order during the game</li>

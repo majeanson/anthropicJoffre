@@ -551,7 +551,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
       {/* Circular Card Layout - Takes remaining space */}
       <div className="mb-2 md:mb-4 relative px-2 md:px-4">
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 shadow-2xl">
+        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 dark:border-gray-500 shadow-2xl">
           {/* Floating Action Buttons - Top Right Corner */}
           <div className="absolute top-4 right-4 z-50 flex flex-col gap-2">
             <button
@@ -726,7 +726,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 z-10">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 shadow-xl">
+                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 dark:border-gray-500 shadow-xl">
                     <p className="text-parchment-50 text-lg md:text-2xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
                     <div className="mt-2 flex gap-1 justify-center">
                       <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce"></div>
@@ -742,8 +742,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
             {isSpectator ? (
               <div className="text-center py-8">
-                <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 shadow-lg">
-                  <span className="text-umber-800 text-base font-semibold">🔒 Hands Hidden</span>
+                <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 dark:border-gray-500 shadow-lg">
+                  <span className="text-umber-800 dark:text-gray-200 text-base font-semibold">🔒 Hands Hidden</span>
                   <p className="text-umber-600 text-sm mt-1.5">Spectator Mode</p>
                 </div>
               </div>

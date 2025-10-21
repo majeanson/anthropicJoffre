@@ -23,7 +23,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
       aria-modal="true"
     >
       <div
-        className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -36,7 +36,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:bg-white hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold"
+            className="text-white hover:bg-white dark:bg-gray-800 hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold"
             aria-label="Close debug panel"
           >
             ✕ Close
@@ -46,7 +46,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
         <div className="p-6 space-y-6">
           {/* Game Info */}
           <section aria-labelledby="game-info-heading">
-            <h3 id="game-info-heading" className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-purple-200 pb-2">
+            <h3 id="game-info-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
               📋 Game Information
             </h3>
             <div className="grid grid-cols-2 gap-4 bg-gray-50 rounded-lg p-4">
@@ -81,7 +81,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
 
           {/* Team Scores */}
           <section aria-labelledby="scores-heading">
-            <h3 id="scores-heading" className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-purple-200 pb-2">
+            <h3 id="scores-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
               🏆 Team Scores
             </h3>
             <div className="grid grid-cols-2 gap-4">
@@ -104,7 +104,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
 
           {/* Players */}
           <section aria-labelledby="players-heading">
-            <h3 id="players-heading" className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-purple-200 pb-2">
+            <h3 id="players-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
               👥 Players
             </h3>
             <div className="space-y-2">
@@ -175,7 +175,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
           {/* Current Trick */}
           {gameState.currentTrick.length > 0 && (
             <section aria-labelledby="trick-heading">
-              <h3 id="trick-heading" className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-purple-200 pb-2">
+              <h3 id="trick-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
                 🎴 Current Trick ({gameState.currentTrick.length}/4 cards)
               </h3>
               <div className="grid grid-cols-4 gap-2">
@@ -201,7 +201,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
           {/* Betting Info */}
           {gameState.currentBets.length > 0 && (
             <section aria-labelledby="betting-heading">
-              <h3 id="betting-heading" className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-purple-200 pb-2">
+              <h3 id="betting-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
                 💰 Betting Information
               </h3>
               <div className="bg-gray-50 rounded-lg p-4 space-y-2">
@@ -217,7 +217,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                   {gameState.currentBets.map((bet) => {
                     const player = gameState.players.find(p => p.id === bet.playerId);
                     return (
-                      <div key={bet.playerId} className="flex items-center justify-between bg-white rounded p-2 border border-gray-200">
+                      <div key={bet.playerId} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded p-2 border border-gray-200">
                         <span className="font-medium text-gray-700">{player?.name}</span>
                         <span className={`text-sm font-semibold ${bet.skipped ? 'text-gray-500' : 'text-purple-600'}`}>
                           {bet.skipped ? 'Skipped' : `${bet.amount}${bet.withoutTrump ? ' 🚫' : ''}`}

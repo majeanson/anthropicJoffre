@@ -80,7 +80,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
   if (!isOpen) return null;
 
   return (
-    <div className="fixed right-4 bottom-4 w-80 bg-parchment-50 rounded-lg shadow-2xl border-4 border-amber-700 flex flex-col max-h-96 z-50">
+    <div className="fixed right-4 bottom-4 w-80 bg-parchment-50 dark:bg-gray-800 rounded-lg shadow-2xl border-4 border-amber-700 flex flex-col max-h-96 z-50">
       {/* Header */}
       <div className="bg-gradient-to-r from-amber-700 to-amber-800 text-parchment-50 px-4 py-3 rounded-t-md flex justify-between items-center">
         <h3 className="font-bold flex items-center gap-2">
@@ -95,7 +95,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-3 bg-parchment-100 min-h-[200px] max-h-[250px]">
+      <div className="flex-1 overflow-y-auto p-3 bg-parchment-100 dark:bg-gray-700 min-h-[200px] max-h-[250px]">
         {messages.length === 0 ? (
           <p className="text-sm text-umber-500 text-center py-4">No messages yet. Say something!</p>
         ) : (
@@ -111,11 +111,11 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
                     : 'bg-parchment-200 border-l-4 border-parchment-400'
                 }`}
               >
-                <div className="font-bold text-umber-900 text-xs">
+                <div className="font-bold text-umber-900 dark:text-gray-100 text-xs">
                   {msg.playerName}
                   {msg.playerId === currentPlayerId && ' (You)'}
                 </div>
-                <div className="text-umber-800 mt-0.5">{msg.message}</div>
+                <div className="text-umber-800 dark:text-gray-200 mt-0.5">{msg.message}</div>
               </div>
             ))}
             <div ref={messagesEndRef} />
@@ -124,7 +124,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
       </div>
 
       {/* Quick Emojis */}
-      <div className="px-3 py-2 bg-parchment-100 border-t border-parchment-300 flex gap-1">
+      <div className="px-3 py-2 bg-parchment-100 dark:bg-gray-700 border-t border-parchment-300 dark:border-gray-600 flex gap-1">
         {quickEmojis.map(emoji => (
           <button
             key={emoji}
@@ -138,7 +138,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className="p-3 bg-parchment-100 border-t border-parchment-300 rounded-b-md">
+      <form onSubmit={handleSendMessage} className="p-3 bg-parchment-100 dark:bg-gray-700 border-t border-parchment-300 dark:border-gray-600 rounded-b-md">
         <div className="flex gap-2">
           <input
             ref={inputRef}
@@ -147,7 +147,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
             onChange={(e) => setInputMessage(e.target.value)}
             placeholder="Type a message... (max 200 chars)"
             maxLength={200}
-            className="flex-1 px-3 py-2 border-2 border-parchment-400 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 text-umber-900 text-sm"
+            className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 dark:bg-gray-800 text-umber-900 dark:text-gray-100 text-sm"
           />
           <button
             type="submit"

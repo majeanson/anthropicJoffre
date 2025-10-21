@@ -45,6 +45,7 @@ function App() {
     lastActivity: number;
   }>>([]);
   const lastToastRef = useRef<string>(''); // Track last toast to prevent duplicates
+  const catchUpModalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // Track catch-up modal timeout
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -192,10 +193,14 @@ function App() {
       setGameId(gameState.id);
       setGameState(gameState);
 
-      // Show catch-up modal and auto-close after 5 seconds
+      // Show catch-up modal and auto-close after 5 seconds (prevent multiple timeouts)
+      if (catchUpModalTimeoutRef.current) {
+        clearTimeout(catchUpModalTimeoutRef.current);
+      }
       setShowCatchUpModal(true);
-      setTimeout(() => {
+      catchUpModalTimeoutRef.current = setTimeout(() => {
         setShowCatchUpModal(false);
+        catchUpModalTimeoutRef.current = null;
       }, 5000);
 
       // Respawn bot sockets if there are bot players
@@ -1032,8 +1037,8 @@ function App() {
           isOpen={debugPanelOpen}
           onClose={() => setDebugPanelOpen(false)}
         />
-        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-6">
-          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-8 shadow-2xl max-w-4xl w-full border-4 border-amber-700">
+        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
+          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-4xl w-full border-4 border-amber-700 dark:border-gray-600">
             {/* Victory Banner */}
             <div className="text-center mb-8">
               <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 mb-4 animate-pulse">

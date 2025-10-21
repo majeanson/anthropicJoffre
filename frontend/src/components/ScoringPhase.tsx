@@ -92,7 +92,7 @@ export function ScoringPhase({
         />
       )}
 
-      <div className="bg-white rounded-xl p-8 shadow-2xl max-w-4xl w-full relative">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-4xl w-full relative">
         {/* Chat Button */}
         <button
           onClick={() => setChatOpen(!chatOpen)}
@@ -106,7 +106,7 @@ export function ScoringPhase({
           )}
         </button>
 
-        <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">
+        <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 text-center">
           Round {gameState.roundNumber} Complete!
         </h2>
 
@@ -253,10 +253,10 @@ export function ScoringPhase({
         {/* Round Statistics */}
         {statistics && (
           <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-lg p-4 border-2 border-amber-200 mb-4">
-            <h3 className="text-xl font-bold mb-4 text-gray-800 text-center">🏅 Round Highlights</h3>
+            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center">🏅 Round Highlights</h3>
             <div className="grid grid-cols-2 gap-4">
               {statistics.fastestPlay && (
-                <div className="bg-white rounded-lg p-4 border-2 border-yellow-300 shadow-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-yellow-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">⚡</div>
                   <p className="text-sm text-gray-600 text-center">Fastest Play</p>
                   <p className="font-bold text-lg text-center text-gray-800">
@@ -269,7 +269,7 @@ export function ScoringPhase({
               )}
 
               {statistics.mostAggressiveBidder && (
-                <div className="bg-white rounded-lg p-4 border-2 border-red-300 shadow-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">🎲</div>
                   <p className="text-sm text-gray-600 text-center">Most Aggressive</p>
                   <p className="font-bold text-lg text-center text-gray-800">
@@ -282,7 +282,7 @@ export function ScoringPhase({
               )}
 
               {statistics.trumpMaster && (
-                <div className="bg-white rounded-lg p-4 border-2 border-purple-300 shadow-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-purple-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">👑</div>
                   <p className="text-sm text-gray-600 text-center">Trump Master</p>
                   <p className="font-bold text-lg text-center text-gray-800">
@@ -295,7 +295,7 @@ export function ScoringPhase({
               )}
 
               {statistics.luckyPlayer && (
-                <div className="bg-white rounded-lg p-4 border-2 border-green-300 shadow-sm">
+                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-green-300 shadow-sm">
                   <div className="text-3xl mb-2 text-center">🍀</div>
                   <p className="text-sm text-gray-600 text-center">Lucky Player</p>
                   <p className="font-bold text-lg text-center text-gray-800">

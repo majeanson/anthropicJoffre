@@ -29,7 +29,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
       aria-modal="true"
     >
       <div
-        className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -42,7 +42,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:bg-white hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold"
+            className="text-white hover:bg-white dark:bg-gray-800 hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold"
             aria-label="Close test panel"
           >
             ✕ Close
@@ -52,7 +52,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
         <div className="p-6 space-y-6">
           {/* Current State */}
           <section>
-            <h3 className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-green-200 pb-2">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-green-200 pb-2">
               📊 Current State
             </h3>
             <div className="bg-gray-50 rounded-lg p-4 space-y-2">
@@ -79,7 +79,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
 
           {/* Score Manipulation */}
           <section>
-            <h3 className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-green-200 pb-2">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-green-200 pb-2">
               🎯 Set Team Scores
             </h3>
             <div className="bg-gray-50 rounded-lg p-4 space-y-4">
@@ -122,7 +122,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
 
           {/* Quick Actions */}
           <section>
-            <h3 className="text-lg font-bold text-gray-800 mb-3 border-b-2 border-green-200 pb-2">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-green-200 pb-2">
               ⚡ Quick Actions
             </h3>
             <div className="grid grid-cols-2 gap-4">
@@ -158,7 +158,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                   setTeam1Score(0);
                   setTeam2Score(0);
                 }}
-                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-3 px-4 rounded-lg transition-colors"
+                className="bg-gray-100 hover:bg-gray-200 text-gray-800 dark:text-gray-200 font-semibold py-3 px-4 rounded-lg transition-colors"
               >
                 Reset Scores (0-0)
               </button>

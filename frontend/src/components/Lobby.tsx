@@ -33,21 +33,21 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="bg-parchment-50 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-umber-600" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-umber-600 dark:border-gray-600" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-4xl font-bold text-umber-900 font-serif">Game Rules</h2>
+          <h2 className="text-4xl font-bold text-umber-900 dark:text-gray-100 font-serif">Game Rules</h2>
           <button
             onClick={onClose}
-            className="text-umber-600 hover:text-umber-800 text-3xl font-bold leading-none"
+            className="text-umber-600 dark:text-gray-400 hover:text-umber-800 dark:text-gray-200 dark:hover:text-gray-200 text-3xl font-bold leading-none"
           >
             ×
           </button>
         </div>
 
-        <div className="space-y-6 text-umber-800">
+        <div className="space-y-6 text-umber-800 dark:text-gray-200">
           {/* Overview */}
           <section>
-            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Overview
             </h3>
             <p className="text-lg leading-relaxed">
@@ -58,7 +58,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
 
           {/* Betting Phase */}
           <section className="bg-yellow-50 rounded-lg p-4 border-2 border-yellow-300">
-            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Betting Phase
             </h3>
             <ul className="space-y-2 text-lg">
@@ -73,7 +73,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
 
           {/* Playing Phase */}
           <section className="bg-blue-50 rounded-lg p-4 border-2 border-blue-300">
-            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Playing Phase
             </h3>
             <ul className="space-y-2 text-lg">
@@ -87,7 +87,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
 
           {/* Special Cards */}
           <section className="bg-green-50 rounded-lg p-4 border-2 border-green-300">
-            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Special Cards
             </h3>
             <ul className="space-y-2 text-lg">
@@ -99,7 +99,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
 
           {/* Scoring */}
           <section className="bg-purple-50 rounded-lg p-4 border-2 border-purple-300">
-            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Scoring
             </h3>
             <ul className="space-y-2 text-lg">
@@ -112,7 +112,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
 
           {/* Teams */}
           <section>
-            <h3 className="text-2xl font-bold text-umber-900 mb-3 flex items-center gap-2">
+            <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
               Teams
             </h3>
             <div className="grid grid-cols-2 gap-4">
@@ -213,7 +213,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             onClose={() => setShowBrowser(false)}
           />
         )}
-        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
           {/* Animated background cards */}
           <div className="absolute inset-0 opacity-10 pointer-events-none">
             <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
@@ -222,7 +222,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
           </div>
 
-          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-10 shadow-2xl max-w-md w-full border-4 border-amber-700 relative">
+          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-10 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
             {/* Decorative corners */}
             <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 rounded-tl-xl"></div>
             <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 rounded-tr-xl"></div>
@@ -231,7 +231,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
             {/* Title */}
             <div className="text-center mb-6">
-              <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
+              <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 dark:from-blue-400 dark:via-purple-500 dark:to-pink-500 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
                 J⋀ffre
               </h1>
             </div>
@@ -246,7 +246,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
                       activeTab === 'recent'
                         ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                        : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
+                        : 'bg-parchment-200 text-umber-700 dark:text-gray-300 hover:bg-parchment-300'
                     }`}
                   >
                     Recent Players
@@ -256,7 +256,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
                       activeTab === 'online'
                         ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
-                        : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
+                        : 'bg-parchment-200 text-umber-700 dark:text-gray-300 hover:bg-parchment-300'
                     }`}
                   >
                     Online Now ({onlinePlayers.length})
@@ -264,7 +264,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 </div>
 
               {/* Tab Content */}
-              <div className="bg-parchment-200 rounded-lg p-4 border-2 border-parchment-400 min-h-[200px] max-h-[200px] overflow-y-auto">
+              <div className="bg-parchment-200 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-500 min-h-[200px] max-h-[200px] overflow-y-auto">
                 {activeTab === 'recent' && (
                   <div className="space-y-2">
                     {recentPlayers.length === 0 ? (
@@ -276,7 +276,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       recentPlayers.map(player => (
                         <div
                           key={player.name}
-                          className="bg-parchment-100 rounded-lg p-3 border-2 border-parchment-400 hover:border-blue-400 transition-colors"
+                          className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-blue-400 transition-colors"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex-1">
@@ -303,7 +303,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       onlinePlayers.map(player => (
                         <div
                           key={player.socketId}
-                          className="bg-parchment-100 rounded-lg p-3 border-2 border-parchment-400 hover:border-green-400 transition-colors"
+                          className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-green-400 transition-colors"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2 flex-1">
@@ -413,10 +413,10 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
 
-          <h2 className="text-4xl font-bold mb-6 text-umber-900 font-serif text-center">Create Game</h2>
+          <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Create Game</h2>
           <form onSubmit={handleCreate} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-umber-800 mb-2">
+              <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
                 Your Name
               </label>
               <input
@@ -424,7 +424,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-parchment-400 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 text-umber-900"
+                className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900"
                 placeholder="Enter your name"
                 required
               />
@@ -469,11 +469,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
         <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
 
-        <h2 className="text-4xl font-bold mb-6 text-umber-900 font-serif text-center">Join Game</h2>
+        <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Join Game</h2>
         <form onSubmit={handleJoin} className="space-y-4">
           {/* Join Type Selection */}
-          <div className="bg-parchment-100 rounded-lg p-4 border-2 border-parchment-400">
-            <label className="block text-sm font-medium text-umber-800 mb-3">
+          <div className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400">
+            <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3">
               Join as:
             </label>
             <div className="space-y-2">
@@ -486,7 +486,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
                   className="w-4 h-4 text-umber-600 focus:ring-umber-500"
                 />
-                <span className="ml-3 text-umber-800 font-medium">🎮 Player</span>
+                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">🎮 Player</span>
               </label>
               <label className="flex items-center cursor-pointer">
                 <input
@@ -497,13 +497,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
                   className="w-4 h-4 text-umber-600 focus:ring-umber-500"
                 />
-                <span className="ml-3 text-umber-800 font-medium">👁️ Guest (Spectator)</span>
+                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">👁️ Guest (Spectator)</span>
               </label>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-umber-800 mb-2">
+            <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
               Game ID
             </label>
             <input
@@ -511,13 +511,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               type="text"
               value={gameId}
               onChange={(e) => setGameId(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-parchment-400 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 text-umber-900"
+              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900"
               placeholder="Enter game ID"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-umber-800 mb-2">
+            <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
               Your Name {joinType === 'spectator' && '(Optional)'}
             </label>
             <input
@@ -525,7 +525,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               type="text"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-parchment-400 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 text-umber-900"
+              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900"
               placeholder="Enter your name"
               required={joinType === 'player'}
             />

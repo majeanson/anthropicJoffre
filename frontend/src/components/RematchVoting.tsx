@@ -21,7 +21,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
   return (
     <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-8 shadow-2xl max-w-2xl mx-auto border-4 border-amber-700">
       <div className="text-center space-y-6">
-        <h2 className="text-3xl font-black text-umber-900 font-serif">
+        <h2 className="text-3xl font-black text-umber-900 dark:text-gray-100 font-serif">
           Play Again?
         </h2>
 
@@ -57,14 +57,14 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
                   className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
                     voted
                       ? 'bg-forest-100 border-forest-400'
-                      : 'bg-parchment-200 border-parchment-400 opacity-60'
+                      : 'bg-parchment-200 border-parchment-400 dark:border-gray-500 opacity-60'
                   }`}
                   title={player.name}
                 >
                   <div className={`w-3 h-3 rounded-full mb-2 ${
                     player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
                   }`} />
-                  <div className="text-xs font-bold text-umber-900 max-w-[60px] truncate">
+                  <div className="text-xs font-bold text-umber-900 dark:text-gray-100 max-w-[60px] truncate">
                     {isCurrentPlayer ? 'You' : player.name}
                   </div>
                   <div className="text-2xl mt-1">
