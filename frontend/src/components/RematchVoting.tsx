@@ -19,7 +19,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
   };
 
   return (
-    <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 rounded-2xl p-8 shadow-2xl max-w-2xl mx-auto border-4 border-amber-700">
+    <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-2xl mx-auto border-4 border-amber-700 dark:border-gray-600">
       <div className="text-center space-y-6">
         <h2 className="text-3xl font-black text-umber-900 dark:text-gray-100 font-serif">
           Play Again?
