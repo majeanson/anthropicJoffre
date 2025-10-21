@@ -1,5 +1,14 @@
 import { Player } from '../types/game';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Socket } from 'socket.io-client';
+
+interface ChatMessage {
+  playerId: string;
+  playerName: string;
+  teamId: 1 | 2 | null;
+  message: string;
+  timestamp: number;
+}
 
 interface TeamSelectionProps {
   players: Player[];
@@ -10,6 +19,7 @@ interface TeamSelectionProps {
   onStartGame: () => void;
   onLeaveGame?: () => void;
   onAddBot?: () => void;
+  socket?: Socket;
 }
 
 export function TeamSelection({
@@ -21,11 +31,36 @@ export function TeamSelection({
   onStartGame,
   onLeaveGame,
   onAddBot,
+  socket,
 }: TeamSelectionProps) {
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const team1Players = players.filter(p => p.teamId === 1);
   const team2Players = players.filter(p => p.teamId === 2);
   const [showCopyToast, setShowCopyToast] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Listen for chat messages
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleChatMessage = (msg: ChatMessage) => {
+      setMessages(prev => [...prev, msg]);
+    };
+
+    socket.on('team_selection_chat_message', handleChatMessage);
+
+    return () => {
+      socket.off('team_selection_chat_message', handleChatMessage);
+    };
+  }, [socket]);
+
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   const handleCopyGameLink = async () => {
     const gameUrl = `${window.location.origin}?join=${gameId}`;
@@ -36,6 +71,19 @@ export function TeamSelection({
     } catch (err) {
       console.error('Failed to copy link:', err);
     }
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!socket || !inputMessage.trim()) return;
+
+    socket.emit('send_team_selection_chat', {
+      gameId,
+      message: inputMessage.trim()
+    });
+
+    setInputMessage('');
+    inputRef.current?.focus();
   };
 
   // Validation for starting game
@@ -225,6 +273,64 @@ export function TeamSelection({
             </div>
           </div>
         </div>
+
+        {/* Chat Box */}
+        {socket && (
+          <div className="mb-6 border-2 border-parchment-400 rounded-lg p-4 bg-parchment-100">
+            <h3 className="text-lg font-bold text-umber-900 mb-3 flex items-center gap-2">
+              💬 Team Chat
+            </h3>
+
+            {/* Messages */}
+            <div className="bg-parchment-50 rounded-lg p-3 mb-3 max-h-40 overflow-y-auto border border-parchment-300">
+              {messages.length === 0 ? (
+                <p className="text-sm text-umber-500 text-center py-4">No messages yet. Say hi!</p>
+              ) : (
+                <div className="space-y-2">
+                  {messages.map((msg, idx) => (
+                    <div
+                      key={`${msg.timestamp}-${idx}`}
+                      className={`p-2 rounded text-sm ${
+                        msg.teamId === 1
+                          ? 'bg-orange-100 border-l-4 border-orange-400'
+                          : msg.teamId === 2
+                          ? 'bg-purple-100 border-l-4 border-purple-400'
+                          : 'bg-parchment-200 border-l-4 border-parchment-400'
+                      }`}
+                    >
+                      <div className="font-bold text-umber-900">
+                        {msg.playerName}
+                        {msg.playerId === currentPlayerId && ' (You)'}:
+                      </div>
+                      <div className="text-umber-800 mt-1">{msg.message}</div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <form onSubmit={handleSendMessage} className="flex gap-2">
+              <input
+                ref={inputRef}
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                placeholder="Type a message... (max 200 chars)"
+                maxLength={200}
+                className="flex-1 px-3 py-2 border-2 border-parchment-400 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 text-umber-900 text-sm"
+              />
+              <button
+                type="submit"
+                disabled={!inputMessage.trim()}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-bold transition-all duration-300 border-2 border-blue-800 disabled:border-gray-600 shadow-sm"
+              >
+                Send
+              </button>
+            </form>
+          </div>
+        )}
 
         {/* Start Game Button */}
         <div className="text-center space-y-3">

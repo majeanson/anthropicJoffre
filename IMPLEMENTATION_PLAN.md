@@ -52,14 +52,24 @@
   - 💾 Session token persistence in localStorage
   - 🔌 Auto-reconnect on page refresh
 
+### Recent Players & Online Players
+- **Date**: 2025-01-20
+- **Files**: backend/src/index.ts, App.tsx, Lobby.tsx, recentPlayers.ts
+- **Features**:
+  - 📝 Recent players saved to localStorage (max 20)
+  - 🟢 Real-time online players tracking (5s updates)
+  - 📊 Status indicators (in_lobby, in_game, in_team_selection)
+  - 📋 Copy invite link from online players
+  - 🎯 Tab interface for Recent/Online switching
+
 ---
 
 ## 🚧 Priority #1: Social Features (Week 1-2)
 
-### 1.1 Recent Players List / All Online Players
+### 1.1 Recent Players List / All Online Players ✅
 **Priority**: HIGH
 **Effort**: Medium (6-8 hours)
-**Status**: Not Started
+**Status**: COMPLETED (2025-01-20)
 
 **Purpose**: Make it easy to play with the same friends repeatedly
 

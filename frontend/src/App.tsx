@@ -771,6 +771,7 @@ function App() {
           onStartGame={handleStartGame}
           onLeaveGame={handleLeaveGame}
           onAddBot={handleAddBot}
+          socket={socket}
         />
       </>
     );

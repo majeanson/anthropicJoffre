@@ -528,6 +528,41 @@ io.on('connection', (socket) => {
     io.to(gameId).emit('game_updated', game);
   });
 
+  // Team selection chat
+  socket.on('send_team_selection_chat', ({ gameId, message }: { gameId: string; message: string }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    const player = game.players.find(p => p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    if (game.phase !== 'team_selection') {
+      socket.emit('error', { message: 'Chat only available during team selection' });
+      return;
+    }
+
+    // Sanitize and limit message length
+    const sanitizedMessage = message.trim().substring(0, 200);
+    if (!sanitizedMessage) {
+      return;
+    }
+
+    // Broadcast message to all players in the game
+    io.to(gameId).emit('team_selection_chat_message', {
+      playerId: socket.id,
+      playerName: player.name,
+      teamId: player.teamId,
+      message: sanitizedMessage,
+      timestamp: Date.now()
+    });
+  });
+
   socket.on('start_game', ({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
     if (!game) {
