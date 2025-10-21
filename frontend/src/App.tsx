@@ -520,6 +520,8 @@ function App() {
   }, [gameState]);
 
   // Helper function to spawn bot sockets for existing bot players
+  // DISABLED: Causes localStorage conflicts when respawning bots after reconnection
+  // @ts-expect-error - Function kept for future reference but currently unused
   const spawnBotsForGame = (gameState: GameState) => {
     const botPlayers = gameState.players.filter(p => p.isBot);
 

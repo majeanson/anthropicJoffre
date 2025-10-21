@@ -1275,7 +1275,8 @@ io.on('connection', (socket) => {
     }
 
     // Update online player status
-    removeOnlinePlayer(playerId);
+    onlinePlayers.delete(playerId);
+    broadcastOnlinePlayers();
 
     // Broadcast updated game state
     io.to(gameId).emit('player_left', { playerId, gameState: game });
