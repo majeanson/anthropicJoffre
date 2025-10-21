@@ -161,6 +161,14 @@ function clearPlayerTimeout(gameId: string, playerId: string) {
     clearTimeout(timeout);
     activeTimeouts.delete(key);
   }
+
+  // Clear countdown interval
+  const intervalKey = `${key}-interval`;
+  const interval = activeTimeouts.get(intervalKey);
+  if (interval) {
+    clearInterval(interval as NodeJS.Timeout);
+    activeTimeouts.delete(intervalKey);
+  }
 }
 
 // Helper to start timeout for current player
@@ -171,6 +179,47 @@ function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' |
   clearPlayerTimeout(gameId, playerId);
 
   const timeoutDuration = phase === 'betting' ? BETTING_TIMEOUT : PLAYING_TIMEOUT;
+  const startTime = Date.now();
+
+  // Send countdown updates every second
+  const countdownInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, Math.floor((timeoutDuration - elapsed) / 1000));
+
+    const game = games.get(gameId);
+    if (!game) {
+      clearInterval(countdownInterval);
+      return;
+    }
+
+    // Check if still current player's turn
+    const currentPlayer = game.players[game.currentPlayerIndex];
+    if (currentPlayer.id !== playerId || game.phase !== phase) {
+      clearInterval(countdownInterval);
+      return;
+    }
+
+    // Send countdown update to all players
+    io.to(gameId).emit('timeout_countdown', {
+      playerId,
+      playerName: currentPlayer.name,
+      secondsRemaining: remaining,
+      phase
+    });
+
+    // Send warning at 15 seconds
+    if (remaining === 15) {
+      io.to(gameId).emit('timeout_warning', {
+        playerId,
+        playerName: currentPlayer.name,
+        secondsRemaining: 15
+      });
+    }
+
+    if (remaining === 0) {
+      clearInterval(countdownInterval);
+    }
+  }, 1000);
 
   const timeout = setTimeout(() => {
     const game = games.get(gameId);
@@ -181,6 +230,13 @@ function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' |
 
     console.log(`⏰ Timeout: ${player.name} (${playerId}) in ${phase} phase`);
 
+    // Emit auto-action notification
+    io.to(gameId).emit('auto_action_taken', {
+      playerId,
+      playerName: player.name,
+      phase
+    });
+
     if (phase === 'betting') {
       handleBettingTimeout(gameId, playerId);
     } else {
@@ -189,6 +245,7 @@ function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' |
   }, timeoutDuration);
 
   activeTimeouts.set(key, timeout);
+  activeTimeouts.set(`${key}-interval`, countdownInterval as any);
 }
 
 // Handle betting timeout - auto-skip bet
