@@ -579,6 +579,21 @@ function App() {
       return;
     }
 
+    // Scoring phase - bot marks ready after delay
+    if (state.phase === 'scoring') {
+      // Check if this bot is already ready
+      const isAlreadyReady = state.playersReady?.includes(botId) || false;
+
+      if (!isAlreadyReady) {
+        const timeout = setTimeout(() => {
+          botSocket.emit('player_ready', { gameId: state.id });
+          botTimeoutsRef.current.delete(botId);
+        }, BotPlayer.getActionDelay());
+        botTimeoutsRef.current.set(botId, timeout);
+      }
+      return;
+    }
+
     // For other phases, only act when it's the bot's turn
     const currentPlayer = state.players[state.currentPlayerIndex];
     if (!currentPlayer || currentPlayer.id !== botId) return;
@@ -613,10 +628,30 @@ function App() {
   // Autoplay effect: when enabled and it's the player's turn, act as a bot
   useEffect(() => {
     if (!autoplayEnabled || !gameState || !socket) return;
-    if (gameState.phase !== 'betting' && gameState.phase !== 'playing') return;
+    if (gameState.phase !== 'betting' && gameState.phase !== 'playing' && gameState.phase !== 'scoring') return;
+
+    const myPlayerId = socket.id || '';
+
+    // For scoring phase, auto-ready
+    if (gameState.phase === 'scoring') {
+      const isAlreadyReady = gameState.playersReady?.includes(myPlayerId) || false;
+      if (!isAlreadyReady) {
+        // Clear any existing autoplay timeout
+        if (autoplayTimeoutRef.current) {
+          clearTimeout(autoplayTimeoutRef.current);
+          autoplayTimeoutRef.current = null;
+        }
+
+        // Schedule ready action with bot delay
+        autoplayTimeoutRef.current = setTimeout(() => {
+          socket.emit('player_ready', { gameId: gameState.id });
+          autoplayTimeoutRef.current = null;
+        }, BotPlayer.getActionDelay());
+      }
+      return;
+    }
 
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    const myPlayerId = socket.id || '';
 
     // Only act if it's my turn
     if (!currentPlayer || currentPlayer.id !== myPlayerId) return;
