@@ -91,6 +91,7 @@ export interface GameState {
   currentRoundTricks: TrickResult[]; // Tricks completed in current round (before endRound)
   playersReady?: string[]; // Array of player IDs who are ready for next round
   roundEndTimestamp?: number; // Timestamp when round ended (for 60s timer)
+  rematchVotes?: string[]; // Array of player IDs who voted for rematch
 }
 
 export interface PlayerSession {

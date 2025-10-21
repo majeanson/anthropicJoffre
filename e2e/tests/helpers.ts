@@ -65,11 +65,21 @@ export async function placeAllBets(pages: Page[], bets: number[] = [9, 9, 7, 8],
     const betAmount = bets[pageIndex];
     const noTrump = withoutTrump[pageIndex];
 
-    // Wait for bet button to appear using test ID (means it's this player's turn)
-    const betTestId = noTrump ? `bet-${betAmount}-without-trump` : `bet-${betAmount}-with-trump`;
-    const betButton = page.getByTestId(betTestId);
-    await betButton.waitFor({ state: 'visible', timeout: 15000 });
-    await betButton.click();
+    // Wait for bet amount button to appear (means it's this player's turn)
+    const amountButton = page.getByRole('button', { name: String(betAmount), exact: true });
+    await amountButton.waitFor({ state: 'visible', timeout: 15000 });
+    await amountButton.click();
+
+    // If without trump, click the "Without Trump" radio option
+    if (noTrump) {
+      await page.getByText('Without Trump (2x multiplier)').click();
+    }
+
+    // Click the Place Bet button
+    const placeBetPattern = noTrump
+      ? new RegExp(`Place Bet: ${betAmount} \\(No Trump\\)`)
+      : new RegExp(`Place Bet: ${betAmount}`);
+    await page.getByRole('button', { name: placeBetPattern }).click();
 
     // Wait for bet to register
     if (i < bettingOrder.length - 1) {

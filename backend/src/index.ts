@@ -1190,6 +1190,82 @@ io.on('connection', (socket) => {
     });
   });
 
+  // Handle rematch vote
+  socket.on('vote_rematch', ({ gameId }: { gameId: string }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Verify game is over
+    if (game.phase !== 'game_over') {
+      socket.emit('error', { message: 'Game is not over yet' });
+      return;
+    }
+
+    // Verify player is in game
+    const player = game.players.find(p => p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    // Initialize rematch votes if not exists
+    if (!game.rematchVotes) {
+      game.rematchVotes = [];
+    }
+
+    // Check if player already voted
+    if (game.rematchVotes.includes(socket.id)) {
+      socket.emit('error', { message: 'You already voted for rematch' });
+      return;
+    }
+
+    // Add vote
+    game.rematchVotes.push(socket.id);
+    console.log(`Player ${player.name} voted for rematch. Votes: ${game.rematchVotes.length}/4`);
+
+    // Broadcast updated vote count
+    io.to(gameId).emit('rematch_vote_update', {
+      votes: game.rematchVotes.length,
+      totalPlayers: 4,
+      voters: game.rematchVotes
+    });
+
+    // If all 4 players voted, start new game
+    if (game.rematchVotes.length === 4) {
+      console.log(`All players voted for rematch in game ${gameId}. Starting new game...`);
+
+      // Reset game state
+      game.phase = 'team_selection';
+      game.currentBets = [];
+      game.highestBet = null;
+      game.trump = null;
+      game.currentTrick = [];
+      game.previousTrick = null;
+      game.currentPlayerIndex = 0;
+      game.dealerIndex = 0;
+      game.teamScores = { team1: 0, team2: 0 };
+      game.roundNumber = 0;
+      game.roundHistory = [];
+      game.currentRoundTricks = [];
+      game.playersReady = [];
+      game.rematchVotes = [];
+
+      // Keep players but clear their hands and reset stats
+      game.players.forEach(player => {
+        player.hand = [];
+        player.tricksWon = 0;
+        player.pointsWon = 0;
+      });
+
+      // Broadcast game restarted
+      io.to(gameId).emit('rematch_started', { gameState: game });
+      console.log(`Rematch started for game ${gameId}`);
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
 

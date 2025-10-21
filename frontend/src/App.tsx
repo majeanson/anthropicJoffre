@@ -6,6 +6,7 @@ import { BettingPhase } from './components/BettingPhase';
 import { PlayingPhase } from './components/PlayingPhase';
 import { TeamSelection } from './components/TeamSelection';
 import { ScoringPhase } from './components/ScoringPhase';
+import { RematchVoting } from './components/RematchVoting';
 import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
 import { DebugPanel } from './components/DebugPanel';
 import { TestPanel } from './components/TestPanel';
@@ -279,6 +280,36 @@ function App() {
 
       // Clear session on game over
       localStorage.removeItem('gameSession');
+    });
+
+    // Listen for rematch events
+    newSocket.on('rematch_vote_update', ({ votes, totalPlayers, voters }: { votes: number; totalPlayers: number; voters: string[] }) => {
+      console.log(`Rematch votes: ${votes}/${totalPlayers}`);
+      // Update game state with new vote count
+      if (gameState) {
+        setGameState({
+          ...gameState,
+          rematchVotes: voters
+        });
+      }
+    });
+
+    newSocket.on('rematch_started', ({ gameState }: { gameState: GameState }) => {
+      console.log('Rematch started! Returning to team selection...');
+      setGameState(gameState);
+
+      // Save session for the new game
+      const currentPlayer = gameState.players.find(p => p.id === newSocket.id);
+      if (currentPlayer) {
+        const session: PlayerSession = {
+          gameId: gameState.id,
+          playerId: currentPlayer.id,
+          playerName: currentPlayer.name,
+          token: `${gameState.id}_${currentPlayer.id}_${Date.now()}`,
+          timestamp: Date.now()
+        };
+        localStorage.setItem('gameSession', JSON.stringify(session));
+      }
     });
 
     // Listen for online players updates
@@ -1093,21 +1124,18 @@ function App() {
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => {
-                  // Reset game state to allow creating a new game with same players
-                  if (socket) {
-                    const currentPlayer = gameState.players.find(p => p.id === socket.id);
-                    const playerName = currentPlayer?.name || 'Player';
-                    socket.emit('create_game', playerName);
-                  }
-                }}
-                className="bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 flex items-center gap-2"
-              >
-                🔄 Rematch
-              </button>
+            {/* Rematch Voting */}
+            <div className="mb-6">
+              <RematchVoting
+                socket={socket}
+                gameId={gameId}
+                gameState={gameState}
+                currentPlayerId={socket?.id || ''}
+              />
+            </div>
+
+            {/* Back to Lobby Button */}
+            <div className="flex justify-center">
               <button
                 onClick={() => {
                   setGameState(null);
