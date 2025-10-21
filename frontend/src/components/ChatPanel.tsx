@@ -80,9 +80,9 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
   if (!isOpen) return null;
 
   return (
-    <div className="fixed right-4 bottom-4 w-80 bg-parchment-50 dark:bg-gray-800 rounded-lg shadow-2xl border-4 border-amber-700 flex flex-col max-h-96 z-50">
+    <div className="fixed right-4 bottom-4 w-80 bg-parchment-50 dark:bg-gray-800 rounded-lg shadow-2xl border-4 border-amber-700 dark:border-gray-600 flex flex-col max-h-96 z-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-amber-700 to-amber-800 text-parchment-50 px-4 py-3 rounded-t-md flex justify-between items-center">
+      <div className="bg-gradient-to-r from-amber-700 to-amber-800 dark:from-gray-700 dark:to-gray-900 text-parchment-50 dark:text-gray-100 px-4 py-3 rounded-t-md flex justify-between items-center">
         <h3 className="font-bold flex items-center gap-2">
           💬 Chat
         </h3>
@@ -105,9 +105,9 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
                 key={`${msg.timestamp}-${idx}`}
                 className={`p-2 rounded text-sm ${
                   msg.teamId === 1
-                    ? 'bg-orange-100 border-l-4 border-orange-400'
+                    ? 'bg-orange-100 dark:bg-orange-900/40 border-l-4 border-orange-400 dark:border-orange-600'
                     : msg.teamId === 2
-                    ? 'bg-purple-100 border-l-4 border-purple-400'
+                    ? 'bg-purple-100 dark:bg-purple-900/40 border-l-4 border-purple-400 dark:border-purple-600'
                     : 'bg-parchment-200 dark:bg-gray-600 border-l-4 border-parchment-400 dark:border-gray-600'
                 }`}
               >

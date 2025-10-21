@@ -495,11 +495,11 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               {gameState.highestBet && bettingTeam && (
                 <div className={`backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 shadow-md ${
                   bettingTeam === 1
-                    ? 'bg-orange-100/90 border-orange-400'
-                    : 'bg-purple-100/90 border-purple-400'
+                    ? 'bg-orange-100/90 dark:bg-orange-900/70 border-orange-400 dark:border-orange-600'
+                    : 'bg-purple-100/90 dark:bg-purple-900/70 border-purple-400 dark:border-purple-600'
                 }`}>
                   <p className={`text-xs md:text-base font-black ${
-                    bettingTeam === 1 ? 'text-orange-800' : 'text-purple-800'
+                    bettingTeam === 1 ? 'text-orange-800 dark:text-orange-200' : 'text-purple-800 dark:text-purple-200'
                   }`}>
                     🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : ''}
                   </p>

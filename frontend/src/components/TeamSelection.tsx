@@ -318,9 +318,9 @@ export function TeamSelection({
                       key={`${msg.timestamp}-${idx}`}
                       className={`p-2 rounded text-sm ${
                         msg.teamId === 1
-                          ? 'bg-orange-100 border-l-4 border-orange-400'
+                          ? 'bg-orange-100 dark:bg-orange-900/40 border-l-4 border-orange-400 dark:border-orange-600'
                           : msg.teamId === 2
-                          ? 'bg-purple-100 border-l-4 border-purple-400'
+                          ? 'bg-purple-100 dark:bg-purple-900/40 border-l-4 border-purple-400 dark:border-purple-600'
                           : 'bg-parchment-200 dark:bg-gray-600 border-l-4 border-parchment-400 dark:border-gray-600'
                       }`}
                     >
