@@ -219,31 +219,32 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               </h1>
             </div>
 
-            {/* Recent/Online Players Tabs */}
-            <div className="mb-6">
-              {/* Tab Buttons */}
-              <div className="flex gap-2 mb-4">
-                <button
-                  onClick={() => setActiveTab('recent')}
-                  className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
-                    activeTab === 'recent'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                      : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
-                  }`}
-                >
-                  Recent Players
-                </button>
-                <button
-                  onClick={() => setActiveTab('online')}
-                  className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
-                    activeTab === 'online'
-                      ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
-                      : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
-                  }`}
-                >
-                  Online Now ({onlinePlayers.length})
-                </button>
-              </div>
+            {/* Recent/Online Players Tabs - Only show if there are players */}
+            {(recentPlayers.length > 0 || onlinePlayers.length > 0) && (
+              <div className="mb-6">
+                {/* Tab Buttons */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => setActiveTab('recent')}
+                    className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
+                      activeTab === 'recent'
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                        : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
+                    }`}
+                  >
+                    Recent Players
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('online')}
+                    className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
+                      activeTab === 'online'
+                        ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
+                        : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
+                    }`}
+                  >
+                    Online Now ({onlinePlayers.length})
+                  </button>
+                </div>
 
               {/* Tab Content */}
               <div className="bg-parchment-200 rounded-lg p-4 border-2 border-parchment-400 min-h-[200px] max-h-[200px] overflow-y-auto">
@@ -311,7 +312,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   </div>
                 )}
               </div>
-            </div>
+              </div>
+            )}
 
             {/* Toast Notification */}
             {showToast && (
