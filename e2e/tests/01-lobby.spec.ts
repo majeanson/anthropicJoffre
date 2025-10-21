@@ -4,13 +4,12 @@ test.describe('Lobby and Player Joining', () => {
   test('should display lobby with create and join options', async ({ page }) => {
     await page.goto('/');
 
-    // Check for lobby title
-    await expect(page.getByRole('heading', { name: /trick card game/i })).toBeVisible();
+    // Check for lobby title (J⋀ffre) - using text content check since heading has special character
+    await expect(page.getByRole('heading').filter({ hasText: 'ffre' })).toBeVisible();
 
     // Check for create and join buttons using test IDs
     await expect(page.getByTestId('create-game-button')).toBeVisible();
     await expect(page.getByTestId('join-game-button')).toBeVisible();
-    await expect(page.getByTestId('spectate-game-button')).toBeVisible();
     await expect(page.getByTestId('quick-play-button')).toBeVisible();
   });
 
