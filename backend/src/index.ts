@@ -572,12 +572,19 @@ io.on('connection', (socket) => {
     let session: PlayerSession | undefined;
     if (!isBot) {
       session = createPlayerSession(gameId, socket.id, playerName);
+      console.log('Created session for human player:', playerName, 'socket:', socket.id);
+    } else {
+      console.log('Skipping session for bot:', playerName);
     }
 
     // Track online player status
     updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
 
-    io.to(gameId).emit('player_joined', { player, gameState: game, session });
+    // Send session only to the joining player (not broadcast to everyone)
+    socket.emit('player_joined', { player, gameState: game, session });
+
+    // Broadcast to other players without session info
+    socket.to(gameId).emit('player_joined', { player, gameState: game });
   });
 
   socket.on('select_team', ({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
@@ -1284,6 +1291,8 @@ io.on('connection', (socket) => {
       socket.emit('reconnection_failed', { message: 'Invalid or expired session token' });
       return;
     }
+
+    console.log('Session found for player:', session.playerName, 'in game:', session.gameId);
 
     const game = games.get(session.gameId);
     if (!game) {

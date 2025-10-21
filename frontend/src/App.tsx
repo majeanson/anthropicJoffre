@@ -183,7 +183,10 @@ function App() {
 
       // Save session to localStorage
       if (session) {
+        console.log('Saving session for player:', session.playerName);
         localStorage.setItem('gameSession', JSON.stringify(session));
+      } else {
+        console.log('No session in player_joined event');
       }
     });
 
