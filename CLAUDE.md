@@ -1112,6 +1112,8 @@ npm run test:e2e     # Run E2E tests
 ## 🎯 Next Steps / Known Issues
 
 ### Current Implementation Status
+
+#### Core Gameplay ✅
 ✅ Team selection with position swapping
 ✅ Dealer rotation and betting order
 ✅ Turn-based betting UI (shows whose turn it is)
@@ -1122,31 +1124,99 @@ npm run test:e2e     # Run E2E tests
 ✅ Skip bet functionality with dealer restrictions
 ✅ Circular trick layout with previous trick viewer
 ✅ 3-second pause after trick completion
-✅ Bot player AI system for automated gameplay
-✅ Quick Play feature (1 human + 3 bots)
-✅ Test Panel for state manipulation
-✅ 4-Player debug view (all perspectives simultaneously)
-✅ Debug controls (Test, State, 4-Player toggle)
+
+#### Quality & Security ✅
 ✅ **Multi-layered validation system** (4-layer defense-in-depth)
 ✅ **Race condition prevention** (trick completion lock, duplicate play check)
-✅ **Leaderboard with round history** (comprehensive game stats tracking)
-✅ **Round-by-round analytics** (bets, points, outcomes)
-✅ **Spectator mode** (watch games without playing, hands hidden)
-✅ **Reconnection support** (2-minute grace period, session management)
-✅ **Quick Copy Game Link** (shareable URL with auto-join from URL parameter)
-✅ **Autoplay mode** (manual toggle + auto-enable on 60s timeout)
-✅ Comprehensive documentation (VALIDATION_SYSTEM.md, BOT_PLAYER_SYSTEM.md, IMPROVEMENT_SUGGESTIONS.md, IMPLEMENTATION_PLAN.md)
-✅ E2E test suite (includes spectator mode tests)
+✅ Comprehensive E2E test suite (17+ test files)
+✅ Documentation (VALIDATION_SYSTEM.md, BOT_PLAYER_SYSTEM.md, IMPROVEMENT_SUGGESTIONS.md, IMPLEMENTATION_PLAN.md)
 
-### Future Enhancements
-- [ ] Backend handlers for Test Panel state manipulation
-- [ ] Game replay functionality
-- [ ] Player statistics tracking
-- [ ] Tournament mode
-- [ ] Mobile responsive improvements
-- [ ] Sound effects and animations
-- [ ] Bot AI improvements (smarter betting/playing strategy)
-- [ ] Adjustable bot difficulty levels
+#### Multiplayer & Social ✅
+✅ **Reconnection support** (15-minute grace period, session management, catch-up modal)
+✅ **Spectator mode** (watch games without playing, hands hidden)
+✅ **Quick Copy Game Link** (shareable URL with auto-join from URL parameter)
+✅ **Recent Players & Online Players** (localStorage + real-time tracking with 5s updates)
+✅ **Pre-lobby Chat** (team selection phase, team-colored messages)
+✅ **In-game Chat** (betting/playing/scoring phases, persistence across phases)
+✅ **Chat Features** (quick emoji reactions, unread counter, 200 char limit)
+
+#### Game Stats & Analytics ✅
+✅ **Leaderboard with round history** (comprehensive game stats tracking)
+✅ **Round-by-round analytics** (bets, points, outcomes, cumulative scores)
+✅ **Round Statistics Panel** (⚡ fastest play, 🎲 aggressive bidder, 👑 trump master, 🍀 lucky player)
+
+#### Bot & Testing Tools ✅
+✅ **Bot player AI system** (automated gameplay with strategic decisions)
+✅ **Quick Play feature** (1 human + 3 bots instant start)
+✅ **Autoplay mode** (manual toggle + auto-enable on 60s timeout)
+✅ **Test Panel** (state manipulation for testing)
+✅ **4-Player debug view** (all perspectives simultaneously)
+✅ **Debug controls** (Test, State, 4-Player toggle)
+
+#### UI/UX Polish ✅
+✅ **Sound Effects** (Web Audio API synthesized: card deal, card play, trick won, trick collect, round start, button click, your turn)
+✅ **Sound Settings** (toggle on/off, volume control at 30% default)
+✅ **Animations** (card slides, trick collection, score pop, points float-up, slideDown/Up, fadeIn)
+✅ **Mobile Responsive Design** (breakpoints sm/md/lg/xl, touch-friendly buttons, adaptive layouts)
+✅ **Enhanced Reconnection UI** (toast notifications, catch-up modal, non-blocking banner)
+
+### Future Enhancements (Priority Order)
+
+#### High Priority
+- [ ] **Player Timeout/AFK Detection** (5-6 hours)
+  - 60s countdown timer when it's player's turn
+  - Auto-play random legal move OR kick player
+  - Visual countdown UI above current player
+  - **Impact**: Prevents games from getting stuck forever
+
+- [ ] **Rematch System** (4-5 hours)
+  - Vote for rematch on game over screen
+  - Seamless new game with same players (keeps teams)
+  - Real-time vote tracking (X/4 players ready)
+  - **Impact**: Keeps friend groups playing together
+
+#### Medium Priority
+- [ ] **Dark Mode** (2-3 hours)
+  - Tailwind dark mode classes
+  - Toggle button with localStorage persistence
+  - **Impact**: Better accessibility and late-night gaming
+
+- [ ] **Game Replay** (6-8 hours)
+  - Record all game actions
+  - Step through game history (play/pause/rewind)
+  - Share replay links
+  - **Impact**: Learn from games, share highlights
+
+- [ ] **Improved Bot AI** (6-8 hours)
+  - Difficulty levels (Easy/Medium/Hard)
+  - Smarter betting based on hand strength evaluation
+  - Card counting and tracking
+  - Advanced strategy (partner support, memory)
+  - **Impact**: Better single-player experience
+
+#### Low Priority
+- [ ] **Lobby Browser** (10-12 hours)
+  - List public games
+  - Join games in progress
+  - Private/password-protected games
+  - **Impact**: Better multiplayer matchmaking
+
+- [ ] **Persistent Storage** (8-10 hours)
+  - Save games to PostgreSQL database
+  - Game history and stats
+  - Survive server restarts
+  - **Impact**: Data persistence
+
+- [ ] **Tournament Mode** (15-20 hours)
+  - Single elimination brackets
+  - Round robin pools
+  - Leaderboards
+  - **Impact**: Competitive play
+
+- [ ] **Achievements/Badges** (6-8 hours)
+  - First Blood, Perfect Round, Betting Master, etc.
+  - Display on player profiles
+  - **Impact**: Engagement and replayability
 
 ---
 
@@ -1163,5 +1233,8 @@ npm run test:e2e     # Run E2E tests
 
 ---
 
-*Last updated: 2025-10-08*
+*Last updated: 2025-01-20*
 *Project: Trick Card Game (anthropicJoffre)*
+
+**Feature Completion Status**: ~95% of planned Priority 1-3 features complete
+**Remaining High-Priority**: Player Timeout/AFK Detection, Rematch System
