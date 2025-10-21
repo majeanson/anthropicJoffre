@@ -10,6 +10,7 @@ import { DebugPanel } from './components/DebugPanel';
 import { TestPanel } from './components/TestPanel';
 import { BotPlayer } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
+import { addRecentPlayers } from './utils/recentPlayers';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -27,6 +28,13 @@ function App() {
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
+  const [onlinePlayers, setOnlinePlayers] = useState<Array<{
+    socketId: string;
+    playerName: string;
+    status: 'in_lobby' | 'in_game' | 'in_team_selection';
+    gameId?: string;
+    lastActivity: number;
+  }>>([]);
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -233,8 +241,22 @@ function App() {
     newSocket.on('game_over', ({ gameState }: { gameState: GameState }) => {
       setGameState(gameState);
 
+      // Save recent players (excluding yourself)
+      const currentPlayer = gameState.players.find(p => p.id === newSocket.id);
+      if (currentPlayer) {
+        const otherPlayers = gameState.players
+          .map(p => p.name)
+          .filter(name => name !== currentPlayer.name);
+        addRecentPlayers(otherPlayers, currentPlayer.name);
+      }
+
       // Clear session on game over
       localStorage.removeItem('gameSession');
+    });
+
+    // Listen for online players updates
+    newSocket.on('online_players_update', (players: typeof onlinePlayers) => {
+      setOnlinePlayers(players);
     });
 
     newSocket.on('error', ({ message }) => {
@@ -637,7 +659,7 @@ function App() {
   }
 
   if (!gameState) {
-    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} />;
+    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} onlinePlayers={onlinePlayers} />;
   }
 
   // Debug controls

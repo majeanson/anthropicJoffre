@@ -68,6 +68,17 @@ const activeTimeouts = new Map<string, NodeJS.Timeout>();
 // Disconnect timeout storage (maps socket.id to timeout ID)
 const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
+// Online players tracking
+interface OnlinePlayer {
+  socketId: string;
+  playerName: string;
+  status: 'in_lobby' | 'in_game' | 'in_team_selection';
+  gameId?: string;
+  lastActivity: number;
+}
+
+const onlinePlayers = new Map<string, OnlinePlayer>();
+
 // Timeout configuration
 const BETTING_TIMEOUT = 60000; // 60 seconds
 const PLAYING_TIMEOUT = 60000; // 60 seconds
@@ -105,6 +116,33 @@ function validateSessionToken(token: string): PlayerSession | null {
 
   return session;
 }
+
+// Helper to update online player status
+function updateOnlinePlayer(socketId: string, playerName: string, status: 'in_lobby' | 'in_game' | 'in_team_selection', gameId?: string) {
+  onlinePlayers.set(socketId, {
+    socketId,
+    playerName,
+    status,
+    gameId,
+    lastActivity: Date.now()
+  });
+}
+
+// Helper to broadcast online players list
+function broadcastOnlinePlayers() {
+  const now = Date.now();
+  const ACTIVITY_THRESHOLD = 30000; // 30 seconds
+
+  // Filter active players (active in last 30 seconds)
+  const activePlayers = Array.from(onlinePlayers.values())
+    .filter(p => now - p.lastActivity < ACTIVITY_THRESHOLD);
+
+  // Broadcast to all connected clients
+  io.emit('online_players_update', activePlayers);
+}
+
+// Broadcast online players every 5 seconds
+setInterval(broadcastOnlinePlayers, 5000);
 
 // Helper to clear timeout for a player
 function clearPlayerTimeout(gameId: string, playerId: string) {
@@ -366,6 +404,9 @@ io.on('connection', (socket) => {
     // Create session for reconnection
     const session = createPlayerSession(gameId, socket.id, playerName);
 
+    // Track online player status
+    updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
+
     socket.emit('game_created', { gameId, gameState, session });
   });
 
@@ -405,6 +446,9 @@ io.on('connection', (socket) => {
 
     // Create session for reconnection
     const session = createPlayerSession(gameId, socket.id, playerName);
+
+    // Track online player status
+    updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
 
     io.to(gameId).emit('player_joined', { player, gameState: game, session });
   });
@@ -509,6 +553,11 @@ io.on('connection', (socket) => {
       socket.emit('error', { message: 'Teams must be balanced (2 players per team)' });
       return;
     }
+
+    // Update all players' status to in_game
+    game.players.forEach(player => {
+      updateOnlinePlayer(player.id, player.name, 'in_game', gameId);
+    });
 
     startNewRound(gameId);
   });
@@ -953,6 +1002,9 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
+
+    // Remove from online players
+    onlinePlayers.delete(socket.id);
 
     // Find player's game and session
     let playerGame: GameState | null = null;

@@ -1,4 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
+
+interface OnlinePlayer {
+  socketId: string;
+  playerName: string;
+  status: 'in_lobby' | 'in_game' | 'in_team_selection';
+  gameId?: string;
+  lastActivity: number;
+}
 
 interface LobbyProps {
   onCreateGame: (playerName: string) => void;
@@ -8,6 +17,7 @@ interface LobbyProps {
   onRejoinGame?: () => void;
   hasValidSession?: boolean;
   autoJoinGameId?: string;
+  onlinePlayers: OnlinePlayer[];
 }
 
 // Rules Modal Component
@@ -127,12 +137,20 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
   );
 }
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers }: LobbyProps) {
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
+  const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
+  const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
+  const [showToast, setShowToast] = useState(false);
+
+  // Load recent players on mount
+  useEffect(() => {
+    setRecentPlayers(getRecentPlayers());
+  }, []);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,6 +170,25 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
       if (gameId.trim()) {
         onSpectateGame(gameId, playerName.trim() || undefined);
       }
+    }
+  };
+
+  const handleCopyInviteLink = (gameIdToCopy: string) => {
+    const inviteLink = `${window.location.origin}/?join=${gameIdToCopy}`;
+    navigator.clipboard.writeText(inviteLink).then(() => {
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 2000);
+    }).catch(err => {
+      console.error('Failed to copy link:', err);
+    });
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'in_lobby': return 'In Lobby';
+      case 'in_game': return 'Playing';
+      case 'in_team_selection': return 'Setting up';
+      default: return status;
     }
   };
 
@@ -176,11 +213,112 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 rounded-br-xl"></div>
 
             {/* Title */}
-            <div className="text-center mb-10">
+            <div className="text-center mb-6">
               <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
                 J⋀ffre
               </h1>
             </div>
+
+            {/* Recent/Online Players Tabs */}
+            <div className="mb-6">
+              {/* Tab Buttons */}
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={() => setActiveTab('recent')}
+                  className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
+                    activeTab === 'recent'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                      : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
+                  }`}
+                >
+                  Recent Players
+                </button>
+                <button
+                  onClick={() => setActiveTab('online')}
+                  className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
+                    activeTab === 'online'
+                      ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
+                      : 'bg-parchment-200 text-umber-700 hover:bg-parchment-300'
+                  }`}
+                >
+                  Online Now ({onlinePlayers.length})
+                </button>
+              </div>
+
+              {/* Tab Content */}
+              <div className="bg-parchment-200 rounded-lg p-4 border-2 border-parchment-400 min-h-[200px] max-h-[200px] overflow-y-auto">
+                {activeTab === 'recent' && (
+                  <div className="space-y-2">
+                    {recentPlayers.length === 0 ? (
+                      <div className="text-center text-umber-600 py-8">
+                        <p className="text-lg">No recent players yet</p>
+                        <p className="text-sm mt-2">Players you've played with will appear here</p>
+                      </div>
+                    ) : (
+                      recentPlayers.map(player => (
+                        <div
+                          key={player.name}
+                          className="bg-parchment-100 rounded-lg p-3 border-2 border-parchment-400 hover:border-blue-400 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <p className="font-bold text-umber-900">{player.name}</p>
+                              <p className="text-sm text-umber-600">
+                                {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} • {new Date(player.lastPlayed).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {activeTab === 'online' && (
+                  <div className="space-y-2">
+                    {onlinePlayers.length === 0 ? (
+                      <div className="text-center text-umber-600 py-8">
+                        <p className="text-lg">No players online</p>
+                        <p className="text-sm mt-2">Online players will appear here</p>
+                      </div>
+                    ) : (
+                      onlinePlayers.map(player => (
+                        <div
+                          key={player.socketId}
+                          className="bg-parchment-100 rounded-lg p-3 border-2 border-parchment-400 hover:border-green-400 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2 flex-1">
+                              <span className="text-green-500 text-xl">🟢</span>
+                              <div>
+                                <p className="font-bold text-umber-900">{player.playerName}</p>
+                                <p className="text-sm text-umber-600">{getStatusLabel(player.status)}</p>
+                              </div>
+                            </div>
+                            {player.gameId && player.status !== 'in_lobby' && (
+                              <button
+                                onClick={() => handleCopyInviteLink(player.gameId!)}
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-bold transition-colors"
+                                title="Copy invite link"
+                              >
+                                📋 Invite
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Toast Notification */}
+            {showToast && (
+              <div className="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in z-50">
+                ✓ Invite link copied!
+              </div>
+            )}
 
             {/* Buttons */}
             <div className="space-y-3">
