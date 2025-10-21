@@ -9,6 +9,9 @@ import { ScoringPhase } from './components/ScoringPhase';
 import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
 import { DebugPanel } from './components/DebugPanel';
 import { TestPanel } from './components/TestPanel';
+import { ReconnectingBanner } from './components/ReconnectingBanner';
+import { CatchUpModal } from './components/CatchUpModal';
+import { Toast, ToastProps } from './components/Toast';
 import { BotPlayer } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { addRecentPlayers } from './utils/recentPlayers';
@@ -24,6 +27,8 @@ function App() {
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
   const [reconnecting, setReconnecting] = useState<boolean>(false);
+  const [showCatchUpModal, setShowCatchUpModal] = useState<boolean>(false);
+  const [toast, setToast] = useState<Omit<ToastProps, 'onClose'> | null>(null);
   const [isSpectator, setIsSpectator] = useState<boolean>(false);
   const [currentTrickWinnerId, setCurrentTrickWinnerId] = useState<string | null>(null);
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
@@ -183,6 +188,9 @@ function App() {
       setGameId(gameState.id);
       setGameState(gameState);
 
+      // Show catch-up modal
+      setShowCatchUpModal(true);
+
       // Respawn bot sockets if there are bot players
       spawnBotsForGame(gameState);
 
@@ -209,12 +217,28 @@ function App() {
 
     newSocket.on('player_reconnected', ({ playerName }: { playerName: string; playerId: string; oldSocketId: string }) => {
       console.log(`${playerName} reconnected`);
-      // Could show a toast notification here
+      // Show toast notification
+      setToast({
+        message: `${playerName} reconnected`,
+        type: 'success',
+        duration: 3000,
+      });
     });
 
     newSocket.on('player_disconnected', ({ playerId, waitingForReconnection }: { playerId: string; waitingForReconnection: boolean }) => {
       console.log(`Player ${playerId} disconnected. Waiting for reconnection: ${waitingForReconnection}`);
-      // Could show a notification that player disconnected
+
+      // Show toast notification if waiting for reconnection
+      if (waitingForReconnection && gameState) {
+        const player = gameState.players.find(p => p.id === playerId);
+        if (player) {
+          setToast({
+            message: `${player.name} disconnected`,
+            type: 'warning',
+            duration: 3000,
+          });
+        }
+      }
     });
 
     newSocket.on('round_started', (gameState) => {
@@ -646,21 +670,29 @@ function App() {
     );
   }
 
-  // Show reconnecting UI
-  if (reconnecting) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-900 to-purple-900 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-2xl text-center">
-          <div className="animate-spin h-12 w-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Reconnecting...</h2>
-          <p className="text-gray-600">Restoring your game session</p>
-        </div>
-      </div>
-    );
-  }
+  // Global UI components (shown across all phases)
+  const GlobalUI = () => (
+    <>
+      {reconnecting && <ReconnectingBanner />}
+      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
+      {gameState && (
+        <CatchUpModal
+          gameState={gameState}
+          currentPlayerId={socket?.id || ''}
+          isOpen={showCatchUpModal}
+          onClose={() => setShowCatchUpModal(false)}
+        />
+      )}
+    </>
+  );
 
   if (!gameState) {
-    return <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} onlinePlayers={onlinePlayers} />;
+    return (
+      <>
+        <GlobalUI />
+        <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} onlinePlayers={onlinePlayers} />
+      </>
+    );
   }
 
   // Debug controls
@@ -755,6 +787,7 @@ function App() {
   if (gameState.phase === 'team_selection') {
     return (
       <>
+        <GlobalUI />
         <DebugControls />
         {renderTestPanel()}
         <DebugPanel
@@ -781,6 +814,7 @@ function App() {
   if (gameState.phase === 'betting') {
     return (
       <>
+        <GlobalUI />
         <DebugControls />
         {renderTestPanel()}
         <DebugPanel
@@ -810,6 +844,7 @@ function App() {
   if (gameState.phase === 'playing') {
     return (
       <>
+        <GlobalUI />
         <DebugControls />
         {renderTestPanel()}
         <DebugPanel
@@ -837,6 +872,7 @@ function App() {
   if (gameState.phase === 'scoring') {
     return (
       <>
+        <GlobalUI />
         <DebugControls />
         {renderTestPanel()}
         <DebugPanel
@@ -862,6 +898,7 @@ function App() {
 
     return (
       <>
+        <GlobalUI />
         <DebugControls />
         {renderTestPanel()}
         <DebugPanel
