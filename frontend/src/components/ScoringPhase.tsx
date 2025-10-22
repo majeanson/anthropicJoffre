@@ -130,20 +130,22 @@ export function ScoringPhase({
 
         {/* Timer and Ready Status */}
         <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+            {/* Timer - Centered on mobile, left on desktop */}
             <div className="flex items-center gap-3">
-              <div className="text-4xl font-bold text-blue-600 dark:text-blue-300">
+              <div className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-300">
                 {timeRemaining}s
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+            {/* Ready Status and Button - Stacked on mobile, horizontal on desktop */}
+            <div className="flex flex-col md:flex-row items-center gap-2 md:gap-3 w-full md:w-auto">
+              <span className="text-xs md:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
                 {readyCount}/4 players ready
               </span>
               <button
                 onClick={handleReady}
                 disabled={isReady}
-                className={`px-6 py-2 rounded-lg font-bold transition-all ${
+                className={`px-4 md:px-6 py-2 rounded-lg font-bold transition-all text-sm md:text-base w-full md:w-auto ${
                   isReady
                     ? 'bg-green-500 text-white cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700 text-white'
