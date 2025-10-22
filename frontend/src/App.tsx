@@ -25,6 +25,7 @@ function App() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [gameId, setGameId] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const botSocketsRef = useRef<Map<string, Socket>>(new Map()); // Track bot sockets by bot player ID
   const [debugMode, setDebugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
@@ -206,10 +207,9 @@ function App() {
         catchUpModalTimeoutRef.current = null;
       }, 5000);
 
-      // Don't respawn bot sockets - they share localStorage with human player and cause session conflicts
-      // Bots will remain disconnected until a full page reload with Quick Play
-      // TODO: Implement server-side bot AI that doesn't require frontend socket connections
-      // spawnBotsForGame(gameState);
+      // Respawn bot sockets after successful reconnection
+      // This ensures bots continue playing after human player reconnects
+      spawnBotsForGame(gameState);
 
       // Update session in localStorage
       localStorage.setItem('gameSession', JSON.stringify(session));
@@ -523,24 +523,35 @@ function App() {
   }, [gameState]);
 
   // Helper function to spawn bot sockets for existing bot players
-  // DISABLED: Causes localStorage conflicts when respawning bots after reconnection
-  // @ts-expect-error - Function kept for future reference but currently unused
   const spawnBotsForGame = (gameState: GameState) => {
     const botPlayers = gameState.players.filter(p => p.isBot);
 
     if (botPlayers.length === 0) return;
 
-    console.log(`Found ${botPlayers.length} bot players, spawning fresh bot sockets...`);
-
-    // Note: We don't try to reconnect bots with sessions because:
-    // 1. Bot sessions are ephemeral and shouldn't be saved
-    // 2. Fresh bot connections work fine and don't interfere with human player sessions
-    // 3. Bots will be marked as disconnected but can continue playing when respawned
+    console.log(`Found ${botPlayers.length} bot players, respawning bot sockets after reconnection...`);
 
     botPlayers.forEach(botPlayer => {
+      // Skip if bot socket already exists and is connected
+      const existingBotSocket = botSocketsRef.current.get(botPlayer.id);
+      if (existingBotSocket && existingBotSocket.connected) {
+        console.log(`Bot ${botPlayer.name} socket already connected, skipping`);
+        return;
+      }
+
+      // Disconnect existing socket if any
+      if (existingBotSocket) {
+        existingBotSocket.disconnect();
+        botSocketsRef.current.delete(botPlayer.id);
+      }
+
       // Create new socket for the bot
-      const botSocket = io(SOCKET_URL);
+      const botSocket = io(SOCKET_URL, {
+        transports: ['websocket', 'polling'],
+      });
       const botName = botPlayer.name;
+
+      // Store the bot socket reference
+      botSocketsRef.current.set(botPlayer.id, botSocket);
 
       botSocket.on('connect', () => {
         console.log(`Bot ${botName} socket connected, joining game...`);
@@ -587,6 +598,12 @@ function App() {
     });
 
     botSocket.on('player_joined', ({ gameState: state }: { gameState: GameState }) => {
+      // Store bot socket reference
+      const botPlayer = state.players.find(p => p.name === botName && p.isBot);
+      if (botPlayer) {
+        botSocketsRef.current.set(botPlayer.id, botSocket);
+        console.log(`Stored bot socket for ${botName} with ID ${botPlayer.id}`);
+      }
       handleBotAction(botSocket, state, botSocket.id || '');
     });
 
@@ -612,7 +629,7 @@ function App() {
     if (!socket) return;
 
     // Listen for game creation to spawn bots
-    const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string; gameState: GameState }) => {
+    const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string }) => {
       // Spawn 3 bot players after game is created
       setTimeout(() => {
         for (let i = 0; i < 3; i++) {
@@ -624,10 +641,16 @@ function App() {
           });
 
           // Listen to all game state updates
-          botSocket.on('player_joined', ({ gameState }: { gameState: GameState; session?: PlayerSession }) => {
+          botSocket.on('player_joined', ({ gameState: newGameState }: { gameState: GameState; session?: PlayerSession }) => {
+            // Store bot socket reference using the bot's player ID
+            const botPlayer = newGameState.players.find(p => p.name === botName && p.isBot);
+            if (botPlayer) {
+              botSocketsRef.current.set(botPlayer.id, botSocket);
+              console.log(`Stored bot socket for ${botName} with ID ${botPlayer.id}`);
+            }
             // Don't save bot sessions to localStorage - they are ephemeral
             // and should not interfere with human player reconnection
-            handleBotAction(botSocket, gameState, botSocket.id || '');
+            handleBotAction(botSocket, newGameState, botSocket.id || '');
           });
 
           botSocket.on('game_updated', (state: GameState) => {
