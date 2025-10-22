@@ -158,6 +158,15 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     setRecentPlayers(getRecentPlayers());
   }, []);
 
+  // React to autoJoinGameId prop changes
+  useEffect(() => {
+    if (autoJoinGameId) {
+      console.log('AutoJoinGameId changed to:', autoJoinGameId, '- updating state');
+      setGameId(autoJoinGameId);
+      setMode('join');
+    }
+  }, [autoJoinGameId]);
+
   // Focus the name input when joining from URL
   useEffect(() => {
     if (autoJoinGameId && mode === 'join') {
