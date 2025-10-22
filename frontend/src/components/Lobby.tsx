@@ -583,8 +583,21 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           )}
 
           <div className="flex gap-3">
-            {/* Hide back button when joining from URL */}
-            {!autoJoinGameId && (
+            {/* Show appropriate back button based on context */}
+            {autoJoinGameId ? (
+              <button
+                data-testid="back-to-homepage-button"
+                type="button"
+                onClick={() => {
+                  setMode('menu');
+                  setGameId('');
+                  setPlayerName('');
+                }}
+                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
+              >
+                🏠 Back to Homepage
+              </button>
+            ) : (
               <button
                 data-testid="back-button"
                 type="button"
@@ -597,7 +610,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <button
               data-testid="submit-join-button"
               type="submit"
-              className={`${autoJoinGameId ? 'w-full' : 'flex-1'} text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
+              className={`flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
                 joinType === 'player'
                   ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-purple-800'
                   : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-blue-800'
