@@ -155,7 +155,15 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     setRecentPlayers(getRecentPlayers());
   }, []);
 
-  // Removed auto-submit for URL joins - user will click join button manually
+  // Focus the name input when joining from URL
+  useEffect(() => {
+    if (autoJoinGameId && mode === 'join') {
+      const nameInput = document.querySelector<HTMLInputElement>('[data-testid="player-name-input"]');
+      if (nameInput) {
+        setTimeout(() => nameInput.focus(), 100);
+      }
+    }
+  }, [autoJoinGameId, mode]);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -475,12 +483,15 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
         {/* Show message when joining from URL */}
         {autoJoinGameId && (
-          <div className="mb-4 bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-4">
-            <p className="text-blue-800 dark:text-blue-200 font-semibold text-center">
-              Joining game: <span className="font-mono">{gameId}</span>
-            </p>
-            <p className="text-blue-600 dark:text-blue-300 text-sm text-center mt-1">
-              Enter your name to join!
+          <div className="mb-6 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 border-2 border-blue-500 dark:border-blue-600 rounded-lg p-5 animate-pulse shadow-lg">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-2xl">🎮</span>
+              <p className="text-blue-900 dark:text-blue-200 font-bold text-lg text-center">
+                Joining game: <span className="font-mono bg-white dark:bg-gray-800 px-2 py-1 rounded border border-blue-400 dark:border-blue-500">{gameId}</span>
+              </p>
+            </div>
+            <p className="text-blue-700 dark:text-blue-300 font-medium text-center">
+              👇 Enter your name below to join!
             </p>
           </div>
         )}
@@ -540,8 +551,12 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               type="text"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
-              placeholder="Enter your name"
+              className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 ${
+                autoJoinGameId
+                  ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-300 dark:ring-blue-700'
+                  : 'border-parchment-400 dark:border-gray-500'
+              }`}
+              placeholder={autoJoinGameId ? "👤 Type your name here..." : "Enter your name"}
               required={joinType === 'player'}
             />
           </div>

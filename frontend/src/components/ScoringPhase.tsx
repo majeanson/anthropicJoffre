@@ -270,6 +270,74 @@ export function ScoringPhase({
           </div>
         </div>
 
+        {/* Trick History */}
+        {latestRound?.tricks && latestRound.tricks.length > 0 && (
+          <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/40 rounded-lg p-4 mb-6 border-2 border-indigo-200 dark:border-indigo-600">
+            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center">🃏 Trick History</h3>
+            <div className="space-y-3">
+              {latestRound.tricks.map((trickResult, index) => {
+                const winner = gameState.players.find(p => p.id === trickResult.winnerId);
+                const winnerTeam = winner?.teamId;
+                return (
+                  <div
+                    key={index}
+                    className={`rounded-lg p-3 border-2 ${
+                      winnerTeam === 1
+                        ? 'bg-orange-50 dark:bg-orange-900/30 border-orange-300 dark:border-orange-600'
+                        : 'bg-purple-50 dark:bg-purple-900/30 border-purple-300 dark:border-purple-600'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-bold text-gray-700 dark:text-gray-200">
+                        Trick {index + 1}
+                      </span>
+                      <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                        winnerTeam === 1
+                          ? 'bg-orange-500 text-white'
+                          : 'bg-purple-500 text-white'
+                      }`}>
+                        {winner?.name} won {trickResult.points > 0 ? `+${trickResult.points}` : trickResult.points} pts
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      {trickResult.trick.map((trickCard, cardIndex) => {
+                        const player = gameState.players.find(p => p.id === trickCard.playerId);
+                        const isWinner = trickCard.playerId === trickResult.winnerId;
+                        return (
+                          <div
+                            key={cardIndex}
+                            className={`text-center p-2 rounded ${
+                              isWinner
+                                ? 'bg-yellow-100 dark:bg-yellow-900/50 border-2 border-yellow-400'
+                                : 'bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600'
+                            }`}
+                          >
+                            <div className="text-xs text-gray-600 dark:text-gray-400 mb-1 truncate">
+                              {player?.name}
+                            </div>
+                            <div className={`text-2xl font-bold ${
+                              trickCard.card.color === 'red' ? 'text-red-600' :
+                              trickCard.card.color === 'blue' ? 'text-blue-600' :
+                              trickCard.card.color === 'green' ? 'text-green-600' :
+                              trickCard.card.color === 'brown' ? 'text-amber-800' :
+                              'text-gray-600'
+                            }`}>
+                              {trickCard.card.value}
+                            </div>
+                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 capitalize">
+                              {trickCard.card.color}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Round Statistics */}
         {statistics && (
           <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600 mb-4">
