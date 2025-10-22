@@ -314,9 +314,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
       return (
-        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400 dark:border-gray-600/40 rounded-xl flex items-center justify-center bg-parchment-200 dark:bg-gray-600/20 backdrop-blur">
+        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400 dark:border-gray-600/40 rounded-xl flex items-center justify-center bg-parchment-300/50 dark:bg-gray-600/20 backdrop-blur">
           <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-parchment-400 dark:border-gray-600/50 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-parchment-400/30"></div>
+            <div className="w-2 h-2 rounded-full bg-parchment-500/40 dark:bg-parchment-400/30"></div>
           </div>
         </div>
       );
@@ -526,7 +526,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               )}
               {/* Trump */}
               {gameState.trump && (
-                <div className="bg-parchment-50 dark:bg-gray-800/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
+                <div className="bg-parchment-300/80 dark:bg-gray-800/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
                   <p className={`text-xs md:text-base font-bold ${getTrumpColor(gameState.trump)}`}>
                     <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
                   </p>
