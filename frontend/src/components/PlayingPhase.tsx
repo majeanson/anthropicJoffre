@@ -606,7 +606,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             <Tooltip content="Open Chat">
               <button
                 onClick={() => setChatOpen(!chatOpen)}
-                className="absolute bottom-4 right-4 z-50 bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-blue-500/50 flex items-center justify-center backdrop-blur-md border-2 border-blue-800 relative focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                className="absolute bottom-2 md:bottom-4 right-4 z-50 bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-blue-500/50 flex items-center justify-center backdrop-blur-md border-2 border-blue-800 relative focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 aria-label="Open Chat"
               >
                 <span className="md:hidden">💬</span>
