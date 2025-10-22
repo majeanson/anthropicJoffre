@@ -4,6 +4,7 @@ import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { ChatPanel, ChatMessage } from './ChatPanel';
+import { Tooltip } from './Tooltip';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
@@ -423,52 +424,60 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   <p className="text-[10px] md:text-xs font-bold text-umber-800 dark:text-gray-200">ROUND {gameState.roundNumber}</p>
                 </div>
                 {/* Sound Toggle Button - Compact */}
-                <button
-                  onClick={toggleSound}
-                  className={`${
-                    soundEnabled
-                      ? 'bg-sapphire-500 hover:bg-sapphire-600'
-                      : 'bg-parchment-400 hover:bg-parchment-50 dark:bg-gray-800'
-                  } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600`}
-                  title={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
-                >
-                  {soundEnabled ? '🔊' : '🔇'}
-                </button>
+                <Tooltip content={soundEnabled ? 'Mute Sound (Volume Control)' : 'Unmute Sound'}>
+                  <button
+                    onClick={toggleSound}
+                    className={`${
+                      soundEnabled
+                        ? 'bg-sapphire-500 hover:bg-sapphire-600'
+                        : 'bg-parchment-400 hover:bg-parchment-50 dark:bg-gray-800'
+                    } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-sapphire-400 focus:outline-none`}
+                    aria-label={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
+                  >
+                    {soundEnabled ? '🔊' : '🔇'}
+                  </button>
+                </Tooltip>
                 {/* Dark Mode Toggle Button - Compact */}
-                <button
-                  onClick={() => setDarkMode(!darkMode)}
-                  className="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600"
-                  title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                >
-                  {darkMode ? '☀️' : '🌙'}
-                </button>
+                <Tooltip content={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+                  <button
+                    onClick={() => setDarkMode(!darkMode)}
+                    className="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-gray-500 focus:outline-none"
+                    aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                  >
+                    {darkMode ? '☀️' : '🌙'}
+                  </button>
+                </Tooltip>
                 {/* Autoplay Toggle Button - Compact */}
                 {!isSpectator && onAutoplayToggle && (
-                  <button
-                    onClick={onAutoplayToggle}
-                    className={`${
-                      autoplayEnabled
-                        ? 'bg-green-500 hover:bg-green-600 animate-pulse'
-                        : 'bg-purple-500 hover:bg-purple-600'
-                    } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600`}
-                    title={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}
-                  >
-                    {autoplayEnabled ? '🤖' : '🎮'}
-                  </button>
+                  <Tooltip content={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}>
+                    <button
+                      onClick={onAutoplayToggle}
+                      className={`${
+                        autoplayEnabled
+                          ? 'bg-green-500 hover:bg-green-600 motion-safe:animate-pulse'
+                          : 'bg-purple-500 hover:bg-purple-600'
+                      } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-green-400 focus:outline-none`}
+                      aria-label={autoplayEnabled ? 'Disable Autoplay' : 'Enable Autoplay'}
+                    >
+                      {autoplayEnabled ? '🤖' : '🎮'}
+                    </button>
+                  </Tooltip>
                 )}
                 {/* Leave Game Button - Compact */}
                 {onLeaveGame && (
-                  <button
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to leave the game?')) {
-                        onLeaveGame();
-                      }
-                    }}
-                    className="bg-crimson-600 hover:bg-crimson-700 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600"
-                    title="Leave Game"
-                  >
-                    🚪
-                  </button>
+                  <Tooltip content="Leave Game">
+                    <button
+                      onClick={() => {
+                        if (window.confirm('Are you sure you want to leave the game?')) {
+                          onLeaveGame();
+                        }
+                      }}
+                      className="bg-crimson-600 hover:bg-crimson-700 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-crimson-400 focus:outline-none"
+                      aria-label="Leave Game"
+                    >
+                      🚪
+                    </button>
+                  </Tooltip>
                 )}
               </div>
 

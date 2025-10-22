@@ -151,5 +151,11 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // Add prefers-reduced-motion support
+    function({ addVariant }) {
+      addVariant('motion-safe', '@media (prefers-reduced-motion: no-preference)');
+      addVariant('motion-reduce', '@media (prefers-reduced-motion: reduce)');
+    },
+  ],
 }
