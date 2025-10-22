@@ -6,17 +6,66 @@ CREATE TABLE IF NOT EXISTS game_history (
     team1_score INTEGER NOT NULL,
     team2_score INTEGER NOT NULL,
     rounds INTEGER NOT NULL,
-    player_names TEXT[],
-    player_teams INTEGER[],
-    round_history JSONB,
-    game_duration_seconds INTEGER,
-    trump_suit VARCHAR(20),
-    is_finished BOOLEAN DEFAULT FALSE,
-    is_bot_game BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    finished_at TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add new columns if they don't exist (migration-safe)
+DO $$
+BEGIN
+    -- Add player_names column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='player_names') THEN
+        ALTER TABLE game_history ADD COLUMN player_names TEXT[];
+    END IF;
+
+    -- Add player_teams column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='player_teams') THEN
+        ALTER TABLE game_history ADD COLUMN player_teams INTEGER[];
+    END IF;
+
+    -- Add round_history column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='round_history') THEN
+        ALTER TABLE game_history ADD COLUMN round_history JSONB;
+    END IF;
+
+    -- Add game_duration_seconds column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='game_duration_seconds') THEN
+        ALTER TABLE game_history ADD COLUMN game_duration_seconds INTEGER;
+    END IF;
+
+    -- Add trump_suit column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='trump_suit') THEN
+        ALTER TABLE game_history ADD COLUMN trump_suit VARCHAR(20);
+    END IF;
+
+    -- Add is_finished column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='is_finished') THEN
+        ALTER TABLE game_history ADD COLUMN is_finished BOOLEAN DEFAULT FALSE;
+    END IF;
+
+    -- Add is_bot_game column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='is_bot_game') THEN
+        ALTER TABLE game_history ADD COLUMN is_bot_game BOOLEAN DEFAULT FALSE;
+    END IF;
+
+    -- Add last_updated_at column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='last_updated_at') THEN
+        ALTER TABLE game_history ADD COLUMN last_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    END IF;
+
+    -- Add finished_at column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='finished_at') THEN
+        ALTER TABLE game_history ADD COLUMN finished_at TIMESTAMP;
+    END IF;
+END $$;
 
 -- Player statistics table with comprehensive metrics
 CREATE TABLE IF NOT EXISTS player_stats (
@@ -24,27 +73,116 @@ CREATE TABLE IF NOT EXISTS player_stats (
     player_name VARCHAR(255) UNIQUE NOT NULL,
     games_played INTEGER DEFAULT 0,
     games_won INTEGER DEFAULT 0,
-    games_lost INTEGER DEFAULT 0,
-    games_abandoned INTEGER DEFAULT 0,
-    win_percentage DECIMAL(5,2) DEFAULT 0.00,
     total_tricks_won INTEGER DEFAULT 0,
-    total_points_earned INTEGER DEFAULT 0,
-    avg_tricks_per_game DECIMAL(5,2) DEFAULT 0.00,
-    total_bets_made INTEGER DEFAULT 0,
-    bets_won INTEGER DEFAULT 0,
-    bets_lost INTEGER DEFAULT 0,
-    avg_bet_amount DECIMAL(5,2) DEFAULT 0.00,
-    highest_bet INTEGER DEFAULT 0,
-    without_trump_bets INTEGER DEFAULT 0,
-    trump_cards_played INTEGER DEFAULT 0,
-    red_zeros_collected INTEGER DEFAULT 0,
-    brown_zeros_received INTEGER DEFAULT 0,
-    elo_rating INTEGER DEFAULT 1200,
-    highest_rating INTEGER DEFAULT 1200,
-    is_bot BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Add new columns to player_stats if they don't exist (migration-safe)
+DO $$
+BEGIN
+    -- Add games_lost column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='games_lost') THEN
+        ALTER TABLE player_stats ADD COLUMN games_lost INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add games_abandoned column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='games_abandoned') THEN
+        ALTER TABLE player_stats ADD COLUMN games_abandoned INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add win_percentage column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='win_percentage') THEN
+        ALTER TABLE player_stats ADD COLUMN win_percentage DECIMAL(5,2) DEFAULT 0.00;
+    END IF;
+
+    -- Add total_points_earned column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='total_points_earned') THEN
+        ALTER TABLE player_stats ADD COLUMN total_points_earned INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add avg_tricks_per_game column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='avg_tricks_per_game') THEN
+        ALTER TABLE player_stats ADD COLUMN avg_tricks_per_game DECIMAL(5,2) DEFAULT 0.00;
+    END IF;
+
+    -- Add total_bets_made column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='total_bets_made') THEN
+        ALTER TABLE player_stats ADD COLUMN total_bets_made INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add bets_won column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='bets_won') THEN
+        ALTER TABLE player_stats ADD COLUMN bets_won INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add bets_lost column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='bets_lost') THEN
+        ALTER TABLE player_stats ADD COLUMN bets_lost INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add avg_bet_amount column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='avg_bet_amount') THEN
+        ALTER TABLE player_stats ADD COLUMN avg_bet_amount DECIMAL(5,2) DEFAULT 0.00;
+    END IF;
+
+    -- Add highest_bet column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='highest_bet') THEN
+        ALTER TABLE player_stats ADD COLUMN highest_bet INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add without_trump_bets column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='without_trump_bets') THEN
+        ALTER TABLE player_stats ADD COLUMN without_trump_bets INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add trump_cards_played column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='trump_cards_played') THEN
+        ALTER TABLE player_stats ADD COLUMN trump_cards_played INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add red_zeros_collected column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='red_zeros_collected') THEN
+        ALTER TABLE player_stats ADD COLUMN red_zeros_collected INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add brown_zeros_received column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='brown_zeros_received') THEN
+        ALTER TABLE player_stats ADD COLUMN brown_zeros_received INTEGER DEFAULT 0;
+    END IF;
+
+    -- Add elo_rating column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='elo_rating') THEN
+        ALTER TABLE player_stats ADD COLUMN elo_rating INTEGER DEFAULT 1200;
+    END IF;
+
+    -- Add highest_rating column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='highest_rating') THEN
+        ALTER TABLE player_stats ADD COLUMN highest_rating INTEGER DEFAULT 1200;
+    END IF;
+
+    -- Add is_bot column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='is_bot') THEN
+        ALTER TABLE player_stats ADD COLUMN is_bot BOOLEAN DEFAULT FALSE;
+    END IF;
+END $$;
 
 -- Game participants junction table
 CREATE TABLE IF NOT EXISTS game_participants (
@@ -57,9 +195,19 @@ CREATE TABLE IF NOT EXISTS game_participants (
     rounds_played INTEGER DEFAULT 0,
     bet_amount INTEGER,
     bet_won BOOLEAN,
-    is_bot BOOLEAN DEFAULT FALSE,
-    CONSTRAINT fk_game FOREIGN KEY (game_id) REFERENCES game_history(game_id) ON DELETE CASCADE
+    is_bot BOOLEAN DEFAULT FALSE
 );
+
+-- Add foreign key if it doesn't exist
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints
+                   WHERE constraint_name='fk_game' AND table_name='game_participants') THEN
+        ALTER TABLE game_participants
+        ADD CONSTRAINT fk_game FOREIGN KEY (game_id)
+        REFERENCES game_history(game_id) ON DELETE CASCADE;
+    END IF;
+END $$;
 
 -- Indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_game_history_created_at ON game_history(created_at DESC);
