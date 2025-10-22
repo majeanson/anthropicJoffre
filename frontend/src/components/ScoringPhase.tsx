@@ -99,13 +99,17 @@ export function ScoringPhase({
         />
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-4xl w-full relative">
-        {/* Top Right Buttons */}
-        <div className="absolute top-4 right-4 flex gap-2">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-8 shadow-2xl max-w-4xl w-full relative">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 dark:text-gray-200 text-center pt-2 md:pt-0">
+          Round {gameState.roundNumber} Complete!
+        </h2>
+
+        {/* Buttons - Below title on mobile, top-right on desktop */}
+        <div className="flex justify-center md:justify-end gap-2 mb-4 md:mb-0 md:absolute md:top-4 md:right-4">
           {/* Dark Mode Toggle Button */}
           <button
             onClick={() => setDarkMode(!darkMode)}
-            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg font-bold transition-all border-2 border-gray-900 shadow-md"
+            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg font-bold transition-all border-2 border-gray-900 shadow-md text-sm"
             title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
             {darkMode ? '☀️' : '🌙'}
@@ -113,7 +117,7 @@ export function ScoringPhase({
           {/* Chat Button */}
           <button
             onClick={() => setChatOpen(!chatOpen)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-all relative"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-all relative text-sm"
           >
             💬 Chat
             {unreadCount > 0 && (
@@ -123,10 +127,6 @@ export function ScoringPhase({
             )}
           </button>
         </div>
-
-        <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 text-center">
-          Round {gameState.roundNumber} Complete!
-        </h2>
 
         {/* Timer and Ready Status */}
         <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600">
