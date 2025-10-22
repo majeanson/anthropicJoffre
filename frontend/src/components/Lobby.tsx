@@ -140,6 +140,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
 }
 
 export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers }: LobbyProps) {
+  console.log('Lobby rendered with autoJoinGameId:', autoJoinGameId);
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
@@ -149,6 +150,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showToast, setShowToast] = useState(false);
+
+  console.log('Lobby state - mode:', mode, 'gameId:', gameId, 'autoJoinGameId:', autoJoinGameId);
 
   // Load recent players on mount
   useEffect(() => {

@@ -417,15 +417,18 @@ function App() {
   const [autoJoinGameId, setAutoJoinGameId] = useState<string>('');
 
   useEffect(() => {
+    console.log('Checking URL params:', window.location.search);
     const urlParams = new URLSearchParams(window.location.search);
     const joinGameId = urlParams.get('join');
+    console.log('Join game ID from URL:', joinGameId);
 
     if (joinGameId) {
-      console.log('Auto-join game from URL:', joinGameId);
+      console.log('Setting auto-join game ID:', joinGameId);
       setAutoJoinGameId(joinGameId);
 
       // Clean the URL without reloading the page
       window.history.replaceState({}, '', window.location.pathname);
+      console.log('URL cleaned, autoJoinGameId set to:', joinGameId);
     }
   }, []);
 
