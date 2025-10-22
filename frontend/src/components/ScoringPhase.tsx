@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { GameState, RoundStatistics } from '../types/game';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { sounds } from '../utils/sounds';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface ScoringPhaseProps {
   gameState: GameState;
@@ -21,6 +22,7 @@ export function ScoringPhase({
   chatMessages = [],
   onNewChatMessage
 }: ScoringPhaseProps) {
+  const { darkMode, setDarkMode } = useSettings();
   const [chatOpen, setChatOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(60);
@@ -98,18 +100,29 @@ export function ScoringPhase({
       )}
 
       <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-4xl w-full relative">
-        {/* Chat Button */}
-        <button
-          onClick={() => setChatOpen(!chatOpen)}
-          className="absolute top-4 right-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-all relative"
-        >
-          💬 Chat
-          {unreadCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
-              {unreadCount}
-            </span>
-          )}
-        </button>
+        {/* Top Right Buttons */}
+        <div className="absolute top-4 right-4 flex gap-2">
+          {/* Dark Mode Toggle Button */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg font-bold transition-all border-2 border-gray-900 shadow-md"
+            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+          {/* Chat Button */}
+          <button
+            onClick={() => setChatOpen(!chatOpen)}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-all relative"
+          >
+            💬 Chat
+            {unreadCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+        </div>
 
         <h2 className="text-3xl font-bold mb-6 text-gray-800 dark:text-gray-200 text-center">
           Round {gameState.roundNumber} Complete!

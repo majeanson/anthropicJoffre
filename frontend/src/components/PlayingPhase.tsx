@@ -6,6 +6,7 @@ import { TimeoutIndicator } from './TimeoutIndicator';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -23,6 +24,7 @@ interface PlayingPhaseProps {
 }
 
 export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
+  const { darkMode, setDarkMode } = useSettings();
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -426,11 +428,19 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   className={`${
                     soundEnabled
                       ? 'bg-sapphire-500 hover:bg-sapphire-600'
-                      : 'bg-parchment-400 hover:bg-parchment-50 dark:bg-gray-8000'
+                      : 'bg-parchment-400 hover:bg-parchment-50 dark:bg-gray-800'
                   } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600`}
                   title={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
                 >
                   {soundEnabled ? '🔊' : '🔇'}
+                </button>
+                {/* Dark Mode Toggle Button - Compact */}
+                <button
+                  onClick={() => setDarkMode(!darkMode)}
+                  className="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600"
+                  title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                >
+                  {darkMode ? '☀️' : '🌙'}
                 </button>
                 {/* Autoplay Toggle Button - Compact */}
                 {!isSpectator && onAutoplayToggle && (

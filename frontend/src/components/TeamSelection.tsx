@@ -1,6 +1,7 @@
 import { Player } from '../types/game';
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface ChatMessage {
   playerId: string;
@@ -37,6 +38,7 @@ export function TeamSelection({
   onKickPlayer,
   socket,
 }: TeamSelectionProps) {
+  const { darkMode, setDarkMode } = useSettings();
   const currentPlayer = players.find(p => p.id === currentPlayerId);
   const team1Players = players.filter(p => p.teamId === 1);
   const team2Players = players.filter(p => p.teamId === 2);
@@ -125,16 +127,25 @@ export function TeamSelection({
         <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
 
-        {/* Leave Button - positioned above everything with more top margin to avoid overlap */}
-        {onLeaveGame && (
+        {/* Top-left buttons */}
+        <div className="absolute top-4 left-4 flex gap-2 z-10">
+          {onLeaveGame && (
+            <button
+              onClick={onLeaveGame}
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-red-800 shadow-lg transform hover:scale-105"
+              title="Leave Game"
+            >
+              🚪 Leave
+            </button>
+          )}
           <button
-            onClick={onLeaveGame}
-            className="absolute top-4 left-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-red-800 shadow-lg transform hover:scale-105 z-10"
-            title="Leave Game"
+            onClick={() => setDarkMode(!darkMode)}
+            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-gray-900 shadow-lg transform hover:scale-105"
+            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >
-            🚪 Leave
+            {darkMode ? '☀️' : '🌙'}
           </button>
-        )}
+        </div>
 
         <h2 className="text-3xl font-bold mb-6 text-umber-900 dark:text-gray-100 text-center font-serif mt-12">Team Selection</h2>
 
