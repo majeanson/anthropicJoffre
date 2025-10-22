@@ -10,7 +10,7 @@ export function DarkModeToggle() {
       title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
     >
       <span className="text-xl">{darkMode ? '☀️' : '🌙'}</span>
-      <span className="hidden md:inline">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+      <span className="hidden md:inline">{darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}</span>
     </button>
   );
 }

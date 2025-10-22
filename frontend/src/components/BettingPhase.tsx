@@ -144,7 +144,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             <button
               onClick={() => setDarkMode(!darkMode)}
               className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-gray-900 shadow-md"
-              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
             >
               {darkMode ? '☀️' : '🌙'}
             </button>

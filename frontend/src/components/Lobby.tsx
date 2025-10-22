@@ -477,7 +477,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
         {autoJoinGameId && (
           <div className="mb-4 bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-4">
             <p className="text-blue-800 dark:text-blue-200 font-semibold text-center">
-              🎮 Joining game: <span className="font-mono">{gameId}</span>
+              Joining game: <span className="font-mono">{gameId}</span>
             </p>
             <p className="text-blue-600 dark:text-blue-300 text-sm text-center mt-1">
               Enter your name to join!
@@ -501,7 +501,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
                   className="w-4 h-4 text-umber-600 focus:ring-umber-500"
                 />
-                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">🎮 Player</span>
+                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Player</span>
               </label>
               <label className="flex items-center cursor-pointer">
                 <input
@@ -512,7 +512,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
                   className="w-4 h-4 text-umber-600 focus:ring-umber-500"
                 />
-                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">👁️ Guest (Spectator)</span>
+                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Guest (Spectator)</span>
               </label>
             </div>
           </div>
@@ -550,7 +550,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           {joinType === 'spectator' && (
             <div className="bg-parchment-200 border-2 border-umber-400 rounded-lg p-3">
               <p className="text-sm text-umber-800">
-                👁️ As a spectator, you can watch the game but cannot play cards. Player hands will be hidden.
+                As a spectator, you can watch the game but cannot play cards. Player hands will be hidden.
               </p>
             </div>
           )}

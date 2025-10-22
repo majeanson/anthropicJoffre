@@ -141,7 +141,7 @@ export function TeamSelection({
           <button
             onClick={() => setDarkMode(!darkMode)}
             className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-gray-900 shadow-lg transform hover:scale-105"
-            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            title={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
           >
             {darkMode ? '☀️' : '🌙'}
           </button>

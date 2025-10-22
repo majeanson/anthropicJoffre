@@ -438,11 +438,11 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </button>
                 </Tooltip>
                 {/* Dark Mode Toggle Button - Compact */}
-                <Tooltip content={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+                <Tooltip content={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}>
                   <button
                     onClick={() => setDarkMode(!darkMode)}
                     className="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-gray-500 focus:outline-none"
-                    aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                    aria-label={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
                   >
                     {darkMode ? '☀️' : '🌙'}
                   </button>

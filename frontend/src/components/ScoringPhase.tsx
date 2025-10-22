@@ -110,7 +110,7 @@ export function ScoringPhase({
           <button
             onClick={() => setDarkMode(!darkMode)}
             className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg font-bold transition-all border-2 border-gray-900 shadow-md text-sm"
-            title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            title={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
           >
             {darkMode ? '☀️' : '🌙'}
           </button>
