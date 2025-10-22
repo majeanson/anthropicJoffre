@@ -865,7 +865,7 @@ function App() {
     return (
       <>
         <GlobalUI />
-        <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} onlinePlayers={onlinePlayers} />
+        <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} onlinePlayers={onlinePlayers} socket={socket} />
       </>
     );
   }

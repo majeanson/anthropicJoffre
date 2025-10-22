@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
 import { DarkModeToggle } from './DarkModeToggle';
 import { LobbyBrowser } from './LobbyBrowser';
+import { PlayerStatsModal } from './PlayerStatsModal';
+import { GlobalLeaderboard } from './GlobalLeaderboard';
+import { Socket } from 'socket.io-client';
 
 interface OnlinePlayer {
   socketId: string;
@@ -20,6 +23,7 @@ interface LobbyProps {
   hasValidSession?: boolean;
   autoJoinGameId?: string;
   onlinePlayers: OnlinePlayer[];
+  socket: Socket | null;
 }
 
 // Rules Modal Component
@@ -139,7 +143,7 @@ function RulesModal({ isOpen, onClose }: RulesModalProps) {
   );
 }
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket }: LobbyProps) {
   console.log('Lobby rendered with autoJoinGameId:', autoJoinGameId);
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
@@ -150,6 +154,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showToast, setShowToast] = useState(false);
+  const [showPlayerStats, setShowPlayerStats] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [selectedPlayerName, setSelectedPlayerName] = useState('');
 
   console.log('Lobby state - mode:', mode, 'gameId:', gameId, 'autoJoinGameId:', autoJoinGameId);
 
@@ -394,6 +401,32 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 <span className="text-xl">🎮</span>
                 Browse Games
               </button>
+
+              {/* Stats & Leaderboard buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    if (socket) {
+                      setSelectedPlayerName(playerName || 'Guest');
+                      setShowPlayerStats(true);
+                    }
+                  }}
+                  className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
+                  disabled={!socket}
+                >
+                  <span className="text-xl">📊</span>
+                  My Stats
+                </button>
+                <button
+                  onClick={() => socket && setShowLeaderboard(true)}
+                  className="bg-gradient-to-r from-yellow-600 to-yellow-700 text-white py-4 rounded-xl font-bold hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 border-2 border-yellow-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
+                  disabled={!socket}
+                >
+                  <span className="text-xl">🏆</span>
+                  Leaderboard
+                </button>
+              </div>
+
               <button
                 data-testid="quick-play-button"
                 onClick={onQuickPlay}
@@ -621,6 +654,28 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           </div>
         </form>
       </div>
+
+      {/* Stats & Leaderboard Modals */}
+      {socket && (
+        <>
+          <PlayerStatsModal
+            playerName={selectedPlayerName}
+            socket={socket}
+            isOpen={showPlayerStats}
+            onClose={() => setShowPlayerStats(false)}
+          />
+          <GlobalLeaderboard
+            socket={socket}
+            isOpen={showLeaderboard}
+            onClose={() => setShowLeaderboard(false)}
+            onViewPlayerStats={(playerName) => {
+              setSelectedPlayerName(playerName);
+              setShowLeaderboard(false);
+              setShowPlayerStats(true);
+            }}
+          />
+        </>
+      )}
     </div>
   );
 }
