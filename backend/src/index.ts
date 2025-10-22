@@ -697,7 +697,7 @@ io.on('connection', (socket) => {
     });
   });
 
-  // In-game chat (betting and playing phases)
+  // In-game chat (betting, playing, and scoring phases)
   socket.on('send_game_chat', ({ gameId, message }: { gameId: string; message: string }) => {
     const game = games.get(gameId);
     if (!game) {
@@ -711,7 +711,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    if (game.phase !== 'betting' && game.phase !== 'playing') {
+    if (game.phase !== 'betting' && game.phase !== 'playing' && game.phase !== 'scoring') {
       socket.emit('error', { message: 'Chat only available during gameplay' });
       return;
     }
