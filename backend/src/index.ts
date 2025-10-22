@@ -13,7 +13,19 @@ import {
   getHighestBet,
   isBetHigher,
 } from './game/logic';
-import { saveGameHistory, getRecentGames } from './db';
+import {
+  saveGameHistory,
+  getRecentGames,
+  saveOrUpdateGame,
+  markGameFinished,
+  saveGameParticipants,
+  updatePlayerStats,
+  calculateEloChange,
+  getPlayerStats,
+  getLeaderboard,
+  getPlayerGameHistory,
+  cleanupAbandonedGames,
+} from './db';
 
 dotenv.config();
 
@@ -70,6 +82,9 @@ const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
 // Game deletion timeouts (maps gameId to timeout ID)
 const gameDeletionTimeouts = new Map<string, NodeJS.Timeout>();
+
+// Game creation timestamps (maps gameId to Date)
+const gameCreationTimes = new Map<string, Date>();
 
 // Online players tracking
 interface OnlinePlayer {
@@ -523,6 +538,7 @@ io.on('connection', (socket) => {
     };
 
     games.set(gameId, gameState);
+    gameCreationTimes.set(gameId, new Date()); // Track creation time for DB saves
     socket.join(gameId);
 
     // Create session for reconnection
@@ -1448,6 +1464,41 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ============= STATS & LEADERBOARD EVENTS =============
+
+  // Get player statistics
+  socket.on('get_player_stats', async ({ playerName }: { playerName: string }) => {
+    try {
+      const stats = await getPlayerStats(playerName);
+      socket.emit('player_stats_response', { stats, playerName });
+    } catch (error) {
+      console.error('Error fetching player stats:', error);
+      socket.emit('error', { message: 'Failed to fetch player statistics' });
+    }
+  });
+
+  // Get global leaderboard
+  socket.on('get_leaderboard', async ({ limit = 100, excludeBots = true }: { limit?: number; excludeBots?: boolean }) => {
+    try {
+      const leaderboard = await getLeaderboard(limit, excludeBots);
+      socket.emit('leaderboard_response', { players: leaderboard });
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      socket.emit('error', { message: 'Failed to fetch leaderboard' });
+    }
+  });
+
+  // Get player game history
+  socket.on('get_player_history', async ({ playerName, limit = 20 }: { playerName: string; limit?: number }) => {
+    try {
+      const history = await getPlayerGameHistory(playerName, limit);
+      socket.emit('player_history_response', { games: history, playerName });
+    } catch (error) {
+      console.error('Error fetching player history:', error);
+      socket.emit('error', { message: 'Failed to fetch player game history' });
+    }
+  });
+
   socket.on('disconnect', () => {
     console.log('Client disconnected:', socket.id);
 
@@ -1784,21 +1835,76 @@ async function endRound(gameId: string) {
     statistics, // Add round statistics
   });
 
+  // Save game state incrementally after each round
+  try {
+    const createdAt = gameCreationTimes.get(gameId) || new Date();
+    await saveOrUpdateGame(game, createdAt);
+    await saveGameParticipants(gameId, game.players);
+    console.log(`Game ${gameId} saved after round ${game.roundNumber}`);
+  } catch (error) {
+    console.error('Error saving game progress:', error);
+  }
+
   // Check for game over
   if (game.teamScores.team1 >= 41 || game.teamScores.team2 >= 41) {
     game.phase = 'game_over';
     const winningTeam = game.teamScores.team1 >= 41 ? 1 : 2;
 
     try {
-      await saveGameHistory(
-        gameId,
-        winningTeam as 1 | 2,
-        game.teamScores.team1,
-        game.teamScores.team2,
-        game.roundNumber
-      );
+      // Mark game as finished in database
+      await markGameFinished(gameId, winningTeam);
+      console.log(`Game ${gameId} marked as finished, Team ${winningTeam} won`);
+
+      // Update player stats for NON-BOT players only
+      const humanPlayers = game.players.filter(p => !p.isBot);
+      for (const player of humanPlayers) {
+        const won = player.teamId === winningTeam;
+
+        // Get current player stats to calculate ELO
+        let currentStats = await getPlayerStats(player.name);
+        const currentElo = currentStats?.elo_rating || 1200;
+
+        // Calculate opponent average ELO (opposing team's average)
+        const opposingTeam = humanPlayers.filter(p => p.teamId !== player.teamId);
+        const opponentElos = await Promise.all(
+          opposingTeam.map(async (opp) => {
+            const stats = await getPlayerStats(opp.name);
+            return stats?.elo_rating || 1200;
+          })
+        );
+        const avgOpponentElo = opponentElos.length > 0
+          ? opponentElos.reduce((sum, elo) => sum + elo, 0) / opponentElos.length
+          : 1200;
+
+        // Calculate ELO change
+        const eloChange = calculateEloChange(currentElo, avgOpponentElo, won);
+
+        // Check if player was the bidder
+        const wasBidder = game.highestBet?.playerId === player.id;
+        const betMade = wasBidder && offensiveTeamPoints >= betAmount;
+
+        // Update player stats
+        await updatePlayerStats(
+          player.name,
+          {
+            won,
+            tricksWon: player.tricksWon,
+            pointsEarned: player.pointsWon,
+            betAmount: wasBidder ? game.highestBet?.amount : undefined,
+            betMade: wasBidder ? betMade : undefined,
+            withoutTrump: wasBidder ? game.highestBet?.withoutTrump : undefined,
+            // TODO: Track these stats during gameplay
+            trumpsPlayed: 0,
+            redZerosCollected: 0,
+            brownZerosReceived: 0,
+          },
+          eloChange
+        );
+
+        console.log(`Updated stats for ${player.name}: ${won ? 'WIN' : 'LOSS'}, ELO ${eloChange > 0 ? '+' : ''}${eloChange}`);
+      }
     } catch (error) {
-      console.error('Error saving game history:', error);
+      console.error('Error finalizing game:', error);
     }
 
     broadcastGameUpdate(gameId, 'game_over', { winningTeam, gameState: game });
