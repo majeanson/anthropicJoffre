@@ -38,7 +38,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [showBrowser, setShowBrowser] = useState(false);
   const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
-  const [showToast, setShowToast] = useState(false);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
@@ -88,16 +87,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
         onSpectateGame(gameId, playerName.trim() || undefined);
       }
     }
-  };
-
-  const handleCopyInviteLink = (gameIdToCopy: string) => {
-    const inviteLink = `${window.location.origin}/?join=${gameIdToCopy}`;
-    navigator.clipboard.writeText(inviteLink).then(() => {
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 2000);
-    }).catch(err => {
-      console.error('Failed to copy link:', err);
-    });
   };
 
   const getStatusLabel = (status: string) => {
@@ -252,13 +241,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   </div>
                 )}
               </div>
-              </div>
-            )}
-
-            {/* Toast Notification */}
-            {showToast && (
-              <div className="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in z-50">
-                ✓ Invite link copied!
               </div>
             )}
 
