@@ -17,6 +17,7 @@ import { ChatMessage } from './components/ChatPanel';
 import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { addRecentPlayers } from './utils/recentPlayers';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -464,6 +465,18 @@ function App() {
       socket.emit('leave_game', { gameId });
       // Clear chat messages when leaving game
       setChatMessages([]);
+
+      // Clean up bot sockets
+      botSocketsRef.current.forEach((botSocket) => {
+        botSocket.disconnect();
+      });
+      botSocketsRef.current.clear();
+
+      // Clear bot timeouts
+      botTimeoutsRef.current.forEach((timeout) => {
+        clearTimeout(timeout);
+      });
+      botTimeoutsRef.current.clear();
     }
   };
 
@@ -989,7 +1002,8 @@ function App() {
           onClose={() => setDebugPanelOpen(false)}
         />
         <div className="min-h-screen bg-gradient-to-br from-orange-900 to-amber-900 flex items-center justify-center p-6">
-          <BettingPhase
+          <ErrorBoundary>
+        <BettingPhase
             players={gameState.players}
             currentBets={gameState.currentBets}
             currentPlayerId={socket?.id || ''}
@@ -1022,7 +1036,8 @@ function App() {
           isOpen={debugPanelOpen}
           onClose={() => setDebugPanelOpen(false)}
         />
-        <PlayingPhase
+        <ErrorBoundary>
+          <PlayingPhase
           gameState={gameState}
           currentPlayerId={socket?.id || ''}
           onPlayCard={handlePlayCard}
@@ -1036,6 +1051,7 @@ function App() {
           chatMessages={chatMessages}
           onNewChatMessage={handleNewChatMessage}
         />
+        </ErrorBoundary>
       </>
     );
   }
@@ -1052,7 +1068,8 @@ function App() {
           isOpen={debugPanelOpen}
           onClose={() => setDebugPanelOpen(false)}
         />
-        <ScoringPhase
+        <ErrorBoundary>
+          <ScoringPhase
           gameState={gameState}
           socket={socket || null}
           gameId={gameId}

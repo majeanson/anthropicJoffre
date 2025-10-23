@@ -171,7 +171,24 @@ function broadcastOnlinePlayers() {
 }
 
 // Broadcast online players every 5 seconds
-setInterval(broadcastOnlinePlayers, 5000);
+let onlinePlayersInterval: NodeJS.Timeout;
+
+const startOnlinePlayersInterval = () => {
+  onlinePlayersInterval = setInterval(broadcastOnlinePlayers, 5000);
+};
+
+const cleanup = () => {
+  if (onlinePlayersInterval) {
+    clearInterval(onlinePlayersInterval);
+  }
+};
+
+// Start the interval
+startOnlinePlayersInterval();
+
+// Graceful shutdown
+process.on('SIGTERM', cleanup);
+process.on('SIGINT', cleanup);
 
 // Helper to clear timeout for a player
 function clearPlayerTimeout(gameId: string, playerId: string) {
