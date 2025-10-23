@@ -58,7 +58,6 @@ function App() {
     // Bot sessions should not persist and can interfere with human player reconnection
     Object.keys(localStorage).forEach(key => {
       if (key.startsWith('botSession_')) {
-        console.log(`Removing old bot session: ${key}`);
         localStorage.removeItem(key);
       }
     });
@@ -95,7 +94,6 @@ function App() {
     setSocket(newSocket);
 
     newSocket.on('connect', () => {
-      console.log('Connected to server');
       setError(''); // Clear any connection errors
 
       // Check for existing session and attempt reconnection
@@ -107,23 +105,21 @@ function App() {
           // Check if session is too old (older than 15 minutes - for mobile AFK)
           const SESSION_TIMEOUT = 900000; // 15 minutes
           if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
-            console.log('Session expired, clearing...');
             localStorage.removeItem('gameSession');
             return;
           }
 
-          console.log('Found existing session, attempting reconnection...');
           setReconnecting(true);
           newSocket.emit('reconnect_to_game', { token: session.token });
         } catch (e) {
-          console.error('Failed to parse session data:', e);
+          logger.error('Failed to parse session data:', e);
           localStorage.removeItem('gameSession');
         }
       }
     });
 
     newSocket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
+      logger.error('Connection error:', error);
       setReconnecting(false);
 
       // If we have a stale session, clear it
@@ -144,7 +140,6 @@ function App() {
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('Disconnected from server:', reason);
       // Don't immediately clear state - allow for reconnection
       if (reason === 'io server disconnect') {
         // Server forcefully disconnected, clear session
@@ -155,17 +150,15 @@ function App() {
     });
 
     newSocket.on('reconnect_attempt', (attemptNumber) => {
-      console.log(`Reconnection attempt #${attemptNumber}`);
       setReconnecting(true);
     });
 
     newSocket.on('reconnect', (attemptNumber) => {
-      console.log(`Reconnected after ${attemptNumber} attempts`);
       setReconnecting(false);
     });
 
     newSocket.on('reconnect_failed', () => {
-      console.error('Reconnection failed');
+      logger.error('Reconnection failed');
       setReconnecting(false);
       setError('Unable to reconnect to server. Please refresh the page.');
     });
@@ -185,15 +178,12 @@ function App() {
 
       // Save session to localStorage
       if (session) {
-        console.log('Saving session for player:', session.playerName);
         localStorage.setItem('gameSession', JSON.stringify(session));
       } else {
-        console.log('No session in player_joined event');
       }
     });
 
     newSocket.on('reconnection_successful', ({ gameState, session }: { gameState: GameState; session: PlayerSession }) => {
-      console.log('Reconnection successful!');
       setReconnecting(false);
       setGameId(gameState.id);
       setGameState(gameState);
@@ -217,7 +207,6 @@ function App() {
     });
 
     newSocket.on('reconnection_failed', ({ message }: { message: string }) => {
-      console.log('Reconnection failed:', message);
       setReconnecting(false);
 
       // Clear invalid session
@@ -234,7 +223,6 @@ function App() {
     });
 
     newSocket.on('player_reconnected', ({ playerName }: { playerName: string; playerId: string; oldSocketId: string }) => {
-      console.log(`${playerName} reconnected`);
       // Show toast notification (prevent duplicates)
       const toastMessage = `${playerName} reconnected`;
       if (lastToastRef.current !== toastMessage) {
@@ -254,7 +242,6 @@ function App() {
     });
 
     newSocket.on('player_disconnected', ({ playerId, waitingForReconnection }: { playerId: string; waitingForReconnection: boolean }) => {
-      console.log(`Player ${playerId} disconnected. Waiting for reconnection: ${waitingForReconnection}`);
 
       // Show toast notification if waiting for reconnection (prevent duplicates)
       if (waitingForReconnection && gameState) {
@@ -319,7 +306,6 @@ function App() {
 
     // Listen for rematch events
     newSocket.on('rematch_vote_update', ({ votes, totalPlayers, voters }: { votes: number; totalPlayers: number; voters: string[] }) => {
-      console.log(`Rematch votes: ${votes}/${totalPlayers}`);
       // Update game state with new vote count
       if (gameState) {
         setGameState({
@@ -330,7 +316,6 @@ function App() {
     });
 
     newSocket.on('rematch_started', ({ gameState }: { gameState: GameState }) => {
-      console.log('Rematch started! Returning to team selection...');
       setGameState(gameState);
 
       // Save session for the new game
@@ -354,7 +339,6 @@ function App() {
 
     // Listen for timeout events
     newSocket.on('timeout_warning', ({ playerName, secondsRemaining }: { playerName: string; secondsRemaining: number }) => {
-      console.log(`⚠️ Timeout warning: ${playerName} has ${secondsRemaining} seconds remaining`);
       setToast({
         message: `⏰ ${playerName === (gameState?.players.find(p => p.id === newSocket.id)?.name) ? 'You have' : `${playerName} has`} ${secondsRemaining} seconds!`,
         type: 'warning',
@@ -363,7 +347,6 @@ function App() {
     });
 
     newSocket.on('auto_action_taken', ({ playerName, phase }: { playerName: string; phase: 'betting' | 'playing' }) => {
-      console.log(`🤖 Auto-action taken for ${playerName} in ${phase} phase`);
       setToast({
         message: `🤖 Auto-${phase === 'betting' ? 'bet' : 'play'} for ${playerName}`,
         type: 'info',
@@ -380,7 +363,6 @@ function App() {
     });
 
     newSocket.on('kicked_from_game', ({ message }) => {
-      console.log('Kicked from game:', message);
       setToast({
         message,
         type: 'error',
@@ -394,7 +376,6 @@ function App() {
     });
 
     newSocket.on('leave_game_success', () => {
-      console.log('Successfully left game');
       // Clear session and reset state
       localStorage.removeItem('gameSession');
       setGameState(null);
@@ -403,7 +384,6 @@ function App() {
     });
 
     newSocket.on('spectator_joined', ({ gameState }: { gameState: GameState }) => {
-      console.log('Joined game as spectator');
       setIsSpectator(true);
       setGameId(gameState.id);
       setGameState(gameState);
@@ -418,18 +398,14 @@ function App() {
   const [autoJoinGameId, setAutoJoinGameId] = useState<string>('');
 
   useEffect(() => {
-    console.log('Checking URL params:', window.location.search);
     const urlParams = new URLSearchParams(window.location.search);
     const joinGameId = urlParams.get('join');
-    console.log('Join game ID from URL:', joinGameId);
 
     if (joinGameId) {
-      console.log('Setting auto-join game ID:', joinGameId);
       setAutoJoinGameId(joinGameId);
 
       // Clean the URL without reloading the page
       window.history.replaceState({}, '', window.location.pathname);
-      console.log('URL cleaned, autoJoinGameId set to:', joinGameId);
     }
   }, []);
 
@@ -510,7 +486,7 @@ function App() {
       setReconnecting(true);
       socket.emit('reconnect_to_game', { token: session.token });
     } catch (e) {
-      console.error('Failed to rejoin game:', e);
+      logger.error('Failed to rejoin game:', e);
       localStorage.removeItem('gameSession');
       setHasValidSession(false);
     }
@@ -529,13 +505,11 @@ function App() {
 
     if (botPlayers.length === 0) return;
 
-    console.log(`Found ${botPlayers.length} bot players, respawning bot sockets after reconnection...`);
 
     botPlayers.forEach(botPlayer => {
       // Skip if bot socket already exists and is connected
       const existingBotSocket = botSocketsRef.current.get(botPlayer.id);
       if (existingBotSocket && existingBotSocket.connected) {
-        console.log(`Bot ${botPlayer.name} socket already connected, skipping`);
         return;
       }
 
@@ -555,13 +529,11 @@ function App() {
       botSocketsRef.current.set(botPlayer.id, botSocket);
 
       botSocket.on('connect', () => {
-        console.log(`Bot ${botName} socket connected, joining game...`);
         // Join as a fresh bot connection (server will handle reconnection internally)
         botSocket.emit('join_game', { gameId: gameState.id, playerName: botName, isBot: true });
       });
 
       botSocket.on('player_joined', ({ gameState: newState }: { gameState: GameState; session?: PlayerSession }) => {
-        console.log(`Bot ${botName} joined/reconnected successfully!`);
         handleBotAction(botSocket, newState, botSocket.id || '');
       });
 
@@ -603,7 +575,6 @@ function App() {
       const botPlayer = state.players.find(p => p.name === botName && p.isBot);
       if (botPlayer) {
         botSocketsRef.current.set(botPlayer.id, botSocket);
-        console.log(`Stored bot socket for ${botName} with ID ${botPlayer.id}`);
       }
       handleBotAction(botSocket, state, botSocket.id || '');
     });
@@ -650,7 +621,6 @@ function App() {
             const botPlayer = newGameState.players.find(p => p.name === botName && p.isBot);
             if (botPlayer) {
               botSocketsRef.current.set(botPlayer.id, botSocket);
-              console.log(`Stored bot socket for ${botName} with ID ${botPlayer.id}`);
             }
             // Don't save bot sessions to localStorage - they are ephemeral
             // and should not interfere with human player reconnection

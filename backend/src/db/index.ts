@@ -10,6 +10,14 @@ const getPool = () => {
   if (!pool && process.env.DATABASE_URL) {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
+      max: 20,                      // Maximum connections in pool
+      idleTimeoutMillis: 30000,     // Close idle connections after 30s
+      connectionTimeoutMillis: 2000, // Fail fast if can't connect in 2s
+    });
+
+    // Handle pool errors
+    pool.on('error', (err) => {
+      console.error('Unexpected database pool error:', err);
     });
   }
   return pool;

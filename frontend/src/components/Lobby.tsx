@@ -33,7 +33,6 @@ interface LobbyProps {
 
 
 export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange }: LobbyProps) {
-  console.log('Lobby rendered with autoJoinGameId:', autoJoinGameId);
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
@@ -49,7 +48,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
 
-  console.log('Lobby state - mode:', mode, 'gameId:', gameId, 'autoJoinGameId:', autoJoinGameId);
 
   // Load recent players on mount
   useEffect(() => {
@@ -59,7 +57,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   // React to autoJoinGameId prop changes
   useEffect(() => {
     if (autoJoinGameId) {
-      console.log('AutoJoinGameId changed to:', autoJoinGameId, '- updating state');
       setGameId(autoJoinGameId);
       setMode('join');
     }

@@ -74,7 +74,7 @@ export function TeamSelection({
       setShowCopyToast(true);
       setTimeout(() => setShowCopyToast(false), 3000);
     } catch (err) {
-      console.error('Failed to copy link:', err);
+      logger.error('Failed to copy link:', err);
     }
   };
 

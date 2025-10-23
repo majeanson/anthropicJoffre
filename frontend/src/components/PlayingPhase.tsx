@@ -32,7 +32,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
 
   // Debug: Log autoplay button visibility conditions
-  console.log('Autoplay button conditions:', {
     isSpectator,
     hasOnAutoplayToggle: !!onAutoplayToggle,
     autoplayEnabled,
@@ -48,6 +47,26 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
   const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
+
+  // Safety check: If player not found and not spectator, show error
+  if (!currentPlayer && !isSpectator) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-900 to-blue-900">
+        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl text-center">
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Player Not Found</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            Your player data could not be found in this game.
+          </p>
+          <button
+            onClick={onLeaveGame}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
+          >
+            Return to Lobby
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Listen for chat messages to update unread count
   useEffect(() => {
@@ -433,7 +452,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                       onTimeout={() => {
                         // Auto-enable autoplay when timeout expires (only for current player)
                         if (isCurrentTurn && onAutoplayToggle && !autoplayEnabled) {
-                          console.log('Timeout expired - enabling autoplay');
                           onAutoplayToggle();
                         }
                       }}

@@ -146,7 +146,6 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             onTimeout={() => {
               // Auto-enable autoplay when timeout expires (only for current player)
               if (isMyTurn && onAutoplayToggle && !autoplayEnabled) {
-                console.log('Betting timeout expired - enabling autoplay');
                 onAutoplayToggle();
               }
             }}
