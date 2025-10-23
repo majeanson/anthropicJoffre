@@ -344,6 +344,28 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             </div>
           </div>
         </div>
+
+        {/* Stats & Leaderboard Modals */}
+        {socket && (
+          <>
+            <PlayerStatsModal
+              playerName={selectedPlayerName}
+              socket={socket}
+              isOpen={showPlayerStats}
+              onClose={() => setShowPlayerStats(false)}
+            />
+            <GlobalLeaderboard
+              socket={socket}
+              isOpen={showLeaderboard}
+              onClose={() => setShowLeaderboard(false)}
+              onViewPlayerStats={(playerName) => {
+                setSelectedPlayerName(playerName);
+                setShowLeaderboard(false);
+                setShowPlayerStats(true);
+              }}
+            />
+          </>
+        )}
       </>
     );
   }
