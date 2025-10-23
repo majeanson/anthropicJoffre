@@ -46,6 +46,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
+  const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
+  const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
 
   console.log('Lobby state - mode:', mode, 'gameId:', gameId, 'autoJoinGameId:', autoJoinGameId);
 
@@ -151,7 +153,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onClick={() => { sounds.buttonClick(); setMainTab('play'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
                     mainTab === 'play'
-                      ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -161,7 +163,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onClick={() => { sounds.buttonClick(); setMainTab('social'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative ${
                     mainTab === 'social'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -176,7 +178,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onClick={() => { sounds.buttonClick(); setMainTab('stats'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
                     mainTab === 'stats'
-                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -186,7 +188,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   onClick={() => { sounds.buttonClick(); setMainTab('settings'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
                     mainTab === 'settings'
-                      ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -306,7 +308,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'online'
-                            ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
+                            ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg'
                             : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                         }`}
                       >
@@ -316,7 +318,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         onClick={() => { sounds.buttonClick(); setSocialTab('recent'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'recent'
-                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                            ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg'
                             : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                         }`}
                       >
@@ -485,20 +487,19 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                               <span className="text-sm text-umber-700 dark:text-gray-300">Enable Sounds</span>
                               <button
                                 onClick={() => {
-                                  const newEnabled = !sounds.isEnabled();
+                                  const newEnabled = !soundEnabled;
                                   sounds.setEnabled(newEnabled);
-                                  // Re-render by forcing state change
-                                  setMainTab(mainTab);
+                                  setSoundEnabled(newEnabled);
                                 }}
                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                                  sounds.isEnabled()
+                                  soundEnabled
                                     ? 'bg-green-500'
                                     : 'bg-gray-300 dark:bg-gray-600'
                                 }`}
                               >
                                 <span
                                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                                    sounds.isEnabled() ? 'translate-x-6' : 'translate-x-1'
+                                    soundEnabled ? 'translate-x-6' : 'translate-x-1'
                                   }`}
                                 />
                               </button>
@@ -508,17 +509,17 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             <div>
                               <div className="flex items-center justify-between mb-1">
                                 <span className="text-sm text-umber-700 dark:text-gray-300">Volume</span>
-                                <span className="text-xs text-umber-600 dark:text-gray-400">{Math.round(sounds.getVolume() * 100)}%</span>
+                                <span className="text-xs text-umber-600 dark:text-gray-400">{Math.round(soundVolume * 100)}%</span>
                               </div>
                               <input
                                 type="range"
                                 min="0"
                                 max="100"
-                                value={sounds.getVolume() * 100}
+                                value={soundVolume * 100}
                                 onChange={(e) => {
-                                  sounds.setVolume(parseInt(e.target.value) / 100);
-                                  // Re-render by forcing state change
-                                  setMainTab(mainTab);
+                                  const newVolume = parseInt(e.target.value) / 100;
+                                  sounds.setVolume(newVolume);
+                                  setSoundVolume(newVolume);
                                 }}
                                 className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-amber-600"
                               />

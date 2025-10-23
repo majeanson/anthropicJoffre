@@ -4,7 +4,6 @@ import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { ChatPanel, ChatMessage } from './ChatPanel';
-import { Tooltip } from './Tooltip';
 import { GameHeader } from './GameHeader';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
@@ -43,8 +42,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
   const [lastTrickLength, setLastTrickLength] = useState<number>(0);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
-  const [previousScores, setPreviousScores] = useState<{team1: number, team2: number} | null>(null);
-  const [scoreAnimation, setScoreAnimation] = useState<{team1: boolean, team2: boolean}>({team1: false, team2: false});
   const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
   const [previousRoundScores, setPreviousRoundScores] = useState<{team1: number, team2: number} | null>(null);
   const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
@@ -165,34 +162,18 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
   // Score change animation (for cumulative scores at round end)
   useEffect(() => {
-    // Initialize previousScores on first render
-    if (previousScores === null) {
-      setPreviousScores({ team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 });
-      return;
-    }
-
-    const team1Delta = gameState.teamScores.team1 - previousScores.team1;
-    const team2Delta = gameState.teamScores.team2 - previousScores.team2;
+    const team1Delta = gameState.teamScores.team1 - (floatingPoints.team1 || 0);
+    const team2Delta = gameState.teamScores.team2 - (floatingPoints.team2 || 0);
 
     if (team1Delta !== 0) {
       setFloatingPoints(prev => ({ ...prev, team1: team1Delta }));
-      setScoreAnimation(prev => ({ ...prev, team1: true }));
-      setTimeout(() => {
-        setScoreAnimation(prev => ({ ...prev, team1: false }));
-        setTimeout(() => setFloatingPoints(prev => ({ ...prev, team1: null })), 2000);
-      }, 500);
+      setTimeout(() => setFloatingPoints(prev => ({ ...prev, team1: null })), 2500);
     }
 
     if (team2Delta !== 0) {
       setFloatingPoints(prev => ({ ...prev, team2: team2Delta }));
-      setScoreAnimation(prev => ({ ...prev, team2: true }));
-      setTimeout(() => {
-        setScoreAnimation(prev => ({ ...prev, team2: false }));
-        setTimeout(() => setFloatingPoints(prev => ({ ...prev, team2: null })), 2000);
-      }, 500);
+      setTimeout(() => setFloatingPoints(prev => ({ ...prev, team2: null })), 2500);
     }
-
-    setPreviousScores({ team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 });
   }, [gameState.teamScores.team1, gameState.teamScores.team2]);
 
   // Round score change animation (for trick points during the round)
@@ -389,6 +370,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         onAutoplayToggle={onAutoplayToggle}
         isSpectator={isSpectator}
         unreadChatCount={unreadChatCount}
+        soundEnabled={soundEnabled}
+        onSoundToggle={toggleSound}
       />
 
       <div className="flex-1 flex flex-col overflow-hidden md:overflow-visible">
@@ -397,13 +380,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
-            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-4 border border-orange-200 relative overflow-visible">
-              <h3 className="text-[10px] md:text-xs font-semibold text-orange-600/70 uppercase tracking-wider mb-1">Team 1</h3>
-              <p className={`text-3xl md:text-5xl font-black text-orange-600 leading-none ${scoreAnimation.team1 ? 'animate-score-pop' : ''}`}>
-                {gameState.teamScores.team1}
-              </p>
-              <p className="text-xs md:text-sm font-bold text-orange-500 mt-1 relative">
-                {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
+            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible">
+              <h3 className="text-xs md:text-sm font-semibold text-orange-600/70 uppercase tracking-wider mb-1">Team 1</h3>
+              <p className="text-lg md:text-2xl font-bold text-orange-500 relative">
+                Round: {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
                 {floatingTrickPoints.team1 !== null && (
                   <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
@@ -433,23 +413,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
             {/* Center Info */}
             <div className="text-center flex-shrink-0 space-y-1.5 md:space-y-2">
-              <div className="flex items-center justify-center gap-2">
-                {/* Sound Toggle Button - Compact */}
-                <Tooltip content={soundEnabled ? 'Mute Sound (Volume Control)' : 'Unmute Sound'}>
-                  <button
-                    onClick={toggleSound}
-                    className={`${
-                      soundEnabled
-                        ? 'bg-sapphire-500 hover:bg-sapphire-600'
-                        : 'bg-parchment-400 hover:bg-parchment-50 dark:bg-gray-800'
-                    } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-sapphire-400 focus:outline-none`}
-                    aria-label={soundEnabled ? 'Mute Sound' : 'Unmute Sound'}
-                  >
-                    {soundEnabled ? '🔊' : '🔇'}
-                  </button>
-                </Tooltip>
-              </div>
-
               {/* Current Turn Indicator with Timeout */}
               <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-1 md:gap-2 border-2 min-h-[2.5rem] md:min-h-[3rem] ${
                 gameState.currentTrick.length >= 4
@@ -504,13 +467,10 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </div>
 
             {/* Team 2 */}
-            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-4 text-right border border-purple-200 relative overflow-visible">
-              <h3 className="text-[10px] md:text-xs font-semibold text-purple-600/70 uppercase tracking-wider mb-1">Team 2</h3>
-              <p className={`text-3xl md:text-5xl font-black text-purple-600 leading-none ${scoreAnimation.team2 ? 'animate-score-pop' : ''}`}>
-                {gameState.teamScores.team2}
-              </p>
-              <p className="text-xs md:text-sm font-bold text-purple-500 mt-1 relative">
-                {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
+            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible">
+              <h3 className="text-xs md:text-sm font-semibold text-purple-600/70 uppercase tracking-wider mb-1">Team 2</h3>
+              <p className="text-lg md:text-2xl font-bold text-purple-500 relative">
+                Round: {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
                 {floatingTrickPoints.team2 !== null && (
                   <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
