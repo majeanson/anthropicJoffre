@@ -1,0 +1,53 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - button "Open debug menu" [ref=e4] [cursor=pointer]: ⚙️ Debug
+  - generic [ref=e5]:
+    - generic:
+      - generic: 🃏
+      - generic: 🎴
+      - generic: 🂡
+      - generic: 🂱
+    - generic [ref=e6]:
+      - generic [ref=e11]:
+        - button "🚪 Leave" [ref=e12] [cursor=pointer]
+        - button "🌙" [ref=e13] [cursor=pointer]
+      - heading "Team Selection" [level=2] [ref=e14]
+      - generic [ref=e15]:
+        - paragraph [ref=e16]: "Game ID:"
+        - generic [ref=e17]: KKIWRG
+        - button "🔗 Copy Game Link" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19]: 🔗
+          - generic [ref=e20]: Copy Game Link
+      - paragraph [ref=e22]: Players (1/4) - Choose your team and position
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - heading "Team 1" [level=3] [ref=e25]
+          - generic [ref=e26]:
+            - generic [ref=e29]: E2ETestPlayer_1761253773012 (You)
+            - generic [ref=e31]: Empty Seat
+        - generic [ref=e32]:
+          - heading "Team 2" [level=3] [ref=e33]
+          - generic [ref=e34]:
+            - button "Join Team 2" [ref=e37] [cursor=pointer]
+            - button "Join Team 2" [ref=e40] [cursor=pointer]
+      - generic [ref=e41]:
+        - heading "💬 Team Chat" [level=3] [ref=e42]
+        - paragraph [ref=e44]: No messages yet. Say hi!
+        - generic [ref=e45]:
+          - textbox "Type a message... (max 200 chars)" [ref=e46]
+          - button "Send" [disabled] [ref=e47]
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - generic [ref=e50]: Bot Difficulty
+          - generic [ref=e51]:
+            - button "Easy" [ref=e52] [cursor=pointer]
+            - button "Medium" [ref=e53] [cursor=pointer]
+            - button "Hard" [ref=e54] [cursor=pointer]
+        - generic [ref=e55]:
+          - button "🤖 Add Bot" [ref=e56] [cursor=pointer]
+          - button "Start Game" [disabled] [ref=e57]
+        - paragraph [ref=e58]: Waiting for 3 more player(s) to join
+      - button "📖 Game Rules" [ref=e60] [cursor=pointer]
+```
