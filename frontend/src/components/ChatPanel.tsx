@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { ChatMessage } from '../types/game';
 
+// Re-export ChatMessage so other components can import it from here
+export type { ChatMessage };
+
 interface ChatPanelProps {
   socket: Socket | null;
   gameId: string;
