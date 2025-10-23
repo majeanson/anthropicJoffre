@@ -3,7 +3,6 @@ import { Socket } from 'socket.io-client';
 import { GameState, RoundStatistics } from '../types/game';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { sounds } from '../utils/sounds';
-import { useSettings } from '../contexts/SettingsContext';
 import { GameHeader } from './GameHeader';
 
 interface ScoringPhaseProps {

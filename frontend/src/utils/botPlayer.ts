@@ -206,7 +206,6 @@ export class BotPlayer {
 
     // Determine position in trick (1st, 2nd, 3rd, 4th)
     const position = gameState.currentTrick.length + 1;
-    const trump = gameState.trump;
 
     // Assess impact of each playable card
     const cardImpacts = playableCards.map(card =>
@@ -228,7 +227,7 @@ export class BotPlayer {
    */
   private static selectCardEasy(impacts: CardImpact[], playableCards: Card[]): Card {
     // 70% random, 30% avoid brown 0 if possible
-    const brownZero = playableCards.find(c => c.card.color === 'brown' && c.card.value === 0);
+    const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
     if (brownZero && Math.random() < 0.3) {
       return brownZero.card;
     }
@@ -248,7 +247,6 @@ export class BotPlayer {
     position: number
   ): Card {
     const currentTrick = gameState.currentTrick;
-    const trump = gameState.trump;
 
     // Rule: Get rid of brown 0 when safe
     const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
@@ -314,14 +312,8 @@ export class BotPlayer {
     position: number
   ): Card {
     const currentTrick = gameState.currentTrick;
-    const trump = gameState.trump;
     const partner = this.getPartner(gameState, playerId);
     const currentWinner = this.getCurrentTrickWinner(gameState);
-
-    // Card counting: Know what high cards have been played
-    const playedCards = this.getPlayedCards(gameState);
-    const remainingHighTrumps = trump ?
-      [7, 6, 5].filter(val => !playedCards.some(c => c.color === trump && c.value === val)).length : 0;
 
     // Priority 1: Get rid of brown 0 strategically
     const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
@@ -373,7 +365,6 @@ export class BotPlayer {
 
     if (position === 2) {
       // Second to play: Decide whether to win or duck
-      const firstCard = currentTrick[0];
       const canBeatFirst = impacts.some(i => i.canWinTrick);
 
       if (canBeatFirst) {
@@ -528,7 +519,9 @@ export class BotPlayer {
 
   /**
    * Get all cards that have been played this round
+   * (Currently unused but kept for future card counting enhancements)
    */
+  // @ts-ignore - Unused for now but will be used for advanced card counting
   private static getPlayedCards(gameState: GameState): Card[] {
     const played: Card[] = [];
 
