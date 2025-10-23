@@ -1071,6 +1071,8 @@ function App() {
           currentPlayerId={socket?.id || ''}
           chatMessages={chatMessages}
           onNewChatMessage={handleNewChatMessage}
+          onLeaveGame={handleLeaveGame}
+          isSpectator={isSpectator}
         />
       </>
     );

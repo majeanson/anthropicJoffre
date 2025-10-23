@@ -4,6 +4,7 @@ import { GameState, RoundStatistics } from '../types/game';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
+import { GameHeader } from './GameHeader';
 
 interface ScoringPhaseProps {
   gameState: GameState;
@@ -12,6 +13,8 @@ interface ScoringPhaseProps {
   currentPlayerId: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
+  onLeaveGame?: () => void;
+  isSpectator?: boolean;
 }
 
 export function ScoringPhase({
@@ -20,9 +23,10 @@ export function ScoringPhase({
   gameId,
   currentPlayerId,
   chatMessages = [],
-  onNewChatMessage
+  onNewChatMessage,
+  onLeaveGame,
+  isSpectator = false
 }: ScoringPhaseProps) {
-  const { darkMode, setDarkMode } = useSettings();
   const [chatOpen, setChatOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(60);
@@ -85,7 +89,19 @@ export function ScoringPhase({
   const statistics: RoundStatistics | undefined = latestRound?.statistics;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex flex-col">
+      {/* Game Header */}
+      <GameHeader
+        gameId={gameId}
+        roundNumber={gameState.roundNumber}
+        team1Score={gameState.teamScores.team1}
+        team2Score={gameState.teamScores.team2}
+        onLeaveGame={onLeaveGame}
+        onOpenChat={() => setChatOpen(true)}
+        isSpectator={isSpectator}
+        unreadChatCount={unreadCount}
+      />
+
       {/* Chat Panel */}
       {socket && onNewChatMessage && (
         <ChatPanel
@@ -99,34 +115,11 @@ export function ScoringPhase({
         />
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-8 shadow-2xl max-w-4xl w-full relative">
-        <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 dark:text-gray-200 text-center pt-2 md:pt-0">
-          Round {gameState.roundNumber} Complete!
-        </h2>
-
-        {/* Buttons - Below title on mobile, top-right on desktop */}
-        <div className="flex justify-center md:justify-end gap-2 mb-4 md:mb-0 md:absolute md:top-4 md:right-4">
-          {/* Dark Mode Toggle Button */}
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg font-bold transition-all border-2 border-gray-900 shadow-md text-sm"
-            title={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
-          >
-            {darkMode ? '☀️' : '🌙'}
-          </button>
-          {/* Chat Button */}
-          <button
-            onClick={() => setChatOpen(!chatOpen)}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-bold transition-all relative text-sm"
-          >
-            💬 Chat
-            {unreadCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
-                {unreadCount}
-              </span>
-            )}
-          </button>
-        </div>
+      <div className="flex-1 flex items-center justify-center p-4 md:p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-8 shadow-2xl max-w-4xl w-full">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 dark:text-gray-200 text-center">
+            Round {gameState.roundNumber} Complete!
+          </h2>
 
         {/* Timer and Ready Status */}
         <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600">
@@ -397,6 +390,7 @@ export function ScoringPhase({
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
