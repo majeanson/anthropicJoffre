@@ -40,6 +40,7 @@ export function TeamSelection({
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [showRules, setShowRules] = useState(false);
 
   // Listen for chat messages
   useEffect(() => {
@@ -402,11 +403,18 @@ export function TeamSelection({
           )}
         </div>
 
-        <div className="mt-6 p-4 bg-parchment-100 dark:bg-gray-700 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
-          <h4 className="font-semibold text-umber-800 dark:text-gray-200 mb-4 text-xl">📖 Game Rules</h4>
-          <HowToPlay />
+        <div className="mt-6">
+          <button
+            onClick={() => setShowRules(true)}
+            className="w-full bg-gradient-to-r from-amber-600 to-amber-700 dark:from-amber-700 dark:to-amber-800 text-white py-3 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 dark:hover:from-amber-800 dark:hover:to-amber-900 transition-all duration-300 border-2 border-amber-800 dark:border-amber-900 shadow-lg transform hover:scale-105"
+          >
+            📖 Game Rules
+          </button>
         </div>
       </div>
+
+      {/* Game Rules Modal */}
+      <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
     </div>
   );
 }
