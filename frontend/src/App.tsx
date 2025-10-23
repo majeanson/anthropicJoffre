@@ -113,14 +113,12 @@ function App() {
           setReconnecting(true);
           newSocket.emit('reconnect_to_game', { token: session.token });
         } catch (e) {
-          logger.error('Failed to parse session data:', e);
           localStorage.removeItem('gameSession');
         }
       }
     });
 
-    newSocket.on('connect_error', (error) => {
-      logger.error('Connection error:', error);
+    newSocket.on('connect_error', () => {
       setReconnecting(false);
 
       // If we have a stale session, clear it
@@ -150,16 +148,15 @@ function App() {
       }
     });
 
-    newSocket.on('reconnect_attempt', (attemptNumber) => {
+    newSocket.on('reconnect_attempt', () => {
       setReconnecting(true);
     });
 
-    newSocket.on('reconnect', (attemptNumber) => {
+    newSocket.on('reconnect', () => {
       setReconnecting(false);
     });
 
     newSocket.on('reconnect_failed', () => {
-      logger.error('Reconnection failed');
       setReconnecting(false);
       setError('Unable to reconnect to server. Please refresh the page.');
     });
@@ -306,7 +303,7 @@ function App() {
     });
 
     // Listen for rematch events
-    newSocket.on('rematch_vote_update', ({ votes, totalPlayers, voters }: { votes: number; totalPlayers: number; voters: string[] }) => {
+    newSocket.on('rematch_vote_update', ({ voters }: { votes: number; totalPlayers: number; voters: string[] }) => {
       // Update game state with new vote count
       if (gameState) {
         setGameState({
@@ -499,7 +496,6 @@ function App() {
       setReconnecting(true);
       socket.emit('reconnect_to_game', { token: session.token });
     } catch (e) {
-      logger.error('Failed to rejoin game:', e);
       localStorage.removeItem('gameSession');
       setHasValidSession(false);
     }
@@ -1001,9 +997,8 @@ function App() {
           isOpen={debugPanelOpen}
           onClose={() => setDebugPanelOpen(false)}
         />
-        <div className="min-h-screen bg-gradient-to-br from-orange-900 to-amber-900 flex items-center justify-center p-6">
-          <ErrorBoundary>
-        <BettingPhase
+        <ErrorBoundary>
+          <BettingPhase
             players={gameState.players}
             currentBets={gameState.currentBets}
             currentPlayerId={socket?.id || ''}
@@ -1019,7 +1014,7 @@ function App() {
             chatMessages={chatMessages}
             onNewChatMessage={handleNewChatMessage}
           />
-        </div>
+        </ErrorBoundary>
       </>
     );
   }
@@ -1070,15 +1065,16 @@ function App() {
         />
         <ErrorBoundary>
           <ScoringPhase
-          gameState={gameState}
-          socket={socket || null}
-          gameId={gameId}
-          currentPlayerId={socket?.id || ''}
-          chatMessages={chatMessages}
-          onNewChatMessage={handleNewChatMessage}
-          onLeaveGame={handleLeaveGame}
-          isSpectator={isSpectator}
-        />
+            gameState={gameState}
+            socket={socket || null}
+            gameId={gameId}
+            currentPlayerId={socket?.id || ''}
+            chatMessages={chatMessages}
+            onNewChatMessage={handleNewChatMessage}
+            onLeaveGame={handleLeaveGame}
+            isSpectator={isSpectator}
+          />
+        </ErrorBoundary>
       </>
     );
   }

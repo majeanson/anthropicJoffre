@@ -46,7 +46,6 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
       setGames(data.games);
       setError(null);
     } catch (err) {
-      logger.error('Error fetching games:', err);
       setError('Failed to load games. Please try again.');
     } finally {
       setLoading(false);

@@ -30,13 +30,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [showDealingAnimation, setShowDealingAnimation] = useState<boolean>(false);
   const [chatOpen, setChatOpen] = useState<boolean>(false);
   const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
-
-  // Debug: Log autoplay button visibility conditions
-    isSpectator,
-    hasOnAutoplayToggle: !!onAutoplayToggle,
-    autoplayEnabled,
-    shouldShow: !isSpectator && !!onAutoplayToggle
-  });
   const [dealingCardIndex, setDealingCardIndex] = useState<number>(0);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
   const [lastTrickLength, setLastTrickLength] = useState<number>(0);
