@@ -73,6 +73,9 @@ app.use(express.json());
 // In-memory game storage (can be moved to Redis for production)
 const games = new Map<string, GameState>();
 
+// Track game creation timestamps (gameId -> timestamp in milliseconds)
+const gameCreationTimes = new Map<string, number>();
+
 // Session storage for reconnection (maps token to session data)
 const playerSessions = new Map<string, PlayerSession>();
 
@@ -84,9 +87,6 @@ const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
 // Game deletion timeouts (maps gameId to timeout ID)
 const gameDeletionTimeouts = new Map<string, NodeJS.Timeout>();
-
-// Game creation timestamps (maps gameId to Date)
-const gameCreationTimes = new Map<string, Date>();
 
 // Online players tracking
 interface OnlinePlayer {
@@ -103,7 +103,32 @@ const onlinePlayers = new Map<string, OnlinePlayer>();
 interface RoundStatsData {
   cardPlayTimes: Map<string, number[]>; // playerId -> array of play times in ms
   trumpsPlayed: Map<string, number>; // playerId -> count of trump cards played
+  redZerosCollected: Map<string, number>; // playerId -> count of red 0 cards collected
+  brownZerosReceived: Map<string, number>; // playerId -> count of brown 0 cards received
   trickStartTime: number; // timestamp when trick started
+}
+
+interface RoundStatistics {
+  fastestPlay?: {
+    playerId: string;
+    playerName: string;
+    timeMs: number;
+  };
+  mostAggressiveBidder?: {
+    playerId: string;
+    playerName: string;
+    bidAmount: number;
+  };
+  trumpMaster?: {
+    playerId: string;
+    playerName: string;
+    trumpsPlayed: number;
+  };
+  luckyPlayer?: {
+    playerId: string;
+    playerName: string;
+    reason: string;
+  };
 }
 
 const roundStats = new Map<string, RoundStatsData>(); // gameId -> stats data
@@ -412,12 +437,12 @@ function handlePlayingTimeout(gameId: string, playerId: string) {
 }
 
 // Helper to broadcast to both players and spectators
-function broadcastGameUpdate(gameId: string, event: string, data: any) {
+function broadcastGameUpdate(gameId: string, event: string, data: GameState | { winnerId: string; points: number; gameState: GameState } | { winningTeam: 1 | 2; gameState: GameState }) {
   // Send full data to players
   io.to(gameId).emit(event, data);
 
   // Send spectator-safe data to spectators (hide player hands)
-  if (data && data.players) {
+  if (data && 'players' in data) {
     const spectatorData = {
       ...data,
       players: data.players.map((player: Player) => ({
@@ -484,7 +509,7 @@ app.get('/api/games/lobby', (req, res) => {
         isInProgress,
         teamScores: game.teamScores,
         roundNumber: game.roundNumber,
-        createdAt: Date.now(), // TODO: Add actual creation timestamp to GameState
+        createdAt: gameCreationTimes.get(game.id) || Date.now(),
         players: game.players.map(p => ({
           name: p.name,
           teamId: p.teamId,
@@ -557,7 +582,7 @@ io.on('connection', (socket) => {
     };
 
     games.set(gameId, gameState);
-    gameCreationTimes.set(gameId, new Date()); // Track creation time for DB saves
+    gameCreationTimes.set(gameId, Date.now()); // Store actual creation timestamp
     socket.join(gameId);
 
     // Create session for reconnection
@@ -1605,6 +1630,8 @@ function startNewRound(gameId: string) {
   roundStats.set(gameId, {
     cardPlayTimes: new Map(),
     trumpsPlayed: new Map(),
+    redZerosCollected: new Map(),
+    brownZerosReceived: new Map(),
     trickStartTime: Date.now(),
   });
   game.players.forEach(player => {
@@ -1612,6 +1639,8 @@ function startNewRound(gameId: string) {
     if (stats) {
       stats.cardPlayTimes.set(player.id, []);
       stats.trumpsPlayed.set(player.id, 0);
+      stats.redZerosCollected.set(player.id, 0);
+      stats.brownZerosReceived.set(player.id, 0);
     }
   });
 
@@ -1637,6 +1666,24 @@ function resolveTrick(gameId: string) {
     winner.tricksWon += 1;
     // Award 1 point for winning trick + special card points
     winner.pointsWon += totalPoints;
+
+    // Track special card collection
+    const stats = roundStats.get(gameId);
+    if (stats) {
+      // Check if trick contains red 0 (worth +5 points)
+      const hasRedZero = game.currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
+      if (hasRedZero) {
+        const redZeroCount = stats.redZerosCollected.get(winnerId) || 0;
+        stats.redZerosCollected.set(winnerId, redZeroCount + 1);
+      }
+
+      // Check if trick contains brown 0 (worth -2 points)
+      const hasBrownZero = game.currentTrick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
+      if (hasBrownZero) {
+        const brownZeroCount = stats.brownZerosReceived.get(winnerId) || 0;
+        stats.brownZerosReceived.set(winnerId, brownZeroCount + 1);
+      }
+    }
   }
 
   // Store current trick as previous trick before clearing
@@ -1670,11 +1717,11 @@ function resolveTrick(gameId: string) {
   }, 3000);
 }
 
-function calculateRoundStatistics(gameId: string, game: GameState): any {
+function calculateRoundStatistics(gameId: string, game: GameState): RoundStatistics | undefined {
   const stats = roundStats.get(gameId);
   if (!stats) return undefined;
 
-  const statistics: any = {};
+  const statistics: RoundStatistics = {};
 
   // 1. Fastest Play - player with fastest average card play time
   let fastestPlayerId: string | null = null;
@@ -1856,13 +1903,16 @@ async function endRound(gameId: string) {
 
   // Save game state incrementally after each round
   try {
-    const createdAt = gameCreationTimes.get(gameId) || new Date();
+    const createdAtMs = gameCreationTimes.get(gameId) || Date.now();
+    const createdAt = new Date(createdAtMs);
     await saveOrUpdateGame(game, createdAt);
     await saveGameParticipants(gameId, game.players);
     console.log(`Game ${gameId} saved after round ${game.roundNumber}`);
 
     // Update round-level stats for NON-BOT players
     const humanPlayers = game.players.filter(p => !p.isBot);
+    const stats = roundStats.get(gameId);
+
     for (const player of humanPlayers) {
       const playerTeamId = player.teamId;
       const roundWon = playerTeamId === offensiveTeamId && offensiveTeamPoints >= betAmount;
@@ -1876,10 +1926,9 @@ async function endRound(gameId: string) {
         betAmount: wasBidder ? game.highestBet?.amount : undefined,
         betMade: wasBidder ? (offensiveTeamPoints >= betAmount) : undefined,
         withoutTrump: wasBidder ? game.highestBet?.withoutTrump : undefined,
-        // TODO: Track these during gameplay
-        redZerosCollected: 0,
-        brownZerosReceived: 0,
-        trumpsPlayed: 0,
+        redZerosCollected: stats?.redZerosCollected.get(player.id) || 0,
+        brownZerosReceived: stats?.brownZerosReceived.get(player.id) || 0,
+        trumpsPlayed: stats?.trumpsPlayed.get(player.id) || 0,
       });
 
       console.log(`Updated round stats for ${player.name}: ${roundWon ? 'WIN' : 'LOSS'}`);
@@ -1900,8 +1949,8 @@ async function endRound(gameId: string) {
 
       // Update game-level stats for NON-BOT players only
       const humanPlayers = game.players.filter(p => !p.isBot);
-      const createdAt = gameCreationTimes.get(gameId) || new Date();
-      const gameDurationMinutes = Math.floor((Date.now() - createdAt.getTime()) / 1000 / 60);
+      const createdAtMs = gameCreationTimes.get(gameId) || Date.now();
+      const gameDurationMinutes = Math.floor((Date.now() - createdAtMs) / 1000 / 60);
 
       for (const player of humanPlayers) {
         const won = player.teamId === winningTeam;
@@ -1980,7 +2029,7 @@ httpServer.listen(PORT, HOST, () => {
   if (process.env.NODE_ENV === 'development') {
     console.log(`🌐 CORS: ${corsOrigin === '*' ? 'All origins' : allowedOrigins.join(', ')}`);
   }
-}).on('error', (error: any) => {
+}).on('error', (error: NodeJS.ErrnoException) => {
   console.error('❌ Server failed to start:', error.message);
   process.exit(1);
 });
