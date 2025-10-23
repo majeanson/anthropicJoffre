@@ -139,7 +139,8 @@ export function GameHeader({
 
                 {/* Dark Mode Toggle */}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setDarkMode(!darkMode);
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
@@ -295,7 +296,8 @@ export function GameHeader({
 
                 {/* Dark Mode Toggle */}
                 <button
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     setDarkMode(!darkMode);
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"

@@ -7,6 +7,7 @@ import { GlobalLeaderboard } from './GlobalLeaderboard';
 import { HowToPlay } from './HowToPlay';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
+import { sounds } from '../utils/sounds';
 
 interface OnlinePlayer {
   socketId: string;
@@ -47,6 +48,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
 
   console.log('Lobby state - mode:', mode, 'gameId:', gameId, 'autoJoinGameId:', autoJoinGameId);
+
+  // Helper to play sound on button click
+  const withSound = (callback: () => void) => {
+    return () => {
+      sounds.buttonClick();
+      callback();
+    };
+  };
 
   // Load recent players on mount
   useEffect(() => {
