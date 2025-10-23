@@ -36,11 +36,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
-  const [activeTab, setActiveTab] = useState<'recent' | 'online'>('recent');
+  const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
+  const [socialTab, setSocialTab] = useState<'recent' | 'online'>('online');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
+  const [showJoinInput, setShowJoinInput] = useState(false);
 
   console.log('Lobby state - mode:', mode, 'gameId:', gameId, 'autoJoinGameId:', autoJoinGameId);
 
@@ -139,198 +141,343 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               </h1>
             </div>
 
-            {/* Recent/Online Players Tabs - Only show if there are players */}
-            {(recentPlayers.length > 0 || onlinePlayers.length > 0) && (
-              <div className="mb-6">
-                {/* Tab Buttons */}
-                <div className="flex gap-2 mb-4">
-                  <button
-                    onClick={() => setActiveTab('recent')}
-                    className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
-                      activeTab === 'recent'
-                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
-                        : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    Recent Players
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('online')}
-                    className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 ${
-                      activeTab === 'online'
-                        ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
-                        : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                    }`}
-                  >
-                    Online Now ({onlinePlayers.length})
-                  </button>
-                </div>
+            {/* Horizontal Tab Navigation */}
+            <div className="mb-6">
+              <div className="grid grid-cols-4 gap-2 mb-4">
+                <button
+                  onClick={() => setMainTab('play')}
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                    mainTab === 'play'
+                      ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg scale-105'
+                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  🎮 PLAY
+                </button>
+                <button
+                  onClick={() => setMainTab('social')}
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative ${
+                    mainTab === 'social'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105'
+                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  👥 SOCIAL
+                  {onlinePlayers.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                      {onlinePlayers.length}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setMainTab('stats')}
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                    mainTab === 'stats'
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg scale-105'
+                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  📊 STATS
+                </button>
+                <button
+                  onClick={() => setMainTab('settings')}
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                    mainTab === 'settings'
+                      ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-lg scale-105'
+                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  ⚙️ SET
+                </button>
+              </div>
 
               {/* Tab Content */}
-              <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 min-h-[200px] max-h-[200px] overflow-y-auto">
-                {activeTab === 'recent' && (
-                  <div className="space-y-2">
-                    {recentPlayers.length === 0 ? (
-                      <div className="text-center text-umber-600 dark:text-gray-400 py-8">
-                        <p className="text-lg">No recent players yet</p>
-                        <p className="text-sm mt-2">Players you've played with will appear here</p>
-                      </div>
-                    ) : (
-                      recentPlayers.map(player => (
-                        <div
-                          key={player.name}
-                          className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-blue-400 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-bold text-umber-900 dark:text-gray-100">{player.name}</p>
-                              <p className="text-sm text-umber-600 dark:text-gray-400">
-                                {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} • {new Date(player.lastPlayed).toLocaleDateString()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))
+              <div className="min-h-[400px]">
+                {/* PLAY TAB */}
+                {mainTab === 'play' && (
+                  <div className="space-y-3">
+                    {/* Rejoin Game (if available) */}
+                    {hasValidSession && onRejoinGame && (
+                      <button
+                        data-testid="rejoin-game-button"
+                        onClick={onRejoinGame}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center gap-2 ring-4 ring-blue-300 animate-pulse border-2 border-blue-800 shadow-lg transform hover:scale-105"
+                      >
+                        <span>🔄</span>
+                        <span>Rejoin Game</span>
+                      </button>
                     )}
+
+                    {/* Primary Actions - Large Buttons */}
+                    <div className="space-y-3">
+                      <button
+                        data-testid="quick-play-button"
+                        onClick={onQuickPlay}
+                        className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-5 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 flex items-center justify-center gap-3 border-2 border-green-800 shadow-lg transform hover:scale-105 text-lg"
+                      >
+                        <span className="text-2xl">⚡</span>
+                        <span>Quick Play (1P + 3 Bots)</span>
+                      </button>
+
+                      <button
+                        data-testid="create-game-button"
+                        onClick={() => setMode('create')}
+                        className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105"
+                      >
+                        ➕ Create Game
+                      </button>
+
+                      <button
+                        onClick={() => setShowBrowser(true)}
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
+                      >
+                        <span>🔍</span>
+                        Browse Games
+                      </button>
+                    </div>
+
+                    {/* Secondary Action - Join with ID */}
+                    <div className="border-t-2 border-parchment-300 dark:border-gray-600 pt-3 mt-3">
+                      <button
+                        onClick={() => setShowJoinInput(!showJoinInput)}
+                        className="w-full bg-parchment-200 dark:bg-gray-700 text-umber-900 dark:text-gray-100 py-3 rounded-lg font-semibold hover:bg-parchment-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2"
+                      >
+                        <span>🔑</span>
+                        <span>Join with Game ID</span>
+                        <span className="text-sm">{showJoinInput ? '▲' : '▼'}</span>
+                      </button>
+
+                      {showJoinInput && (
+                        <div className="mt-3 space-y-2 animate-slideDown">
+                          <input
+                            type="text"
+                            value={gameId}
+                            onChange={(e) => setGameId(e.target.value)}
+                            className="w-full px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 text-sm"
+                            placeholder="Enter Game ID"
+                          />
+                          <button
+                            data-testid="join-game-button"
+                            onClick={() => setMode('join')}
+                            disabled={!gameId.trim()}
+                            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Join →
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
-                {activeTab === 'online' && (
-                  <div className="space-y-2">
-                    {onlinePlayers.length === 0 ? (
-                      <div className="text-center text-umber-600 dark:text-gray-400 py-8">
-                        <p className="text-lg">No players online</p>
-                        <p className="text-sm mt-2">Online players will appear here</p>
-                      </div>
-                    ) : (
-                      onlinePlayers.map(player => (
-                        <div
-                          key={player.socketId}
-                          className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-green-400 transition-colors"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2 flex-1">
-                              <span className="text-green-500 text-xl">🟢</span>
-                              <div>
-                                <p className="font-bold text-umber-900 dark:text-gray-100">{player.playerName}</p>
-                                <p className="text-sm text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
-                              </div>
+                {/* SOCIAL TAB */}
+                {mainTab === 'social' && (
+                  <div className="space-y-4">
+                    {/* Sub-tabs for Social */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSocialTab('online')}
+                        className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
+                          socialTab === 'online'
+                            ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
+                            : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        🟢 Online ({onlinePlayers.length})
+                      </button>
+                      <button
+                        onClick={() => setSocialTab('recent')}
+                        className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
+                          socialTab === 'recent'
+                            ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
+                            : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        📜 Recent
+                      </button>
+                    </div>
+
+                    {/* Players List */}
+                    <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 min-h-[320px] max-h-[320px] overflow-y-auto">
+                      {socialTab === 'online' && (
+                        <div className="space-y-2">
+                          {onlinePlayers.length === 0 ? (
+                            <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+                              <p className="text-2xl mb-2">😴</p>
+                              <p className="text-lg font-semibold">No players online</p>
+                              <p className="text-sm mt-2">Online players will appear here</p>
                             </div>
-                            {player.gameId && player.status !== 'in_lobby' && (
-                              <button
-                                onClick={() => {
-                                  // Prompt for name if not set
-                                  const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
-                                  if (nameToUse && nameToUse.trim()) {
-                                    if (!playerName.trim()) {
-                                      setPlayerName(nameToUse.trim());
-                                    }
-                                    onJoinGame(player.gameId!, nameToUse.trim());
-                                  }
-                                }}
-                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm font-bold transition-colors"
-                                title="Join their game"
+                          ) : (
+                            onlinePlayers.map(player => (
+                              <div
+                                key={player.socketId}
+                                className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-green-400 dark:hover:border-green-500 transition-colors"
                               >
-                                🎮 Join Game
-                              </button>
-                            )}
-                          </div>
+                                <div className="flex items-center justify-between gap-2">
+                                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                                    <span className="text-green-500 text-lg flex-shrink-0">🟢</span>
+                                    <div className="min-w-0 flex-1">
+                                      <p className="font-bold text-umber-900 dark:text-gray-100 truncate">{player.playerName}</p>
+                                      <p className="text-xs text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
+                                    </div>
+                                  </div>
+                                  {player.gameId && player.status !== 'in_lobby' && (
+                                    <button
+                                      onClick={() => {
+                                        const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
+                                        if (nameToUse && nameToUse.trim()) {
+                                          if (!playerName.trim()) {
+                                            setPlayerName(nameToUse.trim());
+                                          }
+                                          onJoinGame(player.gameId!, nameToUse.trim());
+                                        }
+                                      }}
+                                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs font-bold transition-colors flex-shrink-0"
+                                      title="Join their game"
+                                    >
+                                      🎮 Join
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            ))
+                          )}
                         </div>
-                      ))
-                    )}
+                      )}
+
+                      {socialTab === 'recent' && (
+                        <div className="space-y-2">
+                          {recentPlayers.length === 0 ? (
+                            <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+                              <p className="text-2xl mb-2">📭</p>
+                              <p className="text-lg font-semibold">No recent players yet</p>
+                              <p className="text-sm mt-2">Players you've played with will appear here</p>
+                            </div>
+                          ) : (
+                            recentPlayers.map(player => (
+                              <div
+                                key={player.name}
+                                className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex-1">
+                                    <p className="font-bold text-umber-900 dark:text-gray-100">{player.name}</p>
+                                    <p className="text-xs text-umber-600 dark:text-gray-400">
+                                      {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} • {new Date(player.lastPlayed).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
-              </div>
-              </div>
-            )}
 
-            {/* Buttons */}
-            <div className="space-y-3">
-              {hasValidSession && onRejoinGame && (
-                <button
-                  data-testid="rejoin-game-button"
-                  onClick={onRejoinGame}
-                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 flex items-center justify-center gap-2 ring-4 ring-blue-300 animate-pulse border-2 border-blue-800 shadow-lg transform hover:scale-105"
-                >
-                  <span>🔄</span>
-                  <span>Rejoin Game</span>
-                </button>
-              )}
-              <button
-                data-testid="create-game-button"
-                onClick={() => setMode('create')}
-                className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105"
-              >
-                Create Game
-              </button>
-              <button
-                data-testid="join-game-button"
-                onClick={() => setMode('join')}
-                className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105"
-              >
-                Join Game
-              </button>
-              <button
-                onClick={() => setShowBrowser(true)}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
-              >
-                <span className="text-xl">🎮</span>
-                Browse Games
-              </button>
+                {/* STATS TAB */}
+                {mainTab === 'stats' && (
+                  <div className="space-y-3">
+                    <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-6 border-2 border-parchment-400 dark:border-gray-600 text-center">
+                      <p className="text-4xl mb-3">📊</p>
+                      <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4">Player Statistics</h3>
 
-              {/* Stats & Leaderboard buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => {
-                    if (!socket) return;
-                    // Prompt for player name if not set
-                    if (!playerName.trim()) {
-                      const name = window.prompt('Enter your player name to view stats:');
-                      if (name && name.trim()) {
-                        setPlayerName(name.trim());
-                        setSelectedPlayerName(name.trim());
-                        setShowPlayerStats(true);
-                      }
-                    } else {
-                      setSelectedPlayerName(playerName);
-                      setShowPlayerStats(true);
-                    }
-                  }}
-                  className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  disabled={!socket}
-                >
-                  <span className="text-xl">📊</span>
-                  My Stats
-                </button>
-                <button
-                  onClick={() => {
-                    if (socket) {
-                      setShowLeaderboard(true);
-                    }
-                  }}
-                  className="bg-gradient-to-r from-yellow-600 to-yellow-700 text-white py-4 rounded-xl font-bold hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 border-2 border-yellow-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                  disabled={!socket}
-                >
-                  <span className="text-xl">🏆</span>
-                  Leaderboard
-                </button>
-              </div>
+                      <div className="space-y-3">
+                        <button
+                          onClick={() => {
+                            if (!socket) return;
+                            if (!playerName.trim()) {
+                              const name = window.prompt('Enter your player name to view stats:');
+                              if (name && name.trim()) {
+                                setPlayerName(name.trim());
+                                setSelectedPlayerName(name.trim());
+                                setShowPlayerStats(true);
+                              }
+                            } else {
+                              setSelectedPlayerName(playerName);
+                              setShowPlayerStats(true);
+                            }
+                          }}
+                          className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-bold hover:from-purple-700 hover:to-purple-800 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          disabled={!socket}
+                        >
+                          <span className="text-xl">📊</span>
+                          My Stats
+                        </button>
 
-              <button
-                data-testid="quick-play-button"
-                onClick={onQuickPlay}
-                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-xl font-bold hover:from-orange-600 hover:to-orange-700 transition-all duration-300 flex items-center justify-center gap-2 border-2 border-orange-700 shadow-lg transform hover:scale-105"
-              >
-                Quick Play (bots)
-              </button>
-              <div className="flex gap-3">
-                <DarkModeToggle />
-                <button
-                  onClick={() => setShowRules(true)}
-                  className="flex-1 bg-gradient-to-r from-amber-600 to-amber-700 text-white py-4 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 transition-all duration-300 border-2 border-amber-800 shadow-lg transform hover:scale-105"
-                >
-                  📖 Rules
-                </button>
+                        <button
+                          onClick={() => {
+                            if (socket) {
+                              setShowLeaderboard(true);
+                            }
+                          }}
+                          className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-white py-4 rounded-xl font-bold hover:from-yellow-700 hover:to-yellow-800 transition-all duration-300 border-2 border-yellow-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                          disabled={!socket}
+                        >
+                          <span className="text-xl">🏆</span>
+                          Global Leaderboard
+                        </button>
+
+                        <div className="pt-3 border-t-2 border-parchment-300 dark:border-gray-600">
+                          <button
+                            onClick={() => setShowRules(true)}
+                            className="w-full bg-gradient-to-r from-amber-600 to-amber-700 text-white py-3 rounded-lg font-semibold hover:from-amber-700 hover:to-amber-800 transition-all duration-200"
+                          >
+                            📖 How to Play
+                          </button>
+                        </div>
+                      </div>
+
+                      {!socket && (
+                        <p className="text-sm text-red-600 dark:text-red-400 mt-4">
+                          ⚠️ Connect to server to view stats
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* SETTINGS TAB */}
+                {mainTab === 'settings' && (
+                  <div className="space-y-4">
+                    <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-6 border-2 border-parchment-400 dark:border-gray-600">
+                      <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 text-center">⚙️ Settings</h3>
+
+                      <div className="space-y-4">
+                        {/* Dark Mode */}
+                        <div>
+                          <label className="block text-sm font-semibold text-umber-800 dark:text-gray-200 mb-2">
+                            Theme
+                          </label>
+                          <DarkModeToggle />
+                        </div>
+
+                        {/* Sound - Placeholder for future implementation */}
+                        <div>
+                          <label className="block text-sm font-semibold text-umber-800 dark:text-gray-200 mb-2">
+                            Sound Effects
+                          </label>
+                          <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-300 dark:border-gray-500">
+                            <p className="text-xs text-umber-600 dark:text-gray-400">
+                              🔊 Sound settings available in-game
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* About */}
+                        <div className="pt-4 border-t-2 border-parchment-300 dark:border-gray-600">
+                          <p className="text-center text-sm text-umber-700 dark:text-gray-300">
+                            <strong>J⋀ffre</strong>
+                          </p>
+                          <p className="text-center text-xs text-umber-600 dark:text-gray-400 mt-1">
+                            A 4-player trick-taking card game
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
