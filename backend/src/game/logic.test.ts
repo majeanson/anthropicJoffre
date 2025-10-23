@@ -3,16 +3,16 @@ import { TrickCard, Bet, Player } from '../types/game';
 
 describe('Game Logic', () => {
   describe('determineWinner', () => {
-    it('should determine winner based on highest card value when no trump', () => {
+    it('should determine winner based on highest led suit card when no trump', () => {
       const trick: TrickCard[] = [
-        { playerId: 'p1', card: { color: 'red', value: 3 } },
-        { playerId: 'p2', card: { color: 'blue', value: 5 } },
-        { playerId: 'p3', card: { color: 'green', value: 2 } },
+        { playerId: 'p1', card: { color: 'red', value: 3 } },  // led suit
+        { playerId: 'p2', card: { color: 'blue', value: 7 } }, // off-suit (higher value but wrong suit)
+        { playerId: 'p3', card: { color: 'red', value: 5 } },  // led suit (wins)
         { playerId: 'p4', card: { color: 'brown', value: 4 } },
       ];
 
       const winner = determineWinner(trick, null);
-      expect(winner).toBe('p2');
+      expect(winner).toBe('p3'); // p3 has highest led suit card
     });
 
     it('should determine winner when trump card is played', () => {
