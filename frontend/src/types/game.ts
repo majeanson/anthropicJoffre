@@ -112,6 +112,14 @@ export interface PlayerSession {
   timestamp: number;
 }
 
+export interface ChatMessage {
+  playerId: string;
+  playerName: string;
+  teamId: 1 | 2 | null;
+  message: string;
+  timestamp: number;
+}
+
 export interface Spectator {
   id: string;
   name: string;

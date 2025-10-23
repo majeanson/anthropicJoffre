@@ -1,28 +1,59 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
+import { getTierColor, getTierIcon } from '../utils/tierBadge';
 
 interface PlayerStats {
   player_name: string;
+
+  // Game-level stats
   games_played: number;
   games_won: number;
   games_lost: number;
   games_abandoned: number;
   win_percentage: number;
+  elo_rating: number;
+  highest_rating: number;
+  lowest_rating: number;
+  ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+  current_win_streak: number;
+  best_win_streak: number;
+  current_loss_streak: number;
+  worst_loss_streak: number;
+  fastest_win: number;
+  longest_game: number;
+  avg_game_duration_minutes: number;
+
+  // Round-level stats
+  total_rounds_played: number;
+  rounds_won: number;
+  rounds_lost: number;
+  rounds_win_percentage: number;
+
+  // Trick stats
   total_tricks_won: number;
-  total_points_earned: number;
-  avg_tricks_per_game: number;
-  total_bets_made: number;
-  bets_won: number;
-  bets_lost: number;
+  avg_tricks_per_round: number;
+  most_tricks_in_round: number;
+  zero_trick_rounds: number;
+
+  // Betting stats
+  total_bets_placed: number;
+  bets_made: number;
+  bets_failed: number;
+  bet_success_rate: number;
   avg_bet_amount: number;
   highest_bet: number;
   without_trump_bets: number;
+
+  // Points stats
+  total_points_earned: number;
+  avg_points_per_round: number;
+  highest_points_in_round: number;
+
+  // Special cards
   trump_cards_played: number;
   red_zeros_collected: number;
   brown_zeros_received: number;
-  elo_rating: number;
-  highest_rating: number;
-  ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+
   created_at: string;
   updated_at: string;
 }
@@ -37,6 +68,7 @@ interface PlayerStatsModalProps {
 export function PlayerStatsModal({ playerName, socket, isOpen, onClose }: PlayerStatsModalProps) {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'round' | 'game'>('round');
 
   useEffect(() => {
     if (!isOpen || !playerName) return;
@@ -60,33 +92,11 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose }: Player
 
   if (!isOpen) return null;
 
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'Diamond': return 'from-cyan-400 to-blue-600';
-      case 'Platinum': return 'from-gray-300 to-gray-500';
-      case 'Gold': return 'from-yellow-400 to-yellow-600';
-      case 'Silver': return 'from-gray-400 to-gray-600';
-      case 'Bronze': return 'from-orange-700 to-orange-900';
-      default: return 'from-gray-500 to-gray-700';
-    }
-  };
-
-  const getTierIcon = (tier: string) => {
-    switch (tier) {
-      case 'Diamond': return '💎';
-      case 'Platinum': return '🏆';
-      case 'Gold': return '🥇';
-      case 'Silver': return '🥈';
-      case 'Bronze': return '🥉';
-      default: return '📊';
-    }
-  };
-
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600">
+      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-amber-700 to-amber-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-amber-950 dark:border-gray-900">
+        <div className="sticky top-0 bg-gradient-to-r from-amber-700 to-amber-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-amber-950 dark:border-gray-900 z-10">
           <div className="flex items-center gap-3">
             <span className="text-4xl">📊</span>
             <div>
@@ -137,102 +147,233 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose }: Player
                   <div className="text-right">
                     <p className="text-sm font-semibold opacity-90">ELO Rating</p>
                     <p className="text-4xl font-bold mt-1">{stats.elo_rating}</p>
-                    <p className="text-xs opacity-75">Peak: {stats.highest_rating}</p>
+                    <p className="text-xs opacity-75">
+                      Peak: {stats.highest_rating} • Low: {stats.lowest_rating || stats.elo_rating}
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Win/Loss Record */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-green-100 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
-                  <p className="text-green-700 dark:text-green-300 font-bold text-sm">Games Won</p>
-                  <p className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.games_won}</p>
-                </div>
-                <div className="bg-red-100 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-300 dark:border-red-600">
-                  <p className="text-red-700 dark:text-red-300 font-bold text-sm">Games Lost</p>
-                  <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.games_lost}</p>
-                </div>
-                <div className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-4 border-2 border-blue-300 dark:border-blue-600">
-                  <p className="text-blue-700 dark:text-blue-300 font-bold text-sm">Win Rate</p>
-                  <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.win_percentage}%</p>
-                </div>
+              {/* Tab Navigation */}
+              <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
+                <button
+                  onClick={() => setActiveTab('round')}
+                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 ${
+                    activeTab === 'round'
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  📊 Round Stats
+                </button>
+                <button
+                  onClick={() => setActiveTab('game')}
+                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 ${
+                    activeTab === 'game'
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg'
+                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  🏆 Game Stats
+                </button>
               </div>
 
-              {/* Gameplay Stats */}
-              <div className="bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/40 dark:to-blue-900/40 rounded-lg p-6 border-2 border-purple-200 dark:border-purple-600">
-                <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                  🎮 Gameplay Statistics
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Total Games</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.games_played}</p>
+              {/* Round Stats Tab */}
+              {activeTab === 'round' && (
+                <div className="space-y-6 animate-fadeIn">
+                  {/* Round Performance */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-4 border-2 border-blue-300 dark:border-blue-600">
+                      <p className="text-blue-700 dark:text-blue-300 font-bold text-sm">Total Rounds</p>
+                      <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.total_rounds_played || 0}</p>
+                    </div>
+                    <div className="bg-green-100 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
+                      <p className="text-green-700 dark:text-green-300 font-bold text-sm">Rounds Won</p>
+                      <p className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.rounds_won || 0}</p>
+                    </div>
+                    <div className="bg-red-100 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-300 dark:border-red-600">
+                      <p className="text-red-700 dark:text-red-300 font-bold text-sm">Rounds Lost</p>
+                      <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.rounds_lost || 0}</p>
+                    </div>
+                    <div className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-4 border-2 border-purple-300 dark:border-purple-600">
+                      <p className="text-purple-700 dark:text-purple-300 font-bold text-sm">Win Rate</p>
+                      <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.rounds_win_percentage || 0}%</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Tricks Won</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_tricks_won}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Tricks/Game</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_tricks_per_game}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Total Points</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_points_earned}</p>
-                  </div>
-                </div>
-              </div>
 
-              {/* Betting Stats */}
-              <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/40 dark:to-yellow-900/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600">
-                <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                  💰 Betting Statistics
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Made</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_bets_made}</p>
+                  {/* Trick Performance */}
+                  <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 dark:from-indigo-900/40 dark:to-cyan-900/40 rounded-lg p-6 border-2 border-indigo-200 dark:border-indigo-600">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      🎯 Trick Performance
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Total Tricks</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_tricks_won || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Per Round</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_tricks_per_round || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Best Round</p>
+                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.most_tricks_in_round || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Zero Tricks</p>
+                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.zero_trick_rounds || 0}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Won</p>
-                    <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.bets_won}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Lost</p>
-                    <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.bets_lost}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Bet</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_bet_amount}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Highest Bet</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.highest_bet}</p>
-                  </div>
-                  <div>
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Without Trump</p>
-                    <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{stats.without_trump_bets}</p>
-                  </div>
-                </div>
-              </div>
 
-              {/* Special Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-red-50 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-200 dark:border-red-600">
-                  <p className="text-red-700 dark:text-red-300 font-bold mb-2 flex items-center gap-2">
-                    🔴 Red Zeros Collected
-                  </p>
-                  <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.red_zeros_collected}</p>
-                  <p className="text-xs text-red-600 dark:text-red-400 mt-1">+5 bonus points each</p>
+                  {/* Betting Performance */}
+                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/40 dark:to-yellow-900/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      💰 Betting Performance
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Placed</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_bets_placed || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Made</p>
+                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.bets_made || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Failed</p>
+                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.bets_failed || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Success Rate</p>
+                        <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{stats.bet_success_rate || 0}%</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Bet</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_bet_amount || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Highest Bet</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.highest_bet || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Without Trump</p>
+                        <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{stats.without_trump_bets || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Points Performance */}
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/40 dark:to-teal-900/40 rounded-lg p-6 border-2 border-emerald-200 dark:border-emerald-600">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      ⭐ Points Performance
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Total Points</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_points_earned || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Per Round</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_points_per_round || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Best Round</p>
+                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.highest_points_in_round || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Special Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-red-50 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-200 dark:border-red-600">
+                      <p className="text-red-700 dark:text-red-300 font-bold mb-2 flex items-center gap-2">
+                        🔴 Red Zeros Collected
+                      </p>
+                      <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.red_zeros_collected || 0}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">+5 bonus points each</p>
+                    </div>
+                    <div className="bg-amber-50 dark:bg-amber-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600">
+                      <p className="text-amber-700 dark:text-amber-300 font-bold mb-2 flex items-center gap-2">
+                        🟤 Brown Zeros Received
+                      </p>
+                      <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">{stats.brown_zeros_received || 0}</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">-2 penalty points each</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-amber-50 dark:bg-amber-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600">
-                  <p className="text-amber-700 dark:text-amber-300 font-bold mb-2 flex items-center gap-2">
-                    🟤 Brown Zeros Received
-                  </p>
-                  <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">{stats.brown_zeros_received}</p>
-                  <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">-2 penalty points each</p>
+              )}
+
+              {/* Game Stats Tab */}
+              {activeTab === 'game' && (
+                <div className="space-y-6 animate-fadeIn">
+                  {/* Win/Loss Record */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-4 border-2 border-blue-300 dark:border-blue-600">
+                      <p className="text-blue-700 dark:text-blue-300 font-bold text-sm">Games Played</p>
+                      <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.games_played}</p>
+                    </div>
+                    <div className="bg-green-100 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
+                      <p className="text-green-700 dark:text-green-300 font-bold text-sm">Games Won</p>
+                      <p className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.games_won}</p>
+                    </div>
+                    <div className="bg-red-100 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-300 dark:border-red-600">
+                      <p className="text-red-700 dark:text-red-300 font-bold text-sm">Games Lost</p>
+                      <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.games_lost}</p>
+                    </div>
+                    <div className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-4 border-2 border-purple-300 dark:border-purple-600">
+                      <p className="text-purple-700 dark:text-purple-300 font-bold text-sm">Win Rate</p>
+                      <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.win_percentage}%</p>
+                    </div>
+                  </div>
+
+                  {/* Streaks */}
+                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/40 dark:to-orange-900/40 rounded-lg p-6 border-2 border-yellow-200 dark:border-yellow-600">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      🔥 Streaks
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Current Win</p>
+                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.current_win_streak || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Best Win</p>
+                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.best_win_streak || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Current Loss</p>
+                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.current_loss_streak || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Worst Loss</p>
+                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.worst_loss_streak || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Game Records */}
+                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/40 dark:to-blue-900/40 rounded-lg p-6 border-2 border-cyan-200 dark:border-cyan-600">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                      📈 Game Records
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Fastest Win</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.fastest_win || 'N/A'} {stats.fastest_win && 'rounds'}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Longest Game</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.longest_game || 0} rounds</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Duration</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_game_duration_minutes || 0} min</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Footer */}
               <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-4 border-t-2 border-gray-300 dark:border-gray-600">

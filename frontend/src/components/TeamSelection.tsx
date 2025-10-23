@@ -1,15 +1,8 @@
-import { Player } from '../types/game';
+import { Player, ChatMessage } from '../types/game';
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useSettings } from '../contexts/SettingsContext';
-
-interface ChatMessage {
-  playerId: string;
-  playerName: string;
-  teamId: 1 | 2 | null;
-  message: string;
-  timestamp: number;
-}
+import { HowToPlay } from './HowToPlay';
 
 interface TeamSelectionProps {
   players: Player[];
@@ -410,13 +403,8 @@ export function TeamSelection({
         </div>
 
         <div className="mt-6 p-4 bg-parchment-100 dark:bg-gray-700 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
-          <h4 className="font-semibold text-umber-800 dark:text-gray-200 mb-2">How to Play:</h4>
-          <ul className="text-sm text-umber-700 dark:text-gray-300 space-y-1">
-            <li>• Teams play opposite each other (Team 1 vs Team 2)</li>
-            <li>• You can swap positions with other players before starting</li>
-            <li>• Position affects turn order during the game</li>
-            <li>• The dealer rotates each round</li>
-          </ul>
+          <h4 className="font-semibold text-umber-800 dark:text-gray-200 mb-4 text-xl">📖 Game Rules</h4>
+          <HowToPlay />
         </div>
       </div>
     </div>

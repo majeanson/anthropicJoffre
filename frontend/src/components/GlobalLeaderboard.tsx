@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
+import { getTierColor, getTierIcon, getRankMedal } from '../utils/tierBadge';
 
 interface LeaderboardPlayer {
   player_name: string;
@@ -11,6 +12,12 @@ interface LeaderboardPlayer {
   highest_rating: number;
   total_tricks_won: number;
   total_points_earned: number;
+  total_rounds_played: number;
+  rounds_won: number;
+  rounds_win_percentage: number;
+  avg_tricks_per_round: number;
+  bet_success_rate: number;
+  avg_points_per_round: number;
   ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
 }
 
@@ -24,6 +31,7 @@ interface GlobalLeaderboardProps {
 export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }: GlobalLeaderboardProps) {
   const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showRoundStats, setShowRoundStats] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -44,35 +52,6 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
   }, [isOpen, socket]);
 
   if (!isOpen) return null;
-
-  const getTierColor = (tier: string) => {
-    switch (tier) {
-      case 'Diamond': return 'bg-gradient-to-r from-cyan-400 to-blue-600 text-white';
-      case 'Platinum': return 'bg-gradient-to-r from-gray-300 to-gray-500 text-gray-900';
-      case 'Gold': return 'bg-gradient-to-r from-yellow-400 to-yellow-600 text-gray-900';
-      case 'Silver': return 'bg-gradient-to-r from-gray-400 to-gray-600 text-white';
-      case 'Bronze': return 'bg-gradient-to-r from-orange-700 to-orange-900 text-white';
-      default: return 'bg-gray-500 text-white';
-    }
-  };
-
-  const getTierIcon = (tier: string) => {
-    switch (tier) {
-      case 'Diamond': return '💎';
-      case 'Platinum': return '🏆';
-      case 'Gold': return '🥇';
-      case 'Silver': return '🥈';
-      case 'Bronze': return '🥉';
-      default: return '📊';
-    }
-  };
-
-  const getRankMedal = (rank: number) => {
-    if (rank === 1) return '🥇';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
-    return `#${rank}`;
-  };
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
@@ -116,16 +95,40 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
           )}
 
           {!loading && players.length > 0 && (
-            <div className="space-y-2">
-              {/* Table Header */}
-              <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold text-sm text-gray-700 dark:text-gray-300">
-                <div className="col-span-1">Rank</div>
-                <div className="col-span-2">Player</div>
-                <div className="col-span-1 text-center">ELO</div>
-                <div className="col-span-1 text-center">Games</div>
-                <div className="col-span-1 text-center">Win Rate</div>
-                <div className="col-span-1 text-center">Tier</div>
+            <div className="space-y-4">
+              {/* Toggle Stats View Button */}
+              <div className="flex justify-center">
+                <button
+                  onClick={() => setShowRoundStats(!showRoundStats)}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                >
+                  {showRoundStats ? '🏆 Show Game Stats' : '📊 Show Round Stats'}
+                </button>
               </div>
+
+              {/* Table Header - Game Stats */}
+              {!showRoundStats && (
+                <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold text-sm text-gray-700 dark:text-gray-300">
+                  <div className="col-span-1">Rank</div>
+                  <div className="col-span-2">Player</div>
+                  <div className="col-span-1 text-center">ELO</div>
+                  <div className="col-span-1 text-center">Games</div>
+                  <div className="col-span-1 text-center">Win Rate</div>
+                  <div className="col-span-1 text-center">Tier</div>
+                </div>
+              )}
+
+              {/* Table Header - Round Stats */}
+              {showRoundStats && (
+                <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-blue-200 dark:bg-blue-900/60 rounded-lg font-bold text-sm text-blue-900 dark:text-blue-200">
+                  <div className="col-span-1">Rank</div>
+                  <div className="col-span-2">Player</div>
+                  <div className="col-span-1 text-center">Rounds</div>
+                  <div className="col-span-1 text-center">Round Win%</div>
+                  <div className="col-span-1 text-center">Avg Tricks</div>
+                  <div className="col-span-1 text-center">Bet Success</div>
+                </div>
+              )}
 
               {/* Player Rows */}
               {players.map((player, index) => (
@@ -149,35 +152,68 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
                   <div className="col-span-1 md:col-span-2 flex flex-col justify-center">
                     <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{player.player_name}</p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {player.games_won}W - {player.games_lost}L
+                      {showRoundStats
+                        ? `${player.rounds_won || 0}W - ${(player.total_rounds_played || 0) - (player.rounds_won || 0)}L`
+                        : `${player.games_won}W - ${player.games_lost}L`
+                      }
                     </p>
                   </div>
 
-                  {/* ELO Rating */}
-                  <div className="col-span-1 flex flex-col items-center justify-center">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">ELO</p>
-                    <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{player.elo_rating}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500">Peak: {player.highest_rating}</p>
-                  </div>
+                  {!showRoundStats ? (
+                    <>
+                      {/* ELO Rating */}
+                      <div className="col-span-1 flex flex-col items-center justify-center">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">ELO</p>
+                        <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{player.elo_rating}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-500">Peak: {player.highest_rating}</p>
+                      </div>
 
-                  {/* Games Played */}
-                  <div className="col-span-1 flex flex-col items-center justify-center">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Games</p>
-                    <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games_played}</p>
-                  </div>
+                      {/* Games Played */}
+                      <div className="col-span-1 flex flex-col items-center justify-center">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Games</p>
+                        <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games_played}</p>
+                      </div>
 
-                  {/* Win Percentage */}
-                  <div className="col-span-1 flex flex-col items-center justify-center">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Win Rate</p>
-                    <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.win_percentage}%</p>
-                  </div>
+                      {/* Win Percentage */}
+                      <div className="col-span-1 flex flex-col items-center justify-center">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Win Rate</p>
+                        <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.win_percentage}%</p>
+                      </div>
 
-                  {/* Tier Badge */}
-                  <div className="col-span-1 flex items-center justify-center">
-                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.ranking_tier)}`}>
-                      {getTierIcon(player.ranking_tier)} {player.ranking_tier}
-                    </span>
-                  </div>
+                      {/* Tier Badge */}
+                      <div className="col-span-1 flex items-center justify-center">
+                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.ranking_tier, true)}`}>
+                          {getTierIcon(player.ranking_tier)} {player.ranking_tier}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      {/* Total Rounds Played */}
+                      <div className="col-span-1 flex flex-col items-center justify-center">
+                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Rounds</p>
+                        <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{player.total_rounds_played || 0}</p>
+                      </div>
+
+                      {/* Round Win Percentage */}
+                      <div className="col-span-1 flex flex-col items-center justify-center">
+                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Round Win%</p>
+                        <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.rounds_win_percentage || 0}%</p>
+                      </div>
+
+                      {/* Average Tricks Per Round */}
+                      <div className="col-span-1 flex flex-col items-center justify-center">
+                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Avg Tricks</p>
+                        <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{player.avg_tricks_per_round || 0}</p>
+                      </div>
+
+                      {/* Bet Success Rate */}
+                      <div className="col-span-1 flex flex-col items-center justify-center">
+                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Bet Success</p>
+                        <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{player.bet_success_rate || 0}%</p>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

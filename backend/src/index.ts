@@ -20,6 +20,8 @@ import {
   markGameFinished,
   saveGameParticipants,
   updatePlayerStats,
+  updateRoundStats,
+  updateGameStats,
   calculateEloChange,
   getPlayerStats,
   getLeaderboard,
@@ -1841,6 +1843,30 @@ async function endRound(gameId: string) {
     await saveOrUpdateGame(game, createdAt);
     await saveGameParticipants(gameId, game.players);
     console.log(`Game ${gameId} saved after round ${game.roundNumber}`);
+
+    // Update round-level stats for NON-BOT players
+    const humanPlayers = game.players.filter(p => !p.isBot);
+    for (const player of humanPlayers) {
+      const playerTeamId = player.teamId;
+      const roundWon = playerTeamId === offensiveTeamId && offensiveTeamPoints >= betAmount;
+      const wasBidder = game.highestBet?.playerId === player.id;
+
+      await updateRoundStats(player.name, {
+        roundWon,
+        tricksWon: player.tricksWon,
+        pointsEarned: player.pointsWon,
+        wasBidder,
+        betAmount: wasBidder ? game.highestBet?.amount : undefined,
+        betMade: wasBidder ? (offensiveTeamPoints >= betAmount) : undefined,
+        withoutTrump: wasBidder ? game.highestBet?.withoutTrump : undefined,
+        // TODO: Track these during gameplay
+        redZerosCollected: 0,
+        brownZerosReceived: 0,
+        trumpsPlayed: 0,
+      });
+
+      console.log(`Updated round stats for ${player.name}: ${roundWon ? 'WIN' : 'LOSS'}`);
+    }
   } catch (error) {
     console.error('Error saving game progress:', error);
   }
@@ -1855,8 +1881,11 @@ async function endRound(gameId: string) {
       await markGameFinished(gameId, winningTeam);
       console.log(`Game ${gameId} marked as finished, Team ${winningTeam} won`);
 
-      // Update player stats for NON-BOT players only
+      // Update game-level stats for NON-BOT players only
       const humanPlayers = game.players.filter(p => !p.isBot);
+      const createdAt = gameCreationTimes.get(gameId) || new Date();
+      const gameDurationMinutes = Math.floor((Date.now() - createdAt.getTime()) / 1000 / 60);
+
       for (const player of humanPlayers) {
         const won = player.teamId === winningTeam;
 
@@ -1879,29 +1908,18 @@ async function endRound(gameId: string) {
         // Calculate ELO change
         const eloChange = calculateEloChange(currentElo, avgOpponentElo, won);
 
-        // Check if player was the bidder
-        const wasBidder = game.highestBet?.playerId === player.id;
-        const betMade = wasBidder && offensiveTeamPoints >= betAmount;
-
-        // Update player stats
-        await updatePlayerStats(
+        // Update game-level stats (ELO, win/loss, streaks)
+        await updateGameStats(
           player.name,
           {
             won,
-            tricksWon: player.tricksWon,
-            pointsEarned: player.pointsWon,
-            betAmount: wasBidder ? game.highestBet?.amount : undefined,
-            betMade: wasBidder ? betMade : undefined,
-            withoutTrump: wasBidder ? game.highestBet?.withoutTrump : undefined,
-            // TODO: Track these stats during gameplay
-            trumpsPlayed: 0,
-            redZerosCollected: 0,
-            brownZerosReceived: 0,
+            gameRounds: game.roundNumber,
+            gameDurationMinutes,
           },
           eloChange
         );
 
-        console.log(`Updated stats for ${player.name}: ${won ? 'WIN' : 'LOSS'}, ELO ${eloChange > 0 ? '+' : ''}${eloChange}`);
+        console.log(`Updated game stats for ${player.name}: ${won ? 'WIN' : 'LOSS'}, ELO ${eloChange > 0 ? '+' : ''}${eloChange}`);
       }
     } catch (error) {
       console.error('Error finalizing game:', error);

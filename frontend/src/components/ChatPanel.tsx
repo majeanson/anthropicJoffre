@@ -1,13 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
-
-export interface ChatMessage {
-  playerId: string;
-  playerName: string;
-  teamId: 1 | 2 | null;
-  message: string;
-  timestamp: number;
-}
+import { ChatMessage } from '../types/game';
 
 interface ChatPanelProps {
   socket: Socket | null;
