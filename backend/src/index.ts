@@ -816,8 +816,9 @@ io.on('connection', (socket) => {
       game.playersReady = [];
     }
 
-    if (!game.playersReady.includes(socket.id)) {
-      game.playersReady.push(socket.id);
+    // Use player name for stability across reconnections
+    if (!game.playersReady.includes(player.name)) {
+      game.playersReady.push(player.name);
       console.log(`Player ${player.name} is ready (${game.playersReady.length}/4)`);
 
       // Broadcast updated game state
@@ -1419,6 +1420,40 @@ io.on('connection', (socket) => {
       }
     }
 
+    // Migrate rematch votes from old socket ID to player name (for backward compatibility)
+    if (game.rematchVotes && game.rematchVotes.includes(oldSocketId)) {
+      const index = game.rematchVotes.indexOf(oldSocketId);
+      game.rematchVotes[index] = player.name;
+      console.log(`Migrated rematch vote from socket ID to player name: ${player.name}`);
+    }
+
+    // Migrate playersReady from old socket ID to player name (for backward compatibility)
+    if (game.playersReady && game.playersReady.includes(oldSocketId)) {
+      const index = game.playersReady.indexOf(oldSocketId);
+      game.playersReady[index] = player.name;
+      console.log(`Migrated player ready status from socket ID to player name: ${player.name}`);
+    }
+
+    // Update bets with old socket ID to new socket ID
+    game.currentBets.forEach(bet => {
+      if (bet.playerId === oldSocketId) {
+        bet.playerId = socket.id;
+        console.log(`Updated bet playerId from ${oldSocketId} to ${socket.id}`);
+      }
+    });
+    if (game.highestBet && game.highestBet.playerId === oldSocketId) {
+      game.highestBet.playerId = socket.id;
+      console.log(`Updated highestBet playerId from ${oldSocketId} to ${socket.id}`);
+    }
+
+    // Update current trick with old socket ID to new socket ID
+    game.currentTrick.forEach(trickCard => {
+      if (trickCard.playerId === oldSocketId) {
+        trickCard.playerId = socket.id;
+        console.log(`Updated trick card playerId from ${oldSocketId} to ${socket.id}`);
+      }
+    });
+
     console.log(`Player ${session.playerName} reconnected to game ${session.gameId}`);
 
     // Send updated game state to reconnected player
@@ -1458,14 +1493,14 @@ io.on('connection', (socket) => {
       game.rematchVotes = [];
     }
 
-    // Check if player already voted
-    if (game.rematchVotes.includes(socket.id)) {
+    // Check if player already voted (by name for stability across reconnections)
+    if (game.rematchVotes.includes(player.name)) {
       socket.emit('error', { message: 'You already voted for rematch' });
       return;
     }
 
-    // Add vote
-    game.rematchVotes.push(socket.id);
+    // Add vote using player name (stable across reconnections)
+    game.rematchVotes.push(player.name);
     console.log(`Player ${player.name} voted for rematch. Votes: ${game.rematchVotes.length}/4`);
 
     // Broadcast updated vote count

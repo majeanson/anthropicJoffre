@@ -30,7 +30,10 @@ export function ScoringPhase({
   const [unreadCount, setUnreadCount] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(60);
 
-  const isReady = gameState.playersReady?.includes(currentPlayerId) || false;
+  // Find current player to get their name (playersReady now stores names, not IDs)
+  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+  const currentPlayerName = currentPlayer?.name || '';
+  const isReady = gameState.playersReady?.includes(currentPlayerName) || false;
   const readyCount = gameState.playersReady?.length || 0;
 
   // Calculate time remaining

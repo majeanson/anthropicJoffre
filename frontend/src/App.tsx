@@ -704,8 +704,9 @@ function App() {
 
     // Scoring phase - bot marks ready after delay
     if (state.phase === 'scoring') {
-      // Check if this bot is already ready
-      const isAlreadyReady = state.playersReady?.includes(botId) || false;
+      // Check if this bot is already ready (playersReady stores names, not IDs)
+      const bot = state.players.find(p => p.id === botId);
+      const isAlreadyReady = bot ? (state.playersReady?.includes(bot.name) || false) : false;
 
       if (!isAlreadyReady) {
         const timeout = setTimeout(() => {
@@ -757,7 +758,9 @@ function App() {
 
     // For scoring phase, auto-ready
     if (gameState.phase === 'scoring') {
-      const isAlreadyReady = gameState.playersReady?.includes(myPlayerId) || false;
+      // playersReady now stores names, not IDs
+      const me = gameState.players.find(p => p.id === myPlayerId);
+      const isAlreadyReady = me ? (gameState.playersReady?.includes(me.name) || false) : false;
       if (!isAlreadyReady) {
         // Clear any existing autoplay timeout
         if (autoplayTimeoutRef.current) {

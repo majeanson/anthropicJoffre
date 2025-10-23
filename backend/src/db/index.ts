@@ -362,7 +362,7 @@ export const updateGameStats = async (
       END,
       longest_game = GREATEST(longest_game, $8),
       avg_game_duration_minutes = ROUND((
-        (avg_game_duration_minutes * (games_played - 1) + $9) / games_played
+        (avg_game_duration_minutes * games_played + $9) / (games_played + 1)
       ), 2),
       updated_at = CURRENT_TIMESTAMP
     WHERE player_name = $1

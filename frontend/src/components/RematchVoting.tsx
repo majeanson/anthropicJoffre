@@ -10,7 +10,11 @@ interface RematchVotingProps {
 
 export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: RematchVotingProps) {
   const rematchVotes = gameState.rematchVotes || [];
-  const hasVoted = rematchVotes.includes(currentPlayerId);
+
+  // Find current player to get their name (rematchVotes now stores names, not IDs)
+  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+  const currentPlayerName = currentPlayer?.name || '';
+  const hasVoted = rematchVotes.includes(currentPlayerName);
   const votesNeeded = 4 - rematchVotes.length;
 
   const handleVoteRematch = () => {
@@ -48,7 +52,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
           {/* Vote indicators */}
           <div className="flex justify-center gap-3 mt-6">
             {gameState.players.map((player) => {
-              const voted = rematchVotes.includes(player.id);
+              const voted = rematchVotes.includes(player.name);
               const isCurrentPlayer = player.id === currentPlayerId;
 
               return (

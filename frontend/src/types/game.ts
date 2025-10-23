@@ -98,9 +98,9 @@ export interface GameState {
   roundNumber: number;
   roundHistory: RoundHistory[];
   currentRoundTricks: TrickResult[]; // Tricks completed in current round (before endRound)
-  playersReady?: string[]; // Array of player IDs who are ready for next round
+  playersReady?: string[]; // Array of player names who are ready for next round (stable across reconnections)
   roundEndTimestamp?: number; // Timestamp when round ended (for 60s timer)
-  rematchVotes?: string[]; // Array of player IDs who voted for rematch
+  rematchVotes?: string[]; // Array of player names who voted for rematch (stable across reconnections)
   currentTimeout?: PlayerTimeout; // Current active timeout for turn-based phases
 }
 
