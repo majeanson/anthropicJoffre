@@ -376,7 +376,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const bettingTeam = bettingPlayer?.teamId || null;
 
   return (
-    <>
+    <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-hidden md:overflow-visible">
       <GameHeader
         gameId={gameState.id}
         roundNumber={gameState.roundNumber}
@@ -391,7 +391,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         unreadChatCount={unreadChatCount}
       />
 
-      <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-hidden md:overflow-visible">
+      <div className="flex-1 flex flex-col overflow-hidden md:overflow-visible">
         {/* Score Board - Fixed height */}
       <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-4 pt-2 md:pt-4">
         <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600">
@@ -770,6 +770,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         />
       )}
       </div>
-    </>
+    </div>
   );
 }

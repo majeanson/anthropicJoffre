@@ -113,7 +113,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
   };
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col">
       <GameHeader
         gameId={gameState.id}
         roundNumber={gameState.roundNumber}
@@ -127,8 +127,9 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         unreadChatCount={unreadChatCount}
       />
 
-      <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl mx-auto border-2 border-parchment-400 dark:border-gray-600 mt-4">
-        <h2 className="text-2xl font-bold text-umber-900 dark:text-gray-100 font-serif mb-4">Betting Phase</h2>
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl w-full border-2 border-parchment-400 dark:border-gray-600">
+          <h2 className="text-2xl font-bold text-umber-900 dark:text-gray-100 font-serif mb-4">Betting Phase</h2>
 
       {/* Current Turn Indicator with Timeout */}
       {!hasPlacedBet && (
@@ -322,7 +323,8 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
           Waiting for other players to bet...
         </div>
       )}
-    </div>
+        </div>
+      </div>
 
       <Leaderboard
         gameState={gameState}
@@ -341,6 +343,6 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
           onNewMessage={onNewChatMessage}
         />
       )}
-    </>
+    </div>
   );
 }
