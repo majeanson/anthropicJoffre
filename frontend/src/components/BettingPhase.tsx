@@ -5,8 +5,8 @@ import { Card as CardComponent } from './Card';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { Leaderboard } from './Leaderboard';
 import { ChatPanel, ChatMessage } from './ChatPanel';
+import { GameHeader } from './GameHeader';
 import { sounds } from '../utils/sounds';
-import { useSettings } from '../contexts/SettingsContext';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -26,7 +26,6 @@ interface BettingPhaseProps {
 }
 
 export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
-  const { darkMode, setDarkMode } = useSettings();
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
   const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
   const isDealer = currentPlayerIndex === dealerIndex;
@@ -115,65 +114,21 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
 
   return (
     <>
-      <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl mx-auto border-2 border-parchment-400 dark:border-gray-600">
-        {/* Header with title and buttons */}
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
-          <h2 className="text-2xl font-bold text-umber-900 dark:text-gray-100 font-serif">Betting Phase</h2>
+      <GameHeader
+        gameId={gameState.id}
+        roundNumber={gameState.roundNumber}
+        team1Score={gameState.teamScores.team1}
+        team2Score={gameState.teamScores.team2}
+        onLeaveGame={onLeaveGame}
+        onOpenLeaderboard={() => setShowLeaderboard(true)}
+        onOpenChat={() => setChatOpen(!chatOpen)}
+        autoplayEnabled={autoplayEnabled}
+        onAutoplayToggle={onAutoplayToggle}
+        unreadChatCount={unreadChatCount}
+      />
 
-          {/* Action buttons */}
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => setShowLeaderboard(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-yellow-600 shadow-md"
-              title="View Leaderboard"
-            >
-              🏆
-            </button>
-            <button
-              onClick={() => setChatOpen(!chatOpen)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-blue-700 shadow-md relative"
-              title="Chat"
-            >
-              💬
-              {unreadChatCount > 0 && !chatOpen && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  {unreadChatCount}
-                </span>
-              )}
-            </button>
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-gray-900 shadow-md"
-              title={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
-            >
-              {darkMode ? '☀️' : '🌙'}
-            </button>
-            {onAutoplayToggle && (
-              <button
-                onClick={onAutoplayToggle}
-                className={`${
-                  autoplayEnabled
-                    ? 'bg-green-500 hover:bg-green-600 animate-pulse'
-                    : 'bg-purple-500 hover:bg-purple-600'
-                } text-white px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 shadow-md ${
-                  autoplayEnabled ? 'border-green-600' : 'border-purple-600'
-                }`}
-                title={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}
-              >
-                {autoplayEnabled ? '🤖' : '🎮'}
-              </button>
-            )}
-            {onLeaveGame && (
-              <button
-                onClick={onLeaveGame}
-                className="bg-crimson-600 hover:bg-crimson-700 text-parchment-50 px-3 py-2 rounded-lg font-semibold transition-colors text-sm flex items-center gap-1 border-2 border-crimson-700"
-                title="Leave Game"
-              >
-                🚪
-              </button>
-            )}
-          </div>
-        </div>
+      <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl mx-auto border-2 border-parchment-400 dark:border-gray-600 mt-4">
+        <h2 className="text-2xl font-bold text-umber-900 dark:text-gray-100 font-serif mb-4">Betting Phase</h2>
 
       {/* Current Turn Indicator with Timeout */}
       {!hasPlacedBet && (

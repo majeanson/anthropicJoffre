@@ -5,9 +5,9 @@ import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { Tooltip } from './Tooltip';
+import { GameHeader } from './GameHeader';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
-import { useSettings } from '../contexts/SettingsContext';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -25,7 +25,6 @@ interface PlayingPhaseProps {
 }
 
 export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
-  const { darkMode, setDarkMode } = useSettings();
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -377,8 +376,23 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const bettingTeam = bettingPlayer?.teamId || null;
 
   return (
-    <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-hidden md:overflow-visible">
-      {/* Score Board - Fixed height */}
+    <>
+      <GameHeader
+        gameId={gameState.id}
+        roundNumber={gameState.roundNumber}
+        team1Score={gameState.teamScores.team1}
+        team2Score={gameState.teamScores.team2}
+        onLeaveGame={onLeaveGame}
+        onOpenLeaderboard={() => setShowLeaderboard(true)}
+        onOpenChat={() => setChatOpen(!chatOpen)}
+        autoplayEnabled={autoplayEnabled}
+        onAutoplayToggle={onAutoplayToggle}
+        isSpectator={isSpectator}
+        unreadChatCount={unreadChatCount}
+      />
+
+      <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-hidden md:overflow-visible">
+        {/* Score Board - Fixed height */}
       <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-4 pt-2 md:pt-4">
         <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600">
           <div className="flex justify-between items-center gap-2 md:gap-8">
@@ -420,9 +434,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             {/* Center Info */}
             <div className="text-center flex-shrink-0 space-y-1.5 md:space-y-2">
               <div className="flex items-center justify-center gap-2">
-                <div className="bg-gradient-to-r from-parchment-200 to-parchment-100 dark:from-gray-700 dark:to-gray-800 px-2 md:px-3 py-1 rounded-lg border border-parchment-400 dark:border-gray-600">
-                  <p className="text-[10px] md:text-xs font-bold text-umber-800 dark:text-gray-200">ROUND {gameState.roundNumber}</p>
-                </div>
                 {/* Sound Toggle Button - Compact */}
                 <Tooltip content={soundEnabled ? 'Mute Sound (Volume Control)' : 'Unmute Sound'}>
                   <button
@@ -437,48 +448,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                     {soundEnabled ? '🔊' : '🔇'}
                   </button>
                 </Tooltip>
-                {/* Dark Mode Toggle Button - Compact */}
-                <Tooltip content={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}>
-                  <button
-                    onClick={() => setDarkMode(!darkMode)}
-                    className="bg-gray-700 hover:bg-gray-800 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-gray-500 focus:outline-none"
-                    aria-label={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
-                  >
-                    {darkMode ? '☀️' : '🌙'}
-                  </button>
-                </Tooltip>
-                {/* Autoplay Toggle Button - Compact */}
-                {!isSpectator && onAutoplayToggle && (
-                  <Tooltip content={autoplayEnabled ? 'Disable Autoplay (Bot Mode)' : 'Enable Autoplay (Bot Mode)'}>
-                    <button
-                      onClick={onAutoplayToggle}
-                      className={`${
-                        autoplayEnabled
-                          ? 'bg-green-500 hover:bg-green-600 motion-safe:animate-pulse'
-                          : 'bg-purple-500 hover:bg-purple-600'
-                      } text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-green-400 focus:outline-none`}
-                      aria-label={autoplayEnabled ? 'Disable Autoplay' : 'Enable Autoplay'}
-                    >
-                      {autoplayEnabled ? '🤖' : '🎮'}
-                    </button>
-                  </Tooltip>
-                )}
-                {/* Leave Game Button - Compact */}
-                {onLeaveGame && (
-                  <Tooltip content="Leave Game">
-                    <button
-                      onClick={() => {
-                        if (window.confirm('Are you sure you want to leave the game?')) {
-                          onLeaveGame();
-                        }
-                      }}
-                      className="bg-crimson-600 hover:bg-crimson-700 text-white px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200 shadow-lg border border-parchment-400 dark:border-gray-600 focus:ring-2 focus:ring-crimson-400 focus:outline-none"
-                      aria-label="Leave Game"
-                    >
-                      🚪
-                    </button>
-                  </Tooltip>
-                )}
               </div>
 
               {/* Current Turn Indicator with Timeout */}
@@ -575,11 +544,11 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       {/* Circular Card Layout - Takes remaining space */}
       <div className="mb-2 md:mb-4 relative px-2 md:px-4">
         <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 dark:border-gray-600 shadow-2xl">
-          {/* Previous Trick Button - Top Left Corner */}
+          {/* Previous Trick Button - Top Center */}
           {gameState.previousTrick && (
             <button
               onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-              className={`absolute top-4 left-4 z-50 ${
+              className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 ${
                 showPreviousTrick
                   ? 'bg-gradient-to-br from-forest-600 to-forest-800 hover:from-forest-700 hover:to-forest-900 shadow-forest-500/50 border-forest-900'
                   : 'bg-gradient-to-br from-umber-400 to-umber-500 hover:from-umber-500 hover:to-umber-600 shadow-umber-400/50 border-umber-600 dark:border-gray-600'
@@ -590,16 +559,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <span className="hidden md:inline">{showPreviousTrick ? '▶️ Current' : '⏮️ Previous'}</span>
             </button>
           )}
-
-          {/* Leaderboard Button - Top Right Corner */}
-          <button
-            onClick={() => setShowLeaderboard(true)}
-            className="absolute top-4 right-4 z-50 bg-gradient-to-br from-umber-500 to-umber-700 hover:from-umber-600 hover:to-umber-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-umber-500/50 flex items-center justify-center backdrop-blur-md border-2 border-umber-800"
-            title="Leaderboard"
-          >
-            <span className="md:hidden">🏆</span>
-            <span className="hidden md:inline">🏆 Leaderboard</span>
-          </button>
 
           {showPreviousTrick && previousCardPositions ? (
             // Previous Trick View - Circular layout on both mobile and desktop
@@ -727,25 +686,6 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             </>
           )}
 
-          {/* Chat Button - Bottom Right using Flexbox */}
-          {socket && gameId && !isSpectator && (
-            <div className="flex justify-end mt-auto pt-2">
-              <Tooltip content="Open Chat">
-                <button
-                  onClick={() => setChatOpen(!chatOpen)}
-                  className="bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 active:scale-95 text-parchment-50 w-12 h-12 md:w-14 md:h-14 rounded-full text-xl md:text-2xl font-bold transition-all duration-200 shadow-2xl hover:shadow-blue-500/50 flex items-center justify-center backdrop-blur-md border-2 border-blue-800 relative focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                  aria-label="Open Chat"
-                >
-                  💬
-                  {unreadChatCount > 0 && !chatOpen && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold border-2 border-white">
-                      {unreadChatCount}
-                    </span>
-                  )}
-                </button>
-              </Tooltip>
-            </div>
-          )}
         </div>
       </div>
 
@@ -829,6 +769,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
           onNewMessage={onNewChatMessage}
         />
       )}
-    </div>
+      </div>
+    </>
   );
 }
