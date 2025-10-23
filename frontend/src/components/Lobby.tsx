@@ -229,11 +229,20 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             </div>
                             {player.gameId && player.status !== 'in_lobby' && (
                               <button
-                                onClick={() => handleCopyInviteLink(player.gameId!)}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm font-bold transition-colors"
-                                title="Copy invite link"
+                                onClick={() => {
+                                  // Prompt for name if not set
+                                  const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
+                                  if (nameToUse && nameToUse.trim()) {
+                                    if (!playerName.trim()) {
+                                      setPlayerName(nameToUse.trim());
+                                    }
+                                    onJoinGame(player.gameId!, nameToUse.trim());
+                                  }
+                                }}
+                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm font-bold transition-colors"
+                                title="Join their game"
                               >
-                                📋 Invite
+                                🎮 Join Game
                               </button>
                             )}
                           </div>
