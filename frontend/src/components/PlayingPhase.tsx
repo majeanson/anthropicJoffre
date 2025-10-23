@@ -365,7 +365,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         team2Score={gameState.teamScores.team2}
         onLeaveGame={onLeaveGame}
         onOpenLeaderboard={() => setShowLeaderboard(true)}
-        onOpenChat={() => setChatOpen(!chatOpen)}
+        onOpenChat={() => setChatOpen(true)}
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
         isSpectator={isSpectator}

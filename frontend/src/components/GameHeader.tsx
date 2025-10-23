@@ -81,7 +81,7 @@ export function GameHeader({
           <div className="flex-1"></div>
 
           {/* Controls Dropdown */}
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative flex-shrink-0" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 px-2 py-1 rounded backdrop-blur-sm transition-all duration-200 flex items-center gap-1 border border-white/30 dark:border-gray-600"
@@ -96,7 +96,7 @@ export function GameHeader({
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="fixed right-2 top-12 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-600 dark:border-gray-600 overflow-hidden z-[9999] animate-slideDown">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-600 dark:border-gray-600 overflow-hidden z-[9999]">
                 {/* Chat */}
                 {onOpenChat && (
                   <button
@@ -125,7 +125,7 @@ export function GameHeader({
                       onOpenLeaderboard();
                       setDropdownOpen(false);
                     }}
-                    className="w-full px-3 py-2 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center gap-2 border-b border-parchment-200 dark:border-gray-700"
+                    className="w-full px-3 py-2 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-2 border-b border-parchment-200 dark:border-gray-700"
                   >
                     <span className="text-xl">🏆</span>
                     <span className="text-umber-900 dark:text-gray-100 font-semibold">Leaderboard</span>
