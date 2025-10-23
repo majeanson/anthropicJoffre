@@ -1700,21 +1700,28 @@ function resolveTrick(gameId: string) {
   // Emit trick resolution with updated state (showing trick result for 3 seconds)
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, points: totalPoints, gameState: game });
 
-  // Wait 3 seconds before clearing trick and continuing
-  setTimeout(() => {
-    game.currentTrick = [];
-    game.currentPlayerIndex = game.players.findIndex((p) => p.id === winnerId);
+  // Check if round is over BEFORE the 3-second delay
+  const isRoundOver = game.players.every((p) => p.hand.length === 0);
 
-    // Check if round is over (all cards played)
-    if (game.players.every((p) => p.hand.length === 0)) {
+  if (isRoundOver) {
+    // Set phase to 'scoring' immediately so player_ready events work during the 3-second delay
+    game.phase = 'scoring';
+
+    // Wait 3 seconds before finalizing round
+    setTimeout(() => {
+      game.currentTrick = [];
       endRound(gameId);
-    } else {
-      // Continue playing - emit game state for next turn
+    }, 3000);
+  } else {
+    // Normal trick resolution - continue playing
+    setTimeout(() => {
+      game.currentTrick = [];
+      game.currentPlayerIndex = game.players.findIndex((p) => p.id === winnerId);
       io.to(gameId).emit('game_updated', game);
       // Start timeout for trick winner's next card
       startPlayerTimeout(gameId, winnerId, 'playing');
-    }
-  }, 3000);
+    }, 3000);
+  }
 }
 
 function calculateRoundStatistics(gameId: string, game: GameState): RoundStatistics | undefined {
@@ -1817,7 +1824,10 @@ async function endRound(gameId: string) {
   const game = games.get(gameId);
   if (!game) return;
 
-  game.phase = 'scoring';
+  // Phase may already be set to 'scoring' by resolveTrick (to allow player_ready during 3s delay)
+  if (game.phase !== 'scoring') {
+    game.phase = 'scoring';
+  }
 
   // Find offensive team (highest bet winner)
   if (!game.highestBet) return;
