@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-
 interface TimeoutBannerProps {
   playerName: string;
   secondsRemaining: number;
@@ -11,17 +9,6 @@ export function TimeoutBanner({
   secondsRemaining,
   isCurrentPlayer
 }: TimeoutBannerProps) {
-  const [pulseWarning, setPulseWarning] = useState(false);
-
-  // Pulse animation when below 15 seconds
-  useEffect(() => {
-    if (secondsRemaining <= 15 && secondsRemaining > 0) {
-      setPulseWarning(true);
-      const timeout = setTimeout(() => setPulseWarning(false), 300);
-      return () => clearTimeout(timeout);
-    }
-  }, [secondsRemaining]);
-
   if (secondsRemaining === 0 || secondsRemaining > 60) {
     return null;
   }
@@ -34,19 +21,18 @@ export function TimeoutBanner({
       className={`
         fixed top-4 left-1/2 -translate-x-1/2 z-50
         px-6 py-3 rounded-lg shadow-2xl backdrop-blur-md
-        border-2 transition-all duration-300
+        border-2 transition-colors duration-500
         ${isCritical
-          ? 'bg-red-600/90 border-red-400 animate-pulse'
+          ? 'bg-red-600/90 border-red-400'
           : isWarning
             ? 'bg-orange-600/90 border-orange-400'
             : 'bg-blue-600/90 border-blue-400'
         }
-        ${pulseWarning && !isCritical ? 'scale-110' : 'scale-100'}
       `}
     >
       <div className="flex items-center gap-3 text-white">
         {/* Timer Icon */}
-        <div className={`text-2xl ${isCritical ? 'animate-bounce' : ''}`}>
+        <div className="text-2xl">
           ⏱️
         </div>
 

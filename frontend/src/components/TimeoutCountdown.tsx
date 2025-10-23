@@ -5,28 +5,28 @@ interface TimeoutCountdownProps {
 }
 
 export function TimeoutCountdown({ playerName, secondsRemaining, isYourTurn }: TimeoutCountdownProps) {
+  if (secondsRemaining === 0 || secondsRemaining > 60) {
+    return null;
+  }
+
   const isWarning = secondsRemaining <= 15;
   const isCritical = secondsRemaining <= 5;
 
-  // Color based on time remaining
+  // Color based on time remaining (smooth transitions, no animations)
   const bgColor = isCritical
     ? 'bg-red-600'
     : isWarning
     ? 'bg-yellow-600'
     : 'bg-blue-600';
 
-  const textColor = 'text-white';
-
   return (
     <div
-      className={`fixed top-20 left-1/2 transform -translate-x-1/2 ${bgColor} ${textColor} px-6 py-3 rounded-lg shadow-2xl z-40 ${
-        isCritical ? 'animate-pulse' : ''
-      }`}
+      className={`fixed top-20 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-2xl z-40 transition-colors duration-500`}
     >
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <svg
-            className={`w-5 h-5 ${isCritical ? 'animate-spin' : ''}`}
+            className="w-5 h-5"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
