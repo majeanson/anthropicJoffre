@@ -866,10 +866,9 @@ function App() {
   }
 
   // Debug controls - can be controlled via environment variable
-  // In development: defaults to true
-  // In production: set VITE_DEBUG_ENABLED=true to enable
-  const DEBUG_ENABLED = import.meta.env.VITE_DEBUG_ENABLED === 'true'
-    || import.meta.env.MODE === 'development';
+  // Currently enabled for all environments (set to false to hide)
+  // To disable: set VITE_DEBUG_ENABLED=false in .env
+  const DEBUG_ENABLED = import.meta.env.VITE_DEBUG_ENABLED !== 'false';
 
   const DebugControls = () => (
     <div className="fixed top-4 right-4 z-50">
