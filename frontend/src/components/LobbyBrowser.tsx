@@ -34,6 +34,8 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
   const [filter, setFilter] = useState<'all' | 'joinable' | 'in_progress'>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [gameId, setGameId] = useState('');
+  const [showJoinInput, setShowJoinInput] = useState(false);
 
   const fetchGames = async () => {
     try {
@@ -153,6 +155,45 @@ export function LobbyBrowser({ onJoinGame, onSpectateGame, onClose }: LobbyBrows
 
         {/* Games List */}
         <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-4 space-y-3">
+          {/* Join with Game ID Section */}
+          <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600">
+            <button
+              onClick={() => setShowJoinInput(!showJoinInput)}
+              className="w-full flex items-center justify-between text-left"
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🔑</span>
+                <span className="font-semibold text-umber-900 dark:text-gray-100">Join with Game ID</span>
+              </div>
+              <span className="text-sm text-umber-600 dark:text-gray-400">{showJoinInput ? '▲' : '▼'}</span>
+            </button>
+
+            {showJoinInput && (
+              <div className="mt-3 space-y-2 animate-slideDown">
+                <input
+                  type="text"
+                  value={gameId}
+                  onChange={(e) => setGameId(e.target.value)}
+                  className="w-full px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-600 text-umber-900 dark:text-gray-100 text-sm"
+                  placeholder="Enter Game ID"
+                />
+                <button
+                  data-testid="join-game-button"
+                  onClick={() => {
+                    if (gameId.trim()) {
+                      onJoinGame(gameId.trim());
+                      onClose();
+                    }
+                  }}
+                  disabled={!gameId.trim()}
+                  className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Join Game
+                </button>
+              </div>
+            )}
+          </div>
+
           {loading && (
             <div className="text-center py-12">
               <div className="animate-spin h-12 w-12 border-4 border-amber-600 dark:border-gray-500 border-t-transparent rounded-full mx-auto"></div>

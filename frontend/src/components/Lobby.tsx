@@ -42,7 +42,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
-  const [showJoinInput, setShowJoinInput] = useState(false);
 
   console.log('Lobby state - mode:', mode, 'gameId:', gameId, 'autoJoinGameId:', autoJoinGameId);
 
@@ -234,38 +233,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         <span>🔍</span>
                         Browse Games
                       </button>
-                    </div>
-
-                    {/* Secondary Action - Join with ID */}
-                    <div className="border-t-2 border-parchment-300 dark:border-gray-600 pt-3 mt-3">
-                      <button
-                        onClick={() => setShowJoinInput(!showJoinInput)}
-                        className="w-full bg-parchment-200 dark:bg-gray-700 text-umber-900 dark:text-gray-100 py-3 rounded-lg font-semibold hover:bg-parchment-300 dark:hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2"
-                      >
-                        <span>🔑</span>
-                        <span>Join with Game ID</span>
-                        <span className="text-sm">{showJoinInput ? '▲' : '▼'}</span>
-                      </button>
-
-                      {showJoinInput && (
-                        <div className="mt-3 space-y-2 animate-slideDown">
-                          <input
-                            type="text"
-                            value={gameId}
-                            onChange={(e) => setGameId(e.target.value)}
-                            className="w-full px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 text-sm"
-                            placeholder="Enter Game ID"
-                          />
-                          <button
-                            data-testid="join-game-button"
-                            onClick={() => setMode('join')}
-                            disabled={!gameId.trim()}
-                            className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            Join →
-                          </button>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
