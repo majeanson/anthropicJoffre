@@ -999,6 +999,8 @@ function App() {
           onAddBot={handleAddBot}
           onKickPlayer={handleKickPlayer}
           socket={socket}
+          botDifficulty={botDifficulty}
+          onBotDifficultyChange={setBotDifficulty}
         />
       </>
     );

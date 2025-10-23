@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useSettings } from '../contexts/SettingsContext';
 import { HowToPlay } from './HowToPlay';
+import { BotDifficulty } from '../utils/botPlayer';
 
 interface TeamSelectionProps {
   players: Player[];
@@ -16,6 +17,8 @@ interface TeamSelectionProps {
   onAddBot?: () => void;
   onKickPlayer?: (playerId: string) => void;
   socket?: Socket | null;
+  botDifficulty?: BotDifficulty;
+  onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
 }
 
 export function TeamSelection({
@@ -30,6 +33,8 @@ export function TeamSelection({
   onAddBot,
   onKickPlayer,
   socket,
+  botDifficulty = 'medium',
+  onBotDifficultyChange,
 }: TeamSelectionProps) {
   const { darkMode, setDarkMode } = useSettings();
   const currentPlayer = players.find(p => p.id === currentPlayerId);
@@ -363,14 +368,55 @@ export function TeamSelection({
           </div>
         )}
 
-        {/* Start Game Button */}
+        {/* Bot Difficulty & Start Game Section */}
         <div className="text-center space-y-3">
+          {/* Bot Difficulty Selector */}
+          {players.length < 4 && onAddBot && onBotDifficultyChange && (
+            <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600 max-w-md mx-auto">
+              <label className="block text-xs font-semibold text-umber-700 dark:text-gray-300 mb-2">
+                Bot Difficulty
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => onBotDifficultyChange('easy')}
+                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs ${
+                    botDifficulty === 'easy'
+                      ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
+                      : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                  }`}
+                >
+                  Easy
+                </button>
+                <button
+                  onClick={() => onBotDifficultyChange('medium')}
+                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs ${
+                    botDifficulty === 'medium'
+                      ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
+                      : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                  }`}
+                >
+                  Medium
+                </button>
+                <button
+                  onClick={() => onBotDifficultyChange('hard')}
+                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs ${
+                    botDifficulty === 'hard'
+                      ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
+                      : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                  }`}
+                >
+                  Hard
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-3 justify-center items-center">
             {/* Add Bot Button - only show if less than 4 players and onAddBot is provided */}
             {players.length < 4 && onAddBot && (
               <button
                 onClick={onAddBot}
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center gap-2"
+                className="bg-gradient-to-r from-umber-600 to-amber-700 dark:from-gray-600 dark:to-gray-700 hover:from-umber-700 hover:to-amber-800 dark:hover:from-gray-700 dark:hover:to-gray-800 text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-200 border border-umber-800 dark:border-gray-600 shadow flex items-center gap-2"
                 title="Add a bot player"
               >
                 🤖 Add Bot
