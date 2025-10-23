@@ -33,13 +33,11 @@ export function initSentry(): void {
     // Integrate with Node.js frameworks
     integrations: [
       // Enable HTTP calls tracing
-      new Sentry.Integrations.Http({ tracing: true }),
-      // Enable Express.js tracing
-      // new Sentry.Integrations.Express({ app }), // Can be added later
+      Sentry.httpIntegration(),
     ],
 
     // Filter out sensitive data
-    beforeSend(event, hint) {
+    beforeSend(event) {
       // Remove sensitive information from context
       if (event.contexts?.game) {
         const game = event.contexts.game as any;

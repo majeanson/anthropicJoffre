@@ -36,18 +36,15 @@ export function initSentry(): void {
     replaysOnErrorSampleRate: 1.0,
 
     integrations: [
-      new Sentry.BrowserTracing({
-        // Set tracePropagationTargets to control distributed tracing
-        tracePropagationTargets: ['localhost', /^https:\/\/yourapi\.com/],
-      }),
-      new Sentry.Replay({
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
         maskAllText: true,
         blockAllMedia: true,
       }),
     ],
 
     // Filter out sensitive data
-    beforeSend(event, hint) {
+    beforeSend(event) {
       // Remove sensitive game state information
       if (event.contexts?.game) {
         const game = event.contexts.game as any;
