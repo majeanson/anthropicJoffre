@@ -1,4 +1,3 @@
-import { useState, useRef, useEffect } from 'react';
 import { useSettings } from '../contexts/SettingsContext';
 
 interface GameHeaderProps {
@@ -33,25 +32,6 @@ export function GameHeader({
   onSoundToggle
 }: GameHeaderProps) {
   const { darkMode, setDarkMode } = useSettings();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setDropdownOpen(false);
-      }
-    };
-
-    if (dropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [dropdownOpen]);
 
   return (
     <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg">
@@ -80,141 +60,95 @@ export function GameHeader({
           {/* Spacer */}
           <div className="flex-1"></div>
 
-          {/* Controls Dropdown */}
-          <div className="relative flex-shrink-0" ref={dropdownRef}>
-            <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 px-2 py-1 rounded backdrop-blur-sm transition-all duration-200 flex items-center gap-1 border border-white/30 dark:border-gray-600"
-            >
-              <span className="text-white dark:text-gray-100 font-bold text-xs">Menu</span>
-              {(unreadChatCount > 0 && !dropdownOpen) && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse">
-                  {unreadChatCount}
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1 md:gap-2">
+            {/* Chat Button */}
+            {onOpenChat && (
+              <button
+                onClick={onOpenChat}
+                className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title="Chat"
+              >
+                <span className="text-base md:text-lg">💬</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Chat</span>
+                {unreadChatCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse">
+                    {unreadChatCount}
+                  </span>
+                )}
+              </button>
+            )}
+
+            {/* Leaderboard Button */}
+            {onOpenLeaderboard && (
+              <button
+                onClick={onOpenLeaderboard}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title="Leaderboard"
+              >
+                <span className="text-base md:text-lg">🏆</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Stats</span>
+              </button>
+            )}
+
+            {/* Autoplay Toggle */}
+            {!isSpectator && onAutoplayToggle && (
+              <button
+                onClick={onAutoplayToggle}
+                className={`p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border flex items-center gap-1.5 ${
+                  autoplayEnabled
+                    ? 'bg-green-500/80 hover:bg-green-500 border-green-600'
+                    : 'bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 border-white/30 dark:border-gray-600'
+                }`}
+                title={autoplayEnabled ? 'Autoplay ON' : 'Autoplay OFF'}
+              >
+                <span className="text-base md:text-lg">{autoplayEnabled ? '🤖' : '🎮'}</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
+                  {autoplayEnabled ? 'Auto' : 'Manual'}
                 </span>
-              )}
+              </button>
+            )}
+
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+              title={darkMode ? 'Light Mode' : 'Dark Mode'}
+            >
+              <span className="text-base md:text-lg">{darkMode ? '🌙' : '☀️'}</span>
+              <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
+                {darkMode ? 'Dark' : 'Light'}
+              </span>
             </button>
 
-            {/* Dropdown Menu */}
-            {dropdownOpen && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-600 dark:border-gray-600 overflow-hidden z-[9999]">
-                {/* Chat */}
-                {onOpenChat && (
-                  <button
-                    onClick={() => {
-                      onOpenChat();
-                      setDropdownOpen(false);
-                    }}
-                    className="w-full px-3 py-2 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-2 border-b border-parchment-200 dark:border-gray-700"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-base">💬</span>
-                      <span className="text-umber-900 dark:text-gray-100 font-semibold">Chat</span>
-                    </div>
-                    {unreadChatCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5 font-bold">
-                        {unreadChatCount}
-                      </span>
-                    )}
-                  </button>
-                )}
+            {/* Sound Toggle */}
+            {onSoundToggle && (
+              <button
+                onClick={onSoundToggle}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title={soundEnabled ? 'Sound ON' : 'Sound OFF'}
+              >
+                <span className="text-base md:text-lg">{soundEnabled ? '🔊' : '🔇'}</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
+                  {soundEnabled ? 'On' : 'Off'}
+                </span>
+              </button>
+            )}
 
-                {/* Leaderboard */}
-                {onOpenLeaderboard && (
-                  <button
-                    onClick={() => {
-                      onOpenLeaderboard();
-                      setDropdownOpen(false);
-                    }}
-                    className="w-full px-3 py-2 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-2 border-b border-parchment-200 dark:border-gray-700"
-                  >
-                    <span className="text-xl">🏆</span>
-                    <span className="text-umber-900 dark:text-gray-100 font-semibold">Leaderboard</span>
-                  </button>
-                )}
-
-                {/* Autoplay Toggle */}
-                {!isSpectator && onAutoplayToggle && (
-                  <button
-                    onClick={() => {
-                      onAutoplayToggle();
-                      setDropdownOpen(false);
-                    }}
-                    className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-base">{autoplayEnabled ? '🤖' : '🎮'}</span>
-                      <span className="text-umber-900 dark:text-gray-100 font-semibold">Autoplay</span>
-                    </div>
-                    <span className={`text-xs font-bold px-2 py-1 rounded ${
-                      autoplayEnabled
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
-                    }`}>
-                      {autoplayEnabled ? 'ON' : 'OFF'}
-                    </span>
-                  </button>
-                )}
-
-                {/* Dark Mode Toggle */}
-                <button
-                  onClick={() => {
-                    setDarkMode(!darkMode);
-                    setDropdownOpen(false);
-                  }}
-                  className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{darkMode ? '🌙' : '☀️'}</span>
-                    <span className="text-umber-900 dark:text-gray-100 font-semibold">Dark Mode</span>
-                  </div>
-                  <span className={`text-xs font-bold px-2 py-1 rounded ${
-                    darkMode
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
-                  }`}>
-                    {darkMode ? 'ON' : 'OFF'}
-                  </span>
-                </button>
-
-                {/* Sound Toggle */}
-                {onSoundToggle && (
-                  <button
-                    onClick={() => {
-                      onSoundToggle();
-                      setDropdownOpen(false);
-                    }}
-                    className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{soundEnabled ? '🔊' : '🔇'}</span>
-                      <span className="text-umber-900 dark:text-gray-100 font-semibold">Sound</span>
-                    </div>
-                    <span className={`text-xs font-bold px-2 py-1 rounded ${
-                      soundEnabled
-                        ? 'bg-green-500 text-white'
-                        : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
-                    }`}>
-                      {soundEnabled ? 'ON' : 'OFF'}
-                    </span>
-                  </button>
-                )}
-
-                {/* Leave Game */}
-                {onLeaveGame && (
-                  <button
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to leave the game?')) {
-                        onLeaveGame();
-                        setDropdownOpen(false);
-                      }
-                    }}
-                    className="w-full px-3 py-2 text-left hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center gap-2 text-red-600 dark:text-red-400"
-                  >
-                    <span className="text-xl">🚪</span>
-                    <span className="font-semibold">Leave Game</span>
-                  </button>
-                )}
-              </div>
+            {/* Leave Game Button */}
+            {onLeaveGame && (
+              <button
+                onClick={() => {
+                  if (window.confirm('Are you sure you want to leave the game?')) {
+                    onLeaveGame();
+                  }
+                }}
+                className="bg-red-500/80 hover:bg-red-500 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-red-600 flex items-center gap-1.5"
+                title="Leave Game"
+              >
+                <span className="text-base md:text-lg">🚪</span>
+                <span className="hidden md:inline text-white font-semibold text-sm">Leave</span>
+              </button>
             )}
           </div>
         </div>
