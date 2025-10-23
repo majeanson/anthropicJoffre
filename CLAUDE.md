@@ -39,6 +39,17 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 'start_game': { gameId: string }
 'place_bet': { gameId: string; amount: number; withoutTrump: boolean }
 'play_card': { gameId: string; card: Card }
+'player_ready': { gameId: string }
+'send_team_selection_chat': { gameId: string; message: string }
+'send_game_chat': { gameId: string; message: string }
+'reconnect_to_game': { gameId: string; session: PlayerSession }
+'vote_rematch': { gameId: string }
+'kick_player': { gameId: string; playerIdToKick: string }
+'leave_game': { gameId: string }
+'get_player_stats': { playerName: string }
+'get_leaderboard': (limit?: number)
+'get_player_history': { playerName: string }
+'__test_set_scores': { team1: number; team2: number }
 ```
 
 **Server → Client:**
@@ -57,10 +68,19 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 'invalid_move': { message: string }
 'invalid_bet': { message: string }
 'player_left': { playerId: string; gameState: GameState }
+'player_kicked': { kickedPlayerId: string; gameState: GameState }
 'reconnection_successful': { gameState: GameState; session: PlayerSession }
 'reconnection_failed': { message: string }
 'player_reconnected': { playerName: string; playerId: string; oldSocketId: string }
 'player_disconnected': { playerId: string; waitingForReconnection: boolean }
+'team_selection_chat': { playerName: string; message: string; teamId: 1 | 2; timestamp: number }
+'game_chat': { playerName: string; message: string; teamId: 1 | 2; timestamp: number }
+'rematch_vote_update': { votes: Map<playerId, boolean>; votesNeeded: number }
+'rematch_started': { gameId: string; gameState: GameState }
+'player_stats': { playerName: string; stats: PlayerStats }
+'leaderboard': { players: LeaderboardEntry[] }
+'player_history': { playerName: string; games: GameHistoryEntry[] }
+'online_players': { players: OnlinePlayer[] }
 ```
 
 ### Adding New Events
@@ -1159,64 +1179,61 @@ npm run test:e2e     # Run E2E tests
 ✅ **Animations** (card slides, trick collection, score pop, points float-up, slideDown/Up, fadeIn)
 ✅ **Mobile Responsive Design** (breakpoints sm/md/lg/xl, touch-friendly buttons, adaptive layouts)
 ✅ **Enhanced Reconnection UI** (toast notifications, catch-up modal, non-blocking banner)
+✅ **Dark Mode** (Tailwind dark: classes, toggle in GameHeader, localStorage persistence, WCAG compliance)
+✅ **Timeout/AFK System** (60s countdown, autoplay activation, TimeoutIndicator/Banner/Countdown components)
+✅ **How To Play Modal** (comprehensive game rules, mobile-responsive, accessible from lobby)
+
+#### Advanced Features ✅
+✅ **Rematch System** (RematchVoting component, vote_rematch event, real-time vote tracking)
+✅ **Lobby Browser** (LobbyBrowser component, /api/games/lobby endpoint, public game listing)
+✅ **Global Leaderboard** (GlobalLeaderboard.tsx, /api/leaderboard endpoint, top 100 players)
+✅ **Player Statistics** (PlayerStatsModal.tsx, /api/stats/:playerName, win rates, game counts)
+✅ **Tier Badge System** (Bronze/Silver/Gold/Platinum/Diamond, based on total games played)
+✅ **Bot Difficulty Levels** (Easy/Medium/Hard in botPlayer.ts, strategic AI variations)
+✅ **Database Persistence** (PostgreSQL: games, game_players, game_rounds tables, incremental saves)
+✅ **Player History** (/api/player-history/:playerName, game outcome tracking)
+✅ **Kick Player Feature** (kick_player event, host can remove AFK players)
 
 ### Future Enhancements (Priority Order)
 
 #### High Priority
-- [ ] **Player Timeout/AFK Detection** (5-6 hours)
-  - 60s countdown timer when it's player's turn
-  - Auto-play random legal move OR kick player
-  - Visual countdown UI above current player
-  - **Impact**: Prevents games from getting stuck forever
-
-- [ ] **Rematch System** (4-5 hours)
-  - Vote for rematch on game over screen
-  - Seamless new game with same players (keeps teams)
-  - Real-time vote tracking (X/4 players ready)
-  - **Impact**: Keeps friend groups playing together
-
-#### Medium Priority
-- [ ] **Dark Mode** (2-3 hours)
-  - Tailwind dark mode classes
-  - Toggle button with localStorage persistence
-  - **Impact**: Better accessibility and late-night gaming
-
-- [ ] **Game Replay** (6-8 hours)
-  - Record all game actions
+- [ ] **Game Replay System** (8-10 hours)
+  - Record all game actions with timestamps
   - Step through game history (play/pause/rewind)
   - Share replay links
   - **Impact**: Learn from games, share highlights
 
-- [ ] **Improved Bot AI** (6-8 hours)
-  - Difficulty levels (Easy/Medium/Hard)
-  - Smarter betting based on hand strength evaluation
-  - Card counting and tracking
-  - Advanced strategy (partner support, memory)
-  - **Impact**: Better single-player experience
-
-#### Low Priority
-- [ ] **Lobby Browser** (10-12 hours)
-  - List public games
-  - Join games in progress
-  - Private/password-protected games
-  - **Impact**: Better multiplayer matchmaking
-
-- [ ] **Persistent Storage** (8-10 hours)
-  - Save games to PostgreSQL database
-  - Game history and stats
-  - Survive server restarts
-  - **Impact**: Data persistence
-
 - [ ] **Tournament Mode** (15-20 hours)
   - Single elimination brackets
   - Round robin pools
-  - Leaderboards
-  - **Impact**: Competitive play
+  - Tournament leaderboards
+  - **Impact**: Competitive play and events
 
-- [ ] **Achievements/Badges** (6-8 hours)
-  - First Blood, Perfect Round, Betting Master, etc.
+#### Medium Priority
+- [ ] **Advanced Achievement System** (8-10 hours)
+  - More achievements beyond tier badges (Perfect Round, Betting Master, Comeback King, etc.)
+  - Achievement notifications and unlocks
   - Display on player profiles
   - **Impact**: Engagement and replayability
+
+- [ ] **Enhanced Bot AI** (6-8 hours)
+  - Improve hand strength evaluation for smarter betting
+  - Advanced card counting and memory
+  - Better partner support strategies
+  - Personality variations (aggressive, conservative, balanced)
+  - **Impact**: Better single-player experience
+
+#### Low Priority
+- [ ] **Private/Password-Protected Games** (4-5 hours)
+  - Password entry when joining
+  - Visibility toggle in lobby browser
+  - **Impact**: More control over multiplayer sessions
+
+- [ ] **Social Features** (10-12 hours)
+  - Friend lists
+  - Player profiles
+  - Game invitations
+  - **Impact**: Better social engagement
 
 ---
 
@@ -1233,8 +1250,8 @@ npm run test:e2e     # Run E2E tests
 
 ---
 
-*Last updated: 2025-01-20*
+*Last updated: 2025-01-22*
 *Project: Trick Card Game (anthropicJoffre)*
 
-**Feature Completion Status**: ~95% of planned Priority 1-3 features complete
-**Remaining High-Priority**: Player Timeout/AFK Detection, Rematch System
+**Feature Completion Status**: ~98% of planned Priority 1-3 features complete
+**Remaining High-Priority**: Game Replay System, Tournament Mode

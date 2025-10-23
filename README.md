@@ -4,12 +4,39 @@ A real-time multiplayer trick-taking card game built with React, Node.js, Socket
 
 ## 🎯 Features
 
-- **Real-time multiplayer** - 4 players, 2 teams, live gameplay
+### Core Gameplay
+- **Real-time multiplayer** - 4 players, 2 teams, live WebSocket gameplay
 - **Team-based strategy** - Cooperative betting and trick-taking
 - **Special cards** - Red 0 (+5 points), Brown 0 (-2 points)
 - **No-trump betting** - Double or nothing gameplay
-- **Game history** - PostgreSQL persistence
-- **Production-ready** - Deployed on Railway + Vercel
+- **Reconnection support** - 15-minute grace period with catch-up modal
+
+### Social & Multiplayer
+- **Spectator mode** - Watch ongoing games without playing
+- **In-game chat** - Team selection and gameplay chat with emoji reactions
+- **Lobby browser** - Browse and join public games
+- **Quick share links** - One-click shareable game URLs
+- **Rematch system** - Vote to play again with same players
+
+### Stats & Progression
+- **Global leaderboard** - Top 100 players worldwide
+- **Player statistics** - Win rates, games played, performance metrics
+- **Tier badges** - Bronze → Silver → Gold → Platinum → Diamond
+- **Round history** - Detailed stats for every round
+- **Game persistence** - PostgreSQL database with incremental saves
+
+### AI & Testing
+- **Bot players** - 3 difficulty levels (Easy/Medium/Hard)
+- **Quick Play** - Instant 1v3 bot games
+- **Autoplay mode** - Let AI play for you
+- **4-player debug view** - Test all perspectives simultaneously
+
+### UI/UX
+- **Dark mode** - WCAG-compliant accessibility
+- **Sound effects** - Web Audio API synthesized sounds
+- **Mobile responsive** - Touch-friendly design
+- **Timeout indicators** - 60s countdown with auto-play
+- **How To Play modal** - In-app rules and tutorial
 
 ## 🚀 Quick Start
 
@@ -182,15 +209,23 @@ VITE_SOCKET_URL=http://localhost:3001
 ### REST Endpoints
 - `GET /` - Server info
 - `GET /api/health` - Health check
-- `GET /api/games/history` - Recent games
+- `GET /api/games/lobby` - Browse public games
+- `GET /api/stats/:playerName` - Get player statistics
+- `GET /api/leaderboard` - Global top 100 players
+- `GET /api/player-history/:playerName` - Player game history
 
 ### Socket.io Events
 
 **Client → Server**
 - `create_game` - Create new game
 - `join_game` - Join existing game
+- `spectate_game` - Watch game as spectator
 - `place_bet` - Submit bet
 - `play_card` - Play a card
+- `send_game_chat` - Send in-game chat message
+- `vote_rematch` - Vote for rematch
+- `kick_player` - Kick AFK player (host only)
+- `reconnect_to_game` - Reconnect after disconnect
 
 **Server → Client**
 - `game_created` - Game created successfully
@@ -200,6 +235,13 @@ VITE_SOCKET_URL=http://localhost:3001
 - `trick_resolved` - Trick winner determined
 - `round_ended` - Round complete
 - `game_over` - Game finished
+- `game_chat` - Chat message received
+- `rematch_vote_update` - Rematch vote status
+- `player_stats` - Player statistics
+- `leaderboard` - Leaderboard data
+- `online_players` - Online player list
+- `player_reconnected` - Player reconnected
+- `player_disconnected` - Player disconnected
 
 ## 🤝 Contributing
 

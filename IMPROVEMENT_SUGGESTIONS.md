@@ -3,7 +3,7 @@
 ## Overview
 This document outlines potential improvements to the Trick Card Game, organized by priority and complexity. Each suggestion includes rationale, implementation approach, and estimated effort.
 
-**Last Updated**: 2025-01-20
+**Last Updated**: 2025-01-22
 
 ---
 
@@ -11,34 +11,65 @@ This document outlines potential improvements to the Trick Card Game, organized 
 
 The following features from this document have been successfully implemented:
 
-### High Priority (Completed)
+### Critical Issues (Completed)
 - ✅ **Reconnection Support** (Priority 1.2) - 15min grace period, session persistence, catch-up UI
-- ✅ **Spectator Mode** (Priority 2.3) - Watch games, hands hidden, real-time updates
-- ✅ **Chat System** (Priority 4.2) - Pre-lobby + in-game chat with persistence
-- ✅ **Sound Effects** (Priority 2.4) - Web Audio API synthesized sounds, 8 different sounds
-- ✅ **Animations** (Priority 3.1) - Card slides, trick collection, score pops
-- ✅ **Mobile Responsive** (Priority 3.2) - Touch-friendly, adaptive layouts, all breakpoints
+- ✅ **Player Timeout/AFK Detection** (Priority 1.1) - 60s countdown, autoplay activation, TimeoutIndicator/Banner/Countdown components
 
-### Additional Completed Features Not Originally Listed
+### Social Features (Completed)
+- ✅ **Spectator Mode** (Priority 2.3) - Watch games, hands hidden, real-time updates
+- ✅ **Chat System** (Priority 4.2) - Pre-lobby + in-game chat with emoji reactions, persistence
+- ✅ **Lobby Browser** - Browse public games, /api/games/lobby endpoint
+- ✅ **Rematch System** - RematchVoting component, vote_rematch event, real-time tracking
+
+### UI/UX Polish (Completed)
+- ✅ **Sound Effects** (Priority 2.4) - Web Audio API synthesized sounds, 8 different sounds, volume control
+- ✅ **Animations** (Priority 3.1) - Card slides, trick collection, score pops, float-up points
+- ✅ **Mobile Responsive** (Priority 3.2) - Touch-friendly, adaptive layouts, all breakpoints
+- ✅ **Dark Mode** - Tailwind dark: classes, toggle in GameHeader, WCAG compliance
+
+### Stats & Analytics (Completed)
 - ✅ **Leaderboard & Round History** - Complete game stats tracking
-- ✅ **Recent Players & Online Players** - localStorage + real-time tracking
-- ✅ **Quick Copy Game Link** - Shareable URLs with auto-join
-- ✅ **Autoplay Mode** - Manual toggle + 60s timeout auto-enable
+- ✅ **Global Leaderboard** - Top 100 players, /api/leaderboard endpoint
+- ✅ **Player Statistics** - Win rates, game counts, /api/stats/:playerName
+- ✅ **Tier Badge System** - Bronze/Silver/Gold/Platinum/Diamond based on games played
 - ✅ **Round Statistics Panel** - Fastest play, aggressive bidder, trump master, lucky player
+
+### Bot & Testing (Completed)
+- ✅ **Bot Difficulty Levels** - Easy/Medium/Hard in botPlayer.ts, strategic AI variations
+- ✅ **Autoplay Mode** - Manual toggle + 60s timeout auto-enable
+- ✅ **Quick Play** - 1 human + 3 bots instant start
+
+### Backend Features (Completed)
+- ✅ **Database Persistence** - PostgreSQL: games, game_players, game_rounds tables, incremental saves
+- ✅ **Player History** - /api/player-history/:playerName endpoint
+- ✅ **Kick Player** - kick_player event, host can remove AFK players
+
+### Additional Completed Features
+- ✅ **Recent Players & Online Players** - localStorage + real-time tracking with 5s updates
+- ✅ **Quick Copy Game Link** - Shareable URLs with auto-join from URL parameter
+- ✅ **How To Play Modal** - Comprehensive game rules, mobile-responsive
 
 ---
 
 ## Priority 1: Critical Issues
 
-### 1.1 Add Player Timeout / AFK Detection
+### 1.1 Add Player Timeout / AFK Detection ✅ COMPLETED
 **Priority**: HIGH
 **Effort**: Medium
 **Impact**: User Experience
+**Status**: COMPLETED (2025-01-21)
 
-**Problem**:
-- Players can go AFK indefinitely
-- Game gets stuck waiting for inactive players
-- No way to continue or kick AFK players
+**Implemented Features**:
+- ✅ 60-second countdown timer when it's player's turn
+- ✅ Autoplay activation on timeout (plays random legal move)
+- ✅ Visual countdown components (TimeoutIndicator, TimeoutBanner, TimeoutCountdown)
+- ✅ Smooth color transitions (green → yellow → red)
+- ✅ No flashing animations
+
+**Problem Solved**:
+- Players can no longer go AFK indefinitely
+- Game automatically continues if player doesn't act within 60s
+- Visual feedback keeps all players informed
 
 **Solution**:
 ```typescript
