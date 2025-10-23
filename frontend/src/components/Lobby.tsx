@@ -222,14 +222,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         <button
                           data-testid="create-game-button"
                           onClick={() => { sounds.buttonClick(); setMode('create'); }}
-                          className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-600 dark:to-gray-700 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 border border-amber-900 dark:border-gray-600 shadow"
+                          className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-purple-700 dark:to-purple-800 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-purple-600 dark:hover:to-purple-700 transition-all duration-200 border border-amber-900 dark:border-purple-600 shadow"
                         >
                           ➕ Create Game
                         </button>
 
                         <button
                           onClick={() => { sounds.buttonClick(); setShowBrowser(true); }}
-                          className="w-full bg-gradient-to-r from-amber-600 to-orange-600 dark:from-gray-700 dark:to-gray-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-orange-700 dark:hover:from-gray-800 dark:hover:to-gray-900 transition-all duration-200 border border-amber-800 dark:border-gray-600 shadow flex items-center justify-center gap-2"
+                          className="w-full bg-gradient-to-r from-amber-600 to-orange-600 dark:from-indigo-700 dark:to-indigo-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-orange-700 dark:hover:from-indigo-600 dark:hover:to-indigo-700 transition-all duration-200 border border-amber-800 dark:border-indigo-600 shadow flex items-center justify-center gap-2"
                         >
                           <span>🔍</span>
                           Browse Games
@@ -253,8 +253,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('easy'); }}
                             className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
                               botDifficulty === 'easy'
-                                ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
-                                : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                                ? 'bg-umber-600 dark:bg-slate-600 text-white shadow-md scale-105 border border-umber-800 dark:border-slate-500'
+                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                             }`}
                           >
                             Easy
@@ -263,8 +263,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('medium'); }}
                             className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
                               botDifficulty === 'medium'
-                                ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
-                                : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                                ? 'bg-umber-600 dark:bg-slate-600 text-white shadow-md scale-105 border border-umber-800 dark:border-slate-500'
+                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                             }`}
                           >
                             Medium
@@ -273,8 +273,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('hard'); }}
                             className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
                               botDifficulty === 'hard'
-                                ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
-                                : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                                ? 'bg-umber-600 dark:bg-slate-600 text-white shadow-md scale-105 border border-umber-800 dark:border-slate-500'
+                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                             }`}
                           >
                             Hard
@@ -290,7 +290,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       <button
                         data-testid="quick-play-button"
                         onClick={() => { sounds.buttonClick(); onQuickPlay(botDifficulty); }}
-                        className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-gray-600 dark:to-gray-700 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 flex items-center justify-center gap-2 border border-umber-900 dark:border-gray-600 shadow"
+                        className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-violet-700 dark:to-violet-800 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-violet-600 dark:hover:to-violet-700 transition-all duration-200 flex items-center justify-center gap-2 border border-umber-900 dark:border-violet-600 shadow"
                       >
                         <span>⚡</span>
                         <span>Quick Play (1P + 3 Bots)</span>
@@ -430,7 +430,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                               setShowPlayerStats(true);
                             }
                           }}
-                          className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-gray-600 dark:to-gray-700 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 border border-umber-900 dark:border-gray-600 shadow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-blue-700 dark:to-blue-800 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 border border-umber-900 dark:border-blue-600 shadow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={!socket}
                         >
                           <span className="text-xl">📊</span>
@@ -444,7 +444,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                               setShowLeaderboard(true);
                             }
                           }}
-                          className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-600 dark:to-gray-700 text-white py-4 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 border border-amber-900 dark:border-gray-600 shadow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-indigo-700 dark:to-indigo-800 text-white py-4 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-indigo-600 dark:hover:to-indigo-700 transition-all duration-200 border border-amber-900 dark:border-indigo-600 shadow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                           disabled={!socket}
                         >
                           <span className="text-xl">🏆</span>
@@ -531,7 +531,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         <div className="pt-4 border-t-2 border-parchment-300 dark:border-gray-600">
                           <button
                             onClick={() => { sounds.buttonClick(); setShowRules(true); }}
-                            className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-600 dark:to-gray-700 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 border border-amber-900 dark:border-gray-600 shadow flex items-center justify-center gap-2"
+                            className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-teal-700 dark:to-teal-800 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-teal-600 dark:hover:to-teal-700 transition-all duration-200 border border-amber-900 dark:border-teal-600 shadow flex items-center justify-center gap-2"
                           >
                             📖 How to Play
                           </button>

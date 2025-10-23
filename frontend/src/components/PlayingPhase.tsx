@@ -383,7 +383,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible">
               <h3 className="text-xs md:text-sm font-semibold text-orange-600/70 uppercase tracking-wider mb-1">Team 1</h3>
               <p className="text-lg md:text-2xl font-bold text-orange-500 relative">
-                Round: {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
+                {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
                 {floatingTrickPoints.team1 !== null && (
                   <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
@@ -470,7 +470,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible">
               <h3 className="text-xs md:text-sm font-semibold text-purple-600/70 uppercase tracking-wider mb-1">Team 2</h3>
               <p className="text-lg md:text-2xl font-bold text-purple-500 relative">
-                Round: {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
+                {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
                 {floatingTrickPoints.team2 !== null && (
                   <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
@@ -504,15 +504,15 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       {/* Circular Card Layout - Takes remaining space */}
       <div className="mb-2 md:mb-4 relative px-2 md:px-4">
         <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 dark:border-gray-600 shadow-2xl">
-          {/* Previous Trick Button - Top Center */}
+          {/* Previous Trick Button - Top Left Corner */}
           {gameState.previousTrick && (
             <button
               onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-              className={`absolute top-4 left-1/2 -translate-x-1/2 z-50 ${
+              className={`absolute top-3 left-3 md:top-4 md:left-4 z-50 ${
                 showPreviousTrick
                   ? 'bg-gradient-to-br from-forest-600 to-forest-800 hover:from-forest-700 hover:to-forest-900 shadow-forest-500/50 border-forest-900'
                   : 'bg-gradient-to-br from-umber-400 to-umber-500 hover:from-umber-500 hover:to-umber-600 shadow-umber-400/50 border-umber-600 dark:border-gray-600'
-              } active:scale-95 text-parchment-50 w-12 h-12 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-lg md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
+              } active:scale-95 text-parchment-50 w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-base md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
               title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
             >
               <span className="md:hidden">{showPreviousTrick ? '▶️' : '⏮️'}</span>

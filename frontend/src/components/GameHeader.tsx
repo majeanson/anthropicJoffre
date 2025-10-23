@@ -220,26 +220,26 @@ export function GameHeader({
 
         {/* Desktop: Single row layout */}
         <div className="hidden md:flex items-center justify-between gap-3">
-          {/* Left: Game Info */}
-          <div className="flex items-center gap-2 min-w-0 flex-1">
+          {/* Left: Game Info and Scores on same horizontal plane */}
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm">
               <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">{gameId}</p>
             </div>
             <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm">
               <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
             </div>
-          </div>
 
-          {/* Center: Scores */}
-          <div className="flex items-center gap-2">
-            <div className="bg-orange-500 dark:bg-orange-600 px-3 py-1 rounded shadow-md">
-              <p className="text-xs text-white/90 font-semibold">Team 1</p>
-              <p className="text-lg text-white font-black text-center">{team1Score}</p>
-            </div>
-            <div className="text-white dark:text-gray-300 font-bold">:</div>
-            <div className="bg-purple-500 dark:bg-purple-600 px-3 py-1 rounded shadow-md">
-              <p className="text-xs text-white/90 font-semibold">Team 2</p>
-              <p className="text-lg text-white font-black text-center">{team2Score}</p>
+            {/* Scores inline with game info */}
+            <div className="flex items-center gap-2 ml-2">
+              <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1">
+                <p className="text-xs text-white/90 font-semibold">T1</p>
+                <p className="text-base text-white font-black">{team1Score}</p>
+              </div>
+              <div className="text-white dark:text-gray-300 font-bold text-sm">:</div>
+              <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1">
+                <p className="text-xs text-white/90 font-semibold">T2</p>
+                <p className="text-base text-white font-black">{team2Score}</p>
+              </div>
             </div>
           </div>
 
