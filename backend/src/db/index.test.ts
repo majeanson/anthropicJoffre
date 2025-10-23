@@ -55,6 +55,8 @@ describe('Database Stats Functions', () => {
 
       // Update round stats (should initialize player)
       await updateRoundStats(playerName, {
+        roundWon: true,
+        wasBidder: true,
         betMade: true,
         betAmount: 8,
         withoutTrump: false,
@@ -264,6 +266,8 @@ describe('Database Stats Functions', () => {
       const playerName = 'TestPlayer_BetSuccess_' + Date.now();
 
       await updateRoundStats(playerName, {
+        roundWon: true,
+        wasBidder: true,
         betMade: true,
         betAmount: 8,
         withoutTrump: false,
@@ -286,6 +290,8 @@ describe('Database Stats Functions', () => {
       const playerName = 'TestPlayer_BetFail_' + Date.now();
 
       await updateRoundStats(playerName, {
+        roundWon: false,
+        wasBidder: true,
         betMade: false,
         betAmount: 10,
         withoutTrump: false,
@@ -305,6 +311,8 @@ describe('Database Stats Functions', () => {
       const playerName = 'TestPlayer_WithoutTrump_' + Date.now();
 
       await updateRoundStats(playerName, {
+        roundWon: true,
+        wasBidder: true,
         betMade: true,
         betAmount: 8,
         withoutTrump: true,
@@ -349,6 +357,8 @@ describe('Database Stats Functions', () => {
       const playerName = 'TestPlayer_RedZero_' + Date.now();
 
       await updateRoundStats(playerName, {
+        roundWon: true,
+        wasBidder: true,
         betMade: true,
         betAmount: 8,
         withoutTrump: false,
@@ -366,6 +376,8 @@ describe('Database Stats Functions', () => {
       const playerName = 'TestPlayer_BrownZero_' + Date.now();
 
       await updateRoundStats(playerName, {
+        roundWon: true,
+        wasBidder: true,
         betMade: true,
         betAmount: 8,
         withoutTrump: false,
