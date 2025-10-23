@@ -283,4 +283,6 @@ export const sounds = {
   chatNotification: () => soundManager.playChatNotification(),
   setEnabled: (enabled: boolean) => soundManager.setEnabled(enabled),
   setVolume: (volume: number) => soundManager.setVolume(volume),
+  isEnabled: () => soundManager['enabled'],
+  getVolume: () => soundManager['masterVolume'],
 };

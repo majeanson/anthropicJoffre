@@ -156,7 +156,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <div className="mb-6">
               <div className="grid grid-cols-4 gap-2 mb-4">
                 <button
-                  onClick={() => setMainTab('play')}
+                  onClick={() => { sounds.buttonClick(); setMainTab('play'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
                     mainTab === 'play'
                       ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg scale-105'
@@ -166,7 +166,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   PLAY
                 </button>
                 <button
-                  onClick={() => setMainTab('social')}
+                  onClick={() => { sounds.buttonClick(); setMainTab('social'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative ${
                     mainTab === 'social'
                       ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg scale-105'
@@ -181,7 +181,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   )}
                 </button>
                 <button
-                  onClick={() => setMainTab('stats')}
+                  onClick={() => { sounds.buttonClick(); setMainTab('stats'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
                     mainTab === 'stats'
                       ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg scale-105'
@@ -191,7 +191,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   STATS
                 </button>
                 <button
-                  onClick={() => setMainTab('settings')}
+                  onClick={() => { sounds.buttonClick(); setMainTab('settings'); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
                     mainTab === 'settings'
                       ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white shadow-lg scale-105'
@@ -227,14 +227,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       <div className="space-y-2">
                         <button
                           data-testid="create-game-button"
-                          onClick={() => setMode('create')}
+                          onClick={() => { sounds.buttonClick(); setMode('create'); }}
                           className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-600 dark:to-gray-700 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 border border-amber-900 dark:border-gray-600 shadow"
                         >
                           ➕ Create Game
                         </button>
 
                         <button
-                          onClick={() => setShowBrowser(true)}
+                          onClick={() => { sounds.buttonClick(); setShowBrowser(true); }}
                           className="w-full bg-gradient-to-r from-amber-600 to-orange-600 dark:from-gray-700 dark:to-gray-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-orange-700 dark:hover:from-gray-800 dark:hover:to-gray-900 transition-all duration-200 border border-amber-800 dark:border-gray-600 shadow flex items-center justify-center gap-2"
                         >
                           <span>🔍</span>
@@ -256,7 +256,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </label>
                         <div className="grid grid-cols-3 gap-2">
                           <button
-                            onClick={() => onBotDifficultyChange && onBotDifficultyChange('easy')}
+                            onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('easy'); }}
                             className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
                               botDifficulty === 'easy'
                                 ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
@@ -266,7 +266,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             Easy
                           </button>
                           <button
-                            onClick={() => onBotDifficultyChange && onBotDifficultyChange('medium')}
+                            onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('medium'); }}
                             className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
                               botDifficulty === 'medium'
                                 ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
@@ -276,7 +276,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             Medium
                           </button>
                           <button
-                            onClick={() => onBotDifficultyChange && onBotDifficultyChange('hard')}
+                            onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('hard'); }}
                             className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
                               botDifficulty === 'hard'
                                 ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
@@ -295,7 +295,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
                       <button
                         data-testid="quick-play-button"
-                        onClick={() => onQuickPlay(botDifficulty)}
+                        onClick={() => { sounds.buttonClick(); onQuickPlay(botDifficulty); }}
                         className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-gray-600 dark:to-gray-700 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 flex items-center justify-center gap-2 border border-umber-900 dark:border-gray-600 shadow"
                       >
                         <span>⚡</span>
@@ -311,7 +311,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     {/* Sub-tabs for Social */}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => setSocialTab('online')}
+                        onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'online'
                             ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg'
@@ -321,7 +321,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         🟢 Online ({onlinePlayers.length})
                       </button>
                       <button
-                        onClick={() => setSocialTab('recent')}
+                        onClick={() => { sounds.buttonClick(); setSocialTab('recent'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'recent'
                             ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg'
@@ -359,6 +359,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                                   {player.gameId && player.status !== 'in_lobby' && (
                                     <button
                                       onClick={() => {
+                                        sounds.buttonClick();
                                         const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
                                         if (nameToUse && nameToUse.trim()) {
                                           if (!playerName.trim()) {
@@ -422,6 +423,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         <button
                           onClick={() => {
                             if (!socket) return;
+                            sounds.buttonClick();
                             if (!playerName.trim()) {
                               const name = window.prompt('Enter your player name to view stats:');
                               if (name && name.trim()) {
@@ -444,6 +446,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         <button
                           onClick={() => {
                             if (socket) {
+                              sounds.buttonClick();
                               setShowLeaderboard(true);
                             }
                           }}
@@ -479,22 +482,62 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                           <DarkModeToggle />
                         </div>
 
-                        {/* Sound - Placeholder for future implementation */}
+                        {/* Sound Effects */}
                         <div>
                           <label className="block text-sm font-semibold text-umber-800 dark:text-gray-200 mb-2">
                             Sound Effects
                           </label>
-                          <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-300 dark:border-gray-500">
-                            <p className="text-xs text-umber-600 dark:text-gray-400">
-                              🔊 Sound settings available in-game
-                            </p>
+                          <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-300 dark:border-gray-500 space-y-3">
+                            {/* Sound Toggle */}
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm text-umber-700 dark:text-gray-300">Enable Sounds</span>
+                              <button
+                                onClick={() => {
+                                  const newEnabled = !sounds.isEnabled();
+                                  sounds.setEnabled(newEnabled);
+                                  // Re-render by forcing state change
+                                  setMainTab(mainTab);
+                                }}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                  sounds.isEnabled()
+                                    ? 'bg-green-500'
+                                    : 'bg-gray-300 dark:bg-gray-600'
+                                }`}
+                              >
+                                <span
+                                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                    sounds.isEnabled() ? 'translate-x-6' : 'translate-x-1'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+
+                            {/* Volume Slider */}
+                            <div>
+                              <div className="flex items-center justify-between mb-1">
+                                <span className="text-sm text-umber-700 dark:text-gray-300">Volume</span>
+                                <span className="text-xs text-umber-600 dark:text-gray-400">{Math.round(sounds.getVolume() * 100)}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="100"
+                                value={sounds.getVolume() * 100}
+                                onChange={(e) => {
+                                  sounds.setVolume(parseInt(e.target.value) / 100);
+                                  // Re-render by forcing state change
+                                  setMainTab(mainTab);
+                                }}
+                                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-amber-600"
+                              />
+                            </div>
                           </div>
                         </div>
 
                         {/* How to Play */}
                         <div className="pt-4 border-t-2 border-parchment-300 dark:border-gray-600">
                           <button
-                            onClick={() => setShowRules(true)}
+                            onClick={() => { sounds.buttonClick(); setShowRules(true); }}
                             className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-600 dark:to-gray-700 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-200 border border-amber-900 dark:border-gray-600 shadow flex items-center justify-center gap-2"
                           >
                             📖 How to Play
@@ -582,7 +625,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               <button
                 data-testid="back-button"
                 type="button"
-                onClick={() => setMode('menu')}
+                onClick={() => { sounds.buttonClick(); setMode('menu'); }}
                 className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
               >
                 Back
@@ -728,7 +771,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               <button
                 data-testid="back-button"
                 type="button"
-                onClick={() => setMode('menu')}
+                onClick={() => { sounds.buttonClick(); setMode('menu'); }}
                 className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
               >
                 Back
