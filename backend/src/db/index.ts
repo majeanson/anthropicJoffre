@@ -322,6 +322,14 @@ export const updateGameStats = async (
   update: GameStatsUpdate,
   eloChange: number
 ) => {
+  // First, ensure player exists in player_stats
+  const ensurePlayer = `
+    INSERT INTO player_stats (player_name, is_bot)
+    VALUES ($1, FALSE)
+    ON CONFLICT (player_name) DO NOTHING
+  `;
+  await query(ensurePlayer, [playerName]);
+
   // Get current stats for streak calculation
   const currentStats = await getPlayerStats(playerName);
   const currentWinStreak = currentStats?.current_win_streak || 0;
