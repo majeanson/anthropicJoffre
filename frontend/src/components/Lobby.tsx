@@ -6,6 +6,7 @@ import { PlayerStatsModal } from './PlayerStatsModal';
 import { GlobalLeaderboard } from './GlobalLeaderboard';
 import { HowToPlay } from './HowToPlay';
 import { Socket } from 'socket.io-client';
+import { BotDifficulty } from '../utils/botPlayer';
 
 interface OnlinePlayer {
   socketId: string;
@@ -19,16 +20,18 @@ interface LobbyProps {
   onCreateGame: (playerName: string) => void;
   onJoinGame: (gameId: string, playerName: string) => void;
   onSpectateGame: (gameId: string, spectatorName?: string) => void;
-  onQuickPlay: () => void;
+  onQuickPlay: (difficulty: BotDifficulty) => void;
   onRejoinGame?: () => void;
   hasValidSession?: boolean;
   autoJoinGameId?: string;
   onlinePlayers: OnlinePlayer[];
   socket: Socket | null;
+  botDifficulty?: BotDifficulty;
+  onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
 }
 
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange }: LobbyProps) {
   console.log('Lobby rendered with autoJoinGameId:', autoJoinGameId);
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
@@ -209,9 +212,53 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
                     {/* Primary Actions - Large Buttons */}
                     <div className="space-y-3">
+                      {/* Bot Difficulty Selector */}
+                      <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600">
+                        <label className="block text-sm font-semibold text-umber-800 dark:text-gray-200 mb-2">
+                          Bot Difficulty
+                        </label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <button
+                            onClick={() => onBotDifficultyChange && onBotDifficultyChange('easy')}
+                            className={`py-2 px-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                              botDifficulty === 'easy'
+                                ? 'bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md scale-105'
+                                : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                            }`}
+                          >
+                            Easy
+                          </button>
+                          <button
+                            onClick={() => onBotDifficultyChange && onBotDifficultyChange('medium')}
+                            className={`py-2 px-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                              botDifficulty === 'medium'
+                                ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white shadow-md scale-105'
+                                : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                            }`}
+                          >
+                            Medium
+                          </button>
+                          <button
+                            onClick={() => onBotDifficultyChange && onBotDifficultyChange('hard')}
+                            className={`py-2 px-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                              botDifficulty === 'hard'
+                                ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-md scale-105'
+                                : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
+                            }`}
+                          >
+                            Hard
+                          </button>
+                        </div>
+                        <p className="text-xs text-umber-600 dark:text-gray-400 mt-2 text-center">
+                          {botDifficulty === 'easy' && '🎲 Random play, good for beginners'}
+                          {botDifficulty === 'medium' && '🧠 Strategic play with positional awareness'}
+                          {botDifficulty === 'hard' && '🎯 Advanced AI with card counting'}
+                        </p>
+                      </div>
+
                       <button
                         data-testid="quick-play-button"
-                        onClick={onQuickPlay}
+                        onClick={() => onQuickPlay(botDifficulty)}
                         className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-5 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 flex items-center justify-center gap-3 border-2 border-green-800 shadow-lg transform hover:scale-105 text-lg"
                       >
                         <span className="text-2xl">⚡</span>

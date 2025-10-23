@@ -14,7 +14,7 @@ import { ReconnectingBanner } from './components/ReconnectingBanner';
 import { CatchUpModal } from './components/CatchUpModal';
 import { Toast, ToastProps } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
-import { BotPlayer } from './utils/botPlayer';
+import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { addRecentPlayers } from './utils/recentPlayers';
 
@@ -49,6 +49,7 @@ function App() {
   const catchUpModalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // Track catch-up modal timeout
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('medium');
 
   useEffect(() => {
     preloadCardImages();
@@ -625,8 +626,11 @@ function App() {
   };
 
   // Bot player functionality
-  const handleQuickPlay = () => {
+  const handleQuickPlay = (difficulty: BotDifficulty) => {
     if (!socket) return;
+
+    // Set the bot difficulty globally
+    BotPlayer.setDifficulty(difficulty);
 
     // Listen for game creation to spawn bots
     const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string }) => {
@@ -865,7 +869,19 @@ function App() {
     return (
       <>
         <GlobalUI />
-        <Lobby onCreateGame={handleCreateGame} onJoinGame={handleJoinGame} onSpectateGame={handleSpectateGame} onQuickPlay={handleQuickPlay} onRejoinGame={handleRejoinGame} hasValidSession={hasValidSession} autoJoinGameId={autoJoinGameId} onlinePlayers={onlinePlayers} socket={socket} />
+        <Lobby
+          onCreateGame={handleCreateGame}
+          onJoinGame={handleJoinGame}
+          onSpectateGame={handleSpectateGame}
+          onQuickPlay={handleQuickPlay}
+          onRejoinGame={handleRejoinGame}
+          hasValidSession={hasValidSession}
+          autoJoinGameId={autoJoinGameId}
+          onlinePlayers={onlinePlayers}
+          socket={socket}
+          botDifficulty={botDifficulty}
+          onBotDifficultyChange={setBotDifficulty}
+        />
       </>
     );
   }
