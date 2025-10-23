@@ -82,7 +82,7 @@ export function GameHeader({
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-600 dark:border-gray-600 overflow-hidden z-50 animate-slideDown">
+              <div className="fixed right-2 top-12 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-600 dark:border-gray-600 overflow-hidden z-[9999] animate-slideDown">
                 {/* Chat */}
                 {onOpenChat && (
                   <button
@@ -143,9 +143,9 @@ export function GameHeader({
 
                 {/* Dark Mode Toggle */}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  onClick={() => {
                     setDarkMode(!darkMode);
+                    setDropdownOpen(false);
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
                 >
@@ -165,9 +165,9 @@ export function GameHeader({
                 {/* Sound Toggle */}
                 {onSoundToggle && (
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       onSoundToggle();
+                      setDropdownOpen(false);
                     }}
                     className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
                   >
@@ -218,38 +218,37 @@ export function GameHeader({
           </div>
         </div>
 
-        {/* Desktop: Single row layout */}
-        <div className="hidden md:flex items-center justify-between gap-3">
-          {/* Left: Game Info and Scores on same horizontal plane */}
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm">
-              <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">{gameId}</p>
-            </div>
-            <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm">
-              <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
-            </div>
-
-            {/* Scores inline with game info */}
-            <div className="flex items-center gap-2 ml-2">
-              <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1">
-                <p className="text-xs text-white/90 font-semibold">T1</p>
-                <p className="text-base text-white font-black">{team1Score}</p>
-              </div>
-              <div className="text-white dark:text-gray-300 font-bold text-sm">:</div>
-              <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1">
-                <p className="text-xs text-white/90 font-semibold">T2</p>
-                <p className="text-base text-white font-black">{team2Score}</p>
-              </div>
-            </div>
+        {/* Desktop: Single row layout - All items on same horizontal line */}
+        <div className="hidden md:flex items-center gap-3">
+          {/* Game Info */}
+          <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
+            <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">{gameId}</p>
+          </div>
+          <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
+            <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
           </div>
 
-          {/* Right: Controls Dropdown */}
+          {/* Team Scores */}
+          <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+            <p className="text-xs text-white/90 font-semibold">T1</p>
+            <p className="text-base text-white font-black">{team1Score}</p>
+          </div>
+          <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
+          <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+            <p className="text-xs text-white/90 font-semibold">T2</p>
+            <p className="text-base text-white font-black">{team2Score}</p>
+          </div>
+
+          {/* Spacer */}
+          <div className="flex-1"></div>
+
+          {/* Controls Dropdown */}
           <div className="relative flex-shrink-0" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 px-3 py-1.5 rounded backdrop-blur-sm transition-all duration-200 flex items-center gap-1 border border-white/30 dark:border-gray-600"
+              className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 px-3 py-1 rounded backdrop-blur-sm transition-all duration-200 flex items-center gap-1 border border-white/30 dark:border-gray-600"
             >
-              <span className="text-white dark:text-gray-100 font-bold text-sm">Controls</span>
+              <span className="text-white dark:text-gray-100 font-bold text-sm">Menu</span>
               <span className="text-white dark:text-gray-100 text-xs">{dropdownOpen ? '▲' : '▼'}</span>
               {(unreadChatCount > 0 && !dropdownOpen) && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
@@ -260,7 +259,7 @@ export function GameHeader({
 
             {/* Dropdown Menu */}
             {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-600 dark:border-gray-600 overflow-hidden z-50 animate-slideDown">
+              <div className="fixed right-2 top-12 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-amber-600 dark:border-gray-600 overflow-hidden z-[9999] animate-slideDown">
                 {/* Chat */}
                 {onOpenChat && (
                   <button
@@ -321,9 +320,9 @@ export function GameHeader({
 
                 {/* Dark Mode Toggle */}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  onClick={() => {
                     setDarkMode(!darkMode);
+                    setDropdownOpen(false);
                   }}
                   className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
                 >
@@ -343,9 +342,9 @@ export function GameHeader({
                 {/* Sound Toggle */}
                 {onSoundToggle && (
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       onSoundToggle();
+                      setDropdownOpen(false);
                     }}
                     className="w-full px-4 py-3 text-left hover:bg-parchment-100 dark:hover:bg-gray-700 transition-colors flex items-center justify-between gap-3 border-b border-parchment-200 dark:border-gray-700"
                   >
