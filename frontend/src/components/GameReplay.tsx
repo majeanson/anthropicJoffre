@@ -36,14 +36,21 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
   // Fetch replay data on mount
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) {
+      console.error('[GameReplay] Socket is null');
+      return;
+    }
+
+    console.log('[GameReplay] Requesting replay for game:', gameId);
 
     const handleReplayData = ({ replayData }: { replayData: ReplayData }) => {
+      console.log('[GameReplay] Received replay data for game:', replayData?.game_id, 'rounds:', replayData?.rounds);
       setReplayData(replayData);
       setLoading(false);
     };
 
     const handleError = ({ message }: { message: string }) => {
+      console.error('[GameReplay] Error loading replay:', message);
       setError(message);
       setLoading(false);
     };
@@ -59,6 +66,32 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       socket.off('error', handleError);
     };
   }, [socket, gameId]);
+
+  // Auto-playback effect - MUST be before early returns to follow Rules of Hooks
+  useEffect(() => {
+    if (!isPlaying || !replayData) return;
+
+    const currentRound = replayData.round_history[currentRoundIndex];
+    if (!currentRound) return;
+
+    const currentTricks = currentRound.tricks || [];
+    const hasNextTrick = currentTrickIndex < currentTricks.length - 1;
+    const hasNextRound = currentRoundIndex < replayData.round_history.length - 1;
+
+    const delay = playSpeed === 0.5 ? 4000 : playSpeed === 1 ? 2000 : 1000;
+    const timer = setTimeout(() => {
+      if (hasNextTrick) {
+        setCurrentTrickIndex(prev => prev + 1);
+      } else if (hasNextRound) {
+        setCurrentRoundIndex(prev => prev + 1);
+        setCurrentTrickIndex(0);
+      } else {
+        setIsPlaying(false);
+      }
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [isPlaying, currentTrickIndex, currentRoundIndex, playSpeed, replayData]);
 
   if (loading) {
     return (
@@ -105,25 +138,6 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   const hasPrevRound = currentRoundIndex > 0;
   const hasNextTrick = currentTrickIndex < currentTricks.length - 1;
   const hasPrevTrick = currentTrickIndex > 0;
-
-  // Auto-playback effect
-  useEffect(() => {
-    if (!isPlaying || !currentRound) return;
-
-    const delay = playSpeed === 0.5 ? 4000 : playSpeed === 1 ? 2000 : 1000;
-    const timer = setTimeout(() => {
-      if (hasNextTrick) {
-        setCurrentTrickIndex(prev => prev + 1);
-      } else if (hasNextRound) {
-        setCurrentRoundIndex(prev => prev + 1);
-        setCurrentTrickIndex(0);
-      } else {
-        setIsPlaying(false);
-      }
-    }, delay);
-
-    return () => clearTimeout(timer);
-  }, [isPlaying, currentTrickIndex, currentRoundIndex, playSpeed, hasNextTrick, hasNextRound, currentRound]);
 
   const handleNextRound = () => {
     if (hasNextRound) {

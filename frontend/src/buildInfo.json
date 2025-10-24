@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-24T22:45:07.564Z",
-  "version": "1.0.1",
+  "buildDate": "2025-10-24T23:55:00.000Z",
+  "version": "1.0.2",
   "git": {
-    "commitMessage": "fix: Add backend safety checks and remove fragile 04-game-flow tests",
+    "commitMessage": "fix: Resolve UI animation glitches and add loading states",
     "commitHash": "pending",
-    "commitDate": "2025-10-24 22:45:07 +0000",
+    "commitDate": "2025-10-24 23:55:00 +0000",
     "branch": "main"
   },
   "futureTodos": [

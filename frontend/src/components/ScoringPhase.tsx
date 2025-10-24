@@ -31,12 +31,31 @@ export function ScoringPhase({
   const [chatOpen, setChatOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(60);
+  const [dataReady, setDataReady] = useState(false);
 
   // Find current player to get their name (playersReady now stores names, not IDs)
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
   const currentPlayerName = currentPlayer?.name || '';
   const isReady = gameState.playersReady?.includes(currentPlayerName) || false;
   const readyCount = gameState.playersReady?.length || 0;
+
+  // Check if round data is ready (prevents showing stale data during transition)
+  useEffect(() => {
+    const latestRound = gameState.roundHistory[gameState.roundHistory.length - 1];
+    const expectedRoundNumber = gameState.roundNumber;
+
+    // Wait for the latest round to match the expected round number
+    // This ensures we don't show stale data from the previous round
+    if (latestRound && latestRound.roundNumber === expectedRoundNumber) {
+      // Add a small delay to ensure all data is fully computed
+      const timer = setTimeout(() => {
+        setDataReady(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setDataReady(false);
+    }
+  }, [gameState.roundHistory, gameState.roundNumber]);
 
   // Calculate time remaining
   useEffect(() => {
@@ -168,8 +187,26 @@ export function ScoringPhase({
           </div>
         </div>
 
-        {/* Team Scores - Large and Clear */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        {/* Loading Animation - Show while data is being prepared */}
+        {!dataReady ? (
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="relative">
+              {/* Spinning cards animation */}
+              <div className="flex gap-2 mb-4">
+                <div className="w-12 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg animate-bounce" style={{animationDelay: '0s'}}></div>
+                <div className="w-12 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                <div className="w-12 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <div className="w-12 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg animate-bounce" style={{animationDelay: '0.3s'}}></div>
+              </div>
+              <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
+                Calculating round results...
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Team Scores - Large and Clear */}
+            <div className="grid grid-cols-2 gap-6 mb-8">
           <div className="text-center p-6 bg-orange-50 dark:bg-orange-900/40 rounded-lg border-2 border-orange-200 dark:border-orange-600" data-testid="team-1-score-card">
             <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">Team 1</h3>
             <p className="text-5xl font-bold text-orange-600 dark:text-orange-300" data-testid="team-1-score">{gameState.teamScores.team1}</p>
@@ -396,6 +433,8 @@ export function ScoringPhase({
               )}
             </div>
           </div>
+        )}
+          </>
         )}
         </div>
       </div>

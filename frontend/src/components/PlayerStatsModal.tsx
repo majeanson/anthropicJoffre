@@ -94,19 +94,28 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     if (!isOpen || !playerName) return;
 
     setLoading(true);
+    console.log('[PlayerStatsModal] Requesting stats for:', playerName);
     socket.emit('get_player_stats', { playerName });
 
     const handleStatsResponse = ({ stats: receivedStats, playerName: responseName }: { stats: PlayerStats | null; playerName: string }) => {
+      console.log('[PlayerStatsModal] Received stats response for:', responseName, 'stats:', receivedStats ? 'Found' : 'Not found');
       if (responseName === playerName) {
         setStats(receivedStats);
         setLoading(false);
       }
     };
 
+    const handleError = (error: any) => {
+      console.error('[PlayerStatsModal] Socket error:', error);
+      setLoading(false);
+    };
+
     socket.on('player_stats_response', handleStatsResponse);
+    socket.on('error', handleError);
 
     return () => {
       socket.off('player_stats_response', handleStatsResponse);
+      socket.off('error', handleError);
     };
   }, [isOpen, playerName, socket]);
 
@@ -115,19 +124,28 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     if (!isOpen || activeTab !== 'history' || !playerName || historyLoading) return;
 
     setHistoryLoading(true);
+    console.log('[PlayerStatsModal] Requesting history for:', playerName);
     socket.emit('get_player_history', { playerName, limit: 20 });
 
     const handleHistoryResponse = ({ games, playerName: responseName }: { games: GameHistoryEntry[]; playerName: string }) => {
+      console.log('[PlayerStatsModal] Received history response for:', responseName, 'games:', games?.length || 0);
       if (responseName === playerName) {
         setGameHistory(games);
         setHistoryLoading(false);
       }
     };
 
+    const handleError = (error: any) => {
+      console.error('[PlayerStatsModal] Socket error while loading history:', error);
+      setHistoryLoading(false);
+    };
+
     socket.on('player_history_response', handleHistoryResponse);
+    socket.on('error', handleError);
 
     return () => {
       socket.off('player_history_response', handleHistoryResponse);
+      socket.off('error', handleError);
     };
   }, [isOpen, activeTab, playerName, socket, historyLoading]);
 

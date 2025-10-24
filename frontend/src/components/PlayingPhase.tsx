@@ -339,13 +339,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     // Determine animation classes
     let animationClass = '';
 
-    // Card play animation - cards slide in from their position
-    if (positionIndex !== undefined) {
-      const slideDirections = ['animate-slide-from-bottom', 'animate-slide-from-left', 'animate-slide-from-top', 'animate-slide-from-right'];
-      animationClass = slideDirections[positionIndex];
-    }
-
-    // Trick collection animation - all cards move to winner
+    // Trick collection animation - all cards move to winner (PRIORITY)
     if (trickCollectionAnimation && gameState.currentTrick.length === 4) {
       const winnerPosition = cardPositions.findIndex(cp => cp?.playerId === currentTrickWinnerId);
       if (winnerPosition !== -1 && positionIndex !== undefined) {
@@ -353,6 +347,11 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         const winnerDir = directions[winnerPosition];
         animationClass = `animate-collect-to-${winnerDir}`;
       }
+    }
+    // Card play animation - cards slide in from their position (ONLY when trick not complete)
+    else if (positionIndex !== undefined && gameState.currentTrick.length < 4) {
+      const slideDirections = ['animate-slide-from-bottom', 'animate-slide-from-left', 'animate-slide-from-top', 'animate-slide-from-right'];
+      animationClass = slideDirections[positionIndex];
     }
 
     return (
