@@ -59,8 +59,12 @@ export function applyCardPlay(
     trumpWasSet = true;
   }
 
-  // Add card to trick
-  game.currentTrick.push({ playerId, card });
+  // Add card to trick (include playerName for stable identification across reconnects)
+  game.currentTrick.push({
+    playerId,
+    playerName: currentPlayer.name,
+    card
+  });
 
   // Remove card from player's hand
   currentPlayer.hand = currentPlayer.hand.filter(

@@ -234,11 +234,18 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     const positions: (TrickCard | null)[] = [null, null, null, null]; // bottom, left, top, right
 
     trick.forEach(tc => {
-      const playerIndex = gameState.players.findIndex(p => p.id === tc.playerId);
-      // Calculate relative position (0=bottom, 1=left, 2=top, 3=right) - anti-clockwise
-      // Map: player 0→bottom, 1→left, 2→top, 3→right
-      const relativePos = (playerIndex - currentPlayerIndex + 4) % 4;
-      positions[relativePos] = tc;
+      // Use playerName for lookup (stable across reconnections)
+      // Fall back to playerId for backwards compat
+      const playerIndex = gameState.players.findIndex(p =>
+        p.name === tc.playerName || p.id === tc.playerId
+      );
+
+      if (playerIndex !== -1) {
+        // Calculate relative position (0=bottom, 1=left, 2=top, 3=right) - anti-clockwise
+        // Map: player 0→bottom, 1→left, 2→top, 3→right
+        const relativePos = (playerIndex - currentPlayerIndex + 4) % 4;
+        positions[relativePos] = tc;
+      }
     });
 
     return positions;

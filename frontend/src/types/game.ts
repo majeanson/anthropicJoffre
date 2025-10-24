@@ -31,7 +31,8 @@ export type GamePhase =
   | 'game_over';
 
 export interface TrickCard {
-  playerId: string;
+  playerId: string; // Socket ID (changes on reconnect) - kept for backwards compat
+  playerName: string; // STABLE identifier - use this for lookups
   card: Card;
 }
 
