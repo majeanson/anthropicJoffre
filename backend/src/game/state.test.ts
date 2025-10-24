@@ -10,6 +10,9 @@ import {
   addTeamPoints,
   updateScores,
   setPhase,
+  applyTrickResolution,
+  calculateRoundScoring,
+  applyRoundScoring,
 } from './state';
 import { GameState, Card, Player } from '../types/game';
 
@@ -481,5 +484,357 @@ describe('setPhase', () => {
 
     setPhase(game, 'game_over');
     expect(game.phase).toBe('game_over');
+  });
+});
+
+describe('applyTrickResolution', () => {
+  it('should award tricks and points to winner', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      currentTrick: [
+        { playerId: 'p1', card: { color: 'red', value: 7 } },
+        { playerId: 'p2', card: { color: 'blue', value: 5 } },
+        { playerId: 'p3', card: { color: 'red', value: 3 } },
+        { playerId: 'p4', card: { color: 'green', value: 2 } },
+      ],
+    });
+
+    const result = applyTrickResolution(game, 'p1', 1);
+
+    expect(game.players[0].tricksWon).toBe(1);
+    expect(game.players[0].pointsWon).toBe(1);
+    expect(result.winnerId).toBe('p1');
+    expect(result.points).toBe(1);
+    expect(result.winnerIndex).toBe(0);
+  });
+
+  it('should store trick as previousTrick', () => {
+    const trick = [
+      { playerId: 'p1', card: { color: 'red', value: 7 } },
+      { playerId: 'p2', card: { color: 'blue', value: 5 } },
+      { playerId: 'p3', card: { color: 'red', value: 3 } },
+      { playerId: 'p4', card: { color: 'green', value: 2 } },
+    ];
+    const game = createTestGame({ phase: 'playing', currentTrick: trick });
+
+    applyTrickResolution(game, 'p2', 6); // Red 0 worth +5
+
+    expect(game.previousTrick).toBeDefined();
+    expect(game.previousTrick?.winnerId).toBe('p2');
+    expect(game.previousTrick?.points).toBe(6);
+    expect(game.previousTrick?.trick).toEqual(trick);
+  });
+
+  it('should add trick to currentRoundTricks', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      currentTrick: [
+        { playerId: 'p1', card: { color: 'red', value: 7 } },
+        { playerId: 'p2', card: { color: 'blue', value: 5 } },
+        { playerId: 'p3', card: { color: 'red', value: 3 } },
+        { playerId: 'p4', card: { color: 'green', value: 2 } },
+      ],
+      currentRoundTricks: [],
+    });
+
+    applyTrickResolution(game, 'p1', 1);
+
+    expect(game.currentRoundTricks).toHaveLength(1);
+    expect(game.currentRoundTricks[0].winnerId).toBe('p1');
+  });
+
+  it('should clear currentTrick', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      currentTrick: [
+        { playerId: 'p1', card: { color: 'red', value: 7 } },
+        { playerId: 'p2', card: { color: 'blue', value: 5 } },
+        { playerId: 'p3', card: { color: 'red', value: 3 } },
+        { playerId: 'p4', card: { color: 'green', value: 2 } },
+      ],
+    });
+
+    applyTrickResolution(game, 'p1', 1);
+
+    expect(game.currentTrick).toEqual([]);
+  });
+
+  it('should set winner as current player', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      currentPlayerIndex: 2,
+      currentTrick: [
+        { playerId: 'p1', card: { color: 'red', value: 7 } },
+        { playerId: 'p2', card: { color: 'blue', value: 5 } },
+        { playerId: 'p3', card: { color: 'red', value: 3 } },
+        { playerId: 'p4', card: { color: 'green', value: 2 } },
+      ],
+    });
+
+    applyTrickResolution(game, 'p3', 1);
+
+    expect(game.currentPlayerIndex).toBe(2); // p3 is index 2
+  });
+
+  it('should detect round over when all hands empty', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      currentTrick: [
+        { playerId: 'p1', card: { color: 'red', value: 7 } },
+        { playerId: 'p2', card: { color: 'blue', value: 5 } },
+        { playerId: 'p3', card: { color: 'red', value: 3 } },
+        { playerId: 'p4', card: { color: 'green', value: 2 } },
+      ],
+    });
+
+    // Empty all hands
+    game.players.forEach(p => (p.hand = []));
+
+    const result = applyTrickResolution(game, 'p1', 1);
+
+    expect(result.isRoundOver).toBe(true);
+    expect(game.phase).toBe('scoring');
+  });
+
+  it('should not transition to scoring if hands remain', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      currentTrick: [
+        { playerId: 'p1', card: { color: 'red', value: 7 } },
+        { playerId: 'p2', card: { color: 'blue', value: 5 } },
+        { playerId: 'p3', card: { color: 'red', value: 3 } },
+        { playerId: 'p4', card: { color: 'green', value: 2 } },
+      ],
+    });
+
+    // Players still have cards
+    game.players[0].hand = [{ color: 'red', value: 6 }];
+
+    const result = applyTrickResolution(game, 'p1', 1);
+
+    expect(result.isRoundOver).toBe(false);
+    expect(game.phase).toBe('playing');
+  });
+});
+
+describe('calculateRoundScoring', () => {
+  it('should calculate offensive team wins bet', () => {
+    const game = createTestGame({
+      phase: 'scoring',
+      highestBet: { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+      teamScores: { team1: 20, team2: 15 },
+    });
+
+    // Team 1 won 12 points (p1 + p3)
+    game.players[0].pointsWon = 7; // p1
+    game.players[2].pointsWon = 5; // p3 (same team)
+
+    // Team 2 won 8 points
+    game.players[1].pointsWon = 4; // p2
+    game.players[3].pointsWon = 4; // p4
+
+    const result = calculateRoundScoring(game);
+
+    expect(result.offensiveTeamId).toBe(1);
+    expect(result.defensiveTeamId).toBe(2);
+    expect(result.offensiveTeamPoints).toBe(12);
+    expect(result.defensiveTeamPoints).toBe(8);
+    expect(result.betMade).toBe(true);
+    expect(result.offensiveScore).toBe(10); // bet amount
+    expect(result.defensiveScore).toBe(8); // their points
+    expect(result.roundScore).toEqual({ team1: 10, team2: 8 });
+    expect(result.newTeamScores).toEqual({ team1: 30, team2: 23 });
+    expect(result.gameOver).toBe(false);
+  });
+
+  it('should calculate offensive team fails bet', () => {
+    const game = createTestGame({
+      phase: 'scoring',
+      highestBet: { playerId: 'p2', amount: 11, withoutTrump: false, skipped: false },
+      teamScores: { team1: 20, team2: 15 },
+    });
+
+    // Team 2 only won 9 points (failed bet of 11)
+    game.players[1].pointsWon = 5; // p2
+    game.players[3].pointsWon = 4; // p4
+
+    // Team 1 won 11 points
+    game.players[0].pointsWon = 6; // p1
+    game.players[2].pointsWon = 5; // p3
+
+    const result = calculateRoundScoring(game);
+
+    expect(result.offensiveTeamId).toBe(2);
+    expect(result.betMade).toBe(false);
+    expect(result.offensiveScore).toBe(-11); // lost bet
+    expect(result.defensiveScore).toBe(11); // Team 1's points
+    expect(result.roundScore).toEqual({ team1: 11, team2: -11 });
+    expect(result.newTeamScores).toEqual({ team1: 31, team2: 4 });
+  });
+
+  it('should apply without-trump multiplier', () => {
+    const game = createTestGame({
+      phase: 'scoring',
+      highestBet: { playerId: 'p1', amount: 10, withoutTrump: true, skipped: false },
+      teamScores: { team1: 20, team2: 15 },
+    });
+
+    // Team 1 won 12 points
+    game.players[0].pointsWon = 7;
+    game.players[2].pointsWon = 5;
+
+    const result = calculateRoundScoring(game);
+
+    expect(result.multiplier).toBe(2);
+    expect(result.betMade).toBe(true);
+    expect(result.offensiveScore).toBe(20); // 10 × 2
+    expect(result.newTeamScores.team1).toBe(40); // 20 + 20
+  });
+
+  it('should detect game over at 41 points', () => {
+    const game = createTestGame({
+      phase: 'scoring',
+      highestBet: { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+      teamScores: { team1: 35, team2: 20 },
+    });
+
+    game.players[0].pointsWon = 7;
+    game.players[2].pointsWon = 5;
+
+    const result = calculateRoundScoring(game);
+
+    expect(result.newTeamScores.team1).toBe(45); // 35 + 10
+    expect(result.gameOver).toBe(true);
+    expect(result.winningTeam).toBe(1);
+  });
+
+  it('should detect game over for team 2', () => {
+    const game = createTestGame({
+      phase: 'scoring',
+      highestBet: { playerId: 'p2', amount: 10, withoutTrump: false, skipped: false },
+      teamScores: { team1: 20, team2: 35 },
+    });
+
+    game.players[1].pointsWon = 7;
+    game.players[3].pointsWon = 5;
+
+    const result = calculateRoundScoring(game);
+
+    expect(result.newTeamScores.team2).toBe(45);
+    expect(result.gameOver).toBe(true);
+    expect(result.winningTeam).toBe(2);
+  });
+});
+
+describe('applyRoundScoring', () => {
+  it('should update team scores', () => {
+    const game = createTestGame({
+      phase: 'scoring',
+      teamScores: { team1: 20, team2: 15 },
+    });
+
+    const scoring = {
+      offensiveTeamId: 1 as 1 | 2,
+      defensiveTeamId: 2 as 1 | 2,
+      offensiveTeamPoints: 12,
+      defensiveTeamPoints: 8,
+      betAmount: 10,
+      multiplier: 1,
+      betMade: true,
+      offensiveScore: 10,
+      defensiveScore: 8,
+      roundScore: { team1: 10, team2: 8 },
+      newTeamScores: { team1: 30, team2: 23 },
+      gameOver: false,
+    };
+
+    applyRoundScoring(game, scoring);
+
+    expect(game.teamScores).toEqual({ team1: 30, team2: 23 });
+  });
+
+  it('should add round to history', () => {
+    const game = createTestGame({
+      phase: 'scoring',
+      roundNumber: 3,
+      highestBet: { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+      currentBets: [
+        { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+        { playerId: 'p2', amount: 8, withoutTrump: false, skipped: false },
+      ],
+      currentRoundTricks: [],
+      trump: 'red',
+      roundHistory: [],
+    });
+
+    const scoring = {
+      offensiveTeamId: 1 as 1 | 2,
+      defensiveTeamId: 2 as 1 | 2,
+      offensiveTeamPoints: 12,
+      defensiveTeamPoints: 8,
+      betAmount: 10,
+      multiplier: 1,
+      betMade: true,
+      offensiveScore: 10,
+      defensiveScore: 8,
+      roundScore: { team1: 10, team2: 8 },
+      newTeamScores: { team1: 30, team2: 23 },
+      gameOver: false,
+    };
+
+    applyRoundScoring(game, scoring);
+
+    expect(game.roundHistory).toHaveLength(1);
+    expect(game.roundHistory[0].roundNumber).toBe(3);
+    expect(game.roundHistory[0].offensiveTeam).toBe(1);
+    expect(game.roundHistory[0].betMade).toBe(true);
+    expect(game.roundHistory[0].roundScore).toEqual({ team1: 10, team2: 8 });
+  });
+
+  it('should transition to game_over when gameOver is true', () => {
+    const game = createTestGame({ phase: 'scoring' });
+
+    const scoring = {
+      offensiveTeamId: 1 as 1 | 2,
+      defensiveTeamId: 2 as 1 | 2,
+      offensiveTeamPoints: 12,
+      defensiveTeamPoints: 8,
+      betAmount: 10,
+      multiplier: 1,
+      betMade: true,
+      offensiveScore: 10,
+      defensiveScore: 8,
+      roundScore: { team1: 10, team2: 8 },
+      newTeamScores: { team1: 45, team2: 23 },
+      gameOver: true,
+      winningTeam: 1 as 1 | 2,
+    };
+
+    applyRoundScoring(game, scoring);
+
+    expect(game.phase).toBe('game_over');
+  });
+
+  it('should not transition if game continues', () => {
+    const game = createTestGame({ phase: 'scoring' });
+
+    const scoring = {
+      offensiveTeamId: 1 as 1 | 2,
+      defensiveTeamId: 2 as 1 | 2,
+      offensiveTeamPoints: 12,
+      defensiveTeamPoints: 8,
+      betAmount: 10,
+      multiplier: 1,
+      betMade: true,
+      offensiveScore: 10,
+      defensiveScore: 8,
+      roundScore: { team1: 10, team2: 8 },
+      newTeamScores: { team1: 30, team2: 23 },
+      gameOver: false,
+    };
+
+    applyRoundScoring(game, scoring);
+
+    expect(game.phase).toBe('scoring');
   });
 });

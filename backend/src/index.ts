@@ -47,7 +47,10 @@ import {
   applyBet,
   resetBetting,
   applyTeamSelection,
-  applyPositionSwap
+  applyPositionSwap,
+  applyTrickResolution,
+  calculateRoundScoring,
+  applyRoundScoring
 } from './game/state';
 import {
   saveGameHistory,
@@ -1543,66 +1546,44 @@ function resolveTrick(gameId: string) {
   const game = games.get(gameId);
   if (!game) return;
 
+  // 1. PURE CALCULATION - Determine winner and points
   const winnerId = determineWinner(game.currentTrick, game.trump);
   const specialCardPoints = calculateTrickPoints(game.currentTrick);
   const totalPoints = 1 + specialCardPoints;
 
-  const winner = game.players.find((p) => p.id === winnerId);
-  if (winner) {
-    winner.tricksWon += 1;
-    // Award 1 point for winning trick + special card points
-    winner.pointsWon += totalPoints;
+  // 2. SIDE EFFECT - Track special card stats for round statistics
+  const stats = roundStats.get(gameId);
+  if (stats) {
+    // Check if trick contains red 0 (worth +5 points)
+    const hasRedZero = game.currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
+    if (hasRedZero) {
+      const redZeroCount = stats.redZerosCollected.get(winnerId) || 0;
+      stats.redZerosCollected.set(winnerId, redZeroCount + 1);
+    }
 
-    // Track special card collection
-    const stats = roundStats.get(gameId);
-    if (stats) {
-      // Check if trick contains red 0 (worth +5 points)
-      const hasRedZero = game.currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
-      if (hasRedZero) {
-        const redZeroCount = stats.redZerosCollected.get(winnerId) || 0;
-        stats.redZerosCollected.set(winnerId, redZeroCount + 1);
-      }
-
-      // Check if trick contains brown 0 (worth -2 points)
-      const hasBrownZero = game.currentTrick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
-      if (hasBrownZero) {
-        const brownZeroCount = stats.brownZerosReceived.get(winnerId) || 0;
-        stats.brownZerosReceived.set(winnerId, brownZeroCount + 1);
-      }
+    // Check if trick contains brown 0 (worth -2 points)
+    const hasBrownZero = game.currentTrick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
+    if (hasBrownZero) {
+      const brownZeroCount = stats.brownZerosReceived.get(winnerId) || 0;
+      stats.brownZerosReceived.set(winnerId, brownZeroCount + 1);
     }
   }
 
-  // Store current trick as previous trick before clearing
-  const trickResult = {
-    trick: [...game.currentTrick],
-    winnerId,
-    points: totalPoints,
-  };
-  game.previousTrick = trickResult;
+  // 3. STATE TRANSFORMATION - Apply trick resolution (pure function)
+  const result = applyTrickResolution(game, winnerId, totalPoints);
 
-  // Add trick to current round's trick history
-  game.currentRoundTricks.push(trickResult);
-
-  // Emit trick resolution with updated state (showing trick result for 3 seconds)
+  // 4. I/O - Emit trick resolution event
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, points: totalPoints, gameState: game });
 
-  // Check if round is over BEFORE the 3-second delay
-  const isRoundOver = game.players.every((p) => p.hand.length === 0);
-
-  if (isRoundOver) {
-    // Set phase to 'scoring' immediately so player_ready events work during the 3-second delay
-    game.phase = 'scoring';
-
+  // 5. ORCHESTRATION - Handle round completion or continue playing
+  if (result.isRoundOver) {
     // Wait 3 seconds before finalizing round
     setTimeout(() => {
-      game.currentTrick = [];
       endRound(gameId);
     }, 3000);
   } else {
     // Normal trick resolution - continue playing
     setTimeout(() => {
-      game.currentTrick = [];
-      game.currentPlayerIndex = game.players.findIndex((p) => p.id === winnerId);
       io.to(gameId).emit('game_updated', game);
       // Start timeout for trick winner's next card
       startPlayerTimeout(gameId, winnerId, 'playing');
@@ -1715,87 +1696,23 @@ async function endRound(gameId: string) {
     game.phase = 'scoring';
   }
 
-  // Find offensive team (highest bet winner)
-  if (!game.highestBet) return;
+  // 1. PURE CALCULATION - Calculate round scoring
+  const scoring = calculateRoundScoring(game);
 
-  const offensivePlayer = game.players.find(p => p.id === game.highestBet?.playerId);
-  if (!offensivePlayer) return;
+  // 2. STATE TRANSFORMATION - Apply scoring to game state (updates scores, adds to history, checks game over)
+  applyRoundScoring(game, scoring);
 
-  const offensiveTeamId = offensivePlayer.teamId;
-  const defensiveTeamId = offensiveTeamId === 1 ? 2 : 1;
-
-  // Calculate offensive team total points
-  const offensiveTeamPoints = game.players
-    .filter(p => p.teamId === offensiveTeamId)
-    .reduce((sum, p) => sum + p.pointsWon, 0);
-
-  // Calculate defensive team total points
-  const defensiveTeamPoints = game.players
-    .filter(p => p.teamId === defensiveTeamId)
-    .reduce((sum, p) => sum + p.pointsWon, 0);
-
-  const betAmount = game.highestBet.amount;
-  const multiplier = game.highestBet.withoutTrump ? 2 : 1;
-
-  // Offensive team: win or lose their bet
-  let offensiveScore = 0;
-  if (offensiveTeamPoints >= betAmount) {
-    // Made their bet - gain bet amount
-    offensiveScore = betAmount * multiplier;
-    if (offensiveTeamId === 1) {
-      game.teamScores.team1 += offensiveScore;
-    } else {
-      game.teamScores.team2 += offensiveScore;
-    }
-    console.log(`Offensive Team ${offensiveTeamId} made bet (${offensiveTeamPoints}/${betAmount}): +${offensiveScore}`);
-  } else {
-    // Failed their bet - lose bet amount
-    offensiveScore = -(betAmount * multiplier);
-    if (offensiveTeamId === 1) {
-      game.teamScores.team1 += offensiveScore;
-    } else {
-      game.teamScores.team2 += offensiveScore;
-    }
-    console.log(`Offensive Team ${offensiveTeamId} failed bet (${offensiveTeamPoints}/${betAmount}): ${offensiveScore}`);
-  }
-
-  // Defensive team: always gain their points (no negatives)
-  if (defensiveTeamId === 1) {
-    game.teamScores.team1 += defensiveTeamPoints;
-  } else {
-    game.teamScores.team2 += defensiveTeamPoints;
-  }
-  console.log(`Defensive Team ${defensiveTeamId}: +${defensiveTeamPoints}`);
-  console.log(`Round ${game.roundNumber} Scores - Team 1: ${game.teamScores.team1}, Team 2: ${game.teamScores.team2}`);
-
-  // Calculate round statistics
+  // 3. Add round statistics to the round history entry
   const statistics = calculateRoundStatistics(gameId, game);
+  const lastRound = game.roundHistory[game.roundHistory.length - 1];
+  if (lastRound) {
+    lastRound.statistics = statistics;
+  }
 
-  // Add round to history
-  const roundScore = {
-    team1: offensiveTeamId === 1 ? offensiveScore : defensiveTeamPoints,
-    team2: offensiveTeamId === 2 ? offensiveScore : defensiveTeamPoints,
-  };
-
-  game.roundHistory.push({
-    roundNumber: game.roundNumber,
-    bets: [...game.currentBets],
-    highestBet: game.highestBet,
-    offensiveTeam: offensiveTeamId,
-    offensivePoints: offensiveTeamPoints,
-    defensivePoints: defensiveTeamPoints,
-    betAmount: game.highestBet.amount,
-    withoutTrump: game.highestBet.withoutTrump,
-    betMade: offensiveTeamPoints >= betAmount,
-    roundScore,
-    cumulativeScore: {
-      team1: game.teamScores.team1,
-      team2: game.teamScores.team2,
-    },
-    tricks: [...game.currentRoundTricks], // Store all tricks from this round
-    trump: game.trump, // Store trump suit for this round
-    statistics, // Add round statistics
-  });
+  // Log scoring results
+  console.log(`Offensive Team ${scoring.offensiveTeamId} ${scoring.betMade ? 'made' : 'failed'} bet (${scoring.offensiveTeamPoints}/${scoring.betAmount}): ${scoring.offensiveScore > 0 ? '+' : ''}${scoring.offensiveScore}`);
+  console.log(`Defensive Team ${scoring.defensiveTeamId}: +${scoring.defensiveScore}`);
+  console.log(`Round ${game.roundNumber} Scores - Team 1: ${game.teamScores.team1}, Team 2: ${game.teamScores.team2}`);
 
   // Save game state incrementally after each round
   try {
@@ -1811,7 +1728,7 @@ async function endRound(gameId: string) {
 
     for (const player of humanPlayers) {
       const playerTeamId = player.teamId;
-      const roundWon = playerTeamId === offensiveTeamId && offensiveTeamPoints >= betAmount;
+      const roundWon = playerTeamId === scoring.offensiveTeamId && scoring.betMade;
       const wasBidder = game.highestBet?.playerId === player.id;
 
       await updateRoundStats(player.name, {
@@ -1819,8 +1736,8 @@ async function endRound(gameId: string) {
         tricksWon: player.tricksWon,
         pointsEarned: player.pointsWon,
         wasBidder,
-        betAmount: wasBidder ? game.highestBet?.amount : undefined,
-        betMade: wasBidder ? (offensiveTeamPoints >= betAmount) : undefined,
+        betAmount: wasBidder ? scoring.betAmount : undefined,
+        betMade: wasBidder ? scoring.betMade : undefined,
         withoutTrump: wasBidder ? game.highestBet?.withoutTrump : undefined,
         redZerosCollected: stats?.redZerosCollected.get(player.id) || 0,
         brownZerosReceived: stats?.brownZerosReceived.get(player.id) || 0,
@@ -1833,10 +1750,10 @@ async function endRound(gameId: string) {
     console.error('Error saving game progress:', error);
   }
 
-  // Check for game over
-  if (game.teamScores.team1 >= 41 || game.teamScores.team2 >= 41) {
-    game.phase = 'game_over';
-    const winningTeam = game.teamScores.team1 >= 41 ? 1 : 2;
+  // 4. ORCHESTRATION - Handle game over or continue to next round
+  if (scoring.gameOver && scoring.winningTeam) {
+    // Game over - phase already set to 'game_over' by applyRoundScoring()
+    const winningTeam = scoring.winningTeam;
 
     try {
       // Mark game as finished in database

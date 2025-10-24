@@ -364,3 +364,251 @@ export function setPhase(
 ): void {
   game.phase = newPhase;
 }
+
+/**
+ * Result of trick resolution including metadata
+ */
+export interface TrickResolutionResult {
+  winnerId: string;
+  points: number;
+  isRoundOver: boolean;
+  winnerIndex: number;
+}
+
+/**
+ * Applies trick resolution to game state.
+ *
+ * Performs the following transformations:
+ * - Awards tricks and points to winner
+ * - Stores current trick as previousTrick
+ * - Adds trick to currentRoundTricks history
+ * - Clears currentTrick
+ * - Sets winner as next player
+ * - Transitions to 'scoring' phase if round is over
+ *
+ * Note: Requires currentTrick to have 4 cards.
+ *
+ * @param game - Game state (will be mutated)
+ * @param winnerId - ID of player who won the trick
+ * @param points - Total points for the trick (1 + special card points)
+ * @returns Metadata about the resolution
+ *
+ * @example
+ * const winnerId = determineWinner(game.currentTrick, game.trump);
+ * const specialPoints = calculateTrickPoints(game.currentTrick);
+ * const totalPoints = 1 + specialPoints;
+ * const result = applyTrickResolution(game, winnerId, totalPoints);
+ * if (result.isRoundOver) {
+ *   setTimeout(() => endRound(gameId), 3000);
+ * }
+ */
+export function applyTrickResolution(
+  game: GameState,
+  winnerId: string,
+  points: number
+): TrickResolutionResult {
+  const winnerIndex = game.players.findIndex(p => p.id === winnerId);
+
+  if (winnerIndex === -1) {
+    throw new Error('Winner not found in players list');
+  }
+
+  // Award trick and points to winner
+  game.players[winnerIndex].tricksWon += 1;
+  game.players[winnerIndex].pointsWon += points;
+
+  // Store trick result before clearing
+  const trickResult = {
+    trick: [...game.currentTrick],
+    winnerId,
+    points,
+  };
+
+  game.previousTrick = trickResult;
+  game.currentRoundTricks.push(trickResult);
+
+  // Check if round is over (all players have empty hands)
+  const isRoundOver = game.players.every(p => p.hand.length === 0);
+
+  // Clear current trick
+  game.currentTrick = [];
+
+  // Set winner as next player
+  game.currentPlayerIndex = winnerIndex;
+
+  // If round is over, transition to scoring phase
+  if (isRoundOver) {
+    game.phase = 'scoring';
+  }
+
+  return {
+    winnerId,
+    points,
+    isRoundOver,
+    winnerIndex,
+  };
+}
+
+/**
+ * Result of round scoring calculations
+ */
+export interface RoundScoringResult {
+  offensiveTeamId: 1 | 2;
+  defensiveTeamId: 1 | 2;
+  offensiveTeamPoints: number;
+  defensiveTeamPoints: number;
+  betAmount: number;
+  withoutTrump: boolean;
+  multiplier: number;
+  betMade: boolean;
+  offensiveScore: number;
+  defensiveScore: number;
+  roundScore: {
+    team1: number;
+    team2: number;
+  };
+  newTeamScores: {
+    team1: number;
+    team2: number;
+  };
+  gameOver: boolean;
+  winningTeam?: 1 | 2;
+}
+
+/**
+ * Calculates round scoring based on bet results.
+ *
+ * Determines offensive/defensive teams, calculates points earned,
+ * applies bet multipliers, and computes new team scores.
+ *
+ * Scoring rules:
+ * - Offensive team (highest bettor): +/- bet amount × multiplier
+ * - Defensive team: always + their points earned
+ * - Multiplier: 2 if "without trump", otherwise 1
+ * - Game over if either team reaches 41+ points
+ *
+ * @param game - Current game state (not mutated)
+ * @returns Complete scoring breakdown and new scores
+ *
+ * @example
+ * const scoring = calculateRoundScoring(game);
+ * console.log(`Team ${scoring.offensiveTeamId} ${scoring.betMade ? 'made' : 'failed'} bet`);
+ * applyRoundScoring(game, scoring);
+ */
+export function calculateRoundScoring(game: GameState): RoundScoringResult {
+  if (!game.highestBet) {
+    throw new Error('No highest bet found for scoring');
+  }
+
+  const offensivePlayer = game.players.find(p => p.id === game.highestBet?.playerId);
+  if (!offensivePlayer) {
+    throw new Error('Betting player not found');
+  }
+
+  const offensiveTeamId = offensivePlayer.teamId;
+  const defensiveTeamId = offensiveTeamId === 1 ? 2 : 1;
+
+  // Calculate team totals
+  const offensiveTeamPoints = game.players
+    .filter(p => p.teamId === offensiveTeamId)
+    .reduce((sum, p) => sum + p.pointsWon, 0);
+
+  const defensiveTeamPoints = game.players
+    .filter(p => p.teamId === defensiveTeamId)
+    .reduce((sum, p) => sum + p.pointsWon, 0);
+
+  const betAmount = game.highestBet.amount;
+  const multiplier = game.highestBet.withoutTrump ? 2 : 1;
+  const betMade = offensiveTeamPoints >= betAmount;
+
+  // Calculate scores
+  const offensiveScore = betMade
+    ? betAmount * multiplier
+    : -(betAmount * multiplier);
+  const defensiveScore = defensiveTeamPoints;
+
+  const roundScore = {
+    team1: offensiveTeamId === 1 ? offensiveScore : defensiveScore,
+    team2: offensiveTeamId === 2 ? offensiveScore : defensiveScore,
+  };
+
+  const newTeamScores = {
+    team1: game.teamScores.team1 + roundScore.team1,
+    team2: game.teamScores.team2 + roundScore.team2,
+  };
+
+  const gameOver = newTeamScores.team1 >= 41 || newTeamScores.team2 >= 41;
+  const winningTeam = gameOver
+    ? (newTeamScores.team1 >= 41 ? 1 : 2)
+    : undefined;
+
+  return {
+    offensiveTeamId,
+    defensiveTeamId,
+    offensiveTeamPoints,
+    defensiveTeamPoints,
+    betAmount,
+    withoutTrump: game.highestBet.withoutTrump,
+    multiplier,
+    betMade,
+    offensiveScore,
+    defensiveScore,
+    roundScore,
+    newTeamScores,
+    gameOver,
+    winningTeam: winningTeam as 1 | 2 | undefined,
+  };
+}
+
+/**
+ * Applies round scoring to game state.
+ *
+ * Updates team scores, adds round to history, and transitions
+ * to game_over phase if a team reached 41+ points.
+ *
+ * @param game - Game state (will be mutated)
+ * @param scoring - Scoring calculation from calculateRoundScoring()
+ *
+ * @example
+ * const scoring = calculateRoundScoring(game);
+ * applyRoundScoring(game, scoring);
+ * if (scoring.gameOver) {
+ *   io.to(gameId).emit('game_over', {
+ *     winningTeam: scoring.winningTeam,
+ *     gameState: game
+ *   });
+ * }
+ */
+export function applyRoundScoring(
+  game: GameState,
+  scoring: RoundScoringResult
+): void {
+  // Update team scores
+  game.teamScores.team1 = scoring.newTeamScores.team1;
+  game.teamScores.team2 = scoring.newTeamScores.team2;
+
+  // Add to round history
+  game.roundHistory.push({
+    roundNumber: game.roundNumber,
+    bets: [...game.currentBets],
+    highestBet: game.highestBet!,
+    offensiveTeam: scoring.offensiveTeamId,
+    offensivePoints: scoring.offensiveTeamPoints,
+    defensivePoints: scoring.defensiveTeamPoints,
+    betAmount: scoring.betAmount,
+    withoutTrump: scoring.withoutTrump,
+    betMade: scoring.betMade,
+    roundScore: scoring.roundScore,
+    cumulativeScore: {
+      team1: scoring.newTeamScores.team1,
+      team2: scoring.newTeamScores.team2,
+    },
+    tricks: [...game.currentRoundTricks],
+    trump: game.trump,
+  });
+
+  // Transition to game_over if applicable
+  if (scoring.gameOver) {
+    game.phase = 'game_over';
+  }
+}
