@@ -417,20 +417,28 @@ export function applyTrickResolution(
   winnerId: string,
   points: number
 ): TrickResolutionResult {
-  const winnerIndex = game.players.findIndex(p => p.id === winnerId);
+  // Look up winner by name first (stable), fallback to ID (for backwards compat)
+  // winnerId might be a playerName or a socket ID depending on caller
+  let winnerIndex = game.players.findIndex(p => p.name === winnerId);
+  if (winnerIndex === -1) {
+    winnerIndex = game.players.findIndex(p => p.id === winnerId);
+  }
 
   if (winnerIndex === -1) {
     throw new Error('Winner not found in players list');
   }
 
-  // Award trick and points to winner
-  game.players[winnerIndex].tricksWon += 1;
-  game.players[winnerIndex].pointsWon += points;
+  const winner = game.players[winnerIndex];
 
-  // Store trick result before clearing
+  // Award trick and points to winner
+  winner.tricksWon += 1;
+  winner.pointsWon += points;
+
+  // Store trick result before clearing (include both winnerId and winnerName)
   const trickResult = {
     trick: [...game.currentTrick],
-    winnerId,
+    winnerId: winner.id, // Current socket ID (may change on reconnect)
+    winnerName: winner.name, // Stable identifier
     points,
   };
 

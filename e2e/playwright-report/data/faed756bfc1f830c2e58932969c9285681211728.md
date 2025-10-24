@@ -1,0 +1,87 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - button "Open debug menu" [ref=e4] [cursor=pointer]: ⚙️ Debug
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - paragraph [ref=e10]: CU727K
+      - paragraph [ref=e12]: R1
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: T1
+        - paragraph [ref=e15]: "0"
+      - generic [ref=e16]: ":"
+      - generic [ref=e17]:
+        - paragraph [ref=e18]: T2
+        - paragraph [ref=e19]: "0"
+      - generic [ref=e20]:
+        - button "💬 Chat" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: 💬
+          - generic [ref=e23]: Chat
+        - button "🏆 Stats" [ref=e24] [cursor=pointer]:
+          - generic [ref=e25]: 🏆
+          - generic [ref=e26]: Stats
+        - button "🎮 Manual" [ref=e27] [cursor=pointer]:
+          - generic [ref=e28]: 🎮
+          - generic [ref=e29]: Manual
+        - button "☀️ Light" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: ☀️
+          - generic [ref=e32]: Light
+        - button "🔊 On" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: 🔊
+          - generic [ref=e35]: "On"
+        - button "🚪 Leave" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: 🚪
+          - generic [ref=e38]: Leave
+    - generic [ref=e39]:
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - heading "Team 1" [level=3] [ref=e44]
+          - paragraph [ref=e45]: +0 pts
+        - generic [ref=e46]:
+          - generic [ref=e48]: "Waiting for: Player 2"
+          - paragraph [ref=e50]: 🎲 9
+        - generic [ref=e51]:
+          - heading "Team 2" [level=3] [ref=e52]
+          - paragraph [ref=e53]: +0 pts
+      - generic [ref=e56]:
+        - generic [ref=e61]: Player 1 (You)
+        - generic [ref=e63]: Player 2
+        - generic [ref=e68]: Player 3
+        - generic [ref=e76]: Player 4
+      - generic [ref=e77]:
+        - paragraph [ref=e80]: Waiting for first card from Player 2...
+        - generic [ref=e87]:
+          - button "2 red emblem 2" [disabled] [ref=e89]:
+            - generic [ref=e90]: "2"
+            - img "red emblem" [ref=e91]
+            - generic [ref=e92]: "2"
+          - button "6 red emblem 6" [disabled] [ref=e94]:
+            - generic [ref=e95]: "6"
+            - img "red emblem" [ref=e96]
+            - generic [ref=e97]: "6"
+          - button "3 brown emblem 3" [disabled] [ref=e99]:
+            - generic [ref=e100]: "3"
+            - img "brown emblem" [ref=e101]
+            - generic [ref=e102]: "3"
+          - button "6 brown emblem 6" [disabled] [ref=e104]:
+            - generic [ref=e105]: "6"
+            - img "brown emblem" [ref=e106]
+            - generic [ref=e107]: "6"
+          - button "7 brown emblem 7" [disabled] [ref=e109]:
+            - generic [ref=e110]: "7"
+            - img "brown emblem" [ref=e111]
+            - generic [ref=e112]: "7"
+          - button "3 green emblem 3" [disabled] [ref=e114]:
+            - generic [ref=e115]: "3"
+            - img "green emblem" [ref=e116]
+            - generic [ref=e117]: "3"
+          - button "5 blue emblem 5" [disabled] [ref=e119]:
+            - generic [ref=e120]: "5"
+            - img "blue emblem" [ref=e121]
+            - generic [ref=e122]: "5"
+          - button "7 blue emblem 7" [disabled] [ref=e124]:
+            - generic [ref=e125]: "7"
+            - img "blue emblem" [ref=e126]
+            - generic [ref=e127]: "7"
+```

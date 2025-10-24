@@ -38,7 +38,8 @@ export interface TrickCard {
 
 export interface TrickResult {
   trick: TrickCard[];
-  winnerId: string;
+  winnerId: string; // Socket ID (changes on reconnect) - kept for backwards compat
+  winnerName: string; // STABLE identifier - use this for lookups
   points: number;
 }
 

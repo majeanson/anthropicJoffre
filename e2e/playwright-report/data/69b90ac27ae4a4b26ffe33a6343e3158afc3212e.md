@@ -1,0 +1,86 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - button "Open debug menu" [ref=e4] [cursor=pointer]: ⚙️ Debug
+  - generic [ref=e5]:
+    - generic [ref=e8]:
+      - paragraph [ref=e10]: F7IEI
+      - paragraph [ref=e12]: R1
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: T1
+        - paragraph [ref=e15]: "0"
+      - generic [ref=e16]: ":"
+      - generic [ref=e17]:
+        - paragraph [ref=e18]: T2
+        - paragraph [ref=e19]: "0"
+      - generic [ref=e20]:
+        - button "💬 Chat" [ref=e21] [cursor=pointer]:
+          - generic [ref=e22]: 💬
+          - generic [ref=e23]: Chat
+        - button "🏆 Stats" [ref=e24] [cursor=pointer]:
+          - generic [ref=e25]: 🏆
+          - generic [ref=e26]: Stats
+        - button "🎮 Manual" [ref=e27] [cursor=pointer]:
+          - generic [ref=e28]: 🎮
+          - generic [ref=e29]: Manual
+        - button "☀️ Light" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: ☀️
+          - generic [ref=e32]: Light
+        - button "🚪 Leave" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: 🚪
+          - generic [ref=e35]: Leave
+    - generic [ref=e37]:
+      - heading "Betting Phase" [level=2] [ref=e38]
+      - generic [ref=e40]: "Waiting for: Player 3"
+      - generic [ref=e41]:
+        - heading "Players & Bets" [level=3] [ref=e42]
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - generic [ref=e47]: Player 1
+            - generic [ref=e48]: Waiting...
+          - generic [ref=e49]:
+            - generic [ref=e52]: Player 2(Dealer)
+            - generic [ref=e53]: Waiting...
+          - generic [ref=e54]:
+            - generic [ref=e57]: Player 3
+            - generic [ref=e58]: Waiting...
+          - generic [ref=e59]:
+            - generic [ref=e62]: Player 4
+            - generic [ref=e63]: Waiting...
+      - generic [ref=e64]:
+        - heading "Your Hand" [level=3] [ref=e65]
+        - generic [ref=e66]:
+          - button "red bon +5" [ref=e68]:
+            - img "red bon" [ref=e69]
+            - generic [ref=e70]: "+5"
+          - button "6 red emblem 6" [ref=e72]:
+            - generic [ref=e73]: "6"
+            - img "red emblem" [ref=e74]
+            - generic [ref=e75]: "6"
+          - button "2 brown emblem 2" [ref=e77]:
+            - generic [ref=e78]: "2"
+            - img "brown emblem" [ref=e79]
+            - generic [ref=e80]: "2"
+          - button "4 brown emblem 4" [ref=e82]:
+            - generic [ref=e83]: "4"
+            - img "brown emblem" [ref=e84]
+            - generic [ref=e85]: "4"
+          - button "7 brown emblem 7" [ref=e87]:
+            - generic [ref=e88]: "7"
+            - img "brown emblem" [ref=e89]
+            - generic [ref=e90]: "7"
+          - button "4 green emblem 4" [ref=e92]:
+            - generic [ref=e93]: "4"
+            - img "green emblem" [ref=e94]
+            - generic [ref=e95]: "4"
+          - button "0 blue emblem 0" [ref=e97]:
+            - generic [ref=e98]: "0"
+            - img "blue emblem" [ref=e99]
+            - generic [ref=e100]: "0"
+          - button "1 blue emblem 1" [ref=e102]:
+            - generic [ref=e103]: "1"
+            - img "blue emblem" [ref=e104]
+            - generic [ref=e105]: "1"
+      - generic [ref=e108]: It's Player 3's turn to bet
+```

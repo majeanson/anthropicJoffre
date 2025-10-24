@@ -1,0 +1,61 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - button "Open debug menu" [ref=e4] [cursor=pointer]: ⚙️ Debug
+  - generic [ref=e5]:
+    - generic:
+      - generic: 🃏
+      - generic: 🎴
+      - generic: 🂡
+      - generic: 🂱
+    - generic [ref=e6]:
+      - generic [ref=e11]:
+        - button "🚪 Leave" [ref=e12] [cursor=pointer]
+        - button "🌙" [ref=e13] [cursor=pointer]
+      - heading "Team Selection" [level=2] [ref=e14]
+      - generic [ref=e15]:
+        - paragraph [ref=e16]: "Game ID:"
+        - generic [ref=e17]: YJ4IUS
+        - button "🔗 Copy Game Link" [ref=e18] [cursor=pointer]:
+          - generic [ref=e19]: 🔗
+          - generic [ref=e20]: Copy Game Link
+      - paragraph [ref=e22]: Players (3/4) - Choose your team and position
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - heading "Team 1" [level=3] [ref=e25]
+          - generic [ref=e26]:
+            - generic [ref=e29]: Player 1 (You)
+            - generic [ref=e31]:
+              - generic [ref=e32]: Player 3
+              - generic [ref=e33]:
+                - button "Swap" [ref=e34] [cursor=pointer]
+                - button "✕" [ref=e35] [cursor=pointer]
+        - generic [ref=e36]:
+          - heading "Team 2" [level=3] [ref=e37]
+          - generic [ref=e38]:
+            - generic [ref=e40]:
+              - generic [ref=e41]: Player 2
+              - generic [ref=e42]:
+                - button "Swap" [ref=e43] [cursor=pointer]
+                - button "✕" [ref=e44] [cursor=pointer]
+            - button "Join Team 2" [ref=e47] [cursor=pointer]
+      - generic [ref=e48]:
+        - heading "💬 Team Chat" [level=3] [ref=e49]
+        - paragraph [ref=e51]: No messages yet. Say hi!
+        - generic [ref=e52]:
+          - textbox "Type a message... (max 200 chars)" [ref=e53]
+          - button "Send" [disabled] [ref=e54]
+      - generic [ref=e55]:
+        - generic [ref=e56]:
+          - generic [ref=e57]: Bot Difficulty
+          - generic [ref=e58]:
+            - button "Easy" [ref=e59] [cursor=pointer]
+            - button "Medium" [ref=e60] [cursor=pointer]
+            - button "Hard" [ref=e61] [cursor=pointer]
+        - generic [ref=e62]:
+          - button "🤖 Add Bot" [ref=e63] [cursor=pointer]
+          - button "Start Game" [disabled] [ref=e64]
+        - paragraph [ref=e65]: Waiting for 1 more player(s) to join
+      - button "📖 Game Rules" [ref=e67] [cursor=pointer]
+```

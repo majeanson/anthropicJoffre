@@ -394,8 +394,8 @@ process.on('SIGTERM', cleanup);
 process.on('SIGINT', cleanup);
 
 // Helper to clear timeout for a player
-function clearPlayerTimeout(gameId: string, playerId: string) {
-  const key = `${gameId}-${playerId}`;
+function clearPlayerTimeout(gameId: string, playerNameOrId: string) {
+  const key = `${gameId}-${playerNameOrId}`;
   const timeout = activeTimeouts.get(key);
   if (timeout) {
     clearTimeout(timeout);
@@ -411,12 +411,23 @@ function clearPlayerTimeout(gameId: string, playerId: string) {
   }
 }
 
-// Helper to start timeout for current player
-function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' | 'playing') {
-  const key = `${gameId}-${playerId}`;
+// Helper to start timeout for current player (uses stable playerName)
+function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'betting' | 'playing') {
+  const game = games.get(gameId);
+  if (!game) return;
+
+  // Look up player by name (stable), fallback to ID
+  let player = game.players.find(p => p.name === playerNameOrId);
+  if (!player) {
+    player = game.players.find(p => p.id === playerNameOrId);
+  }
+  if (!player) return;
+
+  const playerName = player.name;
+  const key = `${gameId}-${playerName}`; // Use stable playerName for key
 
   // Clear any existing timeout for this player
-  clearPlayerTimeout(gameId, playerId);
+  clearPlayerTimeout(gameId, playerName);
 
   const timeoutDuration = phase === 'betting' ? BETTING_TIMEOUT : PLAYING_TIMEOUT;
   const startTime = Date.now();
@@ -432,17 +443,17 @@ function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' |
       return;
     }
 
-    // Check if still current player's turn
+    // Check if still current player's turn (use name for stable check)
     const currentPlayer = game.players[game.currentPlayerIndex];
-    if (currentPlayer.id !== playerId || game.phase !== phase) {
+    if (currentPlayer.name !== playerName || game.phase !== phase) {
       clearInterval(countdownInterval);
       return;
     }
 
     // Send countdown update to all players
     io.to(gameId).emit('timeout_countdown', {
-      playerId,
-      playerName: currentPlayer.name,
+      playerId: currentPlayer.id, // Current socket ID
+      playerName: playerName, // Stable identifier
       secondsRemaining: remaining,
       phase
     });
@@ -450,8 +461,8 @@ function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' |
     // Send warning at 15 seconds
     if (remaining === 15) {
       io.to(gameId).emit('timeout_warning', {
-        playerId,
-        playerName: currentPlayer.name,
+        playerId: currentPlayer.id,
+        playerName: playerName,
         secondsRemaining: 15
       });
     }
@@ -465,22 +476,22 @@ function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' |
     const game = games.get(gameId);
     if (!game) return;
 
-    const player = game.players.find(p => p.id === playerId);
+    const player = game.players.find(p => p.name === playerName);
     if (!player) return;
 
-    console.log(`⏰ Timeout: ${player.name} (${playerId}) in ${phase} phase`);
+    console.log(`⏰ Timeout: ${player.name} in ${phase} phase`);
 
     // Emit auto-action notification
     io.to(gameId).emit('auto_action_taken', {
-      playerId,
+      playerId: player.id,
       playerName: player.name,
       phase
     });
 
     if (phase === 'betting') {
-      handleBettingTimeout(gameId, playerId);
+      handleBettingTimeout(gameId, playerName);
     } else {
-      handlePlayingTimeout(gameId, playerId);
+      handlePlayingTimeout(gameId, playerName);
     }
   }, timeoutDuration);
 
@@ -488,15 +499,19 @@ function startPlayerTimeout(gameId: string, playerId: string, phase: 'betting' |
   activeTimeouts.set(`${key}-interval`, countdownInterval as any);
 }
 
-// Handle betting timeout - auto-skip bet
-function handleBettingTimeout(gameId: string, playerId: string) {
+// Handle betting timeout - auto-skip bet (uses stable playerName)
+function handleBettingTimeout(gameId: string, playerName: string) {
   const game = games.get(gameId);
   if (!game || game.phase !== 'betting') return;
 
-  const currentPlayer = game.players[game.currentPlayerIndex];
-  if (currentPlayer.id !== playerId) return; // Not their turn anymore
+  // Look up player by name (stable across reconnects)
+  const player = game.players.find(p => p.name === playerName);
+  if (!player) return;
 
-  const hasAlreadyBet = game.currentBets.some(b => b.playerId === playerId);
+  const currentPlayer = game.players[game.currentPlayerIndex];
+  if (currentPlayer.name !== playerName) return; // Not their turn anymore
+
+  const hasAlreadyBet = game.currentBets.some(b => b.playerId === player.id);
   if (hasAlreadyBet) return; // Already bet
 
   console.log(`Auto-skipping bet for ${currentPlayer.name} due to timeout`);
@@ -507,7 +522,7 @@ function handleBettingTimeout(gameId: string, playerId: string) {
   // If dealer and no valid bets, must bet minimum 7
   if (isDealer && !hasValidBets) {
     const bet: Bet = {
-      playerId,
+      playerId: player.id,
       amount: 7,
       withoutTrump: false,
       skipped: false,
@@ -517,7 +532,7 @@ function handleBettingTimeout(gameId: string, playerId: string) {
   } else {
     // Skip the bet
     const bet: Bet = {
-      playerId,
+      playerId: player.id,
       amount: -1,
       withoutTrump: false,
       skipped: true,
@@ -533,7 +548,7 @@ function handleBettingTimeout(gameId: string, playerId: string) {
       game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
       emitGameUpdate(gameId, game);
       io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
-      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
+      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'betting');
       return;
     }
 
@@ -545,23 +560,27 @@ function handleBettingTimeout(gameId: string, playerId: string) {
     );
     game.currentPlayerIndex = highestBidderIndex;
     emitGameUpdate(gameId, game);
-    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
+    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'playing');
   } else {
     game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
     emitGameUpdate(gameId, game);
-    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
+    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'betting');
   }
 }
 
-// Handle playing timeout - auto-play random valid card
-function handlePlayingTimeout(gameId: string, playerId: string) {
+// Handle playing timeout - auto-play random valid card (uses stable playerName)
+function handlePlayingTimeout(gameId: string, playerName: string) {
   const game = games.get(gameId);
   if (!game || game.phase !== 'playing') return;
 
-  const currentPlayer = game.players[game.currentPlayerIndex];
-  if (currentPlayer.id !== playerId) return; // Not their turn anymore
+  // Look up player by name (stable across reconnects)
+  const player = game.players.find(p => p.name === playerName);
+  if (!player) return;
 
-  const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === playerId);
+  const currentPlayer = game.players[game.currentPlayerIndex];
+  if (currentPlayer.name !== playerName) return; // Not their turn anymore
+
+  const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerName === playerName);
   if (hasAlreadyPlayed) return; // Already played
 
   if (game.currentTrick.length >= 4) return; // Trick complete
@@ -593,8 +612,12 @@ function handlePlayingTimeout(gameId: string, playerId: string) {
     game.trump = randomCard.color;
   }
 
-  // Add card to trick
-  game.currentTrick.push({ playerId, card: randomCard });
+  // Add card to trick (include both playerId and playerName)
+  game.currentTrick.push({
+    playerId: player.id,
+    playerName: player.name,
+    card: randomCard
+  });
 
   // Remove card from player's hand
   currentPlayer.hand = currentPlayer.hand.filter(
@@ -610,7 +633,7 @@ function handlePlayingTimeout(gameId: string, playerId: string) {
     resolveTrick(gameId);
   } else {
     emitGameUpdate(gameId, game);
-    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
+    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'playing');
   }
 }
 
@@ -1982,29 +2005,35 @@ function resolveTrick(gameId: string) {
   const specialCardPoints = calculateTrickPoints(game.currentTrick);
   const totalPoints = 1 + specialCardPoints;
 
-  // 2. SIDE EFFECT - Track special card stats for round statistics
+  // Look up winner's name (stable identifier) from the trick
+  const winningTrickCard = game.currentTrick.find(tc => tc.playerId === winnerId);
+  const winnerName = winningTrickCard?.playerName ||
+                     game.players.find(p => p.id === winnerId)?.name ||
+                     winnerId;
+
+  // 2. SIDE EFFECT - Track special card stats for round statistics (use stable playerName)
   const stats = roundStats.get(gameId);
   if (stats) {
     // Check if trick contains red 0 (worth +5 points)
     const hasRedZero = game.currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
     if (hasRedZero) {
-      const redZeroCount = stats.redZerosCollected.get(winnerId) || 0;
-      stats.redZerosCollected.set(winnerId, redZeroCount + 1);
+      const redZeroCount = stats.redZerosCollected.get(winnerName) || 0;
+      stats.redZerosCollected.set(winnerName, redZeroCount + 1);
     }
 
     // Check if trick contains brown 0 (worth -2 points)
     const hasBrownZero = game.currentTrick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
     if (hasBrownZero) {
-      const brownZeroCount = stats.brownZerosReceived.get(winnerId) || 0;
-      stats.brownZerosReceived.set(winnerId, brownZeroCount + 1);
+      const brownZeroCount = stats.brownZerosReceived.get(winnerName) || 0;
+      stats.brownZerosReceived.set(winnerName, brownZeroCount + 1);
     }
   }
 
-  // 3. STATE TRANSFORMATION - Apply trick resolution (pure function)
-  const result = applyTrickResolution(game, winnerId, totalPoints);
+  // 3. STATE TRANSFORMATION - Apply trick resolution (use stable playerName)
+  const result = applyTrickResolution(game, winnerName, totalPoints);
 
-  // 4. I/O - Emit trick resolution event
-  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, points: totalPoints, gameState: game });
+  // 4. I/O - Emit trick resolution event (include both for backwards compat)
+  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: game });
 
   // 5. ORCHESTRATION - Handle round completion or continue playing
   if (result.isRoundOver) {
@@ -2016,8 +2045,8 @@ function resolveTrick(gameId: string) {
     // Normal trick resolution - continue playing
     setTimeout(() => {
       emitGameUpdate(gameId, game);
-      // Start timeout for trick winner's next card
-      startPlayerTimeout(gameId, winnerId, 'playing');
+      // Start timeout for trick winner's next card (use stable playerName)
+      startPlayerTimeout(gameId, winnerName, 'playing');
     }, 3000);
   }
 }
