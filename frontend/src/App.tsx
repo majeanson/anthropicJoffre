@@ -26,7 +26,7 @@ function App() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [gameId, setGameId] = useState<string>('');
   const [error, setError] = useState<string>('');
-  const botSocketsRef = useRef<Map<string, Socket>>(new Map()); // Track bot sockets by bot player ID
+  const botSocketsRef = useRef<Map<string, Socket>>(new Map()); // Track bot sockets by bot player NAME (stable across reconnects)
   const [debugMode, setDebugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
@@ -516,26 +516,30 @@ function App() {
 
 
     botPlayers.forEach(botPlayer => {
-      // Skip if bot socket already exists and is connected
-      const existingBotSocket = botSocketsRef.current.get(botPlayer.id);
+      const botName = botPlayer.name;
+
+      // Skip if bot socket already exists and is connected (using name as stable key)
+      const existingBotSocket = botSocketsRef.current.get(botName);
       if (existingBotSocket && existingBotSocket.connected) {
+        console.log(`Bot ${botName} already connected, skipping spawn`);
         return;
       }
 
       // Disconnect existing socket if any
       if (existingBotSocket) {
+        console.log(`Disconnecting stale bot socket for ${botName}`);
         existingBotSocket.disconnect();
-        botSocketsRef.current.delete(botPlayer.id);
+        botSocketsRef.current.delete(botName);
       }
 
       // Create new socket for the bot
+      console.log(`Spawning new bot socket for ${botName}`);
       const botSocket = io(SOCKET_URL, {
         transports: ['websocket', 'polling'],
       });
-      const botName = botPlayer.name;
 
-      // Store the bot socket reference
-      botSocketsRef.current.set(botPlayer.id, botSocket);
+      // Store the bot socket reference using NAME as key (stable across reconnects)
+      botSocketsRef.current.set(botName, botSocket);
 
       botSocket.on('connect', () => {
         // Join as a fresh bot connection (server will handle reconnection internally)
