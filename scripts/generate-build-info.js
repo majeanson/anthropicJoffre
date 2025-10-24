@@ -51,28 +51,26 @@ function getFutureTodos() {
     if (fs.existsSync(improvementsPath)) {
       const content = fs.readFileSync(improvementsPath, 'utf-8');
 
-      // Extract Priority 1 items (most important)
-      const priority1Match = content.match(/## Priority 1[\s\S]*?(?=##|$)/);
-      if (priority1Match) {
-        const items = priority1Match[0]
-          .split('\n')
-          .filter(line => line.trim().startsWith('-'))
-          .map(line => line.replace(/^-\s*/, '').trim())
-          .slice(0, 5); // Take first 5 items
+      // Manually curated list of next priority features (remaining incomplete)
+      // Based on Priority 2, 3, 4, 6 from IMPROVEMENT_SUGGESTIONS.md
+      const futureTodos = [
+        'Game Replay Feature - Review and learn from completed games',
+        'Improve Bot AI - Advanced strategy and card tracking',
+        'Enhanced Leaderboard - Charts, statistics, and CSV export',
+        'Achievements & Badges System - Earn rewards for milestones',
+        'Friend System - Add friends and invite to games'
+      ];
 
-        if (items.length > 0) {
-          return items;
-        }
-      }
+      return futureTodos;
     }
 
-    // Fallback todos
+    // Fallback todos if file doesn't exist
     return [
-      'Improve AI difficulty balancing',
-      'Add more sound effects',
-      'Enhanced mobile UI',
-      'Tutorial mode for new players',
-      'Achievement system'
+      'Game Replay Feature',
+      'Improve Bot AI',
+      'Enhanced Leaderboard',
+      'Achievements & Badges',
+      'Friend System'
     ];
   } catch (error) {
     console.warn('Failed to read todos:', error.message);

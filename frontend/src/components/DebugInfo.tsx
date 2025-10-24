@@ -1,8 +1,12 @@
-import { useState } from 'react';
 import buildInfo from '../buildInfo.json';
 
-export function DebugInfo() {
-  const [isOpen, setIsOpen] = useState(false);
+interface DebugInfoProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
+  if (!isOpen) return null;
 
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
@@ -21,20 +25,27 @@ export function DebugInfo() {
   };
 
   return (
-    <div className="mt-6 border-t-2 border-parchment-400 dark:border-gray-600 pt-6">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-lg hover:from-indigo-100 hover:to-purple-100 dark:hover:from-gray-700 dark:hover:to-gray-600 transition-all duration-200 border-2 border-indigo-200 dark:border-gray-600"
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div
+        className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-indigo-600 dark:border-indigo-500"
+        onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">🎮</span>
-          <span className="font-bold text-lg text-indigo-900 dark:text-indigo-200">Debug Fun</span>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">🎮</span>
+            <h2 className="text-4xl font-bold text-indigo-900 dark:text-indigo-100 font-serif">Debug Fun</h2>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 text-3xl font-bold leading-none"
+          >
+            ×
+          </button>
         </div>
-        <span className="text-xl text-indigo-600 dark:text-indigo-400">{isOpen ? '▼' : '▶'}</span>
-      </button>
 
-      {isOpen && (
-        <div className="mt-4 bg-parchment-100 dark:bg-gray-800 rounded-lg p-6 border-2 border-indigo-200 dark:border-gray-600 space-y-4 animate-slideDown">
+        {/* Content */}
+        <div className="space-y-4">
           {/* Version */}
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0">🏷️</span>
@@ -104,7 +115,15 @@ export function DebugInfo() {
             </p>
           </div>
         </div>
-      )}
+
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="w-full mt-8 bg-indigo-600 dark:bg-indigo-700 text-white py-4 rounded-lg font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors border-2 border-indigo-700 dark:border-indigo-600 text-lg"
+        >
+          Got it!
+        </button>
+      </div>
     </div>
   );
 }

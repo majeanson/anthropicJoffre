@@ -39,6 +39,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
+  const [showDebugInfo, setShowDebugInfo] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
   const [socialTab, setSocialTab] = useState<'recent' | 'online'>('online');
@@ -107,6 +108,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     return (
       <>
         <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
+        <DebugInfo isOpen={showDebugInfo} onClose={() => setShowDebugInfo(false)} />
         {showBrowser && (
           <LobbyBrowser
             onJoinGame={(gameId) => {
@@ -554,7 +556,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </div>
 
                         {/* Debug Fun */}
-                        <DebugInfo />
+                        <div className="pt-4 border-t-2 border-parchment-300 dark:border-gray-600">
+                          <button
+                            onClick={() => { sounds.buttonClick(); setShowDebugInfo(true); }}
+                            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 text-white py-3 rounded-lg font-bold hover:from-indigo-700 hover:to-purple-700 dark:hover:from-indigo-600 dark:hover:to-purple-600 transition-all duration-200 border border-indigo-800 dark:border-indigo-600 shadow flex items-center justify-center gap-2"
+                          >
+                            🎮 Debug Fun
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

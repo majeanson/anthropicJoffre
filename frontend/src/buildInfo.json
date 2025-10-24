@@ -1,17 +1,17 @@
 {
-  "buildDate": "2025-10-24T15:46:25.070Z",
+  "buildDate": "2025-10-24T15:54:24.709Z",
   "version": "1.0.1",
   "git": {
-    "commitMessage": "test: Version bump to v1.0.1 - Testing Debug Fun panel in production! 🎮\n\nThis is a test commit to verify the Debug Fun section displays correctly\nin production. The panel should now show:\n\n✅ Version: 1.0.1\n✅ Latest commit message (this one!)\n✅ Build timestamp\n✅ Future feature roadmap\n✅ Git commit hash\n\nIf you're reading this in the Debug Fun panel - IT WORKS! 🎉\n\nChanges:\n- Bumped version from 1.0.0 to 1.0.1\n- Testing auto-generated build info display\n- Verifying commit message extraction\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "b6fc47f",
-    "commitDate": "2025-10-24 11:42:31 -0400",
+    "commitMessage": "fix: Resolve TypeScript build errors in DebugInfo component\n\nFixed TypeScript compilation errors that were blocking Railway deployment:\n\nIssues Fixed:\n1. TS2307: Cannot find module '../buildInfo.json'\n   - Created buildInfo.json with default values (committed to repo)\n   - Created buildInfo.default.json as template\n   - Build process now updates buildInfo.json (no longer gitignored)\n\n2. TS7006: Implicit 'any' type errors in map function\n   - Added explicit type annotations: (todo: string, index: number)\n   - Ensures strict TypeScript compliance\n\n3. TS6133: Unused type import\n   - Removed unused BuildInfo type import\n   - TypeScript infers type from JSON import automatically\n\nChanges:\n- Created frontend/src/types/buildInfo.ts (type definitions)\n- Created frontend/src/buildInfo.default.json (template)\n- Created frontend/src/buildInfo.json (default state, updated by build)\n- Updated .gitignore (removed buildInfo.json exclusion)\n- Fixed DebugInfo.tsx type annotations\n\nBuild Process:\n- buildInfo.json now committed with defaults\n- Build script overwrites with real git info\n- No more missing module errors on fresh installs\n- TypeScript strict mode compliance maintained\n\n✅ Build verified: Both frontend and backend compile successfully\n✅ Railway deployment should now succeed\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "6afb6c2",
+    "commitDate": "2025-10-24 11:47:01 -0400",
     "branch": "main"
   },
   "futureTodos": [
-    "Improve AI difficulty balancing",
-    "Add more sound effects",
-    "Enhanced mobile UI",
-    "Tutorial mode for new players",
-    "Achievement system"
+    "Game Replay Feature - Review and learn from completed games",
+    "Improve Bot AI - Advanced strategy and card tracking",
+    "Enhanced Leaderboard - Charts, statistics, and CSV export",
+    "Achievements & Badges System - Earn rewards for milestones",
+    "Friend System - Add friends and invite to games"
   ]
 }
