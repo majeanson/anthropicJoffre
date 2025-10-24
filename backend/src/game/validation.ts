@@ -17,7 +17,27 @@ export type ValidationResult =
   | { valid: false; error: string };
 
 /**
- * Validates if a card play is allowed
+ * Validates if a card play is allowed.
+ *
+ * Checks all game rules for playing a card:
+ * - Game must be in playing phase
+ * - Player hasn't already played in current trick
+ * - Trick isn't complete (waiting for resolution)
+ * - It's the player's turn
+ * - Card data is valid
+ * - Card is in player's hand
+ * - Suit-following rule is respected (if applicable)
+ *
+ * @param game - Current game state
+ * @param playerId - ID of the player attempting to play
+ * @param card - Card the player wants to play
+ * @returns ValidationResult - Success or error with message
+ *
+ * @example
+ * const result = validateCardPlay(game, 'player-1', { color: 'red', value: 7 });
+ * if (!result.valid) {
+ *   socket.emit('invalid_move', { message: result.error });
+ * }
  */
 export function validateCardPlay(
   game: GameState,
@@ -73,7 +93,27 @@ export function validateCardPlay(
 }
 
 /**
- * Validates if a bet is allowed
+ * Validates if a bet is allowed.
+ *
+ * Checks betting rules:
+ * - Game must be in betting phase
+ * - It's the player's turn
+ * - Player hasn't already bet
+ * - Bet amount is in valid range (7-12) for non-skip bets
+ * - Skip rules: dealer cannot skip if no one has bet
+ *
+ * @param game - Current game state
+ * @param playerId - ID of the player attempting to bet
+ * @param amount - Bet amount (7-12 points)
+ * @param withoutTrump - Whether bet is "without trump"
+ * @param skipped - Optional flag indicating if player is skipping
+ * @returns ValidationResult - Success or error with message
+ *
+ * @example
+ * const result = validateBet(game, 'player-1', 10, false);
+ * if (!result.valid) {
+ *   socket.emit('invalid_bet', { message: result.error });
+ * }
  */
 export function validateBet(
   game: GameState,
@@ -119,7 +159,24 @@ export function validateBet(
 }
 
 /**
- * Validates if a team selection is allowed
+ * Validates if a team selection is allowed.
+ *
+ * Checks team selection rules:
+ * - Game must be in team_selection phase
+ * - Player must exist in game
+ * - Player is not already on the target team
+ * - Target team is not full (max 2 players per team)
+ *
+ * @param game - Current game state
+ * @param playerId - ID of the player selecting a team
+ * @param teamId - Team to join (1 or 2)
+ * @returns ValidationResult - Success or error with message
+ *
+ * @example
+ * const result = validateTeamSelection(game, 'player-1', 1);
+ * if (!result.valid) {
+ *   socket.emit('error', { message: result.error });
+ * }
  */
 export function validateTeamSelection(
   game: GameState,
@@ -151,7 +208,23 @@ export function validateTeamSelection(
 }
 
 /**
- * Validates if a position swap is allowed
+ * Validates if a position swap is allowed.
+ *
+ * Checks position swap rules:
+ * - Game must be in team_selection phase
+ * - Both initiator and target players exist
+ * - Player is not swapping with themselves
+ *
+ * @param game - Current game state
+ * @param initiatorId - ID of the player initiating the swap
+ * @param targetPlayerId - ID of the player to swap positions with
+ * @returns ValidationResult - Success or error with message
+ *
+ * @example
+ * const result = validatePositionSwap(game, 'player-1', 'player-2');
+ * if (!result.valid) {
+ *   socket.emit('error', { message: result.error });
+ * }
  */
 export function validatePositionSwap(
   game: GameState,
@@ -179,7 +252,23 @@ export function validatePositionSwap(
 }
 
 /**
- * Validates if the game can start
+ * Validates if the game can start.
+ *
+ * Checks game start requirements:
+ * - Game must be in team_selection phase
+ * - Exactly 4 players must be present
+ * - Teams must be balanced (2 players per team)
+ *
+ * @param game - Current game state
+ * @returns ValidationResult - Success or error with message
+ *
+ * @example
+ * const result = validateGameStart(game);
+ * if (!result.valid) {
+ *   socket.emit('error', { message: result.error });
+ * } else {
+ *   startNewRound(gameId);
+ * }
  */
 export function validateGameStart(game: GameState): ValidationResult {
   // Check game phase

@@ -1,5 +1,31 @@
+/**
+ * Pure game logic functions for trick card game.
+ *
+ * These functions contain the core game rules:
+ * - Card point values (red 0 = +5, brown 0 = -3)
+ * - Trick winner determination (trump > led suit > off-suit)
+ * - Round scoring (bet met or failed, with/without trump multiplier)
+ * - Bet comparison (higher amount > same amount with "without trump")
+ */
+
 import { Card, CardColor, TrickCard, Player, Bet } from '../types/game';
 
+/**
+ * Gets the point value of a card.
+ *
+ * Point values:
+ * - Red 0 card: +5 points
+ * - Brown 0 card: -3 points
+ * - All other cards: 0 points
+ *
+ * @param card - Card to evaluate
+ * @returns Point value of the card
+ *
+ * @example
+ * getCardPoints({ color: 'red', value: 0 }) // returns 5
+ * getCardPoints({ color: 'brown', value: 0 }) // returns -3
+ * getCardPoints({ color: 'blue', value: 7 }) // returns 0
+ */
 export const getCardPoints = (card: Card): number => {
   // Special cards
   if (card.color === 'red' && card.value === 0) return 5;
@@ -7,6 +33,32 @@ export const getCardPoints = (card: Card): number => {
   return 0;
 };
 
+/**
+ * Determines the winner of a trick.
+ *
+ * Game rules for winning a trick:
+ * 1. Trump always beats non-trump
+ * 2. Within trump cards, higher value wins
+ * 3. Led suit beats off-suit (when no trump)
+ * 4. Within led suit, higher value wins
+ * 5. Off-suit cards cannot win (unless all cards are off-suit)
+ *
+ * The first card played determines the led suit.
+ *
+ * @param trick - Array of 4 cards played in the trick
+ * @param trump - Trump color for this round (null if not set yet)
+ * @returns ID of the player who won the trick
+ * @throws Error if trick is empty
+ *
+ * @example
+ * const trick = [
+ *   { playerId: 'p1', card: { color: 'red', value: 7 } },
+ *   { playerId: 'p2', card: { color: 'blue', value: 4 } },
+ *   { playerId: 'p3', card: { color: 'red', value: 3 } },
+ *   { playerId: 'p4', card: { color: 'green', value: 2 } }
+ * ];
+ * const winner = determineWinner(trick, 'blue'); // 'p2' (trump beats all)
+ */
 export const determineWinner = (
   trick: TrickCard[],
   trump: CardColor | null
@@ -53,10 +105,53 @@ export const determineWinner = (
   return winningCard.playerId;
 };
 
+/**
+ * Calculates the total point value of all cards in a trick.
+ *
+ * Sums the special card points (red 0 = +5, brown 0 = -3).
+ * Most tricks are worth 0 points unless they contain special cards.
+ *
+ * @param trick - Array of cards in the completed trick
+ * @returns Total point value of the trick
+ *
+ * @example
+ * const trick = [
+ *   { playerId: 'p1', card: { color: 'red', value: 0 } },  // +5 points
+ *   { playerId: 'p2', card: { color: 'blue', value: 7 } }, // 0 points
+ *   { playerId: 'p3', card: { color: 'brown', value: 0 } }, // -3 points
+ *   { playerId: 'p4', card: { color: 'green', value: 5 } } // 0 points
+ * ];
+ * calculateTrickPoints(trick); // returns 2 (5 + 0 - 3 + 0)
+ */
 export const calculateTrickPoints = (trick: TrickCard[]): number => {
   return trick.reduce((sum, tc) => sum + getCardPoints(tc.card), 0);
 };
 
+/**
+ * Calculates a player's score for the round based on their bet.
+ *
+ * Scoring rules:
+ * - If points won >= bet amount: Score = bet amount × multiplier
+ * - If points won < bet amount: Score = -bet amount × multiplier
+ * - Multiplier = 2 if "without trump", otherwise 1
+ *
+ * @param player - Player whose score to calculate (uses player.pointsWon)
+ * @param bet - Player's bet for the round
+ * @returns Round score (positive if bet met, negative if failed)
+ *
+ * @example
+ * // Player bet 10 points and won 12 points
+ * calculateRoundScore({ pointsWon: 12 }, { amount: 10, withoutTrump: false });
+ * // returns 10
+ *
+ * // Player bet 10 "without trump" and won 12 points
+ * calculateRoundScore({ pointsWon: 12 }, { amount: 10, withoutTrump: true });
+ * // returns 20 (10 × 2)
+ *
+ * // Player bet 10 points but only won 7 points
+ * calculateRoundScore({ pointsWon: 7 }, { amount: 10, withoutTrump: false });
+ * // returns -10
+ */
 export const calculateRoundScore = (
   player: Player,
   bet: Bet
@@ -72,6 +167,26 @@ export const calculateRoundScore = (
   }
 };
 
+/**
+ * Compares two bets to determine if bet1 is strictly higher than bet2.
+ *
+ * Bet comparison rules:
+ * 1. Higher amount wins
+ * 2. Same amount + "without trump" beats same amount with trump
+ * 3. Equal bets (same amount, same withoutTrump) are NOT considered higher
+ *
+ * @param bet1 - First bet to compare
+ * @param bet2 - Second bet to compare
+ * @returns True if bet1 is strictly higher than bet2
+ *
+ * @example
+ * isBetHigher({ amount: 11 }, { amount: 10 }); // true (11 > 10)
+ * isBetHigher(
+ *   { amount: 10, withoutTrump: true },
+ *   { amount: 10, withoutTrump: false }
+ * ); // true (same amount but without trump)
+ * isBetHigher({ amount: 10 }, { amount: 11 }); // false (10 < 11)
+ */
 export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
   // bet1 is higher if amount is greater
   if (bet1.amount > bet2.amount) return true;
@@ -80,6 +195,33 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
   return false;
 };
 
+/**
+ * Finds the highest bet from an array of bets.
+ *
+ * Rules:
+ * - Skipped bets are filtered out
+ * - Compares bets using isBetHigher() (amount, then withoutTrump)
+ * - Tie-breaker: If bets are exactly equal, dealer wins
+ *
+ * @param bets - Array of all bets placed
+ * @param dealerPlayerId - Optional dealer ID (for tie-breaking)
+ * @returns Highest bet, or null if no valid bets exist
+ *
+ * @example
+ * const bets = [
+ *   { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+ *   { playerId: 'p2', amount: 11, withoutTrump: false, skipped: false },
+ *   { playerId: 'p3', amount: 0, withoutTrump: false, skipped: true }
+ * ];
+ * getHighestBet(bets); // returns p2's bet (11 points)
+ *
+ * // Dealer tie-breaker
+ * const equalBets = [
+ *   { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+ *   { playerId: 'p2', amount: 10, withoutTrump: false, skipped: false } // dealer
+ * ];
+ * getHighestBet(equalBets, 'p2'); // returns p2's bet (dealer wins tie)
+ */
 export const getHighestBet = (bets: Bet[], dealerPlayerId?: string): Bet | null => {
   if (bets.length === 0) return null;
 
