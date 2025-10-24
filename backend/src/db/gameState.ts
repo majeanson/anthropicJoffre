@@ -52,9 +52,15 @@ export async function saveGameState(gameState: GameState): Promise<void> {
       last_updated_at = CURRENT_TIMESTAMP
   `;
 
+  // Prepare game state for serialization (convert Maps to objects)
+  const serializableGameState = {
+    ...gameState,
+    afkWarnings: gameState.afkWarnings ? Object.fromEntries(gameState.afkWarnings) : undefined
+  };
+
   const values = [
     gameState.id,
-    JSON.stringify(gameState),
+    JSON.stringify(serializableGameState),
     gameState.phase,
     status,
     playerCount,
@@ -82,7 +88,14 @@ export async function loadGameState(gameId: string): Promise<GameState | null> {
     return null;
   }
 
-  return result.rows[0].game_state as GameState;
+  const rawGameState = result.rows[0].game_state;
+
+  // Restore Map objects that were serialized as plain objects
+  if (rawGameState.afkWarnings && typeof rawGameState.afkWarnings === 'object' && !Array.isArray(rawGameState.afkWarnings)) {
+    rawGameState.afkWarnings = new Map(Object.entries(rawGameState.afkWarnings));
+  }
+
+  return rawGameState as GameState;
 }
 
 /**
