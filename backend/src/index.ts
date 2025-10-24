@@ -1383,14 +1383,15 @@ io.on('connection', (socket) => {
         const player = game.players.find(p => p.id === tc.playerId);
         console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
       });
-      // Emit game_updated so clients see the 4th card added
-      emitGameUpdate(gameId, game);
+      // Emit socket update so clients see the 4th card added (but DON'T save to DB yet)
+      io.to(gameId).emit('game_updated', game);
       console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
       // Small delay to ensure clients render the 4-card state before resolution
       setTimeout(() => {
         resolveTrick(gameId);
       }, 100);
       // Note: timeout will be started by resolveTrick after 2-second delay
+      // Database save will happen after trick is cleared
     } else {
       // Emit updated state with turn advanced
       console.log(`   ➡️  Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
