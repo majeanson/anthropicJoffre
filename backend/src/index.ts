@@ -629,8 +629,20 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
 
   // Check if trick is complete
   if (game.currentTrick.length === 4) {
-    emitGameUpdate(gameId, game);
-    resolveTrick(gameId);
+    console.log(`   🎯 Trick complete! (via timeout auto-play)`);
+    console.log(`   Final trick state before resolution:`);
+    game.currentTrick.forEach((tc, idx) => {
+      const player = game.players.find(p => p.id === tc.playerId);
+      console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
+    });
+    // Emit socket update so clients see the 4th card added (but DON'T save to DB yet)
+    io.to(gameId).emit('game_updated', game);
+    console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
+    // Small delay to ensure clients render the 4-card state before resolution
+    setTimeout(() => {
+      resolveTrick(gameId);
+    }, 100);
+    // Note: timeout will be started by resolveTrick after 2-second delay
   } else {
     emitGameUpdate(gameId, game);
     startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'playing');
