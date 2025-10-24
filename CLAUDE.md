@@ -12,6 +12,7 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 ### Architecture Patterns
 - **Small atomic components** - Favor new files over agglomeration
 - **Event-driven architecture** - Use WebSocket events, NEVER setTimeout for game logic resolution
+- **Player Identification** - **CRITICAL**: ALWAYS use player names as identifiers, NEVER socket.ids (socket IDs are volatile and change on reconnection)
 - **Type safety** - All WebSocket actions must be well-defined, typed, and reusable
 - **TDD workflow** - Write tests proactively, follow TDD_WORKFLOW.md
 - **Shared types** - Keep backend/src/types/game.ts and frontend/src/types/game.ts in sync

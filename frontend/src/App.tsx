@@ -16,6 +16,7 @@ import { BotManagementPanel } from './components/BotManagementPanel';
 import { BotTakeoverModal } from './components/BotTakeoverModal';
 import { Toast, ToastProps } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
+import { GameReplay } from './components/GameReplay';
 import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { addRecentPlayers } from './utils/recentPlayers';
@@ -60,6 +61,8 @@ function App() {
     availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
     playerName: string;
   } | null>(null);
+
+  const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
 
   useEffect(() => {
     preloadCardImages();
@@ -1437,8 +1440,14 @@ function App() {
               />
             </div>
 
-            {/* Back to Lobby Button */}
-            <div className="flex justify-center">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4">
+              <button
+                onClick={() => setShowReplayModal(true)}
+                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 border-2 border-purple-700 shadow-lg transform hover:scale-105"
+              >
+                📺 View Game Replay
+              </button>
               <button
                 onClick={() => {
                   setGameState(null);
@@ -1451,6 +1460,15 @@ function App() {
             </div>
           </div>
         </div>
+
+        {/* Game Replay Modal */}
+        {showReplayModal && socket && (
+          <GameReplay
+            gameId={gameId}
+            socket={socket}
+            onClose={() => setShowReplayModal(false)}
+          />
+        )}
       </>
     );
   }

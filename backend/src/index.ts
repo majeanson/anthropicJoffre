@@ -66,6 +66,8 @@ import {
   getPlayerStats,
   getLeaderboard,
   getPlayerGameHistory,
+  getGameReplayData,
+  getAllFinishedGames,
   cleanupAbandonedGames,
 } from './db';
 import {
@@ -2167,6 +2169,34 @@ io.on('connection', (socket) => {
     } catch (error) {
       console.error('Error fetching player history:', error);
       socket.emit('error', { message: 'Failed to fetch player game history' });
+    }
+  });
+
+  // Get game replay data
+  socket.on('get_game_replay', async ({ gameId }: { gameId: string }) => {
+    try {
+      const replayData = await getGameReplayData(gameId);
+
+      if (!replayData) {
+        socket.emit('error', { message: 'Game replay not found or game is not finished yet' });
+        return;
+      }
+
+      socket.emit('game_replay_data', { replayData });
+    } catch (error) {
+      console.error('Error fetching game replay:', error);
+      socket.emit('error', { message: 'Failed to fetch game replay data' });
+    }
+  });
+
+  // Get all finished games (for browsing replays)
+  socket.on('get_all_finished_games', async ({ limit = 50, offset = 0 }: { limit?: number; offset?: number }) => {
+    try {
+      const games = await getAllFinishedGames(limit, offset);
+      socket.emit('finished_games_list', { games });
+    } catch (error) {
+      console.error('Error fetching finished games:', error);
+      socket.emit('error', { message: 'Failed to fetch finished games list' });
     }
   });
 

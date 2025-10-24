@@ -474,6 +474,71 @@ export const getPlayerGameHistory = async (playerName: string, limit: number = 2
 };
 
 /**
+ * Get complete replay data for a finished game
+ * Returns all rounds with full trick-by-trick history
+ */
+export const getGameReplayData = async (gameId: string) => {
+  const text = `
+    SELECT
+      game_id,
+      winning_team,
+      team1_score,
+      team2_score,
+      rounds,
+      player_names,
+      player_teams,
+      round_history,
+      trump_suit,
+      game_duration_seconds,
+      is_bot_game,
+      created_at,
+      finished_at
+    FROM game_history
+    WHERE game_id = $1 AND is_finished = TRUE
+  `;
+  const result = await query(text, [gameId]);
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const game = result.rows[0];
+
+  // Parse round_history from JSONB
+  if (typeof game.round_history === 'string') {
+    game.round_history = JSON.parse(game.round_history);
+  }
+
+  return game;
+};
+
+/**
+ * Get list of all finished games (for replay browsing)
+ */
+export const getAllFinishedGames = async (limit: number = 50, offset: number = 0) => {
+  const text = `
+    SELECT
+      game_id,
+      winning_team,
+      team1_score,
+      team2_score,
+      rounds,
+      player_names,
+      player_teams,
+      is_bot_game,
+      game_duration_seconds,
+      created_at,
+      finished_at
+    FROM game_history
+    WHERE is_finished = TRUE
+    ORDER BY finished_at DESC
+    LIMIT $1 OFFSET $2
+  `;
+  const result = await query(text, [limit, offset]);
+  return result.rows;
+};
+
+/**
  * Clean up abandoned games (games not finished after 24 hours)
  */
 export const cleanupAbandonedGames = async () => {
