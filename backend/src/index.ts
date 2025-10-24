@@ -13,8 +13,20 @@ import {
   getHighestBet,
   isBetHigher,
 } from './game/logic';
-import { validateCardPlay, validateBet } from './game/validation';
-import { applyCardPlay, applyBet, resetBetting } from './game/state';
+import {
+  validateCardPlay,
+  validateBet,
+  validateTeamSelection,
+  validatePositionSwap,
+  validateGameStart
+} from './game/validation';
+import {
+  applyCardPlay,
+  applyBet,
+  resetBetting,
+  applyTeamSelection,
+  applyPositionSwap
+} from './game/state';
 import {
   saveGameHistory,
   getRecentGames,
@@ -650,77 +662,46 @@ io.on('connection', (socket) => {
   });
 
   socket.on('select_team', ({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
+    // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
       return;
     }
 
-    if (game.phase !== 'team_selection') {
-      socket.emit('error', { message: 'Cannot select team - game has already started' });
+    // VALIDATION - Use pure validation function
+    const validation = validateTeamSelection(game, socket.id, teamId);
+    if (!validation.valid) {
+      socket.emit('error', { message: validation.error });
       return;
     }
 
-    const player = game.players.find(p => p.id === socket.id);
-    if (!player) {
-      socket.emit('error', { message: 'You are not in this game' });
-      return;
-    }
+    // STATE TRANSFORMATION - Use pure state function
+    applyTeamSelection(game, socket.id, teamId);
 
-    // Validate teamId is 1 or 2
-    if (teamId !== 1 && teamId !== 2) {
-      socket.emit('error', { message: 'Invalid team ID' });
-      return;
-    }
-
-    // Check if team has space (max 2 players per team)
-    const teamCount = game.players.filter(p => p.teamId === teamId).length;
-    if (teamCount >= 2 && player.teamId !== teamId) {
-      socket.emit('error', { message: 'Team is full' });
-      return;
-    }
-
-    player.teamId = teamId;
+    // I/O - Emit updates
     io.to(gameId).emit('game_updated', game);
   });
 
   socket.on('swap_position', ({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
+    // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
       return;
     }
 
-    if (game.phase !== 'team_selection') {
-      socket.emit('error', { message: 'Cannot swap positions - game has already started' });
+    // VALIDATION - Use pure validation function
+    const validation = validatePositionSwap(game, socket.id, targetPlayerId);
+    if (!validation.valid) {
+      socket.emit('error', { message: validation.error });
       return;
     }
 
-    const currentPlayer = game.players.find(p => p.id === socket.id);
-    const targetPlayer = game.players.find(p => p.id === targetPlayerId);
+    // STATE TRANSFORMATION - Use pure state function
+    applyPositionSwap(game, socket.id, targetPlayerId);
 
-    if (!currentPlayer) {
-      socket.emit('error', { message: 'You are not in this game' });
-      return;
-    }
-
-    if (!targetPlayer) {
-      socket.emit('error', { message: 'Target player not found' });
-      return;
-    }
-
-    if (currentPlayer.id === targetPlayer.id) {
-      socket.emit('error', { message: 'Cannot swap with yourself' });
-      return;
-    }
-
-    // Swap positions in the players array
-    const currentIndex = game.players.indexOf(currentPlayer);
-    const targetIndex = game.players.indexOf(targetPlayer);
-
-    game.players[currentIndex] = targetPlayer;
-    game.players[targetIndex] = currentPlayer;
-
+    // I/O - Emit updates
     io.to(gameId).emit('game_updated', game);
   });
 
@@ -829,36 +810,26 @@ io.on('connection', (socket) => {
   });
 
   socket.on('start_game', ({ gameId }: { gameId: string }) => {
+    // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
       return;
     }
 
-    if (game.phase !== 'team_selection') {
-      socket.emit('error', { message: 'Game has already started' });
+    // VALIDATION - Use pure validation function
+    const validation = validateGameStart(game);
+    if (!validation.valid) {
+      socket.emit('error', { message: validation.error });
       return;
     }
 
-    if (game.players.length !== 4) {
-      socket.emit('error', { message: 'Need exactly 4 players to start' });
-      return;
-    }
-
-    // Validate teams are balanced (2v2)
-    const team1Count = game.players.filter(p => p.teamId === 1).length;
-    const team2Count = game.players.filter(p => p.teamId === 2).length;
-
-    if (team1Count !== 2 || team2Count !== 2) {
-      socket.emit('error', { message: 'Teams must be balanced (2 players per team)' });
-      return;
-    }
-
-    // Update all players' status to in_game
+    // Side effects - Update online player statuses
     game.players.forEach(player => {
       updateOnlinePlayer(player.id, player.name, 'in_game', gameId);
     });
 
+    // Start the game (handles state transitions and I/O)
     startNewRound(gameId);
   });
 
