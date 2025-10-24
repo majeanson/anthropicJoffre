@@ -1385,8 +1385,11 @@ io.on('connection', (socket) => {
       });
       // Emit game_updated so clients see the 4th card added
       emitGameUpdate(gameId, game);
-      console.log(`   ⏳ Resolving trick...\n`);
-      resolveTrick(gameId);
+      console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
+      // Small delay to ensure clients render the 4-card state before resolution
+      setTimeout(() => {
+        resolveTrick(gameId);
+      }, 100);
       // Note: timeout will be started by resolveTrick after 2-second delay
     } else {
       // Emit updated state with turn advanced
