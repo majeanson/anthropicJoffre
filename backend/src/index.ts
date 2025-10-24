@@ -1376,14 +1376,15 @@ io.on('connection', (socket) => {
 
     // I/O - Emit updates and handle trick resolution
     if (result.trickComplete) {
-      // Trick complete - don't emit here, let resolveTrick handle it
+      // Emit state with all 4 cards visible before trick resolution
       console.log(`   🎯 Trick complete! Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name}`);
       console.log(`   Final trick state before resolution:`);
       game.currentTrick.forEach((tc, idx) => {
         const player = game.players.find(p => p.id === tc.playerId);
         console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
       });
-      // Don't emit game_updated here - resolveTrick will emit trick_resolved with visible cards
+      // Emit game_updated so clients see the 4th card added
+      emitGameUpdate(gameId, game);
       console.log(`   ⏳ Resolving trick...\n`);
       resolveTrick(gameId);
       // Note: timeout will be started by resolveTrick after 2-second delay

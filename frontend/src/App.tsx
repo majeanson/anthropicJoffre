@@ -684,6 +684,12 @@ function App() {
       botTimeoutsRef.current.delete(botId);
     }
 
+    // Don't act if trick is being resolved (4 cards played, waiting for resolution)
+    if (state.phase === 'playing' && state.currentTrick.length >= 4) {
+      console.log(`Bot ${botId} waiting for trick resolution...`);
+      return;
+    }
+
     // Team selection phase - bot selects team immediately
     if (state.phase === 'team_selection') {
       const bot = state.players.find(p => p.id === botId);
