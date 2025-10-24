@@ -67,6 +67,26 @@ import {
   getPlayerGameHistory,
   cleanupAbandonedGames,
 } from './db';
+import {
+  saveGameState as saveGameToDB,
+  loadGameState as loadGameFromDB,
+  deleteGameState as deleteGameFromDB,
+  listActiveGames,
+  getPlayerGames
+} from './db/gameState';
+import {
+  createSession as createDBSession,
+  validateSession as validateDBSession,
+  updateSessionActivity,
+  deletePlayerSessions,
+  findSessionByPlayer
+} from './db/sessions';
+import {
+  updatePlayerPresence,
+  getOnlinePlayers,
+  getPlayerPresence,
+  markPlayerOffline,
+} from './db/presence';
 
 const app = express();
 const httpServer = createServer(app);
@@ -173,6 +193,79 @@ const roundStats = new Map<string, RoundStatsData>(); // gameId -> stats data
 // Timeout configuration
 const BETTING_TIMEOUT = 60000; // 60 seconds
 const PLAYING_TIMEOUT = 60000; // 60 seconds
+
+// Database-backed game storage helpers
+
+/**
+ * Get game from cache or load from database
+ * Provides transparent database-backed storage with memory caching
+ */
+async function getGame(gameId: string): Promise<GameState | undefined> {
+  // Check cache first
+  if (games.has(gameId)) {
+    return games.get(gameId);
+  }
+
+  // Load from database if not in cache
+  try {
+    const gameState = await loadGameFromDB(gameId);
+    if (gameState) {
+      games.set(gameId, gameState); // Cache it
+      return gameState;
+    }
+  } catch (error) {
+    console.error(`Failed to load game ${gameId} from database:`, error);
+  }
+
+  return undefined;
+}
+
+/**
+ * Save game to both cache and database
+ * Ensures persistence across server restarts
+ */
+async function saveGame(gameState: GameState): Promise<void> {
+  // Update cache
+  games.set(gameState.id, gameState);
+
+  // Persist to database (async, non-blocking)
+  try {
+    await saveGameToDB(gameState);
+  } catch (error) {
+    console.error(`Failed to save game ${gameState.id} to database:`, error);
+    // Continue execution - cache is still valid
+  }
+}
+
+/**
+ * Delete game from both cache and database
+ */
+async function deleteGame(gameId: string): Promise<void> {
+  // Remove from cache
+  games.delete(gameId);
+  gameCreationTimes.delete(gameId);
+
+  // Remove from database (async)
+  try {
+    await deleteGameFromDB(gameId);
+  } catch (error) {
+    console.error(`Failed to delete game ${gameId} from database:`, error);
+  }
+}
+
+/**
+ * Helper to emit game_updated event AND persist to database
+ * Use this instead of direct io.to().emit() calls for consistency
+ */
+function emitGameUpdate(gameId: string, gameState: GameState) {
+  // Emit socket event
+  io.to(gameId).emit('game_updated', gameState);
+
+  // Persist to database (fire and forget - don't block socket emission)
+  saveGame(gameState).catch(err => {
+    console.error(`Failed to persist game ${gameId}:`, err);
+  });
+}
 
 // Helper to generate secure random token
 function generateSessionToken(): string {
@@ -390,7 +483,7 @@ function handleBettingTimeout(gameId: string, playerId: string) {
     if (game.currentBets.every(b => b.skipped)) {
       game.currentBets = [];
       game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
-      io.to(gameId).emit('game_updated', game);
+      emitGameUpdate(gameId, game);
       io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
       return;
@@ -403,11 +496,11 @@ function handleBettingTimeout(gameId: string, playerId: string) {
       (p) => p.id === game.highestBet?.playerId
     );
     game.currentPlayerIndex = highestBidderIndex;
-    io.to(gameId).emit('game_updated', game);
+    emitGameUpdate(gameId, game);
     startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
   } else {
     game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
-    io.to(gameId).emit('game_updated', game);
+    emitGameUpdate(gameId, game);
     startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
   }
 }
@@ -465,10 +558,10 @@ function handlePlayingTimeout(gameId: string, playerId: string) {
 
   // Check if trick is complete
   if (game.currentTrick.length === 4) {
-    io.to(gameId).emit('game_updated', game);
+    emitGameUpdate(gameId, game);
     resolveTrick(gameId);
   } else {
-    io.to(gameId).emit('game_updated', game);
+    emitGameUpdate(gameId, game);
     startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
   }
 }
@@ -523,12 +616,34 @@ app.get('/', (req, res) => {
 });
 
 // Get list of active games for lobby browser
-app.get('/api/games/lobby', (req, res) => {
+app.get('/api/games/lobby', async (req, res) => {
   try {
-    const activeGames = Array.from(games.values()).map(game => {
+    // Load games from DB if not in memory (in case server restarted)
+    const dbGames = await listActiveGames({ isPublic: true, limit: 100 });
+
+    // Merge with in-memory games
+    const gameMap = new Map<string, any>();
+
+    // Add in-memory games first
+    Array.from(games.values()).forEach(game => {
+      gameMap.set(game.id, game);
+    });
+
+    // Add DB games that aren't in memory
+    for (const dbGame of dbGames) {
+      if (!gameMap.has(dbGame.gameId)) {
+        // Load full game state from DB
+        const fullGame = await loadGameFromDB(dbGame.gameId);
+        if (fullGame) {
+          gameMap.set(fullGame.id, fullGame);
+        }
+      }
+    }
+
+    const activeGames = Array.from(gameMap.values()).map((game: GameState) => {
       // Get actual player count (not including bots unless specified)
-      const humanPlayerCount = game.players.filter(p => !p.isBot).length;
-      const botPlayerCount = game.players.filter(p => p.isBot).length;
+      const humanPlayerCount = game.players.filter((p: Player) => !p.isBot).length;
+      const botPlayerCount = game.players.filter((p: Player) => p.isBot).length;
 
       // Check if game is joinable
       const isJoinable = game.phase === 'team_selection' && game.players.length < 4;
@@ -547,7 +662,7 @@ app.get('/api/games/lobby', (req, res) => {
         teamScores: game.teamScores,
         roundNumber: game.roundNumber,
         createdAt: gameCreationTimes.get(game.id) || Date.now(),
-        players: game.players.map(p => ({
+        players: game.players.map((p: Player) => ({
           name: p.name,
           teamId: p.teamId,
           isBot: p.isBot || false,
@@ -584,11 +699,100 @@ app.get('/api/games/history', async (req, res) => {
   }
 });
 
+// Get specific game by ID
+app.get('/api/games/:gameId', async (req, res) => {
+  try {
+    const { gameId } = req.params;
+    const game = await getGame(gameId);
+
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+
+    // Return game with metadata
+    res.json({
+      gameId: game.id,
+      phase: game.phase,
+      playerCount: game.players.length,
+      players: game.players.map(p => ({
+        name: p.name,
+        teamId: p.teamId,
+        isBot: p.isBot || false,
+      })),
+      teamScores: game.teamScores,
+      roundNumber: game.roundNumber,
+      isJoinable: game.phase === 'team_selection' && game.players.length < 4,
+      createdAt: gameCreationTimes.get(game.id) || Date.now(),
+    });
+  } catch (error) {
+    console.error('Error fetching game:', error);
+    res.status(500).json({ error: 'Failed to fetch game' });
+  }
+});
+
+// Get games for a specific player
+app.get('/api/players/:playerName/games', async (req, res) => {
+  try {
+    const { playerName } = req.params;
+
+    // Get games from database
+    const dbGames = await getPlayerGames(playerName);
+
+    // Also check in-memory games
+    const inMemoryGames = Array.from(games.values())
+      .filter((game: GameState) => game.players.some((p: Player) => p.name === playerName))
+      .map((game: GameState) => ({
+        gameId: game.id,
+        phase: game.phase,
+        status: game.phase === 'game_over' ? 'finished' :
+                game.phase === 'team_selection' ? 'waiting' : 'in_progress',
+        playerCount: game.players.length,
+        playerNames: game.players.map(p => p.name),
+        teamAssignments: game.players.reduce((acc, p) => {
+          acc[p.name] = p.teamId;
+          return acc;
+        }, {} as Record<string, number>),
+        createdAt: gameCreationTimes.get(game.id) || Date.now(),
+      }));
+
+    // Merge results (prefer in-memory)
+    const gameMap = new Map<string, any>();
+    dbGames.forEach((g: any) => gameMap.set(g.gameId, g));
+    inMemoryGames.forEach((g: any) => gameMap.set(g.gameId, g));
+
+    const playerGames = Array.from(gameMap.values())
+      .sort((a, b) => b.createdAt - a.createdAt);
+
+    res.json({
+      playerName,
+      games: playerGames,
+      total: playerGames.length,
+    });
+  } catch (error) {
+    console.error('Error fetching player games:', error);
+    res.status(500).json({ error: 'Failed to fetch player games' });
+  }
+});
+
+// Get online players
+app.get('/api/players/online', async (req, res) => {
+  try {
+    const onlinePlayers = await getOnlinePlayers();
+    res.json({
+      players: onlinePlayers,
+      total: onlinePlayers.length,
+    });
+  } catch (error) {
+    console.error('Error fetching online players:', error);
+    res.status(500).json({ error: 'Failed to fetch online players' });
+  }
+});
+
 // Socket.io event handlers
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
-  socket.on('create_game', (playerName: string) => {
+  socket.on('create_game', async (playerName: string) => {
     const gameId = Math.random().toString(36).substring(7).toUpperCase();
     const player: Player = {
       id: socket.id,
@@ -618,20 +822,34 @@ io.on('connection', (socket) => {
       currentRoundTricks: [],
     };
 
-    games.set(gameId, gameState);
+    // Persist game to database (with fallback to cache-only)
+    await saveGame(gameState);
     gameCreationTimes.set(gameId, Date.now()); // Store actual creation timestamp
     socket.join(gameId);
 
-    // Create session for reconnection
-    const session = createPlayerSession(gameId, socket.id, playerName);
+    // Create session for reconnection (using DB-backed sessions)
+    let session: PlayerSession;
+    try {
+      session = await createDBSession(playerName, socket.id, gameId);
+    } catch (error) {
+      console.error('Failed to create DB session, falling back to in-memory:', error);
+      session = createPlayerSession(gameId, socket.id, playerName);
+    }
 
     // Track online player status
     updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
 
+    // Update player presence in database
+    try {
+      await updatePlayerPresence(playerName, 'online', socket.id, gameId);
+    } catch (error) {
+      console.error('Failed to update player presence:', error);
+    }
+
     socket.emit('game_created', { gameId, gameState, session });
   });
 
-  socket.on('join_game', ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
+  socket.on('join_game', async ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -650,10 +868,15 @@ io.on('connection', (socket) => {
       // Join game room
       socket.join(gameId);
 
-      // Create new session for human players only
+      // Create new session for human players only (DB-backed)
       let session: PlayerSession | undefined;
       if (!existingPlayer.isBot) {
-        session = createPlayerSession(gameId, socket.id, playerName);
+        try {
+          session = await createDBSession(playerName, socket.id, gameId);
+        } catch (error) {
+          console.error('Failed to create DB session for rejoin, falling back to in-memory:', error);
+          session = createPlayerSession(gameId, socket.id, playerName);
+        }
       }
 
       // Update timeout if this player had an active timeout
@@ -683,7 +906,7 @@ io.on('connection', (socket) => {
         socket.emit('player_joined', { player: existingPlayer, gameState: game });
 
         // Broadcast game_updated to all players so bot knows to act if it's their turn
-        io.to(gameId).emit('game_updated', game);
+        emitGameUpdate(gameId, game);
       } else {
         // For humans, emit reconnection_successful
         socket.emit('reconnection_successful', { gameState: game, session });
@@ -696,7 +919,7 @@ io.on('connection', (socket) => {
         });
 
         // Broadcast game_updated to ensure all clients are synced
-        io.to(gameId).emit('game_updated', game);
+        emitGameUpdate(gameId, game);
       }
 
       console.log(`Player ${playerName} successfully rejoined game ${gameId}`);
@@ -730,17 +953,31 @@ io.on('connection', (socket) => {
       console.log(`Cancelled disconnect timeout for rejoining player ${socket.id}`);
     }
 
-    // Create session for reconnection (only for human players, not bots)
+    // Create session for reconnection (only for human players, not bots) - DB-backed
     let session: PlayerSession | undefined;
     if (!isBot) {
-      session = createPlayerSession(gameId, socket.id, playerName);
-      console.log('Created session for human player:', playerName, 'socket:', socket.id);
+      try {
+        session = await createDBSession(playerName, socket.id, gameId);
+        console.log('Created DB session for human player:', playerName, 'socket:', socket.id);
+      } catch (error) {
+        console.error('Failed to create DB session, falling back to in-memory:', error);
+        session = createPlayerSession(gameId, socket.id, playerName);
+      }
     } else {
       console.log('Skipping session for bot:', playerName);
     }
 
     // Track online player status
     updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
+
+    // Update player presence in database (only for human players)
+    if (!isBot) {
+      try {
+        await updatePlayerPresence(playerName, 'online', socket.id, gameId);
+      } catch (error) {
+        console.error('Failed to update player presence:', error);
+      }
+    }
 
     // Send session only to the joining player (not broadcast to everyone)
     socket.emit('player_joined', { player, gameState: game, session });
@@ -768,7 +1005,7 @@ io.on('connection', (socket) => {
     applyTeamSelection(game, socket.id, teamId);
 
     // I/O - Emit updates
-    io.to(gameId).emit('game_updated', game);
+    emitGameUpdate(gameId, game);
   });
 
   socket.on('swap_position', ({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
@@ -790,7 +1027,7 @@ io.on('connection', (socket) => {
     applyPositionSwap(game, socket.id, targetPlayerId);
 
     // I/O - Emit updates
-    io.to(gameId).emit('game_updated', game);
+    emitGameUpdate(gameId, game);
   });
 
   // Team selection chat
@@ -972,7 +1209,7 @@ io.on('connection', (socket) => {
     // Handle all-players-skipped scenario
     if (result.allPlayersSkipped) {
       resetBetting(game);
-      io.to(gameId).emit('game_updated', game);
+      emitGameUpdate(gameId, game);
       io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
       return;
@@ -987,11 +1224,11 @@ io.on('connection', (socket) => {
         (p) => p.id === game.highestBet?.playerId
       );
       game.currentPlayerIndex = highestBidderIndex;
-      io.to(gameId).emit('game_updated', game);
+      emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
     } else {
       // Betting continues - emit update and start next player's timeout
-      io.to(gameId).emit('game_updated', game);
+      emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
     }
   });
@@ -1068,14 +1305,14 @@ io.on('connection', (socket) => {
         const player = game.players.find(p => p.id === tc.playerId);
         console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
       });
-      io.to(gameId).emit('game_updated', game);
+      emitGameUpdate(gameId, game);
       console.log(`   ⏳ Resolving trick...\n`);
       resolveTrick(gameId);
       // Note: timeout will be started by resolveTrick after 3-second delay
     } else {
       // Emit updated state with turn advanced
       console.log(`   ➡️  Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
-      io.to(gameId).emit('game_updated', game);
+      emitGameUpdate(gameId, game);
       // Start timeout for next player
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
     }
@@ -1141,13 +1378,13 @@ io.on('connection', (socket) => {
         game.teamScores.team1 = team1;
         game.teamScores.team2 = team2;
         console.log(`TEST: Set scores to Team1=${team1}, Team2=${team2}`);
-        io.to(game.id).emit('game_updated', game);
+        emitGameUpdate(game.id, game);
       }
     });
   });
 
   // Leave game handler
-  socket.on('leave_game', ({ gameId }: { gameId: string }) => {
+  socket.on('leave_game', async ({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1158,6 +1395,14 @@ io.on('connection', (socket) => {
     if (!player) {
       socket.emit('error', { message: 'You are not in this game' });
       return;
+    }
+
+    // Clean up player sessions from database
+    try {
+      await deletePlayerSessions(player.name, gameId);
+      console.log(`Deleted DB sessions for ${player.name} leaving game ${gameId}`);
+    } catch (error) {
+      console.error('Failed to delete player sessions from DB:', error);
     }
 
     // Remove player from game
@@ -1197,7 +1442,7 @@ io.on('connection', (socket) => {
   });
 
   // Kick player handler
-  socket.on('kick_player', ({ gameId, playerId }: { gameId: string; playerId: string }) => {
+  socket.on('kick_player', async ({ gameId, playerId }: { gameId: string; playerId: string }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1230,6 +1475,14 @@ io.on('connection', (socket) => {
     }
 
     const kickedPlayer = game.players[playerIndex];
+
+    // Clean up kicked player's sessions from database
+    try {
+      await deletePlayerSessions(kickedPlayer.name, gameId);
+      console.log(`Deleted DB sessions for kicked player ${kickedPlayer.name} from game ${gameId}`);
+    } catch (error) {
+      console.error('Failed to delete kicked player sessions from DB:', error);
+    }
 
     // Remove player from game
     game.players.splice(playerIndex, 1);
@@ -1264,10 +1517,18 @@ io.on('connection', (socket) => {
   });
 
   // Reconnection handler
-  socket.on('reconnect_to_game', ({ token }: { token: string }) => {
+  socket.on('reconnect_to_game', async ({ token }: { token: string }) => {
     console.log('Reconnection attempt with token:', token.substring(0, 10) + '...');
 
-    const session = validateSessionToken(token);
+    // Validate session from database
+    let session: PlayerSession | null;
+    try {
+      session = await validateDBSession(token);
+    } catch (error) {
+      console.error('DB session validation error, trying in-memory:', error);
+      session = validateSessionToken(token);
+    }
+
     if (!session) {
       socket.emit('reconnection_failed', { message: 'Invalid or expired session token' });
       return;
@@ -1275,9 +1536,16 @@ io.on('connection', (socket) => {
 
     console.log('Session found for player:', session.playerName, 'in game:', session.gameId);
 
-    const game = games.get(session.gameId);
+    // Load game from database (with cache fallback)
+    const game = await getGame(session.gameId);
     if (!game) {
       socket.emit('reconnection_failed', { message: 'Game no longer exists' });
+      // Clean up invalid session from DB
+      try {
+        await deletePlayerSessions(session.playerName, session.gameId);
+      } catch (err) {
+        console.error('Failed to delete session:', err);
+      }
       playerSessions.delete(token);
       return;
     }
@@ -1292,6 +1560,11 @@ io.on('connection', (socket) => {
     const player = game.players.find(p => p.name === session.playerName);
     if (!player) {
       socket.emit('reconnection_failed', { message: 'Player no longer in game' });
+      try {
+        await deletePlayerSessions(session.playerName, session.gameId);
+      } catch (err) {
+        console.error('Failed to delete session:', err);
+      }
       playerSessions.delete(token);
       return;
     }
@@ -1299,6 +1572,11 @@ io.on('connection', (socket) => {
     // Don't allow reconnection to bot players (safety check)
     if (player.isBot) {
       socket.emit('reconnection_failed', { message: 'Cannot reconnect as bot player' });
+      try {
+        await deletePlayerSessions(session.playerName, session.gameId);
+      } catch (err) {
+        console.error('Failed to delete session:', err);
+      }
       playerSessions.delete(token);
       return;
     }
@@ -1307,9 +1585,15 @@ io.on('connection', (socket) => {
     const oldSocketId = player.id;
     player.id = socket.id;
 
-    // Update session with new socket ID and timestamp
-    session.playerId = socket.id;
-    session.timestamp = Date.now();
+    // Update session with new socket ID and timestamp in database
+    try {
+      await updateSessionActivity(token, socket.id);
+    } catch (error) {
+      console.error('Failed to update session activity in DB:', error);
+      // Update in-memory as fallback
+      session.playerId = socket.id;
+      session.timestamp = Date.now();
+    }
 
     // Join game room
     socket.join(session.gameId);
@@ -1497,26 +1781,37 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     console.log('Client disconnected:', socket.id);
 
     // Remove from online players
+    const onlinePlayer = onlinePlayers.get(socket.id);
     onlinePlayers.delete(socket.id);
 
     // Find player's game and session
     let playerGame: GameState | null = null;
     let playerGameId: string | null = null;
+    let playerName: string | null = null;
 
     games.forEach((game, gameId) => {
       const player = game.players.find((p) => p.id === socket.id);
       if (player) {
         playerGame = game;
         playerGameId = gameId;
+        playerName = player.name;
       }
     });
 
     if (!playerGame || !playerGameId) {
-      return; // Player not in any game
+      // Player not in any game - mark as offline immediately if we know their name
+      if (onlinePlayer) {
+        try {
+          await markPlayerOffline(onlinePlayer.playerName);
+        } catch (error) {
+          console.error('Failed to mark player offline:', error);
+        }
+      }
+      return;
     }
 
     // Don't immediately remove player - give 15 minutes grace period for reconnection (mobile AFK)
@@ -1529,7 +1824,7 @@ io.on('connection', (socket) => {
     });
 
     // Set timeout to remove player if they don't reconnect
-    const disconnectTimeout = setTimeout(() => {
+    const disconnectTimeout = setTimeout(async () => {
       const game = games.get(playerGameId!);
       if (!game) {
         disconnectTimeouts.delete(socket.id);
@@ -1544,6 +1839,15 @@ io.on('connection', (socket) => {
           game.players.splice(playerIndex, 1);
           io.to(playerGameId!).emit('player_left', { playerId: socket.id, gameState: game });
           console.log(`Player ${socket.id} removed from game ${playerGameId} (no reconnection)`);
+
+          // Mark player as offline in database
+          if (playerName) {
+            try {
+              await markPlayerOffline(playerName);
+            } catch (error) {
+              console.error('Failed to mark player offline:', error);
+            }
+          }
         }
       }
       disconnectTimeouts.delete(socket.id);
@@ -1649,7 +1953,7 @@ function resolveTrick(gameId: string) {
   } else {
     // Normal trick resolution - continue playing
     setTimeout(() => {
-      io.to(gameId).emit('game_updated', game);
+      emitGameUpdate(gameId, game);
       // Start timeout for trick winner's next card
       startPlayerTimeout(gameId, winnerId, 'playing');
     }, 3000);

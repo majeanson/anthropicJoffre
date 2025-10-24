@@ -229,6 +229,12 @@ export function applyPositionSwap(
     // Swap players in array
     [game.players[player1Index], game.players[player2Index]] =
       [game.players[player2Index], game.players[player1Index]];
+
+    // FIX: Enforce alternating team pattern (1-2-1-2) to maintain turn order
+    // This prevents turn order bugs when positions are swapped
+    game.players.forEach((player, index) => {
+      player.teamId = (index % 2 === 0 ? 1 : 2) as 1 | 2;
+    });
   }
 }
 

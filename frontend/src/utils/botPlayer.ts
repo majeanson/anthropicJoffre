@@ -248,22 +248,27 @@ export class BotPlayer {
   ): Card {
     const currentTrick = gameState.currentTrick;
 
-    // Rule: Get rid of brown 0 when safe
-    const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
-    if (brownZero && position > 1 && Math.random() < 0.6) {
-      return brownZero.card;
-    }
-
-    // Rule: If partner is winning (3rd/4th position), play low
+    // FIX: Check if partner is winning FIRST (before dumping brown 0)
+    // This prevents dumping brown 0 on partner when they're winning
     if (position >= 3) {
       const partner = this.getPartner(gameState, playerId);
       const currentWinner = this.getCurrentTrickWinner(gameState);
       if (partner && currentWinner === partner.id) {
-        const lowImpactCards = impacts.filter(i => i.impact === 'low');
+        // Partner is winning - play low card (avoid brown 0!)
+        const lowImpactCards = impacts.filter(i =>
+          i.impact === 'low' &&
+          !(i.card.color === 'brown' && i.card.value === 0) // Don't dump brown 0 on partner!
+        );
         if (lowImpactCards.length > 0) {
           return lowImpactCards[0].card;
         }
       }
+    }
+
+    // Rule: Get rid of brown 0 when safe (only if partner not winning)
+    const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
+    if (brownZero && position > 1 && Math.random() < 0.6) {
+      return brownZero.card;
     }
 
     // Rule: Try to win red 0

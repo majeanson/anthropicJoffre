@@ -467,12 +467,18 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   </p>
                 </div>
               )}
-              {/* Trump */}
-              {gameState.trump && (
+              {/* Trump (or NO TRUMP if withoutTrump bet) */}
+              {(gameState.trump || gameState.highestBet?.withoutTrump) && (
                 <div className="bg-parchment-300/80 dark:bg-gray-800/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
-                  <p className={`text-xs md:text-base font-bold ${getTrumpColor(gameState.trump)}`}>
-                    <span className="capitalize">{!gameState.trump ? 'No Trump' : gameState.trump}</span>
-                  </p>
+                  {gameState.highestBet?.withoutTrump ? (
+                    <p className="text-xs md:text-base font-bold text-gray-500 dark:text-gray-400">
+                      NO TRUMP
+                    </p>
+                  ) : (
+                    <p className={`text-xs md:text-base font-bold ${getTrumpColor(gameState.trump)}`}>
+                      <span className="capitalize">{gameState.trump}</span>
+                    </p>
+                  )}
                 </div>
               )}
             </div>
