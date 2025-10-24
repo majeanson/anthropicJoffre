@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-24T16:06:49.333Z",
+  "buildDate": "2025-10-24T17:18:27.366Z",
   "version": "1.0.1",
   "git": {
-    "commitMessage": "fix: Restrict team swap to teammates only\n\nFixed two issues with position swapping in team selection:\n\nIssue 1: Swap button showed for all players (cross-team swaps allowed)\n- Frontend: Swap button now only shows for players on same team\n- Team 1 players: swap button only if currentPlayer.teamId === 1\n- Team 2 players: swap button only if currentPlayer.teamId === 2\n\nIssue 2: Backend didn't validate team membership during swap\n- Added validation in validatePositionSwap() function\n- Now checks: initiator.teamId !== target.teamId\n- Returns error: \"Can only swap positions with teammates\"\n\nWhy this matters:\n- Prevents confusion from cross-team position swaps\n- Ensures logical game setup (teammates swap within team)\n- Fixes reported bug: \"can't add bots after swapping teams\"\n  (was caused by swapping with opponent team players)\n\nChanges:\n- frontend/src/components/TeamSelection.tsx: Team-specific swap visibility\n- backend/src/game/validation.ts: Added team membership check\n\nResult: Swap button only appears for your teammates, and backend\nenforces this rule with proper error messages.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "036dac6",
-    "commitDate": "2025-10-24 12:01:52 -0400",
+    "commitMessage": "fix: Bot naming finds next available number after kicks\n\nFixed bug where \"Add Bot\" button stopped working after kicking bots.\n\nRoot Cause:\nOld logic counted existing bots and added 1 to create name:\n- If you have Bot 2 and Bot 3 (after kicking Bot 1)\n- existingBots.length = 2\n- New bot name: \"Bot 3\" ❌ (already exists!)\n- Backend treats it as rejoin attempt instead of new bot\n\nExample Failure Scenario:\n1. Start with Bot 1, Bot 2, Bot 3\n2. Kick Bot 1 (or replace with human)\n3. Now have: Bot 2, Bot 3, You\n4. Click \"Add Bot\"\n5. Tries to create \"Bot 3\" (count=2, so 2+1=3)\n6. Backend sees existing \"Bot 3\" → rejoin logic\n7. Nothing happens! 🐛\n\nNew Logic:\n- Extract existing bot numbers: [2, 3]\n- Find smallest available number 1-3: finds 1 ✅\n- Creates \"Bot 1\" (new unique name)\n- Backend adds new bot successfully\n\nChanges:\n- frontend/src/App.tsx: handleAddBot now finds next available number\n- Matches backend's getNextBotName() pattern (already correct)\n- Supports bot numbers 1-3 (max 3 bots per game)\n\nResult: \"Add Bot\" works correctly even after kicking bots or\nreplacing them with human players.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "d2b9c31",
+    "commitDate": "2025-10-24 12:07:21 -0400",
     "branch": "main"
   },
   "futureTodos": [
