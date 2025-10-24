@@ -24,9 +24,9 @@ export function BotTakeoverModal({
       case 'easy':
         return '😊';
       case 'medium':
-        return '🙂';
+        return '😤';
       case 'hard':
-        return '😎';
+        return '👹';
       default:
         return '🤖';
     }

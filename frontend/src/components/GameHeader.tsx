@@ -120,7 +120,7 @@ export function GameHeader({
                 }`}
                 title={autoplayEnabled ? 'Autoplay ON' : 'Autoplay OFF'}
               >
-                <span className="text-base md:text-lg">{autoplayEnabled ? '🤖' : '🎮'}</span>
+                <span className="text-base md:text-lg">{autoplayEnabled ? '⚡' : '🎮'}</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
                   {autoplayEnabled ? 'Auto' : 'Manual'}
                 </span>
@@ -246,7 +246,7 @@ export function GameHeader({
                 }`}
                 title={autoplayEnabled ? 'Autoplay ON' : 'Autoplay OFF'}
               >
-                <span className="text-base">{autoplayEnabled ? '🤖' : '🎮'}</span>
+                <span className="text-base">{autoplayEnabled ? '⚡' : '🎮'}</span>
               </button>
             )}
 

@@ -39,8 +39,8 @@ export function BotManagementPanel({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 max-w-2xl w-full mx-4 border-4 border-blue-600 shadow-2xl animate-slideUp max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn" onClick={onClose}>
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 max-w-2xl w-full mx-4 border-4 border-blue-600 shadow-2xl animate-slideUp max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -62,22 +62,6 @@ export function BotManagementPanel({
           </button>
         </div>
 
-        {/* Info Box */}
-        <div className="bg-blue-100 border-2 border-blue-300 rounded-lg p-4 mb-6">
-          <div className="flex items-start gap-3">
-            <div className="text-2xl">ℹ️</div>
-            <div className="text-sm text-blue-800">
-              <p className="font-semibold mb-1">Bot Management Rules:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Only <strong>teammates</strong> can replace a player with a bot</li>
-                <li>Maximum <strong>3 bots</strong> per game</li>
-                <li>At least <strong>1 human</strong> player required</li>
-                <li>Bots inherit team, position, hand, and score</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
         {/* Players List */}
         <div className="space-y-3">
           {gameState.players.map((player, index) => {
@@ -97,7 +81,7 @@ export function BotManagementPanel({
                 <div className="flex items-center justify-between gap-4">
                   {/* Player Info */}
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2">
                       <span className={`font-bold text-lg ${textColor}`}>
                         {player.name}
                       </span>
@@ -111,15 +95,8 @@ export function BotManagementPanel({
                           TURN
                         </span>
                       )}
-                    </div>
-
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className={`${textColor} font-semibold`}>
+                      <span className={`${textColor} text-sm font-semibold ml-2`}>
                         Team {player.teamId}
-                      </span>
-                      <span className="text-gray-400">•</span>
-                      <span className="text-gray-600">
-                        {player.tricksWon} tricks • {player.pointsWon} pts
                       </span>
                     </div>
                   </div>

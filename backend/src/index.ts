@@ -1416,14 +1416,14 @@ io.on('connection', (socket) => {
     if (stats) {
       // Track play time (time since trick started)
       const playTime = Date.now() - stats.trickStartTime;
-      const playerTimes = stats.cardPlayTimes.get(socket.id) || [];
+      const playerTimes = stats.cardPlayTimes.get(playerName) || [];
       playerTimes.push(playTime);
-      stats.cardPlayTimes.set(socket.id, playerTimes);
+      stats.cardPlayTimes.set(playerName, playerTimes);
 
       // Track trump card usage (check BEFORE trump is set)
       if (game.trump && card.color === game.trump) {
-        const trumpCount = stats.trumpsPlayed.get(socket.id) || 0;
-        stats.trumpsPlayed.set(socket.id, trumpCount + 1);
+        const trumpCount = stats.trumpsPlayed.get(playerName) || 0;
+        stats.trumpsPlayed.set(playerName, trumpCount + 1);
       }
 
       // Reset trick start time if this starts a new trick
@@ -2314,10 +2314,10 @@ function startNewRound(gameId: string) {
   game.players.forEach(player => {
     const stats = roundStats.get(gameId);
     if (stats) {
-      stats.cardPlayTimes.set(player.id, []);
-      stats.trumpsPlayed.set(player.id, 0);
-      stats.redZerosCollected.set(player.id, 0);
-      stats.brownZerosReceived.set(player.id, 0);
+      stats.cardPlayTimes.set(player.name, []);
+      stats.trumpsPlayed.set(player.name, 0);
+      stats.redZerosCollected.set(player.name, 0);
+      stats.brownZerosReceived.set(player.name, 0);
     }
   });
 
@@ -2437,10 +2437,10 @@ function calculateRoundStatistics(gameId: string, game: GameState): RoundStatist
   });
 
   if (fastestPlayerId) {
-    const player = game.players.find(p => p.id === fastestPlayerId);
+    const player = game.players.find(p => p.name === fastestPlayerId);
     if (player) {
       statistics.fastestPlay = {
-        playerId: fastestPlayerId,
+        playerId: player.id,
         playerName: player.name,
         timeMs: Math.round(fastestAvgTime),
       };
@@ -2471,10 +2471,10 @@ function calculateRoundStatistics(gameId: string, game: GameState): RoundStatist
   });
 
   if (trumpMasterId && maxTrumps > 0) {
-    const player = game.players.find(p => p.id === trumpMasterId);
+    const player = game.players.find(p => p.name === trumpMasterId);
     if (player) {
       statistics.trumpMaster = {
-        playerId: trumpMasterId,
+        playerId: player.id,
         playerName: player.name,
         trumpsPlayed: maxTrumps,
       };
@@ -2564,9 +2564,9 @@ async function endRound(gameId: string) {
         betAmount: wasBidder ? scoring.betAmount : undefined,
         betMade: wasBidder ? scoring.betMade : undefined,
         withoutTrump: wasBidder ? game.highestBet?.withoutTrump : undefined,
-        redZerosCollected: stats?.redZerosCollected.get(player.id) || 0,
-        brownZerosReceived: stats?.brownZerosReceived.get(player.id) || 0,
-        trumpsPlayed: stats?.trumpsPlayed.get(player.id) || 0,
+        redZerosCollected: stats?.redZerosCollected.get(player.name) || 0,
+        brownZerosReceived: stats?.brownZerosReceived.get(player.name) || 0,
+        trumpsPlayed: stats?.trumpsPlayed.get(player.name) || 0,
       });
 
       console.log(`Updated round stats for ${player.name}: ${roundWon ? 'WIN' : 'LOSS'}`);

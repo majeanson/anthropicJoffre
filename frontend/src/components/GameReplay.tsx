@@ -28,6 +28,9 @@ interface GameReplayProps {
 export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   const [replayData, setReplayData] = useState<ReplayData | null>(null);
   const [currentRoundIndex, setCurrentRoundIndex] = useState(0);
+  const [currentTrickIndex, setCurrentTrickIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playSpeed, setPlaySpeed] = useState<0.5 | 1 | 2>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,13 +100,37 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   }
 
   const currentRound = replayData.round_history[currentRoundIndex];
+  const currentTricks = currentRound?.tricks || [];
   const hasNextRound = currentRoundIndex < replayData.round_history.length - 1;
   const hasPrevRound = currentRoundIndex > 0;
+  const hasNextTrick = currentTrickIndex < currentTricks.length - 1;
+  const hasPrevTrick = currentTrickIndex > 0;
+
+  // Auto-playback effect
+  useEffect(() => {
+    if (!isPlaying || !currentRound) return;
+
+    const delay = playSpeed === 0.5 ? 4000 : playSpeed === 1 ? 2000 : 1000;
+    const timer = setTimeout(() => {
+      if (hasNextTrick) {
+        setCurrentTrickIndex(prev => prev + 1);
+      } else if (hasNextRound) {
+        setCurrentRoundIndex(prev => prev + 1);
+        setCurrentTrickIndex(0);
+      } else {
+        setIsPlaying(false);
+      }
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [isPlaying, currentTrickIndex, currentRoundIndex, playSpeed, hasNextTrick, hasNextRound, currentRound]);
 
   const handleNextRound = () => {
     if (hasNextRound) {
       sounds.buttonClick();
       setCurrentRoundIndex(prev => prev + 1);
+      setCurrentTrickIndex(0);
+      setIsPlaying(false);
     }
   };
 
@@ -111,7 +138,40 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     if (hasPrevRound) {
       sounds.buttonClick();
       setCurrentRoundIndex(prev => prev - 1);
+      setCurrentTrickIndex(0);
+      setIsPlaying(false);
     }
+  };
+
+  const handleNextTrick = () => {
+    if (hasNextTrick) {
+      sounds.buttonClick();
+      setCurrentTrickIndex(prev => prev + 1);
+    } else if (hasNextRound) {
+      handleNextRound();
+    }
+  };
+
+  const handlePrevTrick = () => {
+    if (hasPrevTrick) {
+      sounds.buttonClick();
+      setCurrentTrickIndex(prev => prev - 1);
+    } else if (hasPrevRound) {
+      setCurrentRoundIndex(prev => prev - 1);
+      const prevRound = replayData.round_history[currentRoundIndex - 1];
+      setCurrentTrickIndex((prevRound?.tricks?.length || 1) - 1);
+    }
+  };
+
+  const togglePlayback = () => {
+    sounds.buttonClick();
+    setIsPlaying(prev => !prev);
+  };
+
+  const handleJumpToTrick = (trickIndex: number) => {
+    sounds.buttonClick();
+    setCurrentTrickIndex(trickIndex);
+    setIsPlaying(false);
   };
 
   // Format date
@@ -199,9 +259,10 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
           </div>
         </div>
 
-        {/* Round Navigation */}
+        {/* Playback Controls */}
         <div className="px-6 py-4 bg-white/5 border-b-2 border-purple-600">
-          <div className="flex items-center justify-between">
+          {/* Round Navigation */}
+          <div className="flex items-center justify-between mb-4">
             <button
               onClick={handlePrevRound}
               disabled={!hasPrevRound}
@@ -230,6 +291,81 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
               Next Round →
             </button>
           </div>
+
+          {/* Trick Navigation & Playback */}
+          <div className="flex items-center justify-between gap-4">
+            {/* Trick Navigation */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePrevTrick}
+                disabled={!hasPrevTrick && !hasPrevRound}
+                className={`px-3 py-1.5 rounded-lg font-bold text-sm transition-all ${
+                  hasPrevTrick || hasPrevRound
+                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                ← Prev Trick
+              </button>
+
+              <span className="text-sm font-bold text-white">
+                Trick {currentTrickIndex + 1} of {currentTricks.length}
+              </span>
+
+              <button
+                onClick={handleNextTrick}
+                disabled={!hasNextTrick && !hasNextRound}
+                className={`px-3 py-1.5 rounded-lg font-bold text-sm transition-all ${
+                  hasNextTrick || hasNextRound
+                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Next Trick →
+              </button>
+            </div>
+
+            {/* Playback Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={togglePlayback}
+                className="px-4 py-2 rounded-lg font-bold bg-green-600 hover:bg-green-700 text-white transition-all"
+              >
+                {isPlaying ? '⏸ Pause' : '▶ Play'}
+              </button>
+
+              <select
+                value={playSpeed}
+                onChange={(e) => setPlaySpeed(Number(e.target.value) as 0.5 | 1 | 2)}
+                className="bg-gray-700 text-white px-3 py-2 rounded-lg font-bold text-sm border-2 border-gray-600"
+              >
+                <option value={0.5}>0.5x</option>
+                <option value={1}>1x</option>
+                <option value={2}>2x</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Trick Timeline */}
+          {currentTricks.length > 0 && (
+            <div className="mt-4 flex gap-2">
+              {currentTricks.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleJumpToTrick(index)}
+                  className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${
+                    index === currentTrickIndex
+                      ? 'bg-yellow-500 text-black'
+                      : index < currentTrickIndex
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                  }`}
+                >
+                  T{index + 1}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Round Content */}
@@ -334,7 +470,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                       </div>
                     )}
                     <div className="space-y-3">
-                      {currentRound.tricks.map((trick: TrickResult, trickIndex: number) => {
+                      {currentRound.tricks.slice(0, currentTrickIndex + 1).map((trick: TrickResult, trickIndex: number) => {
                         const winnerName = trick.winnerId || 'Unknown';
                         const winnerIndex = replayData.player_names.indexOf(trick.winnerId);
                         const winnerTeam = winnerIndex >= 0 ? replayData.player_teams[winnerIndex] : 1;
@@ -343,8 +479,12 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                           ? 'bg-orange-500 text-white border-2 border-orange-700'
                           : 'bg-purple-500 text-white border-2 border-purple-700';
 
+                        const isCurrentTrick = trickIndex === currentTrickIndex;
+
                         return (
-                          <div key={trickIndex} className="bg-gray-800 rounded-lg p-3 border-2 border-gray-600">
+                          <div key={trickIndex} className={`bg-gray-800 rounded-lg p-3 border-2 ${
+                            isCurrentTrick ? 'border-yellow-400 ring-2 ring-yellow-500' : 'border-gray-600'
+                          }`}>
                             <div className="flex items-center justify-between mb-3">
                               <span className="text-sm font-bold text-white">
                                 Trick {trickIndex + 1}
