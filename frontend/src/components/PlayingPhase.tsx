@@ -140,7 +140,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       setTrickCollectionAnimation(true);
       setTimeout(() => {
         setTrickCollectionAnimation(false);
-      }, 3000); // Match the backend 3-second delay
+      }, 2000); // Match the backend 2-second delay
     }
     setLastTrickLength(gameState.currentTrick.length);
   }, [gameState.currentTrick.length]);

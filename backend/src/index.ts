@@ -2034,20 +2034,20 @@ function resolveTrick(gameId: string) {
   const completedTrick = [...game.currentTrick];
   const result = applyTrickResolution(game, winnerName, totalPoints);
 
-  // 4. Restore currentTrick temporarily for display (will be cleared after delay)
-  game.currentTrick = completedTrick;
+  // 4. Broadcast with currentTrick temporarily included (for visual display)
+  // Create a temporary game state with trick visible
+  const gameStateWithTrick = {
+    ...game,
+    currentTrick: completedTrick, // Show the completed trick
+  };
 
-  // 5. I/O - Emit trick resolution event (include both for backwards compat)
-  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: game });
+  // 5. I/O - Emit trick resolution event with trick visible
+  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: gameStateWithTrick });
 
   // 6. ORCHESTRATION - Handle round completion or continue playing
   if (result.isRoundOver) {
     // Wait 2 seconds before finalizing round (show completed trick)
     setTimeout(() => {
-      const g = games.get(gameId);
-      if (g) {
-        g.currentTrick = []; // Clear trick after delay
-      }
       endRound(gameId);
     }, 2000);
   } else {
@@ -2055,7 +2055,7 @@ function resolveTrick(gameId: string) {
     setTimeout(() => {
       const g = games.get(gameId);
       if (g) {
-        g.currentTrick = []; // Clear trick after delay
+        // Trick already cleared by applyTrickResolution
         emitGameUpdate(gameId, g);
         // Start timeout for trick winner's next card (use stable playerName)
         startPlayerTimeout(gameId, winnerName, 'playing');
