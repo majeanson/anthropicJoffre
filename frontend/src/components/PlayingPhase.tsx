@@ -460,7 +460,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 )}
               </div>
 
-              {/* Current Bet & Trump */}
+              {/* Current Bet */}
               {gameState.highestBet && bettingTeam && (
                 <div className={`backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 shadow-md ${
                   bettingTeam === 1
@@ -470,14 +470,14 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   <p className={`text-xs md:text-base font-black ${
                     bettingTeam === 1 ? 'text-orange-800 dark:text-orange-200' : 'text-purple-800 dark:text-purple-200'
                   }`}>
-                    🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : ''}
+                    🎲 {gameState.highestBet.amount}
                   </p>
                 </div>
               )}
               {/* Trump (or NO TRUMP if withoutTrump bet) */}
-              {(gameState.trump || gameState.highestBet?.withoutTrump) && (
+              {gameState.highestBet && (
                 <div className="bg-parchment-300/80 dark:bg-gray-800/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
-                  {gameState.highestBet?.withoutTrump ? (
+                  {gameState.highestBet.withoutTrump ? (
                     <p className="text-xs md:text-base font-bold text-gray-500 dark:text-gray-400">
                       NO TRUMP
                     </p>
