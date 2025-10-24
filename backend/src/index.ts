@@ -1,8 +1,30 @@
+// Sentry must be imported and initialized first
+import * as Sentry from '@sentry/node';
+import { nodeProfilingIntegration } from '@sentry/profiling-node';
+import dotenv from 'dotenv';
+
+// Load environment variables first
+dotenv.config();
+
+// Initialize Sentry for error tracking
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'production',
+    integrations: [
+      nodeProfilingIntegration(),
+    ],
+    // Performance Monitoring
+    tracesSampleRate: 1.0, // Capture 100% of transactions in development
+    // Profiling
+    profilesSampleRate: 1.0, // Profile 100% of transactions
+  });
+}
+
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import crypto from 'crypto';
 import { GameState, Player, Bet, TrickCard, Card, PlayerSession } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
@@ -42,8 +64,6 @@ import {
   getPlayerGameHistory,
   cleanupAbandonedGames,
 } from './db';
-
-dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
