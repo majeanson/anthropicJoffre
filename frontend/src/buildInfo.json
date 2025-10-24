@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-24T16:01:29.289Z",
+  "buildDate": "2025-10-24T16:06:49.333Z",
   "version": "1.0.1",
   "git": {
-    "commitMessage": "feat: Convert Debug Fun to modal + align future todos with roadmap\n\nPart 1: Debug Fun Modal Conversion\n- Converted DebugInfo from accordion to modal popup (like How to Play)\n- Added modal overlay with backdrop click-to-close\n- Added X button and \"Got it!\" bottom button\n- Updated Lobby to use button + state pattern for modal\n- Better UX: cleaner interface, more prominent display\n\nPart 2: Aligned Future Todos with Actual Roadmap\n- Fixed build script to show real remaining features\n- Removed outdated fallback todos (sound effects, mobile UI already done!)\n- New todos aligned with IMPROVEMENT_SUGGESTIONS.md:\n  1. Game Replay Feature (Priority 2.2)\n  2. Improve Bot AI - Advanced strategy (Priority 2.1)\n  3. Enhanced Leaderboard - Charts & CSV (Priority 3.4)\n  4. Achievements & Badges System (Priority 6.2)\n  5. Friend System (Priority 4.3)\n\nChanges:\n- frontend/src/components/DebugInfo.tsx: Modal pattern\n- frontend/src/components/Lobby.tsx: Button + state for modal\n- scripts/generate-build-info.js: Curated future todos\n\nResult: Clean modal UI + accurate roadmap display that reflects\nactual project priorities and remaining features.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "fbf5068",
-    "commitDate": "2025-10-24 11:55:02 -0400",
+    "commitMessage": "fix: Restrict team swap to teammates only\n\nFixed two issues with position swapping in team selection:\n\nIssue 1: Swap button showed for all players (cross-team swaps allowed)\n- Frontend: Swap button now only shows for players on same team\n- Team 1 players: swap button only if currentPlayer.teamId === 1\n- Team 2 players: swap button only if currentPlayer.teamId === 2\n\nIssue 2: Backend didn't validate team membership during swap\n- Added validation in validatePositionSwap() function\n- Now checks: initiator.teamId !== target.teamId\n- Returns error: \"Can only swap positions with teammates\"\n\nWhy this matters:\n- Prevents confusion from cross-team position swaps\n- Ensures logical game setup (teammates swap within team)\n- Fixes reported bug: \"can't add bots after swapping teams\"\n  (was caused by swapping with opponent team players)\n\nChanges:\n- frontend/src/components/TeamSelection.tsx: Team-specific swap visibility\n- backend/src/game/validation.ts: Added team membership check\n\nResult: Swap button only appears for your teammates, and backend\nenforces this rule with proper error messages.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "036dac6",
+    "commitDate": "2025-10-24 12:01:52 -0400",
     "branch": "main"
   },
   "futureTodos": [

@@ -716,9 +716,18 @@ function App() {
   const handleAddBot = () => {
     if (!socket || !gameId) return;
 
-    // Count existing bots
-    const existingBots = gameState?.players.filter(p => p.name.startsWith('Bot ')).length || 0;
-    const botName = `Bot ${existingBots + 1}`;
+    // Find next available bot number (1-3, matching backend limit)
+    const existingBotNumbers = gameState?.players
+      .filter(p => p.name.startsWith('Bot '))
+      .map(p => parseInt(p.name.replace('Bot ', '')))
+      .filter(n => !isNaN(n)) || [];
+
+    let botNumber = 1;
+    while (existingBotNumbers.includes(botNumber) && botNumber <= 3) {
+      botNumber++;
+    }
+
+    const botName = `Bot ${botNumber}`;
 
     const botSocket = io(SOCKET_URL);
 
