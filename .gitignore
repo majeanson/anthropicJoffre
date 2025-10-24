@@ -7,3 +7,6 @@ build
 *.log
 .vercel
 .claude
+
+# Auto-generated build info
+frontend/src/buildInfo.json

@@ -5,6 +5,7 @@ import { LobbyBrowser } from './LobbyBrowser';
 import { PlayerStatsModal } from './PlayerStatsModal';
 import { GlobalLeaderboard } from './GlobalLeaderboard';
 import { HowToPlay } from './HowToPlay';
+import { DebugInfo } from './DebugInfo';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
@@ -551,6 +552,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             A 4-player trick-taking card game
                           </p>
                         </div>
+
+                        {/* Debug Fun */}
+                        <DebugInfo />
                       </div>
                     </div>
                   </div>
