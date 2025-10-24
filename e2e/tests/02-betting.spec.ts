@@ -239,7 +239,9 @@ test.describe('Betting Phase', () => {
     await expect(pages[0].getByTestId('player-hand')).toBeVisible({ timeout: 10000 });
 
     // Player 1 (first with highest bet of 12) should have turn first
-    await expect(pages[0].getByText(/your turn/i)).toBeVisible();
+    const turnIndicator = pages[0].getByTestId('turn-indicator');
+    await expect(turnIndicator).toBeVisible();
+    await expect(turnIndicator).toHaveText('Your turn');
 
     for (const context of contexts) {
       await context.close();

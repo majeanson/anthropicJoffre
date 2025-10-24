@@ -47,7 +47,7 @@ export function GameHeader({
             <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">{gameId}</p>
           </div>
           <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
-            <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
+            <p className="text-xs text-white dark:text-gray-100 font-bold" data-testid="round-number">R{roundNumber}</p>
           </div>
 
           {/* Team Scores */}

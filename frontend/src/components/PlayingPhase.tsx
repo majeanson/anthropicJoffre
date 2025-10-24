@@ -461,7 +461,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   <span className="whitespace-nowrap">Waiting for trick to end...</span>
                 ) : (
                   <>
-                    <span className="whitespace-nowrap">Waiting for: {currentTurnPlayer?.name}</span>
+                    <span className="whitespace-nowrap" data-testid="current-turn-player">Waiting for: {currentTurnPlayer?.name}</span>
                     <TimeoutIndicator
                       duration={60000}
                       isActive={gameState.currentTrick.length < 4 && isCurrentTurn}
@@ -695,7 +695,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 z-10">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 dark:border-gray-600 shadow-xl">
+                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 dark:border-gray-600 shadow-xl" data-testid="waiting-first-card">
                     <p className="text-parchment-50 text-lg md:text-2xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
                     <div className="mt-2 flex gap-1 justify-center">
                       <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce"></div>

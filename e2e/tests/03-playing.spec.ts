@@ -47,7 +47,7 @@ test.describe('Card Playing Phase', () => {
     await expect(scoreBoard.getByText(/team 2/i)).toBeVisible();
 
     // Should show round number
-    await expect(pages[0].getByText(/round 1/i)).toBeVisible();
+    await expect(pages[0].getByTestId('round-number')).toHaveText('R1');
 
     for (const context of contexts) {
       await context.close();
@@ -81,12 +81,13 @@ test.describe('Card Playing Phase', () => {
     const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
-    // First player (highest bidder or designated starter) should have turn
-    const firstPlayerPage = pages.find(async (page) => {
-      return await page.getByText(/your turn/i).isVisible();
-    });
+    // At least one player should have their turn indicated
+    const currentPlayerIndex = await findCurrentPlayerIndex(pages);
+    expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
-    expect(firstPlayerPage).toBeTruthy();
+    const turnIndicator = pages[currentPlayerIndex].getByTestId('turn-indicator');
+    await expect(turnIndicator).toBeVisible();
+    await expect(turnIndicator).toHaveText('Your turn');
 
     for (const context of contexts) {
       await context.close();
@@ -101,12 +102,16 @@ test.describe('Card Playing Phase', () => {
     expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
     // Current player should see "Your Turn"
-    await expect(pages[currentPlayerIndex].getByText(/your turn/i)).toBeVisible();
+    const turnIndicator = pages[currentPlayerIndex].getByTestId('turn-indicator');
+    await expect(turnIndicator).toBeVisible();
+    await expect(turnIndicator).toHaveText('Your turn');
 
-    // Other players should NOT see "Your Turn"
+    // Other players should see a different player's name
     for (let i = 0; i < 4; i++) {
       if (i !== currentPlayerIndex) {
-        await expect(pages[i].getByText(/your turn/i)).not.toBeVisible();
+        const otherTurnIndicator = pages[i].getByTestId('turn-indicator');
+        await expect(otherTurnIndicator).toBeVisible();
+        await expect(otherTurnIndicator).not.toHaveText('Your turn');
       }
     }
 
@@ -122,8 +127,8 @@ test.describe('Card Playing Phase', () => {
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     const currentPage = pages[currentPlayerIndex];
 
-    // Count cards in hand before (look inside "Your Hand" section)
-    const handSection = currentPage.getByText(/your hand/i).locator('..');
+    // Count cards in hand before
+    const handSection = currentPage.getByTestId('player-hand');
     const cardsBefore = await handSection.locator('[data-card-value]').count();
 
     // Get first card in hand and click it
@@ -166,8 +171,8 @@ test.describe('Card Playing Phase', () => {
       const currentPlayerIndex = await findCurrentPlayerIndex(pages);
       expect(currentPlayerIndex).toBeGreaterThanOrEqual(0);
 
-      // Play a card from hand section - use force to bypass suit-following disabled state
-      const handSection = pages[currentPlayerIndex].getByText(/your hand/i).locator('..');
+      // Play a card from hand - use force to bypass suit-following disabled state
+      const handSection = pages[currentPlayerIndex].getByTestId('player-hand');
       const card = handSection.locator('[data-card-value]').first();
       await card.click({ force: true });
 
@@ -191,8 +196,8 @@ test.describe('Card Playing Phase', () => {
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
     const currentPage = pages[currentPlayerIndex];
 
-    // Count cards in hand before (look inside "Your Hand" section)
-    const handSection = currentPage.getByText(/your hand/i).locator('..');
+    // Count cards in hand before
+    const handSection = currentPage.getByTestId('player-hand');
     const cardsBefore = await handSection.locator('[data-card-value]').count();
 
     // Play a card from hand

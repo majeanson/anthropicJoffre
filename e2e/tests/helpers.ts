@@ -113,12 +113,29 @@ export async function findCurrentPlayerIndex(pages: Page[]): Promise<number> {
   // Check pages sequentially to avoid "Target crashed" errors
   for (let i = 0; i < pages.length; i++) {
     try {
-      const hasTurn = await pages[i].getByText(/your turn/i).isVisible({ timeout: 500 });
-      if (hasTurn) {
+      // First try the turn-indicator (shows during active play with countdown)
+      const turnIndicator = pages[i].getByTestId('turn-indicator');
+      const hasCountdown = await turnIndicator.isVisible({ timeout: 500 });
+      if (hasCountdown) {
+        const text = await turnIndicator.textContent();
+        if (text === 'Your turn') {
+          return i;
+        }
+      }
+    } catch {
+      // Turn indicator might not be visible yet
+    }
+
+    // Also check if current-turn-player shows this player's name
+    // (this shows before the countdown/turn-indicator appears)
+    try {
+      const playerName = `Player ${i + 1}`;
+      const currentTurnText = await pages[i].getByTestId('current-turn-player').textContent();
+      if (currentTurnText && currentTurnText.includes(playerName)) {
         return i;
       }
     } catch {
-      // Page might not have text, continue checking
+      // Page might not have current-turn-player element yet
     }
   }
 
@@ -135,19 +152,8 @@ export async function playFullTrick(pages: Page[]) {
   for (let i = 0; i < 4; i++) {
     await pages[0].waitForTimeout(200);
 
-    // Find current player by checking pages sequentially (avoid parallel "Target crashed" issues)
-    let pageWithTurn = -1;
-    for (let j = 0; j < pages.length; j++) {
-      try {
-        const hasTurn = await pages[j].getByText(/your turn/i).isVisible({ timeout: 500 });
-        if (hasTurn) {
-          pageWithTurn = j;
-          break;
-        }
-      } catch {
-        // Page might not have loaded yet or text not present, continue checking
-      }
-    }
+    // Find current player using the helper function
+    const pageWithTurn = await findCurrentPlayerIndex(pages);
 
     if (pageWithTurn === -1) {
       throw new Error(`Could not find current player at card ${i + 1} of trick`);
