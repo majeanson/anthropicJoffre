@@ -882,6 +882,13 @@ io.on('connection', (socket) => {
       const oldSocketId = existingPlayer.id;
       existingPlayer.id = socket.id;
 
+      // IMPORTANT: Update player ID in currentTrick to fix card display after reconnection
+      game.currentTrick.forEach(tc => {
+        if (tc.playerId === oldSocketId) {
+          tc.playerId = socket.id;
+        }
+      });
+
       // Join game room
       socket.join(gameId);
 
@@ -1601,6 +1608,13 @@ io.on('connection', (socket) => {
     // Update player's socket ID
     const oldSocketId = player.id;
     player.id = socket.id;
+
+    // IMPORTANT: Update player ID in currentTrick to fix card display after reconnection
+    game.currentTrick.forEach(tc => {
+      if (tc.playerId === oldSocketId) {
+        tc.playerId = socket.id;
+      }
+    });
 
     // Update session with new socket ID and timestamp in database
     try {
