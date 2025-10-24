@@ -145,6 +145,9 @@ const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 // Game deletion timeouts (maps gameId to timeout ID)
 const gameDeletionTimeouts = new Map<string, NodeJS.Timeout>();
 
+// Database save debounce timeouts (prevent rapid concurrent saves)
+const gameSaveTimeouts = new Map<string, NodeJS.Timeout>();
+
 // Online players tracking
 interface OnlinePlayer {
   socketId: string;
@@ -256,15 +259,29 @@ async function deleteGame(gameId: string): Promise<void> {
 /**
  * Helper to emit game_updated event AND persist to database
  * Use this instead of direct io.to().emit() calls for consistency
+ *
+ * Debounces database saves to prevent race conditions when multiple rapid updates occur
+ * (e.g., when multiple bots reconnect simultaneously)
  */
 function emitGameUpdate(gameId: string, gameState: GameState) {
-  // Emit socket event
+  // Emit socket event immediately
   io.to(gameId).emit('game_updated', gameState);
 
-  // Persist to database (fire and forget - don't block socket emission)
-  saveGame(gameState).catch(err => {
-    console.error(`Failed to persist game ${gameId}:`, err);
-  });
+  // Clear any pending save for this game
+  const existingSaveTimeout = gameSaveTimeouts.get(gameId);
+  if (existingSaveTimeout) {
+    clearTimeout(existingSaveTimeout);
+  }
+
+  // Debounce database save (wait 100ms for any additional updates)
+  const saveTimeout = setTimeout(() => {
+    saveGame(gameState).catch(err => {
+      console.error(`Failed to persist game ${gameId}:`, err);
+    });
+    gameSaveTimeouts.delete(gameId);
+  }, 100);
+
+  gameSaveTimeouts.set(gameId, saveTimeout);
 }
 
 // Helper to generate secure random token

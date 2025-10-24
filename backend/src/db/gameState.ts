@@ -90,12 +90,17 @@ export async function loadGameState(gameId: string): Promise<GameState | null> {
 
   const rawGameState = result.rows[0].game_state;
 
+  // Deep clone to prevent mutations to the DB-loaded object
+  const clonedGameState = JSON.parse(JSON.stringify(rawGameState));
+
   // Restore Map objects that were serialized as plain objects
-  if (rawGameState.afkWarnings && typeof rawGameState.afkWarnings === 'object' && !Array.isArray(rawGameState.afkWarnings)) {
-    rawGameState.afkWarnings = new Map(Object.entries(rawGameState.afkWarnings));
+  if (clonedGameState.afkWarnings && typeof clonedGameState.afkWarnings === 'object' && !Array.isArray(clonedGameState.afkWarnings)) {
+    clonedGameState.afkWarnings = new Map(Object.entries(clonedGameState.afkWarnings));
   }
 
-  return rawGameState as GameState;
+  console.log(`✅ Loaded game ${gameId} from DB - Phase: ${clonedGameState.phase}, Players: ${clonedGameState.players.length}, Round: ${clonedGameState.roundNumber}`);
+
+  return clonedGameState as GameState;
 }
 
 /**
