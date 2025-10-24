@@ -638,6 +638,54 @@ io.on('connection', (socket) => {
       return;
     }
 
+    // Check if player is trying to rejoin with same name
+    const existingPlayer = game.players.find(p => p.name === playerName);
+    if (existingPlayer && !existingPlayer.isBot) {
+      console.log(`Player ${playerName} attempting to rejoin game ${gameId}`);
+
+      // Allow rejoin - update socket ID
+      const oldSocketId = existingPlayer.id;
+      existingPlayer.id = socket.id;
+
+      // Join game room
+      socket.join(gameId);
+
+      // Create new session for the rejoin
+      const session = createPlayerSession(gameId, socket.id, playerName);
+
+      // Update timeout if this player had an active timeout
+      const oldTimeoutKey = `${gameId}-${oldSocketId}`;
+      const existingTimeout = activeTimeouts.get(oldTimeoutKey);
+      if (existingTimeout) {
+        clearTimeout(existingTimeout);
+        activeTimeouts.delete(oldTimeoutKey);
+        console.log(`Cleared old timeout for ${oldSocketId}, restarting for ${socket.id}`);
+
+        // Restart timeout with new socket ID if it's their turn
+        const currentPlayer = game.players[game.currentPlayerIndex];
+        if (currentPlayer && currentPlayer.id === socket.id) {
+          const phase = game.phase === 'betting' ? 'betting' : 'playing';
+          startPlayerTimeout(gameId, socket.id, phase as 'betting' | 'playing');
+        }
+      }
+
+      // Track online player status
+      updateOnlinePlayer(socket.id, playerName, 'in_game', gameId);
+
+      // Emit reconnection successful
+      socket.emit('reconnection_successful', { gameState: game, session });
+
+      // Notify other players
+      socket.to(gameId).emit('player_reconnected', {
+        playerName,
+        playerId: socket.id,
+        oldSocketId
+      });
+
+      console.log(`Player ${playerName} successfully rejoined game ${gameId}`);
+      return;
+    }
+
     if (game.players.length >= 4) {
       socket.emit('error', { message: 'Game is full' });
       return;
