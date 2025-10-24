@@ -681,6 +681,9 @@ io.on('connection', (socket) => {
       if (existingPlayer.isBot) {
         // For bots, emit player_joined (they don't need sessions)
         socket.emit('player_joined', { player: existingPlayer, gameState: game });
+
+        // Broadcast game_updated to all players so bot knows to act if it's their turn
+        io.to(gameId).emit('game_updated', game);
       } else {
         // For humans, emit reconnection_successful
         socket.emit('reconnection_successful', { gameState: game, session });
@@ -691,6 +694,9 @@ io.on('connection', (socket) => {
           playerId: socket.id,
           oldSocketId
         });
+
+        // Broadcast game_updated to ensure all clients are synced
+        io.to(gameId).emit('game_updated', game);
       }
 
       console.log(`Player ${playerName} successfully rejoined game ${gameId}`);
