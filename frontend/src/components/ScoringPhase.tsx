@@ -123,7 +123,7 @@ export function ScoringPhase({
 
       <div className="flex-1 flex items-center justify-center p-4 md:p-6">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-8 shadow-2xl max-w-4xl w-full">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 dark:text-gray-200 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 dark:text-gray-200 text-center" data-testid="scoring-phase-heading">
             Round {gameState.roundNumber} Complete!
           </h2>
 
@@ -144,6 +144,7 @@ export function ScoringPhase({
               <button
                 onClick={handleReady}
                 disabled={isReady}
+                data-testid="ready-button"
                 className={`px-4 md:px-6 py-2 rounded-lg font-bold transition-all text-sm md:text-base w-full md:w-auto ${
                   isReady
                     ? 'bg-green-500 text-white cursor-not-allowed'
@@ -169,14 +170,14 @@ export function ScoringPhase({
 
         {/* Team Scores - Large and Clear */}
         <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="text-center p-6 bg-orange-50 dark:bg-orange-900/40 rounded-lg border-2 border-orange-200 dark:border-orange-600">
+          <div className="text-center p-6 bg-orange-50 dark:bg-orange-900/40 rounded-lg border-2 border-orange-200 dark:border-orange-600" data-testid="team-1-score-card">
             <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">Team 1</h3>
-            <p className="text-5xl font-bold text-orange-600 dark:text-orange-300">{gameState.teamScores.team1}</p>
+            <p className="text-5xl font-bold text-orange-600 dark:text-orange-300" data-testid="team-1-score">{gameState.teamScores.team1}</p>
             <p className="text-xs text-orange-700 dark:text-orange-300 mt-2">Total Score</p>
           </div>
-          <div className="text-center p-6 bg-purple-50 dark:bg-purple-900/40 rounded-lg border-2 border-purple-200 dark:border-purple-600">
+          <div className="text-center p-6 bg-purple-50 dark:bg-purple-900/40 rounded-lg border-2 border-purple-200 dark:border-purple-600" data-testid="team-2-score-card">
             <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">Team 2</h3>
-            <p className="text-5xl font-bold text-purple-600 dark:text-purple-300">{gameState.teamScores.team2}</p>
+            <p className="text-5xl font-bold text-purple-600 dark:text-purple-300" data-testid="team-2-score">{gameState.teamScores.team2}</p>
             <p className="text-xs text-purple-700 dark:text-purple-300 mt-2">Total Score</p>
           </div>
         </div>

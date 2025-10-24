@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-24T18:01:38.162Z",
+  "buildDate": "2025-10-24T22:45:07.564Z",
   "version": "1.0.1",
   "git": {
-    "commitMessage": "feat: Redesign lobby browser with tabs and game replay integration\n\nEnhanced lobby browser UX with cleaner navigation and replay functionality.\n\nLOBBY BROWSER REDESIGN:\n1. Tab Navigation System\n   - Active Games tab: Browse and join current games\n   - Recent Games tab: View completed games with replay option\n   - Tab-based navigation replaces filter buttons for cleaner UI\n\n2. Simplified Active Games Display\n   - Removed player list from cards (reduced clutter)\n   - Kept essential info: phase, player/bot counts, round number\n   - Clearer Join/Spectate buttons with better visual hierarchy\n   - \"Join with Game ID\" section only shows in Active tab\n\n3. Recent Games View\n   - Shows last 20 completed games\n   - Display: winning team, score, rounds, duration, time ago\n   - \"Watch Replay\" button for each game\n   - Time ago formatting (minutes, hours, days)\n\n4. Game Replay Integration\n   - Opens replay directly from Recent Games tab\n   - Seamless transition between lobby and replay views\n   - Uses existing GameReplay component with full playback controls\n\nBACKEND CHANGES:\n- Added REST endpoint: GET /api/games/recent\n  - Returns finished games from database\n  - Supports limit and offset query params\n  - Default limit: 20 games\n  - Uses existing getAllFinishedGames() function\n\nFRONTEND CHANGES:\n- LobbyBrowser.tsx:\n  - Added Socket.io prop for replay functionality\n  - Tab state management (active/recent)\n  - Separate fetch functions for active and recent games\n  - Auto-refresh active games every 5 seconds\n  - GameReplay modal integration\n  - Helper function for time ago formatting\n  - Removed filter state and filter buttons\n\n- Lobby.tsx:\n  - Pass socket prop to LobbyBrowser component\n\nUX IMPROVEMENTS:\n- Cleaner, less cluttered interface\n- Easier to scan game list\n- Quick access to game replays\n- Better visual hierarchy and organization\n- Consistent with existing parchment theme\n\nFiles Changed:\n- backend/src/index.ts: Added /api/games/recent endpoint\n- frontend/src/components/LobbyBrowser.tsx: Complete redesign with tabs\n- frontend/src/components/Lobby.tsx: Added socket prop\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "12c1963",
-    "commitDate": "2025-10-24 14:01:10 -0400",
+    "commitMessage": "fix: Add backend safety checks and remove fragile 04-game-flow tests",
+    "commitHash": "pending",
+    "commitDate": "2025-10-24 22:45:07 +0000",
     "branch": "main"
   },
   "futureTodos": [

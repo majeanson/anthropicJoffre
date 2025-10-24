@@ -614,13 +614,23 @@ function handleBettingTimeout(gameId: string, playerName: string) {
     const highestBidderIndex = game.players.findIndex(
       (p) => p.id === game.highestBet?.playerId
     );
-    game.currentPlayerIndex = highestBidderIndex;
+    game.currentPlayerIndex = highestBidderIndex >= 0 ? highestBidderIndex : 0;
     emitGameUpdate(gameId, game);
-    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'playing');
+
+    // Safety check: ensure player exists before starting timeout
+    const currentPlayer = game.players[game.currentPlayerIndex];
+    if (currentPlayer) {
+      startPlayerTimeout(gameId, currentPlayer.name, 'playing');
+    }
   } else {
     game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
     emitGameUpdate(gameId, game);
-    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'betting');
+
+    // Safety check: ensure player exists before starting timeout
+    const nextPlayer = game.players[game.currentPlayerIndex];
+    if (nextPlayer) {
+      startPlayerTimeout(gameId, nextPlayer.name, 'betting');
+    }
   }
 }
 
@@ -691,7 +701,10 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
     // Note: timeout will be started by resolveTrick after 2-second delay
   } else {
     emitGameUpdate(gameId, game);
-    startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].name, 'playing');
+    const nextPlayer = game.players[game.currentPlayerIndex];
+    if (nextPlayer) {
+      startPlayerTimeout(gameId, nextPlayer.name, 'playing');
+    }
   }
 }
 
@@ -1463,7 +1476,11 @@ io.on('connection', (socket) => {
     // I/O - Emit updates and handle trick resolution
     if (result.trickComplete) {
       // Emit state with all 4 cards visible before trick resolution
-      console.log(`   🎯 Trick complete! Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name}`);
+      const prevPlayer = game.players[result.previousPlayerIndex];
+      const currPlayer = game.players[game.currentPlayerIndex];
+      if (prevPlayer && currPlayer) {
+        console.log(`   🎯 Trick complete! Turn advanced: ${prevPlayer.name} → ${currPlayer.name}`);
+      }
       console.log(`   Final trick state before resolution:`);
       game.currentTrick.forEach((tc, idx) => {
         const player = game.players.find(p => p.id === tc.playerId);
@@ -1480,10 +1497,17 @@ io.on('connection', (socket) => {
       // Database save will happen after trick is cleared
     } else {
       // Emit updated state with turn advanced
-      console.log(`   ➡️  Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
+      const prevPlayer = game.players[result.previousPlayerIndex];
+      const currPlayer = game.players[game.currentPlayerIndex];
+      if (prevPlayer && currPlayer) {
+        console.log(`   ➡️  Turn advanced: ${prevPlayer.name} → ${currPlayer.name} (${game.currentTrick.length}/4 cards played)\n`);
+      }
       emitGameUpdate(gameId, game);
       // Start timeout for next player
-      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
+      const nextPlayer = game.players[game.currentPlayerIndex];
+      if (nextPlayer) {
+        startPlayerTimeout(gameId, nextPlayer.id, 'playing');
+      }
     }
   });
 

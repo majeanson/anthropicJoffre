@@ -180,6 +180,6 @@ export async function playFullRound(pages: Page[]) {
     await playFullTrick(pages);
   }
 
-  // Wait for scoring phase to appear with text "Round {N} Complete!"
-  await pages[0].waitForSelector('text=/round \\d+ complete/i', { timeout: 10000 });
+  // Wait for scoring phase to appear
+  await pages[0].getByTestId('scoring-phase-heading').waitFor({ timeout: 10000 });
 }
