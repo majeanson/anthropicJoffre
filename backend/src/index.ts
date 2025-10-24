@@ -2002,8 +2002,17 @@ function startNewRound(gameId: string) {
 }
 
 function resolveTrick(gameId: string) {
+  console.log(`\n🎯 ===== resolveTrick START for game ${gameId} =====`);
   const game = games.get(gameId);
-  if (!game) return;
+  if (!game) {
+    console.log(`   ❌ Game not found!`);
+    return;
+  }
+
+  console.log(`   📊 currentTrick.length = ${game.currentTrick.length}`);
+  game.currentTrick.forEach((tc, idx) => {
+    console.log(`      ${idx + 1}. ${tc.playerName}: ${tc.card.color} ${tc.card.value}`);
+  });
 
   // 1. PURE CALCULATION - Determine winner and points
   const winnerId = determineWinner(game.currentTrick, game.trump);
@@ -2039,13 +2048,20 @@ function resolveTrick(gameId: string) {
   const result = applyTrickResolution(game, winnerName, totalPoints);
 
   // DEBUG: Log current trick state before emitting
-  console.log(`   📤 Emitting trick_resolved with currentTrick.length = ${game.currentTrick.length}`);
-  game.currentTrick.forEach((tc, idx) => {
-    console.log(`      ${idx + 1}. ${tc.playerName}: ${tc.card.color} ${tc.card.value}`);
-  });
+  console.log(`   📤 About to emit trick_resolved`);
+  console.log(`   📤 game object currentTrick.length = ${game.currentTrick.length}`);
+  console.log(`   📤 games.get('${gameId}')?.currentTrick.length = ${games.get(gameId)?.currentTrick.length}`);
+
+  const gameToSend = games.get(gameId);
+  if (gameToSend) {
+    console.log(`   📤 Sending gameState with currentTrick.length = ${gameToSend.currentTrick.length}`);
+    gameToSend.currentTrick.forEach((tc, idx) => {
+      console.log(`      ${idx + 1}. ${tc.playerName}: ${tc.card.color} ${tc.card.value}`);
+    });
+  }
 
   // 4. I/O - Emit trick resolution event with trick still visible
-  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: game });
+  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: gameToSend || game });
 
   // 5. ORCHESTRATION - Handle round completion or continue playing
   if (result.isRoundOver) {

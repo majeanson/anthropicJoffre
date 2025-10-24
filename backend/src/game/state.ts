@@ -417,6 +417,8 @@ export function applyTrickResolution(
   winnerId: string,
   points: number
 ): TrickResolutionResult {
+  console.log(`🔧 applyTrickResolution START: currentTrick.length = ${game.currentTrick.length}`);
+
   // Look up winner by name first (stable), fallback to ID (for backwards compat)
   // winnerId might be a playerName or a socket ID depending on caller
   let winnerIndex = game.players.findIndex(p => p.name === winnerId);
@@ -434,6 +436,8 @@ export function applyTrickResolution(
   winner.tricksWon += 1;
   winner.pointsWon += points;
 
+  console.log(`🔧 Before storing trick: currentTrick.length = ${game.currentTrick.length}`);
+
   // Store trick result before clearing (include both winnerId and winnerName)
   const trickResult = {
     trick: [...game.currentTrick],
@@ -441,6 +445,8 @@ export function applyTrickResolution(
     winnerName: winner.name, // Stable identifier
     points,
   };
+
+  console.log(`🔧 After creating trickResult: currentTrick.length = ${game.currentTrick.length}, trickResult.trick.length = ${trickResult.trick.length}`);
 
   game.previousTrick = trickResult;
   game.currentRoundTricks.push(trickResult);
@@ -459,6 +465,8 @@ export function applyTrickResolution(
   if (isRoundOver) {
     game.phase = 'scoring';
   }
+
+  console.log(`🔧 applyTrickResolution END: currentTrick.length = ${game.currentTrick.length}`);
 
   return {
     winnerId,
