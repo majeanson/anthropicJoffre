@@ -260,6 +260,7 @@ function App() {
     });
 
     newSocket.on('game_updated', (gameState) => {
+      console.log(`📥 Frontend received game_updated, currentTrick.length = ${gameState.currentTrick.length}`);
       setGameState(gameState);
       // Clear winner ID when trick is cleared
       if (gameState.currentTrick.length === 0) {
@@ -268,6 +269,7 @@ function App() {
     });
 
     newSocket.on('trick_resolved', ({ winnerId, gameState }) => {
+      console.log(`📥 Frontend received trick_resolved, currentTrick.length = ${gameState.currentTrick.length}`);
       setGameState(gameState);
       // Store the winner ID for highlighting during the 3-second delay
       setCurrentTrickWinnerId(winnerId);

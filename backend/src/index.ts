@@ -2038,6 +2038,12 @@ function resolveTrick(gameId: string) {
   // applyTrickResolution now keeps currentTrick visible (doesn't clear it)
   const result = applyTrickResolution(game, winnerName, totalPoints);
 
+  // DEBUG: Log current trick state before emitting
+  console.log(`   📤 Emitting trick_resolved with currentTrick.length = ${game.currentTrick.length}`);
+  game.currentTrick.forEach((tc, idx) => {
+    console.log(`      ${idx + 1}. ${tc.playerName}: ${tc.card.color} ${tc.card.value}`);
+  });
+
   // 4. I/O - Emit trick resolution event with trick still visible
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: game });
 
