@@ -62,7 +62,7 @@ describe('applyCardPlay', () => {
     const result = applyCardPlay(game, 'p1', card);
 
     expect(game.currentTrick.length).toBe(1);
-    expect(game.currentTrick[0]).toEqual({ playerId: 'p1', card });
+    expect(game.currentTrick[0]).toEqual({ playerId: 'p1', playerName: 'P1', card });
     expect(game.players[0].hand).toEqual([{ color: 'blue', value: 3 }]);
     expect(result.trickComplete).toBe(false);
   });
@@ -543,7 +543,7 @@ describe('applyTrickResolution', () => {
     expect(game.currentRoundTricks[0].winnerId).toBe('p1');
   });
 
-  it('should clear currentTrick', () => {
+  it('should NOT clear currentTrick (cleared later after delay)', () => {
     const game = createTestGame({
       phase: 'playing',
       currentTrick: [
@@ -556,7 +556,8 @@ describe('applyTrickResolution', () => {
 
     applyTrickResolution(game, 'p1', 1);
 
-    expect(game.currentTrick).toEqual([]);
+    // Trick remains visible for 2 seconds before being cleared
+    expect(game.currentTrick).toHaveLength(4);
   });
 
   it('should set winner as current player', () => {

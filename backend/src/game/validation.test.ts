@@ -386,9 +386,17 @@ describe('validatePositionSwap', () => {
     }
   });
 
-  it('should allow valid position swap', () => {
-    const game = createTestGame({ phase: 'team_selection' });
-    const result = validatePositionSwap(game, 'p1', 'p2');
+  it('should allow valid position swap between teammates', () => {
+    const game = createTestGame({
+      phase: 'team_selection',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ]
+    });
+    const result = validatePositionSwap(game, 'p1', 'p3'); // Both on team 1
 
     expect(result.valid).toBe(true);
   });

@@ -178,6 +178,7 @@ export const updatePlayerStats = async (
       total_tricks_won = total_tricks_won + $3,
       total_points_earned = total_points_earned + $4,
       total_bets_made = total_bets_made + CASE WHEN $5 IS NOT NULL THEN 1 ELSE 0 END,
+      total_bet_amount = total_bet_amount + COALESCE($5, 0),
       bets_won = bets_won + CASE WHEN $6 = TRUE THEN 1 ELSE 0 END,
       bets_lost = bets_lost + CASE WHEN $6 = FALSE THEN 1 ELSE 0 END,
       highest_bet = GREATEST(highest_bet, COALESCE($5, 0)),
@@ -211,11 +212,7 @@ export const updatePlayerStats = async (
     UPDATE player_stats SET
       win_percentage = ROUND((games_won::numeric / NULLIF(games_played, 0) * 100), 2),
       avg_tricks_per_game = ROUND((total_tricks_won::numeric / NULLIF(games_played, 0)), 2),
-      avg_bet_amount = ROUND((
-        SELECT AVG(bet_amount)::numeric
-        FROM game_participants
-        WHERE player_name = $1 AND bet_amount IS NOT NULL
-      ), 2)
+      avg_bet_amount = ROUND((total_bet_amount::numeric / NULLIF(total_bets_made, 0)), 2)
     WHERE player_name = $1
   `, [playerName]);
 
@@ -262,9 +259,10 @@ export const updateRoundStats = async (
       most_tricks_in_round = GREATEST(most_tricks_in_round, $3),
       zero_trick_rounds = zero_trick_rounds + CASE WHEN $3 = 0 THEN 1 ELSE 0 END,
       highest_points_in_round = GREATEST(highest_points_in_round, $4),
-      total_bets_placed = total_bets_placed + CASE WHEN $5 = TRUE THEN 1 ELSE 0 END,
-      bets_made = bets_made + CASE WHEN $6 = TRUE THEN 1 ELSE 0 END,
-      bets_failed = bets_failed + CASE WHEN $6 = FALSE THEN 1 ELSE 0 END,
+      total_bets_made = total_bets_made + CASE WHEN $5 = TRUE THEN 1 ELSE 0 END,
+      total_bet_amount = total_bet_amount + COALESCE($7, 0),
+      bets_won = bets_won + CASE WHEN $6 = TRUE THEN 1 ELSE 0 END,
+      bets_lost = bets_lost + CASE WHEN $6 = FALSE THEN 1 ELSE 0 END,
       highest_bet = GREATEST(highest_bet, COALESCE($7, 0)),
       without_trump_bets = without_trump_bets + CASE WHEN $8 = TRUE THEN 1 ELSE 0 END,
       red_zeros_collected = red_zeros_collected + COALESCE($9, 0),
@@ -295,12 +293,8 @@ export const updateRoundStats = async (
       rounds_win_percentage = ROUND((rounds_won::numeric / NULLIF(total_rounds_played, 0) * 100), 2),
       avg_tricks_per_round = ROUND((total_tricks_won::numeric / NULLIF(total_rounds_played, 0)), 2),
       avg_points_per_round = ROUND((total_points_earned::numeric / NULLIF(total_rounds_played, 0)), 2),
-      bet_success_rate = ROUND((bets_made::numeric / NULLIF(total_bets_placed, 0) * 100), 2),
-      avg_bet_amount = ROUND((
-        SELECT AVG(bet_amount)::numeric
-        FROM game_participants
-        WHERE player_name = $1 AND bet_amount IS NOT NULL
-      ), 2)
+      bet_success_rate = ROUND((bets_won::numeric / NULLIF(total_bets_made, 0) * 100), 2),
+      avg_bet_amount = ROUND((total_bet_amount::numeric / NULLIF(total_bets_made, 0)), 2)
     WHERE player_name = $1
   `, [playerName]);
 
@@ -351,7 +345,7 @@ export const updateGameStats = async (
       games_lost = games_lost + CASE WHEN $2 THEN 0 ELSE 1 END,
       elo_rating = elo_rating + $3,
       highest_rating = GREATEST(highest_rating, elo_rating + $3),
-      lowest_rating = LEAST(COALESCE(NULLIF(lowest_rating, 0), elo_rating + $3), elo_rating + $3),
+      lowest_rating = LEAST(COALESCE(NULLIF(lowest_rating, 1200), elo_rating + $3), elo_rating + $3),
       current_win_streak = $4,
       current_loss_streak = $5,
       best_win_streak = $6,
@@ -400,7 +394,21 @@ export const getPlayerStats = async (playerName: string) => {
     WHERE player_name = $1 AND is_bot = FALSE
   `;
   const result = await query(text, [playerName]);
-  return result.rows[0] || null;
+  const row = result.rows[0];
+
+  if (!row) return null;
+
+  // Convert string numeric values to numbers
+  return {
+    ...row,
+    rounds_win_percentage: parseFloat(row.rounds_win_percentage) || 0,
+    avg_tricks_per_round: parseFloat(row.avg_tricks_per_round) || 0,
+    avg_points_per_round: parseFloat(row.avg_points_per_round) || 0,
+    bet_success_rate: parseFloat(row.bet_success_rate) || 0,
+    avg_bet_amount: parseFloat(row.avg_bet_amount) || 0,
+    win_percentage: parseFloat(row.win_percentage) || 0,
+    avg_tricks_per_game: parseFloat(row.avg_tricks_per_game) || 0,
+  };
 };
 
 /**

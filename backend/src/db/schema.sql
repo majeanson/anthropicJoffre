@@ -182,6 +182,12 @@ BEGIN
                    WHERE table_name='player_stats' AND column_name='is_bot') THEN
         ALTER TABLE player_stats ADD COLUMN is_bot BOOLEAN DEFAULT FALSE;
     END IF;
+
+    -- Add total_bet_amount column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='total_bet_amount') THEN
+        ALTER TABLE player_stats ADD COLUMN total_bet_amount INTEGER DEFAULT 0;
+    END IF;
 END $$;
 
 -- Game participants junction table

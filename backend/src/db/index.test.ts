@@ -391,11 +391,13 @@ describe('Database Stats Functions', () => {
       expect(stats?.brown_zeros_received).toBe(1);
     });
 
-    it('should calculate average tricks per game', async () => {
+    it('should calculate average tricks per round', async () => {
       const playerName = 'TestPlayer_AvgTricks_' + Date.now();
 
       // Round 1 - 9 tricks
       await updateRoundStats(playerName, {
+        roundWon: true,
+        wasBidder: true,
         betMade: true,
         betAmount: 8,
         withoutTrump: false,
@@ -404,11 +406,13 @@ describe('Database Stats Functions', () => {
         trumpsPlayed: 2,
       });
       let stats = await getPlayerStats(playerName);
-      expect(stats?.avg_tricks_per_game).toBeCloseTo(9.00, 1);
+      expect(stats?.avg_tricks_per_round).toBeCloseTo(9.00, 1);
 
       // Round 2 - 7 tricks (avg should be 8)
       await updateRoundStats(playerName, {
-        betMade: true,
+        roundWon: false,
+        wasBidder: true,
+        betMade: false,
         betAmount: 7,
         withoutTrump: false,
         tricksWon: 7,
@@ -416,7 +420,7 @@ describe('Database Stats Functions', () => {
         trumpsPlayed: 1,
       });
       stats = await getPlayerStats(playerName);
-      expect(stats?.avg_tricks_per_game).toBeCloseTo(8.00, 1);
+      expect(stats?.avg_tricks_per_round).toBeCloseTo(8.00, 1);
     });
 
     it('should update highest bet', async () => {
