@@ -19,13 +19,14 @@ interface BettingPhaseProps {
   gameState: GameState;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
+  onOpenBotManagement?: () => void;
   socket?: Socket | null;
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
   const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
   const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
   const isDealer = currentPlayerIndex === dealerIndex;
@@ -122,6 +123,8 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
         onLeaveGame={onLeaveGame}
         onOpenLeaderboard={() => setShowLeaderboard(true)}
         onOpenChat={() => setChatOpen(!chatOpen)}
+        onOpenBotManagement={onOpenBotManagement}
+        botCount={gameState.players.filter(p => p.isBot).length}
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
         unreadChatCount={unreadChatCount}

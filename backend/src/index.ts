@@ -35,6 +35,7 @@ import {
   getHighestBet,
   isBetHigher,
 } from './game/logic';
+import { selectBotCard } from './game/botLogic';
 import {
   validateCardPlay,
   validateBet,
@@ -303,6 +304,53 @@ function findPlayer(game: GameState, socketId: string, playerName?: string): Pla
   }
 
   return player;
+}
+
+/**
+ * Helper to get the next available bot name (Bot 1, Bot 2, Bot 3)
+ */
+function getNextBotName(game: GameState): string {
+  const existingBotNumbers = game.players
+    .filter(p => p.name.startsWith('Bot '))
+    .map(p => parseInt(p.name.split(' ')[1]))
+    .filter(n => !isNaN(n));
+
+  for (let i = 1; i <= 3; i++) {
+    if (!existingBotNumbers.includes(i)) {
+      return `Bot ${i}`;
+    }
+  }
+
+  // Fallback (should never happen with validation)
+  return `Bot ${Date.now() % 1000}`;
+}
+
+/**
+ * Helper to check if game can add another bot (max 3 bots)
+ */
+function canAddBot(game: GameState): boolean {
+  const botCount = game.players.filter(p => p.isBot).length;
+  return botCount < 3;
+}
+
+/**
+ * Helper to check if two players are teammates
+ */
+function areTeammates(game: GameState, player1Name: string, player2Name: string): boolean {
+  const p1 = game.players.find(p => p.name === player1Name);
+  const p2 = game.players.find(p => p.name === player2Name);
+
+  if (!p1 || !p2) return false;
+
+  return p1.teamId === p2.teamId;
+}
+
+/**
+ * Helper to ensure at least 1 human player remains
+ */
+function hasAtLeastOneHuman(game: GameState): boolean {
+  const humanCount = game.players.filter(p => !p.isBot).length;
+  return humanCount >= 1;
 }
 
 /**
@@ -587,41 +635,31 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
 
   console.log(`Auto-playing card for ${currentPlayer.name} due to timeout`);
 
-  // Determine valid cards
-  let validCards = currentPlayer.hand;
-  if (game.currentTrick.length > 0) {
-    const ledSuit = game.currentTrick[0].card.color;
-    const cardsInLedSuit = currentPlayer.hand.filter(c => c.color === ledSuit);
-    if (cardsInLedSuit.length > 0) {
-      validCards = cardsInLedSuit;
-    }
-  }
+  // Use hard bot logic to select best card (same strategy as frontend autoplay)
+  const selectedCard = selectBotCard(game, player.id);
 
-  // Pick random valid card
-  const randomCard = validCards[Math.floor(Math.random() * validCards.length)];
-
-  if (!randomCard) {
+  if (!selectedCard) {
     console.error(`No valid cards found for ${currentPlayer.name}`);
     return;
   }
 
-  console.log(`Auto-playing: ${randomCard.color} ${randomCard.value}`);
+  console.log(`Auto-playing (bot logic): ${selectedCard.color} ${selectedCard.value}`);
 
   // Set trump on first card
   if (game.currentTrick.length === 0 && !game.trump) {
-    game.trump = randomCard.color;
+    game.trump = selectedCard.color;
   }
 
   // Add card to trick (include both playerId and playerName)
   game.currentTrick.push({
     playerId: player.id,
     playerName: player.name,
-    card: randomCard
+    card: selectedCard
   });
 
   // Remove card from player's hand
   currentPlayer.hand = currentPlayer.hand.filter(
-    (c) => !(c.color === randomCard.color && c.value === randomCard.value)
+    (c) => !(c.color === selectedCard.color && c.value === selectedCard.value)
   );
 
   // Move to next player
@@ -1609,6 +1647,240 @@ io.on('connection', (socket) => {
     // Broadcast updated game state
     io.to(gameId).emit('player_left', { playerId, gameState: game });
     console.log(`Player ${kickedPlayer.name} was kicked from game ${gameId} by host`);
+  });
+
+  // Replace human player with bot
+  socket.on('replace_with_bot', async ({
+    gameId,
+    playerNameToReplace,
+    requestingPlayerName
+  }: {
+    gameId: string;
+    playerNameToReplace: string;
+    requestingPlayerName: string;
+  }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Find the player to replace
+    const playerToReplace = game.players.find(p => p.name === playerNameToReplace);
+    if (!playerToReplace) {
+      socket.emit('error', { message: 'Player to replace not found' });
+      return;
+    }
+
+    // Cannot replace a bot
+    if (playerToReplace.isBot) {
+      socket.emit('error', { message: 'Cannot replace a bot with another bot' });
+      return;
+    }
+
+    // Validate requesting player is a teammate
+    if (!areTeammates(game, requestingPlayerName, playerNameToReplace)) {
+      socket.emit('error', { message: 'Only teammates can replace a player with a bot' });
+      return;
+    }
+
+    // Check bot limit (max 3 bots)
+    if (!canAddBot(game)) {
+      socket.emit('error', { message: 'Maximum of 3 bots allowed per game' });
+      return;
+    }
+
+    // Check if at least 1 human would remain
+    const humanCountAfterReplace = game.players.filter(p => !p.isBot && p.name !== playerNameToReplace).length;
+    if (humanCountAfterReplace < 1) {
+      socket.emit('error', { message: 'At least 1 human player must remain in the game' });
+      return;
+    }
+
+    // Get next available bot name
+    const botName = getNextBotName(game);
+    const oldSocketId = playerToReplace.id;
+
+    // Update player to be a bot (preserve team, hand, scores, position)
+    playerToReplace.name = botName;
+    playerToReplace.isBot = true;
+    playerToReplace.botDifficulty = 'hard';
+    // Note: Keep the same socket ID for now - bot socket will reconnect with new ID
+
+    // Clean up old player's sessions
+    try {
+      await deletePlayerSessions(playerNameToReplace, gameId);
+      console.log(`Deleted DB sessions for replaced player ${playerNameToReplace}`);
+    } catch (error) {
+      console.error('Failed to delete replaced player sessions from DB:', error);
+    }
+
+    // Remove from player sessions
+    for (const [token, session] of playerSessions.entries()) {
+      if (session.playerName === playerNameToReplace && session.gameId === gameId) {
+        playerSessions.delete(token);
+        break;
+      }
+    }
+
+    // Notify the replaced player
+    io.to(oldSocketId).emit('replaced_by_bot', {
+      message: 'You have been replaced by a bot',
+      gameId
+    });
+
+    // Remove old socket from room
+    const oldSocket = io.sockets.sockets.get(oldSocketId);
+    if (oldSocket) {
+      oldSocket.leave(gameId);
+    }
+
+    // Broadcast updated game state
+    io.to(gameId).emit('bot_replaced', {
+      gameState: game,
+      replacedPlayerName: playerNameToReplace,
+      botName
+    });
+
+    console.log(`Player ${playerNameToReplace} replaced with ${botName} in game ${gameId}`);
+  });
+
+  // Take over a bot with a human player
+  socket.on('take_over_bot', async ({
+    gameId,
+    botNameToReplace,
+    newPlayerName
+  }: {
+    gameId: string;
+    botNameToReplace: string;
+    newPlayerName: string;
+  }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Find the bot to replace
+    const botToReplace = game.players.find(p => p.name === botNameToReplace);
+    if (!botToReplace) {
+      socket.emit('error', { message: 'Bot not found' });
+      return;
+    }
+
+    // Must be a bot
+    if (!botToReplace.isBot) {
+      socket.emit('error', { message: 'Can only take over bot players' });
+      return;
+    }
+
+    // Check if new player name already exists
+    const existingPlayer = game.players.find(p => p.name === newPlayerName);
+    if (existingPlayer) {
+      socket.emit('error', { message: 'Player name already exists in this game' });
+      return;
+    }
+
+    // Update bot to be a human player (preserve team, hand, scores, position)
+    botToReplace.name = newPlayerName;
+    botToReplace.isBot = false;
+    botToReplace.botDifficulty = undefined;
+    botToReplace.id = socket.id; // Update to new player's socket
+
+    // Join the socket room
+    socket.join(gameId);
+
+    // Create and save session token
+    let session: PlayerSession;
+    try {
+      session = await createDBSession(newPlayerName, socket.id, gameId);
+      playerSessions.set(session.token, session);
+      console.log(`Saved DB session for takeover player ${newPlayerName}`);
+    } catch (error) {
+      console.error('Failed to save takeover session to DB:', error);
+      // Fallback to in-memory session
+      const token = generateSessionToken();
+      session = {
+        gameId,
+        playerId: socket.id,
+        playerName: newPlayerName,
+        token,
+        timestamp: Date.now()
+      };
+      playerSessions.set(token, session);
+    }
+
+    // Update online players
+    onlinePlayers.set(socket.id, {
+      socketId: socket.id,
+      playerName: newPlayerName,
+      status: 'in_game',
+      gameId,
+      lastActivity: Date.now()
+    });
+    broadcastOnlinePlayers();
+
+    // Emit to the new player
+    socket.emit('bot_taken_over', {
+      gameState: game,
+      botName: botNameToReplace,
+      newPlayerName,
+      session
+    });
+
+    // Broadcast to other players
+    socket.to(gameId).emit('bot_taken_over', {
+      gameState: game,
+      botName: botNameToReplace,
+      newPlayerName,
+      session: null // Don't send session to other players
+    });
+
+    console.log(`Bot ${botNameToReplace} taken over by ${newPlayerName} in game ${gameId}`);
+  });
+
+  // Change bot difficulty
+  socket.on('change_bot_difficulty', async ({
+    gameId,
+    botName,
+    difficulty
+  }: {
+    gameId: string;
+    botName: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+  }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Find the bot
+    const bot = game.players.find(p => p.name === botName);
+    if (!bot) {
+      socket.emit('error', { message: 'Bot not found' });
+      return;
+    }
+
+    // Must be a bot
+    if (!bot.isBot) {
+      socket.emit('error', { message: 'Can only change difficulty of bot players' });
+      return;
+    }
+
+    // Validate difficulty
+    if (!['easy', 'medium', 'hard'].includes(difficulty)) {
+      socket.emit('error', { message: 'Invalid difficulty level' });
+      return;
+    }
+
+    // Update bot difficulty
+    bot.botDifficulty = difficulty;
+
+    // Broadcast updated game state
+    emitGameUpdate(gameId, game);
+
+    console.log(`Bot ${botName} difficulty changed to ${difficulty} in game ${gameId}`);
   });
 
   // Reconnection handler

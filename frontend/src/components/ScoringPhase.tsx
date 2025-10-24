@@ -13,6 +13,7 @@ interface ScoringPhaseProps {
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
   onLeaveGame?: () => void;
+  onOpenBotManagement?: () => void;
   isSpectator?: boolean;
 }
 
@@ -24,6 +25,7 @@ export function ScoringPhase({
   chatMessages = [],
   onNewChatMessage,
   onLeaveGame,
+  onOpenBotManagement,
   isSpectator = false
 }: ScoringPhaseProps) {
   const [chatOpen, setChatOpen] = useState(false);
@@ -100,6 +102,8 @@ export function ScoringPhase({
         team2Score={gameState.teamScores.team2}
         onLeaveGame={onLeaveGame}
         onOpenChat={() => setChatOpen(true)}
+        onOpenBotManagement={onOpenBotManagement}
+        botCount={gameState.players.filter(p => p.isBot).length}
         isSpectator={isSpectator}
         unreadChatCount={unreadCount}
       />

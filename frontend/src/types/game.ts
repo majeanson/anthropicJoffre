@@ -6,6 +6,8 @@ export interface Card {
   value: CardValue;
 }
 
+export type BotDifficulty = 'easy' | 'medium' | 'hard';
+
 export interface Player {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ export interface Player {
   tricksWon: number;
   pointsWon: number;
   isBot?: boolean; // True if this player is a bot
+  botDifficulty?: BotDifficulty; // Difficulty level if this is a bot
 }
 
 export interface Bet {
@@ -130,4 +133,36 @@ export interface Spectator {
 
 export interface SpectatorGameState extends Omit<GameState, 'players'> {
   players: Omit<Player, 'hand'>[];
+}
+
+// Bot management socket event payloads
+export interface ReplaceWithBotPayload {
+  gameId: string;
+  playerNameToReplace: string;
+  requestingPlayerName: string;
+}
+
+export interface TakeOverBotPayload {
+  gameId: string;
+  botNameToReplace: string;
+  newPlayerName: string;
+}
+
+export interface ChangeBotDifficultyPayload {
+  gameId: string;
+  botName: string;
+  difficulty: BotDifficulty;
+}
+
+export interface BotReplacedPayload {
+  gameState: GameState;
+  replacedPlayerName: string;
+  botName: string;
+}
+
+export interface BotTakenOverPayload {
+  gameState: GameState;
+  botName: string;
+  newPlayerName: string;
+  session: PlayerSession;
 }

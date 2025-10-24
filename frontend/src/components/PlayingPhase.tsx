@@ -17,13 +17,14 @@ interface PlayingPhaseProps {
   onLeaveGame?: () => void;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
+  onOpenBotManagement?: () => void;
   socket?: Socket | null;
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
+export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -37,6 +38,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
   const [previousRoundScores, setPreviousRoundScores] = useState<{team1: number, team2: number} | null>(null);
   const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
+  const [cardInTransition, setCardInTransition] = useState<CardType | null>(null);
 
   const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
   const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
@@ -110,6 +112,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   useEffect(() => {
     setIsPlayingCard(false);
   }, [gameState.currentTrick.length]);
+
+  // Clear card transition when trick is resolved or new round starts
+  useEffect(() => {
+    if (gameState.currentTrick.length === 0) {
+      setCardInTransition(null);
+    }
+  }, [gameState.currentTrick.length, gameState.roundNumber]);
 
   // Card dealing animation when round starts or hand changes
   useEffect(() => {
@@ -292,8 +301,14 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     }
 
     setIsPlayingCard(true);
+    setCardInTransition(card); // Mark card as transitioning
     sounds.cardPlay(); // Play card play sound
     onPlayCard(card);
+
+    // Clear the transition state after the board animation completes (400ms)
+    setTimeout(() => {
+      setCardInTransition(null);
+    }, 450); // Slightly longer than the 400ms animation
   };
 
   const cardPositions = getCardPositions(gameState.currentTrick);
@@ -385,6 +400,8 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
         onLeaveGame={onLeaveGame}
         onOpenLeaderboard={() => setShowLeaderboard(true)}
         onOpenChat={() => setChatOpen(true)}
+        onOpenBotManagement={onOpenBotManagement}
+        botCount={gameState.players.filter(p => p.isBot).length}
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
         isSpectator={isSpectator}
@@ -703,30 +720,43 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               <>
                 <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
                   <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
-                    {currentPlayer.hand.map((card, index) => {
-                      const playable = isCardPlayable(card);
-                      const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
-                      const dealDelay = index * 80; // Stagger animation for each card
+                    {(() => {
+                      // Create combined hand: actual hand + card in transition (if it's no longer in hand)
+                      const displayHand = [...currentPlayer.hand];
 
-                      return (
-                        <div
-                          key={`${card.color}-${card.value}-${index}`}
-                          className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
-                            playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
-                          } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : 'opacity-100 scale-100'}`}
-                          style={{
-                            transition: `opacity 200ms ease-out ${dealDelay}ms, transform 200ms ease-out ${dealDelay}ms`
-                          }}
-                        >
-                          <CardComponent
-                            card={card}
-                            size="small"
-                            onClick={() => handleCardClick(card)}
-                            disabled={!isCurrentTurn || !playable}
-                          />
-                        </div>
-                      );
-                    })}
+                      // If a card is in transition and not in the current hand, add it temporarily
+                      if (cardInTransition && !currentPlayer.hand.some(c => c.color === cardInTransition.color && c.value === cardInTransition.value)) {
+                        displayHand.push(cardInTransition);
+                      }
+
+                      return displayHand.map((card, index) => {
+                        const playable = isCardPlayable(card);
+                        const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
+                        const dealDelay = index * 80; // Stagger animation for each card
+                        const isTransitioning = cardInTransition && card.color === cardInTransition.color && card.value === cardInTransition.value;
+
+                        return (
+                          <div
+                            key={`${card.color}-${card.value}-${index}`}
+                            className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
+                              playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
+                            } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0' : 'opacity-100 scale-100'}`}
+                            style={{
+                              transition: isTransitioning
+                                ? 'opacity 400ms ease-out, transform 400ms ease-out'
+                                : `opacity 200ms ease-out ${dealDelay}ms, transform 200ms ease-out ${dealDelay}ms`
+                            }}
+                          >
+                            <CardComponent
+                              card={card}
+                              size="small"
+                              onClick={() => handleCardClick(card)}
+                              disabled={!isCurrentTurn || !playable || !!isTransitioning}
+                            />
+                          </div>
+                        );
+                      });
+                    })()}
                   </div>
                 </div>
               </>

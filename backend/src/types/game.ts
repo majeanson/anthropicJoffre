@@ -6,6 +6,8 @@ export interface Card {
   value: CardValue;
 }
 
+export type BotDifficulty = 'easy' | 'medium' | 'hard';
+
 export interface Player {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ export interface Player {
   tricksWon: number;
   pointsWon: number; // Points earned from tricks and special cards
   isBot?: boolean; // True if this player is a bot
+  botDifficulty?: BotDifficulty; // Difficulty level if this is a bot
 }
 
 export interface Bet {

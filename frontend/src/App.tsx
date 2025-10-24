@@ -12,6 +12,7 @@ import { DebugPanel } from './components/DebugPanel';
 import { TestPanel } from './components/TestPanel';
 import { ReconnectingBanner } from './components/ReconnectingBanner';
 import { CatchUpModal } from './components/CatchUpModal';
+import { BotManagementPanel } from './components/BotManagementPanel';
 import { Toast, ToastProps } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
 import { BotPlayer, BotDifficulty } from './utils/botPlayer';
@@ -39,6 +40,7 @@ function App() {
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
+  const [botManagementOpen, setBotManagementOpen] = useState<boolean>(false);
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
     socketId: string;
     playerName: string;
@@ -50,6 +52,7 @@ function App() {
   const catchUpModalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // Track catch-up modal timeout
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const botDifficultiesRef = useRef<Map<string, BotDifficulty>>(new Map()); // Track per-bot difficulty by bot name
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('medium');
 
   useEffect(() => {
@@ -380,6 +383,64 @@ function App() {
       setGameState(gameState);
     });
 
+    // Bot management listeners
+    newSocket.on('bot_replaced', ({ gameState, replacedPlayerName, botName }: {
+      gameState: GameState;
+      replacedPlayerName: string;
+      botName: string;
+    }) => {
+      setGameState(gameState);
+      setToast({
+        message: `${replacedPlayerName} has been replaced by ${botName}`,
+        type: 'info',
+        duration: 3000,
+      });
+      // Respawn bot socket for the new bot
+      spawnBotsForGame(gameState);
+    });
+
+    newSocket.on('bot_taken_over', ({ gameState, botName, newPlayerName, session }: {
+      gameState: GameState;
+      botName: string;
+      newPlayerName: string;
+      session: PlayerSession | null;
+    }) => {
+      setGameState(gameState);
+      setToast({
+        message: `${botName} has been taken over by ${newPlayerName}`,
+        type: 'info',
+        duration: 3000,
+      });
+
+      // If we're the one taking over, save our session
+      if (session) {
+        localStorage.setItem('gameSession', JSON.stringify(session));
+      }
+
+      // Clean up old bot socket if it exists
+      const botSocket = botSocketsRef.current.get(botName);
+      if (botSocket) {
+        botSocket.disconnect();
+        botSocketsRef.current.delete(botName);
+      }
+    });
+
+    newSocket.on('replaced_by_bot', ({ message }: {
+      message: string;
+      gameId: string;
+    }) => {
+      setToast({
+        message,
+        type: 'warning',
+        duration: 5000,
+      });
+      // Clear session and reset state
+      localStorage.removeItem('gameSession');
+      setGameState(null);
+      setGameId('');
+      setIsSpectator(false);
+    });
+
     return () => {
       newSocket.close();
     };
@@ -476,6 +537,34 @@ function App() {
     }
   };
 
+  // Bot management handlers
+  const handleReplaceWithBot = (playerNameToReplace: string) => {
+    if (socket && gameId && gameState) {
+      const currentPlayer = gameState.players.find(p => p.id === socket.id);
+      if (currentPlayer) {
+        socket.emit('replace_with_bot', {
+          gameId,
+          playerNameToReplace,
+          requestingPlayerName: currentPlayer.name
+        });
+      }
+    }
+  };
+
+  const handleChangeBotDifficulty = (botName: string, difficulty: BotDifficulty) => {
+    // Update local ref immediately for responsiveness
+    botDifficultiesRef.current.set(botName, difficulty);
+
+    // Emit to server to update game state
+    if (socket && gameId) {
+      socket.emit('change_bot_difficulty', {
+        gameId,
+        botName,
+        difficulty
+      });
+    }
+  };
+
   const handleNewChatMessage = (message: ChatMessage) => {
     setChatMessages(prev => [...prev, message]);
   };
@@ -510,6 +599,14 @@ function App() {
 
     botPlayers.forEach(botPlayer => {
       const botName = botPlayer.name;
+
+      // Initialize bot difficulty from gameState if not already set
+      if (botPlayer.botDifficulty && !botDifficultiesRef.current.has(botName)) {
+        botDifficultiesRef.current.set(botName, botPlayer.botDifficulty);
+      } else if (!botDifficultiesRef.current.has(botName)) {
+        // Default to 'hard' if not specified
+        botDifficultiesRef.current.set(botName, 'hard');
+      }
 
       // Skip if bot socket already exists and is connected (using name as stable key)
       const existingBotSocket = botSocketsRef.current.get(botName);
@@ -679,6 +776,14 @@ function App() {
   };
 
   const handleBotAction = (botSocket: Socket, state: GameState, botId: string) => {
+    // Find bot player and set difficulty
+    const bot = state.players.find(p => p.id === botId && p.isBot);
+    if (!bot) return; // Not a bot, exit early
+
+    // Set bot difficulty from ref (default to hard if not found)
+    const botDifficulty = botDifficultiesRef.current.get(bot.name) || 'hard';
+    BotPlayer.setDifficulty(botDifficulty);
+
     // Clear any existing timeout for this bot
     const existingTimeout = botTimeoutsRef.current.get(botId);
     if (existingTimeout) {
@@ -694,8 +799,6 @@ function App() {
 
     // Team selection phase - bot selects team immediately
     if (state.phase === 'team_selection') {
-      const bot = state.players.find(p => p.id === botId);
-
       // If bot hasn't selected a team yet, select one
       if (bot && !bot.teamId) {
         const playerIndex = state.players.findIndex(p => p.id === botId);
@@ -862,6 +965,16 @@ function App() {
           currentPlayerId={socket?.id || ''}
           isOpen={showCatchUpModal}
           onClose={() => setShowCatchUpModal(false)}
+        />
+      )}
+      {gameState && socket?.id && (
+        <BotManagementPanel
+          isOpen={botManagementOpen}
+          onClose={() => setBotManagementOpen(false)}
+          gameState={gameState}
+          currentPlayerId={socket.id}
+          onReplaceWithBot={handleReplaceWithBot}
+          onChangeBotDifficulty={handleChangeBotDifficulty}
         />
       )}
     </>
@@ -1034,6 +1147,7 @@ function App() {
             gameState={gameState}
             autoplayEnabled={autoplayEnabled}
             onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
+            onOpenBotManagement={() => setBotManagementOpen(true)}
             socket={socket}
             gameId={gameId}
             chatMessages={chatMessages}
@@ -1066,6 +1180,7 @@ function App() {
           onLeaveGame={handleLeaveGame}
           autoplayEnabled={autoplayEnabled}
           onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
+          onOpenBotManagement={() => setBotManagementOpen(true)}
           socket={socket}
           gameId={gameId}
           chatMessages={chatMessages}
@@ -1097,6 +1212,7 @@ function App() {
             chatMessages={chatMessages}
             onNewChatMessage={handleNewChatMessage}
             onLeaveGame={handleLeaveGame}
+            onOpenBotManagement={() => setBotManagementOpen(true)}
             isSpectator={isSpectator}
           />
         </ErrorBoundary>

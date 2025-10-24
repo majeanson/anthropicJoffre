@@ -8,6 +8,8 @@ interface GameHeaderProps {
   onLeaveGame?: () => void;
   onOpenLeaderboard?: () => void;
   onOpenChat?: () => void;
+  onOpenBotManagement?: () => void;
+  botCount?: number;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
   isSpectator?: boolean;
@@ -24,6 +26,8 @@ export function GameHeader({
   onLeaveGame,
   onOpenLeaderboard,
   onOpenChat,
+  onOpenBotManagement,
+  botCount = 0,
   autoplayEnabled = false,
   onAutoplayToggle,
   isSpectator = false,
@@ -88,6 +92,20 @@ export function GameHeader({
               >
                 <span className="text-base md:text-lg">🏆</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Stats</span>
+              </button>
+            )}
+
+            {/* Bot Management Button */}
+            {!isSpectator && onOpenBotManagement && (
+              <button
+                onClick={onOpenBotManagement}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title="Bot Management"
+              >
+                <span className="text-base md:text-lg">🤖</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
+                  Bots ({botCount}/3)
+                </span>
               </button>
             )}
 
@@ -203,6 +221,17 @@ export function GameHeader({
                 title="Leaderboard"
               >
                 <span className="text-base">🏆</span>
+              </button>
+            )}
+
+            {/* Bot Management Button */}
+            {!isSpectator && onOpenBotManagement && (
+              <button
+                onClick={onOpenBotManagement}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                title="Bot Management"
+              >
+                <span className="text-base">🤖</span>
               </button>
             )}
 
