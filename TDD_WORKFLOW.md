@@ -325,6 +325,190 @@ test('should not send empty messages', async ({ browser }) => {
 });
 ```
 
+## Unit Testing with Vitest
+
+### When to Write Unit Tests
+
+Unit tests should be written for **pure functions** - functions that:
+- Have no side effects (no I/O, no database, no socket emissions)
+- Return predictable output for given input
+- Can be tested in isolation
+
+**Examples of Pure Functions**:
+- `determineWinner(trick, trump)` - Game logic
+- `calculateRoundScore(player, bet)` - Scoring logic
+- `isBetHigher(bet1, bet2)` - Comparison logic
+- `getCardPoints(card)` - Point calculation
+
+**Not for Pure Functions**:
+- Socket.IO event handlers (use E2E tests)
+- Database queries (use integration tests)
+- UI components (use E2E tests)
+
+### Unit Test Structure
+
+```typescript
+// backend/src/game/logic.test.ts
+import { describe, it, expect } from 'vitest';
+import { determineWinner, calculateRoundScore } from './logic';
+import { TrickCard, Bet, Player } from '../types/game';
+
+describe('Game Logic', () => {
+  describe('determineWinner', () => {
+    it('should throw error for empty trick', () => {
+      expect(() => determineWinner([], null)).toThrow('Empty trick');
+    });
+
+    it('should determine winner when trump card is played', () => {
+      const trick: TrickCard[] = [
+        { playerId: 'p1', card: { color: 'red', value: 7 } },
+        { playerId: 'p2', card: { color: 'blue', value: 2 } },
+      ];
+
+      const winner = determineWinner(trick, 'blue');
+      expect(winner).toBe('p2'); // Trump beats non-trump
+    });
+
+    it('should pick higher value in led suit when no trump', () => {
+      const trick: TrickCard[] = [
+        { playerId: 'p1', card: { color: 'red', value: 3 } },
+        { playerId: 'p2', card: { color: 'red', value: 5 } },
+        { playerId: 'p3', card: { color: 'blue', value: 7 } }, // Off-suit
+      ];
+
+      expect(determineWinner(trick, null)).toBe('p2');
+    });
+  });
+
+  describe('calculateRoundScore', () => {
+    it('should calculate positive score when bet is met', () => {
+      const player: Player = {
+        id: 'p1',
+        name: 'Player 1',
+        teamId: 1,
+        hand: [],
+        tricksWon: 8,
+        pointsWon: 8,
+      };
+
+      const bet: Bet = {
+        playerId: 'p1',
+        amount: 7,
+        withoutTrump: false,
+      };
+
+      expect(calculateRoundScore(player, bet)).toBe(7);
+    });
+
+    it('should double score when without trump', () => {
+      const player: Player = {
+        id: 'p1',
+        name: 'Player 1',
+        teamId: 1,
+        hand: [],
+        tricksWon: 8,
+        pointsWon: 8,
+      };
+
+      const bet: Bet = {
+        playerId: 'p1',
+        amount: 8,
+        withoutTrump: true,
+      };
+
+      expect(calculateRoundScore(player, bet)).toBe(16); // 8 * 2
+    });
+  });
+});
+```
+
+### Running Unit Tests
+
+```bash
+# Run all unit tests
+cd backend
+npm test
+
+# Run specific test file
+npm test -- logic.test.ts
+
+# Run with coverage
+npm test -- --coverage
+
+# Watch mode (re-run on file changes)
+npm test -- --watch
+```
+
+### Unit Test Best Practices
+
+1. **Test Edge Cases**: Empty inputs, boundary values, special cases
+2. **Test Each Branch**: Every if/else, every ternary operator
+3. **Descriptive Test Names**: Use "should [expected behavior] when [condition]"
+4. **Arrange-Act-Assert**: Clear structure for each test
+5. **One Assertion Per Test**: Focus on testing one thing
+
+### Example: Comprehensive Edge Case Testing
+
+```typescript
+describe('isBetHigher', () => {
+  it('should return true when bet1 has higher amount', () => {
+    const bet1: Bet = { playerId: 'p1', amount: 10, withoutTrump: false };
+    const bet2: Bet = { playerId: 'p2', amount: 8, withoutTrump: false };
+    expect(isBetHigher(bet1, bet2)).toBe(true);
+  });
+
+  it('should return false when bet1 has lower amount', () => {
+    const bet1: Bet = { playerId: 'p1', amount: 7, withoutTrump: false };
+    const bet2: Bet = { playerId: 'p2', amount: 9, withoutTrump: false };
+    expect(isBetHigher(bet1, bet2)).toBe(false);
+  });
+
+  it('should prioritize without trump when amounts are equal', () => {
+    const bet1: Bet = { playerId: 'p1', amount: 8, withoutTrump: true };
+    const bet2: Bet = { playerId: 'p2', amount: 8, withoutTrump: false };
+    expect(isBetHigher(bet1, bet2)).toBe(true);
+  });
+
+  it('should return false when both bets are identical', () => {
+    const bet1: Bet = { playerId: 'p1', amount: 8, withoutTrump: false };
+    const bet2: Bet = { playerId: 'p2', amount: 8, withoutTrump: false };
+    expect(isBetHigher(bet1, bet2)).toBe(false);
+  });
+});
+```
+
+### Testing Strategy: Unit vs E2E
+
+**Use Unit Tests For**:
+- Game logic (determineWinner, calculateScore)
+- Utility functions (card comparison, validation)
+- Pure calculations (points, averages)
+- Fast feedback (milliseconds per test)
+
+**Use E2E Tests For**:
+- Full game flow (lobby → betting → playing → scoring)
+- Socket.IO communication
+- UI interactions
+- Multi-player scenarios
+- Integration testing (slower but comprehensive)
+
+**Test Pyramid**:
+```
+       /\
+      /E2E\       <-- Few, slow, comprehensive
+     /------\
+    / Unit  \     <-- Many, fast, focused
+   /----------\
+```
+
+### Coverage Goals
+
+- **Unit Tests**: Aim for 80%+ coverage of pure functions
+- **E2E Tests**: Cover critical user flows and edge cases
+- **Current Status**:
+  - Unit tests: `backend/src/game/logic.test.ts` (29 tests, 100% coverage)
+  - E2E tests: `e2e/tests/*.spec.ts` (19 test files, ~159 tests)
+
 ## Best Practices
 
 ### Test Structure

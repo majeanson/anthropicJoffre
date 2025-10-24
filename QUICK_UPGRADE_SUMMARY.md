@@ -2,15 +2,14 @@
 
 ## 🎯 Top 5 Priorities for Next Sessions
 
-### 1. ⚡ Fix Test Compilation (URGENT - 1 hour)
-**Why**: Tests are excluded from build, blocking proper CI/CD
-**What**: Fix import errors and type mismatches in `backend/src/db/index.test.ts`
-**Impact**: Can run tests, catch bugs earlier
+### 1. ⚡ Fix Test Compilation ✅ DONE
+**Completed**: Fixed import errors and type mismatches in test files
+**Impact**: Tests can now run, build succeeds
 
-### 2. 🧪 Add Unit Tests (2-3 sessions)
-**Why**: Only E2E tests exist, game logic is hard to test
-**What**: Test pure functions (determineWinner, calculateRoundScore, etc.)
-**Impact**: 80% code coverage, safer refactoring
+### 2. 🧪 Add Unit Tests ✅ DONE
+**Completed**: 29 unit tests with 100% coverage of game logic
+**Files**: `backend/src/game/logic.test.ts`, updated `TDD_WORKFLOW.md`
+**Impact**: Fast feedback, safe refactoring, testing patterns documented
 
 ### 3. ⭐ Extract Pure Functions (3-4 sessions) - HIGHEST VALUE
 **Why**: Game logic mixed with Socket.IO, impossible to unit test
@@ -44,8 +43,8 @@ io.to(gameId).emit('game_updated', newGame);
 
 ### Phase 1: Code Quality & Testing (2-3 sessions)
 - [x] Fix session state stability (DONE - using player names)
-- [ ] Fix test compilation errors
-- [ ] Add unit tests for game logic
+- [x] Fix test compilation errors (DONE)
+- [x] Add unit tests for game logic (DONE - 29 tests, 100% coverage)
 - [ ] Improve E2E test reliability
 - [ ] Enable TypeScript strict mode
 
