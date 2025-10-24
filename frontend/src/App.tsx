@@ -542,25 +542,42 @@ function App() {
         botSocket.emit('join_game', { gameId: gameState.id, playerName: botName, isBot: true });
       });
 
-      botSocket.on('player_joined', ({ gameState: newState }: { gameState: GameState; session?: PlayerSession }) => {
-        handleBotAction(botSocket, newState, botSocket.id || '');
+      botSocket.on('player_joined', ({ player, gameState: newState }: { player?: any; gameState: GameState; session?: PlayerSession }) => {
+        // Use the player ID from the game state, not botSocket.id
+        const botPlayerId = player?.id || newState.players.find(p => p.name === botName && p.isBot)?.id;
+        if (botPlayerId) {
+          handleBotAction(botSocket, newState, botPlayerId);
+        }
       });
 
       // Listen to all game state updates
       botSocket.on('game_updated', (state: GameState) => {
-        handleBotAction(botSocket, state, botSocket.id || '');
+        // Find the bot's current player ID in the game state
+        const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+        if (botPlayerId) {
+          handleBotAction(botSocket, state, botPlayerId);
+        }
       });
 
       botSocket.on('round_started', (state: GameState) => {
-        handleBotAction(botSocket, state, botSocket.id || '');
+        const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+        if (botPlayerId) {
+          handleBotAction(botSocket, state, botPlayerId);
+        }
       });
 
       botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) => {
-        handleBotAction(botSocket, newState, botSocket.id || '');
+        const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
+        if (botPlayerId) {
+          handleBotAction(botSocket, newState, botPlayerId);
+        }
       });
 
       botSocket.on('round_ended', (state: GameState) => {
-        handleBotAction(botSocket, state, botSocket.id || '');
+        const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+        if (botPlayerId) {
+          handleBotAction(botSocket, state, botPlayerId);
+        }
       });
     });
   };
