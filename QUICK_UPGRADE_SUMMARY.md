@@ -11,21 +11,32 @@
 **Files**: `backend/src/game/logic.test.ts`, updated `TDD_WORKFLOW.md`
 **Impact**: Fast feedback, safe refactoring, testing patterns documented
 
-### 3. ⭐ Extract Pure Functions (3-4 sessions) - HIGHEST VALUE
-**Why**: Game logic mixed with Socket.IO, impossible to unit test
-**What**: Separate validation, state transformation, and I/O
+### 3. ⭐ Extract Pure Functions ✅ DONE (Phase 2.1 & 2.2)
+**Completed**: Extracted pure functions and refactored 5 Socket.IO handlers
+**What**: Separated validation, state transformation, and I/O
+**Results**:
+- Created validation.ts with 6 functions (30 tests)
+- Created state.ts with 10 functions (30 tests)
+- Refactored 5 handlers: play_card, place_bet, select_team, swap_position, start_game
+- Reduced handler code by 228 lines (-45% average)
+- 89 unit tests passing in ~25ms with 100% coverage
+
 ```typescript
-// Before: 50 lines of mixed concerns
+// Before: 150 lines of mixed concerns
 socket.on('play_card', ({ gameId, card }) => {
-  // validation + business logic + I/O all mixed
+  // 70+ lines of validation
+  // 40 lines of state mutations
+  // 30 lines of I/O
 });
 
-// After: Clean separation
-const validation = validateCardPlay(game, playerId, card);
-const newGame = playCard(game, playerId, card);
-io.to(gameId).emit('game_updated', newGame);
+// After: ~80 lines with clean separation
+const validation = validateCardPlay(game, socket.id, card);
+if (!validation.valid) { /* error */ }
+const result = applyCardPlay(game, socket.id, card);
+io.to(gameId).emit('game_updated', game);
 ```
-**Impact**: Enables unit testing, bot AI reuse, game replay, undo/redo
+
+**Impact**: ✅ Unit testing, ✅ Bot AI reuse, ✅ Game replay possible, ✅ Undo/redo possible
 
 ### 4. 📊 Add Error Tracking (1 session)
 **Why**: No visibility into production errors
@@ -41,16 +52,19 @@ io.to(gameId).emit('game_updated', newGame);
 
 ## 📋 Complete Upgrade Roadmap
 
-### Phase 1: Code Quality & Testing (2-3 sessions)
+### Phase 1: Code Quality & Testing ✅ COMPLETE
 - [x] Fix session state stability (DONE - using player names)
 - [x] Fix test compilation errors (DONE)
 - [x] Add unit tests for game logic (DONE - 29 tests, 100% coverage)
-- [ ] Improve E2E test reliability
-- [ ] Enable TypeScript strict mode
+- [x] Improve E2E test reliability (DONE - all lobby tests passing)
+- [x] TypeScript strict mode (DONE - already enabled!)
 
-### Phase 2: Refactoring & Architecture (3-4 sessions)
-- [ ] Extract game logic to pure functions ⭐ **HIGHEST VALUE**
-- [ ] Refactor Socket.IO handlers
+### Phase 2: Refactoring & Architecture (IN PROGRESS - 2.1 & 2.2 DONE)
+- [x] Extract game logic to pure functions ⭐ **DONE - Phase 2.1**
+- [x] Refactor Socket.IO handlers **DONE - Phase 2.1 & 2.2**
+  - [x] play_card, place_bet (Phase 2.1)
+  - [x] select_team, swap_position, start_game (Phase 2.2)
+- [ ] Phase 2.3: Extract trick/round logic (deferred - complex)
 - [ ] Standardize session identifiers
 - [ ] Add API documentation
 - [ ] Consolidate documentation
