@@ -289,6 +289,37 @@ function generateSessionToken(): string {
   return crypto.randomBytes(32).toString('hex');
 }
 
+/**
+ * Helper to find player by socket ID or name (stable across reconnections)
+ * Prefers socket ID for speed, falls back to name if ID not found
+ */
+function findPlayer(game: GameState, socketId: string, playerName?: string): Player | undefined {
+  // First try by socket ID (fast path)
+  let player = game.players.find(p => p.id === socketId);
+
+  // If not found and we have a name, try by name (reconnection case)
+  if (!player && playerName) {
+    player = game.players.find(p => p.name === playerName);
+  }
+
+  return player;
+}
+
+/**
+ * Helper to find player index by socket ID or name
+ */
+function findPlayerIndex(game: GameState, socketId: string, playerName?: string): number {
+  // First try by socket ID
+  let index = game.players.findIndex(p => p.id === socketId);
+
+  // If not found and we have a name, try by name
+  if (index === -1 && playerName) {
+    index = game.players.findIndex(p => p.name === playerName);
+  }
+
+  return index;
+}
+
 // Helper to create and store player session
 function createPlayerSession(gameId: string, playerId: string, playerName: string): PlayerSession {
   const token = generateSessionToken();
