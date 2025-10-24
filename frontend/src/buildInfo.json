@@ -1,0 +1,17 @@
+{
+  "buildDate": "2025-10-24T15:46:25.070Z",
+  "version": "1.0.1",
+  "git": {
+    "commitMessage": "test: Version bump to v1.0.1 - Testing Debug Fun panel in production! 🎮\n\nThis is a test commit to verify the Debug Fun section displays correctly\nin production. The panel should now show:\n\n✅ Version: 1.0.1\n✅ Latest commit message (this one!)\n✅ Build timestamp\n✅ Future feature roadmap\n✅ Git commit hash\n\nIf you're reading this in the Debug Fun panel - IT WORKS! 🎉\n\nChanges:\n- Bumped version from 1.0.0 to 1.0.1\n- Testing auto-generated build info display\n- Verifying commit message extraction\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "b6fc47f",
+    "commitDate": "2025-10-24 11:42:31 -0400",
+    "branch": "main"
+  },
+  "futureTodos": [
+    "Improve AI difficulty balancing",
+    "Add more sound effects",
+    "Enhanced mobile UI",
+    "Tutorial mode for new players",
+    "Achievement system"
+  ]
+}

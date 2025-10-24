@@ -1,0 +1,17 @@
+{
+  "buildDate": "2025-01-01T00:00:00.000Z",
+  "version": "0.0.0",
+  "git": {
+    "commitMessage": "Build info will be generated during build process",
+    "commitHash": "N/A",
+    "commitDate": "N/A",
+    "branch": "main"
+  },
+  "futureTodos": [
+    "Improve AI difficulty balancing",
+    "Add more sound effects",
+    "Enhanced mobile UI",
+    "Tutorial mode for new players",
+    "Achievement system"
+  ]
+}

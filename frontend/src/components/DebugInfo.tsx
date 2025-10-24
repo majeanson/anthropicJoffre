@@ -84,7 +84,7 @@ export function DebugInfo() {
             <div className="flex-1">
               <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-2">Future Features</h3>
               <ul className="space-y-2">
-                {buildInfo.futureTodos.map((todo, index) => (
+                {buildInfo.futureTodos.map((todo: string, index: number) => (
                   <li
                     key={index}
                     className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700"
