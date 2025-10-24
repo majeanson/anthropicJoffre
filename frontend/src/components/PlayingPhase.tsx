@@ -461,7 +461,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               </div>
 
               {/* Current Bet */}
-              {gameState.highestBet && bettingTeam && (
+              {gameState.highestBet && (
                 <div className={`backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 shadow-md ${
                   bettingTeam === 1
                     ? 'bg-orange-100/90 dark:bg-orange-900/70 border-orange-400 dark:border-orange-600'
