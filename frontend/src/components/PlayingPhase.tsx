@@ -566,7 +566,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
@@ -577,7 +577,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
                 {/* Left - Next player anti-clockwise (position 1) */}
                 <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(1) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
@@ -589,7 +589,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
                 {/* Top - Opposite player (position 2) */}
                 <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(2) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
@@ -602,7 +602,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 {/* Right - Previous player anti-clockwise (position 3) */}
                 <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
                   {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId, 3)}
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
@@ -622,7 +622,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
@@ -633,7 +633,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
                 {/* Left - Next player anti-clockwise (position 1) */}
                 <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(1) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
@@ -645,7 +645,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
                 {/* Top - Opposite player (position 2) */}
                 <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(2) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
@@ -658,7 +658,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                 {/* Right - Previous player anti-clockwise (position 3) */}
                 <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
                   {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
-                  <div className={`px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                  <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                       : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
