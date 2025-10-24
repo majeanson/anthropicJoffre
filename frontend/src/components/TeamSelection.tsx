@@ -204,7 +204,7 @@ export function TeamSelection({
                           {isCurrentPlayer && ' (You)'}
                         </span>
                         <div className="flex gap-2">
-                          {!isCurrentPlayer && currentPlayer && (
+                          {!isCurrentPlayer && currentPlayer && currentPlayer.teamId === 1 && (
                             <button
                               onClick={() => onSwapPosition(playerAtPosition.id)}
                               className="text-xs bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0"
@@ -269,7 +269,7 @@ export function TeamSelection({
                           {isCurrentPlayer && ' (You)'}
                         </span>
                         <div className="flex gap-2">
-                          {!isCurrentPlayer && currentPlayer && (
+                          {!isCurrentPlayer && currentPlayer && currentPlayer.teamId === 2 && (
                             <button
                               onClick={() => onSwapPosition(playerAtPosition.id)}
                               className="text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0"

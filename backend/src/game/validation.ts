@@ -248,6 +248,11 @@ export function validatePositionSwap(
     return { valid: false, error: 'Cannot swap position with yourself' };
   }
 
+  // Can only swap with players on the same team
+  if (initiator.teamId !== target.teamId) {
+    return { valid: false, error: 'Can only swap positions with teammates' };
+  }
+
   return { valid: true };
 }
 
