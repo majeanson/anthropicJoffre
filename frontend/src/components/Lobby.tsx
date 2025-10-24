@@ -111,6 +111,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
         <DebugInfo isOpen={showDebugInfo} onClose={() => setShowDebugInfo(false)} />
         {showBrowser && (
           <LobbyBrowser
+            socket={socket}
             onJoinGame={(gameId) => {
               setGameId(gameId);
               setMode('join');

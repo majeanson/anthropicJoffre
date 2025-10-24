@@ -812,6 +812,19 @@ app.get('/api/games/lobby', async (req, res) => {
   }
 });
 
+// Get list of recent finished games for replay browser
+app.get('/api/games/recent', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = parseInt(req.query.offset as string) || 0;
+    const games = await getAllFinishedGames(limit, offset);
+    res.json({ games });
+  } catch (error) {
+    console.error('Error fetching recent games:', error);
+    res.status(500).json({ error: 'Failed to fetch recent games' });
+  }
+});
+
 app.get('/api/games/history', async (req, res) => {
   try {
     const history = await getRecentGames(10);
