@@ -640,8 +640,8 @@ io.on('connection', (socket) => {
 
     // Check if player is trying to rejoin with same name
     const existingPlayer = game.players.find(p => p.name === playerName);
-    if (existingPlayer && !existingPlayer.isBot) {
-      console.log(`Player ${playerName} attempting to rejoin game ${gameId}`);
+    if (existingPlayer) {
+      console.log(`Player ${playerName} attempting to rejoin game ${gameId} (isBot: ${existingPlayer.isBot})`);
 
       // Allow rejoin - update socket ID
       const oldSocketId = existingPlayer.id;
@@ -650,8 +650,11 @@ io.on('connection', (socket) => {
       // Join game room
       socket.join(gameId);
 
-      // Create new session for the rejoin
-      const session = createPlayerSession(gameId, socket.id, playerName);
+      // Create new session for human players only
+      let session: PlayerSession | undefined;
+      if (!existingPlayer.isBot) {
+        session = createPlayerSession(gameId, socket.id, playerName);
+      }
 
       // Update timeout if this player had an active timeout
       const oldTimeoutKey = `${gameId}-${oldSocketId}`;
@@ -669,18 +672,26 @@ io.on('connection', (socket) => {
         }
       }
 
-      // Track online player status
-      updateOnlinePlayer(socket.id, playerName, 'in_game', gameId);
+      // Track online player status (only for human players)
+      if (!existingPlayer.isBot) {
+        updateOnlinePlayer(socket.id, playerName, 'in_game', gameId);
+      }
 
-      // Emit reconnection successful
-      socket.emit('reconnection_successful', { gameState: game, session });
+      // Emit appropriate response
+      if (existingPlayer.isBot) {
+        // For bots, emit player_joined (they don't need sessions)
+        socket.emit('player_joined', { player: existingPlayer, gameState: game });
+      } else {
+        // For humans, emit reconnection_successful
+        socket.emit('reconnection_successful', { gameState: game, session });
 
-      // Notify other players
-      socket.to(gameId).emit('player_reconnected', {
-        playerName,
-        playerId: socket.id,
-        oldSocketId
-      });
+        // Notify other players
+        socket.to(gameId).emit('player_reconnected', {
+          playerName,
+          playerId: socket.id,
+          oldSocketId
+        });
+      }
 
       console.log(`Player ${playerName} successfully rejoined game ${gameId}`);
       return;
