@@ -5,6 +5,14 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 
 **Stack**: React + TypeScript, Tailwind CSS, Socket.io, Node.js, PostgreSQL
 
+**Current Status**: Feature-complete for core gameplay and social features (October 2025)
+- ✅ 89 unit tests passing
+- ✅ E2E test suite
+- ✅ Database persistence
+- ✅ Game replay system
+- ✅ Lobby browser with tabs
+- ✅ Bot AI with 3 difficulty levels
+
 ---
 
 ## 🎯 Core Development Principles
@@ -49,7 +57,8 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 'leave_game': { gameId: string }
 'get_player_stats': { playerName: string }
 'get_leaderboard': (limit?: number)
-'get_player_history': { playerName: string }
+'get_player_history': { playerName: string; limit?: number }
+'get_game_replay': { gameId: string }
 '__test_set_scores': { team1: number; team2: number }
 ```
 
@@ -90,6 +99,18 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 3. Add listener in `frontend/src/App.tsx`
 4. Update this documentation
 5. Write E2E test for the new event flow
+
+### REST API Endpoints
+```typescript
+GET /api/health                  // Health check
+GET /api/games/lobby             // List active games
+GET /api/games/recent            // List recent finished games (for replay)
+GET /api/games/:gameId           // Get specific game details
+GET /api/games/history           // Get game history (deprecated, use /recent)
+GET /api/leaderboard             // Global leaderboard
+GET /api/stats/:playerName       // Player statistics
+GET /api/player-history/:playerName // Player game history
+```
 
 ---
 
@@ -284,10 +305,14 @@ npx playwright show-report     # View HTML report
 backend/src/
 ├── db/                 # Database layer
 │   ├── index.ts       # Query functions
-│   └── schema.sql     # Table definitions
+│   ├── schema.sql     # Table definitions
+│   ├── gameState.ts   # Game persistence
+│   └── sessions.ts    # Session management
 ├── game/              # Game logic (pure functions)
 │   ├── deck.ts       # Card creation and dealing
-│   └── logic.ts      # Winner determination, scoring
+│   ├── logic.ts      # Winner determination, scoring
+│   ├── state.ts      # State transformations (NEW)
+│   └── validation.ts # Input validation (NEW)
 ├── types/            # TypeScript definitions
 │   └── game.ts       # Shared game types
 └── index.ts          # Socket.io event handlers (orchestration)
@@ -299,20 +324,45 @@ frontend/src/
 ├── components/        # UI components (one per file)
 │   ├── Card.tsx      # Single card display
 │   ├── Lobby.tsx     # Game creation/joining (includes QuickPlay)
+│   ├── LobbyBrowser.tsx  # Browse active/recent games with tabs
 │   ├── TeamSelection.tsx  # Team/position selection
 │   ├── BettingPhase.tsx   # Betting UI
 │   ├── PlayingPhase.tsx   # Game board with circular trick layout
+│   ├── GameReplay.tsx     # Replay viewer with playback controls
+│   ├── PlayerStatsModal.tsx  # Player stats and game history
+│   ├── GlobalLeaderboard.tsx # Top 100 players
+│   ├── BotManagementPanel.tsx # Bot settings and replacement
 │   ├── DebugPanel.tsx     # Game state inspector (JSON viewer)
 │   ├── DebugMultiPlayerView.tsx  # 4-player simultaneous view
 │   └── TestPanel.tsx      # State manipulation for testing
 ├── utils/            # Utility functions and helpers
-│   └── botPlayer.ts  # AI bot decision-making system
+│   ├── botPlayer.ts  # AI bot decision-making system
+│   ├── sounds.ts     # Web Audio API sound effects
+│   └── recentPlayers.ts  # Recent players tracking
 ├── types/            # TypeScript definitions
 │   └── game.ts       # Shared game types (sync with backend)
 └── App.tsx           # Main app + Socket.io client setup + bot integration
 ```
 
 ---
+
+## 🐛 Recent Critical Fixes (October 2025)
+
+### Stats Tracking Bug
+**Problem**: All special card stats (red zeros, brown zeros, trumps) were returning 0
+**Root Cause**: Using volatile `socket.id` instead of stable `player.name`
+**Fix**: Changed all stat Maps to use player names as keys consistently
+**Files**: `backend/src/index.ts` (lines 1419-1426, 2314-2322, 2567-2569)
+
+### Bot Management Modal Flickering
+**Problem**: Modal would close unexpectedly on click
+**Fix**: Added `onClick={onClose}` to overlay, `onClick={(e) => e.stopPropagation()}` to content
+**File**: `frontend/src/components/BotManagementPanel.tsx` (lines 42-43)
+
+### Lobby Browser UX
+**Problem**: Cluttered interface, difficult to find games
+**Solution**: Tab navigation (Active/Recent), simplified cards, integrated replay
+**File**: `frontend/src/components/LobbyBrowser.tsx` (complete redesign)
 
 ## 🚨 Common Pitfalls
 
@@ -427,19 +477,30 @@ npm run test:e2e     # Run E2E tests
 
 ## 📚 Additional Resources
 
-- **Game Rules**: See README.md section "Game Rules"
-- **Features**: See FEATURES.md (detailed feature documentation)
-- **Deployment**: See RAILWAY_DEPLOY.md
-- **Quick Start**: See QUICKSTART.md
-- **Testing**: See TDD_WORKFLOW.md
-- **Contributing**: See CONTRIBUTING.md
-- **Validation System**: See VALIDATION_SYSTEM.md (multi-layer validation architecture)
-- **Bot Player System**: See BOT_PLAYER_SYSTEM.md (AI decision-making and lifecycle)
-- **Improvement Suggestions**: See IMPROVEMENT_SUGGESTIONS.md (future enhancement roadmap)
+### Core Documentation
+- **README.md** - Project overview and setup
+- **ROADMAP.md** - Current status and future plans
+- **QUICKSTART.md** - Quick setup guide
+- **CONTRIBUTING.md** - How to contribute
+
+### Technical Documentation
+- **[Features](docs/technical/FEATURES.md)** - Complete feature documentation
+- **[Validation System](docs/technical/VALIDATION_SYSTEM.md)** - Multi-layer validation architecture
+- **[Bot Player System](docs/technical/BOT_PLAYER_SYSTEM.md)** - AI decision-making and lifecycle
+- **[TDD Workflow](docs/technical/TDD_WORKFLOW.md)** - Testing methodology
+- **[Test IDs](docs/technical/TEST_IDS.md)** - Test identifier reference
+- **[Accessibility](docs/technical/ACCESSIBILITY.md)** - WCAG compliance
+
+### Design Documentation
+- **[Dark Mode Colors](docs/design/DARK_MODE_COLORS.md)** - Dark theme palette
+- **[Light Mode Colors](docs/design/LIGHT_MODE_COLORS.md)** - Light theme palette
+
+### Deployment
+- **[Railway Deploy](docs/deployment/RAILWAY_DEPLOY.md)** - Production deployment guide
 
 ---
 
-*Last updated: 2025-01-22*
+*Last updated: 2025-10-24*
 *Project: Trick Card Game (anthropicJoffre)*
 
 **Feature Completion Status**: All planned Priority 1-3 features complete (100%)

@@ -259,6 +259,31 @@ Contributions welcome! To add features:
 - Code style: Keep components small and focused. Prefer none comments and good nomenclature.
 - Socket events: Add new events to types first
 
+## 📚 Documentation
+
+### Quick Links
+- [**Development Guide**](CLAUDE.md) - AI-assisted development guide
+- [**Roadmap**](ROADMAP.md) - Current status and future plans
+- [**Quick Start**](QUICKSTART.md) - Get started quickly
+- [**Contributing**](CONTRIBUTING.md) - How to contribute
+
+### Documentation Structure
+```
+docs/
+├── technical/          # Technical implementation details
+│   ├── FEATURES.md    # Complete feature documentation
+│   ├── VALIDATION_SYSTEM.md  # Validation architecture
+│   ├── BOT_PLAYER_SYSTEM.md  # Bot AI system
+│   ├── TDD_WORKFLOW.md        # Testing methodology
+│   ├── TEST_IDS.md           # Test identifiers
+│   └── ACCESSIBILITY.md      # Accessibility guidelines
+├── design/            # UI/UX documentation
+│   ├── DARK_MODE_COLORS.md   # Dark theme palette
+│   └── LIGHT_MODE_COLORS.md  # Light theme palette
+└── deployment/        # Deployment guides
+    └── RAILWAY_DEPLOY.md      # Railway deployment
+```
+
 ## 📄 License
 
 MIT License - feel free to use this project however you like!
