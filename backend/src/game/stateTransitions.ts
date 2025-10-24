@@ -15,7 +15,7 @@
  * - Potential for time-travel debugging
  */
 
-import { GameState, Player, Bet, Card, TrickCard, TrickResult } from '../types/game';
+import { GameState, Bet, Card, TrickCard, TrickResult } from '../types/game';
 import { determineWinner, calculateTrickPoints } from './logic';
 
 /**
@@ -236,6 +236,7 @@ export function playCard(game: GameState, playerId: string, card: Card): GameSta
   // Create trick card
   const trickCard: TrickCard = {
     playerId,
+    playerName: player.name,
     card,
   };
 
@@ -295,9 +296,11 @@ export function resolveTrick(game: GameState): GameState {
   );
 
   // Create TrickResult for previous trick
+  const winnerPlayer = game.players[winnerPlayerIndex];
   const updatedPreviousTrick: TrickResult = {
     trick: [...game.currentTrick],
     winnerId,
+    winnerName: winnerPlayer.name,
     points,
   };
 

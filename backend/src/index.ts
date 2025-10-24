@@ -638,7 +638,7 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
 }
 
 // Helper to broadcast to both players and spectators
-function broadcastGameUpdate(gameId: string, event: string, data: GameState | { winnerId: string; points: number; gameState: GameState } | { winningTeam: 1 | 2; gameState: GameState }) {
+function broadcastGameUpdate(gameId: string, event: string, data: GameState | { winnerId: string; winnerName: string; points: number; gameState: GameState } | { winningTeam: 1 | 2; gameState: GameState }) {
   // Send full data to players
   io.to(gameId).emit(event, data);
 
