@@ -186,15 +186,20 @@ function App() {
       setGameId(gameState.id);
       setGameState(gameState);
 
-      // Show catch-up modal and auto-close after 5 seconds (prevent multiple timeouts)
+      // Show catch-up modal and auto-close after 5 seconds (prevent flickering)
       if (catchUpModalTimeoutRef.current) {
         clearTimeout(catchUpModalTimeoutRef.current);
       }
-      setShowCatchUpModal(true);
-      catchUpModalTimeoutRef.current = setTimeout(() => {
-        setShowCatchUpModal(false);
-        catchUpModalTimeoutRef.current = null;
-      }, 5000);
+      // Only show modal if not already showing (prevents flickering)
+      setShowCatchUpModal(prev => {
+        if (!prev) {
+          catchUpModalTimeoutRef.current = setTimeout(() => {
+            setShowCatchUpModal(false);
+            catchUpModalTimeoutRef.current = null;
+          }, 5000);
+        }
+        return true;
+      });
 
       // Respawn bot sockets after successful reconnection
       // This ensures bots continue playing after human player reconnects
