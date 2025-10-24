@@ -2037,10 +2037,10 @@ function resolveTrick(gameId: string) {
 
   // 5. ORCHESTRATION - Handle round completion or continue playing
   if (result.isRoundOver) {
-    // Wait 3 seconds before finalizing round
+    // Wait 2 seconds before finalizing round (show completed trick)
     setTimeout(() => {
       endRound(gameId);
-    }, 3000);
+    }, 2000);
   } else {
     // Normal trick resolution - continue playing
     setTimeout(() => {
