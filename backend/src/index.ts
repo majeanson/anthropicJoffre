@@ -1376,17 +1376,17 @@ io.on('connection', (socket) => {
 
     // I/O - Emit updates and handle trick resolution
     if (result.trickComplete) {
-      // Emit state with all 4 cards played and turn advanced
+      // Trick complete - don't emit here, let resolveTrick handle it
       console.log(`   🎯 Trick complete! Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name}`);
       console.log(`   Final trick state before resolution:`);
       game.currentTrick.forEach((tc, idx) => {
         const player = game.players.find(p => p.id === tc.playerId);
         console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
       });
-      emitGameUpdate(gameId, game);
+      // Don't emit game_updated here - resolveTrick will emit trick_resolved with visible cards
       console.log(`   ⏳ Resolving trick...\n`);
       resolveTrick(gameId);
-      // Note: timeout will be started by resolveTrick after 3-second delay
+      // Note: timeout will be started by resolveTrick after 2-second delay
     } else {
       // Emit updated state with turn advanced
       console.log(`   ➡️  Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
@@ -2030,24 +2030,20 @@ function resolveTrick(gameId: string) {
   }
 
   // 3. STATE TRANSFORMATION - Apply trick resolution (use stable playerName)
-  // Save currentTrick before resolution clears it (for display during delay)
-  const completedTrick = [...game.currentTrick];
+  // applyTrickResolution now keeps currentTrick visible (doesn't clear it)
   const result = applyTrickResolution(game, winnerName, totalPoints);
 
-  // 4. Broadcast with currentTrick temporarily included (for visual display)
-  // Create a temporary game state with trick visible
-  const gameStateWithTrick = {
-    ...game,
-    currentTrick: completedTrick, // Show the completed trick
-  };
+  // 4. I/O - Emit trick resolution event with trick still visible
+  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: game });
 
-  // 5. I/O - Emit trick resolution event with trick visible
-  broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: gameStateWithTrick });
-
-  // 6. ORCHESTRATION - Handle round completion or continue playing
+  // 5. ORCHESTRATION - Handle round completion or continue playing
   if (result.isRoundOver) {
     // Wait 2 seconds before finalizing round (show completed trick)
     setTimeout(() => {
+      const g = games.get(gameId);
+      if (g) {
+        g.currentTrick = []; // Clear trick after delay
+      }
       endRound(gameId);
     }, 2000);
   } else {
@@ -2055,12 +2051,12 @@ function resolveTrick(gameId: string) {
     setTimeout(() => {
       const g = games.get(gameId);
       if (g) {
-        // Trick already cleared by applyTrickResolution
+        g.currentTrick = []; // Clear trick after delay
         emitGameUpdate(gameId, g);
         // Start timeout for trick winner's next card (use stable playerName)
         startPlayerTimeout(gameId, winnerName, 'playing');
       }
-    }, 2000); // Changed to 2 seconds for consistency
+    }, 2000);
   }
 }
 

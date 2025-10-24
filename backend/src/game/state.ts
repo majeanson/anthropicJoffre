@@ -448,8 +448,9 @@ export function applyTrickResolution(
   // Check if round is over (all players have empty hands)
   const isRoundOver = game.players.every(p => p.hand.length === 0);
 
-  // Clear current trick
-  game.currentTrick = [];
+  // DON'T clear current trick here - it will be cleared after delay in resolveTrick()
+  // This allows the trick to remain visible for 2 seconds
+  // game.currentTrick = []; // Moved to resolveTrick setTimeout
 
   // Set winner as next player
   game.currentPlayerIndex = winnerIndex;
