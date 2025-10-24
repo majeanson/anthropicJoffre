@@ -13,6 +13,8 @@ import {
   getHighestBet,
   isBetHigher,
 } from './game/logic';
+import { validateCardPlay, validateBet } from './game/validation';
+import { applyCardPlay, applyBet, resetBetting } from './game/state';
 import {
   saveGameHistory,
   getRecentGames,
@@ -861,99 +863,24 @@ io.on('connection', (socket) => {
   });
 
   socket.on('place_bet', ({ gameId, amount, withoutTrump, skipped }: { gameId: string; amount: number; withoutTrump: boolean; skipped?: boolean }) => {
+    // Basic validation: game exists
     const game = games.get(gameId);
-    if (!game || game.phase !== 'betting') return;
+    if (!game) return;
 
-    const currentPlayer = game.players[game.currentPlayerIndex];
-    if (currentPlayer.id !== socket.id) {
-      socket.emit('invalid_bet', {
-        message: 'It is not your turn to bet'
-      });
+    // VALIDATION - Use pure validation function
+    const validation = validateBet(game, socket.id, amount, withoutTrump, skipped);
+    if (!validation.valid) {
+      socket.emit('invalid_bet', { message: validation.error });
       return;
     }
 
-    // Check if player has already bet
-    const hasAlreadyBet = game.currentBets.some(b => b.playerId === socket.id);
-    if (hasAlreadyBet) {
-      console.log(`Player ${socket.id} attempted to bet multiple times`);
-      socket.emit('invalid_bet', {
-        message: 'You have already placed your bet'
-      });
-      return;
-    }
-
-    // Clear timeout for current player (they took action)
+    // Clear timeout for current player (side effect)
     clearPlayerTimeout(gameId, socket.id);
 
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
 
-    // Validate bet amount range (only for non-skip bets)
-    if (!skipped && (amount < 7 || amount > 12)) {
-      socket.emit('invalid_bet', {
-        message: 'Bet amount must be between 7 and 12'
-      });
-      return;
-    }
-
-    // Handle skip bet
-    if (skipped) {
-      // Check if there are any non-skipped bets
-      const hasValidBets = game.currentBets.some(b => !b.skipped);
-
-      // Dealer cannot skip ONLY if no one has bet (all skipped or no bets) - must bet minimum 7
-      if (isDealer && !hasValidBets) {
-        socket.emit('invalid_bet', {
-          message: 'As dealer, you must bet at least 7 points when no one has bet.'
-        });
-        return;
-      }
-
-      // Add the skip bet
-      const bet: Bet = {
-        playerId: socket.id,
-        amount: -1,
-        withoutTrump: false,
-        skipped: true,
-      };
-
-      game.currentBets.push(bet);
-
-      // If all 4 players skip, restart betting with first player after dealer
-      if (game.currentBets.length === 4 && game.currentBets.every(b => b.skipped)) {
-        game.currentBets = [];
-        game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
-        io.to(gameId).emit('game_updated', game);
-        io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
-        // Start timeout for first player after betting restart
-        startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
-        return;
-      }
-
-      // Check if all 4 players have bet (including skips)
-      if (game.currentBets.length === 4) {
-        const dealerPlayerId = game.players[game.dealerIndex].id;
-        game.highestBet = getHighestBet(game.currentBets, dealerPlayerId);
-        game.phase = 'playing';
-        const highestBidderIndex = game.players.findIndex(
-          (p) => p.id === game.highestBet?.playerId
-        );
-        game.currentPlayerIndex = highestBidderIndex;
-        io.to(gameId).emit('game_updated', game);
-        // Start timeout for first card play
-        startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
-        return;
-      }
-
-      // Move to next player
-      game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
-      io.to(gameId).emit('game_updated', game);
-      // Start timeout for next player's bet
-      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
-      return;
-    }
-
-    // Validate betting rules for non-skip bets
-    if (game.currentBets.length > 0) {
+    // Additional validation for non-skip bets (complex betting rules)
+    if (!skipped && game.currentBets.length > 0) {
       const dealerPlayerId = game.players[game.dealerIndex].id;
       const currentHighest = getHighestBet(game.currentBets, dealerPlayerId);
       if (currentHighest) {
@@ -968,7 +895,6 @@ io.on('connection', (socket) => {
             });
             return;
           }
-          // If same amount, dealer can match even if current highest is withoutTrump
         } else {
           // Non-dealers must raise (beat the current highest)
           if (!isBetHigher(newBet, currentHighest)) {
@@ -981,16 +907,20 @@ io.on('connection', (socket) => {
       }
     }
 
-    const bet: Bet = {
-      playerId: socket.id,
-      amount,
-      withoutTrump,
-      skipped: false,
-    };
+    // STATE TRANSFORMATION - Use pure state function
+    const result = applyBet(game, socket.id, amount, withoutTrump, skipped);
 
-    game.currentBets.push(bet);
+    // Handle all-players-skipped scenario
+    if (result.allPlayersSkipped) {
+      resetBetting(game);
+      io.to(gameId).emit('game_updated', game);
+      io.to(gameId).emit('error', { message: 'All players skipped. Betting restarts.' });
+      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
+      return;
+    }
 
-    if (game.currentBets.length === 4) {
+    // Handle betting completion - transition to playing phase
+    if (result.bettingComplete) {
       const dealerPlayerId = game.players[game.dealerIndex].id;
       game.highestBet = getHighestBet(game.currentBets, dealerPlayerId);
       game.phase = 'playing';
@@ -999,25 +929,23 @@ io.on('connection', (socket) => {
       );
       game.currentPlayerIndex = highestBidderIndex;
       io.to(gameId).emit('game_updated', game);
-      // Start timeout for first card play
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
     } else {
-      // Move to next player
-      game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
+      // Betting continues - emit update and start next player's timeout
       io.to(gameId).emit('game_updated', game);
-      // Start timeout for next player's bet
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
     }
   });
 
   socket.on('play_card', ({ gameId, card }: { gameId: string; card: Card }) => {
+    // Basic validation: game exists
     const game = games.get(gameId);
-    if (!game || game.phase !== 'playing') return;
+    if (!game) return;
 
     const currentPlayer = game.players[game.currentPlayerIndex];
     const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
 
-    // Log current trick state and player's hand
+    // Log current trick state and player's hand (debugging)
     console.log(`\n🃏 PLAY_CARD - Player: ${playerName} (${socket.id})`);
     console.log(`   Current Trick (${game.currentTrick.length}/4):`);
     game.currentTrick.forEach((tc, idx) => {
@@ -1031,78 +959,18 @@ io.on('connection', (socket) => {
     console.log(`   Card being played: ${card.color} ${card.value}`);
     console.log(`   Current turn index: ${game.currentPlayerIndex} (${currentPlayer.name})`);
 
-    // Check if player has already played a card in this trick FIRST (before any other checks)
-    const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === socket.id);
-    if (hasAlreadyPlayed) {
-      console.log(`   ❌ REJECTED: Player has already played in this trick`);
-      socket.emit('invalid_move', {
-        message: 'You have already played a card this trick'
-      });
+    // VALIDATION - Use pure validation function
+    const validation = validateCardPlay(game, socket.id, card);
+    if (!validation.valid) {
+      console.log(`   ❌ REJECTED: ${validation.error}`);
+      socket.emit('invalid_move', { message: validation.error });
       return;
     }
 
-    // Prevent playing when trick is complete (4 cards already played)
-    if (game.currentTrick.length >= 4) {
-      console.log(`   ❌ REJECTED: Trick is complete (${game.currentTrick.length}/4 cards)`);
-      socket.emit('invalid_move', {
-        message: 'Please wait for the current trick to be resolved'
-      });
-      return;
-    }
-
-    if (currentPlayer.id !== socket.id) {
-      console.log(`   ❌ REJECTED: Not player's turn (current: ${currentPlayer.name}, requestor: ${playerName})`);
-
-      socket.emit('invalid_move', {
-        message: 'It is not your turn'
-      });
-      return;
-    }
-
-    // Clear timeout for current player (they took action)
+    // Clear timeout for current player (side effect)
     clearPlayerTimeout(gameId, socket.id);
 
-    // Validate card data structure
-    if (!card || !card.color || card.value === undefined) {
-      console.log(`Player ${socket.id} sent invalid card data:`, card);
-      socket.emit('invalid_move', {
-        message: 'Invalid card data'
-      });
-      return;
-    }
-
-    // Validate that card is in player's hand
-    const cardInHand = currentPlayer.hand.find(
-      c => c.color === card.color && c.value === card.value
-    );
-    if (!cardInHand) {
-      console.log(`Player ${socket.id} attempted to play card not in hand:`, card);
-      socket.emit('invalid_move', {
-        message: 'You do not have that card in your hand'
-      });
-      return;
-    }
-
-    // Validate suit-following rule
-    if (game.currentTrick.length > 0) {
-      const ledSuit = game.currentTrick[0].card.color;
-      const hasLedSuit = currentPlayer.hand.some((c) => c.color === ledSuit);
-
-      // If player has the led suit, they must play it
-      if (hasLedSuit && card.color !== ledSuit) {
-        socket.emit('invalid_move', {
-          message: 'You must follow suit if you have it in your hand'
-        });
-        return;
-      }
-    }
-
-    // Set trump on first card
-    if (game.currentTrick.length === 0 && !game.trump) {
-      game.trump = card.color;
-    }
-
-    // Track statistics for this card play
+    // Track statistics BEFORE state change (side effect)
     const stats = roundStats.get(gameId);
     if (stats) {
       // Track play time (time since trick started)
@@ -1111,7 +979,7 @@ io.on('connection', (socket) => {
       playerTimes.push(playTime);
       stats.cardPlayTimes.set(socket.id, playerTimes);
 
-      // Track trump card usage
+      // Track trump card usage (check BEFORE trump is set)
       if (game.trump && card.color === game.trump) {
         const trumpCount = stats.trumpsPlayed.get(socket.id) || 0;
         stats.trumpsPlayed.set(socket.id, trumpCount + 1);
@@ -1123,27 +991,19 @@ io.on('connection', (socket) => {
       }
     }
 
-    // Add card to trick
-    game.currentTrick.push({ playerId: socket.id, card });
-    console.log(`   ✅ ACCEPTED: Card added to trick (now ${game.currentTrick.length}/4 cards)`);
+    // STATE TRANSFORMATION - Use pure state function
+    const result = applyCardPlay(game, socket.id, card);
 
-    // Remove card from player's hand
-    currentPlayer.hand = currentPlayer.hand.filter(
-      (c) => !(c.color === card.color && c.value === card.value)
-    );
+    console.log(`   ✅ ACCEPTED: Card added to trick (now ${game.currentTrick.length}/4 cards)`);
     console.log(`   Updated hand (${currentPlayer.hand.length} cards remaining):`);
     currentPlayer.hand.forEach((c, idx) => {
       console.log(`     ${idx + 1}. ${c.color} ${c.value}`);
     });
 
-    // Move to next player IMMEDIATELY (before resolving trick)
-    const previousIndex = game.currentPlayerIndex;
-    game.currentPlayerIndex = (game.currentPlayerIndex + 1) % 4;
-
-    // Check if trick is complete
-    if (game.currentTrick.length === 4) {
+    // I/O - Emit updates and handle trick resolution
+    if (result.trickComplete) {
       // Emit state with all 4 cards played and turn advanced
-      console.log(`   🎯 Trick complete! Turn advanced: ${game.players[previousIndex].name} → ${game.players[game.currentPlayerIndex].name}`);
+      console.log(`   🎯 Trick complete! Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name}`);
       console.log(`   Final trick state before resolution:`);
       game.currentTrick.forEach((tc, idx) => {
         const player = game.players.find(p => p.id === tc.playerId);
@@ -1155,7 +1015,7 @@ io.on('connection', (socket) => {
       // Note: timeout will be started by resolveTrick after 3-second delay
     } else {
       // Emit updated state with turn advanced
-      console.log(`   ➡️  Turn advanced: ${game.players[previousIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
+      console.log(`   ➡️  Turn advanced: ${game.players[result.previousPlayerIndex].name} → ${game.players[game.currentPlayerIndex].name} (${game.currentTrick.length}/4 cards played)\n`);
       io.to(gameId).emit('game_updated', game);
       // Start timeout for next player
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');

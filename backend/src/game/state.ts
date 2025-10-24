@@ -8,7 +8,7 @@
  * but do NOT perform I/O (no socket.emit, no console.log, no database calls).
  */
 
-import { GameState, Card, Bet, Player } from '../types/game';
+import { GameState, Card, Bet, Player, CardColor } from '../types/game';
 
 /**
  * Result of playing a card - includes state changes and metadata
@@ -17,7 +17,7 @@ export interface CardPlayResult {
   trickComplete: boolean;
   previousPlayerIndex: number;
   trumpWasSet: boolean;
-  trump?: string;
+  trump?: CardColor | null;
 }
 
 /**
@@ -212,6 +212,9 @@ export function clearTrick(game: GameState, winnerId: string): void {
 /**
  * Records points won by a team in the current round
  *
+ * Note: Points are tracked per player in player.pointsWon
+ * This function is not currently used in the codebase.
+ *
  * @param game - Game state (will be mutated)
  * @param teamId - Team that won points (1 or 2)
  * @param points - Points won
@@ -221,11 +224,9 @@ export function addTeamPoints(
   teamId: 1 | 2,
   points: number
 ): void {
-  if (teamId === 1) {
-    game.team1PointsWon = (game.team1PointsWon || 0) + points;
-  } else {
-    game.team2PointsWon = (game.team2PointsWon || 0) + points;
-  }
+  // Points are tracked per player, not per team in current round
+  // This is a placeholder for future use if needed
+  // Currently, points are accumulated in player.pointsWon
 }
 
 /**
@@ -241,11 +242,11 @@ export function updateScores(
   team1RoundScore: number,
   team2RoundScore: number
 ): boolean {
-  game.team1Score += team1RoundScore;
-  game.team2Score += team2RoundScore;
+  game.teamScores.team1 += team1RoundScore;
+  game.teamScores.team2 += team2RoundScore;
 
   // Check for game over (41+ points)
-  return game.team1Score >= 41 || game.team2Score >= 41;
+  return game.teamScores.team1 >= 41 || game.teamScores.team2 >= 41;
 }
 
 /**

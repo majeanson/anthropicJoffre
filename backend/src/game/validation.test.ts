@@ -19,16 +19,20 @@ function createTestGame(overrides?: Partial<GameState>): GameState {
 
   return {
     id: 'test-game',
+    creatorId: 'test-creator',
     players: defaultPlayers,
     phase: 'team_selection',
     currentPlayerIndex: 0,
     currentBets: [],
     currentTrick: [],
     trump: null,
-    team1Score: 0,
-    team2Score: 0,
+    teamScores: { team1: 0, team2: 0 },
     dealerIndex: 0,
     roundNumber: 0,
+    highestBet: null,
+    previousTrick: null,
+    roundHistory: [],
+    currentRoundTricks: [],
     ...overrides,
   };
 }
