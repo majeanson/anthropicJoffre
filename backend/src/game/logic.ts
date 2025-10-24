@@ -308,3 +308,106 @@ export const hasRedZero = (trick: TrickCard[]): boolean => {
 export const hasBrownZero = (trick: TrickCard[]): boolean => {
   return trick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
 };
+
+/**
+ * Finds the player with the fastest average card play time.
+ *
+ * @param cardPlayTimes - Map of player names to array of play times in milliseconds
+ * @returns Player name with fastest average play time, or null if no data
+ *
+ * @example
+ * const times = new Map([
+ *   ['Alice', [1000, 2000, 1500]],
+ *   ['Bob', [3000, 2500, 2000]]
+ * ]);
+ * getFastestPlayer(times); // returns 'Alice'
+ */
+export const getFastestPlayer = (
+  cardPlayTimes: Map<string, number[]>
+): { playerName: string; avgTime: number } | null => {
+  let fastestPlayerName: string | null = null;
+  let fastestAvgTime = Infinity;
+
+  cardPlayTimes.forEach((times, playerName) => {
+    if (times.length > 0) {
+      const avgTime = times.reduce((sum, t) => sum + t, 0) / times.length;
+      if (avgTime < fastestAvgTime) {
+        fastestAvgTime = avgTime;
+        fastestPlayerName = playerName;
+      }
+    }
+  });
+
+  return fastestPlayerName
+    ? { playerName: fastestPlayerName, avgTime: fastestAvgTime }
+    : null;
+};
+
+/**
+ * Finds the player who played the most trump cards.
+ *
+ * @param trumpsPlayed - Map of player names to trump card counts
+ * @returns Player name with most trumps played, or null if no data
+ *
+ * @example
+ * const trumps = new Map([
+ *   ['Alice', 3],
+ *   ['Bob', 5],
+ *   ['Carol', 2]
+ * ]);
+ * getTrumpMaster(trumps); // returns { playerName: 'Bob', count: 5 }
+ */
+export const getTrumpMaster = (
+  trumpsPlayed: Map<string, number>
+): { playerName: string; count: number } | null => {
+  let trumpMasterName: string | null = null;
+  let maxTrumps = 0;
+
+  trumpsPlayed.forEach((count, playerName) => {
+    if (count > maxTrumps) {
+      maxTrumps = count;
+      trumpMasterName = playerName;
+    }
+  });
+
+  return trumpMasterName && maxTrumps > 0
+    ? { playerName: trumpMasterName, count: maxTrumps }
+    : null;
+};
+
+/**
+ * Finds the luckiest player based on points per trick ratio.
+ *
+ * A player is considered lucky if they won significantly more points
+ * per trick than the base value (>1.5 pts/trick).
+ *
+ * @param players - Array of players with tricksWon and pointsWon
+ * @returns Luckiest player info, or null if no player qualifies
+ *
+ * @example
+ * const players = [
+ *   { id: 'p1', name: 'Alice', tricksWon: 3, pointsWon: 10, teamId: 1, hand: [], isBot: false },
+ *   { id: 'p2', name: 'Bob', tricksWon: 2, pointsWon: 2, teamId: 2, hand: [], isBot: false }
+ * ];
+ * getLuckiestPlayer(players); // returns { player: Alice's object, pointsPerTrick: 3.3 }
+ */
+export const getLuckiestPlayer = (
+  players: Player[]
+): { player: Player; pointsPerTrick: number } | null => {
+  let luckyPlayer: Player | null = null;
+  let bestPointsPerTrick = 1.5; // Minimum threshold to qualify as "lucky"
+
+  players.forEach(player => {
+    if (player.tricksWon > 0) {
+      const pointsPerTrick = player.pointsWon / player.tricksWon;
+      if (pointsPerTrick > bestPointsPerTrick) {
+        bestPointsPerTrick = pointsPerTrick;
+        luckyPlayer = player;
+      }
+    }
+  });
+
+  return luckyPlayer
+    ? { player: luckyPlayer, pointsPerTrick: bestPointsPerTrick }
+    : null;
+};

@@ -37,6 +37,9 @@ import {
   getWinnerName,
   hasRedZero,
   hasBrownZero,
+  getFastestPlayer,
+  getTrumpMaster,
+  getLuckiestPlayer,
 } from './game/logic';
 import { selectBotCard } from './game/botLogic';
 import {
@@ -2434,26 +2437,14 @@ function calculateRoundStatistics(gameId: string, game: GameState): RoundStatist
   const statistics: RoundStatistics = {};
 
   // 1. Fastest Play - player with fastest average card play time
-  let fastestPlayerId: string | null = null;
-  let fastestAvgTime = Infinity;
-
-  stats.cardPlayTimes.forEach((times, playerId) => {
-    if (times.length > 0) {
-      const avgTime = times.reduce((sum, t) => sum + t, 0) / times.length;
-      if (avgTime < fastestAvgTime) {
-        fastestAvgTime = avgTime;
-        fastestPlayerId = playerId;
-      }
-    }
-  });
-
-  if (fastestPlayerId) {
-    const player = game.players.find(p => p.name === fastestPlayerId);
+  const fastestResult = getFastestPlayer(stats.cardPlayTimes);
+  if (fastestResult) {
+    const player = game.players.find(p => p.name === fastestResult.playerName);
     if (player) {
       statistics.fastestPlay = {
         playerId: player.id,
         playerName: player.name,
-        timeMs: Math.round(fastestAvgTime),
+        timeMs: Math.round(fastestResult.avgTime),
       };
     }
   }
@@ -2471,50 +2462,26 @@ function calculateRoundStatistics(gameId: string, game: GameState): RoundStatist
   }
 
   // 3. Trump Master - player who played most trump cards
-  let trumpMasterId: string | null = null;
-  let maxTrumps = 0;
-
-  stats.trumpsPlayed.forEach((count, playerId) => {
-    if (count > maxTrumps) {
-      maxTrumps = count;
-      trumpMasterId = playerId;
-    }
-  });
-
-  if (trumpMasterId && maxTrumps > 0) {
-    const player = game.players.find(p => p.name === trumpMasterId);
+  const trumpMasterResult = getTrumpMaster(stats.trumpsPlayed);
+  if (trumpMasterResult) {
+    const player = game.players.find(p => p.name === trumpMasterResult.playerName);
     if (player) {
       statistics.trumpMaster = {
         playerId: player.id,
         playerName: player.name,
-        trumpsPlayed: maxTrumps,
+        trumpsPlayed: trumpMasterResult.count,
       };
     }
   }
 
   // 4. Lucky Player - player who won most points with fewest tricks
-  let luckyPlayerId: string | null = null;
-  let bestPointsPerTrick = 0;
-
-  game.players.forEach(player => {
-    if (player.tricksWon > 0) {
-      const pointsPerTrick = player.pointsWon / player.tricksWon;
-      if (pointsPerTrick > bestPointsPerTrick) {
-        bestPointsPerTrick = pointsPerTrick;
-        luckyPlayerId = player.id;
-      }
-    }
-  });
-
-  if (luckyPlayerId && bestPointsPerTrick > 1.5) { // Only award if significantly lucky (>1.5 pts/trick)
-    const player = game.players.find(p => p.id === luckyPlayerId);
-    if (player) {
-      statistics.luckyPlayer = {
-        playerId: luckyPlayerId,
-        playerName: player.name,
-        reason: `${bestPointsPerTrick.toFixed(1)} pts/trick`,
-      };
-    }
+  const luckyResult = getLuckiestPlayer(game.players);
+  if (luckyResult) {
+    statistics.luckyPlayer = {
+      playerId: luckyResult.player.id,
+      playerName: luckyResult.player.name,
+      reason: `${luckyResult.pointsPerTrick.toFixed(1)} pts/trick`,
+    };
   }
 
   // Clean up stats for this game
