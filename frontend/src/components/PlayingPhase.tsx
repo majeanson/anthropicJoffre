@@ -470,7 +470,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
                   <p className={`text-xs md:text-base font-black ${
                     bettingTeam === 1 ? 'text-orange-800 dark:text-orange-200' : 'text-purple-800 dark:text-purple-200'
                   }`}>
-                    🎲 {gameState.highestBet.amount}
+                    🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : ''}
                   </p>
                 </div>
               )}
