@@ -221,22 +221,8 @@ function App() {
     });
 
     newSocket.on('player_reconnected', ({ playerName }: { playerName: string; playerId: string; oldSocketId: string }) => {
-      // Show toast notification (prevent duplicates)
-      const toastMessage = `${playerName} reconnected`;
-      if (lastToastRef.current !== toastMessage) {
-        lastToastRef.current = toastMessage;
-        setToast({
-          message: toastMessage,
-          type: 'success',
-          duration: 3000,
-        });
-        // Clear the ref after duration to allow same message later
-        setTimeout(() => {
-          if (lastToastRef.current === toastMessage) {
-            lastToastRef.current = '';
-          }
-        }, 3000);
-      }
+      // Player online/offline badges will show reconnection status instead of toast
+      console.log(`Player reconnected: ${playerName}`);
     });
 
     newSocket.on('player_disconnected', ({ playerId, waitingForReconnection }: { playerId: string; waitingForReconnection: boolean }) => {
