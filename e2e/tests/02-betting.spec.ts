@@ -119,11 +119,11 @@ test.describe('Betting Phase', () => {
 
     const page1 = pages[0];
 
-    // Should show all 4 players in the player list (use exact match to avoid duplicates)
-    await expect(page1.getByText('Player 1', { exact: true })).toBeVisible();
-    await expect(page1.getByText('Player 2', { exact: true })).toBeVisible();
-    await expect(page1.getByText('Player 3', { exact: true })).toBeVisible();
-    await expect(page1.getByText('Player 4', { exact: true })).toBeVisible();
+    // Should show all 4 players in the player list using test IDs
+    await expect(page1.getByTestId('player-name-Player 1')).toBeVisible();
+    await expect(page1.getByTestId('player-name-Player 2')).toBeVisible();
+    await expect(page1.getByTestId('player-name-Player 3')).toBeVisible();
+    await expect(page1.getByTestId('player-name-Player 4')).toBeVisible();
 
     // All should show "Waiting..." initially (in player list, not the turn indicator)
     const waitingTexts = page1.locator('.text-sm.text-umber-500', { hasText: 'Waiting...' });

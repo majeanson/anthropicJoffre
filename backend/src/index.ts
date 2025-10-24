@@ -501,7 +501,7 @@ function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'bett
 
     // Check if still current player's turn (use name for stable check)
     const currentPlayer = game.players[game.currentPlayerIndex];
-    if (currentPlayer.name !== playerName || game.phase !== phase) {
+    if (!currentPlayer || currentPlayer.name !== playerName || game.phase !== phase) {
       clearInterval(countdownInterval);
       return;
     }

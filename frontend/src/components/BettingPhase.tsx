@@ -163,10 +163,10 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
             const bet = currentBets.find(b => b.playerId === player.id);
             const isDealerPlayer = index === dealerIndex;
             return (
-              <div key={player.id} className="flex items-center justify-between p-3 bg-parchment-100 dark:bg-gray-700 rounded-lg border border-parchment-300 dark:border-gray-600">
+              <div key={player.id} className="flex items-center justify-between p-3 bg-parchment-100 dark:bg-gray-700 rounded-lg border border-parchment-300 dark:border-gray-600" data-testid={`player-list-item-${player.name}`}>
                 <div className="flex items-center gap-3">
                   <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
-                  <span className="font-medium text-umber-900 dark:text-gray-100">
+                  <span className="font-medium text-umber-900 dark:text-gray-100" data-testid={`player-name-${player.name}`}>
                     {player.name}
                     {isDealerPlayer && <span className="ml-2 text-xs text-umber-600 dark:text-gray-400">(Dealer)</span>}
                   </span>
