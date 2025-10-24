@@ -245,3 +245,66 @@ export const getHighestBet = (bets: Bet[], dealerPlayerId?: string): Bet | null 
     return highest;
   });
 };
+
+/**
+ * Finds the winner's name from trick cards.
+ *
+ * Looks up the winner's stable playerName from the trick cards
+ * to ensure reconnection stability.
+ *
+ * @param trick - Array of cards played in the trick
+ * @param winnerId - ID of the player who won (from determineWinner)
+ * @param players - Array of players in the game (fallback)
+ * @returns Winner's name (stable identifier)
+ *
+ * @example
+ * const trick = [
+ *   { playerId: 'p1', playerName: 'Alice', card: { color: 'red', value: 7 } },
+ *   { playerId: 'p2', playerName: 'Bob', card: { color: 'red', value: 5 } }
+ * ];
+ * getWinnerName(trick, 'p1', players); // returns 'Alice'
+ */
+export const getWinnerName = (
+  trick: TrickCard[],
+  winnerId: string,
+  players: Player[]
+): string => {
+  const winningTrickCard = trick.find(tc => tc.playerId === winnerId);
+  return winningTrickCard?.playerName ||
+         players.find(p => p.id === winnerId)?.name ||
+         winnerId;
+};
+
+/**
+ * Checks if a trick contains a red zero card.
+ *
+ * Red zero cards are worth +5 bonus points to the trick winner.
+ *
+ * @param trick - Array of cards played in the trick
+ * @returns True if trick contains red 0
+ *
+ * @example
+ * hasRedZero([
+ *   { playerId: 'p1', playerName: 'Alice', card: { color: 'red', value: 0 } }
+ * ]); // returns true
+ */
+export const hasRedZero = (trick: TrickCard[]): boolean => {
+  return trick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
+};
+
+/**
+ * Checks if a trick contains a brown zero card.
+ *
+ * Brown zero cards are worth -2 penalty points to the trick winner.
+ *
+ * @param trick - Array of cards played in the trick
+ * @returns True if trick contains brown 0
+ *
+ * @example
+ * hasBrownZero([
+ *   { playerId: 'p1', playerName: 'Alice', card: { color: 'brown', value: 0 } }
+ * ]); // returns true
+ */
+export const hasBrownZero = (trick: TrickCard[]): boolean => {
+  return trick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
+};

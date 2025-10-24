@@ -34,6 +34,9 @@ import {
   calculateRoundScore,
   getHighestBet,
   isBetHigher,
+  getWinnerName,
+  hasRedZero,
+  hasBrownZero,
 } from './game/logic';
 import { selectBotCard } from './game/botLogic';
 import {
@@ -2362,24 +2365,19 @@ function resolveTrick(gameId: string) {
   const totalPoints = 1 + specialCardPoints;
 
   // Look up winner's name (stable identifier) from the trick
-  const winningTrickCard = game.currentTrick.find(tc => tc.playerId === winnerId);
-  const winnerName = winningTrickCard?.playerName ||
-                     game.players.find(p => p.id === winnerId)?.name ||
-                     winnerId;
+  const winnerName = getWinnerName(game.currentTrick, winnerId, game.players);
 
   // 2. SIDE EFFECT - Track special card stats for round statistics (use stable playerName)
   const stats = roundStats.get(gameId);
   if (stats) {
     // Check if trick contains red 0 (worth +5 points)
-    const hasRedZero = game.currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
-    if (hasRedZero) {
+    if (hasRedZero(game.currentTrick)) {
       const redZeroCount = stats.redZerosCollected.get(winnerName) || 0;
       stats.redZerosCollected.set(winnerName, redZeroCount + 1);
     }
 
     // Check if trick contains brown 0 (worth -2 points)
-    const hasBrownZero = game.currentTrick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
-    if (hasBrownZero) {
+    if (hasBrownZero(game.currentTrick)) {
       const brownZeroCount = stats.brownZerosReceived.get(winnerName) || 0;
       stats.brownZerosReceived.set(winnerName, brownZeroCount + 1);
     }
