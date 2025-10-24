@@ -13,6 +13,7 @@ import { TestPanel } from './components/TestPanel';
 import { ReconnectingBanner } from './components/ReconnectingBanner';
 import { CatchUpModal } from './components/CatchUpModal';
 import { BotManagementPanel } from './components/BotManagementPanel';
+import { BotTakeoverModal } from './components/BotTakeoverModal';
 import { Toast, ToastProps } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
 import { BotPlayer, BotDifficulty } from './utils/botPlayer';
@@ -54,6 +55,11 @@ function App() {
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const botDifficultiesRef = useRef<Map<string, BotDifficulty>>(new Map()); // Track per-bot difficulty by bot name
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('medium');
+  const [botTakeoverModal, setBotTakeoverModal] = useState<{
+    gameId: string;
+    availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
+    playerName: string;
+  } | null>(null);
 
   useEffect(() => {
     preloadCardImages();
@@ -441,6 +447,20 @@ function App() {
       setIsSpectator(false);
     });
 
+    newSocket.on('game_full_with_bots', ({ gameId, availableBots }: {
+      gameId: string;
+      availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
+    }) => {
+      // Store the pending join info to show bot takeover modal
+      // We need to get the player name from somewhere - let's add it to the modal state
+      const storedPlayerName = localStorage.getItem('pendingPlayerName') || '';
+      setBotTakeoverModal({
+        gameId,
+        availableBots,
+        playerName: storedPlayerName
+      });
+    });
+
     return () => {
       newSocket.close();
     };
@@ -469,6 +489,8 @@ function App() {
 
   const handleJoinGame = (gameId: string, playerName: string) => {
     if (socket) {
+      // Store player name temporarily in case game is full with bots
+      localStorage.setItem('pendingPlayerName', playerName);
       socket.emit('join_game', { gameId, playerName });
       setGameId(gameId);
     }
@@ -562,6 +584,20 @@ function App() {
         botName,
         difficulty
       });
+    }
+  };
+
+  const handleTakeOverBot = (botName: string) => {
+    if (socket && botTakeoverModal) {
+      socket.emit('take_over_bot', {
+        gameId: botTakeoverModal.gameId,
+        botNameToReplace: botName,
+        newPlayerName: botTakeoverModal.playerName
+      });
+      // Clear the pending player name
+      localStorage.removeItem('pendingPlayerName');
+      // Close the modal
+      setBotTakeoverModal(null);
     }
   };
 
@@ -975,6 +1011,17 @@ function App() {
           currentPlayerId={socket.id}
           onReplaceWithBot={handleReplaceWithBot}
           onChangeBotDifficulty={handleChangeBotDifficulty}
+        />
+      )}
+      {botTakeoverModal && (
+        <BotTakeoverModal
+          isOpen={!!botTakeoverModal}
+          availableBots={botTakeoverModal.availableBots}
+          onTakeOver={handleTakeOverBot}
+          onCancel={() => {
+            setBotTakeoverModal(null);
+            localStorage.removeItem('pendingPlayerName');
+          }}
         />
       )}
     </>

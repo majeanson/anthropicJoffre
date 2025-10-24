@@ -166,3 +166,14 @@ export interface BotTakenOverPayload {
   newPlayerName: string;
   session: PlayerSession;
 }
+
+export interface AvailableBot {
+  name: string;
+  teamId: 1 | 2;
+  difficulty: BotDifficulty;
+}
+
+export interface GameFullWithBotsPayload {
+  gameId: string;
+  availableBots: AvailableBot[];
+}

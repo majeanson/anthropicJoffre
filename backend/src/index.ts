@@ -1055,6 +1055,21 @@ io.on('connection', (socket) => {
     }
 
     if (game.players.length >= 4) {
+      // Check if there are bots that can be replaced
+      const availableBots = game.players.filter(p => p.isBot);
+      if (availableBots.length > 0) {
+        // Game is full but has bots - offer takeover option
+        socket.emit('game_full_with_bots', {
+          gameId,
+          availableBots: availableBots.map(bot => ({
+            name: bot.name,
+            teamId: bot.teamId,
+            difficulty: bot.botDifficulty || 'hard'
+          }))
+        });
+        return;
+      }
+      // Game is full with no bots - cannot join
       socket.emit('error', { message: 'Game is full' });
       return;
     }
