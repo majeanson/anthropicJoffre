@@ -203,7 +203,7 @@ test.describe('Betting Phase', () => {
     }
 
     // Should transition to playing phase
-    await expect(pages[0].getByText(/your hand/i)).toBeVisible({ timeout: 10000 });
+    await expect(pages[0].getByTestId('player-hand')).toBeVisible({ timeout: 10000 });
 
     for (const context of contexts) {
       await context.close();
@@ -236,7 +236,7 @@ test.describe('Betting Phase', () => {
     await pages[1].getByRole('button', { name: /Place Bet: 12/i }).click();
 
     // Wait for playing phase
-    await pages[0].waitForSelector('text=/your hand/i', { timeout: 10000 });
+    await expect(pages[0].getByTestId('player-hand')).toBeVisible({ timeout: 10000 });
 
     // Player 1 (first with highest bet of 12) should have turn first
     await expect(pages[0].getByText(/your turn/i)).toBeVisible();

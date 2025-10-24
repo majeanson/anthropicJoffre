@@ -6,9 +6,9 @@ test.describe('Card Playing Phase', () => {
     const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
-    // All players should see their hand
+    // All players should see their hand area
     for (const page of pages) {
-      await expect(page.getByText(/your hand/i)).toBeVisible();
+      await expect(page.getByTestId('player-hand')).toBeVisible();
 
       // Should have 8 cards
       const cards = page.locator('[data-card-value]');
@@ -24,10 +24,10 @@ test.describe('Card Playing Phase', () => {
     const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
-    // Should show playing phase with score board (always visible)
-    await expect(pages[0].getByText(/team 1/i)).toBeVisible();
-    await expect(pages[0].getByText(/team 2/i)).toBeVisible();
-    await expect(pages[0].getByText(/your hand/i)).toBeVisible();
+    // Should show playing phase with key elements
+    await expect(pages[0].getByTestId('score-board')).toBeVisible();
+    await expect(pages[0].getByTestId('trick-area')).toBeVisible();
+    await expect(pages[0].getByTestId('player-hand')).toBeVisible();
 
     for (const context of contexts) {
       await context.close();
@@ -38,9 +38,13 @@ test.describe('Card Playing Phase', () => {
     const { contexts, pages } = await createGameWith4Players(browser);
     await placeAllBets(pages);
 
-    // Should show team scores
-    await expect(pages[0].getByText(/team 1/i)).toBeVisible();
-    await expect(pages[0].getByText(/team 2/i)).toBeVisible();
+    // Should show score board
+    const scoreBoard = pages[0].getByTestId('score-board');
+    await expect(scoreBoard).toBeVisible();
+
+    // Should show team scores within score board
+    await expect(scoreBoard.getByText(/team 1/i)).toBeVisible();
+    await expect(scoreBoard.getByText(/team 2/i)).toBeVisible();
 
     // Should show round number
     await expect(pages[0].getByText(/round 1/i)).toBeVisible();

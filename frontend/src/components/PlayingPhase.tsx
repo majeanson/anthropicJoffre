@@ -413,7 +413,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
       <div className="flex-1 flex flex-col overflow-hidden md:overflow-visible">
         {/* Score Board - Fixed height */}
       <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-4 pt-2 md:pt-4">
-        <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600">
+        <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600" data-testid="score-board">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible">
@@ -633,7 +633,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
             // Current Trick View - Circular layout on both mobile and desktop - ANTI-CLOCKWISE
             <>
               {/* Circular Layout for both mobile and desktop */}
-              <div className="relative h-[320px] md:h-[350px]">
+              <div className="relative h-[320px] md:h-[350px]" data-testid="trick-area">
               
 
                 {/* Bottom - You (position 0) */}
@@ -707,7 +707,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
               )}
         {/* Only show player hand section if spectator OR if player has cards */}
         {(isSpectator || (currentPlayer && currentPlayer.hand.length > 0)) && (
-          <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600">
+          <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600" data-testid="player-hand">
             {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
             {isSpectator ? (
               <div className="text-center py-8">
