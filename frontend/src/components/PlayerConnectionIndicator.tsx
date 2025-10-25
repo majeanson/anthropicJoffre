@@ -60,7 +60,7 @@ export const PlayerConnectionIndicator: React.FC<PlayerConnectionIndicatorProps>
     }
   };
 
-  const { bg, text, icon, label, pulse } = getStatusStyles();
+  const { bg, text, label, pulse } = getStatusStyles();
   const sizeClass = small ? 'w-2 h-2' : 'w-3 h-3';
 
   if (small) {

@@ -220,7 +220,7 @@ const activeTimeouts = new Map<string, NodeJS.Timeout>();
 const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
 
 // Countdown interval storage (maps socket.id to interval ID)
-const countdownIntervals = new Map<string, NodeJS.Timer>();
+const countdownIntervals = new Map<string, NodeJS.Timeout>();
 
 // Game deletion timeouts (maps gameId to timeout ID)
 const gameDeletionTimeouts = new Map<string, NodeJS.Timeout>();
@@ -2432,11 +2432,15 @@ io.on('connection', (socket) => {
       return;
     }
 
+    // TypeScript type guard - playerGame is definitely not null here
+    const game: GameState = playerGame;
+    const gameId: string = playerGameId;
+
     // Don't immediately remove player - give 15 minutes grace period for reconnection (mobile AFK)
     console.log(`Player ${socket.id} disconnected. Waiting for reconnection...`);
 
     // Update player connection status
-    const player = playerGame.players.find(p => p.id === socket.id);
+    const player = game.players.find((p: Player) => p.id === socket.id);
     if (player) {
       player.connectionStatus = 'disconnected';
       player.disconnectedAt = Date.now();
@@ -2445,8 +2449,8 @@ io.on('connection', (socket) => {
 
     // Start countdown timer that updates every second
     const countdownInterval = setInterval(() => {
-      const game = games.get(playerGameId!);
-      if (!game) {
+      const currentGame = games.get(gameId);
+      if (!currentGame) {
         const interval = countdownIntervals.get(socket.id);
         if (interval) {
           clearInterval(interval);
@@ -2455,13 +2459,13 @@ io.on('connection', (socket) => {
         return;
       }
 
-      const player = game.players.find(p => p.id === socket.id);
+      const player = currentGame.players.find(p => p.id === socket.id);
       if (player && player.connectionStatus === 'disconnected' && player.reconnectTimeLeft) {
         player.reconnectTimeLeft = Math.max(0, player.reconnectTimeLeft - 1);
 
         // Emit connection status update every 5 seconds to reduce bandwidth
         if (player.reconnectTimeLeft % 5 === 0 || player.reconnectTimeLeft < 5) {
-          io.to(playerGameId!).emit('connection_status_update', {
+          io.to(gameId).emit('connection_status_update', {
             playerId: socket.id,
             playerName: player.name,
             status: 'disconnected',
@@ -2490,7 +2494,7 @@ io.on('connection', (socket) => {
     countdownIntervals.set(socket.id, countdownInterval);
 
     // Notify other players of disconnection
-    io.to(playerGameId).emit('player_disconnected', {
+    io.to(gameId).emit('player_disconnected', {
       playerId: socket.id,
       playerName: playerName,
       waitingForReconnection: true,
@@ -2498,24 +2502,24 @@ io.on('connection', (socket) => {
     });
 
     // Update game state for all players
-    io.to(playerGameId).emit('game_updated', playerGame);
+    io.to(gameId).emit('game_updated', game);
 
     // Set timeout to remove player if they don't reconnect
     const disconnectTimeout = setTimeout(async () => {
-      const game = games.get(playerGameId!);
-      if (!game) {
+      const currentGame = games.get(gameId);
+      if (!currentGame) {
         disconnectTimeouts.delete(socket.id);
         return;
       }
 
-      const player = game.players.find((p) => p.id === socket.id);
+      const player = currentGame.players.find((p) => p.id === socket.id);
       if (player) {
         // Player didn't reconnect - remove them
-        const playerIndex = game.players.findIndex((p) => p.id === socket.id);
+        const playerIndex = currentGame.players.findIndex((p) => p.id === socket.id);
         if (playerIndex !== -1) {
-          game.players.splice(playerIndex, 1);
-          io.to(playerGameId!).emit('player_left', { playerId: socket.id, gameState: game });
-          console.log(`Player ${socket.id} removed from game ${playerGameId} (no reconnection)`);
+          currentGame.players.splice(playerIndex, 1);
+          io.to(gameId).emit('player_left', { playerId: socket.id, gameState: currentGame });
+          console.log(`Player ${socket.id} removed from game ${gameId} (no reconnection)`);
 
           // Mark player as offline in database
           if (playerName) {
@@ -2896,18 +2900,19 @@ httpServer.listen(PORT, HOST, async () => {
       if (!games.has(snapshot.id)) {
         // Restore the game state
         games.set(snapshot.id, snapshot);
-        gameCreationTimes.set(snapshot.id, new Date());
+        gameCreationTimes.set(snapshot.id, Date.now());
         console.log(`✅ Restored game ${snapshot.id} with ${snapshot.players.length} players`);
 
         // Re-establish bot timeouts if needed
         if (snapshot.phase === 'betting' || snapshot.phase === 'playing') {
-          const currentPlayer = snapshot.players.find(p => p.id === snapshot.currentPlayerId);
+          const currentPlayer = snapshot.players[snapshot.currentPlayerIndex];
           if (currentPlayer?.isBot) {
             // Give bots a moment to reconnect/play
             setTimeout(() => {
               const game = games.get(snapshot.id);
-              if (game && game.phase === snapshot.phase && game.currentPlayerId === snapshot.currentPlayerId) {
-                handleBotTurn(snapshot.id);
+              if (game && game.phase === snapshot.phase && game.currentPlayerIndex === snapshot.currentPlayerIndex) {
+                // Bot will be handled by existing bot logic
+                console.log(`Bot ${currentPlayer.name} will take action when ready`);
               }
             }, 5000);
           }
@@ -2951,7 +2956,7 @@ httpServer.listen(PORT, HOST, async () => {
   // ============= PERIODIC STATE SNAPSHOTS =============
   // Save game snapshots every 30 seconds for recovery
   setInterval(async () => {
-    const activeGames = Array.from(games.values()).filter(game => !game.isFinished);
+    const activeGames = Array.from(games.values()).filter(game => game.phase !== 'game_over');
 
     if (activeGames.length > 0) {
       for (const game of activeGames) {

@@ -1,4 +1,4 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to console in development
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error);
       console.error('Error info:', errorInfo);
       console.error('Component stack:', errorInfo.componentStack);
@@ -120,7 +120,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <p className="text-sm text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-gray-700 p-3 rounded">
                   {this.state.error.message}
                 </p>
-                {process.env.NODE_ENV === 'development' && this.state.errorInfo && (
+                {import.meta.env.DEV && this.state.errorInfo && (
                   <details className="mt-4 text-left">
                     <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
                       Show Technical Details
