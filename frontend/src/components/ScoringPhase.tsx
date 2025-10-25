@@ -436,6 +436,7 @@ export function ScoringPhase({
         )}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
