@@ -4,6 +4,7 @@ import { Socket } from 'socket.io-client';
 import { useSettings } from '../contexts/SettingsContext';
 import { HowToPlay } from './HowToPlay';
 import { BotDifficulty } from '../utils/botPlayer';
+import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 
 interface TeamSelectionProps {
   players: Player[];
@@ -199,10 +200,19 @@ export function TeamSelection({
                   >
                     {playerAtPosition ? (
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
-                          {playerAtPosition.name}
-                          {isCurrentPlayer && ' (You)'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
+                            {playerAtPosition.name}
+                            {isCurrentPlayer && ' (You)'}
+                          </span>
+                          {!playerAtPosition.isBot && (
+                            <PlayerConnectionIndicator
+                              status={playerAtPosition.connectionStatus}
+                              reconnectTimeLeft={playerAtPosition.reconnectTimeLeft}
+                              small
+                            />
+                          )}
+                        </div>
                         <div className="flex gap-2">
                           {!isCurrentPlayer && currentPlayer && currentPlayer.teamId === 1 && (
                             <button
@@ -264,10 +274,19 @@ export function TeamSelection({
                   >
                     {playerAtPosition ? (
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
-                          {playerAtPosition.name}
-                          {isCurrentPlayer && ' (You)'}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
+                            {playerAtPosition.name}
+                            {isCurrentPlayer && ' (You)'}
+                          </span>
+                          {!playerAtPosition.isBot && (
+                            <PlayerConnectionIndicator
+                              status={playerAtPosition.connectionStatus}
+                              reconnectTimeLeft={playerAtPosition.reconnectTimeLeft}
+                              small
+                            />
+                          )}
+                        </div>
                         <div className="flex gap-2">
                           {!isCurrentPlayer && currentPlayer && currentPlayer.teamId === 2 && (
                             <button

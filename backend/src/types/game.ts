@@ -8,6 +8,8 @@ export interface Card {
 
 export type BotDifficulty = 'easy' | 'medium' | 'hard';
 
+export type ConnectionStatus = 'connected' | 'disconnected' | 'reconnecting';
+
 export interface Player {
   id: string;
   name: string;
@@ -17,6 +19,9 @@ export interface Player {
   pointsWon: number; // Points earned from tricks and special cards
   isBot?: boolean; // True if this player is a bot
   botDifficulty?: BotDifficulty; // Difficulty level if this is a bot
+  connectionStatus?: ConnectionStatus; // Connection status for real-time feedback
+  disconnectedAt?: number; // Timestamp when player disconnected
+  reconnectTimeLeft?: number; // Seconds left to reconnect (countdown)
 }
 
 export interface Bet {
