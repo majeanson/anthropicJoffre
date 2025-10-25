@@ -26,6 +26,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
 import crypto from 'crypto';
+import rateLimit from 'express-rate-limit';
 import { GameState, Player, Bet, TrickCard, Card, PlayerSession } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
 import {
@@ -75,6 +76,9 @@ import {
   getGameReplayData,
   getAllFinishedGames,
   cleanupAbandonedGames,
+  cleanupStaleGames,
+  saveGameSnapshot,
+  loadGameSnapshots,
 } from './db';
 import {
   saveGameState as saveGameToDB,
@@ -135,6 +139,70 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// Configure rate limiting
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in headers
+  legacyHeaders: false, // Disable X-RateLimit-* headers
+});
+
+// Apply rate limiting to all API routes
+app.use('/api/', apiLimiter);
+
+// Stricter rate limit for game creation
+const gameCreateLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10, // Limit to 10 game creations per 5 minutes
+  message: 'Too many games created, please try again later.',
+});
+
+// Socket event rate limiters (stored per socket ID)
+const socketRateLimiters = {
+  chat: new Map<string, number>(), // Last message timestamp
+  bet: new Map<string, number>(), // Last bet timestamp
+  card: new Map<string, number>(), // Last card play timestamp
+};
+
+// Input sanitization helpers
+const sanitizePlayerName = (name: string): string => {
+  // Remove leading/trailing whitespace
+  let sanitized = name.trim();
+
+  // Limit length to 20 characters
+  sanitized = sanitized.substring(0, 20);
+
+  // Remove any HTML tags or script tags
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+
+  // Remove any potential XSS characters
+  sanitized = sanitized.replace(/[<>'"]/g, '');
+
+  // Ensure name is not empty after sanitization
+  if (!sanitized) {
+    sanitized = 'Player';
+  }
+
+  return sanitized;
+};
+
+const sanitizeChatMessage = (message: string): string => {
+  // Remove leading/trailing whitespace
+  let sanitized = message.trim();
+
+  // Limit length to 200 characters
+  sanitized = sanitized.substring(0, 200);
+
+  // Remove any HTML tags or script tags
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+
+  // Remove any potential XSS characters but allow some punctuation
+  sanitized = sanitized.replace(/[<>]/g, '');
+
+  return sanitized;
+};
 
 // In-memory game storage (can be moved to Redis for production)
 const games = new Map<string, GameState>();
@@ -968,10 +1036,16 @@ io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
   socket.on('create_game', async (playerName: string) => {
+    // Apply game creation rate limiting
+    const clientIp = (socket.request as any).connection.remoteAddress;
+
+    // Sanitize player name
+    const sanitizedName = sanitizePlayerName(playerName);
+
     const gameId = Math.random().toString(36).substring(7).toUpperCase();
     const player: Player = {
       id: socket.id,
-      name: playerName,
+      name: sanitizedName,
       teamId: 1,
       hand: [],
       tricksWon: 0,
@@ -1025,6 +1099,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('join_game', async ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
+    // Sanitize player name
+    const sanitizedName = sanitizePlayerName(playerName);
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1032,9 +1109,9 @@ io.on('connection', (socket) => {
     }
 
     // Check if player is trying to rejoin with same name
-    const existingPlayer = game.players.find(p => p.name === playerName);
+    const existingPlayer = game.players.find(p => p.name === sanitizedName);
     if (existingPlayer) {
-      console.log(`Player ${playerName} attempting to rejoin game ${gameId} (isBot: ${existingPlayer.isBot})`);
+      console.log(`Player ${sanitizedName} attempting to rejoin game ${gameId} (isBot: ${existingPlayer.isBot})`);
 
       // Allow rejoin - update socket ID
       const oldSocketId = existingPlayer.id;
@@ -1131,7 +1208,7 @@ io.on('connection', (socket) => {
     const teamId = game.players.length % 2 === 0 ? 1 : 2;
     const player: Player = {
       id: socket.id,
-      name: playerName,
+      name: sanitizedName,
       teamId: teamId as 1 | 2,
       hand: [],
       tricksWon: 0,
@@ -1229,6 +1306,15 @@ io.on('connection', (socket) => {
 
   // Team selection chat
   socket.on('send_team_selection_chat', ({ gameId, message }: { gameId: string; message: string }) => {
+    // Rate limiting: Check if user is sending messages too quickly
+    const lastChatTime = socketRateLimiters.chat.get(socket.id);
+    const now = Date.now();
+    if (lastChatTime && now - lastChatTime < 1000) { // 1 second between messages
+      socket.emit('error', { message: 'Please wait 1 second between messages' });
+      return;
+    }
+    socketRateLimiters.chat.set(socket.id, now);
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1246,8 +1332,8 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Sanitize and limit message length
-    const sanitizedMessage = message.trim().substring(0, 200);
+    // Sanitize message
+    const sanitizedMessage = sanitizeChatMessage(message);
     if (!sanitizedMessage) {
       return;
     }
@@ -1264,6 +1350,15 @@ io.on('connection', (socket) => {
 
   // In-game chat (betting, playing, and scoring phases)
   socket.on('send_game_chat', ({ gameId, message }: { gameId: string; message: string }) => {
+    // Rate limiting: Check if user is sending messages too quickly
+    const lastChatTime = socketRateLimiters.chat.get(socket.id);
+    const now = Date.now();
+    if (lastChatTime && now - lastChatTime < 1000) { // 1 second between messages
+      socket.emit('error', { message: 'Please wait 1 second between messages' });
+      return;
+    }
+    socketRateLimiters.chat.set(socket.id, now);
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1281,8 +1376,8 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Sanitize and limit message length
-    const sanitizedMessage = message.trim().substring(0, 200);
+    // Sanitize message
+    const sanitizedMessage = sanitizeChatMessage(message);
     if (!sanitizedMessage) {
       return;
     }
@@ -2286,6 +2381,11 @@ io.on('connection', (socket) => {
   socket.on('disconnect', async () => {
     console.log('Client disconnected:', socket.id);
 
+    // Clean up rate limiters
+    socketRateLimiters.chat.delete(socket.id);
+    socketRateLimiters.bet.delete(socket.id);
+    socketRateLimiters.card.delete(socket.id);
+
     // Remove from online players
     const onlinePlayer = onlinePlayers.get(socket.id);
     onlinePlayers.delete(socket.id);
@@ -2703,12 +2803,110 @@ async function endRound(gameId: string) {
 const PORT = parseInt(process.env.PORT || '3001', 10);
 const HOST = '0.0.0.0';
 
-httpServer.listen(PORT, HOST, () => {
+httpServer.listen(PORT, HOST, async () => {
   console.log(`🚀 Trick Card Game Server running on ${HOST}:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
   if (process.env.NODE_ENV === 'development') {
     console.log(`🌐 CORS: ${corsOrigin === '*' ? 'All origins' : allowedOrigins.join(', ')}`);
   }
+
+  // ============= GAME STATE RECOVERY =============
+  // Load and restore game snapshots on server startup
+  try {
+    console.log('🔄 Attempting to restore game snapshots...');
+    const snapshots = await loadGameSnapshots();
+
+    for (const snapshot of snapshots) {
+      // Validate the game isn't already in memory
+      if (!games.has(snapshot.id)) {
+        // Restore the game state
+        games.set(snapshot.id, snapshot);
+        gameCreationTimes.set(snapshot.id, new Date());
+        console.log(`✅ Restored game ${snapshot.id} with ${snapshot.players.length} players`);
+
+        // Re-establish bot timeouts if needed
+        if (snapshot.phase === 'betting' || snapshot.phase === 'playing') {
+          const currentPlayer = snapshot.players.find(p => p.id === snapshot.currentPlayerId);
+          if (currentPlayer?.isBot) {
+            // Give bots a moment to reconnect/play
+            setTimeout(() => {
+              const game = games.get(snapshot.id);
+              if (game && game.phase === snapshot.phase && game.currentPlayerId === snapshot.currentPlayerId) {
+                handleBotTurn(snapshot.id);
+              }
+            }, 5000);
+          }
+        }
+      }
+    }
+
+    if (snapshots.length > 0) {
+      console.log(`🎮 Recovered ${snapshots.length} game(s) from previous session`);
+    } else {
+      console.log('💭 No games to recover');
+    }
+  } catch (error) {
+    console.error('⚠️ Failed to restore game snapshots:', error);
+  }
+
+  // ============= PERIODIC CLEANUP =============
+  // Clean up stale games every hour
+  setInterval(async () => {
+    try {
+      console.log('[Cleanup] Running stale game cleanup...');
+      const staleGames = await cleanupStaleGames();
+
+      // Remove from memory if exists
+      for (const staleGame of staleGames) {
+        if (games.has(staleGame.game_id)) {
+          games.delete(staleGame.game_id);
+          gameCreationTimes.delete(staleGame.game_id);
+          console.log(`[Cleanup] Removed stale game from memory: ${staleGame.game_id}`);
+        }
+      }
+
+      if (staleGames.length > 0) {
+        console.log(`[Cleanup] Cleaned up ${staleGames.length} stale game(s)`);
+      }
+    } catch (error) {
+      console.error('[Cleanup] Error during cleanup:', error);
+    }
+  }, 3600000); // Run every hour
+
+  // ============= PERIODIC STATE SNAPSHOTS =============
+  // Save game snapshots every 30 seconds for recovery
+  setInterval(async () => {
+    const activeGames = Array.from(games.values()).filter(game => !game.isFinished);
+
+    if (activeGames.length > 0) {
+      for (const game of activeGames) {
+        try {
+          await saveGameSnapshot(game.id, game);
+        } catch (error) {
+          console.error(`[Snapshot] Failed to save snapshot for game ${game.id}:`, error);
+        }
+      }
+
+      // Only log if we're actually saving snapshots
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Snapshot] Saved ${activeGames.length} game snapshot(s)`);
+      }
+    }
+  }, 30000); // Save every 30 seconds
+
+  // ============= INITIAL CLEANUP =============
+  // Run an initial cleanup on startup
+  setTimeout(async () => {
+    try {
+      console.log('[Startup] Running initial cleanup...');
+      const staleGames = await cleanupStaleGames();
+      if (staleGames.length > 0) {
+        console.log(`[Startup] Cleaned up ${staleGames.length} stale game(s) from previous sessions`);
+      }
+    } catch (error) {
+      console.error('[Startup] Initial cleanup failed:', error);
+    }
+  }, 5000); // Wait 5 seconds after startup
 }).on('error', (error: NodeJS.ErrnoException) => {
   console.error('❌ Server failed to start:', error.message);
   process.exit(1);

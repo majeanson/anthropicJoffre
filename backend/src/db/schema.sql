@@ -65,7 +65,18 @@ BEGIN
                    WHERE table_name='game_history' AND column_name='finished_at') THEN
         ALTER TABLE game_history ADD COLUMN finished_at TIMESTAMP;
     END IF;
+
+    -- Add game_state_snapshot column for crash recovery
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='game_history' AND column_name='game_state_snapshot') THEN
+        ALTER TABLE game_history ADD COLUMN game_state_snapshot JSONB;
+    END IF;
 END $$;
+
+-- Create indexes for better query performance
+CREATE INDEX IF NOT EXISTS idx_game_history_finished ON game_history(is_finished, created_at);
+CREATE INDEX IF NOT EXISTS idx_game_history_last_updated ON game_history(is_finished, last_updated_at);
+CREATE INDEX IF NOT EXISTS idx_game_history_game_id ON game_history(game_id);
 
 -- Player statistics table with comprehensive metrics
 CREATE TABLE IF NOT EXISTS player_stats (

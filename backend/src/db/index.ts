@@ -568,6 +568,116 @@ export const cleanupAbandonedGames = async () => {
   return result.rows;
 };
 
+/**
+ * Clean up stale games (games inactive for 2+ hours)
+ * More aggressive cleanup for unfinished games
+ */
+export const cleanupStaleGames = async () => {
+  try {
+    const text = `
+      UPDATE game_history
+      SET is_finished = TRUE,
+          finished_at = CURRENT_TIMESTAMP,
+          last_updated_at = CURRENT_TIMESTAMP
+      WHERE is_finished = FALSE
+        AND (
+          last_updated_at < NOW() - INTERVAL '2 hours'
+          OR (last_updated_at IS NULL AND created_at < NOW() - INTERVAL '2 hours')
+        )
+      RETURNING game_id, player_names
+    `;
+    const result = await query(text);
+    console.log(`[Cleanup] Marked ${result.rows.length} stale games as finished`);
+    return result.rows;
+  } catch (error) {
+    console.error('[Cleanup] Failed to cleanup stale games:', error);
+    return [];
+  }
+};
+
+/**
+ * Save game state snapshot for recovery
+ */
+export const saveGameSnapshot = async (gameId: string, gameState: GameState) => {
+  try {
+    const text = `
+      UPDATE game_history
+      SET game_state_snapshot = $1,
+          last_updated_at = CURRENT_TIMESTAMP
+      WHERE game_id = $2 AND is_finished = FALSE
+      RETURNING game_id
+    `;
+    const result = await query(text, [JSON.stringify(gameState), gameId]);
+    return result.rows[0];
+  } catch (error) {
+    console.error(`[Snapshot] Failed to save snapshot for game ${gameId}:`, error);
+    return null;
+  }
+};
+
+/**
+ * Load game state snapshots for recovery on server restart
+ */
+export const loadGameSnapshots = async (): Promise<GameState[]> => {
+  try {
+    const text = `
+      SELECT game_state_snapshot
+      FROM game_history
+      WHERE is_finished = FALSE
+        AND game_state_snapshot IS NOT NULL
+        AND last_updated_at > NOW() - INTERVAL '2 hours'
+      ORDER BY last_updated_at DESC
+    `;
+    const result = await query(text);
+
+    const snapshots: GameState[] = [];
+    for (const row of result.rows) {
+      try {
+        const snapshot = typeof row.game_state_snapshot === 'string'
+          ? JSON.parse(row.game_state_snapshot)
+          : row.game_state_snapshot;
+
+        // Validate the snapshot has required fields
+        if (snapshot && snapshot.id && snapshot.players && snapshot.phase) {
+          snapshots.push(snapshot);
+        }
+      } catch (parseError) {
+        console.error('[Recovery] Failed to parse game snapshot:', parseError);
+      }
+    }
+
+    console.log(`[Recovery] Loaded ${snapshots.length} game snapshots for recovery`);
+    return snapshots;
+  } catch (error) {
+    console.error('[Recovery] Failed to load game snapshots:', error);
+    return [];
+  }
+};
+
+/**
+ * Get active games that might need cleanup
+ */
+export const getActiveGamesForCleanup = async () => {
+  try {
+    const text = `
+      SELECT
+        game_id,
+        player_names,
+        created_at,
+        last_updated_at,
+        EXTRACT(EPOCH FROM (NOW() - COALESCE(last_updated_at, created_at))) / 3600 AS hours_inactive
+      FROM game_history
+      WHERE is_finished = FALSE
+      ORDER BY last_updated_at DESC NULLS LAST
+    `;
+    const result = await query(text);
+    return result.rows;
+  } catch (error) {
+    console.error('[Cleanup] Failed to get active games:', error);
+    return [];
+  }
+};
+
 // ============= LEGACY FUNCTIONS (keeping for backwards compatibility) =============
 
 export const saveGameHistory = async (

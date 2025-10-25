@@ -6,6 +6,7 @@ import './index.css';
 import { SocketProvider } from './contexts/SocketContext';
 import { GameProvider } from './contexts/GameContext';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Initialize Sentry for error tracking
 if (import.meta.env.VITE_SENTRY_DSN) {
@@ -29,12 +30,14 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <SocketProvider>
-      <GameProvider>
-        <SettingsProvider>
-          <App />
-        </SettingsProvider>
-      </GameProvider>
-    </SocketProvider>
+    <ErrorBoundary>
+      <SocketProvider>
+        <GameProvider>
+          <SettingsProvider>
+            <App />
+          </SettingsProvider>
+        </GameProvider>
+      </SocketProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );
