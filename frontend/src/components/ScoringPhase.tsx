@@ -187,7 +187,7 @@ export function ScoringPhase({
           </div>
         </div>
 
-        {/* Loading Animation - Show while data is being prepared */}
+        {/* Loading Animation OR Data Display */}
         {!dataReady ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="relative">
@@ -204,7 +204,7 @@ export function ScoringPhase({
             </div>
           </div>
         ) : (
-          <>
+          <div>
             {/* Team Scores - Large and Clear */}
             <div className="grid grid-cols-2 gap-6 mb-8">
           <div className="text-center p-6 bg-orange-50 dark:bg-orange-900/40 rounded-lg border-2 border-orange-200 dark:border-orange-600" data-testid="team-1-score-card">
@@ -434,9 +434,8 @@ export function ScoringPhase({
             </div>
           </div>
         )}
-          </>
+          </div>
         )}
-        </div>
       </div>
     </div>
   );
