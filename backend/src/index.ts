@@ -774,15 +774,36 @@ app.get('/api/games/lobby', async (req, res) => {
     // Add DB games that aren't in memory
     for (const dbGame of dbGames) {
       if (!gameMap.has(dbGame.gameId)) {
-        // Load full game state from DB
-        const fullGame = await loadGameFromDB(dbGame.gameId);
-        if (fullGame) {
-          gameMap.set(fullGame.id, fullGame);
+        try {
+          // Load full game state from DB
+          const fullGame = await loadGameFromDB(dbGame.gameId);
+
+          // Validate the loaded game has required properties
+          if (fullGame && fullGame.id && fullGame.players && Array.isArray(fullGame.players)) {
+            // Only add to map if game is in team_selection phase (joinable)
+            if (fullGame.phase === 'team_selection') {
+              gameMap.set(fullGame.id, fullGame);
+            } else {
+              console.log('[Lobby] Skipping non-joinable DB game:', fullGame.id, 'phase:', fullGame.phase);
+            }
+          } else {
+            console.warn('[Lobby] Invalid game loaded from DB:', dbGame.gameId);
+          }
+        } catch (error) {
+          console.error('[Lobby] Failed to load game from DB:', dbGame.gameId, error);
         }
       }
     }
 
     const activeGames = Array.from(gameMap.values())
+      .filter((game: GameState) => {
+        // Pre-filter: Only include games with valid structure
+        if (!game || !game.id || !game.players || !Array.isArray(game.players)) {
+          console.warn('[Lobby] Filtering out invalid game:', game?.id);
+          return false;
+        }
+        return true;
+      })
       .map((game: GameState) => {
         // Get actual player count (not including bots unless specified)
         const humanPlayerCount = game.players.filter((p: Player) => !p.isBot).length;
