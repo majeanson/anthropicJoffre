@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameReplay } from './GameReplay';
 
@@ -56,10 +56,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [replayGameId, setReplayGameId] = useState<string | null>(null);
 
+  // Track if we've done the initial load for each tab
+  const hasLoadedActiveGames = useRef(false);
+  const hasLoadedRecentGames = useRef(false);
+
   const fetchGames = async (isInitialLoad = false) => {
     try {
-      // Only show loading spinner on initial load, not on refresh
-      if (isInitialLoad || games.length === 0) {
+      // Only show loading spinner on first ever load
+      if (isInitialLoad && !hasLoadedActiveGames.current) {
         setLoading(true);
       }
       console.log('[LobbyBrowser] Fetching games from:', `${SOCKET_URL}/api/games/lobby`);
@@ -76,19 +80,21 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
       console.log('[LobbyBrowser] Received games:', data.games?.length || 0);
       setGames(data.games);
       setError(null);
+      hasLoadedActiveGames.current = true;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('[LobbyBrowser] Failed to load games:', errorMessage, err);
       setError(`Failed to load games: ${errorMessage}`);
     } finally {
+      // Always clear loading state if it was set
       setLoading(false);
     }
   };
 
   const fetchRecentGames = async (isInitialLoad = false) => {
     try {
-      // Only show loading spinner on initial load, not on refresh
-      if (isInitialLoad || recentGames.length === 0) {
+      // Only show loading spinner on first ever load
+      if (isInitialLoad && !hasLoadedRecentGames.current) {
         setLoading(true);
       }
       console.log('[LobbyBrowser] Fetching recent games from:', `${SOCKET_URL}/api/games/recent?limit=20`);
@@ -105,11 +111,13 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
       console.log('[LobbyBrowser] Received recent games:', data.games?.length || 0);
       setRecentGames(data.games);
       setError(null);
+      hasLoadedRecentGames.current = true;
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error';
       console.error('[LobbyBrowser] Failed to load recent games:', errorMessage, err);
       setError(`Failed to load recent games: ${errorMessage}`);
     } finally {
+      // Always clear loading state if it was set
       setLoading(false);
     }
   };
