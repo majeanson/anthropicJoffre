@@ -108,26 +108,7 @@ function App() {
 
     newSocket.on('connect', () => {
       setError(''); // Clear any connection errors
-
-      // Check for existing session and attempt reconnection
-      const sessionData = localStorage.getItem('gameSession');
-      if (sessionData) {
-        try {
-          const session: PlayerSession = JSON.parse(sessionData);
-
-          // Check if session is too old (older than 15 minutes - for mobile AFK)
-          const SESSION_TIMEOUT = 900000; // 15 minutes
-          if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
-            localStorage.removeItem('gameSession');
-            return;
-          }
-
-          setReconnecting(true);
-          newSocket.emit('reconnect_to_game', { token: session.token });
-        } catch (e) {
-          localStorage.removeItem('gameSession');
-        }
-      }
+      // Note: Removed automatic reconnection - now requires explicit Rejoin button click
     });
 
     newSocket.on('connect_error', () => {
@@ -859,17 +840,7 @@ function App() {
         botTimeoutsRef.current.set(botId, timeout);
       }
 
-      // Check if all players have teams and auto-start
-      const allHaveTeams = state.players.every(p => p.teamId);
-      const team1Count = state.players.filter(p => p.teamId === 1).length;
-      const team2Count = state.players.filter(p => p.teamId === 2).length;
-
-      if (allHaveTeams && team1Count === 2 && team2Count === 2 && state.players.length === 4) {
-        const timeout = setTimeout(() => {
-          botSocket.emit('start_game', { gameId: state.id });
-        }, 2000);
-        botTimeoutsRef.current.set(`${botId}-start`, timeout);
-      }
+      // Note: Removed auto-start logic - game now requires explicit Start Game button press
       return;
     }
 

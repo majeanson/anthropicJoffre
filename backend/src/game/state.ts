@@ -53,8 +53,8 @@ export function applyCardPlay(
   const currentPlayer = game.players[game.currentPlayerIndex];
   let trumpWasSet = false;
 
-  // Set trump on first card of first trick
-  if (game.currentTrick.length === 0 && !game.trump) {
+  // Set trump on first card of first trick (unless bet was "without trump")
+  if (game.currentTrick.length === 0 && !game.trump && !game.highestBet?.withoutTrump) {
     game.trump = card.color;
     trumpWasSet = true;
   }
@@ -527,8 +527,26 @@ export function calculateRoundScoring(game: GameState): RoundScoringResult {
     throw new Error('No highest bet found for scoring');
   }
 
-  const offensivePlayer = game.players.find(p => p.id === game.highestBet?.playerId);
+  // Look up betting player - try by ID first, then by name (in case player was replaced by bot)
+  let offensivePlayer = game.players.find(p => p.id === game.highestBet?.playerId);
+
+  // If not found by ID, try finding by playerId in currentBets (which has both playerId and name)
+  if (!offensivePlayer && game.highestBet?.playerId) {
+    const bet = game.currentBets.find(b => b.playerId === game.highestBet?.playerId);
+    if (bet) {
+      // Find player who placed this bet (might have different ID now if replaced by bot)
+      offensivePlayer = game.players.find(p =>
+        game.currentTrick.some(tc => tc.playerId === bet.playerId && tc.playerName === p.name)
+      );
+    }
+  }
+
   if (!offensivePlayer) {
+    console.error('Failed to find betting player. Game state:', {
+      highestBetPlayerId: game.highestBet?.playerId,
+      players: game.players.map(p => ({ id: p.id, name: p.name, isBot: p.isBot })),
+      currentBets: game.currentBets
+    });
     throw new Error('Betting player not found');
   }
 

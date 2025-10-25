@@ -46,12 +46,34 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
     const handleReplayData = ({ replayData }: { replayData: ReplayData }) => {
       console.log('[GameReplay] Received replay data for game:', replayData?.game_id, 'rounds:', replayData?.rounds);
+
+      // Validate replay data structure
+      if (!replayData) {
+        console.error('[GameReplay] Replay data is null or undefined');
+        setError('Replay data is missing');
+        setLoading(false);
+        return;
+      }
+
+      if (!replayData.round_history || !Array.isArray(replayData.round_history)) {
+        console.error('[GameReplay] round_history is missing or not an array:', replayData.round_history);
+        setError('Replay data is malformed (missing round history)');
+        setLoading(false);
+        return;
+      }
+
+      if (replayData.round_history.length === 0) {
+        console.warn('[GameReplay] round_history is empty for game:', replayData.game_id);
+        // Don't set error here - let the validation check below handle it with better UX
+      }
+
+      console.log('[GameReplay] Replay data validated successfully. Rounds:', replayData.round_history.length);
       setReplayData(replayData);
       setLoading(false);
     };
 
     const handleError = ({ message }: { message: string }) => {
-      console.error('[GameReplay] Error loading replay:', message);
+      console.error('[GameReplay] Error loading replay:', message, 'for game:', gameId);
       setError(message);
       setLoading(false);
     };
@@ -120,6 +142,34 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             <div className="text-4xl mb-4">❌</div>
             <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-4">
               {error || 'Failed to load replay'}
+            </p>
+            <button
+              onClick={onClose}
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Validate replay data has rounds
+  if (!replayData.round_history || replayData.round_history.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={onClose}>
+        <div
+          className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="text-center">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2">
+              No Replay Data Available
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              This game has no recorded rounds. The game may have ended prematurely or data was not saved.
             </p>
             <button
               onClick={onClose}

@@ -474,6 +474,10 @@ export const getPlayerGameHistory = async (playerName: string, limit: number = 2
     FROM game_history gh
     JOIN game_participants gp ON gh.game_id = gp.game_id
     WHERE gp.player_name = $1
+      AND (
+        gh.is_finished = FALSE
+        OR (gh.is_finished = TRUE AND gh.round_history IS NOT NULL AND jsonb_array_length(gh.round_history) > 0)
+      )
     ORDER BY gh.created_at DESC
     LIMIT $2
   `;
@@ -539,6 +543,8 @@ export const getAllFinishedGames = async (limit: number = 50, offset: number = 0
       finished_at
     FROM game_history
     WHERE is_finished = TRUE
+      AND round_history IS NOT NULL
+      AND jsonb_array_length(round_history) > 0
     ORDER BY finished_at DESC
     LIMIT $1 OFFSET $2
   `;

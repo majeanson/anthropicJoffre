@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useSettings } from '../contexts/SettingsContext';
 
 interface GameHeaderProps {
@@ -36,16 +37,34 @@ export function GameHeader({
   onSoundToggle
 }: GameHeaderProps) {
   const { darkMode, setDarkMode } = useSettings();
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const handleCopyGameLink = async () => {
+    const gameLink = `${window.location.origin}?gameId=${gameId}`;
+    try {
+      await navigator.clipboard.writeText(gameLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+    }
+  };
 
   return (
     <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1 sm:py-1.5">
         {/* Desktop: Single row - All items on same horizontal line */}
         <div className="hidden md:flex items-center gap-3">
-          {/* Game Info */}
-          <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
-            <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">{gameId}</p>
-          </div>
+          {/* Game Info - Clickable to copy link */}
+          <button
+            onClick={handleCopyGameLink}
+            className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0 hover:bg-white/30 dark:hover:bg-black/30 transition-all cursor-pointer border border-transparent hover:border-white/50"
+            title="Click to copy game link"
+          >
+            <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">
+              {linkCopied ? '✓ Copied!' : gameId}
+            </p>
+          </button>
           <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
             <p className="text-xs text-white dark:text-gray-100 font-bold" data-testid="round-number">R{roundNumber}</p>
           </div>
@@ -175,9 +194,15 @@ export function GameHeader({
         <div className="md:hidden space-y-1">
           {/* Row 1: Game Info and Scores */}
           <div className="flex items-center gap-2">
-            <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
-              <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">{gameId}</p>
-            </div>
+            <button
+              onClick={handleCopyGameLink}
+              className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0 active:bg-white/30 dark:active:bg-black/30"
+              title="Click to copy game link"
+            >
+              <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">
+                {linkCopied ? '✓' : gameId}
+              </p>
+            </button>
             <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
               <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
             </div>

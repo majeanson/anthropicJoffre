@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-25T00:30:00.000Z",
-  "version": "1.0.3",
+  "buildDate": "2025-10-25T01:35:00.000Z",
+  "version": "1.0.4",
   "git": {
-    "commitMessage": "feat: Enhance game replay with starting hands and statistics",
+    "commitMessage": "fix: Resolve 9 critical production issues and improve data filtering",
     "commitHash": "pending",
-    "commitDate": "2025-10-25 00:30:00 +0000",
+    "commitDate": "2025-10-25 01:35:00 +0000",
     "branch": "main"
   },
   "futureTodos": [

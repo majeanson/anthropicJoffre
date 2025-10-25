@@ -663,8 +663,8 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
 
   console.log(`Auto-playing (bot logic): ${selectedCard.color} ${selectedCard.value}`);
 
-  // Set trump on first card
-  if (game.currentTrick.length === 0 && !game.trump) {
+  // Set trump on first card (unless bet was "without trump")
+  if (game.currentTrick.length === 0 && !game.trump && !game.highestBet?.withoutTrump) {
     game.trump = selectedCard.color;
   }
 
@@ -782,42 +782,41 @@ app.get('/api/games/lobby', async (req, res) => {
       }
     }
 
-    const activeGames = Array.from(gameMap.values()).map((game: GameState) => {
-      // Get actual player count (not including bots unless specified)
-      const humanPlayerCount = game.players.filter((p: Player) => !p.isBot).length;
-      const botPlayerCount = game.players.filter((p: Player) => p.isBot).length;
+    const activeGames = Array.from(gameMap.values())
+      .map((game: GameState) => {
+        // Get actual player count (not including bots unless specified)
+        const humanPlayerCount = game.players.filter((p: Player) => !p.isBot).length;
+        const botPlayerCount = game.players.filter((p: Player) => p.isBot).length;
 
-      // Check if game is joinable
-      const isJoinable = game.phase === 'team_selection' && game.players.length < 4;
+        // Check if game is joinable (can join if not full, or if there are bots to replace)
+        const isJoinable = game.phase === 'team_selection' && (game.players.length < 4 || botPlayerCount > 0);
 
-      // Check if game is in progress
-      const isInProgress = game.phase === 'betting' || game.phase === 'playing' || game.phase === 'scoring';
+        // Check if game is in progress
+        const isInProgress = game.phase === 'betting' || game.phase === 'playing' || game.phase === 'scoring';
 
-      return {
-        gameId: game.id,
-        phase: game.phase,
-        playerCount: game.players.length,
-        humanPlayerCount,
-        botPlayerCount,
-        isJoinable,
-        isInProgress,
-        teamScores: game.teamScores,
-        roundNumber: game.roundNumber,
-        createdAt: gameCreationTimes.get(game.id) || Date.now(),
-        players: game.players.map((p: Player) => ({
-          name: p.name,
-          teamId: p.teamId,
-          isBot: p.isBot || false,
-        })),
-      };
-    });
+        return {
+          gameId: game.id,
+          phase: game.phase,
+          playerCount: game.players.length,
+          humanPlayerCount,
+          botPlayerCount,
+          isJoinable,
+          isInProgress,
+          teamScores: game.teamScores,
+          roundNumber: game.roundNumber,
+          createdAt: gameCreationTimes.get(game.id) || Date.now(),
+          players: game.players.map((p: Player) => ({
+            name: p.name,
+            teamId: p.teamId,
+            isBot: p.isBot || false,
+          })),
+        };
+      })
+      // Only show joinable games in the active games list
+      .filter(game => game.isJoinable);
 
-    // Sort by joinable first, then by creation time (newest first)
-    activeGames.sort((a, b) => {
-      if (a.isJoinable && !b.isJoinable) return -1;
-      if (!a.isJoinable && b.isJoinable) return 1;
-      return b.createdAt - a.createdAt;
-    });
+    // Sort by creation time (newest first)
+    activeGames.sort((a, b) => b.createdAt - a.createdAt);
 
     res.json({
       games: activeGames,
@@ -1761,11 +1760,31 @@ io.on('connection', (socket) => {
     const botName = getNextBotName(game);
     const oldSocketId = playerToReplace.id;
 
+    // Generate new unique ID for bot (bots don't have socket connections)
+    const newBotId = `bot-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
     // Update player to be a bot (preserve team, hand, scores, position)
     playerToReplace.name = botName;
     playerToReplace.isBot = true;
     playerToReplace.botDifficulty = 'hard';
-    // Note: Keep the same socket ID for now - bot socket will reconnect with new ID
+    playerToReplace.id = newBotId;
+
+    // IMPORTANT: Update player ID in currentTrick to fix card display after replacement
+    game.currentTrick.forEach(tc => {
+      if (tc.playerId === oldSocketId) {
+        tc.playerId = newBotId;
+      }
+    });
+
+    // IMPORTANT: Update player ID in bets to fix round scoring
+    game.currentBets.forEach(bet => {
+      if (bet.playerId === oldSocketId) {
+        bet.playerId = newBotId;
+      }
+    });
+    if (game.highestBet && game.highestBet.playerId === oldSocketId) {
+      game.highestBet.playerId = newBotId;
+    }
 
     // Clean up old player's sessions
     try {

@@ -87,6 +87,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'round' | 'game' | 'history'>('round');
+  const [historyTab, setHistoryTab] = useState<'finished' | 'unfinished'>('finished');
   const [gameHistory, setGameHistory] = useState<GameHistoryEntry[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
 
@@ -447,6 +448,30 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
               {/* Game History Tab */}
               {activeTab === 'history' && (
                 <div className="space-y-4 animate-fadeIn">
+                  {/* Sub-tabs for Finished/Unfinished */}
+                  <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
+                    <button
+                      onClick={() => setHistoryTab('finished')}
+                      className={`px-4 py-2 font-bold transition-all ${
+                        historyTab === 'finished'
+                          ? 'border-b-4 border-green-600 text-green-700 dark:text-green-400 -mb-0.5'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      ✓ Finished Games
+                    </button>
+                    <button
+                      onClick={() => setHistoryTab('unfinished')}
+                      className={`px-4 py-2 font-bold transition-all ${
+                        historyTab === 'unfinished'
+                          ? 'border-b-4 border-orange-600 text-orange-700 dark:text-orange-400 -mb-0.5'
+                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
+                      }`}
+                    >
+                      ⏸ Unfinished Games
+                    </button>
+                  </div>
+
                   {historyLoading && (
                     <div className="text-center py-12">
                       <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-green-700"></div>
@@ -466,13 +491,29 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                     </div>
                   )}
 
-                  {!historyLoading && gameHistory.length > 0 && (
-                    <>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Showing last {gameHistory.length} games
-                      </p>
-                      <div className="space-y-3">
-                        {gameHistory.map((game) => (
+                  {!historyLoading && gameHistory.length > 0 && (() => {
+                    const filteredGames = gameHistory.filter(game =>
+                      historyTab === 'finished' ? game.is_finished : !game.is_finished
+                    );
+
+                    if (filteredGames.length === 0) {
+                      return (
+                        <div className="text-center py-12">
+                          <span className="text-4xl">🔍</span>
+                          <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold">
+                            No {historyTab} games found
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Showing {filteredGames.length} {historyTab} game{filteredGames.length !== 1 ? 's' : ''}
+                        </p>
+                        <div className="space-y-3">
+                          {filteredGames.map((game) => (
                           <div
                             key={game.game_id}
                             className={`rounded-lg p-4 border-2 ${
@@ -551,10 +592,11 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                               </button>
                             )}
                           </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
+                          ))}
+                        </div>
+                      </>
+                    );
+                  })()}
                 </div>
               )}
 
