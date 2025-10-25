@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { RoundHistory, TrickResult, TrickCard } from '../types/game';
+import { RoundHistory } from '../types/game';
 import { sounds } from '../utils/sounds';
+import { TrickHistory } from './TrickHistory';
 
 interface ReplayData {
   game_id: string;
@@ -138,6 +139,32 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   const hasPrevRound = currentRoundIndex > 0;
   const hasNextTrick = currentTrickIndex < currentTricks.length - 1;
   const hasPrevTrick = currentTrickIndex > 0;
+
+  // Calculate starting hands from trick history
+  const calculateStartingHands = () => {
+    if (!currentRound?.tricks || currentRound.tricks.length === 0) return {};
+
+    const hands: Record<string, any[]> = {};
+    replayData.player_names.forEach(name => hands[name] = []);
+
+    currentRound.tricks.forEach(trick => {
+      trick.trick.forEach(trickCard => {
+        hands[trickCard.playerName].push(trickCard.card);
+      });
+    });
+
+    // Sort each hand by color then value
+    Object.keys(hands).forEach(playerName => {
+      hands[playerName].sort((a, b) => {
+        if (a.color !== b.color) return a.color.localeCompare(b.color);
+        return a.value - b.value;
+      });
+    });
+
+    return hands;
+  };
+
+  const startingHands = calculateStartingHands();
 
   const handleNextRound = () => {
     if (hasNextRound) {
@@ -396,7 +423,15 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                     <div>
                       <p className="text-sm text-blue-200 font-semibold mb-1">Highest Bidder</p>
                       <p className="text-lg font-bold text-white">
-                        {currentRound.highestBet?.playerId || 'Unknown'}
+                        {(() => {
+                          // Find player name from the first trick's winner or any trick player
+                          if (currentRound.tricks && currentRound.tricks.length > 0) {
+                            const firstTrick = currentRound.tricks[0];
+                            const bidder = firstTrick.trick.find(tc => tc.playerId === currentRound.highestBet?.playerId);
+                            if (bidder) return bidder.playerName;
+                          }
+                          return 'Unknown';
+                        })()}
                       </p>
                       <p className="text-xs text-blue-300">Team {currentRound.offensiveTeam}</p>
                     </div>
@@ -469,6 +504,90 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 </div>
               </section>
 
+              {/* Starting Hands */}
+              {Object.keys(startingHands).length > 0 && (
+                <section className="mb-6">
+                  <h3 className="text-xl font-bold text-white mb-4 border-b-2 border-white/30 pb-2">
+                    🃏 Starting Hands
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {Object.entries(startingHands).map(([playerName, cards]) => {
+                      const playerIndex = replayData.player_names.indexOf(playerName);
+                      const teamId = replayData.player_teams[playerIndex];
+                      const teamColor = teamId === 1 ? 'from-orange-500/20 to-orange-600/20 border-orange-400' : 'from-purple-500/20 to-purple-600/20 border-purple-400';
+
+                      return (
+                        <div key={playerName} className={`bg-gradient-to-r ${teamColor} rounded-lg p-3 border-2`}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-bold text-white">{playerName}</span>
+                            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${teamId === 1 ? 'bg-orange-500 text-white' : 'bg-purple-500 text-white'}`}>
+                              Team {teamId}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-4 gap-1">
+                            {(cards as any[]).map((card, idx) => (
+                              <div key={idx} className="bg-gray-800/50 rounded p-1 text-center">
+                                <div className={`text-lg font-bold ${
+                                  card.color === 'red' ? 'text-red-400' :
+                                  card.color === 'blue' ? 'text-blue-400' :
+                                  card.color === 'green' ? 'text-green-400' :
+                                  card.color === 'brown' ? 'text-amber-500' :
+                                  'text-gray-400'
+                                }`}>
+                                  {card.value}
+                                </div>
+                                <div className="text-xs text-gray-400 capitalize">{card.color}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {/* Game Statistics */}
+              <section className="mb-6">
+                <h3 className="text-xl font-bold text-white mb-4 border-b-2 border-white/30 pb-2">
+                  📊 Round Statistics
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Trick count */}
+                  <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg p-4 border-2 border-blue-400">
+                    <p className="text-blue-200 text-sm font-semibold mb-1">Total Tricks</p>
+                    <p className="text-3xl font-bold text-white">{currentRound.tricks?.length || 0}</p>
+                  </div>
+
+                  {/* Points distribution */}
+                  <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-lg p-4 border-2 border-emerald-400">
+                    <p className="text-emerald-200 text-sm font-semibold mb-1">Points Earned</p>
+                    <p className="text-xl font-bold text-white">
+                      Team 1: {currentRound.offensiveTeam === 1 ? currentRound.offensivePoints : currentRound.defensivePoints}
+                      {' | '}
+                      Team 2: {currentRound.offensiveTeam === 2 ? currentRound.offensivePoints : currentRound.defensivePoints}
+                    </p>
+                  </div>
+
+                  {/* Bet result */}
+                  <div className={`bg-gradient-to-r rounded-lg p-4 border-2 ${
+                    currentRound.betMade
+                      ? 'from-green-500/20 to-lime-500/20 border-green-400'
+                      : 'from-red-500/20 to-pink-500/20 border-red-400'
+                  }`}>
+                    <p className={`text-sm font-semibold mb-1 ${currentRound.betMade ? 'text-green-200' : 'text-red-200'}`}>
+                      Bet Status
+                    </p>
+                    <p className="text-xl font-bold text-white">
+                      {currentRound.betMade ? '✓ Made' : '✗ Failed'}
+                    </p>
+                    <p className="text-sm text-gray-300">
+                      {currentRound.offensivePoints}/{currentRound.betAmount} pts
+                    </p>
+                  </div>
+                </div>
+              </section>
+
               {/* Tricks Played */}
               {currentRound.tricks && currentRound.tricks.length > 0 && (
                 <section>
@@ -483,66 +602,20 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                         </span>
                       </div>
                     )}
-                    <div className="space-y-3">
-                      {currentRound.tricks.slice(0, currentTrickIndex + 1).map((trick: TrickResult, trickIndex: number) => {
-                        const winnerName = trick.winnerId || 'Unknown';
-                        const winnerIndex = replayData.player_names.indexOf(trick.winnerId);
-                        const winnerTeam = winnerIndex >= 0 ? replayData.player_teams[winnerIndex] : 1;
-
-                        const winnerTeamColor = winnerTeam === 1
-                          ? 'bg-orange-500 text-white border-2 border-orange-700'
-                          : 'bg-purple-500 text-white border-2 border-purple-700';
-
-                        const isCurrentTrick = trickIndex === currentTrickIndex;
-
-                        return (
-                          <div key={trickIndex} className={`bg-gray-800 rounded-lg p-3 border-2 ${
-                            isCurrentTrick ? 'border-yellow-400 ring-2 ring-yellow-500' : 'border-gray-600'
-                          }`}>
-                            <div className="flex items-center justify-between mb-3">
-                              <span className="text-sm font-bold text-white">
-                                Trick {trickIndex + 1}
-                              </span>
-                              <span className={`text-xs px-3 py-1 rounded-full font-semibold ${winnerTeamColor}`}>
-                                👑 {winnerName} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
-                              </span>
-                            </div>
-                            <div className="grid grid-cols-4 gap-2">
-                              {trick.trick.map((trickCard: TrickCard, cardIndex: number) => {
-                                const playerName = trickCard.playerId || 'Unknown';
-                                const isWinner = trickCard.playerId === trick.winnerId;
-
-                                return (
-                                  <div key={cardIndex} className="text-center">
-                                    <div className={`mb-1 p-2 rounded-lg border-2 ${
-                                      isWinner
-                                        ? 'bg-yellow-500/30 border-yellow-400'
-                                        : 'bg-gray-700 border-gray-600'
-                                    }`}>
-                                      <div className={`text-2xl font-bold mb-1 ${
-                                        trickCard.card.color === 'red' ? 'text-red-500' :
-                                        trickCard.card.color === 'blue' ? 'text-blue-500' :
-                                        trickCard.card.color === 'green' ? 'text-green-500' :
-                                        trickCard.card.color === 'brown' ? 'text-amber-600' :
-                                        'text-gray-400'
-                                      }`}>
-                                        {trickCard.card.value}
-                                      </div>
-                                      <div className="text-xs font-semibold text-gray-400 capitalize">
-                                        {trickCard.card.color}
-                                      </div>
-                                    </div>
-                                    <p className="text-xs font-medium text-gray-300 truncate">
-                                      {playerName}
-                                    </p>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <TrickHistory
+                      tricks={currentRound.tricks.slice(0, currentTrickIndex + 1)}
+                      players={replayData.player_names.map((name, idx) => ({
+                        id: name,
+                        name: name,
+                        teamId: replayData.player_teams[idx],
+                        hand: [],
+                        tricksWon: 0,
+                        pointsWon: 0
+                      }))}
+                      trump={currentRound.trump}
+                      currentTrickIndex={currentTrickIndex}
+                      showWinner={true}
+                    />
                   </div>
                 </section>
               )}

@@ -459,6 +459,17 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                           <span className="text-xl">🏆</span>
                           Global Leaderboard
                         </button>
+
+                        <button
+                          onClick={() => {
+                            sounds.buttonClick();
+                            setShowBrowser(true);
+                          }}
+                          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-700 dark:to-pink-800 text-white py-4 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-700 transition-all duration-200 border border-purple-800 dark:border-pink-600 shadow flex items-center justify-center gap-2"
+                        >
+                          <span className="text-xl">📜</span>
+                          Recent Games
+                        </button>
                       </div>
 
                       {!socket && (

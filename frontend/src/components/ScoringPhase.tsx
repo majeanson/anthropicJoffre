@@ -4,6 +4,7 @@ import { GameState, RoundStatistics } from '../types/game';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { sounds } from '../utils/sounds';
 import { GameHeader } from './GameHeader';
+import { TrickHistory } from './TrickHistory';
 
 interface ScoringPhaseProps {
   gameState: GameState;
@@ -320,57 +321,12 @@ export function ScoringPhase({
                   </span>
                 </div>
               )}
-              <div className="space-y-3">
-                {latestRound.tricks.map((trick, trickIndex) => {
-                  const winner = gameState.players.find(p => p.id === trick.winnerId);
-                  const winnerTeamColor = winner?.teamId === 1
-                    ? 'bg-orange-500 text-white border-2 border-orange-700'
-                    : 'bg-purple-500 text-white border-2 border-purple-700';
-                  return (
-                    <div key={trickIndex} className="bg-white dark:bg-gray-700 rounded-lg p-3 border-2 border-gray-300 dark:border-gray-600">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                          Trick {trickIndex + 1}
-                        </span>
-                        <span className={`text-xs px-3 py-1 rounded-full font-semibold ${winnerTeamColor}`}>
-                          👑 {winner?.name || 'Unknown'} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-4 gap-2">
-                        {trick.trick.map((trickCard, cardIndex) => {
-                          const player = gameState.players.find(p => p.id === trickCard.playerId);
-                          const isWinner = trickCard.playerId === trick.winnerId;
-                          return (
-                            <div key={cardIndex} className="text-center">
-                              <div className={`mb-1 p-2 rounded-lg border-2 ${
-                                isWinner
-                                  ? 'bg-yellow-100 dark:bg-yellow-900/50 border-yellow-400'
-                                  : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                              }`}>
-                                <div className={`text-2xl font-bold mb-1 ${
-                                  trickCard.card.color === 'red' ? 'text-red-600' :
-                                  trickCard.card.color === 'blue' ? 'text-blue-600' :
-                                  trickCard.card.color === 'green' ? 'text-green-600' :
-                                  trickCard.card.color === 'brown' ? 'text-amber-800 dark:text-amber-600' :
-                                  'text-gray-600'
-                                }`}>
-                                  {trickCard.card.value}
-                                </div>
-                                <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 capitalize">
-                                  {trickCard.card.color}
-                                </div>
-                              </div>
-                              <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">
-                                {player?.name || 'Unknown'}
-                              </p>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <TrickHistory
+                tricks={latestRound.tricks}
+                players={gameState.players}
+                trump={latestRound.trump}
+                showWinner={true}
+              />
             </div>
           </section>
         )}
