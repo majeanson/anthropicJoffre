@@ -3,7 +3,7 @@
   "version": "1.0.5",
   "git": {
     "commitMessage": "fix: Add crash recovery, data validation, and lobby filtering",
-    "commitHash": "pending",
+    "commitHash": "47e6328",
     "commitDate": "2025-10-25 01:50:00 +0000",
     "branch": "main"
   },
