@@ -183,3 +183,300 @@ export async function playFullRound(pages: Page[]) {
   // Wait for scoring phase to appear
   await pages[0].getByTestId('scoring-phase-heading').waitFor({ timeout: 10000 });
 }
+
+// ===== NEW BOT AND COMPREHENSIVE TESTING UTILITIES =====
+
+export interface GameConfig {
+  humanPlayers: number;
+  botPlayers: number;
+  startScores?: { team1: number; team2: number };
+  playerNames?: string[];
+}
+
+/**
+ * Creates a game with a mix of human players and bots.
+ *
+ * @param browser - Browser instance
+ * @param config - Configuration for human and bot players
+ * @returns Object with contexts, pages, gameId, and bot information
+ */
+export async function createGameWithBots(browser: any, config: GameConfig) {
+  const totalPlayers = config.humanPlayers + config.botPlayers;
+  const pages: Page[] = [];
+  const contexts: any[] = [];
+  const botPlayerIndices: number[] = [];
+  let gameId: string | null = null;
+
+  // Create human players first
+  for (let i = 0; i < config.humanPlayers; i++) {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/');
+
+    const playerName = config.playerNames?.[i] || `Player ${i + 1}`;
+
+    if (i === 0) {
+      // First player creates the game
+      await page.getByTestId('create-game-button').click();
+      await page.getByTestId('player-name-input').fill(playerName);
+      await page.getByTestId('submit-create-button').click();
+
+      await page.getByTestId('game-id').waitFor({ timeout: 10000 });
+      gameId = await page.getByTestId('game-id').textContent();
+    } else {
+      // Other human players join
+      await page.getByTestId('join-game-button').click();
+      await page.getByTestId('game-id-input').fill(gameId!);
+      await page.getByTestId('player-name-input').fill(playerName);
+      await page.getByTestId('submit-join-button').click();
+    }
+
+    pages.push(page);
+    contexts.push(context);
+  }
+
+  // Create bot players
+  for (let i = config.humanPlayers; i < totalPlayers; i++) {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.goto('/');
+
+    const botName = config.playerNames?.[i] || `Bot ${i - config.humanPlayers + 1}`;
+
+    await page.getByTestId('join-game-button').click();
+    await page.getByTestId('game-id-input').fill(gameId!);
+    await page.getByTestId('player-name-input').fill(botName);
+    await page.getByTestId('submit-join-button').click();
+
+    pages.push(page);
+    contexts.push(context);
+    botPlayerIndices.push(i);
+  }
+
+  // Wait for team selection
+  await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
+
+  // Set initial scores if provided
+  if (config.startScores) {
+    await pages[0].evaluate((scores) => {
+      // @ts-ignore
+      if (window.socket) {
+        // @ts-ignore
+        window.socket.emit('__test_set_scores', scores);
+      }
+    }, config.startScores);
+    await pages[0].waitForTimeout(500);
+  }
+
+  // Enable autoplay for bot players
+  for (const botIndex of botPlayerIndices) {
+    await enableAutoplayForPlayer(pages[botIndex]);
+  }
+
+  // Start the game
+  await pages[0].getByTestId('start-game-button').click();
+
+  // Wait for betting phase
+  await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
+
+  return { contexts, pages, gameId, botPlayerIndices };
+}
+
+/**
+ * Enables autoplay mode for a specific player.
+ *
+ * @param page - Page instance of the player
+ */
+export async function enableAutoplayForPlayer(page: Page) {
+  // Look for the autoplay toggle button
+  const autoplayButton = page.getByRole('button', { name: /manual|auto/i });
+
+  // Check if it's currently showing "Manual"
+  const buttonText = await autoplayButton.textContent();
+  if (buttonText?.toLowerCase().includes('manual')) {
+    await autoplayButton.click();
+    await page.waitForTimeout(200);
+  }
+}
+
+/**
+ * Waits for a bot to make its decision.
+ *
+ * @param page - Page instance to monitor
+ * @param timeout - Maximum time to wait (default: 5000ms)
+ */
+export async function waitForBotAction(page: Page, timeout: number = 5000) {
+  // Wait for either "Waiting for other players" or a state change
+  await Promise.race([
+    page.waitForSelector('text=/Waiting for other players/i', { timeout }),
+    page.waitForTimeout(timeout)
+  ]);
+}
+
+/**
+ * Plays multiple complete rounds.
+ *
+ * @param pages - Array of all player page instances
+ * @param roundCount - Number of rounds to play
+ * @param botIndices - Indices of bot players (will act automatically)
+ */
+export async function playMultipleRounds(pages: Page[], roundCount: number, botIndices: number[] = []) {
+  for (let round = 0; round < roundCount; round++) {
+    console.log(`Playing round ${round + 1}/${roundCount}`);
+
+    // Wait for betting phase
+    await pages[0].waitForSelector('text=/Betting Phase/i', { timeout: 15000 });
+
+    // Betting phase - bots will bet automatically, humans need to bet
+    for (let i = 0; i < 4; i++) {
+      const currentPlayerIndex = await findCurrentPlayerIndex(pages);
+
+      if (currentPlayerIndex !== -1 && !botIndices.includes(currentPlayerIndex)) {
+        // Human player needs to bet
+        const page = pages[currentPlayerIndex];
+        const skipBtn = page.getByTestId('skip-bet-button');
+        const bet8Btn = page.getByTestId('bet-8-with-trump');
+
+        // Try to bet 8, otherwise skip
+        if (await bet8Btn.isVisible({ timeout: 1000 })) {
+          await bet8Btn.click();
+        } else if (await skipBtn.isVisible({ timeout: 1000 })) {
+          await skipBtn.click();
+        }
+      } else {
+        // Bot will bet automatically
+        await waitForBotAction(pages[0]);
+      }
+
+      await pages[0].waitForTimeout(500);
+    }
+
+    // Playing phase - play 8 tricks
+    await playFullRound(pages);
+
+    // Wait for scoring phase and click ready
+    await pages[0].waitForSelector('text=/Scoring Phase/i', { timeout: 10000 });
+
+    // All players click ready (bots will auto-ready)
+    for (let i = 0; i < pages.length; i++) {
+      if (!botIndices.includes(i)) {
+        const readyBtn = pages[i].getByTestId('ready-for-next-round-button');
+        if (await readyBtn.isVisible({ timeout: 1000 })) {
+          await readyBtn.click();
+        }
+      }
+    }
+
+    await pages[0].waitForTimeout(1000);
+  }
+}
+
+/**
+ * Verifies the current game state matches expectations.
+ *
+ * @param page - Page instance to check
+ * @param expectedState - Expected state values
+ */
+export async function verifyGameState(page: Page, expectedState: {
+  phase?: string;
+  team1Score?: number;
+  team2Score?: number;
+  roundNumber?: number;
+}) {
+  if (expectedState.phase) {
+    const phaseText = await page.locator('text=/' + expectedState.phase + '/i').first();
+    await expect(phaseText).toBeVisible();
+  }
+
+  if (expectedState.team1Score !== undefined || expectedState.team2Score !== undefined) {
+    const scores = await page.locator('[data-testid="team-scores"]').textContent();
+    if (expectedState.team1Score !== undefined) {
+      expect(scores).toContain(`Team 1: ${expectedState.team1Score}`);
+    }
+    if (expectedState.team2Score !== undefined) {
+      expect(scores).toContain(`Team 2: ${expectedState.team2Score}`);
+    }
+  }
+
+  if (expectedState.roundNumber !== undefined) {
+    const roundText = await page.locator('text=/Round ' + expectedState.roundNumber + '/i').first();
+    await expect(roundText).toBeVisible();
+  }
+}
+
+/**
+ * Measures the duration of a round from betting to scoring.
+ *
+ * @param pages - Array of all player page instances
+ * @returns Duration in milliseconds
+ */
+export async function measureRoundDuration(pages: Page[]): Promise<number> {
+  const startTime = Date.now();
+
+  // Wait for betting phase to start
+  await pages[0].waitForSelector('text=/Betting Phase/i', { timeout: 10000 });
+
+  // Play through the round (assuming bots or automated play)
+  await pages[0].waitForSelector('text=/Scoring Phase/i', { timeout: 300000 });
+
+  const endTime = Date.now();
+  return endTime - startTime;
+}
+
+/**
+ * Verifies score progression over multiple rounds.
+ *
+ * @param page - Page instance to monitor
+ * @param expectedProgression - Array of expected score pairs [team1, team2]
+ */
+export async function verifyScoreProgression(page: Page, expectedProgression: Array<[number, number]>) {
+  for (const [expectedTeam1, expectedTeam2] of expectedProgression) {
+    await verifyGameState(page, {
+      team1Score: expectedTeam1,
+      team2Score: expectedTeam2
+    });
+  }
+}
+
+/**
+ * Plays a complete game from start to finish.
+ *
+ * @param pages - Array of all player page instances
+ * @param botIndices - Indices of bot players
+ * @param targetScore - Score to reach for game end (default: 41)
+ */
+export async function playCompleteGame(pages: Page[], botIndices: number[] = [], targetScore: number = 41) {
+  let gameEnded = false;
+  let roundCount = 0;
+  const maxRounds = 20; // Safety limit
+
+  while (!gameEnded && roundCount < maxRounds) {
+    roundCount++;
+    console.log(`Starting round ${roundCount}`);
+
+    await playMultipleRounds(pages, 1, botIndices);
+
+    // Check if game has ended
+    const gameOverElement = pages[0].locator('text=/Game Over/i');
+    gameEnded = await gameOverElement.isVisible({ timeout: 1000 });
+
+    if (!gameEnded) {
+      // Check scores
+      const scoresText = await pages[0].locator('[data-testid="team-scores"]').textContent();
+      const team1Match = scoresText?.match(/Team 1: (\d+)/);
+      const team2Match = scoresText?.match(/Team 2: (\d+)/);
+
+      if (team1Match && team2Match) {
+        const team1Score = parseInt(team1Match[1]);
+        const team2Score = parseInt(team2Match[1]);
+
+        if (team1Score >= targetScore || team2Score >= targetScore) {
+          console.log(`Game should end - Team 1: ${team1Score}, Team 2: ${team2Score}`);
+          gameEnded = true;
+        }
+      }
+    }
+  }
+
+  return { roundCount, gameEnded };
+}

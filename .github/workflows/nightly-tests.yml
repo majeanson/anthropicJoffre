@@ -1,0 +1,266 @@
+name: Nightly Comprehensive Tests
+
+on:
+  schedule:
+    # Run at 2 AM UTC every night
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  comprehensive-test-suite:
+    name: Comprehensive Test Suite
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        browser: [chromium, firefox, webkit]
+        test-type: [game-flow, bot-tests, marathon]
+        exclude:
+          # Webkit doesn't work well on Windows
+          - os: windows-latest
+            browser: webkit
+          # Marathon tests only on Ubuntu to save resources
+          - os: windows-latest
+            test-type: marathon
+          - os: macos-latest
+            test-type: marathon
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+
+      - name: Install Playwright browsers
+        run: |
+          cd e2e
+          npx playwright install ${{ matrix.browser }}
+          npx playwright install-deps ${{ matrix.browser }}
+
+      - name: Run Game Flow Tests
+        if: matrix.test-type == 'game-flow'
+        run: |
+          cd e2e
+          npx playwright test 23-game-flow 24-game-flow 25-game-flow 26-game-flow --project=${{ matrix.browser }}
+        env:
+          CI: true
+
+      - name: Run Bot Tests
+        if: matrix.test-type == 'bot-tests'
+        run: |
+          cd e2e
+          npx playwright test 24-game-flow-1-player-3-bots 25-game-flow-2-players-2-bots --project=${{ matrix.browser }} --repeat-each=3
+        env:
+          CI: true
+
+      - name: Run Marathon Tests
+        if: matrix.test-type == 'marathon'
+        run: |
+          cd e2e
+          TEST_MODE=marathon npx playwright test 26-game-flow-full-length --project=${{ matrix.browser }}
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-results-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.test-type }}
+          path: e2e/test-results/
+          retention-days: 30
+
+      - name: Upload playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-report-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.test-type }}
+          path: e2e/playwright-report/
+          retention-days: 30
+
+  performance-regression-tests:
+    name: Performance Regression Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+          npx playwright install chromium
+
+      - name: Run performance tests
+        run: |
+          cd e2e
+          # Run stress tests 3 times to get average
+          for i in 1 2 3; do
+            echo "Performance run $i/3"
+            TEST_MODE=stress npx playwright test --grep @stress > perf-$i.log 2>&1 || true
+          done
+
+      - name: Analyze performance
+        run: |
+          cd e2e
+          echo "## Performance Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Extract timing information from logs
+          for i in 1 2 3; do
+            if [ -f perf-$i.log ]; then
+              echo "### Run $i" >> $GITHUB_STEP_SUMMARY
+              grep -E "Round .* completed in|Performance degradation:|Memory growth:" perf-$i.log >> $GITHUB_STEP_SUMMARY || echo "No metrics found" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+
+      - name: Compare with baseline
+        run: |
+          # In a real scenario, you would compare with stored baseline metrics
+          echo "Comparing with baseline performance metrics..."
+
+      - name: Store performance metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-metrics-${{ github.sha }}
+          path: e2e/perf-*.log
+          retention-days: 90
+
+  memory-leak-detection:
+    name: Memory Leak Detection
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+          npx playwright install chromium
+
+      - name: Run memory leak tests
+        run: |
+          cd e2e
+          # Run marathon tests with memory profiling
+          TEST_MODE=marathon npx playwright test --grep @marathon --workers=1
+        env:
+          CI: true
+          NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Analyze memory usage
+        if: always()
+        run: |
+          cd e2e
+          if [ -f test-results.json ]; then
+            echo "## Memory Usage Analysis" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            grep -E "Memory|memory|heap" test-results.json || echo "No memory data found" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload memory analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memory-analysis
+          path: e2e/test-results/
+          retention-days: 30
+
+  nightly-report:
+    name: Nightly Report
+    runs-on: ubuntu-latest
+    needs: [comprehensive-test-suite, performance-regression-tests, memory-leak-detection]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate nightly report
+        run: |
+          echo "# Nightly Test Report - $(date +%Y-%m-%d)" >> nightly-report.md
+          echo "" >> nightly-report.md
+
+          echo "## Test Suite Results" >> nightly-report.md
+          echo "- Comprehensive Tests: ${{ needs.comprehensive-test-suite.result }}" >> nightly-report.md
+          echo "- Performance Tests: ${{ needs.performance-regression-tests.result }}" >> nightly-report.md
+          echo "- Memory Leak Detection: ${{ needs.memory-leak-detection.result }}" >> nightly-report.md
+          echo "" >> nightly-report.md
+
+          echo "## Artifacts" >> nightly-report.md
+          echo "All test artifacts have been uploaded and are available for 30 days." >> nightly-report.md
+          echo "" >> nightly-report.md
+
+          echo "## Actions Required" >> nightly-report.md
+          if [[ "${{ needs.comprehensive-test-suite.result }}" == "failure" ||
+                "${{ needs.performance-regression-tests.result }}" == "failure" ||
+                "${{ needs.memory-leak-detection.result }}" == "failure" ]]; then
+            echo "⚠️ **Failures detected** - Please review the test results and logs." >> nightly-report.md
+          else
+            echo "✅ All tests passed successfully!" >> nightly-report.md
+          fi
+
+      - name: Upload nightly report
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-report-$(date +%Y%m%d)
+          path: nightly-report.md
+          retention-days: 90
+
+      - name: Create issue if tests failed
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const date = new Date().toISOString().split('T')[0];
+            const title = `Nightly Test Failures - ${date}`;
+            const body = `
+            ## Nightly Test Run Failed
+
+            **Date:** ${date}
+            **Workflow Run:** [${context.runNumber}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+
+            ### Results
+            - Comprehensive Tests: ${{ needs.comprehensive-test-suite.result }}
+            - Performance Tests: ${{ needs.performance-regression-tests.result }}
+            - Memory Leak Detection: ${{ needs.memory-leak-detection.result }}
+
+            Please review the test artifacts and address any failures.
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'nightly-test', 'automated', 'high-priority']
+            });

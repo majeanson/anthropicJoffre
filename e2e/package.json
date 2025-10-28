@@ -7,7 +7,19 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "test:quick": "playwright test --grep @quick",
+    "test:full": "playwright test --grep @full",
+    "test:stress": "playwright test --grep @stress",
+    "test:marathon": "playwright test --grep @marathon",
+    "test:game-flow": "playwright test 23-game-flow 24-game-flow 25-game-flow 26-game-flow",
+    "test:4-players": "playwright test 23-game-flow-4-players",
+    "test:with-bots": "playwright test 24-game-flow-1-player-3-bots 25-game-flow-2-players-2-bots",
+    "test:full-length": "playwright test 26-game-flow-full-length",
+    "test:continuous": "playwright test --repeat-each=3 --workers=2 23-game-flow 24-game-flow 25-game-flow",
+    "test:ci-quick": "playwright test --grep @quick --workers=4",
+    "test:ci-full": "playwright test --grep='@quick|@full' --workers=2",
+    "test:ci-stress": "playwright test --grep='@stress|@marathon' --workers=1"
   },
   "devDependencies": {
     "@playwright/test": "^1.42.1",

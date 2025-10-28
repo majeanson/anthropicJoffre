@@ -1,0 +1,311 @@
+name: Continuous Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run tests every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Test mode to run'
+        required: false
+        default: 'quick'
+        type: choice
+        options:
+          - quick
+          - full
+          - stress
+          - marathon
+          - continuous
+
+jobs:
+  quick-tests:
+    name: Quick Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+          npx playwright install chromium
+
+      - name: Run Quick Tests (Shard ${{ matrix.shard }}/4)
+        run: |
+          cd e2e
+          TEST_MODE=quick SHARD_INDEX=${{ matrix.shard }} SHARD_TOTAL=4 npm run test:quick
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-test-results-shard-${{ matrix.shard }}
+          path: e2e/test-results/
+          retention-days: 7
+
+      - name: Upload playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quick-playwright-report-shard-${{ matrix.shard }}
+          path: e2e/playwright-report/
+          retention-days: 7
+
+  full-tests:
+    name: Full Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+          npx playwright install
+
+      - name: Run Full Tests
+        run: |
+          cd e2e
+          TEST_MODE=full npm run test:full
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-test-results
+          path: e2e/test-results/
+          retention-days: 14
+
+  stress-tests:
+    name: Stress Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_mode == 'stress')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+          npx playwright install chromium
+
+      - name: Run Stress Tests
+        run: |
+          cd e2e
+          TEST_MODE=stress npm run test:stress
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stress-test-results
+          path: e2e/test-results/
+          retention-days: 14
+
+      - name: Upload performance metrics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-metrics
+          path: e2e/test-results.json
+          retention-days: 30
+
+  marathon-tests:
+    name: Marathon Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test_mode == 'marathon'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+          npx playwright install chromium
+
+      - name: Run Marathon Tests
+        run: |
+          cd e2e
+          TEST_MODE=marathon npm run test:marathon
+        env:
+          CI: true
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: marathon-test-results
+          path: e2e/test-results/
+          retention-days: 30
+
+  continuous-monitoring:
+    name: Continuous Monitoring
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_mode == 'continuous')
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd e2e && npm ci
+          npx playwright install
+
+      - name: Run Continuous Tests
+        run: |
+          cd e2e
+          TEST_MODE=continuous npm run test:continuous
+        env:
+          CI: true
+
+      - name: Analyze test results
+        if: always()
+        run: |
+          cd e2e
+          if [ -f test-results.json ]; then
+            echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat test-results.json | jq '.' >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: continuous-test-results
+          path: e2e/test-results/
+          retention-days: 14
+
+      - name: Create issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `E2E Test Failure - ${new Date().toISOString().split('T')[0]}`;
+            const body = `
+            ## Continuous Testing Failed
+
+            **Workflow Run:** [${context.runNumber}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
+            **Triggered by:** ${context.eventName}
+            **Branch:** ${context.ref}
+
+            Please check the test artifacts and logs for more details.
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'e2e-test', 'automated']
+            });
+
+  report-status:
+    name: Report Status
+    runs-on: ubuntu-latest
+    needs: [quick-tests, full-tests, stress-tests]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Generate consolidated report
+        run: |
+          echo "## E2E Test Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          echo "### Quick Tests: ${{ needs.quick-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Full Tests: ${{ needs.full-tests.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "### Stress Tests: ${{ needs.stress-tests.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Run Number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const quickResult = '${{ needs.quick-tests.result }}';
+            const fullResult = '${{ needs.full-tests.result }}' || 'skipped';
+
+            const status = quickResult === 'success' ? '✅' : '❌';
+            const comment = `
+            ## E2E Test Results ${status}
+
+            | Test Suite | Status |
+            |------------|--------|
+            | Quick Tests | ${quickResult === 'success' ? '✅ Passed' : '❌ Failed'} |
+            | Full Tests | ${fullResult === 'success' ? '✅ Passed' : fullResult === 'skipped' ? '⏭️ Skipped' : '❌ Failed'} |
+
+            [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
