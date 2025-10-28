@@ -39,7 +39,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
 
       - name: Install Playwright browsers
         run: |
@@ -106,7 +109,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
           npx playwright install chromium
 
       - name: Run performance tests
@@ -162,7 +168,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
           npx playwright install chromium
 
       - name: Run memory leak tests

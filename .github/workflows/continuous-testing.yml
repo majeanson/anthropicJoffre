@@ -32,6 +32,21 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4]
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -44,8 +59,18 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
           npx playwright install chromium
+
+      - name: Setup Database
+        run: |
+          cd backend
+          npm run db:init || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
 
       - name: Run Quick Tests (Shard ${{ matrix.shard }}/4)
         run: |
@@ -53,6 +78,8 @@ jobs:
           TEST_MODE=quick SHARD_INDEX=${{ matrix.shard }} SHARD_TOTAL=4 npm run test:quick
         env:
           CI: true
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
+          NODE_ENV: test
 
       - name: Upload test results
         if: always()
@@ -76,6 +103,21 @@ jobs:
     timeout-minutes: 120
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -88,8 +130,18 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
           npx playwright install
+
+      - name: Setup Database
+        run: |
+          cd backend
+          npm run db:init || true
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
 
       - name: Run Full Tests
         run: |
@@ -97,6 +149,8 @@ jobs:
           TEST_MODE=full npm run test:full
         env:
           CI: true
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
+          NODE_ENV: test
 
       - name: Upload test results
         if: always()
@@ -124,7 +178,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
           npx playwright install chromium
 
       - name: Run Stress Tests
@@ -168,7 +225,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
           npx playwright install chromium
 
       - name: Run Marathon Tests
@@ -204,7 +264,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          cd e2e && npm ci
+          npm install concurrently
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
           npx playwright install
 
       - name: Run Continuous Tests
