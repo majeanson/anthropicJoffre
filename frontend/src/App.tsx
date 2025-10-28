@@ -106,6 +106,11 @@ function App() {
     });
     setSocket(newSocket);
 
+    // Expose socket on window for E2E tests
+    if (typeof window !== 'undefined') {
+      (window as any).socket = newSocket;
+    }
+
     newSocket.on('connect', () => {
       setError(''); // Clear any connection errors
       // Note: Removed automatic reconnection - now requires explicit Rejoin button click

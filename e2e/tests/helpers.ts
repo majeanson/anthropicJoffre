@@ -110,32 +110,40 @@ export async function playCard(page: Page, cardIndex: number = 0) {
  * @returns Index of the player with current turn, or -1 if not found
  */
 export async function findCurrentPlayerIndex(pages: Page[]): Promise<number> {
-  // Check pages sequentially to avoid "Target crashed" errors
-  for (let i = 0; i < pages.length; i++) {
-    try {
-      // First try the turn-indicator (shows during active play with countdown)
-      const turnIndicator = pages[i].getByTestId('turn-indicator');
-      const hasCountdown = await turnIndicator.isVisible({ timeout: 500 });
-      if (hasCountdown) {
-        const text = await turnIndicator.textContent();
-        if (text === 'Your turn') {
+  // Try multiple times with increasing waits for multi-browser sync
+  for (let attempt = 0; attempt < 3; attempt++) {
+    // Check pages sequentially to avoid "Target crashed" errors
+    for (let i = 0; i < pages.length; i++) {
+      try {
+        // First try the turn-indicator (shows during active play with countdown)
+        const turnIndicator = pages[i].getByTestId('turn-indicator');
+        const hasCountdown = await turnIndicator.isVisible({ timeout: attempt === 0 ? 500 : 2000 });
+        if (hasCountdown) {
+          const text = await turnIndicator.textContent();
+          if (text === 'Your turn') {
+            return i;
+          }
+        }
+      } catch {
+        // Turn indicator might not be visible yet
+      }
+
+      // Also check if current-turn-player shows this player's name
+      // (this shows before the countdown/turn-indicator appears)
+      try {
+        const playerName = `Player ${i + 1}`;
+        const currentTurnText = await pages[i].getByTestId('current-turn-player').textContent();
+        if (currentTurnText && currentTurnText.includes(playerName)) {
           return i;
         }
+      } catch {
+        // Page might not have current-turn-player element yet
       }
-    } catch {
-      // Turn indicator might not be visible yet
     }
 
-    // Also check if current-turn-player shows this player's name
-    // (this shows before the countdown/turn-indicator appears)
-    try {
-      const playerName = `Player ${i + 1}`;
-      const currentTurnText = await pages[i].getByTestId('current-turn-player').textContent();
-      if (currentTurnText && currentTurnText.includes(playerName)) {
-        return i;
-      }
-    } catch {
-      // Page might not have current-turn-player element yet
+    // If not found, wait before retrying
+    if (attempt < 2) {
+      await pages[0].waitForTimeout(1000);
     }
   }
 
@@ -385,11 +393,16 @@ export async function verifyGameState(page: Page, expectedState: {
 }) {
   if (expectedState.phase) {
     const phaseText = await page.locator('text=/' + expectedState.phase + '/i').first();
-    await expect(phaseText).toBeVisible();
+    await expect(phaseText).toBeVisible({ timeout: 10000 });
   }
 
   if (expectedState.team1Score !== undefined || expectedState.team2Score !== undefined) {
-    const scores = await page.locator('[data-testid="team-scores"]').textContent();
+    // Wait for team scores element to be visible first
+    const scoresElement = page.locator('[data-testid="team-scores"]');
+    await scoresElement.waitFor({ state: 'visible', timeout: 10000 });
+
+    // Then get the text content
+    const scores = await scoresElement.textContent();
     if (expectedState.team1Score !== undefined) {
       expect(scores).toContain(`Team 1: ${expectedState.team1Score}`);
     }
@@ -400,7 +413,7 @@ export async function verifyGameState(page: Page, expectedState: {
 
   if (expectedState.roundNumber !== undefined) {
     const roundText = await page.locator('text=/Round ' + expectedState.roundNumber + '/i').first();
-    await expect(roundText).toBeVisible();
+    await expect(roundText).toBeVisible({ timeout: 10000 });
   }
 }
 

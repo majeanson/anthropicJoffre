@@ -70,14 +70,17 @@ export function GameHeader({
           </div>
 
           {/* Team Scores */}
-          <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
-            <p className="text-xs text-white/90 font-semibold">T1</p>
-            <p className="text-base text-white font-black">{team1Score}</p>
-          </div>
-          <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-          <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
-            <p className="text-xs text-white/90 font-semibold">T2</p>
-            <p className="text-base text-white font-black">{team2Score}</p>
+          <div className="flex items-center gap-1" data-testid="team-scores">
+            <span className="sr-only">Team 1: {team1Score} Team 2: {team2Score}</span>
+            <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+              <p className="text-xs text-white/90 font-semibold">T1</p>
+              <p className="text-base text-white font-black">{team1Score}</p>
+            </div>
+            <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
+            <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+              <p className="text-xs text-white/90 font-semibold">T2</p>
+              <p className="text-base text-white font-black">{team2Score}</p>
+            </div>
           </div>
 
           {/* Spacer */}
@@ -209,14 +212,16 @@ export function GameHeader({
 
             <div className="flex-1"></div>
 
-            <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
-              <p className="text-xs text-white/90 font-semibold">T1</p>
-              <p className="text-base text-white font-black">{team1Score}</p>
-            </div>
-            <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-            <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
-              <p className="text-xs text-white/90 font-semibold">T2</p>
-              <p className="text-base text-white font-black">{team2Score}</p>
+            <div className="flex items-center gap-1">
+              <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+                <p className="text-xs text-white/90 font-semibold">T1</p>
+                <p className="text-base text-white font-black">{team1Score}</p>
+              </div>
+              <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
+              <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+                <p className="text-xs text-white/90 font-semibold">T2</p>
+                <p className="text-base text-white font-black">{team2Score}</p>
+              </div>
             </div>
           </div>
 

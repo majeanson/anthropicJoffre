@@ -46,7 +46,7 @@ test.describe('Game Flow - 4 Real Players', () => {
           window.socket.emit('__test_set_scores', { team1: 35, team2: 35 });
         }
       });
-      await pages[0].waitForTimeout(500);
+      await pages[0].waitForTimeout(2000); // Wait for state to propagate
 
       // Verify scores were set
       await verifyGameState(pages[0], {
@@ -77,6 +77,10 @@ test.describe('Game Flow - 4 Real Players', () => {
           }
           await pages[0].waitForTimeout(500);
         }
+
+        // Wait for playing phase to start
+        await pages[0].locator('[data-card-value]').first().waitFor({ state: 'visible', timeout: 10000 });
+        await pages[0].waitForTimeout(1000); // Extra wait for dealing animation
 
         // Play the round
         await playFullRound(pages);
@@ -124,7 +128,7 @@ test.describe('Game Flow - 4 Real Players', () => {
           window.socket.emit('__test_set_scores', { team1: 40, team2: 39 });
         }
       });
-      await pages[0].waitForTimeout(500);
+      await pages[0].waitForTimeout(2000); // Wait for state to propagate
 
       // Play one round - should end the game
       const bettingOrder = [2, 3, 0, 1];
@@ -139,6 +143,10 @@ test.describe('Game Flow - 4 Real Players', () => {
         }
         await pages[0].waitForTimeout(500);
       }
+
+      // Wait for playing phase to start
+      await pages[0].locator('[data-card-value]').first().waitFor({ state: 'visible', timeout: 10000 });
+      await pages[0].waitForTimeout(1000); // Extra wait for dealing animation
 
       await playFullRound(pages);
 
@@ -342,6 +350,7 @@ test.describe('Game Flow - 4 Real Players', () => {
           window.socket.emit('__test_set_scores', { team1: 20, team2: 20 });
         }
       });
+      await pages[0].waitForTimeout(2000); // Wait for state to propagate
 
       const roundDurations: number[] = [];
 

@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-28T16:00:00.000Z",
-  "version": "1.0.7",
+  "buildDate": "2025-10-28T16:30:00.000Z",
+  "version": "1.0.8",
   "git": {
-    "commitMessage": "feat: Add comprehensive E2E test suites for continuous testing",
+    "commitMessage": "fix: Add test infrastructure for E2E tests (team-scores testid, socket exposure)",
     "commitHash": "pending",
-    "commitDate": "2025-10-28 16:00:00 +0000",
+    "commitDate": "2025-10-28 16:30:00 +0000",
     "branch": "main"
   },
   "futureTodos": [
