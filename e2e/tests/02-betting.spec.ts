@@ -1,65 +1,29 @@
 import { test, expect, Page } from '@playwright/test';
-
-async function createGameWith4Players(browser: any) {
-  const pages: Page[] = [];
-  const contexts: any[] = [];
-  let gameId: string | null = null;
-
-  for (let i = 1; i <= 4; i++) {
-    // Create separate context for each player to avoid localStorage sharing
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    await page.goto('/');
-
-    if (i === 1) {
-      // Create game using test IDs
-      await page.getByTestId('create-game-button').click();
-      await page.getByTestId('player-name-input').fill(`Player ${i}`);
-      await page.getByTestId('submit-create-button').click();
-
-      // Get game ID using test ID
-      await page.getByTestId('game-id').waitFor({ timeout: 10000 });
-      gameId = await page.getByTestId('game-id').textContent();
-    } else {
-      // Join game using test IDs
-      await page.getByTestId('join-game-button').click();
-      await page.getByTestId('game-id-input').fill(gameId!);
-      await page.getByTestId('player-name-input').fill(`Player ${i}`);
-      await page.getByTestId('submit-join-button').click();
-    }
-
-    pages.push(page);
-    contexts.push(context);
-  }
-
-  // Wait for team selection to be ready, then start game using test ID
-  await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
-  await pages[0].getByTestId('start-game-button').click();
-
-  // Wait for betting phase to start
-  await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
-
-  return { contexts, pages, gameId };
-}
+import { createGameWith4Players } from './helpers';
 
 test.describe('Betting Phase', () => {
+  let context: any;
+
+  test.afterEach(async () => {
+    if (context) {
+      await context.close();
+    }
+  });
   test('should show betting phase after 4 players join', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // All players should see betting phase
     for (const page of pages) {
       await expect(page.getByRole('heading', { name: /betting phase/i })).toBeVisible();
     }
-
-    for (const context of contexts) {
-      for (const context of contexts) {
-      await context.close();
-    }
-    }
   });
 
   test('should display bet amount selector (7-12)', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // Player 3 bets first (after dealer rotation)
     const page3 = pages[2];
@@ -71,14 +35,12 @@ test.describe('Betting Phase', () => {
     // Should see trump option radio buttons
     await expect(page3.getByText('With Trump (1x)')).toBeVisible();
     await expect(page3.getByText('Without Trump (2x multiplier)')).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should allow selecting different bet amounts', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // Player 3 bets first (dealer rotates from 0 to 1, so Player 2 is dealer, Player 3 starts)
     const page3 = pages[2];
@@ -93,14 +55,12 @@ test.describe('Betting Phase', () => {
     // Both should be enabled (no bets placed yet)
     await expect(bet7Button).toBeEnabled();
     await expect(bet10Button).toBeEnabled();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should allow selecting "without trump" option', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // Player 3 bets first
     const page3 = pages[2];
@@ -108,14 +68,12 @@ test.describe('Betting Phase', () => {
     // Should see "Without Trump" radio option
     const noTrumpRadio = page3.getByText('Without Trump (2x multiplier)');
     await expect(noTrumpRadio).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should show all players and their bet status', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     const page1 = pages[0];
 
@@ -128,14 +86,12 @@ test.describe('Betting Phase', () => {
     // All should show "Waiting..." initially (in player list, not the turn indicator)
     const waitingTexts = page1.locator('.text-sm.text-umber-500', { hasText: 'Waiting...' });
     await expect(waitingTexts).toHaveCount(4);
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should submit bet and show waiting state', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // Player 3 bets first
     const page3 = pages[2];
@@ -154,14 +110,12 @@ test.describe('Betting Phase', () => {
 
     // Other players should see Player 3's bet
     await expect(pages[0].getByText(/8 points/i)).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should show "No Trump" indicator for without-trump bets', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // Player 3 bets first
     const page3 = pages[2];
@@ -177,14 +131,12 @@ test.describe('Betting Phase', () => {
 
     // Other players should see "No Trump" indicator
     await expect(pages[0].getByText(/no trump/i)).toBeVisible({ timeout: 10000 });
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should transition to playing phase when all bets are placed', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // Betting order: Player 3, 4, 1, 2 (Player 2 is dealer, bets last)
     const bettingOrder = [2, 3, 0, 1]; // indices for pages array
@@ -204,14 +156,12 @@ test.describe('Betting Phase', () => {
 
     // Should transition to playing phase
     await expect(pages[0].getByTestId('player-hand')).toBeVisible({ timeout: 10000 });
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should correctly identify highest bidder', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     // Betting order: Player 3, 4, 1, 2 (Player 2 is dealer, bets last)
     // Player 3: 8
@@ -247,9 +197,5 @@ test.describe('Betting Phase', () => {
     const turnText = await currentTurnPlayer.textContent();
     const hasHighestBidder = turnText?.includes('Player 1') || turnText?.includes('Player 2');
     expect(hasHighestBidder).toBe(true);
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 });

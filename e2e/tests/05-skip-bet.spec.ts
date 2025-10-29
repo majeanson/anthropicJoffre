@@ -2,8 +2,18 @@ import { test, expect } from '@playwright/test';
 import { createGameWith4Players } from './helpers';
 
 test.describe('Skip Bet Functionality', () => {
+  let context: any;
+
+  test.afterEach(async () => {
+    if (context) {
+      await context.close();
+    }
+  });
+
   test('should allow first player to skip bet', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -20,14 +30,12 @@ test.describe('Skip Bet Functionality', () => {
     // Should move to next player and show "Skipped" badge
     await page3.waitForTimeout(500);
     await expect(page3.getByText(/skipped/i)).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should allow all non-dealer players to skip', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -48,14 +56,12 @@ test.describe('Skip Bet Functionality', () => {
     // All 3 players should show "Skipped"
     const skippedCount = await pages[0].locator('text=/skipped/i').count();
     expect(skippedCount).toBe(3);
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should NOT allow dealer to skip when there are bets', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -81,14 +87,12 @@ test.describe('Skip Bet Functionality', () => {
 
     // Should see dealer privilege message
     await expect(page2.getByText(/dealer privilege/i)).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should force dealer to bet minimum when all others skip', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -114,14 +118,12 @@ test.describe('Skip Bet Functionality', () => {
 
     // Should see message that dealer must bet
     await expect(page2.getByText(/you must bet at least 7/i)).toBeVisible({ timeout: 2000 });
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should show validation message when bet is too low', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -139,14 +141,12 @@ test.describe('Skip Bet Functionality', () => {
     // Button for 10 should be disabled (non-dealer can't match)
     const bet10ButtonP4 = page4.locator('button:has-text("10")').first();
     await expect(bet10ButtonP4).toBeDisabled({ timeout: 2000 });
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should allow dealer to match highest bet', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -177,14 +177,12 @@ test.describe('Skip Bet Functionality', () => {
     // Button for 9 should be enabled (dealer can match)
     const bet9Button = page2.locator('button:has-text("9")').first();
     await expect(bet9Button).toBeEnabled();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should handle skip then bet scenario without infinite rerender', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
 
     await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
@@ -219,9 +217,5 @@ test.describe('Skip Bet Functionality', () => {
 
     // Should show that bet was placed successfully
     await expect(page1.getByText(/waiting for other players/i)).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 });

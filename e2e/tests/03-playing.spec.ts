@@ -2,8 +2,18 @@ import { test, expect, Page } from '@playwright/test';
 import { createGameWith4Players, placeAllBets, findCurrentPlayerIndex } from './helpers';
 
 test.describe('Card Playing Phase', () => {
+  let context: any;
+
+  test.afterEach(async () => {
+    if (context) {
+      await context.close();
+    }
+  });
+
   test('should display player hands after betting', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     // All players should see their hand area
@@ -14,28 +24,24 @@ test.describe('Card Playing Phase', () => {
       const cards = page.locator('[data-card-value]');
       await expect(cards).toHaveCount(8);
     }
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should show current trick area', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     // Should show playing phase with key elements
     await expect(pages[0].getByTestId('score-board')).toBeVisible();
     await expect(pages[0].getByTestId('trick-area')).toBeVisible();
     await expect(pages[0].getByTestId('player-hand')).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should show score board with team scores', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     // Should show score board
@@ -48,10 +54,6 @@ test.describe('Card Playing Phase', () => {
 
     // Should show round number
     await expect(pages[0].getByTestId('round-number')).toHaveText('R1');
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test.skip('should show player info (cards left, tricks won)', async ({ browser }) => {
@@ -59,7 +61,9 @@ test.describe('Card Playing Phase', () => {
     // card counts or tricks won. The game shows team scores and round points instead.
     // If this feature is added in the future, this test can be re-enabled.
 
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     // Should show all 4 players - use .first() to handle duplicates
@@ -75,14 +79,12 @@ test.describe('Card Playing Phase', () => {
     // Should show cards count (8 initially)
     const cardsElements = pages[0].locator('text=/cards.*8/i');
     await expect(cardsElements.first()).toBeVisible();
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should indicate whose turn it is', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     // At least one player should have their turn indicated
@@ -105,14 +107,12 @@ test.describe('Card Playing Phase', () => {
       await expect(currentTurnPlayer).toBeVisible();
       await expect(currentTurnPlayer).toContainText(playerName);
     }
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should disable cards when not player turn', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
@@ -133,14 +133,12 @@ test.describe('Card Playing Phase', () => {
         await expect(otherCurrentTurnPlayer).not.toContainText(`Player ${i + 1}`);
       }
     }
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should allow current player to play a card', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
@@ -159,14 +157,12 @@ test.describe('Card Playing Phase', () => {
     // Card count in hand should decrease
     const cardsAfter = await handSection.locator('[data-card-value]').count();
     expect(cardsAfter).toBe(cardsBefore - 1);
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should set trump suit from first card played', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
@@ -188,14 +184,12 @@ test.describe('Card Playing Phase', () => {
     );
 
     expect(hasTrumpVisible).toBe(true);
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should complete a full trick with 4 cards', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     // Play 4 cards (one from each player)
@@ -215,14 +209,12 @@ test.describe('Card Playing Phase', () => {
     // Trick should be resolved
     // One player should have tricksWon = 1
     await pages[0].waitForTimeout(2000); // Wait for trick resolution
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should decrease card count after playing', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     const currentPlayerIndex = await findCurrentPlayerIndex(pages);
@@ -242,14 +234,12 @@ test.describe('Card Playing Phase', () => {
     const cardsAfter = await handSection.locator('[data-card-value]').count();
 
     expect(cardsAfter).toBe(cardsBefore - 1);
-
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should show special card indicators (+5 for Red 0, -2 for Brown 0)', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     await placeAllBets(pages);
 
     // Look for special cards in any player's hand
@@ -263,10 +253,6 @@ test.describe('Card Playing Phase', () => {
 
     if (await brown0.isVisible()) {
       await expect(brown0.locator('text=-2')).toBeVisible();
-    }
-
-    for (const context of contexts) {
-      await context.close();
     }
   });
 });

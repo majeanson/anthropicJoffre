@@ -5,16 +5,19 @@ import { Page, expect } from '@playwright/test';
  * Players are assigned to teams 1-2-1-2 by default.
  * Player 2 will be the first dealer after rotation.
  *
- * @returns Object with browser context, page instances, and game ID
+ * Uses single-browser context with sessionStorage isolation (multi-tab support).
+ * Each page acts as an independent player tab.
+ *
+ * @returns Object with browser context (singular), page instances, and game ID
  */
 export async function createGameWith4Players(browser: any) {
+  // Single browser context - sessionStorage provides tab isolation
+  const context = await browser.newContext();
   const pages: Page[] = [];
-  const contexts: any[] = [];
   let gameId: string | null = null;
 
+  // Create 4 pages (tabs) in the same context
   for (let i = 1; i <= 4; i++) {
-    // Create separate context for each player to avoid localStorage sharing
-    const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto('/');
 
@@ -35,7 +38,6 @@ export async function createGameWith4Players(browser: any) {
     }
 
     pages.push(page);
-    contexts.push(context);
   }
 
   // Wait for team selection, then start game using test ID
@@ -45,7 +47,7 @@ export async function createGameWith4Players(browser: any) {
   // Wait for betting phase to begin
   await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-  return { contexts, pages, gameId };
+  return { context, pages, gameId };
 }
 
 /**
@@ -204,20 +206,22 @@ export interface GameConfig {
 /**
  * Creates a game with a mix of human players and bots.
  *
+ * Uses single-browser context with sessionStorage isolation (multi-tab support).
+ *
  * @param browser - Browser instance
  * @param config - Configuration for human and bot players
- * @returns Object with contexts, pages, gameId, and bot information
+ * @returns Object with context (singular), pages, gameId, and bot information
  */
 export async function createGameWithBots(browser: any, config: GameConfig) {
   const totalPlayers = config.humanPlayers + config.botPlayers;
+  // Single browser context - sessionStorage provides tab isolation
+  const context = await browser.newContext();
   const pages: Page[] = [];
-  const contexts: any[] = [];
   const botPlayerIndices: number[] = [];
   let gameId: string | null = null;
 
   // Create human players first
   for (let i = 0; i < config.humanPlayers; i++) {
-    const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto('/');
 
@@ -240,12 +244,10 @@ export async function createGameWithBots(browser: any, config: GameConfig) {
     }
 
     pages.push(page);
-    contexts.push(context);
   }
 
   // Create bot players
   for (let i = config.humanPlayers; i < totalPlayers; i++) {
-    const context = await browser.newContext();
     const page = await context.newPage();
     await page.goto('/');
 
@@ -257,7 +259,6 @@ export async function createGameWithBots(browser: any, config: GameConfig) {
     await page.getByTestId('submit-join-button').click();
 
     pages.push(page);
-    contexts.push(context);
     botPlayerIndices.push(i);
   }
 
@@ -287,7 +288,7 @@ export async function createGameWithBots(browser: any, config: GameConfig) {
   // Wait for betting phase
   await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
 
-  return { contexts, pages, gameId, botPlayerIndices };
+  return { context, pages, gameId, botPlayerIndices };
 }
 
 /**
