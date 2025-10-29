@@ -12,7 +12,7 @@ test.describe('Reconnection Support - Basic Tests', () => {
     });
   });
 
-  test('should save session to localStorage when creating game', async ({ page }) => {
+  test('should save session to sessionStorage when creating game', async ({ page }) => {
     // Wait for lobby buttons using test IDs
     await page.getByTestId('create-game-button').waitFor({ timeout: 10000 });
 
@@ -29,9 +29,9 @@ test.describe('Reconnection Support - Basic Tests', () => {
     // Wait for game to be created (team selection phase)
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
-    // Check localStorage for session
+    // Check sessionStorage for session
     const session = await page.evaluate(() => {
-      return localStorage.getItem('gameSession');
+      return sessionStorage.getItem('gameSession');
     });
 
     expect(session).not.toBeNull();
@@ -75,7 +75,7 @@ test.describe('Reconnection Support - Basic Tests', () => {
   test('should clear expired session', async ({ page }) => {
     // Manually set an expired session
     await page.evaluate(() => {
-      localStorage.setItem('gameSession', JSON.stringify({
+      sessionStorage.setItem('gameSession', JSON.stringify({
         gameId: 'EXPIRED123',
         playerId: 'invalid-id',
         playerName: 'OldPlayer',
@@ -91,7 +91,7 @@ test.describe('Reconnection Support - Basic Tests', () => {
     await page.getByTestId('create-game-button').waitFor({ timeout: 15000 });
 
     // Session should be cleared
-    const session = await page.evaluate(() => localStorage.getItem('gameSession'));
+    const session = await page.evaluate(() => sessionStorage.getItem('gameSession'));
     expect(session).toBeNull();
   });
 });

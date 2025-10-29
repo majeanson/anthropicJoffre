@@ -24,7 +24,7 @@ test.describe('Chat System', () => {
     // Get game ID
     await player1Page.waitForTimeout(1000);
     gameId = await player1Page.evaluate(() => {
-      const session = localStorage.getItem('gameSession');
+      const session = sessionStorage.getItem('gameSession');
       return session ? JSON.parse(session).gameId : '';
     });
 

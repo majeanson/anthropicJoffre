@@ -12,11 +12,11 @@ test.describe('Spectator Mode', () => {
     await playerPage.goto('/');
     await playerPage.getByTestId('quick-play-button').click();
 
-    // Wait for game to be created and get game ID from localStorage
+    // Wait for game to be created and get game ID from sessionStorage
     await playerPage.waitForTimeout(2000);
 
     gameId = await playerPage.evaluate(() => {
-      const session = localStorage.getItem('gameSession');
+      const session = sessionStorage.getItem('gameSession');
       return session ? JSON.parse(session).gameId : '';
     });
 

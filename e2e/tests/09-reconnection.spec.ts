@@ -1,11 +1,14 @@
 import { test, expect, Page } from '@playwright/test';
 
 test.describe('Reconnection Support', () => {
-  test('should save session to localStorage when joining game', async ({ page }) => {
+  test('should save session to sessionStorage when joining game', async ({ page }) => {
     await page.goto('http://localhost:5173');
 
     // Clear any existing session
-    await page.evaluate(() => localStorage.clear());
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
     await page.reload();
 
     // Wait for lobby to load using test ID
@@ -19,9 +22,9 @@ test.describe('Reconnection Support', () => {
     // Wait for game to be created (team selection phase)
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
-    // Check localStorage for session
+    // Check sessionStorage for session
     const session = await page.evaluate(() => {
-      return localStorage.getItem('gameSession');
+      return sessionStorage.getItem('gameSession');
     });
 
     expect(session).not.toBeNull();
@@ -36,8 +39,11 @@ test.describe('Reconnection Support', () => {
   test('should allow player to reconnect after page reload', async ({ page }) => {
     await page.goto('http://localhost:5173');
 
-    // Clear localStorage first
-    await page.evaluate(() => localStorage.clear());
+    // Clear storage first
+    await page.evaluate(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+    });
     await page.reload();
 
     // Wait for lobby using test ID
@@ -169,7 +175,7 @@ test.describe('Reconnection Support', () => {
 
     // Manually set an expired/invalid session
     await page.evaluate(() => {
-      localStorage.setItem('gameSession', JSON.stringify({
+      sessionStorage.setItem('gameSession', JSON.stringify({
         gameId: 'EXPIRED123',
         playerId: 'invalid-id',
         playerName: 'OldPlayer',
@@ -194,7 +200,7 @@ test.describe('Reconnection Support', () => {
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Verify session exists
-    let session = await page.evaluate(() => localStorage.getItem('gameSession'));
+    let session = await page.evaluate(() => sessionStorage.getItem('gameSession'));
     expect(session).not.toBeNull();
 
     // Leave game explicitly (if such button exists, or go back to lobby)
@@ -220,14 +226,14 @@ test.describe('Reconnection Support', () => {
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Store session
-    const session = await page.evaluate(() => localStorage.getItem('gameSession'));
+    const session = await page.evaluate(() => sessionStorage.getItem('gameSession'));
     expect(session).not.toBeNull();
 
     // Manually mark game as finished (simulate game_over)
     await page.evaluate(() => {
-      const sessionData = JSON.parse(localStorage.getItem('gameSession')!);
+      const sessionData = JSON.parse(sessionStorage.getItem('gameSession')!);
       sessionData.gameFinished = true;
-      localStorage.setItem('gameSession', JSON.stringify(sessionData));
+      sessionStorage.setItem('gameSession', JSON.stringify(sessionData));
     });
 
     // Try to reconnect

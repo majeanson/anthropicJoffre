@@ -101,11 +101,10 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   }, [currentBets]);
 
   const canSkip = (): boolean => {
-    // Dealer can skip if there are existing valid bets
-    // Dealer cannot skip if no one has bet (must bet minimum 7)
+    // Dealer can NEVER skip (must match/raise if bets exist, or bet minimum 7 if all skipped)
+    // Non-dealers can always skip (if no bets yet) or must raise
     if (isDealer) {
-      const hasValidBets = currentBets.some(b => !b.skipped);
-      return hasValidBets; // Can skip only if someone has bet
+      return false; // Dealer can never skip
     }
     return true; // Non-dealers can always skip
   };
@@ -116,6 +115,20 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
 
   const handleSkip = () => {
     onPlaceBet(0, false, true);
+  };
+
+  // Check if a specific bet amount is valid (for button disabling)
+  const isBetAmountValid = (amount: number): boolean => {
+    if (!highestBet) return true; // No bets yet, all amounts valid
+
+    if (isDealer) {
+      // Dealer can match or raise
+      return amount >= highestBet.amount;
+    } else {
+      // Non-dealer must raise (strictly greater)
+      // Note: They could match with withoutTrump, but we disable the button to encourage raising
+      return amount > highestBet.amount;
+    }
   };
 
   // Check if current selection is valid
@@ -239,19 +252,25 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                     Select Bet Amount:
                   </label>
                   <div className="grid grid-cols-3 gap-2">
-                    {[7, 8, 9, 10, 11, 12].map((amount) => (
-                      <button
-                        key={amount}
-                        onClick={() => setSelectedAmount(amount)}
-                        className={`py-3 px-4 rounded-lg font-semibold transition-all text-base border-2 ${
-                          selectedAmount === amount
-                            ? 'bg-umber-600 text-parchment-50 ring-2 ring-umber-400 border-umber-700'
-                            : 'bg-parchment-100 dark:bg-gray-700 text-umber-800 dark:text-gray-200 hover:bg-parchment-200 dark:bg-gray-600 border-parchment-400 dark:border-gray-600'
-                        }`}
-                      >
-                        {amount}
-                      </button>
-                    ))}
+                    {[7, 8, 9, 10, 11, 12].map((amount) => {
+                      const isValid = isBetAmountValid(amount);
+                      return (
+                        <button
+                          key={amount}
+                          onClick={() => setSelectedAmount(amount)}
+                          disabled={!isValid}
+                          className={`py-3 px-4 rounded-lg font-semibold transition-all text-base border-2 ${
+                            !isValid
+                              ? 'bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-600 cursor-not-allowed opacity-50 border-gray-400'
+                              : selectedAmount === amount
+                                ? 'bg-umber-600 text-parchment-50 ring-2 ring-umber-400 border-umber-700'
+                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-800 dark:text-gray-200 hover:bg-parchment-200 dark:bg-gray-600 border-parchment-400 dark:border-gray-600'
+                          }`}
+                        >
+                          {amount}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -327,7 +346,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
 
               {isDealer && !currentBets.some(b => !b.skipped) && (
                 <div className="bg-parchment-200 dark:bg-gray-600 border-2 border-umber-400 text-umber-800 dark:text-gray-200 px-3 py-2 rounded-lg text-xs">
-                  <strong>Dealer:</strong> Must bet (min 7 points)
+                  <strong>Dealer:</strong> You must bet at least 7
                 </div>
               )}
             </>

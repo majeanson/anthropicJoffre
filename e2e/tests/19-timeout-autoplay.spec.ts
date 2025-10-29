@@ -15,7 +15,7 @@ test.describe('Timeout and Autoplay System', () => {
     await playerPage.waitForTimeout(2000);
 
     gameId = await playerPage.evaluate(() => {
-      const session = localStorage.getItem('gameSession');
+      const session = sessionStorage.getItem('gameSession');
       return session ? JSON.parse(session).gameId : '';
     });
 

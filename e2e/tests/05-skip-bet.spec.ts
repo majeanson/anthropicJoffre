@@ -67,9 +67,10 @@ test.describe('Skip Bet Functionality', () => {
 
     // Player 3 places a bet (first in betting order)
     const page3 = pages[2];
-    const bet7Button = page3.locator('button:has-text("7")').first();
-    await bet7Button.waitFor({ state: 'visible', timeout: 15000 });
-    await bet7Button.click();
+    await page3.getByRole('button', { name: '7', exact: true }).waitFor({ timeout: 15000 });
+    await page3.getByRole('button', { name: '7', exact: true }).click();
+    await page3.getByRole('button', { name: /Place Bet: 7/ }).click();
+    await pages[0].waitForTimeout(500);
 
     // Players 4 and 1 skip
     await pages[3].getByRole('button', { name: /skip/i }).waitFor({ timeout: 15000 });
@@ -86,7 +87,7 @@ test.describe('Skip Bet Functionality', () => {
     await expect(skipButton).not.toBeVisible({ timeout: 2000 }).catch(() => {});
 
     // Should see dealer privilege message
-    await expect(page2.getByText(/dealer privilege/i)).toBeVisible();
+    await expect(page2.getByText(/you can match or raise/i)).toBeVisible();
   });
 
   test('should force dealer to bet minimum when all others skip', async ({ browser }) => {
@@ -129,9 +130,9 @@ test.describe('Skip Bet Functionality', () => {
 
     // Player 3 bets 10
     const page3 = pages[2];
-    const bet10ButtonP3 = page3.locator('button:has-text("10")').first();
-    await bet10ButtonP3.waitFor({ state: 'visible', timeout: 15000 });
-    await bet10ButtonP3.click();
+    await page3.getByRole('button', { name: '10', exact: true }).waitFor({ timeout: 15000 });
+    await page3.getByRole('button', { name: '10', exact: true }).click();
+    await page3.getByRole('button', { name: /Place Bet: 10/ }).click();
     await pages[0].waitForTimeout(500);
 
     // Player 4 should see bet 10 button disabled (same as current, must raise)
@@ -139,8 +140,7 @@ test.describe('Skip Bet Functionality', () => {
     await pages[3].waitForTimeout(1000); // Wait for turn
 
     // Button for 10 should be disabled (non-dealer can't match)
-    const bet10ButtonP4 = page4.locator('button:has-text("10")').first();
-    await expect(bet10ButtonP4).toBeDisabled({ timeout: 2000 });
+    await expect(page4.getByRole('button', { name: '10', exact: true })).toBeDisabled({ timeout: 2000 });
   });
 
   test('should allow dealer to match highest bet', async ({ browser }) => {
@@ -158,9 +158,9 @@ test.describe('Skip Bet Functionality', () => {
       const pageIndex = bettingOrder[i];
       const page = pages[pageIndex];
 
-      const betButton = page.locator(`button:has-text("${betAmounts[i]}")`).first();
-      await betButton.waitFor({ state: 'visible', timeout: 15000 });
-      await betButton.click();
+      await page.getByRole('button', { name: String(betAmounts[i]), exact: true }).waitFor({ timeout: 15000 });
+      await page.getByRole('button', { name: String(betAmounts[i]), exact: true }).click();
+      await page.getByRole('button', { name: new RegExp(`Place Bet: ${betAmounts[i]}`) }).click();
 
       if (i < bettingOrder.length - 1) {
         await pages[0].waitForTimeout(500);
@@ -172,11 +172,10 @@ test.describe('Skip Bet Functionality', () => {
     await pages[0].waitForTimeout(500); // Wait for turn
 
     // Should see dealer privilege message
-    await expect(page2.getByText(/dealer privilege/i)).toBeVisible({ timeout: 5000 });
+    await expect(page2.getByText('Dealer: You can match or raise')).toBeVisible({ timeout: 5000 });
 
     // Button for 9 should be enabled (dealer can match)
-    const bet9Button = page2.locator('button:has-text("9")').first();
-    await expect(bet9Button).toBeEnabled();
+    await expect(page2.getByRole('button', { name: '9', exact: true })).toBeEnabled();
   });
 
   test('should handle skip then bet scenario without infinite rerender', async ({ browser }) => {
@@ -194,9 +193,9 @@ test.describe('Skip Bet Functionality', () => {
 
     // Player 4 places bet of 7
     const page4 = pages[3];
-    const bet7ButtonP4 = page4.locator('button:has-text("7")').first();
-    await bet7ButtonP4.waitFor({ state: 'visible', timeout: 15000 });
-    await bet7ButtonP4.click();
+    await page4.getByRole('button', { name: '7', exact: true }).waitFor({ timeout: 15000 });
+    await page4.getByRole('button', { name: '7', exact: true }).click();
+    await page4.getByRole('button', { name: /Place Bet: 7/ }).click();
     await pages[0].waitForTimeout(500);
 
     // Player 1 should now be able to bet (must raise to 8 or more)
@@ -204,15 +203,14 @@ test.describe('Skip Bet Functionality', () => {
     await pages[0].waitForTimeout(500); // Wait for turn
 
     // Button for 7 should be disabled (must raise)
-    const bet7ButtonP1 = page1.locator('button:has-text("7")').first();
-    await expect(bet7ButtonP1).toBeDisabled({ timeout: 2000 });
+    await expect(page1.getByRole('button', { name: '7', exact: true })).toBeDisabled({ timeout: 2000 });
 
     // Button for 8 should be enabled (valid raise)
-    const bet8ButtonP1 = page1.locator('button:has-text("8")').first();
-    await expect(bet8ButtonP1).toBeEnabled();
+    await expect(page1.getByRole('button', { name: '8', exact: true })).toBeEnabled();
 
     // Should be able to place bet without issues
-    await bet8ButtonP1.click();
+    await page1.getByRole('button', { name: '8', exact: true }).click();
+    await page1.getByRole('button', { name: /Place Bet: 8/ }).click();
     await pages[0].waitForTimeout(500);
 
     // Should show that bet was placed successfully

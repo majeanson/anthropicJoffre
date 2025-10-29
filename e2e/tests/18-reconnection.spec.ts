@@ -15,11 +15,11 @@ test.describe('Reconnection Flow', () => {
     await playerPage.goto('/');
     await playerPage.getByTestId('quick-play-button').click();
 
-    // Wait for game to be created and get game ID from localStorage
+    // Wait for game to be created and get game ID from sessionStorage
     await playerPage.waitForTimeout(2000);
 
     gameId = await playerPage.evaluate(() => {
-      const session = localStorage.getItem('gameSession');
+      const session = sessionStorage.getItem('gameSession');
       return session ? JSON.parse(session).gameId : '';
     });
 
@@ -32,10 +32,10 @@ test.describe('Reconnection Flow', () => {
     await playerPage.waitForSelector('text=/betting|playing|your turn|team selection/i', { timeout: 15000 });
   });
 
-  test('should store session in localStorage when joining game', async () => {
-    // Get session from localStorage
+  test('should store session in sessionStorage when joining game', async () => {
+    // Get session from sessionStorage
     const session = await playerPage.evaluate(() => {
-      const stored = localStorage.getItem('gameSession');
+      const stored = sessionStorage.getItem('gameSession');
       return stored ? JSON.parse(stored) : null;
     });
 
@@ -50,7 +50,7 @@ test.describe('Reconnection Flow', () => {
   test('should auto-reconnect when refreshing page within grace period', async () => {
     // Get initial player ID
     const initialPlayerId = await playerPage.evaluate(() => {
-      const session = localStorage.getItem('gameSession');
+      const session = sessionStorage.getItem('gameSession');
       return session ? JSON.parse(session).playerId : '';
     });
 
@@ -70,7 +70,7 @@ test.describe('Reconnection Flow', () => {
 
     // Verify session is still valid
     const sessionAfterReload = await playerPage.evaluate(() => {
-      const stored = localStorage.getItem('gameSession');
+      const stored = sessionStorage.getItem('gameSession');
       return stored ? JSON.parse(stored) : null;
     });
 
@@ -154,11 +154,11 @@ test.describe('Reconnection Flow', () => {
   test('should fail reconnection after session expires', async () => {
     // Manually expire the session by setting timestamp to 16 minutes ago
     await playerPage.evaluate(() => {
-      const session = localStorage.getItem('gameSession');
+      const session = sessionStorage.getItem('gameSession');
       if (session) {
         const parsed = JSON.parse(session);
         parsed.timestamp = Date.now() - (16 * 60 * 1000); // 16 minutes ago
-        localStorage.setItem('gameSession', JSON.stringify(parsed));
+        sessionStorage.setItem('gameSession', JSON.stringify(parsed));
       }
     });
 
@@ -171,7 +171,7 @@ test.describe('Reconnection Flow', () => {
 
     // Verify session was cleared
     const sessionAfter = await playerPage.evaluate(() => {
-      return localStorage.getItem('gameSession');
+      return sessionStorage.getItem('gameSession');
     });
 
     expect(sessionAfter).toBeNull();
@@ -195,7 +195,7 @@ test.describe('Reconnection Flow', () => {
 
     // Verify session is still valid
     const session = await playerPage.evaluate(() => {
-      const stored = localStorage.getItem('gameSession');
+      const stored = sessionStorage.getItem('gameSession');
       return stored ? JSON.parse(stored) : null;
     });
 
@@ -263,7 +263,7 @@ test.describe('Reconnection Flow', () => {
 
       // Verify session was cleared
       const session = await playerPage.evaluate(() => {
-        return localStorage.getItem('gameSession');
+        return sessionStorage.getItem('gameSession');
       });
 
       expect(session).toBeNull();
