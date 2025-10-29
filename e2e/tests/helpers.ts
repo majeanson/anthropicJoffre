@@ -277,16 +277,19 @@ export async function createGameWithBots(browser: any, config: GameConfig) {
     await pages[0].waitForTimeout(500);
   }
 
-  // Enable autoplay for bot players
-  for (const botIndex of botPlayerIndices) {
-    await enableAutoplayForPlayer(pages[botIndex]);
-  }
-
-  // Start the game
+  // Start the game first
   await pages[0].getByTestId('start-game-button').click();
 
   // Wait for betting phase
   await pages[0].waitForSelector('text=Betting Phase', { timeout: 10000 });
+
+  // Small delay to ensure UI is ready
+  await pages[0].waitForTimeout(1000);
+
+  // Enable autoplay for bot players AFTER game starts (when button is visible)
+  for (const botIndex of botPlayerIndices) {
+    await enableAutoplayForPlayer(pages[botIndex]);
+  }
 
   return { context, pages, gameId, botPlayerIndices };
 }
@@ -298,21 +301,56 @@ export async function createGameWithBots(browser: any, config: GameConfig) {
  */
 export async function enableAutoplayForPlayer(page: Page) {
   try {
-    // Wait for the autoplay toggle button to be available
-    const autoplayButton = page.getByRole('button', { name: /manual|auto/i });
-    await autoplayButton.waitFor({ state: 'visible', timeout: 5000 });
+    // First check if we're in a phase where autoplay button exists
+    const inBettingPhase = await page.locator('text=/Betting Phase/i').isVisible({ timeout: 1000 }).catch(() => false);
+    const inPlayingPhase = await page.locator('text=/Playing Phase|Trump/i').isVisible({ timeout: 1000 }).catch(() => false);
 
-    // Check if it's currently showing "Manual"
+    if (!inBettingPhase && !inPlayingPhase) {
+      console.log('Not in betting or playing phase - autoplay button not available yet');
+      return false;
+    }
+
+    // Try multiple selectors for the autoplay button
+    const selectors = [
+      'button:has-text("Manual")',
+      'button:has-text("Auto")',
+      '[aria-label*="autoplay" i]',
+      'button[title*="Autoplay" i]',
+      'text=/Manual|Auto/i'
+    ];
+
+    let autoplayButton = null;
+    for (const selector of selectors) {
+      try {
+        const button = page.locator(selector).first();
+        if (await button.isVisible({ timeout: 500 })) {
+          autoplayButton = button;
+          break;
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    if (!autoplayButton) {
+      console.log('Autoplay button not found with any selector');
+      return false;
+    }
+
+    // Check current state and toggle if needed
     const buttonText = await autoplayButton.textContent();
     if (buttonText?.toLowerCase().includes('manual')) {
       await autoplayButton.click();
-      await page.waitForTimeout(200);
-      console.log('Autoplay enabled');
-    } else {
+      await page.waitForTimeout(300);
+      console.log('Autoplay enabled successfully');
+      return true;
+    } else if (buttonText?.toLowerCase().includes('auto')) {
       console.log('Autoplay already enabled');
+      return true;
     }
   } catch (error) {
-    console.log('Autoplay button not found or not ready - skipping');
+    console.error('Error enabling autoplay:', error);
+    return false;
   }
 }
 
