@@ -5,9 +5,11 @@ import { resolve } from 'path';
 import type { GameState } from '../types/game';
 
 // Prioritize .env.local for local development (avoids Neon quota usage)
-const localEnvPath = resolve(__dirname, '../.env.local');
+// Path: backend/src/db -> backend/.env.local (need to go up 2 levels)
+const localEnvPath = resolve(__dirname, '../../.env.local');
 if (existsSync(localEnvPath)) {
-  dotenv.config({ path: localEnvPath });
+  // Use override: true to replace DATABASE_URL that was already loaded
+  dotenv.config({ path: localEnvPath, override: true });
 } else {
   dotenv.config();
 }

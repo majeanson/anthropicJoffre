@@ -4,12 +4,22 @@ import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
 // Prioritize .env.local for local development (avoids Neon quota usage)
-const localEnvPath = resolve(__dirname, '../.env.local');
+// Path: backend/src/db -> backend/.env.local (need to go up 2 levels)
+const localEnvPath = resolve(__dirname, '../../.env.local');
+
 if (existsSync(localEnvPath)) {
   console.log('📝 Using local environment (.env.local)');
-  dotenv.config({ path: localEnvPath });
+  // Use override: true to replace DATABASE_URL that was already loaded
+  dotenv.config({ path: localEnvPath, override: true });
 } else {
+  console.log('⚠️  .env.local not found, using default .env (Neon)');
   dotenv.config();
+}
+
+// Show which database we're connecting to
+if (process.env.DATABASE_URL) {
+  const dbUrl = process.env.DATABASE_URL.replace(/:[^:@]+@/, ':****@');
+  console.log(`📍 Database: ${dbUrl}`);
 }
 
 async function initDatabase() {
