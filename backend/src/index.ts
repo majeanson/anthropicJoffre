@@ -98,6 +98,16 @@ import {
   getPlayerGames
 } from './db/gameState';
 import {
+  sanitizePlayerName,
+  sanitizeChatMessage,
+  validateBetAmount,
+  validateGameId,
+  validateTeamId,
+  validateBoolean,
+  validateCardValue,
+  validateCardColor,
+} from './utils/sanitization';
+import {
   createSession as createDBSession,
   validateSession as validateDBSession,
   updateSessionActivity,
