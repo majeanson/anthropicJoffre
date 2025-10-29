@@ -21,7 +21,10 @@
     "test:ci-full": "playwright test --grep='@quick|@full' --workers=2",
     "test:ci-stress": "playwright test --grep='@stress|@marathon' --workers=1",
     "test:repeatability": "node scripts/repeatability-test.js",
-    "test:stress-bots": "node scripts/stress-test.js"
+    "test:stress-bots": "node scripts/stress-test.js",
+    "test:flakiness": "node scripts/flakiness-detector.js",
+    "test:network": "playwright test tests/network-resilience.spec.ts",
+    "test:stability": "playwright test tests/stability-test-example.spec.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.42.1",
