@@ -13,16 +13,14 @@ import {
  */
 test.describe('Game Flow - 1 Player + 3 Bots', () => {
   let pages: Page[];
-  let contexts: any[];
+  let context: any;
   let gameId: string;
   let botIndices: number[];
 
   test.afterEach(async () => {
-    // Cleanup all contexts
-    if (contexts) {
-      for (const context of contexts) {
-        await context.close();
-      }
+    // Cleanup single context
+    if (context) {
+      await context.close();
     }
   });
 
@@ -38,7 +36,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -130,7 +128,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -238,7 +236,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -354,7 +352,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       // For now, bots use medium difficulty by default
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
 
       // Play one round with easy bots
       await pages[0].waitForSelector('text=/Betting Phase/i', { timeout: 10000 });
@@ -372,10 +370,8 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       const betTexts = await pages[0].locator('[data-testid="player-bet"]').allTextContents();
       console.log('Easy bot bets:', betTexts);
 
-      // Cleanup
-      for (const context of contexts) {
-        await context.close();
-      }
+      // Cleanup (will be handled by afterEach)
+      await context.close();
 
       // Test with hard bots
       console.log('\nTesting with HARD bots...');
@@ -386,7 +382,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
 
       // TODO: Set bot difficulty to hard
 
@@ -419,7 +415,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -474,7 +470,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
 
       const botBehaviorLog = {

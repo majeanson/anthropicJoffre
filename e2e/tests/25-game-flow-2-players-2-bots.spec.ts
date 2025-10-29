@@ -13,16 +13,14 @@ import {
  */
 test.describe('Game Flow - 2 Players + 2 Bots', () => {
   let pages: Page[];
-  let contexts: any[];
+  let context: any;
   let gameId: string;
   let botIndices: number[];
 
   test.afterEach(async () => {
-    // Cleanup all contexts
-    if (contexts) {
-      for (const context of contexts) {
-        await context.close();
-      }
+    // Cleanup single context
+    if (context) {
+      await context.close();
     }
   });
 
@@ -39,7 +37,7 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -136,7 +134,7 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -225,7 +223,7 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -353,7 +351,7 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
       botIndices = result.botPlayerIndices;
 
@@ -431,7 +429,7 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
 
       // Test with one fast human and one slow human
@@ -502,7 +500,7 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       });
 
       pages = result.pages;
-      contexts = result.contexts;
+      context = result.context;
       gameId = result.gameId!;
 
       // Rapid play to test synchronization
