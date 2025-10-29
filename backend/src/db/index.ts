@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
 import type { GameState } from '../types/game';
+import { withCache, CACHE_TTL, queryCache } from '../utils/queryCache';
 
 // Prioritize .env.local for local development (avoids Neon quota usage)
 // Path: backend/src/db -> backend/.env.local (need to go up 2 levels)
@@ -101,6 +102,10 @@ export const markGameFinished = async (gameId: string, winningTeam: 1 | 2) => {
     RETURNING *
   `;
   const result = await query(text, [gameId, winningTeam]);
+
+  // Invalidate recent games cache since a new game just finished
+  queryCache.invalidatePattern('recent_games:');
+
   return result.rows[0];
 };
 
@@ -226,6 +231,10 @@ export const updatePlayerStats = async (
     WHERE player_name = $1
   `, [playerName]);
 
+  // Invalidate caches since stats have changed
+  queryCache.invalidate(`player_stats:${playerName}`);
+  queryCache.invalidatePattern('leaderboard:'); // Rankings may have changed
+
   return result.rows[0];
 };
 
@@ -307,6 +316,10 @@ export const updateRoundStats = async (
       avg_bet_amount = ROUND((total_bet_amount::numeric / NULLIF(total_bets_made, 0)), 2)
     WHERE player_name = $1
   `, [playerName]);
+
+  // Invalidate caches since stats have changed
+  queryCache.invalidate(`player_stats:${playerName}`);
+  queryCache.invalidatePattern('leaderboard:'); // Rankings may have changed
 
   return result.rows[0];
 };
@@ -392,70 +405,84 @@ export const updateGameStats = async (
     WHERE player_name = $1
   `, [playerName]);
 
+  // Invalidate caches since stats have changed
+  queryCache.invalidate(`player_stats:${playerName}`);
+  queryCache.invalidatePattern('leaderboard:'); // Rankings may have changed
+
   return result.rows[0];
 };
 
 /**
  * Get player statistics by name
+ * Cached for 30 seconds to reduce database load on frequently accessed data
  */
 export const getPlayerStats = async (playerName: string) => {
-  const text = `
-    SELECT * FROM player_stats
-    WHERE player_name = $1 AND is_bot = FALSE
-  `;
-  const result = await query(text, [playerName]);
-  const row = result.rows[0];
+  const cacheKey = `player_stats:${playerName}`;
 
-  if (!row) return null;
+  return withCache(cacheKey, CACHE_TTL.PLAYER_STATS, async () => {
+    const text = `
+      SELECT * FROM player_stats
+      WHERE player_name = $1 AND is_bot = FALSE
+    `;
+    const result = await query(text, [playerName]);
+    const row = result.rows[0];
 
-  // Convert string numeric values to numbers
-  return {
-    ...row,
-    rounds_win_percentage: parseFloat(row.rounds_win_percentage) || 0,
-    avg_tricks_per_round: parseFloat(row.avg_tricks_per_round) || 0,
-    avg_points_per_round: parseFloat(row.avg_points_per_round) || 0,
-    bet_success_rate: parseFloat(row.bet_success_rate) || 0,
-    avg_bet_amount: parseFloat(row.avg_bet_amount) || 0,
-    win_percentage: parseFloat(row.win_percentage) || 0,
-    avg_tricks_per_game: parseFloat(row.avg_tricks_per_game) || 0,
-  };
+    if (!row) return null;
+
+    // Convert string numeric values to numbers
+    return {
+      ...row,
+      rounds_win_percentage: parseFloat(row.rounds_win_percentage) || 0,
+      avg_tricks_per_round: parseFloat(row.avg_tricks_per_round) || 0,
+      avg_points_per_round: parseFloat(row.avg_points_per_round) || 0,
+      bet_success_rate: parseFloat(row.bet_success_rate) || 0,
+      avg_bet_amount: parseFloat(row.avg_bet_amount) || 0,
+      win_percentage: parseFloat(row.win_percentage) || 0,
+      avg_tricks_per_game: parseFloat(row.avg_tricks_per_game) || 0,
+    };
+  });
 };
 
 /**
  * Get leaderboard (top players by ELO)
+ * Cached for 60 seconds to reduce database load on expensive sorting queries
  */
 export const getLeaderboard = async (limit: number = 100, excludeBots: boolean = true) => {
-  const text = `
-    SELECT
-      player_name,
-      games_played,
-      games_won,
-      games_lost,
-      win_percentage,
-      elo_rating,
-      highest_rating,
-      total_tricks_won,
-      total_points_earned,
-      total_rounds_played,
-      rounds_won,
-      rounds_win_percentage,
-      avg_tricks_per_round,
-      bet_success_rate,
-      avg_points_per_round,
-      CASE
-        WHEN elo_rating >= 1600 THEN 'Diamond'
-        WHEN elo_rating >= 1400 THEN 'Platinum'
-        WHEN elo_rating >= 1200 THEN 'Gold'
-        WHEN elo_rating >= 1000 THEN 'Silver'
-        ELSE 'Bronze'
-      END as ranking_tier
-    FROM player_stats
-    WHERE is_bot = FALSE ${excludeBots ? '' : 'OR is_bot = TRUE'}
-    ORDER BY elo_rating DESC, win_percentage DESC
-    LIMIT $1
-  `;
-  const result = await query(text, [limit]);
-  return result.rows;
+  const cacheKey = `leaderboard:${limit}:${excludeBots}`;
+
+  return withCache(cacheKey, CACHE_TTL.LEADERBOARD, async () => {
+    const text = `
+      SELECT
+        player_name,
+        games_played,
+        games_won,
+        games_lost,
+        win_percentage,
+        elo_rating,
+        highest_rating,
+        total_tricks_won,
+        total_points_earned,
+        total_rounds_played,
+        rounds_won,
+        rounds_win_percentage,
+        avg_tricks_per_round,
+        bet_success_rate,
+        avg_points_per_round,
+        CASE
+          WHEN elo_rating >= 1600 THEN 'Diamond'
+          WHEN elo_rating >= 1400 THEN 'Platinum'
+          WHEN elo_rating >= 1200 THEN 'Gold'
+          WHEN elo_rating >= 1000 THEN 'Silver'
+          ELSE 'Bronze'
+        END as ranking_tier
+      FROM player_stats
+      WHERE is_bot = FALSE ${excludeBots ? '' : 'OR is_bot = TRUE'}
+      ORDER BY elo_rating DESC, win_percentage DESC
+      LIMIT $1
+    `;
+    const result = await query(text, [limit]);
+    return result.rows;
+  });
 };
 
 /**
@@ -701,15 +728,23 @@ export const saveGameHistory = async (
   return markGameFinished(gameId, winningTeam);
 };
 
+/**
+ * Get recent finished games
+ * Cached for 30 seconds to reduce load on lobby browser queries
+ */
 export const getRecentGames = async (limit: number = 10) => {
-  const text = `
-    SELECT * FROM game_history
-    WHERE is_finished = TRUE
-    ORDER BY finished_at DESC
-    LIMIT $1
-  `;
-  const result = await query(text, [limit]);
-  return result.rows;
+  const cacheKey = `recent_games:${limit}`;
+
+  return withCache(cacheKey, CACHE_TTL.RECENT_GAMES, async () => {
+    const text = `
+      SELECT * FROM game_history
+      WHERE is_finished = TRUE
+      ORDER BY finished_at DESC
+      LIMIT $1
+    `;
+    const result = await query(text, [limit]);
+    return result.rows;
+  });
 };
 
 export default getPool();
