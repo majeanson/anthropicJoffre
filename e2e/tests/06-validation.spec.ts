@@ -105,9 +105,9 @@ test.describe('Validation Feedback', () => {
 
       // Player 3 bets 9
       const page3 = pages[2];
-      const bet9Button = page3.locator('button:has-text("9")').first();
-      await bet9Button.waitFor({ state: 'visible', timeout: 15000 });
-      await bet9Button.click();
+      await page3.getByRole('button', { name: '9', exact: true }).waitFor({ timeout: 15000 });
+      await page3.getByRole('button', { name: '9', exact: true }).click();
+      await page3.getByRole('button', { name: /Place Bet: 9/ }).click();
       await pages[0].waitForTimeout(500);
 
       // Player 4 should see bet 7 button disabled (too low)
@@ -115,12 +115,10 @@ test.describe('Validation Feedback', () => {
       await pages[0].waitForTimeout(500); // Wait for turn
 
       // Button for 7 should be disabled (must raise to 10+)
-      const bet7Button = page4.locator('button:has-text("7")').first();
-      await expect(bet7Button).toBeDisabled({ timeout: 2000 });
+      await expect(page4.getByRole('button', { name: '7', exact: true })).toBeDisabled({ timeout: 2000 });
 
       // Button for 10 should be enabled (valid raise)
-      const bet10Button = page4.locator('button:has-text("10")').first();
-      await expect(bet10Button).toBeEnabled();
+      await expect(page4.getByRole('button', { name: '10', exact: true })).toBeEnabled();
     });
 
     test('should show validation message explaining bet requirements', async ({ browser }) => {
@@ -132,9 +130,10 @@ test.describe('Validation Feedback', () => {
 
       // Player 3 bets 10 with "without trump"
       const page3 = pages[2];
-      const bet10NoTrumpButton = page3.locator('button:has-text("10 (No Trump)")');
-      await bet10NoTrumpButton.waitFor({ state: 'visible', timeout: 15000 });
-      await bet10NoTrumpButton.click();
+      await page3.getByRole('button', { name: '10', exact: true }).waitFor({ timeout: 15000 });
+      await page3.getByRole('button', { name: '10', exact: true }).click();
+      await page3.getByRole('radio', { name: /without trump/i }).click();
+      await page3.getByRole('button', { name: /Place Bet: 10/ }).click();
       await pages[0].waitForTimeout(500);
 
       // Player 4 should see regular 10 button disabled (must beat "without trump")
@@ -142,12 +141,10 @@ test.describe('Validation Feedback', () => {
       await pages[0].waitForTimeout(500); // Wait for turn
 
       // Regular 10 button should be disabled (same amount with trump loses to without trump)
-      const bet10Button = page4.locator('button:has-text("10")').first();
-      await expect(bet10Button).toBeDisabled({ timeout: 2000 });
+      await expect(page4.getByRole('button', { name: '10', exact: true })).toBeDisabled({ timeout: 2000 });
 
       // Button for 11 should be enabled (valid raise)
-      const bet11Button = page4.locator('button:has-text("11")').first();
-      await expect(bet11Button).toBeEnabled();
+      await expect(page4.getByRole('button', { name: '11', exact: true })).toBeEnabled();
     });
 
     test('should show dealer indicator during betting', async ({ browser }) => {
@@ -185,9 +182,9 @@ test.describe('Validation Feedback', () => {
 
       await pages[0].waitForTimeout(500);
 
-      // Second player should see "Led suit" information
+      // Second player should see current turn indicator (validation is visual via disabled cards)
       const secondPlayerIndex = await findCurrentPlayerIndex(pages);
-      await expect(pages[secondPlayerIndex].getByText(/led suit/i)).toBeVisible();
+      await expect(pages[secondPlayerIndex].getByTestId('current-turn-player')).toBeVisible();
     });
 
     test('should visually disable unplayable cards', async ({ browser }) => {
@@ -223,10 +220,11 @@ test.describe('Validation Feedback', () => {
       const pages = result.pages;
       await placeAllBets(pages);
 
-      // Other players should see "Waiting for [PlayerName]..." (more specific to avoid multiple matches)
+      // Other players should see "Waiting for: [PlayerName]" in the current turn indicator
       const currentPlayerIndex = await findCurrentPlayerIndex(pages);
       const otherPlayerIndex = (currentPlayerIndex + 1) % 4;
-      await expect(pages[otherPlayerIndex].getByText(/waiting for player \d+/i)).toBeVisible();
+      await expect(pages[otherPlayerIndex].getByTestId('current-turn-player')).toBeVisible();
+      await expect(pages[otherPlayerIndex].getByText(/Waiting for:/)).toBeVisible();
     });
   });
 });
