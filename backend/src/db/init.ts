@@ -1,9 +1,16 @@
-import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, readdirSync, existsSync } from 'fs';
+import { join, resolve } from 'path';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
-dotenv.config();
+// Prioritize .env.local for local development (avoids Neon quota usage)
+const localEnvPath = resolve(__dirname, '../.env.local');
+if (existsSync(localEnvPath)) {
+  console.log('📝 Using local environment (.env.local)');
+  dotenv.config({ path: localEnvPath });
+} else {
+  dotenv.config();
+}
 
 async function initDatabase() {
   if (!process.env.DATABASE_URL) {

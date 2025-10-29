@@ -1,8 +1,16 @@
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 import type { GameState } from '../types/game';
 
-dotenv.config();
+// Prioritize .env.local for local development (avoids Neon quota usage)
+const localEnvPath = resolve(__dirname, '../.env.local');
+if (existsSync(localEnvPath)) {
+  dotenv.config({ path: localEnvPath });
+} else {
+  dotenv.config();
+}
 
 let pool: Pool | null = null;
 
