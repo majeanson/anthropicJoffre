@@ -28,17 +28,17 @@ const numberColorStyles: Record<CardColor, string> = {
 };
 
 const sizeStyles = {
-  tiny: 'w-12 h-20 text-base',
-  small: 'w-16 h-28 text-lg',
-  medium: 'w-20 h-32 text-2xl',
-  large: 'w-24 h-36 text-3xl',
+  tiny: 'w-14 h-20 text-base sm:w-12 sm:h-20',
+  small: 'w-20 h-32 text-lg md:w-16 md:h-28',
+  medium: 'w-24 h-36 text-2xl md:w-20 md:h-32',
+  large: 'w-28 h-40 text-3xl md:w-24 md:h-36',
 };
 
 const emblemSizeStyles = {
-  tiny: 'w-6 h-6',
-  small: 'w-10 h-10',
-  medium: 'w-12 h-12',
-  large: 'w-16 h-16',
+  tiny: 'w-7 h-7 sm:w-6 sm:h-6',
+  small: 'w-12 h-12 md:w-10 md:h-10',
+  medium: 'w-14 h-14 md:w-12 md:h-12',
+  large: 'w-18 h-18 md:w-16 md:h-16',
 };
 
 function CardComponent({ card, onClick, disabled, size = 'medium' }: CardProps) {
