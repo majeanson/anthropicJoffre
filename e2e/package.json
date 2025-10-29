@@ -19,7 +19,9 @@
     "test:continuous": "playwright test --repeat-each=3 --workers=2 23-game-flow 24-game-flow 25-game-flow",
     "test:ci-quick": "playwright test --grep @quick --workers=4",
     "test:ci-full": "playwright test --grep='@quick|@full' --workers=2",
-    "test:ci-stress": "playwright test --grep='@stress|@marathon' --workers=1"
+    "test:ci-stress": "playwright test --grep='@stress|@marathon' --workers=1",
+    "test:repeatability": "node scripts/repeatability-test.js",
+    "test:stress-bots": "node scripts/stress-test.js"
   },
   "devDependencies": {
     "@playwright/test": "^1.42.1",
