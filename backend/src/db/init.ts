@@ -56,7 +56,13 @@ async function initDatabase() {
     await pool.query(schema);
     console.log('✅ Main tables created');
 
-    // 2. Run all migration files in order
+    // 2. Run round stats schema (adds additional player_stats columns)
+    console.log('📋 Adding round-level stats columns from schema_round_stats.sql...');
+    const roundStatsSchema = readFileSync(join(__dirname, 'schema_round_stats.sql'), 'utf-8');
+    await pool.query(roundStatsSchema);
+    console.log('✅ Round-level stats columns added');
+
+    // 3. Run all migration files in order
     const migrationsDir = join(__dirname, 'migrations');
     let migrationFiles: string[] = [];
 
@@ -80,7 +86,7 @@ async function initDatabase() {
       console.log('✅ All migrations completed');
     }
 
-    // 3. Verify critical tables exist
+    // 4. Verify critical tables exist
     const criticalTables = ['game_history', 'player_stats', 'game_participants', 'active_games', 'game_sessions', 'player_presence'];
     console.log('🔍 Verifying critical tables...');
 
@@ -100,7 +106,7 @@ async function initDatabase() {
       }
     }
 
-    // 4. Initialize sample data for development (skip in CI)
+    // 5. Initialize sample data for development (skip in CI)
     if (process.env.NODE_ENV !== 'test' && process.env.CI !== 'true') {
       console.log('📊 Initializing sample data for development...');
       // Could add sample data here if needed
