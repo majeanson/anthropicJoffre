@@ -75,21 +75,23 @@ function App() {
       }
     });
   }, [])
+
   // Helper function to check if there's a valid session
+  // Uses sessionStorage for multi-tab isolation - each tab maintains its own player session
   const checkValidSession = (): boolean => {
-    const sessionData = localStorage.getItem('gameSession');
+    const sessionData = sessionStorage.getItem('gameSession');
     if (!sessionData) return false;
 
     try {
       const session: PlayerSession = JSON.parse(sessionData);
       const SESSION_TIMEOUT = 120000; // 2 minutes
       if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
-        localStorage.removeItem('gameSession');
+        sessionStorage.removeItem('gameSession');
         return false;
       }
       return true;
     } catch (e) {
-      localStorage.removeItem('gameSession');
+      sessionStorage.removeItem('gameSession');
       return false;
     }
   };
@@ -120,18 +122,18 @@ function App() {
       setReconnecting(false);
 
       // If we have a stale session, clear it
-      const sessionData = localStorage.getItem('gameSession');
+      const sessionData = sessionStorage.getItem('gameSession');
       if (sessionData) {
         try {
           const session: PlayerSession = JSON.parse(sessionData);
           const SESSION_TIMEOUT = 900000; // 15 minutes
           if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
-            localStorage.removeItem('gameSession');
+            sessionStorage.removeItem('gameSession');
             setGameState(null);
             setGameId('');
           }
         } catch (e) {
-          localStorage.removeItem('gameSession');
+          sessionStorage.removeItem('gameSession');
         }
       }
     });
@@ -140,7 +142,7 @@ function App() {
       // Don't immediately clear state - allow for reconnection
       if (reason === 'io server disconnect') {
         // Server forcefully disconnected, clear session
-        localStorage.removeItem('gameSession');
+        sessionStorage.removeItem('gameSession');
         setGameState(null);
         setGameId('');
       }
@@ -163,18 +165,18 @@ function App() {
       setGameId(gameId);
       setGameState(gameState);
 
-      // Save session to localStorage
+      // Save session to sessionStorage (multi-tab isolation)
       if (session) {
-        localStorage.setItem('gameSession', JSON.stringify(session));
+        sessionStorage.setItem('gameSession', JSON.stringify(session));
       }
     });
 
     newSocket.on('player_joined', ({ gameState, session }: { gameState: GameState; session?: PlayerSession }) => {
       setGameState(gameState);
 
-      // Save session to localStorage
+      // Save session to sessionStorage (multi-tab isolation)
       if (session) {
-        localStorage.setItem('gameSession', JSON.stringify(session));
+        sessionStorage.setItem('gameSession', JSON.stringify(session));
       } else {
       }
     });
@@ -203,15 +205,15 @@ function App() {
       // This ensures bots continue playing after human player reconnects
       spawnBotsForGame(gameState);
 
-      // Update session in localStorage
-      localStorage.setItem('gameSession', JSON.stringify(session));
+      // Update session in sessionStorage (multi-tab isolation)
+      sessionStorage.setItem('gameSession', JSON.stringify(session));
     });
 
     newSocket.on('reconnection_failed', ({ message }: { message: string }) => {
       setReconnecting(false);
 
       // Clear invalid session
-      localStorage.removeItem('gameSession');
+      sessionStorage.removeItem('gameSession');
 
       // Reset game state to go back to lobby
       setGameState(null);
@@ -290,7 +292,7 @@ function App() {
       }
 
       // Clear session on game over
-      localStorage.removeItem('gameSession');
+      sessionStorage.removeItem('gameSession');
     });
 
     // Listen for rematch events
@@ -317,7 +319,7 @@ function App() {
           token: `${gameState.id}_${currentPlayer.id}_${Date.now()}`,
           timestamp: Date.now()
         };
-        localStorage.setItem('gameSession', JSON.stringify(session));
+        sessionStorage.setItem('gameSession', JSON.stringify(session));
       }
     });
 
@@ -358,7 +360,7 @@ function App() {
         duration: 5000,
       });
       // Clear session and reset state
-      localStorage.removeItem('gameSession');
+      sessionStorage.removeItem('gameSession');
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
@@ -366,7 +368,7 @@ function App() {
 
     newSocket.on('leave_game_success', () => {
       // Clear session and reset state
-      localStorage.removeItem('gameSession');
+      sessionStorage.removeItem('gameSession');
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
@@ -409,7 +411,7 @@ function App() {
 
       // If we're the one taking over, save our session
       if (session) {
-        localStorage.setItem('gameSession', JSON.stringify(session));
+        sessionStorage.setItem('gameSession', JSON.stringify(session));
       }
 
       // Clean up old bot socket if it exists
@@ -430,7 +432,7 @@ function App() {
         duration: 5000,
       });
       // Clear session and reset state
-      localStorage.removeItem('gameSession');
+      sessionStorage.removeItem('gameSession');
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
@@ -595,7 +597,7 @@ function App() {
   };
 
   const handleRejoinGame = () => {
-    const sessionData = localStorage.getItem('gameSession');
+    const sessionData = sessionStorage.getItem('gameSession');
     if (!sessionData || !socket) return;
 
     try {
@@ -603,7 +605,7 @@ function App() {
       setReconnecting(true);
       socket.emit('reconnect_to_game', { token: session.token });
     } catch (e) {
-      localStorage.removeItem('gameSession');
+      sessionStorage.removeItem('gameSession');
       setHasValidSession(false);
     }
   };
@@ -1019,6 +1021,20 @@ function App() {
     return (
       <>
         <GlobalUI />
+        {/* Multi-Tab Support Indicator */}
+        {sessionStorage.getItem('gameSession') && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 max-w-md">
+            <div className="bg-blue-500/90 dark:bg-blue-600/90 backdrop-blur-sm border-2 border-blue-400 dark:border-blue-500 rounded-lg px-4 py-2 shadow-lg">
+              <div className="flex items-center gap-2 text-white">
+                <span className="text-xl">🪟</span>
+                <div className="text-sm">
+                  <div className="font-semibold">Multi-Tab Mode Active</div>
+                  <div className="text-blue-100 text-xs">Each tab maintains an independent player session</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         <Lobby
           onCreateGame={handleCreateGame}
           onJoinGame={handleJoinGame}

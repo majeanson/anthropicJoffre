@@ -1,13 +1,15 @@
 {
-  "buildDate": "2025-10-28T17:00:00.000Z",
-  "version": "1.0.9",
+  "buildDate": "2025-10-28T21:00:00.000Z",
+  "version": "1.0.11",
   "git": {
-    "commitMessage": "refactor: Remove score manipulation from @quick tests, improve bot test stability",
+    "commitMessage": "feat: Add multi-tab support with sessionStorage isolation",
     "commitHash": "pending",
-    "commitDate": "2025-10-28 17:00:00 +0000",
+    "commitDate": "2025-10-28 21:00:00 +0000",
     "branch": "main"
   },
   "futureTodos": [
+    "Refactor E2E Tests - Single-browser architecture for stability",
+    "WebSocket Integration Tests - Backend multi-player test suite",
     "Improve Bot AI - Advanced strategy and card tracking",
     "Enhanced Leaderboard - Charts, statistics, and CSV export",
     "Achievements & Badges System - Earn rewards for milestones",
