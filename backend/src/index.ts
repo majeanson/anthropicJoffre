@@ -2,9 +2,18 @@
 import * as Sentry from '@sentry/node';
 import { nodeProfilingIntegration } from '@sentry/profiling-node';
 import dotenv from 'dotenv';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 
 // Load environment variables first
-dotenv.config();
+// Prioritize .env.local for local development (avoids Neon quota usage)
+const localEnvPath = resolve(__dirname, '../.env.local');
+if (existsSync(localEnvPath)) {
+  console.log('📝 Using local environment (.env.local)');
+  dotenv.config({ path: localEnvPath });
+} else {
+  dotenv.config();
+}
 
 // Initialize Sentry for error tracking
 if (process.env.SENTRY_DSN) {
