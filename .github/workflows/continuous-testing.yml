@@ -5,9 +5,10 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  schedule:
-    # Run tests every 6 hours
-    - cron: '0 */6 * * *'
+  # schedule:
+  #   # Run tests every 6 hours (DISABLED to reduce Neon compute usage)
+  #   # Re-enable only if needed for monitoring
+  #   - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       test_mode:

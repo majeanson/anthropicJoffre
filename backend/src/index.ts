@@ -2961,8 +2961,13 @@ httpServer.listen(PORT, HOST, async () => {
   }
 
   // ============= PERIODIC CLEANUP =============
-  // Clean up stale games every hour
+  // Clean up stale games every hour (ONLY when games exist to reduce DB compute usage)
   setInterval(async () => {
+    // Skip cleanup if no games in memory (reduces Neon compute usage)
+    if (games.size === 0) {
+      return;
+    }
+
     try {
       console.log('[Cleanup] Running stale game cleanup...');
       const staleGames = await cleanupStaleGames();
@@ -2985,8 +2990,13 @@ httpServer.listen(PORT, HOST, async () => {
   }, 3600000); // Run every hour
 
   // ============= PERIODIC STATE SNAPSHOTS =============
-  // Save game snapshots every 30 seconds for recovery
+  // Save game snapshots every 30 seconds for recovery (ONLY when active games exist)
   setInterval(async () => {
+    // Skip if no games at all (reduces Neon compute usage)
+    if (games.size === 0) {
+      return;
+    }
+
     const activeGames = Array.from(games.values()).filter(game => game.phase !== 'game_over');
 
     if (activeGames.length > 0) {

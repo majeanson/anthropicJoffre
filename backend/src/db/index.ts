@@ -10,8 +10,8 @@ const getPool = () => {
   if (!pool && process.env.DATABASE_URL) {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      max: 20,                      // Maximum connections in pool
-      idleTimeoutMillis: 30000,     // Close idle connections after 30s
+      max: 10,                      // Maximum connections in pool (reduced for Neon)
+      idleTimeoutMillis: 10000,     // Close idle connections after 10s (Neon scale-to-zero optimization)
       connectionTimeoutMillis: 2000, // Fail fast if can't connect in 2s
     });
 
