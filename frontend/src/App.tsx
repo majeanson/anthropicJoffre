@@ -17,7 +17,10 @@ import { BotTakeoverModal } from './components/BotTakeoverModal';
 import { Toast, ToastProps } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
 import { GameReplay } from './components/GameReplay';
-import { BotPlayer, BotDifficulty } from './utils/botPlayer';
+// Use enhanced bot AI with advanced strategic concepts
+import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayerEnhanced';
+// Fallback to original bot player if needed:
+// import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { addRecentPlayers } from './utils/recentPlayers';
 import { ErrorBoundary } from './components/ErrorBoundary';
