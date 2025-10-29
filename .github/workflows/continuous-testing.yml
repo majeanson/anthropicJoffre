@@ -27,6 +27,15 @@ jobs:
     name: Quick Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+
+    # Set database credentials at job level to ensure all steps use correct user
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: trickgame
+
     strategy:
       fail-fast: false
       matrix:
@@ -42,10 +51,10 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d trickgame"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 30
 
     steps:
       - uses: actions/checkout@v4
@@ -63,14 +72,18 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           cd ../e2e && npm ci
-          npx playwright install chromium
+          npx playwright install --with-deps
 
       - name: Setup Database
         run: |
           cd backend
+          export PGPASSWORD=$PGPASSWORD
+          echo "Waiting for Postgres (host=$PGHOST user=$PGUSER db=$PGDATABASE)..."
+          until pg_isready -h $PGHOST -p 5432 -U $PGUSER; do
+            echo "Waiting for postgres..."
+            sleep 1
+          done
           npm run db:init || true
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
 
       - name: Run Quick Tests (Shard ${{ matrix.shard }}/4)
         run: |
@@ -103,6 +116,14 @@ jobs:
     timeout-minutes: 120
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
+    # Set database credentials at job level to ensure all steps use correct user
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: trickgame
+
     services:
       postgres:
         image: postgres:15
@@ -113,10 +134,10 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U postgres -d trickgame"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 5
+          --health-retries 30
 
     steps:
       - uses: actions/checkout@v4
@@ -134,14 +155,18 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           cd ../e2e && npm ci
-          npx playwright install
+          npx playwright install --with-deps
 
       - name: Setup Database
         run: |
           cd backend
+          export PGPASSWORD=$PGPASSWORD
+          echo "Waiting for Postgres (host=$PGHOST user=$PGUSER db=$PGDATABASE)..."
+          until pg_isready -h $PGHOST -p 5432 -U $PGUSER; do
+            echo "Waiting for postgres..."
+            sleep 1
+          done
           npm run db:init || true
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
 
       - name: Run Full Tests
         run: |
@@ -182,7 +207,7 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           cd ../e2e && npm ci
-          npx playwright install chromium
+          npx playwright install --with-deps
 
       - name: Run Stress Tests
         run: |
@@ -229,7 +254,7 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           cd ../e2e && npm ci
-          npx playwright install chromium
+          npx playwright install --with-deps
 
       - name: Run Marathon Tests
         run: |
@@ -268,7 +293,7 @@ jobs:
           cd backend && npm ci
           cd ../frontend && npm ci
           cd ../e2e && npm ci
-          npx playwright install
+          npx playwright install --with-deps
 
       - name: Run Continuous Tests
         run: |
