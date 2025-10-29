@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Socket } from 'socket.io-client';
 import { Card as CardComponent } from './Card';
 import { Leaderboard } from './Leaderboard';
@@ -24,7 +24,7 @@ interface PlayingPhaseProps {
   onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
+function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -40,8 +40,16 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
   const [cardInTransition, setCardInTransition] = useState<CardType | null>(null);
 
-  const currentPlayer = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
-  const isCurrentTurn = !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
+  // Memoize expensive computations
+  const currentPlayer = useMemo(
+    () => isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId),
+    [gameState.players, currentPlayerId, isSpectator]
+  );
+
+  const isCurrentTurn = useMemo(
+    () => !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId,
+    [isSpectator, gameState.players, gameState.currentPlayerIndex, currentPlayerId]
+  );
 
   // Safety check: If player not found and not spectator, show error
   if (!currentPlayer && !isSpectator) {
@@ -92,14 +100,14 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
   }, [chatOpen]);
 
   // Toggle sound on/off
-  const toggleSound = () => {
+  const toggleSound = useCallback(() => {
     const newState = !soundEnabled;
     setSoundEnabled(newState);
     sounds.setEnabled(newState);
     if (newState) {
       sounds.buttonClick(); // Play test sound when enabling
     }
-  };
+  }, [soundEnabled]);
 
   // Reset isPlayingCard flag when it's no longer the player's turn or when trick changes
   useEffect(() => {
@@ -260,9 +268,9 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     return positions;
   };
 
-  // Determine which cards are playable
-  const getPlayableCards = (): CardType[] => {
-    if (!isCurrentTurn) return [];
+  // Determine which cards are playable (memoized for performance)
+  const playableCards = useMemo(() => {
+    if (!isCurrentTurn || !currentPlayer) return [];
 
     // If no cards in trick, all cards are playable
     if (gameState.currentTrick.length === 0) return currentPlayer.hand;
@@ -278,15 +286,13 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
 
     // Otherwise, all cards are playable
     return currentPlayer.hand;
-  };
+  }, [isCurrentTurn, currentPlayer, gameState.currentTrick]);
 
-  const playableCards = getPlayableCards();
-
-  const isCardPlayable = (card: CardType): boolean => {
+  const isCardPlayable = useCallback((card: CardType): boolean => {
     return playableCards.some(c => c.color === card.color && c.value === card.value);
-  };
+  }, [playableCards]);
 
-  const handleCardClick = (card: CardType) => {
+  const handleCardClick = useCallback((card: CardType) => {
     // Prevent multiple rapid clicks
     if (isPlayingCard) {
       return;
@@ -309,7 +315,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     setTimeout(() => {
       setCardInTransition(null);
     }, 450); // Slightly longer than the 400ms animation
-  };
+  }, [isPlayingCard, isCurrentTurn, isCardPlayable, onPlayCard]);
 
   const cardPositions = getCardPositions(gameState.currentTrick);
   const previousCardPositions = gameState.previousTrick ? getCardPositions(gameState.previousTrick.trick) : null;
@@ -786,3 +792,7 @@ export function PlayingPhase({ gameState, currentPlayerId, onPlayCard, isSpectat
     </div>
   );
 }
+
+// Export memoized component to prevent unnecessary re-renders
+// Only re-render when game state, player ID, or critical props change
+export const PlayingPhase = memo(PlayingPhaseComponent);

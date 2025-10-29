@@ -1,3 +1,4 @@
+import { memo, useMemo } from 'react';
 import { Card as CardType, CardColor } from '../types/game';
 
 interface CardProps {
@@ -40,20 +41,32 @@ const emblemSizeStyles = {
   large: 'w-16 h-16',
 };
 
-export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
-  const isSpecial = (card.color === 'red' || card.color === 'brown') && card.value === 0;
-  const badgeSize = size === 'tiny' ? 'text-[8px] px-0.5' : size === 'small' ? 'text-[9px] px-0.5' : 'text-xs px-1';
-  const borderWidth = size === 'tiny' ? 'border-2' : size === 'small' ? 'border-3' : 'border-4';
+function CardComponent({ card, onClick, disabled, size = 'medium' }: CardProps) {
+  // Memoize expensive calculations
+  const isSpecial = useMemo(
+    () => (card.color === 'red' || card.color === 'brown') && card.value === 0,
+    [card.color, card.value]
+  );
+
+  const badgeSize = useMemo(
+    () => size === 'tiny' ? 'text-[8px] px-0.5' : size === 'small' ? 'text-[9px] px-0.5' : 'text-xs px-1',
+    [size]
+  );
+
+  const borderWidth = useMemo(
+    () => size === 'tiny' ? 'border-2' : size === 'small' ? 'border-3' : 'border-4',
+    [size]
+  );
 
   // Determine which image to show
-  const getCardImage = () => {
+  const cardImage = useMemo(() => {
     if (isSpecial) {
       // Use special bon images for red 0 and brown 0
       return `/cards/${card.color}_bon.jpg`;
     }
     // Use emblem for regular cards
     return `/cards/${card.color}_emblem.jpg`;
-  };
+  }, [isSpecial, card.color]);
 
   return (
     <button
@@ -83,7 +96,7 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
 
       {/* Center emblem or special card image */}
       <img
-        src={getCardImage()}
+        src={cardImage}
         alt={`${card.color} ${isSpecial ? 'bon' : 'emblem'}`}
         className={`${emblemSizeStyles[size]} object-contain ${isSpecial ? '' : 'opacity-90'}`}
       />
@@ -104,3 +117,19 @@ export function Card({ card, onClick, disabled, size = 'medium' }: CardProps) {
     </button>
   );
 }
+
+// Custom comparison function for React.memo
+// Only re-render if card, disabled, or size changes
+function arePropsEqual(prevProps: CardProps, nextProps: CardProps) {
+  return (
+    prevProps.card.color === nextProps.card.color &&
+    prevProps.card.value === nextProps.card.value &&
+    prevProps.disabled === nextProps.disabled &&
+    prevProps.size === nextProps.size &&
+    prevProps.onClick === nextProps.onClick
+  );
+}
+
+// Export memoized component for better performance
+// This prevents re-renders when parent components update unnecessarily
+export const Card = memo(CardComponent, arePropsEqual);

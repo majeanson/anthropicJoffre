@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback, memo } from 'react';
 import { Socket } from 'socket.io-client';
 import { Bet, Player, GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
@@ -26,14 +26,33 @@ interface BettingPhaseProps {
   onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-export function BettingPhase({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
-  const hasPlacedBet = currentBets.some(b => b.playerId === currentPlayerId);
-  const isMyTurn = players[currentPlayerIndex]?.id === currentPlayerId;
-  const isDealer = currentPlayerIndex === dealerIndex;
+function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+  // Memoize expensive computations
+  const hasPlacedBet = useMemo(
+    () => currentBets.some(b => b.playerId === currentPlayerId),
+    [currentBets, currentPlayerId]
+  );
+
+  const isMyTurn = useMemo(
+    () => players[currentPlayerIndex]?.id === currentPlayerId,
+    [players, currentPlayerIndex, currentPlayerId]
+  );
+
+  const isDealer = useMemo(
+    () => currentPlayerIndex === dealerIndex,
+    [currentPlayerIndex, dealerIndex]
+  );
 
   // Get current player's hand
-  const currentPlayer = players.find(p => p.id === currentPlayerId);
-  const playerHand = currentPlayer?.hand || [];
+  const currentPlayer = useMemo(
+    () => players.find(p => p.id === currentPlayerId),
+    [players, currentPlayerId]
+  );
+
+  const playerHand = useMemo(
+    () => currentPlayer?.hand || [],
+    [currentPlayer]
+  );
 
   // State for bet selection
   const [selectedAmount, setSelectedAmount] = useState<number>(7);
@@ -348,3 +367,7 @@ export function BettingPhase({ players, currentBets, currentPlayerId, currentPla
     </div>
   );
 }
+
+// Export memoized component to prevent unnecessary re-renders
+// Only re-render when bets, players, or critical props change
+export const BettingPhase = memo(BettingPhaseComponent);
