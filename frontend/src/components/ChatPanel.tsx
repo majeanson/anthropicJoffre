@@ -76,30 +76,22 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
   if (!isOpen) return null;
 
   return (
-    <>
-      {/* Backdrop for mobile */}
-      <div
-        className="md:hidden fixed inset-0 bg-black/50 z-40"
-        onClick={onClose}
-      />
+    <div className="fixed right-4 bottom-4 w-80 md:w-80 bg-parchment-50 dark:bg-gray-800 rounded-lg shadow-2xl border-4 border-amber-700 dark:border-gray-600 flex flex-col max-h-96 z-50">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-amber-700 to-amber-800 dark:from-gray-700 dark:to-gray-900 text-parchment-50 dark:text-gray-100 px-4 py-3 rounded-t-md flex justify-between items-center">
+        <h3 className="font-bold flex items-center gap-2">
+          💬 Chat
+        </h3>
+        <button
+          onClick={onClose}
+          className="text-parchment-50 hover:text-parchment-200 text-xl font-bold leading-none"
+        >
+          ×
+        </button>
+      </div>
 
-      {/* Chat Panel - Bottom sheet on mobile, floating on desktop */}
-      <div className="fixed bottom-0 left-0 right-0 md:right-4 md:bottom-4 md:left-auto md:w-80 bg-parchment-50 dark:bg-gray-800 rounded-t-lg md:rounded-lg shadow-2xl border-4 border-t-amber-700 md:border-amber-700 dark:border-gray-600 flex flex-col max-h-[70vh] md:max-h-96 z-50">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-amber-700 to-amber-800 dark:from-gray-700 dark:to-gray-900 text-parchment-50 dark:text-gray-100 px-4 py-3 rounded-t-md flex justify-between items-center">
-          <h3 className="font-bold flex items-center gap-2">
-            💬 Chat
-          </h3>
-          <button
-            onClick={onClose}
-            className="text-parchment-50 hover:text-parchment-200 text-xl font-bold leading-none"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-3 bg-parchment-100 dark:bg-gray-700 min-h-[200px] max-h-[40vh] md:max-h-[250px]">
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-3 bg-parchment-100 dark:bg-gray-700 min-h-[200px] max-h-[250px]">
         {messages.length === 0 ? (
           <p className="text-sm text-umber-500 text-center py-4">No messages yet. Say something!</p>
         ) : (
@@ -162,8 +154,7 @@ export function ChatPanel({ socket, gameId, currentPlayerId, isOpen, onClose, me
           </button>
         </div>
       </form>
-      </div>
-    </>
+    </div>
   );
 }
 
