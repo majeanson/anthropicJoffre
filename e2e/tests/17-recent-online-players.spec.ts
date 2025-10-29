@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Recent and Online Players', () => {
+  let context: any;
+
+  test.afterEach(async () => {
+    if (context) {
+      await context.close();
+    }
+  });
+
   test('should show Recent/Online tabs in lobby', async ({ page }) => {
     await page.goto('http://localhost:5177');
 
@@ -27,12 +35,11 @@ test.describe('Recent and Online Players', () => {
   });
 
   test('should show online players when multiple users connect', async ({ browser }) => {
-    // Create two browser contexts
-    const context1 = await browser.newContext();
-    const context2 = await browser.newContext();
+    // Single context with multiple pages (tabs) - sessionStorage provides isolation
+    context = await browser.newContext();
 
-    const page1 = await context1.newPage();
-    const page2 = await context2.newPage();
+    const page1 = await context.newPage();
+    const page2 = await context.newPage();
 
     // Player 1 creates a game
     await page1.goto('http://localhost:5177');
@@ -54,15 +61,11 @@ test.describe('Recent and Online Players', () => {
 
     // Should see Player One online
     await expect(page2.getByText('Player One')).toBeVisible({ timeout: 10000 });
-
-    // Cleanup
-    await context1.close();
-    await context2.close();
   });
 
   test('should load recent players from localStorage on mount', async ({ browser }) => {
     // This test verifies that the Recent Players tab loads properly
-    const context = await browser.newContext();
+    context = await browser.newContext();
     const page = await context.newPage();
 
     await page.goto('http://localhost:5177');
@@ -75,13 +78,12 @@ test.describe('Recent and Online Players', () => {
 
     // Should show empty state initially
     await expect(page.getByText('No recent players yet').first()).toBeVisible();
-
-    await context.close();
   });
 
   test('should show player status correctly', async ({ browser }) => {
-    const context1 = await browser.newContext();
-    const page1 = await context1.newPage();
+    // Single context with multiple pages (tabs) - sessionStorage provides isolation
+    context = await browser.newContext();
+    const page1 = await context.newPage();
 
     // Create a game
     await page1.goto('http://localhost:5177');
@@ -92,9 +94,8 @@ test.describe('Recent and Online Players', () => {
     // Wait for game creation
     await page1.waitForSelector('text=/game id/i', { timeout: 5000 });
 
-    // Open second browser to check online status
-    const context2 = await browser.newContext();
-    const page2 = await context2.newPage();
+    // Open second tab to check online status
+    const page2 = await context.newPage();
 
     await page2.goto('http://localhost:5177');
     await page2.getByRole('button', { name: /online now/i }).click();
@@ -104,17 +105,14 @@ test.describe('Recent and Online Players', () => {
 
     // Should show StatusTest player name in online list
     await expect(page2.getByText('StatusTest')).toBeVisible({ timeout: 10000 });
-
-    await context1.close();
-    await context2.close();
   });
 
   test('should allow copying invite link from online players', async ({ browser }) => {
-    const context1 = await browser.newContext();
-    const context2 = await browser.newContext();
+    // Single context with multiple pages (tabs) - sessionStorage provides isolation
+    context = await browser.newContext();
 
-    const page1 = await context1.newPage();
-    const page2 = await context2.newPage();
+    const page1 = await context.newPage();
+    const page2 = await context.newPage();
 
     // Player 1 creates a game
     await page1.goto('http://localhost:5177');
@@ -148,8 +146,5 @@ test.describe('Recent and Online Players', () => {
       // Should show toast notification
       await expect(page2.getByText(/invite link copied/i)).toBeVisible({ timeout: 3000 });
     }
-
-    await context1.close();
-    await context2.close();
   });
 });

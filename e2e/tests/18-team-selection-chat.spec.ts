@@ -1,6 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Team Selection Chat', () => {
+  let context: any;
+
+  test.afterEach(async () => {
+    if (context) {
+      await context.close();
+    }
+  });
+
   test('should show chat box in team selection phase', async ({ page }) => {
     await page.goto('http://localhost:5177');
 
@@ -18,11 +26,11 @@ test.describe('Team Selection Chat', () => {
   });
 
   test('should send and receive chat messages', async ({ browser }) => {
-    const context1 = await browser.newContext();
-    const context2 = await browser.newContext();
+    // Single context with multiple pages (tabs) - sessionStorage provides isolation
+    context = await browser.newContext();
 
-    const page1 = await context1.newPage();
-    const page2 = await context2.newPage();
+    const page1 = await context.newPage();
+    const page2 = await context.newPage();
 
     // Player 1 creates a game
     await page1.goto('http://localhost:5177');
@@ -64,13 +72,10 @@ test.describe('Team Selection Chat', () => {
 
     // Player 1 should see Player 2's message
     await expect(page1.getByText('Hi from Player 2!')).toBeVisible({ timeout: 5000 });
-
-    await context1.close();
-    await context2.close();
   });
 
   test('should show different colors for different teams', async ({ browser }) => {
-    const context = await browser.newContext();
+    context = await browser.newContext();
     const page = await context.newPage();
 
     // Create a game and join a team
@@ -91,8 +96,6 @@ test.describe('Team Selection Chat', () => {
 
     // Message should be visible (team-colored styling is visual, hard to test)
     await expect(page.getByText('Testing team colors')).toBeVisible();
-
-    await context.close();
   });
 
   test('should limit message length to 200 characters', async ({ page }) => {
