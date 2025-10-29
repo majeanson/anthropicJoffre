@@ -2,8 +2,18 @@ import { test, expect } from '@playwright/test';
 import { createGameWith4Players } from './helpers';
 
 test.describe('UI Improvements', () => {
+  let context: any;
+
+  test.afterEach(async () => {
+    if (context) {
+      await context.close();
+    }
+  });
+
   test('should show leaderboard button in betting phase', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     const [player1] = pages;
 
     // Wait for betting phase
@@ -21,15 +31,12 @@ test.describe('UI Improvements', () => {
     const closeButton = player1.getByRole('button', { name: /close/i });
     await closeButton.click();
     await expect(player1.getByText(/Current Standings/i)).not.toBeVisible();
-
-    // Cleanup
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should show autoplay toggle button in betting and playing phases', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     const [player1] = pages;
 
     // Wait for betting phase
@@ -55,15 +62,12 @@ test.describe('UI Improvements', () => {
     // The playing phase button uses emojis, so we look for the title attribute
     const autoplayButtonPlaying = player1.locator('button[title*="Autoplay"]').first();
     await expect(autoplayButtonPlaying).toBeVisible();
-
-    // Cleanup
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should maintain consistent height for waiting badge', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     const [player1] = pages;
 
     // Complete betting phase by having all players skip or bet
@@ -86,15 +90,12 @@ test.describe('UI Improvements', () => {
 
     // Note: This test verifies the CSS exists, actual height comparison would require
     // playing through a trick which is complex. The min-h class ensures consistency.
-
-    // Cleanup
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should display team-based round summary with points badges', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     const [player1] = pages;
 
     // Play through a complete round to see round summary
@@ -103,15 +104,12 @@ test.describe('UI Improvements', () => {
 
     // For this test, we verify the component structure by checking App.tsx
     // The actual gameplay to reach scoring phase would require significant setup
-
-    // Cleanup
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 
   test('should enable autoplay and have bot make decisions', async ({ browser }) => {
-    const { contexts, pages } = await createGameWith4Players(browser);
+    const result = await createGameWith4Players(browser);
+    context = result.context;
+    const pages = result.pages;
     const [player1] = pages;
 
     // Wait for betting phase
@@ -128,10 +126,5 @@ test.describe('UI Improvements', () => {
     // Check if bet was placed or waiting message appears
     const hasBetOrWaiting = await player1.locator('text=/Waiting for other players|Place Bet/i').first().isVisible();
     expect(hasBetOrWaiting).toBeTruthy();
-
-    // Cleanup
-    for (const context of contexts) {
-      await context.close();
-    }
   });
 });
