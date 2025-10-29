@@ -10,7 +10,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "db:setup": "tsx src/db/setup.ts"
+    "db:setup": "tsx src/db/setup.ts",
+    "db:init": "tsx src/db/init.ts"
   },
   "dependencies": {
     "@sentry/node": "^10.21.0",
