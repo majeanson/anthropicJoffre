@@ -27,6 +27,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
+import { ConnectionManager } from './connection/ConnectionManager';
 import { GameState, Player, Bet, TrickCard, Card, PlayerSession } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
 import {
@@ -131,6 +132,24 @@ const io = new Server(httpServer, {
   // Ping timeout and interval for faster disconnect detection
   pingTimeout: 10000, // 10 seconds
   pingInterval: 5000,  // 5 seconds
+});
+
+// Initialize connection manager for robust connection handling
+const connectionManager = new ConnectionManager(io, {
+  heartbeatInterval: 25000,  // 25 seconds
+  heartbeatTimeout: 60000,   // 60 seconds
+  maxReconnectionTime: 5 * 60 * 1000, // 5 minutes
+  messageQueueLimit: 100,
+  enableLogging: process.env.NODE_ENV === 'development'
+});
+
+// Log connection events
+connectionManager.on('connection_lost', ({ playerName, gameId }) => {
+  console.log(`Connection lost: ${playerName} in game ${gameId}`);
+});
+
+connectionManager.on('connection_timeout', ({ playerName, socketId }) => {
+  console.log(`Connection timeout: ${playerName} (${socketId})`);
 });
 
 // Configure CORS for Express
@@ -1038,6 +1057,9 @@ app.get('/api/players/online', async (req, res) => {
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
 
+  // Register connection with ConnectionManager
+  connectionManager.registerConnection(socket);
+
   socket.on('create_game', async (playerName: string) => {
     // Apply game creation rate limiting
     const clientIp = (socket.request as any).connection.remoteAddress;
@@ -1099,6 +1121,12 @@ io.on('connection', (socket) => {
     }
 
     socket.emit('game_created', { gameId, gameState, session });
+
+    // Associate player with connection manager
+    const creator = gameState.players.find(p => p.name === sanitizedName);
+    if (creator) {
+      connectionManager.associatePlayer(socket.id, sanitizedName, creator.id, gameId, false);
+    }
   });
 
   socket.on('join_game', async ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
@@ -1262,6 +1290,9 @@ io.on('connection', (socket) => {
 
     // Broadcast to other players without session info
     socket.to(gameId).emit('player_joined', { player, gameState: game });
+
+    // Associate player with connection manager
+    connectionManager.associatePlayer(socket.id, playerName, player.id, gameId, isBot || false);
   });
 
   socket.on('select_team', ({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
