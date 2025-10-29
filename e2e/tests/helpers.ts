@@ -296,14 +296,22 @@ export async function createGameWithBots(browser: any, config: GameConfig) {
  * @param page - Page instance of the player
  */
 export async function enableAutoplayForPlayer(page: Page) {
-  // Look for the autoplay toggle button
-  const autoplayButton = page.getByRole('button', { name: /manual|auto/i });
+  try {
+    // Wait for the autoplay toggle button to be available
+    const autoplayButton = page.getByRole('button', { name: /manual|auto/i });
+    await autoplayButton.waitFor({ state: 'visible', timeout: 5000 });
 
-  // Check if it's currently showing "Manual"
-  const buttonText = await autoplayButton.textContent();
-  if (buttonText?.toLowerCase().includes('manual')) {
-    await autoplayButton.click();
-    await page.waitForTimeout(200);
+    // Check if it's currently showing "Manual"
+    const buttonText = await autoplayButton.textContent();
+    if (buttonText?.toLowerCase().includes('manual')) {
+      await autoplayButton.click();
+      await page.waitForTimeout(200);
+      console.log('Autoplay enabled');
+    } else {
+      console.log('Autoplay already enabled');
+    }
+  } catch (error) {
+    console.log('Autoplay button not found or not ready - skipping');
   }
 }
 

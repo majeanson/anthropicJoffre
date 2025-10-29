@@ -35,7 +35,6 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       const result = await createGameWithBots(browser, {
         humanPlayers: 2,
         botPlayers: 2,
-        startScores: { team1: 36, team2: 35 },
         playerNames: ['Human1', 'Human2', 'Bot1', 'Bot2']
       });
 
@@ -133,7 +132,6 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       const result = await createGameWithBots(browser, {
         humanPlayers: 2,
         botPlayers: 2,
-        startScores: { team1: 30, team2: 30 },
         playerNames: ['TeamLead1', 'TeamLead2', 'Support1', 'Support2']
       });
 
@@ -352,7 +350,6 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       const result = await createGameWithBots(browser, {
         humanPlayers: 2,
         botPlayers: 2,
-        startScores: { team1: 20, team2: 20 }
       });
 
       pages = result.pages;
@@ -431,7 +428,6 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       const result = await createGameWithBots(browser, {
         humanPlayers: 2,
         botPlayers: 2,
-        startScores: { team1: 30, team2: 30 }
       });
 
       pages = result.pages;
@@ -503,7 +499,6 @@ test.describe('Game Flow - 2 Players + 2 Bots', () => {
       const result = await createGameWithBots(browser, {
         humanPlayers: 2,
         botPlayers: 2,
-        startScores: { team1: 38, team2: 38 }
       });
 
       pages = result.pages;

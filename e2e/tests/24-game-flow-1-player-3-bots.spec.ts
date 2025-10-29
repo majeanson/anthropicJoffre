@@ -27,14 +27,13 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
   });
 
   test.describe('@quick Quick Bot Games', () => {
-    test('should complete a game with 3 bots from near end-game', async ({ browser }) => {
-      test.setTimeout(120000); // 2 minutes
+    test('should complete a game with 3 bots', async ({ browser }) => {
+      test.setTimeout(180000); // 3 minutes (bots play fast)
 
       // Create game with 1 human and 3 bots
       const result = await createGameWithBots(browser, {
         humanPlayers: 1,
         botPlayers: 3,
-        startScores: { team1: 38, team2: 37 },
         playerNames: ['Human', 'Bot1', 'Bot2', 'Bot3']
       });
 
@@ -49,15 +48,15 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
       // Verify initial state
       await verifyGameState(pages[0], {
         phase: 'Betting',
-        team1Score: 38,
-        team2Score: 37
+        team1Score: 0,
+        team2Score: 0
       });
 
-      // Play rounds until game ends
+      // Play rounds until game ends (bots play fast, ~10-15 rounds to reach 41)
       let gameEnded = false;
       let roundsPlayed = 0;
 
-      while (!gameEnded && roundsPlayed < 3) {
+      while (!gameEnded && roundsPlayed < 20) {
         roundsPlayed++;
         console.log(`Round ${roundsPlayed}`);
 
@@ -127,8 +126,7 @@ test.describe('Game Flow - 1 Player + 3 Bots', () => {
 
       const result = await createGameWithBots(browser, {
         humanPlayers: 1,
-        botPlayers: 3,
-        startScores: { team1: 30, team2: 30 }
+        botPlayers: 3
       });
 
       pages = result.pages;
