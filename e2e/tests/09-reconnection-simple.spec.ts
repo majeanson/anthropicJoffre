@@ -64,6 +64,10 @@ test.describe('Reconnection Support - Basic Tests', () => {
     // Reload the page (simulate disconnect/refresh)
     await page.reload();
 
+    // Click Rejoin Game button (explicit reconnection required)
+    await page.getByRole('button', { name: /rejoin game/i }).waitFor({ timeout: 10000 });
+    await page.getByRole('button', { name: /rejoin game/i }).click();
+
     // Should show reconnecting briefly, then reconnect
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
