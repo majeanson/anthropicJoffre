@@ -10,7 +10,7 @@ test.describe('Team Selection Chat', () => {
   });
 
   test('should show chat box in team selection phase', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
 
     // Create a game
     await page.getByTestId('create-game-button').click();
@@ -33,7 +33,7 @@ test.describe('Team Selection Chat', () => {
     const page2 = await context.newPage();
 
     // Player 1 creates a game
-    await page1.goto('http://localhost:5177');
+    await page1.goto('http://localhost:5173');
     await page1.getByTestId('create-game-button').click();
     await page1.getByTestId('player-name-input').fill('Player 1');
     await page1.getByTestId('submit-create-button').click();
@@ -46,7 +46,7 @@ test.describe('Team Selection Chat', () => {
     const gameId = await gameIdElement.textContent();
 
     // Player 2 joins the game
-    await page2.goto('http://localhost:5177');
+    await page2.goto('http://localhost:5173');
     await page2.getByTestId('join-game-button').click();
     if (gameId) {
       await page2.getByTestId('game-id-input').fill(gameId);
@@ -79,15 +79,15 @@ test.describe('Team Selection Chat', () => {
     const page = await context.newPage();
 
     // Create a game and join a team
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
     await page.getByTestId('create-game-button').click();
     await page.getByTestId('player-name-input').fill('TeamTest');
     await page.getByTestId('submit-create-button').click();
 
     await page.waitForSelector('text=/team selection/i', { timeout: 5000 });
 
-    // Join Team 1
-    await page.getByText('Join Team 1').first().click();
+    // Players are auto-assigned to teams, no need to click
+    await page.waitForTimeout(500);
 
     // Send a message
     const chatInput = page.getByPlaceholder(/type a message/i);
@@ -99,7 +99,7 @@ test.describe('Team Selection Chat', () => {
   });
 
   test('should limit message length to 200 characters', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
 
     // Create a game
     await page.getByTestId('create-game-button').click();
@@ -119,7 +119,7 @@ test.describe('Team Selection Chat', () => {
   });
 
   test('should clear input after sending message', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
 
     // Create a game
     await page.getByTestId('create-game-button').click();
@@ -138,7 +138,7 @@ test.describe('Team Selection Chat', () => {
   });
 
   test('should disable send button when input is empty', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
 
     // Create a game
     await page.getByTestId('create-game-button').click();
