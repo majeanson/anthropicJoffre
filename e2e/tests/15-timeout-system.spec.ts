@@ -68,7 +68,7 @@ test.describe('Timeout System', () => {
 
       // Place bet (amount must increase or equal for dealer)
       const betAmount = i === 3 ? 9 : 7 + i; // P3=7, P4=8, P1=9, P2=9 (dealer can match)
-      await page.getByRole('button', { name: `${betAmount}` }).click();
+      await page.getByRole('button', { name: `${betAmount}`, exact: true }).click();
       await page.getByRole('button', { name: /Place Bet/ }).click();
 
       // Wait briefly between bets
@@ -101,7 +101,7 @@ test.describe('Timeout System', () => {
       const page = pages[pageIndex];
       await page.waitForSelector('text=Select Bet Amount:', { timeout: 15000 });
       const betAmount = i === 3 ? 9 : 7 + i; // P3=7, P4=8, P1=9, P2=9 (dealer matches)
-      await page.getByRole('button', { name: `${betAmount}` }).click();
+      await page.getByRole('button', { name: `${betAmount}`, exact: true }).click();
       await page.getByRole('button', { name: /Place Bet/ }).click();
       await page.waitForTimeout(500);
     }
