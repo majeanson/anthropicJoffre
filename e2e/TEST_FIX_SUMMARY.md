@@ -112,3 +112,27 @@
 **Pattern:** Most failures follow same selector update pattern - systematic batch fixing would be efficient.
 
 **Priority:** Core game functionality tests all pass. Remaining failures are advanced features (chat, autoplay, spectator, reconnection).
+
+---
+
+## 📈 Progress Update
+
+### Session 2 - Reconnection Tests Fixed
+
+**09-reconnection.spec.ts - 9/9 passing** ✅
+**Fixes:**
+- Added "Rejoin Game" button clicks after page reload
+- Removed invalid team selection button clicks (auto-assignment)
+- Fixed strict mode violations for duplicate text matches
+
+**Key Learning:** Reconnection now shows explicit "Rejoin Game" button rather than automatic reconnection.
+
+**09-reconnection-simple.spec.ts - 2/3 passing** ✅
+
+### Running Total
+- **✅ Tests Fixed This Session: 24**
+- **✅ Core Tests (01-06): 53 passing**
+- **✅ Reconnection Tests (09): 11 passing**
+- **⏳ Remaining: ~52 tests to fix**
+
+---
