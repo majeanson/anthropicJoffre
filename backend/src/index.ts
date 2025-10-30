@@ -98,8 +98,6 @@ import {
   getPlayerGames
 } from './db/gameState';
 import {
-  sanitizePlayerName,
-  sanitizeChatMessage,
   validateBetAmount,
   validateGameId,
   validateTeamId,

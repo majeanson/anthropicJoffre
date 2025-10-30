@@ -1,4 +1,4 @@
-import { Card, GameState, CardColor } from '../types/game';
+import { Card, GameState, CardColor, CardValue } from '../types/game';
 
 /**
  * Enhanced Bot AI with Advanced Strategic Concepts
@@ -79,7 +79,7 @@ export class EnhancedBotPlayer {
     const colors: CardColor[] = ['red', 'brown', 'green', 'blue'];
     for (const color of colors) {
       for (let value = 0; value <= 7; value++) {
-        memory.remainingCards.set(`${color}-${value}`, { color, value });
+        memory.remainingCards.set(`${color}-${value}`, { color, value: value as CardValue });
       }
     }
 
@@ -243,7 +243,7 @@ export class EnhancedBotPlayer {
     } else {
       // Can we win red 0 from opponent?
       const hasRed7 = hand.some(c => c.color === 'red' && c.value === 7);
-      const hasHighTrump = trump && hand.some(c => c.color === trump && c.value >= 5);
+      const hasHighTrump = !!trump && hand.some(c => c.color === trump && c.value >= 5);
       analysis.canControlRed0 = hasRed7 || hasHighTrump;
     }
 
@@ -379,7 +379,6 @@ export class EnhancedBotPlayer {
     memory: CardMemory
   ): PlayDecision {
     const trick = gameState.currentTrick;
-    const trump = gameState.trump;
     let priority = 50;  // Base priority
     let reasoning = '';
 
@@ -525,7 +524,7 @@ export class EnhancedBotPlayer {
     // Leading trump is situational
     if (card.color === trump) {
       // Draw out opponent trumps if we have many
-      const trumpCount = gameState.players.find(p => p.id === gameState.currentPlayerId)?.hand
+      const trumpCount = gameState.players[gameState.currentPlayerIndex]?.hand
         .filter(c => c.color === trump).length || 0;
       if (trumpCount >= 3) {
         return 55;  // Draw trumps
@@ -595,7 +594,7 @@ export class EnhancedBotPlayer {
     });
 
     // Update from our hand (to track special cards we hold)
-    const player = gameState.players.find(p => p.id === gameState.currentPlayerId);
+    const player = gameState.players[gameState.currentPlayerIndex];
     if (player) {
       const hasRed0 = player.hand.some(c => c.color === 'red' && c.value === 0);
       const hasBrown0 = player.hand.some(c => c.color === 'brown' && c.value === 0);

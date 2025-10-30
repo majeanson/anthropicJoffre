@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback, memo } from 'react';
+import { useMemo, useState, useEffect, memo } from 'react';
 import { Socket } from 'socket.io-client';
 import { Bet, Player, GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
