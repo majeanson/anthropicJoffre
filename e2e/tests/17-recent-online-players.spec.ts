@@ -10,7 +10,7 @@ test.describe('Recent and Online Players', () => {
   });
 
   test('should show Recent/Online tabs in lobby', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
 
     // Check that both tabs exist
     await expect(page.getByRole('button', { name: /recent players/i })).toBeVisible();
@@ -18,7 +18,7 @@ test.describe('Recent and Online Players', () => {
   });
 
   test('should switch between Recent and Online tabs', async ({ page }) => {
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
 
     // Default tab should be Recent
     await expect(page.getByText('No recent players yet').first()).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('Recent and Online Players', () => {
     const page2 = await context.newPage();
 
     // Player 1 creates a game
-    await page1.goto('http://localhost:5177');
+    await page1.goto('http://localhost:5173');
     await page1.getByTestId('create-game-button').click();
     await page1.getByTestId('player-name-input').fill('Player One');
     await page1.getByTestId('submit-create-button').click();
@@ -51,7 +51,7 @@ test.describe('Recent and Online Players', () => {
     await page1.waitForSelector('text=/game id/i', { timeout: 5000 });
 
     // Player 2 goes to lobby
-    await page2.goto('http://localhost:5177');
+    await page2.goto('http://localhost:5173');
 
     // Switch to Online tab
     await page2.getByRole('button', { name: /online now/i }).click();
@@ -68,7 +68,7 @@ test.describe('Recent and Online Players', () => {
     context = await browser.newContext();
     const page = await context.newPage();
 
-    await page.goto('http://localhost:5177');
+    await page.goto('http://localhost:5173');
 
     // Verify Recent Players tab exists and is visible
     await expect(page.getByRole('button', { name: /recent players/i })).toBeVisible();
@@ -86,7 +86,7 @@ test.describe('Recent and Online Players', () => {
     const page1 = await context.newPage();
 
     // Create a game
-    await page1.goto('http://localhost:5177');
+    await page1.goto('http://localhost:5173');
     await page1.getByTestId('create-game-button').click();
     await page1.getByTestId('player-name-input').fill('StatusTest');
     await page1.getByTestId('submit-create-button').click();
@@ -97,7 +97,7 @@ test.describe('Recent and Online Players', () => {
     // Open second tab to check online status
     const page2 = await context.newPage();
 
-    await page2.goto('http://localhost:5177');
+    await page2.goto('http://localhost:5173');
     await page2.getByRole('button', { name: /online now/i }).click();
 
     // Wait for online players update
@@ -115,7 +115,7 @@ test.describe('Recent and Online Players', () => {
     const page2 = await context.newPage();
 
     // Player 1 creates a game
-    await page1.goto('http://localhost:5177');
+    await page1.goto('http://localhost:5173');
     await page1.getByTestId('create-game-button').click();
     await page1.getByTestId('player-name-input').fill('Host');
     await page1.getByTestId('submit-create-button').click();
@@ -123,7 +123,7 @@ test.describe('Recent and Online Players', () => {
     await page1.waitForSelector('text=/game id/i', { timeout: 5000 });
 
     // Player 2 checks online players
-    await page2.goto('http://localhost:5177');
+    await page2.goto('http://localhost:5173');
 
     // Wait for page to load completely
     await page2.waitForTimeout(1000);
