@@ -58,8 +58,7 @@ test.describe('Reconnection Support - Basic Tests', () => {
     // Wait for team selection
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
-    // Select a team
-    await page.click('button:has-text("Team 1")');
+    // Player is auto-assigned to Team 1, no need to click anything
     await page.waitForTimeout(1000); // Wait for state to update
 
     // Reload the page (simulate disconnect/refresh)

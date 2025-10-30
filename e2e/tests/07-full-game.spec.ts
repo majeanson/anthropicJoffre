@@ -84,28 +84,31 @@ test.describe('Full Game Flow', () => {
     // Dealer is P2 (index 1) after rotation
     // Betting order: P3, P4, P1, P2 (dealer last)
 
-    // P3 (index 2) bets 9 using test ID
+    // P3 (index 2) bets 9
     console.log('P3 betting 9...');
-    await pages[2].getByTestId('bet-9-with-trump').waitFor({ timeout: 15000 });
-    await pages[2].getByTestId('bet-9-with-trump').click();
+    await pages[2].getByRole('button', { name: '9', exact: true }).waitFor({ timeout: 15000 });
+    await pages[2].getByRole('button', { name: '9', exact: true }).click();
+    await pages[2].getByRole('button', { name: /Place Bet: 9/ }).click();
     await pages[2].waitForTimeout(500);
 
-    // P4 (index 3) bets 10 using test ID
+    // P4 (index 3) bets 10
     console.log('P4 betting 10...');
-    await pages[3].getByTestId('bet-10-with-trump').waitFor({ timeout: 15000 });
-    await pages[3].getByTestId('bet-10-with-trump').click();
+    await pages[3].getByRole('button', { name: '10', exact: true }).waitFor({ timeout: 15000 });
+    await pages[3].getByRole('button', { name: '10', exact: true }).click();
+    await pages[3].getByRole('button', { name: /Place Bet: 10/ }).click();
     await pages[3].waitForTimeout(500);
 
-    // P1 (index 0) skips using test ID
+    // P1 (index 0) skips
     console.log('P1 skipping...');
-    await pages[0].getByTestId('skip-bet-button').waitFor({ timeout: 15000 });
-    await pages[0].getByTestId('skip-bet-button').click();
+    await pages[0].getByRole('button', { name: /skip/i }).waitFor({ timeout: 15000 });
+    await pages[0].getByRole('button', { name: /skip/i }).click();
     await pages[0].waitForTimeout(500);
 
-    // P2 (index 1, dealer) matches with 10 using test ID
+    // P2 (index 1, dealer) matches with 10
     console.log('P2 (dealer) matching with 10...');
-    await pages[1].getByTestId('bet-10-with-trump').waitFor({ timeout: 15000 });
-    await pages[1].getByTestId('bet-10-with-trump').click();
+    await pages[1].getByRole('button', { name: '10', exact: true }).waitFor({ timeout: 15000 });
+    await pages[1].getByRole('button', { name: '10', exact: true }).click();
+    await pages[1].getByRole('button', { name: /Place Bet: 10/ }).click();
     await pages[1].waitForTimeout(500);
 
     // === PHASE 3: Play rounds until a team reaches 41 points ===
@@ -146,14 +149,16 @@ test.describe('Full Game Flow', () => {
         await pages[0].waitForTimeout(500);
 
         const page = pages[i];
-        const skipBtn = page.getByTestId('skip-bet-button');
-        const bet8Btn = page.getByTestId('bet-8-with-trump');
+        const skipBtn = page.getByRole('button', { name: /skip/i });
+        const bet8Btn = page.getByRole('button', { name: '8', exact: true });
 
         try {
           if (await skipBtn.isVisible({ timeout: 2000 })) {
             await skipBtn.click();
           } else if (await bet8Btn.isVisible({ timeout: 2000 })) {
             await bet8Btn.click();
+            // Need to confirm the bet
+            await page.getByRole('button', { name: /Place Bet: 8/ }).click();
           }
         } catch {}
       }
