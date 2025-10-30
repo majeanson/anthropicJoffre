@@ -57,17 +57,21 @@ test.describe('Reconnection Support', () => {
     // Wait for team selection
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
-    // Select a team
-    await page.click('button:has-text("Team 1")');
+    // Player is auto-assigned to Team 1, no need to click
+    await page.waitForTimeout(500);
 
     // Reload the page (simulate disconnect/refresh)
     await page.reload();
 
-    // Should automatically reconnect
+    // Should show rejoin button
+    await page.getByRole('button', { name: /rejoin game/i }).waitFor({ timeout: 10000 });
+    await page.getByRole('button', { name: /rejoin game/i }).click();
+
+    // Should reconnect to team selection
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
-    // Verify we're still in the same game
-    await expect(page.locator('text=/Team 1/i')).toBeVisible();
+    // Verify we're still in the same game (player should be visible in Team 1)
+    await expect(page.locator('text=/Player1/i')).toBeVisible();
   });
 
   test('should show reconnecting state during reconnection', async ({ page }) => {
@@ -91,6 +95,10 @@ test.describe('Reconnection Support', () => {
     }
 
     await reloadPromise;
+
+    // Click rejoin button
+    await page.getByRole('button', { name: /rejoin game/i }).waitFor({ timeout: 10000 });
+    await page.getByRole('button', { name: /rejoin game/i }).click();
 
     // Should successfully reconnect
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
@@ -119,17 +127,21 @@ test.describe('Reconnection Support', () => {
     await page2.getByTestId('submit-join-button').click();
     await page2.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
-    // Both players select teams
-    await page1.click('button:has-text("Team 1")');
-    await page2.click('button:has-text("Team 2")');
+    // Players are auto-assigned to teams, no need to click
+    await page1.waitForTimeout(500);
 
     // Player1 reloads (reconnects)
     await page1.reload();
+
+    // Click rejoin button
+    await page1.getByRole('button', { name: /rejoin game/i }).waitFor({ timeout: 10000 });
+    await page1.getByRole('button', { name: /rejoin game/i }).click();
+
     await page1.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Player1 should still be able to interact
-    // Try swapping position or another action
-    await expect(page1.locator('button:has-text("Team 1")')).toBeVisible();
+    // Verify player is still in the game
+    await expect(page1.locator('text=/Player1/i')).toBeVisible();
 
     await page1.close();
     await page2.close();
@@ -160,6 +172,11 @@ test.describe('Reconnection Support', () => {
 
     // Player1 reconnects
     await page1.reload();
+
+    // Click rejoin button
+    await page1.getByRole('button', { name: /rejoin game/i }).waitFor({ timeout: 10000 });
+    await page1.getByRole('button', { name: /rejoin game/i }).click();
+
     await page1.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
     // Player2 should be notified (via game_updated or specific event)
@@ -250,9 +267,7 @@ test.describe('Reconnection Support', () => {
     await page.getByTestId('quick-play-button').click();
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
 
-    // Select team
-    await page.click('button:has-text("Team 1")');
-
+    // Player is auto-assigned to team, no need to click
     // Wait for bots to join and select teams
     await page.waitForTimeout(3000);
 
@@ -261,6 +276,10 @@ test.describe('Reconnection Support', () => {
 
     // Reload page
     await page.reload();
+
+    // Click rejoin button
+    await page.getByRole('button', { name: /rejoin game/i }).waitFor({ timeout: 10000 });
+    await page.getByRole('button', { name: /rejoin game/i }).click();
 
     // Should reconnect
     await page.waitForSelector('text=/Team Selection/i', { timeout: 10000 });
