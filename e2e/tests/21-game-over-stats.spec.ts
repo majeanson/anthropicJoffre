@@ -54,12 +54,14 @@ test.describe('Game Over Stats', () => {
     // Check for final scores
     await expect(page.getByText(/final score/i).first()).toBeVisible();
 
-    // Verify team scores are displayed
-    const team1Score = page.locator('text=/team 1/i').locator('..').locator('text=/\d+/');
-    const team2Score = page.locator('text=/team 2/i').locator('..').locator('text=/\d+/');
+    // Verify team scores are displayed using test IDs
+    const team1Score = page.getByTestId('team1-final-score');
+    const team2Score = page.getByTestId('team2-final-score');
 
     await expect(team1Score).toBeVisible();
     await expect(team2Score).toBeVisible();
+    await expect(team1Score).toHaveText('41');
+    await expect(team2Score).toHaveText('35');
 
     // Check for player stats (tricks and points)
     await expect(page.getByText(/tricks/i).first()).toBeVisible();
@@ -75,9 +77,9 @@ test.describe('Game Over Stats', () => {
       await expect(page.getByText(/bet made|bet failed/i).first()).toBeVisible();
     }
 
-    // Verify action buttons
-    await expect(page.getByRole('button', { name: /new game/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /back to lobby/i })).toBeVisible();
+    // Verify action buttons using test IDs
+    await expect(page.getByTestId('view-replay-button')).toBeVisible();
+    await expect(page.getByTestId('back-to-lobby-button')).toBeVisible();
   });
 
   test('should show correct winning team and crown icon', async ({ page }) => {
@@ -132,12 +134,12 @@ test.describe('Game Over Stats', () => {
 
     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
 
-    // Click "New Game" button
-    await page.getByRole('button', { name: /new game/i }).click();
+    // Click "Back to Lobby" button
+    await page.getByTestId('back-to-lobby-button').click();
 
-    // Should return to team selection with new game
-    await expect(page.getByText(/game id/i)).toBeVisible();
-    await expect(page.getByText(/waiting for/i)).toBeVisible();
+    // Should return to lobby
+    await expect(page.getByRole('button', { name: /quick play/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /create game/i })).toBeVisible();
   });
 
   test('should allow returning to lobby from game over screen', async ({ page }) => {
@@ -160,8 +162,8 @@ test.describe('Game Over Stats', () => {
 
     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
 
-    // Click "Back to Lobby" button
-    await page.getByRole('button', { name: /back to lobby/i }).click();
+    // Click "Back to Lobby" button using test ID
+    await page.getByTestId('back-to-lobby-button').click();
 
     // Should return to main lobby
     await expect(page.getByRole('button', { name: /create game/i })).toBeVisible();

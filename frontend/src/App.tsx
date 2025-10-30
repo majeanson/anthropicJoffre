@@ -1297,7 +1297,7 @@ function App() {
                   {winningTeam === 1 && <span className="text-3xl">👑</span>}
                   <h3 className="text-2xl font-bold text-orange-800">Team 1</h3>
                 </div>
-                <p className="text-6xl font-black text-orange-600">{gameState.teamScores.team1}</p>
+                <p data-testid="team1-final-score" className="text-6xl font-black text-orange-600">{gameState.teamScores.team1}</p>
                 <p className="text-sm text-orange-700 mt-2">Final Score</p>
               </div>
               <div className={`text-center p-6 rounded-xl border-4 ${winningTeam === 2 ? 'bg-purple-100 border-purple-400 ring-4 ring-yellow-400' : 'bg-purple-50 border-purple-200'}`}>
@@ -1305,7 +1305,7 @@ function App() {
                   {winningTeam === 2 && <span className="text-3xl">👑</span>}
                   <h3 className="text-2xl font-bold text-purple-800">Team 2</h3>
                 </div>
-                <p className="text-6xl font-black text-purple-600">{gameState.teamScores.team2}</p>
+                <p data-testid="team2-final-score" className="text-6xl font-black text-purple-600">{gameState.teamScores.team2}</p>
                 <p className="text-sm text-purple-700 mt-2">Final Score</p>
               </div>
             </div>
@@ -1425,12 +1425,14 @@ function App() {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <button
+                data-testid="view-replay-button"
                 onClick={() => setShowReplayModal(true)}
                 className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 border-2 border-purple-700 shadow-lg transform hover:scale-105"
               >
                 📺 View Game Replay
               </button>
               <button
+                data-testid="back-to-lobby-button"
                 onClick={() => {
                   setGameState(null);
                   setGameId('');
