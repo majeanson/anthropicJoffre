@@ -11,7 +11,7 @@ import {
  * Test suite for games with 1 real player and 3 bots.
  * Tests bot AI behavior, decision-making, and game flow automation.
  */
-test.describe('Game Flow - 1 Player + 3 Bots', () => {
+test.describe('@marathon Game Flow - 1 Player + 3 Bots', () => {
   let pages: Page[];
   let context: any;
   let gameId: string;

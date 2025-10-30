@@ -1,7 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { createGameWith4Players } from './helpers';
 
-test.describe('Timeout System', () => {
+test.describe('@slow Timeout System', () => {
   let context: any;
 
   test.afterEach(async () => {

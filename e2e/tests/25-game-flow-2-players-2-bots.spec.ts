@@ -11,7 +11,7 @@ import {
  * Test suite for games with 2 real players and 2 bots.
  * Tests mixed human/bot team coordination and gameplay dynamics.
  */
-test.describe('Game Flow - 2 Players + 2 Bots', () => {
+test.describe('@marathon Game Flow - 2 Players + 2 Bots', () => {
   let pages: Page[];
   let context: any;
   let gameId: string;

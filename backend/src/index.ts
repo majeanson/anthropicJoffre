@@ -1738,6 +1738,20 @@ io.on('connection', (socket) => {
         game.teamScores.team1 = team1;
         game.teamScores.team2 = team2;
         console.log(`TEST: Set scores to Team1=${team1}, Team2=${team2}`);
+
+        // Check if game should be over (team >= 41)
+        if (team1 >= 41 || team2 >= 41) {
+          game.phase = 'game_over';
+          const winningTeam = team1 >= 41 ? 1 : 2;
+          console.log(`TEST: Game over triggered, Team ${winningTeam} wins`);
+
+          // Emit game_over event
+          io.to(game.id).emit('game_over', {
+            winningTeam,
+            gameState: game
+          });
+        }
+
         emitGameUpdate(game.id, game);
       }
     });

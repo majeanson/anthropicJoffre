@@ -26,10 +26,10 @@ test.describe('Game Over Stats', () => {
       await testButton.click();
 
       // Set Team 1 to 41 points (winning score)
-      const team1Input = page.locator('input[placeholder*="Team 1"]');
+      const team1Input = page.getByLabel('Team 1 Score');
       await team1Input.fill('41');
 
-      const team2Input = page.locator('input[placeholder*="Team 2"]');
+      const team2Input = page.getByLabel('Team 2 Score');
       await team2Input.fill('35');
 
       // Apply scores
@@ -108,8 +108,8 @@ test.describe('Game Over Stats', () => {
       await testButton.click();
 
       // Set Team 2 to win
-      await page.locator('input[placeholder*="Team 1"]').fill('30');
-      await page.locator('input[placeholder*="Team 2"]').fill('41');
+      await page.getByLabel('Team 1 Score').fill('30');
+      await page.getByLabel('Team 2 Score').fill('41');
       await page.getByRole('button', { name: /apply scores/i }).click();
       await page.getByRole('button', { name: /close/i }).click();
     }
@@ -138,8 +138,8 @@ test.describe('Game Over Stats', () => {
     const testButton = page.getByRole('button', { name: /test/i });
     if (await testButton.isVisible()) {
       await testButton.click();
-      await page.locator('input[placeholder*="Team 1"]').fill('41');
-      await page.locator('input[placeholder*="Team 2"]').fill('20');
+      await page.getByLabel('Team 1 Score').fill('41');
+      await page.getByLabel('Team 2 Score').fill('20');
       await page.getByRole('button', { name: /apply scores/i }).click();
       await page.getByRole('button', { name: /close/i }).click();
     }
@@ -167,8 +167,8 @@ test.describe('Game Over Stats', () => {
     const testButton = page.getByRole('button', { name: /test/i });
     if (await testButton.isVisible()) {
       await testButton.click();
-      await page.locator('input[placeholder*="Team 1"]').fill('41');
-      await page.locator('input[placeholder*="Team 2"]').fill('20');
+      await page.getByLabel('Team 1 Score').fill('41');
+      await page.getByLabel('Team 2 Score').fill('20');
       await page.getByRole('button', { name: /apply scores/i }).click();
       await page.getByRole('button', { name: /close/i }).click();
     }

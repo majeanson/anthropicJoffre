@@ -5,7 +5,7 @@ import { test, expect, Page } from '@playwright/test';
  * This test plays through an entire game from start to finish with predetermined actions
  */
 
-test.describe('Full Game Flow', () => {
+test.describe('@marathon Full Game Flow', () => {
   let pages: Page[];
   let gameId: string;
 

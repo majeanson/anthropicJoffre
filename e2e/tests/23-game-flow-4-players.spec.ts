@@ -12,7 +12,7 @@ import {
  * Test suite for complete game flows with 4 real players (4 browsers).
  * Tests both quick games (near end-game) and full-length games from scratch.
  */
-test.describe('Game Flow - 4 Real Players', () => {
+test.describe('@marathon Game Flow - 4 Real Players', () => {
   let pages: Page[];
   let contexts: any[];
   let gameId: string;

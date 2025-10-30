@@ -113,13 +113,24 @@ echo "  - Servers: Backend & Frontend"
 echo ""
 echo "Results will be saved to: ${RESULTS_DIR}"
 echo ""
-echo "Running full E2E test suite..."
+
+# Determine test mode
+if [ "$TEST_MODE" = "marathon" ]; then
+  echo "Running FULL test suite (including @marathon and @slow tests)..."
+  GREP_ARGS=""
+else
+  echo "Running standard test suite (skipping @marathon and @slow tests)..."
+  echo "  (Use TEST_MODE=marathon to run all tests)"
+  GREP_ARGS="--grep-invert @marathon|@slow"
+fi
+
 echo ""
 
 # Run tests with detailed output
 npx playwright test \
   --reporter=html,line \
   --output="${RESULTS_DIR}/artifacts" \
+  $GREP_ARGS \
   > "${RESULTS_DIR}/test-output.txt" 2>&1
 
 # Save the exit code

@@ -33,11 +33,11 @@ test.describe('Game Completion Stats Recording', () => {
     }
 
     // Set both teams to 40 points (one point away from winning)
-    const team1Input = page.locator('input[placeholder*="Team 1"]');
+    const team1Input = page.getByLabel('Team 1 Score');
     await team1Input.waitFor({ state: 'visible', timeout: 5000 });
     await team1Input.fill('40');
 
-    const team2Input = page.locator('input[placeholder*="Team 2"]');
+    const team2Input = page.getByLabel('Team 2 Score');
     await team2Input.fill('40');
 
     // Apply scores
@@ -148,11 +148,11 @@ test.describe('Game Completion Stats Recording', () => {
     }
 
     // Set Team 1 to 41 points (winning score)
-    const team1Input = page.locator('input[placeholder*="Team 1"]');
+    const team1Input = page.getByLabel('Team 1 Score');
     await team1Input.waitFor({ state: 'visible', timeout: 5000 });
     await team1Input.fill('41');
 
-    const team2Input = page.locator('input[placeholder*="Team 2"]');
+    const team2Input = page.getByLabel('Team 2 Score');
     await team2Input.fill('30');
 
     await page.getByRole('button', { name: /apply scores/i }).click();
@@ -219,8 +219,8 @@ test.describe('Game Completion Stats Recording', () => {
       await page.getByText(/🧪 test panel/i).click();
     }
 
-    await page.locator('input[placeholder*="Team 1"]').fill('41');
-    await page.locator('input[placeholder*="Team 2"]').fill('35');
+    await page.getByLabel('Team 1 Score').fill('41');
+    await page.getByLabel('Team 2 Score').fill('35');
     await page.getByRole('button', { name: /apply scores/i }).click();
     await page.getByRole('button', { name: /close/i }).click();
 
