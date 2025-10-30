@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { setGameStateViaAPI } from './helpers';
 
 test.describe('Game Over Stats', () => {
   test('should display game over screen with final scores and history', async ({ page }) => {
@@ -11,6 +12,11 @@ test.describe('Game Over Stats', () => {
     // Wait for team selection (bots will auto-join)
     await page.waitForSelector('text=/game id/i', { timeout: 10000 });
 
+    // Capture game ID for API manipulation
+    const gameIdElement = page.getByTestId('game-id');
+    const gameId = (await gameIdElement.textContent())!;
+    console.log(`Game ID: ${gameId}`);
+
     // Wait for all 4 players to join
     await page.waitForSelector('text=/player 1|bot 1/i', { timeout: 5000 });
     await page.waitForSelector('text=/bot 2/i', { timeout: 5000 });
@@ -19,25 +25,10 @@ test.describe('Game Over Stats', () => {
     // Start the game
     await page.getByRole('button', { name: /start game/i }).click();
 
-    // Fast forward to game over by manipulating scores via test panel
-    // Open test panel
-    const testButton = page.getByRole('button', { name: /test/i });
-    if (await testButton.isVisible()) {
-      await testButton.click();
-
-      // Set Team 1 to 41 points (winning score)
-      const team1Input = page.getByLabel('Team 1 Score');
-      await team1Input.fill('41');
-
-      const team2Input = page.getByLabel('Team 2 Score');
-      await team2Input.fill('35');
-
-      // Apply scores
-      await page.getByRole('button', { name: /apply scores/i }).click();
-
-      // Close test panel
-      await page.getByRole('button', { name: /close/i }).click();
-    }
+    // Fast forward to game over using REST API (more reliable than Test Panel UI)
+    await setGameStateViaAPI(page, gameId, {
+      teamScores: { team1: 41, team2: 35 }
+    });
 
     // Check if game_over phase is displayed
     const gameOverHeading = page.getByRole('heading', { name: /game over/i });
@@ -96,23 +87,19 @@ test.describe('Game Over Stats', () => {
     await page.getByRole('button', { name: /quick play/i }).click();
     await page.waitForSelector('text=/game id/i', { timeout: 10000 });
 
+    // Capture game ID
+    const gameId = (await page.getByTestId('game-id').textContent())!;
+
     // Wait for bots to join
     await page.waitForTimeout(2000);
 
     // Start game
     await page.getByRole('button', { name: /start game/i }).click();
 
-    // Use test panel to set winning scores
-    const testButton = page.getByRole('button', { name: /test/i });
-    if (await testButton.isVisible()) {
-      await testButton.click();
-
-      // Set Team 2 to win
-      await page.getByLabel('Team 1 Score').fill('30');
-      await page.getByLabel('Team 2 Score').fill('41');
-      await page.getByRole('button', { name: /apply scores/i }).click();
-      await page.getByRole('button', { name: /close/i }).click();
-    }
+    // Set winning scores using REST API
+    await setGameStateViaAPI(page, gameId, {
+      teamScores: { team1: 30, team2: 41 }
+    });
 
     // Wait for game over
     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
@@ -131,18 +118,17 @@ test.describe('Game Over Stats', () => {
     // Create game
     await page.getByRole('button', { name: /quick play/i }).click();
     await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+
+    // Capture game ID
+    const gameId = (await page.getByTestId('game-id').textContent())!;
+
     await page.waitForTimeout(2000);
     await page.getByRole('button', { name: /start game/i }).click();
 
-    // Fast forward to game over using test panel
-    const testButton = page.getByRole('button', { name: /test/i });
-    if (await testButton.isVisible()) {
-      await testButton.click();
-      await page.getByLabel('Team 1 Score').fill('41');
-      await page.getByLabel('Team 2 Score').fill('20');
-      await page.getByRole('button', { name: /apply scores/i }).click();
-      await page.getByRole('button', { name: /close/i }).click();
-    }
+    // Fast forward to game over using REST API
+    await setGameStateViaAPI(page, gameId, {
+      teamScores: { team1: 41, team2: 20 }
+    });
 
     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
 
@@ -160,18 +146,17 @@ test.describe('Game Over Stats', () => {
     // Create game
     await page.getByRole('button', { name: /quick play/i }).click();
     await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+
+    // Capture game ID
+    const gameId = (await page.getByTestId('game-id').textContent())!;
+
     await page.waitForTimeout(2000);
     await page.getByRole('button', { name: /start game/i }).click();
 
-    // Fast forward to game over
-    const testButton = page.getByRole('button', { name: /test/i });
-    if (await testButton.isVisible()) {
-      await testButton.click();
-      await page.getByLabel('Team 1 Score').fill('41');
-      await page.getByLabel('Team 2 Score').fill('20');
-      await page.getByRole('button', { name: /apply scores/i }).click();
-      await page.getByRole('button', { name: /close/i }).click();
-    }
+    // Fast forward to game over using REST API
+    await setGameStateViaAPI(page, gameId, {
+      teamScores: { team1: 41, team2: 20 }
+    });
 
     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
 

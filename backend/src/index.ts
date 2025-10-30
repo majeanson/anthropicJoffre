@@ -850,6 +850,69 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Test-only endpoint to manipulate game state
+// POST /api/__test/set-game-state
+// Body: { gameId: string, teamScores?: { team1: number, team2: number }, phase?: string }
+app.post('/api/__test/set-game-state', express.json(), (req, res) => {
+  try {
+    const { gameId, teamScores, phase } = req.body;
+
+    if (!gameId) {
+      return res.status(400).json({ error: 'gameId is required' });
+    }
+
+    const game = games.get(gameId);
+    if (!game) {
+      return res.status(404).json({ error: `Game ${gameId} not found` });
+    }
+
+    console.log(`TEST API: Manipulating game state for ${gameId}`);
+
+    // Set team scores if provided
+    if (teamScores) {
+      if (typeof teamScores.team1 === 'number') {
+        game.teamScores.team1 = teamScores.team1;
+      }
+      if (typeof teamScores.team2 === 'number') {
+        game.teamScores.team2 = teamScores.team2;
+      }
+      console.log(`TEST API: Set scores to Team1=${game.teamScores.team1}, Team2=${game.teamScores.team2}`);
+
+      // Check if game should be over (team >= 41)
+      if (game.teamScores.team1 >= 41 || game.teamScores.team2 >= 41) {
+        game.phase = 'game_over';
+        const winningTeam = game.teamScores.team1 >= 41 ? 1 : 2;
+        console.log(`TEST API: Game over triggered, Team ${winningTeam} wins`);
+
+        // Emit game_over event
+        io.to(game.id).emit('game_over', {
+          winningTeam,
+          gameState: game
+        });
+      }
+    }
+
+    // Set phase if provided (and not already set to game_over by score logic)
+    if (phase && game.phase !== 'game_over') {
+      game.phase = phase as any;
+      console.log(`TEST API: Set phase to ${phase}`);
+    }
+
+    // Emit game update
+    emitGameUpdate(game.id, game);
+
+    res.json({
+      success: true,
+      gameId: game.id,
+      phase: game.phase,
+      teamScores: game.teamScores
+    });
+  } catch (error) {
+    console.error('TEST API error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({

@@ -540,3 +540,51 @@ export async function playCompleteGame(pages: Page[], botIndices: number[] = [],
 
   return { roundCount, gameEnded };
 }
+
+/**
+ * Sets game state via REST API (more reliable than UI interactions).
+ * Use this instead of TestPanel UI for manipulating game state in tests.
+ *
+ * @param page - Page instance (used to get gameId from URL context)
+ * @param gameId - Game ID to manipulate
+ * @param options - State to set: teamScores { team1, team2 } and/or phase
+ * @returns API response with success status and updated state
+ */
+export async function setGameStateViaAPI(
+  page: Page,
+  gameId: string,
+  options: {
+    teamScores?: { team1: number; team2: number };
+    phase?: string;
+  }
+) {
+  const response = await page.evaluate(
+    async ({ gameId, teamScores, phase }) => {
+      const res = await fetch('http://localhost:3000/api/__test/set-game-state', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          gameId,
+          teamScores,
+          phase,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`API request failed: ${res.status} ${res.statusText}`);
+      }
+
+      return await res.json();
+    },
+    { gameId, ...options }
+  );
+
+  console.log(`TEST API: Set game state for ${gameId}:`, response);
+
+  // Give a moment for Socket.io events to propagate
+  await page.waitForTimeout(500);
+
+  return response;
+}
