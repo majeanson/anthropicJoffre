@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-31T14:44:00.000Z",
-  "version": "1.0.18",
+  "buildDate": "2025-10-31T14:54:00.000Z",
+  "version": "1.0.19",
   "git": {
-    "commitMessage": "feat(security): Implement per-user rate limiting with sliding window algorithm",
-    "commitHash": "0e4de11",
-    "commitDate": "2025-10-31 10:44:40 -0400",
+    "commitMessage": "feat(security): Implement comprehensive input validation with Zod schemas",
+    "commitHash": "e13db97",
+    "commitDate": "2025-10-31 10:54:17 -0400",
     "branch": "main"
   },
   "futureTodos": [
