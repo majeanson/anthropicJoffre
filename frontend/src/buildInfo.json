@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-30T22:30:00.000Z",
-  "version": "1.0.13",
+  "buildDate": "2025-10-30T23:00:00.000Z",
+  "version": "1.0.14",
   "git": {
-    "commitMessage": "feat: Add REST API endpoints, game replay caching, and documentation overhaul",
-    "commitHash": "d73f4f1",
-    "commitDate": "2025-10-30 22:30:00 -0400",
+    "commitMessage": "refactor(e2e): Convert 23-game-flow-4-players to use segmented architecture",
+    "commitHash": "c84b461",
+    "commitDate": "2025-10-30 23:00:00 -0400",
     "branch": "main"
   },
   "futureTodos": [
