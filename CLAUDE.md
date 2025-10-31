@@ -8,8 +8,8 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 **Stack**: React + TypeScript, Tailwind CSS, Socket.io, Node.js, PostgreSQL
 
 **Current Status**: Feature-complete for core gameplay and social features (October 2025)
-- ✅ 89 unit tests passing
-- ✅ E2E test suite
+- ✅ 150 backend unit tests passing (~1s runtime)
+- ✅ 22 E2E test files (Playwright)
 - ✅ Database persistence
 - ✅ Game replay system
 - ✅ Lobby browser with tabs
@@ -276,13 +276,13 @@ The game implements a **4-layer defense-in-depth validation strategy** to preven
 
 ## 🧪 Testing Strategy
 
-**Status**: ✅ **113 passing backend tests**, E2E infrastructure in place
+**Status**: ✅ **150 passing backend tests**, E2E infrastructure in place
 **Coverage**: >95% of game logic, comprehensive validation testing
 
 ### Overview
 
 The project follows a **hybrid testing pyramid** approach:
-- **Backend Tests** (113 tests, ~3s): Pure function testing of all game logic
+- **Backend Tests** (150 tests, ~1s): Pure function testing of all game logic
 - **E2E Tests** (22 test files, Playwright): User flow validation
 
 **See**: **[docs/technical/TESTING_ARCHITECTURE.md](docs/technical/TESTING_ARCHITECTURE.md)** for comprehensive testing strategy
@@ -290,15 +290,17 @@ The project follows a **hybrid testing pyramid** approach:
 ### Backend Testing (Primary)
 
 **Framework**: Vitest v4.0.2
-**Location**: `backend/src/game/*.test.ts`
-**Runtime**: ~3 seconds for 113 tests
+**Location**: `backend/src/game/*.test.ts` and `backend/src/db/*.test.ts`
+**Runtime**: ~1 second for 150 tests
 
 ✅ **What's Tested**:
-- Deck operations (8 tests)
-- Game logic: winner determination, scoring, betting hierarchy (37 tests)
-- Validation: all player actions, suit-following, bet requirements (27 tests)
-- State management: transitions, mutations, round flows (47 tests)
-- Database operations (18 tests, currently limited by quota)
+- Deck operations (8 tests) - deck.test.ts
+- Game logic: winner determination, scoring, betting hierarchy (37 tests) - logic.test.ts
+- Validation: all player actions, suit-following, bet requirements (27 tests) - validation.test.ts
+- State management: transitions, mutations, round flows (47 tests) - state.test.ts
+- Immutable state transitions (5+ tests) - stateTransitions.test.ts
+- Round statistics helpers (8 tests) - roundStatistics.test.ts
+- Database operations (18 tests, limited by quota) - db/index.test.ts
 
 ```bash
 cd backend

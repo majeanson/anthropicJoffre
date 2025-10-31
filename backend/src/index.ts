@@ -55,6 +55,7 @@ import {
 import {
   calculateRoundStatistics,
   initializeRoundStats,
+  updateTrickStats,
   RoundStatsData,
   RoundStatistics,
 } from './game/roundStatistics';
@@ -1006,6 +1007,44 @@ function startNewRound(gameId: string) {
   }
 }
 
+/**
+ * Schedule post-trick actions after animation delay
+ * Sprint 5 Phase 2.3: Extracted from resolveTrick() to reduce duplication
+ *
+ * The 2-second delay allows the frontend to show trick resolution animation.
+ * After the delay, clears the current trick and either:
+ * - Ends the round if all hands are empty
+ * - Continues playing with next card
+ *
+ * @param gameId - Game ID
+ * @param winnerName - Name of player who won the trick
+ * @param isRoundOver - Whether the round is complete (all hands empty)
+ * @param delayMs - Delay in milliseconds before executing actions (default: 2000ms)
+ */
+function schedulePostTrickActions(
+  gameId: string,
+  winnerName: string,
+  isRoundOver: boolean,
+  delayMs: number = 2000
+) {
+  setTimeout(() => {
+    const game = games.get(gameId);
+    if (!game) return;
+
+    // Clear trick after frontend has shown the animation
+    game.currentTrick = [];
+
+    if (isRoundOver) {
+      // All hands empty - proceed to round end
+      endRound(gameId);
+    } else {
+      // Continue playing - emit update and start timeout for next card
+      emitGameUpdate(gameId, game);
+      startPlayerTimeout(gameId, winnerName, 'playing');
+    }
+  }, delayMs);
+}
+
 function resolveTrick(gameId: string) {
   console.log(`\n🎯 ===== resolveTrick START for game ${gameId} =====`);
   const game = games.get(gameId);
@@ -1028,20 +1067,9 @@ function resolveTrick(gameId: string) {
   const winnerName = getWinnerName(game.currentTrick, winnerId, game.players);
 
   // 2. SIDE EFFECT - Track special card stats for round statistics (use stable playerName)
+  // Sprint 5 Phase 2.3: Extracted to updateTrickStats() helper
   const stats = roundStats.get(gameId);
-  if (stats) {
-    // Check if trick contains red 0 (worth +5 points)
-    if (hasRedZero(game.currentTrick)) {
-      const redZeroCount = stats.redZerosCollected.get(winnerName) || 0;
-      stats.redZerosCollected.set(winnerName, redZeroCount + 1);
-    }
-
-    // Check if trick contains brown 0 (worth -2 points)
-    if (hasBrownZero(game.currentTrick)) {
-      const brownZeroCount = stats.brownZerosReceived.get(winnerName) || 0;
-      stats.brownZerosReceived.set(winnerName, brownZeroCount + 1);
-    }
-  }
+  updateTrickStats(stats, game.currentTrick, winnerName);
 
   // 3. STATE TRANSFORMATION - Apply trick resolution (use stable playerName)
   // applyTrickResolution now keeps currentTrick visible (doesn't clear it)
@@ -1064,27 +1092,8 @@ function resolveTrick(gameId: string) {
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: gameToSend || game });
 
   // 5. ORCHESTRATION - Handle round completion or continue playing
-  if (result.isRoundOver) {
-    // Wait 2 seconds before finalizing round (show completed trick)
-    setTimeout(() => {
-      const g = games.get(gameId);
-      if (g) {
-        g.currentTrick = []; // Clear trick after delay
-      }
-      endRound(gameId);
-    }, 2000);
-  } else {
-    // Normal trick resolution - continue playing
-    setTimeout(() => {
-      const g = games.get(gameId);
-      if (g) {
-        g.currentTrick = []; // Clear trick after delay
-        emitGameUpdate(gameId, g);
-        // Start timeout for trick winner's next card (use stable playerName)
-        startPlayerTimeout(gameId, winnerName, 'playing');
-      }
-    }, 2000);
-  }
+  // Sprint 5 Phase 2.3: Extracted setTimeout logic to schedulePostTrickActions()
+  schedulePostTrickActions(gameId, winnerName, result.isRoundOver);
 }
 
 

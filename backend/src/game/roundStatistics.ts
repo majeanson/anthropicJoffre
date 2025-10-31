@@ -1,16 +1,19 @@
 /**
  * Round Statistics Calculation
  * Sprint 4: Extracted from index.ts
+ * Sprint 5 Phase 2.3: Added updateTrickStats() helper
  *
  * Calculates end-of-round statistics like fastest play, most aggressive bidder,
  * trump master, and lucky player.
  */
 
-import { GameState, Player } from '../types/game';
+import { GameState, Player, TrickCard } from '../types/game';
 import {
   getFastestPlayer,
   getTrumpMaster,
   getLuckiestPlayer,
+  hasRedZero,
+  hasBrownZero,
 } from './logic';
 
 /**
@@ -141,6 +144,43 @@ export function initializeRoundStats(players: Player[]): RoundStatsData {
     stats.redZerosCollected.set(player.name, 0);
     stats.brownZerosReceived.set(player.name, 0);
   });
+
+  return stats;
+}
+
+/**
+ * Update round statistics after a trick is won
+ * Tracks special card collection (red zeros and brown zeros)
+ *
+ * Sprint 5 Phase 2.3: Extracted from resolveTrick() orchestration
+ *
+ * @param stats - Current round statistics data (will be mutated)
+ * @param trick - The completed trick
+ * @param winnerName - Name of the player who won the trick
+ * @returns The updated stats object (same reference, for chaining)
+ *
+ * @example
+ * const stats = roundStats.get(gameId);
+ * updateTrickStats(stats, game.currentTrick, winnerName);
+ */
+export function updateTrickStats(
+  stats: RoundStatsData | undefined,
+  trick: TrickCard[],
+  winnerName: string
+): RoundStatsData | undefined {
+  if (!stats) return stats;
+
+  // Track red zero collection (+5 points)
+  if (hasRedZero(trick)) {
+    const redZeroCount = stats.redZerosCollected.get(winnerName) || 0;
+    stats.redZerosCollected.set(winnerName, redZeroCount + 1);
+  }
+
+  // Track brown zero collection (-2 points)
+  if (hasBrownZero(trick)) {
+    const brownZeroCount = stats.brownZerosReceived.get(winnerName) || 0;
+    stats.brownZerosReceived.set(winnerName, brownZeroCount + 1);
+  }
 
   return stats;
 }
