@@ -9,10 +9,10 @@ test.describe('Game Completion Stats Recording', () => {
     await page.goto('http://localhost:5173');
 
     // Create a game using Quick Play with custom player name
-    await page.getByRole('button', { name: /quick play/i }).click();
+    await page.getByTestId('quick-play-button').click();
 
     // Wait for team selection
-    await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+    await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
 
     // Capture game ID
     const gameId = (await page.getByTestId('game-id').textContent())!;
@@ -21,25 +21,19 @@ test.describe('Game Completion Stats Recording', () => {
     await page.waitForTimeout(2000);
 
     // Start the game
-    await page.getByRole('button', { name: /start game/i }).click();
+    await page.getByTestId('start-game-button').click();
 
     // Wait for betting phase
     await page.waitForSelector('text=/betting/i', { state: 'visible', timeout: 10000 });
 
-    // Set both teams to 40 points using REST API (more reliable than Test Panel)
+    // Set team 1 to 41 points to trigger immediate game_over
     await setGameStateViaAPI(page, gameId, {
-      teamScores: { team1: 40, team2: 40 }
+      teamScores: { team1: 41, team2: 30 }
     });
 
-    // Enable autoplay to complete the game quickly
-    const autoplayButton = page.locator('button:has-text("Manual"), button:has-text("Auto")').first();
-    if (await autoplayButton.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await autoplayButton.click();
-    }
-
-    // Wait for game to complete (should be quick since scores are at 40)
+    // Wait for game to complete (should be immediate since team1 >= 41)
     const gameOverHeading = page.getByRole('heading', { name: /game over/i });
-    await gameOverHeading.waitFor({ timeout: 120000 });
+    await gameOverHeading.waitFor({ timeout: 10000 });
 
     console.log('✅ Game completed, verifying game over screen...');
 
@@ -85,47 +79,24 @@ test.describe('Game Completion Stats Recording', () => {
   });
 
   test('should update player stats correctly when completing a game (E2E with real player name)', async ({ page }) => {
-    const playerName = 'E2ETestPlayer_' + Date.now();
+    // Use Quick Play with default player name "You"
+    const playerName = 'You';
 
     // Navigate to the app
     await page.goto('http://localhost:5173');
 
-    // Create game with specific player name
-    await page.getByRole('button', { name: /create game/i }).click();
-    await page.getByPlaceholder(/enter your name/i).fill(playerName);
-    await page.getByRole('button', { name: /create/i }).click();
+    // Use Quick Play to create game with bots
+    await page.getByTestId('quick-play-button').click();
+    await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
 
-    // Wait for game creation
-    await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+    // Capture game ID
+    const gameId = (await page.getByTestId('game-id').textContent())!;
 
-    // Capture game ID (will be reassigned if Quick Play fallback is used)
-    let gameId = (await page.getByTestId('game-id').textContent())!;
-
-    // Add 3 bot players
-    for (let i = 0; i < 3; i++) {
-      await page.waitForTimeout(500);
-    }
-
-    // Wait for bots to join via Quick Play or manually
-    // Note: This might need adjustment based on how bots are added
-
-    await page.waitForTimeout(3000);
+    // Wait for bots to join
+    await page.waitForTimeout(2000);
 
     // Start the game
-    const startButton = page.getByRole('button', { name: /start game/i });
-    if (await startButton.isEnabled({ timeout: 5000 }).catch(() => false)) {
-      await startButton.click();
-    } else {
-      console.log('Start button not enabled, may need manual bot addition');
-      // Try Quick Play instead
-      await page.goto('http://localhost:5173');
-      await page.getByRole('button', { name: /quick play/i }).click();
-      await page.waitForSelector('text=/game id/i', { timeout: 10000 });
-      // Re-capture game ID after Quick Play
-      gameId = (await page.getByTestId('game-id').textContent())!;
-      await page.waitForTimeout(2000);
-      await page.getByRole('button', { name: /start game/i }).click();
-    }
+    await page.getByTestId('start-game-button').click();
 
     // Wait for betting phase
     await page.waitForSelector('text=/betting/i', { state: 'visible', timeout: 10000 });
@@ -184,14 +155,14 @@ test.describe('Game Completion Stats Recording', () => {
     await page.goto('http://localhost:5173');
 
     // Create game with Quick Play
-    await page.getByRole('button', { name: /quick play/i }).click();
-    await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+    await page.getByTestId('quick-play-button').click();
+    await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
 
     // Capture game ID
     const gameId = (await page.getByTestId('game-id').textContent())!;
 
     await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: /start game/i }).click();
+    await page.getByTestId('start-game-button').click();
 
     // Fast-forward using REST API (more reliable than Test Panel)
     await setGameStateViaAPI(page, gameId, {

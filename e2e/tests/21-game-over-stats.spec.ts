@@ -7,10 +7,10 @@ test.describe('Game Over Stats', () => {
     await page.goto('http://localhost:5173');
 
     // Create a game using Quick Play
-    await page.getByRole('button', { name: /quick play/i }).click();
+    await page.getByTestId('quick-play-button').click();
 
     // Wait for team selection (bots will auto-join)
-    await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+    await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
 
     // Capture game ID for API manipulation
     const gameIdElement = page.getByTestId('game-id');
@@ -23,7 +23,7 @@ test.describe('Game Over Stats', () => {
     await page.waitForSelector('text=/bot 3/i', { timeout: 5000 });
 
     // Start the game
-    await page.getByRole('button', { name: /start game/i }).click();
+    await page.getByTestId('start-game-button').click();
 
     // Fast forward to game over using REST API (more reliable than Test Panel UI)
     await setGameStateViaAPI(page, gameId, {
@@ -86,8 +86,8 @@ test.describe('Game Over Stats', () => {
     await page.goto('http://localhost:5173');
 
     // Create game with Quick Play
-    await page.getByRole('button', { name: /quick play/i }).click();
-    await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+    await page.getByTestId('quick-play-button').click();
+    await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
 
     // Capture game ID
     const gameId = (await page.getByTestId('game-id').textContent())!;
@@ -96,7 +96,7 @@ test.describe('Game Over Stats', () => {
     await page.waitForTimeout(2000);
 
     // Start game
-    await page.getByRole('button', { name: /start game/i }).click();
+    await page.getByTestId('start-game-button').click();
 
     // Set winning scores using REST API
     await setGameStateViaAPI(page, gameId, {
@@ -118,14 +118,14 @@ test.describe('Game Over Stats', () => {
     await page.goto('http://localhost:5173');
 
     // Create game
-    await page.getByRole('button', { name: /quick play/i }).click();
-    await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+    await page.getByTestId('quick-play-button').click();
+    await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
 
     // Capture game ID
     const gameId = (await page.getByTestId('game-id').textContent())!;
 
     await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: /start game/i }).click();
+    await page.getByTestId('start-game-button').click();
 
     // Fast forward to game over using REST API
     await setGameStateViaAPI(page, gameId, {
@@ -146,14 +146,14 @@ test.describe('Game Over Stats', () => {
     await page.goto('http://localhost:5173');
 
     // Create game
-    await page.getByRole('button', { name: /quick play/i }).click();
-    await page.waitForSelector('text=/game id/i', { timeout: 10000 });
+    await page.getByTestId('quick-play-button').click();
+    await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
 
     // Capture game ID
     const gameId = (await page.getByTestId('game-id').textContent())!;
 
     await page.waitForTimeout(2000);
-    await page.getByRole('button', { name: /start game/i }).click();
+    await page.getByTestId('start-game-button').click();
 
     // Fast forward to game over using REST API
     await setGameStateViaAPI(page, gameId, {

@@ -274,7 +274,7 @@ test.describe('Reconnection Flow', () => {
     await expect(playerPage.locator('text=/team 1|team 2/i').first()).toBeVisible({ timeout: 5000 });
 
     // Try to start game if button is available (bots joined)
-    const startButton = playerPage.getByRole('button', { name: /start game/i });
+    const startButton = playerPage.getByTestId('start-game-button');
     const hasStartButton = await startButton.isVisible({ timeout: 5000 }).catch(() => false);
 
     if (hasStartButton) {

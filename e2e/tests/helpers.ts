@@ -362,10 +362,14 @@ export async function enableAutoplayForPlayer(page: Page) {
  */
 export async function waitForBotAction(page: Page, timeout: number = 5000) {
   // Wait for either "Waiting for other players" or a state change
-  await Promise.race([
-    page.waitForSelector('text=/Waiting for other players/i', { timeout }),
-    page.waitForTimeout(timeout)
-  ]);
+  // Use try-catch to prevent timeout errors from failing the test
+  try {
+    await page.waitForSelector('text=/Waiting for other players/i', { timeout });
+  } catch (error) {
+    // Timeout is acceptable - bot may have already acted
+    // Just wait a bit for UI to update
+    await page.waitForTimeout(1000);
+  }
 }
 
 /**
@@ -587,4 +591,96 @@ export async function setGameStateViaAPI(
   await page.waitForTimeout(500);
 
   return response;
+}
+
+/**
+ * Creates a game using Quick Play (single player + 3 server-side bots).
+ * More stable than multi-page approach for long-running tests.
+ *
+ * Returns same interface as createGameWith4Players for backward compatibility,
+ * but only pages[0] is a real page (others are references to it).
+ *
+ * @param browser - Playwright browser instance
+ * @returns Object with context, pages array (all point to same page), and gameId
+ */
+export async function createQuickPlayGame(browser: any) {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto('/');
+
+  // Use Quick Play to create game with 3 server-side bots
+  await page.getByTestId('quick-play-button').click();
+  await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
+  const gameId = (await page.getByTestId('game-id').textContent())!;
+
+  // Wait for bots to join (3 bots)
+  await page.waitForTimeout(2000);
+
+  // Start the game
+  await page.getByTestId('start-game-button').click();
+
+  // Wait for betting phase
+  await page.waitForSelector('text=/Betting Phase/i', { state: 'visible', timeout: 10000 });
+
+  // For backward compatibility, return array with same page 4 times
+  // Tests that iterate pages[0-3] will still work, just accessing same page
+  const pages = [page, page, page, page];
+
+  return { context, pages, gameId };
+}
+
+/**
+ * Places bets using autoplay for all players except the human.
+ * Simplifies betting phase for single-player + bots tests.
+ *
+ * @param page - The page instance of the human player
+ * @param betAmount - Bet amount for human player (default: 8)
+ */
+export async function placeAllBetsWithAutoplay(page: Page, betAmount: number = 8) {
+  // Wait for betting controls to be available
+  await page.waitForSelector('text=/Select Bet Amount/i', { timeout: 10000 });
+
+  // Place human player's bet
+  const betButton = page.getByRole('button', { name: String(betAmount), exact: true });
+  await betButton.waitFor({ state: 'visible', timeout: 10000 });
+  await betButton.click();
+
+  const placeBetButton = page.getByRole('button', { name: new RegExp(`Place Bet: ${betAmount}`) });
+  await placeBetButton.waitFor({ state: 'visible', timeout: 5000 });
+  await placeBetButton.click();
+
+  // Wait for bots to complete betting
+  await waitForBotAction(page, 15000);
+
+  // Wait for playing phase - check for cards to be visible
+  await page.locator('[data-card-value]').first().waitFor({ timeout: 10000 });
+}
+
+/**
+ * Plays a complete game using autoplay until game over.
+ * Useful for testing game completion, stats recording, etc.
+ *
+ * @param page - Page instance of the player
+ * @param maxRounds - Maximum rounds to wait (default: 20)
+ * @returns True if game completed, false if timeout
+ */
+export async function playCompleteGameWithAutoplay(page: Page, maxRounds: number = 20): Promise<boolean> {
+  // Enable autoplay for human player
+  await enableAutoplayForPlayer(page);
+
+  // Wait for game completion or max rounds
+  for (let i = 0; i < maxRounds; i++) {
+    // Check if game is over
+    const isGameOver = await page.locator('text=/Game Over/i').isVisible({ timeout: 2000 }).catch(() => false);
+    if (isGameOver) {
+      console.log(`Game completed after ${i + 1} rounds`);
+      return true;
+    }
+
+    // Wait for round to progress
+    await page.waitForTimeout(5000);
+  }
+
+  console.log(`Game still running after ${maxRounds} rounds`);
+  return false;
 }

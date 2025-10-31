@@ -22,15 +22,15 @@ test.describe('Validation Feedback', () => {
         await page.goto('/');
 
         if (i === 1) {
-          await page.getByRole('button', { name: /create game/i }).click();
+          await page.getByTestId('create-game-button').click();
           await page.getByPlaceholder(/enter your name/i).fill(`Player ${i}`);
           await page.getByRole('button', { name: /create/i }).click();
 
-          await page.waitForSelector('.font-mono', { timeout: 10000 });
-          const gameIdElement = page.locator('.font-mono');
+          await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
+          const gameIdElement = page.getByTestId('game-id');
           gameId = await gameIdElement.textContent();
         } else {
-          await page.getByRole('button', { name: /join game/i }).click();
+          await page.getByTestId('join-game-button').click();
           await page.getByPlaceholder(/game id/i).fill(gameId!);
           await page.getByPlaceholder(/your name/i).fill(`Player ${i}`);
           await page.getByRole('button', { name: /join/i }).click();
@@ -43,7 +43,7 @@ test.describe('Validation Feedback', () => {
       await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
 
       // Start Game button should be disabled
-      const startButton = pages[0].getByRole('button', { name: /start game/i });
+      const startButton = pages[0].getByTestId('start-game-button');
       await expect(startButton).toBeDisabled();
 
       // Should show message about waiting for players
@@ -61,15 +61,15 @@ test.describe('Validation Feedback', () => {
         await page.goto('/');
 
         if (i === 1) {
-          await page.getByRole('button', { name: /create game/i }).click();
+          await page.getByTestId('create-game-button').click();
           await page.getByPlaceholder(/enter your name/i).fill(`Player ${i}`);
           await page.getByRole('button', { name: /create/i }).click();
 
-          await page.waitForSelector('.font-mono', { timeout: 10000 });
-          const gameIdElement = page.locator('.font-mono');
+          await page.getByTestId('game-id').waitFor({ state: 'visible', timeout: 10000 });
+          const gameIdElement = page.getByTestId('game-id');
           gameId = await gameIdElement.textContent();
         } else {
-          await page.getByRole('button', { name: /join game/i }).click();
+          await page.getByTestId('join-game-button').click();
           await page.getByPlaceholder(/game id/i).fill(gameId!);
           await page.getByPlaceholder(/your name/i).fill(`Player ${i}`);
           await page.getByRole('button', { name: /join/i }).click();
@@ -82,7 +82,7 @@ test.describe('Validation Feedback', () => {
       await pages[0].waitForSelector('text=Team Selection', { timeout: 10000 });
 
       // Start Game button should be enabled (4 players, default 2-2 split)
-      const startButton = pages[0].getByRole('button', { name: /start game/i });
+      const startButton = pages[0].getByTestId('start-game-button');
       await expect(startButton).toBeEnabled();
     });
   });
