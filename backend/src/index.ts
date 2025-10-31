@@ -129,6 +129,11 @@ import logger, {
   requestLogger,
   PerformanceTimer,
 } from './utils/logger';
+import {
+  responseTimeTracker,
+  responseTimeMiddleware,
+  trackSocketEvent,
+} from './utils/responseTime';
 
 const app = express();
 const httpServer = createServer(app);
@@ -160,6 +165,23 @@ const io = new Server(httpServer, {
   // Ping timeout and interval for faster disconnect detection
   pingTimeout: 10000, // 10 seconds
   pingInterval: 5000,  // 5 seconds
+  // Enable WebSocket compression (reduces bandwidth by 30-60%)
+  perMessageDeflate: {
+    threshold: 1024, // Only compress messages > 1KB
+    zlibDeflateOptions: {
+      chunkSize: 1024,
+      memLevel: 7,
+      level: 3, // Compression level (1-9, lower = faster, higher = better compression)
+    },
+    zlibInflateOptions: {
+      chunkSize: 10 * 1024,
+    },
+    // Compression options
+    clientNoContextTakeover: true, // Reset context between messages (lower memory)
+    serverNoContextTakeover: true,
+    serverMaxWindowBits: 10, // Lower memory usage
+    concurrencyLimit: 10, // Limit concurrent compression operations
+  },
 });
 
 // Initialize connection manager for robust connection handling
@@ -191,6 +213,9 @@ app.use(express.json());
 if (process.env.NODE_ENV !== 'test') {
   app.use(requestLogger);
 }
+
+// Add response time monitoring for all requests
+app.use(responseTimeMiddleware);
 
 // Configure rate limiting
 const apiLimiter = rateLimit({
@@ -1016,6 +1041,23 @@ app.get('/api/health/detailed', (req, res) => {
       cors: {
         origin: corsOrigin === '*' ? 'All origins (development)' : allowedOrigins,
       },
+
+      // WebSocket configuration
+      websocket: {
+        compressionEnabled: true,
+        compressionThreshold: '1KB',
+        compressionLevel: 3,
+      },
+
+      // Performance monitoring
+      performance: {
+        responseTime: {
+          totalEndpoints: responseTimeTracker.getSummary().totalEndpoints,
+          totalRequests: responseTimeTracker.getSummary().totalRequests,
+          avgResponseTime: Math.round(responseTimeTracker.getSummary().avgResponseTime * 100) / 100 + 'ms',
+          slowEndpoints: responseTimeTracker.getSummary().slowEndpoints.length,
+        },
+      },
     });
   } catch (error) {
     logger.error('Error generating detailed health check', { error });
@@ -1053,6 +1095,51 @@ app.get('/api/metrics/error-boundaries', (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve metrics' });
+  }
+});
+
+// Response time metrics endpoint
+app.get('/api/metrics/response-times', (req, res) => {
+  try {
+    const summary = responseTimeTracker.getSummary();
+    const allMetrics = responseTimeTracker.getAllMetrics();
+
+    // Format metrics with rounded values for readability
+    const formattedMetrics = allMetrics.map(metric => ({
+      name: metric.name,
+      count: metric.count,
+      min: Math.round(metric.min * 100) / 100,
+      max: Math.round(metric.max * 100) / 100,
+      avg: Math.round(metric.avg * 100) / 100,
+      p50: Math.round(metric.p50 * 100) / 100,
+      p95: Math.round(metric.p95 * 100) / 100,
+      p99: Math.round(metric.p99 * 100) / 100,
+    }));
+
+    // Add alerting information
+    const slowEndpoints = formattedMetrics.filter(m => m.p95 > 100);
+    const verySlowEndpoints = formattedMetrics.filter(m => m.p95 > 200);
+
+    res.json({
+      timestamp: new Date().toISOString(),
+      summary: {
+        totalEndpoints: summary.totalEndpoints,
+        totalRequests: summary.totalRequests,
+        avgResponseTime: Math.round(summary.avgResponseTime * 100) / 100,
+      },
+      alerts: {
+        slowEndpoints: slowEndpoints.length,
+        verySlowEndpoints: verySlowEndpoints.length,
+      },
+      metrics: formattedMetrics,
+      // Separate sections for quick reference
+      performance: {
+        fastest: formattedMetrics.slice(-5).reverse(), // Top 5 fastest
+        slowest: formattedMetrics.slice(0, 5), // Top 5 slowest
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve response time metrics' });
   }
 });
 
