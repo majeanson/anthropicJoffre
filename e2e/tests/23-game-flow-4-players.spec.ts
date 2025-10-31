@@ -5,18 +5,18 @@ import {
   playMultipleRounds,
   verifyGameState,
   measureRoundDuration,
-  playCompleteGame
+  playCompleteGame,
+  playGameInSegments
 } from './helpers';
 
 /**
  * Test suite for complete game flows with 4 real players (4 browsers).
  * Tests both quick games (near end-game) and full-length games from scratch.
  *
- * NOTE: These tests are temporarily skipped due to multi-browser stability issues.
- * Multi-page architecture crashes after ~60s in marathon runs.
- * TODO: Refactor to use spectator mode or accept these tests as known limitations.
+ * REFACTORED: Now uses segmented architecture to prevent browser crashes.
+ * Multi-page games are split into 5-round segments with context resets.
  */
-test.describe.skip('@marathon Game Flow - 4 Real Players', () => {
+test.describe('@stability Game Flow - 4 Real Players (Segmented)', () => {
   let pages: Page[];
   let contexts: any[];
   let gameId: string;
@@ -31,7 +31,9 @@ test.describe.skip('@marathon Game Flow - 4 Real Players', () => {
   });
 
 
-  test.describe('@full Full-Length Games', () => {
+  test.describe.skip('@full Full-Length Games', () => {
+    // NOTE: These tests take 30-45 minutes each - skip for normal runs
+    // Run explicitly with: npx playwright test --grep @full
     test('should play a complete game from 0-0 to 41+', async ({ browser }) => {
       test.setTimeout(2700000); // 45 minutes for full game
 
@@ -210,61 +212,55 @@ test.describe.skip('@marathon Game Flow - 4 Real Players', () => {
   });
 
   test.describe('@stress Stress Testing', () => {
-    test('should maintain performance over 10 consecutive quick rounds', async ({ browser }) => {
+    test('should maintain performance over 15 rounds using segmented approach', async ({ browser }) => {
       test.setTimeout(600000); // 10 minutes
 
-      const result = await createGameWith4Players(browser);
-      pages = result.pages;
-      contexts = result.contexts;
-      gameId = result.gameId!;
+      // Use segmented approach: 3 segments of 5 rounds each
+      const results = await playGameInSegments(
+        browser,
+        15, // total rounds
+        5,  // rounds per segment
+        { humanPlayers: 4, botPlayers: 0 } // 4 real players, no bots
+      );
 
-      // Set scores near end for quick rounds
-      await pages[0].evaluate(() => {
-        // @ts-ignore
-        if (window.socket) {
-          // @ts-ignore
-          window.socket.emit('__test_set_scores', { team1: 20, team2: 20 });
-        }
-      });
-      await pages[0].waitForTimeout(2000); // Wait for state to propagate
+      // Verify all segments completed
+      expect(results.totalRounds).toBe(15);
+      expect(results.segments).toBe(3);
+      expect(results.errors.length).toBe(0);
 
-      const roundDurations: number[] = [];
+      // Check for performance degradation across segments
+      if (results.segmentResults.length >= 2) {
+        const firstSegmentAvg = results.segmentResults[0].avgRoundTime;
+        const lastSegmentAvg = results.segmentResults[results.segmentResults.length - 1].avgRoundTime;
+        const degradation = ((lastSegmentAvg - firstSegmentAvg) / firstSegmentAvg) * 100;
 
-      for (let round = 1; round <= 10; round++) {
-        const startTime = Date.now();
+        console.log(`\nPerformance Analysis:`);
+        console.log(`First segment avg: ${firstSegmentAvg}s per round`);
+        console.log(`Last segment avg: ${lastSegmentAvg}s per round`);
+        console.log(`Performance degradation: ${degradation.toFixed(2)}%`);
 
-        // Quick betting - all bet 8
-        const bettingOrder = [2, 3, 0, 1];
-        for (const playerIndex of bettingOrder) {
-          const betBtn = pages[playerIndex].getByTestId('bet-8-with-trump');
-          if (await betBtn.isVisible({ timeout: 1000 })) {
-            await betBtn.click();
-          }
-          await pages[0].waitForTimeout(300);
-        }
-
-        // Play round
-        await playFullRound(pages);
-
-        const duration = Date.now() - startTime;
-        roundDurations.push(duration);
-
-        // Ready for next
-        for (const page of pages) {
-          const readyBtn = page.getByTestId('ready-for-next-round-button');
-          if (await readyBtn.isVisible({ timeout: 1000 })) {
-            await readyBtn.click();
-          }
-        }
+        // With context resets, degradation should be minimal
+        expect(Math.abs(degradation)).toBeLessThan(30); // Less than 30% degradation
       }
+    });
 
-      // Check for performance degradation
-      const firstRoundDuration = roundDurations[0];
-      const lastRoundDuration = roundDurations[roundDurations.length - 1];
-      const degradation = ((lastRoundDuration - firstRoundDuration) / firstRoundDuration) * 100;
+    test('should handle 10 quick rounds with context reset at midpoint', async ({ browser }) => {
+      test.setTimeout(300000); // 5 minutes
 
-      console.log(`Performance degradation: ${degradation.toFixed(2)}%`);
-      expect(Math.abs(degradation)).toBeLessThan(50); // Less than 50% degradation
+      // Test with a single context reset in the middle
+      const results = await playGameInSegments(
+        browser,
+        10, // total rounds
+        5,  // rounds per segment (2 segments)
+        { humanPlayers: 4, botPlayers: 0 }
+      );
+
+      expect(results.totalRounds).toBe(10);
+      expect(results.segments).toBe(2);
+      expect(results.errors.length).toBe(0);
+
+      // Both segments should complete successfully
+      expect(results.segmentResults.length).toBe(2);
     });
   });
 });
