@@ -24,6 +24,7 @@ import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayer
 import { preloadCardImages } from './utils/imagePreloader';
 import { addRecentPlayers } from './utils/recentPlayers';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { applyStateDelta, GameStateDelta } from './utils/stateDelta';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -269,6 +270,20 @@ function App() {
       if (gameState.currentTrick.length === 0) {
         setCurrentTrickWinnerId(null);
       }
+    });
+
+    // Sprint 2: Handle delta updates for reduced bandwidth (80-90% reduction)
+    newSocket.on('game_updated_delta', (delta: GameStateDelta) => {
+      console.log(`📥 Frontend received game_updated_delta`);
+      setGameState(prevState => {
+        if (!prevState) return prevState; // Can't apply delta without previous state
+        const newState = applyStateDelta(prevState, delta);
+        // Clear winner ID when trick is cleared
+        if (newState.currentTrick.length === 0) {
+          setCurrentTrickWinnerId(null);
+        }
+        return newState;
+      });
     });
 
     newSocket.on('trick_resolved', ({ winnerId, gameState }) => {
