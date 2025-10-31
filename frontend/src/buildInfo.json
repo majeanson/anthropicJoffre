@@ -1,15 +1,14 @@
 {
-  "buildDate": "2025-10-31T18:25:00.000Z",
-  "version": "1.0.25",
+  "buildDate": "2025-10-31T20:30:00.000Z",
+  "version": "1.0.26",
   "git": {
-    "commitMessage": "refactor(backend): Sprint 4 Phase 2 - Extract broadcast utilities module",
-    "commitHash": "0b2ac94",
-    "commitDate": "2025-10-31 14:24:20 -0400",
+    "commitMessage": "refactor(frontend): Sprint 5 Phase 2 - Integrate hooks into App.tsx",
+    "commitHash": "b8c514e",
+    "commitDate": "2025-10-31 16:30:00 -0400",
     "branch": "main"
   },
   "futureTodos": [
-    "Sprint 5: Frontend Refactoring - Extract App.tsx handlers to hooks",
-    "Refactor E2E Tests - Single-browser architecture for stability",
+    "Sprint 6: E2E Test Refactoring - Single-browser architecture for stability",
     "Redis Caching Layer - Further optimize database usage",
     "WebSocket Integration Tests - Backend multi-player test suite",
     "CI/CD Pipeline - Automated deployment and testing",
