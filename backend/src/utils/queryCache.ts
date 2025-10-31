@@ -115,11 +115,24 @@ class QueryCache {
 
   /**
    * Get cache statistics
+   * Sprint 3: Enhanced stats for monitoring cache effectiveness
    */
-  getStats(): { size: number; keys: string[] } {
+  getStats(): {
+    size: number;
+    keys: string[];
+    entries: Array<{ key: string; age: number; ttl: number }>;
+  } {
+    const now = Date.now();
+    const entries = Array.from(this.cache.entries()).map(([key, entry]) => ({
+      key,
+      age: now - entry.timestamp,
+      ttl: entry.ttl,
+    }));
+
     return {
       size: this.cache.size,
       keys: Array.from(this.cache.keys()),
+      entries,
     };
   }
 
@@ -140,13 +153,17 @@ export const queryCache = new QueryCache();
 
 /**
  * Cache TTL constants (in milliseconds)
+ *
+ * Sprint 3 Optimization: Increased TTLs to reduce Neon compute usage
+ * Target: 30% reduction in database queries
  */
 export const CACHE_TTL = {
-  LEADERBOARD: 60000,      // 60 seconds - expensive query with sorting
-  PLAYER_STATS: 30000,     // 30 seconds - frequently accessed
-  RECENT_GAMES: 30000,     // 30 seconds - lobby browser data
-  GAME_REPLAY: 300000,     // 5 minutes - historical data rarely changes
-  PLAYER_HISTORY: 60000,   // 60 seconds - player-specific game list
+  LEADERBOARD: 120000,     // 2 minutes (was 60s) - expensive query, updates infrequently
+  PLAYER_STATS: 120000,    // 2 minutes (was 30s) - only changes after game finish
+  RECENT_GAMES: 120000,    // 2 minutes (was 30s) - lobby browser, low update frequency
+  ALL_FINISHED_GAMES: 120000, // 2 minutes - NEW: lobby browser pagination
+  GAME_REPLAY: 300000,     // 5 minutes - historical data never changes
+  PLAYER_HISTORY: 120000,  // 2 minutes (was 60s) - player game list
 } as const;
 
 /**

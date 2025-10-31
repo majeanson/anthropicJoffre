@@ -50,6 +50,8 @@ const getPool = () => {
 /**
  * Execute a database query with automatic connection pooling
  * Optimized for Neon with minimal connection usage
+ *
+ * Sprint 3: Added query performance logging in production for slow queries
  */
 export const query = async (text: string, params?: any[]) => {
   const dbPool = getPool();
@@ -57,21 +59,19 @@ export const query = async (text: string, params?: any[]) => {
     throw new Error('Database not configured. Set DATABASE_URL environment variable.');
   }
 
-  // Log slow queries in development (>100ms)
-  if (process.env.NODE_ENV !== 'production') {
-    const start = Date.now();
-    const result = await dbPool.query(text, params);
-    const duration = Date.now() - start;
+  const start = Date.now();
+  const result = await dbPool.query(text, params);
+  const duration = Date.now() - start;
 
+  // Log all queries in development, only slow queries (>100ms) in production
+  if (process.env.NODE_ENV !== 'production' || duration > 100) {
     logDatabaseQuery(text, duration, {
       params: params?.length,
       rows: result.rows.length,
     });
-
-    return result;
   }
 
-  return dbPool.query(text, params);
+  return result;
 };
 
 /**
@@ -229,6 +229,10 @@ export const calculateEloChange = (
 
 /**
  * Update player statistics after a game
+ */
+/**
+ * Update player statistics after a game
+ * Sprint 3: Invalidate player stats cache after update
  */
 export const updatePlayerStats = async (
   playerName: string,
@@ -631,29 +635,37 @@ export const getGameReplayData = async (gameId: string) => {
 /**
  * Get list of all finished games (for replay browsing)
  */
+/**
+ * Get all finished games with pagination
+ * Sprint 3: Added caching to reduce Neon compute usage
+ */
 export const getAllFinishedGames = async (limit: number = 50, offset: number = 0) => {
-  const text = `
-    SELECT
-      game_id,
-      winning_team,
-      team1_score,
-      team2_score,
-      rounds,
-      player_names,
-      player_teams,
-      is_bot_game,
-      game_duration_seconds,
-      created_at,
-      finished_at
-    FROM game_history
-    WHERE is_finished = TRUE
-      AND round_history IS NOT NULL
-      AND jsonb_array_length(round_history) > 0
-    ORDER BY finished_at DESC
-    LIMIT $1 OFFSET $2
-  `;
-  const result = await query(text, [limit, offset]);
-  return result.rows;
+  const cacheKey = `all_finished_games:${limit}:${offset}`;
+
+  return withCache(cacheKey, CACHE_TTL.ALL_FINISHED_GAMES, async () => {
+    const text = `
+      SELECT
+        game_id,
+        winning_team,
+        team1_score,
+        team2_score,
+        rounds,
+        player_names,
+        player_teams,
+        is_bot_game,
+        game_duration_seconds,
+        created_at,
+        finished_at
+      FROM game_history
+      WHERE is_finished = TRUE
+        AND round_history IS NOT NULL
+        AND jsonb_array_length(round_history) > 0
+      ORDER BY finished_at DESC
+      LIMIT $1 OFFSET $2
+    `;
+    const result = await query(text, [limit, offset]);
+    return result.rows;
+  });
 };
 
 /**
