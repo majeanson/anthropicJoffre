@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { EventEmitter } from 'events';
+import { QueuedMessage, ServerEventName, ServerToClientEvents } from '../types/events';
 
 /**
  * Connection status for tracking individual sockets
@@ -14,7 +15,7 @@ interface ConnectionInfo {
   lastHeartbeat: number;
   disconnectedAt: number | null;
   reconnectionAttempts: number;
-  messageQueue: Array<{ event: string; data: any }>;
+  messageQueue: QueuedMessage[];
   isAlive: boolean;
 }
 
@@ -144,7 +145,11 @@ export class ConnectionManager extends EventEmitter {
   /**
    * Queue a message for a player (used when connection is temporarily down)
    */
-  queueMessage(socketId: string, event: string, data: any): boolean {
+  queueMessage<E extends ServerEventName>(
+    socketId: string,
+    event: E,
+    data: ServerToClientEvents[E]
+  ): boolean {
     const conn = this.connections.get(socketId);
     if (!conn) return false;
 
@@ -153,7 +158,7 @@ export class ConnectionManager extends EventEmitter {
       conn.messageQueue.shift(); // Remove oldest
     }
 
-    conn.messageQueue.push({ event, data });
+    conn.messageQueue.push({ event, data } as QueuedMessage);
     this.log(`Queued message '${event}' for ${socketId} (queue size: ${conn.messageQueue.length})`);
     return true;
   }
@@ -161,7 +166,11 @@ export class ConnectionManager extends EventEmitter {
   /**
    * Send a message to a socket, queuing if connection is down
    */
-  sendToSocket(socketId: string, event: string, data: any): boolean {
+  sendToSocket<E extends ServerEventName>(
+    socketId: string,
+    event: E,
+    data: ServerToClientEvents[E]
+  ): boolean {
     const conn = this.connections.get(socketId);
     if (!conn) {
       this.log(`Cannot send message: socket ${socketId} not found`);
@@ -185,7 +194,11 @@ export class ConnectionManager extends EventEmitter {
   /**
    * Send a message to all sockets in a game room
    */
-  sendToRoom(gameId: string, event: string, data: any): void {
+  sendToRoom<E extends ServerEventName>(
+    gameId: string,
+    event: E,
+    data: ServerToClientEvents[E]
+  ): void {
     this.io.to(gameId).emit(event, data);
   }
 

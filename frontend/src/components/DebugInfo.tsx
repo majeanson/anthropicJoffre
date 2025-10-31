@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import buildInfo from '../buildInfo.json';
 
 interface DebugInfoProps {
@@ -5,7 +6,72 @@ interface DebugInfoProps {
   onClose: () => void;
 }
 
+interface HealthData {
+  status: string;
+  timestamp: string;
+  uptime: {
+    seconds: number;
+    formatted: string;
+  };
+  database: {
+    pool: {
+      total: number;
+      idle: number;
+      utilization: string;
+    };
+  };
+  cache: {
+    size: number;
+    keys: number;
+  };
+  memory: {
+    heapUsedMB: number;
+    heapTotalMB: number;
+    heapUtilization: string;
+  };
+  game: {
+    activeGames: number;
+    connectedSockets: number;
+    onlinePlayers: number;
+  };
+  errorHandling: {
+    totalCalls: number;
+    totalErrors: number;
+    errorRate: string;
+    successRate: string;
+  };
+}
+
 export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
+  const [healthData, setHealthData] = useState<HealthData | null>(null);
+  const [healthLoading, setHealthLoading] = useState(false);
+  const [healthError, setHealthError] = useState<string | null>(null);
+  const [showHealth, setShowHealth] = useState(false);
+
+  const fetchHealthData = async () => {
+    setHealthLoading(true);
+    setHealthError(null);
+    try {
+      const response = await fetch('http://localhost:3001/api/health/detailed');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      setHealthData(data);
+    } catch (error) {
+      setHealthError(error instanceof Error ? error.message : 'Failed to fetch health data');
+      console.error('Health check failed:', error);
+    } finally {
+      setHealthLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showHealth && !healthData) {
+      fetchHealthData();
+    }
+  }, [showHealth]);
+
   if (!isOpen) return null;
 
   const formatDate = (isoString: string) => {
@@ -105,6 +171,135 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                   </li>
                 ))}
               </ul>
+            </div>
+          </div>
+
+          {/* Server Health Monitoring */}
+          <div className="flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">🏥</span>
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Server Health</h3>
+                <button
+                  onClick={() => setShowHealth(!showHealth)}
+                  className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                >
+                  {showHealth ? 'Hide' : 'Show'} Health
+                </button>
+              </div>
+
+              {showHealth && (
+                <div className="space-y-2">
+                  {healthLoading && (
+                    <div className="bg-white dark:bg-gray-900 px-3 py-4 rounded border border-gray-300 dark:border-gray-700 text-center">
+                      <div className="animate-spin inline-block w-6 h-6 border-3 border-indigo-600 border-t-transparent rounded-full"></div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading health data...</p>
+                    </div>
+                  )}
+
+                  {healthError && (
+                    <div className="bg-red-50 dark:bg-red-900/20 px-3 py-3 rounded border border-red-300 dark:border-red-700">
+                      <p className="text-sm text-red-700 dark:text-red-300">❌ {healthError}</p>
+                      <button
+                        onClick={fetchHealthData}
+                        className="text-xs text-red-600 dark:text-red-400 underline mt-1"
+                      >
+                        Retry
+                      </button>
+                    </div>
+                  )}
+
+                  {healthData && !healthLoading && (
+                    <div className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700 space-y-3">
+                      {/* Status & Uptime */}
+                      <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                        <div>
+                          <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded">
+                            {healthData.status.toUpperCase()}
+                          </span>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Uptime: {healthData.uptime.formatted}
+                          </p>
+                        </div>
+                        <button
+                          onClick={fetchHealthData}
+                          className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                        >
+                          🔄 Refresh
+                        </button>
+                      </div>
+
+                      {/* Game State */}
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">🎮 Game State</h4>
+                        <div className="grid grid-cols-3 gap-2 text-xs">
+                          <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                            <div className="text-gray-500 dark:text-gray-400">Games</div>
+                            <div className="font-bold text-gray-900 dark:text-gray-100">{healthData.game.activeGames}</div>
+                          </div>
+                          <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                            <div className="text-gray-500 dark:text-gray-400">Sockets</div>
+                            <div className="font-bold text-gray-900 dark:text-gray-100">{healthData.game.connectedSockets}</div>
+                          </div>
+                          <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                            <div className="text-gray-500 dark:text-gray-400">Players</div>
+                            <div className="font-bold text-gray-900 dark:text-gray-100">{healthData.game.onlinePlayers}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Database & Cache */}
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">💾 Database & Cache</h4>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                            <div className="text-gray-500 dark:text-gray-400">Pool Utilization</div>
+                            <div className="font-bold text-gray-900 dark:text-gray-100">{healthData.database.pool.utilization}</div>
+                          </div>
+                          <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                            <div className="text-gray-500 dark:text-gray-400">Cache Keys</div>
+                            <div className="font-bold text-gray-900 dark:text-gray-100">{healthData.cache.keys}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Memory */}
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">🧠 Memory</h4>
+                        <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-gray-500 dark:text-gray-400">Heap Used / Total</span>
+                            <span className="font-bold text-gray-900 dark:text-gray-100">
+                              {healthData.memory.heapUsedMB} / {healthData.memory.heapTotalMB} MB
+                            </span>
+                          </div>
+                          <div className="mt-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div
+                              className="bg-indigo-600 dark:bg-indigo-500 h-2 rounded-full transition-all"
+                              style={{ width: healthData.memory.heapUtilization }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Error Handling */}
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">🛡️ Error Handling</h4>
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                            <div className="text-gray-500 dark:text-gray-400">Success Rate</div>
+                            <div className="font-bold text-green-600 dark:text-green-400">{healthData.errorHandling.successRate}</div>
+                          </div>
+                          <div className="bg-gray-50 dark:bg-gray-800 px-2 py-1 rounded">
+                            <div className="text-gray-500 dark:text-gray-400">Total Calls</div>
+                            <div className="font-bold text-gray-900 dark:text-gray-100">{healthData.errorHandling.totalCalls.toLocaleString()}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

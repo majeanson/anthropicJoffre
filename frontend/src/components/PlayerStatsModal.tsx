@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
+import { GameHistoryEntry } from '../types/game';
 
 interface PlayerStats {
   player_name: string;
@@ -56,23 +57,6 @@ interface PlayerStats {
 
   created_at: string;
   updated_at: string;
-}
-
-interface GameHistoryEntry {
-  game_id: string;
-  winning_team: 1 | 2;
-  team1_score: number;
-  team2_score: number;
-  rounds: number;
-  is_finished: boolean;
-  created_at: string;
-  finished_at: string;
-  team_id: 1 | 2;
-  tricks_won: number;
-  points_earned: number;
-  bet_amount: number | null;
-  bet_won: boolean | null;
-  won_game: boolean;
 }
 
 interface PlayerStatsModalProps {

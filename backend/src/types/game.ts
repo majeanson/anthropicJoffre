@@ -150,3 +150,56 @@ export interface Spectator {
 export interface SpectatorGameState extends Omit<GameState, 'players'> {
   players: Omit<Player, 'hand'>[];
 }
+
+/**
+ * Leaderboard entry from database
+ */
+export interface LeaderboardEntry {
+  player_name: string;
+  games_played: number;
+  games_won: number;
+  games_lost: number;
+  win_percentage: number;
+  elo_rating: number;
+  highest_rating: number;
+  total_tricks_won: number;
+  total_points_earned: number;
+  total_rounds_played: number;
+  rounds_won: number;
+  rounds_win_percentage: number;
+  avg_tricks_per_round: number;
+  bet_success_rate: number;
+  avg_points_per_round: number;
+  ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+}
+
+/**
+ * Game history entry for a player
+ */
+export interface GameHistoryEntry {
+  game_id: string;
+  winning_team: 1 | 2 | null;
+  team1_score: number;
+  team2_score: number;
+  rounds: number;
+  is_finished: boolean;
+  created_at: Date;
+  finished_at: Date | null;
+  team_id: 1 | 2;
+  tricks_won: number;
+  points_earned: number;
+  bet_amount: number | null;
+  bet_won: boolean | null;
+  won_game: boolean;
+}
+
+/**
+ * Online player status
+ */
+export interface OnlinePlayer {
+  socketId: string;
+  playerName: string;
+  status: 'in_lobby' | 'in_game' | 'in_team_selection';
+  gameId?: string;
+  lastActivity: number;
+}

@@ -43,8 +43,8 @@ describe('validateCardPlay', () => {
     const card: Card = { color: 'red', value: 5 };
     const result = validateCardPlay(game, 'p1', card);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Game is not in playing phase');
     }
   });
@@ -57,8 +57,8 @@ describe('validateCardPlay', () => {
     const card: Card = { color: 'blue', value: 3 };
     const result = validateCardPlay(game, 'p1', card);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('You have already played a card this trick');
     }
   });
@@ -77,8 +77,8 @@ describe('validateCardPlay', () => {
     // p5 doesn't exist in game but trying to play
     const result = validateCardPlay(game, 'p5', card);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Please wait for the current trick to be resolved');
     }
   });
@@ -91,8 +91,8 @@ describe('validateCardPlay', () => {
     const card: Card = { color: 'red', value: 5 };
     const result = validateCardPlay(game, 'p2', card); // p2 trying to play
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('It is not your turn');
     }
   });
@@ -102,8 +102,8 @@ describe('validateCardPlay', () => {
     const invalidCard = { color: '', value: undefined } as any;
     const result = validateCardPlay(game, 'p1', invalidCard);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Invalid card data');
     }
   });
@@ -121,8 +121,8 @@ describe('validateCardPlay', () => {
     const card: Card = { color: 'blue', value: 3 };
     const result = validateCardPlay(game, 'p1', card);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('You do not have that card in your hand');
     }
   });
@@ -145,8 +145,8 @@ describe('validateCardPlay', () => {
     const card: Card = { color: 'blue', value: 2 }; // trying to play blue when has red
     const result = validateCardPlay(game, 'p2', card);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('You must follow suit if you have it in your hand');
     }
   });
@@ -166,7 +166,7 @@ describe('validateCardPlay', () => {
     const card: Card = { color: 'blue', value: 2 };
     const result = validateCardPlay(game, 'p2', card);
 
-    expect(result.valid).toBe(true);
+    expect(result.success).toBe(true);
   });
 
   it('should allow valid card play', () => {
@@ -183,7 +183,7 @@ describe('validateCardPlay', () => {
     const card: Card = { color: 'red', value: 5 };
     const result = validateCardPlay(game, 'p1', card);
 
-    expect(result.valid).toBe(true);
+    expect(result.success).toBe(true);
   });
 });
 
@@ -192,8 +192,8 @@ describe('validateBet', () => {
     const game = createTestGame({ phase: 'playing' });
     const result = validateBet(game, 'p1', 8, false);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Game is not in betting phase');
     }
   });
@@ -202,8 +202,8 @@ describe('validateBet', () => {
     const game = createTestGame({ phase: 'betting', currentPlayerIndex: 0 });
     const result = validateBet(game, 'p2', 8, false);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('It is not your turn to bet');
     }
   });
@@ -215,8 +215,8 @@ describe('validateBet', () => {
     });
     const result = validateBet(game, 'p1', 9, false);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('You have already placed your bet');
     }
   });
@@ -225,8 +225,8 @@ describe('validateBet', () => {
     const game = createTestGame({ phase: 'betting' });
     const result = validateBet(game, 'p1', 6, false);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Bet amount must be between 7 and 12');
     }
   });
@@ -235,8 +235,8 @@ describe('validateBet', () => {
     const game = createTestGame({ phase: 'betting' });
     const result = validateBet(game, 'p1', 13, false);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Bet amount must be between 7 and 12');
     }
   });
@@ -254,8 +254,8 @@ describe('validateBet', () => {
     });
     const result = validateBet(game, 'p1', 0, false, true); // dealer trying to skip
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('As dealer, you must bet at least 7 points when no one has bet.');
     }
   });
@@ -271,14 +271,14 @@ describe('validateBet', () => {
     });
     const result = validateBet(game, 'p1', 0, false, true);
 
-    expect(result.valid).toBe(true);
+    expect(result.success).toBe(true);
   });
 
   it('should allow valid bet', () => {
     const game = createTestGame({ phase: 'betting' });
     const result = validateBet(game, 'p1', 8, false);
 
-    expect(result.valid).toBe(true);
+    expect(result.success).toBe(true);
   });
 });
 
@@ -287,8 +287,8 @@ describe('validateTeamSelection', () => {
     const game = createTestGame({ phase: 'betting' });
     const result = validateTeamSelection(game, 'p1', 1);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Game is not in team selection phase');
     }
   });
@@ -297,8 +297,8 @@ describe('validateTeamSelection', () => {
     const game = createTestGame({ phase: 'team_selection' });
     const result = validateTeamSelection(game, 'invalid-id', 1);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Player not found in game');
     }
   });
@@ -315,8 +315,8 @@ describe('validateTeamSelection', () => {
     });
     const result = validateTeamSelection(game, 'p1', 1); // already on team 1
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('You are already on this team');
     }
   });
@@ -333,8 +333,8 @@ describe('validateTeamSelection', () => {
     });
     const result = validateTeamSelection(game, 'p4', 1); // trying to join full team
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Team is full');
     }
   });
@@ -351,7 +351,7 @@ describe('validateTeamSelection', () => {
     });
     const result = validateTeamSelection(game, 'p3', 1);
 
-    expect(result.valid).toBe(true);
+    expect(result.success).toBe(true);
   });
 });
 
@@ -360,8 +360,8 @@ describe('validatePositionSwap', () => {
     const game = createTestGame({ phase: 'betting' });
     const result = validatePositionSwap(game, 'p1', 'p2');
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Position swapping is only allowed during team selection');
     }
   });
@@ -370,8 +370,8 @@ describe('validatePositionSwap', () => {
     const game = createTestGame({ phase: 'team_selection' });
     const result = validatePositionSwap(game, 'invalid', 'p2');
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Player not found');
     }
   });
@@ -380,8 +380,8 @@ describe('validatePositionSwap', () => {
     const game = createTestGame({ phase: 'team_selection' });
     const result = validatePositionSwap(game, 'p1', 'p1');
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Cannot swap position with yourself');
     }
   });
@@ -398,7 +398,7 @@ describe('validatePositionSwap', () => {
     });
     const result = validatePositionSwap(game, 'p1', 'p3'); // Both on team 1
 
-    expect(result.valid).toBe(true);
+    expect(result.success).toBe(true);
   });
 });
 
@@ -407,8 +407,8 @@ describe('validateGameStart', () => {
     const game = createTestGame({ phase: 'betting' });
     const result = validateGameStart(game);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Game cannot be started from this phase');
     }
   });
@@ -424,8 +424,8 @@ describe('validateGameStart', () => {
     });
     const result = validateGameStart(game);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Need exactly 4 players to start');
     }
   });
@@ -442,8 +442,8 @@ describe('validateGameStart', () => {
     });
     const result = validateGameStart(game);
 
-    expect(result.valid).toBe(false);
-    if (!result.valid) {
+    expect(result.success).toBe(false);
+    if (!result.success) {
       expect(result.error).toBe('Teams must be balanced (2 players per team)');
     }
   });
@@ -460,6 +460,6 @@ describe('validateGameStart', () => {
     });
     const result = validateGameStart(game);
 
-    expect(result.valid).toBe(true);
+    expect(result.success).toBe(true);
   });
 });

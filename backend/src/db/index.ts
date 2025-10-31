@@ -2,8 +2,9 @@ import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import { existsSync } from 'fs';
 import { resolve } from 'path';
-import type { GameState } from '../types/game';
+import type { GameState, Player } from '../types/game';
 import { withCache, CACHE_TTL, queryCache } from '../utils/queryCache';
+import { logDatabaseQuery } from '../utils/logger';
 
 // Prioritize .env.local for local development (avoids Neon quota usage)
 // Path: backend/src/db -> backend/.env.local (need to go up 2 levels)
@@ -21,25 +22,83 @@ const getPool = () => {
   if (!pool && process.env.DATABASE_URL) {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      max: 10,                      // Maximum connections in pool (reduced for Neon)
-      idleTimeoutMillis: 10000,     // Close idle connections after 10s (Neon scale-to-zero optimization)
-      connectionTimeoutMillis: 2000, // Fail fast if can't connect in 2s
+      max: 5,                        // Reduced to 5 for Neon Free Tier (was 10)
+      min: 0,                        // Allow pool to scale to 0 when idle
+      idleTimeoutMillis: 30000,      // Close idle connections after 30s (Neon scale-to-zero)
+      connectionTimeoutMillis: 3000, // Fail fast if can't connect in 3s
+      allowExitOnIdle: true,         // Allow process to exit when pool is idle
     });
 
     // Handle pool errors
     pool.on('error', (err) => {
       console.error('Unexpected database pool error:', err);
     });
+
+    // Log connection events for monitoring (only in development)
+    if (process.env.NODE_ENV !== 'production') {
+      pool.on('connect', () => {
+        console.log('🔌 Database connection acquired from pool');
+      });
+      pool.on('remove', () => {
+        console.log('🔌 Database connection removed from pool');
+      });
+    }
   }
   return pool;
 };
 
-export const query = (text: string, params?: any[]) => {
+/**
+ * Execute a database query with automatic connection pooling
+ * Optimized for Neon with minimal connection usage
+ */
+export const query = async (text: string, params?: any[]) => {
   const dbPool = getPool();
   if (!dbPool) {
     throw new Error('Database not configured. Set DATABASE_URL environment variable.');
   }
+
+  // Log slow queries in development (>100ms)
+  if (process.env.NODE_ENV !== 'production') {
+    const start = Date.now();
+    const result = await dbPool.query(text, params);
+    const duration = Date.now() - start;
+
+    logDatabaseQuery(text, duration, {
+      params: params?.length,
+      rows: result.rows.length,
+    });
+
+    return result;
+  }
+
   return dbPool.query(text, params);
+};
+
+/**
+ * Gracefully close the database pool
+ * Use this on application shutdown to free Neon resources
+ */
+export const closePool = async () => {
+  if (pool) {
+    await pool.end();
+    pool = null;
+    console.log('🔌 Database pool closed');
+  }
+};
+
+/**
+ * Get current pool statistics
+ * Useful for monitoring Neon connection usage
+ */
+export const getPoolStats = () => {
+  if (!pool) {
+    return { totalCount: 0, idleCount: 0, waitingCount: 0 };
+  }
+  return {
+    totalCount: pool.totalCount,
+    idleCount: pool.idleCount,
+    waitingCount: pool.waitingCount,
+  };
 };
 
 // ============= GAME HISTORY FUNCTIONS =============
@@ -112,7 +171,7 @@ export const markGameFinished = async (gameId: string, winningTeam: 1 | 2) => {
 /**
  * Save/update game participants (player performance in this game)
  */
-export const saveGameParticipants = async (gameId: string, players: any[]) => {
+export const saveGameParticipants = async (gameId: string, players: Player[]) => {
   // Delete existing participants for this game, then insert fresh data
   await query('DELETE FROM game_participants WHERE game_id = $1', [gameId]);
 
@@ -489,37 +548,41 @@ export const getLeaderboard = async (limit: number = 100, excludeBots: boolean =
  * Get player's game history
  */
 export const getPlayerGameHistory = async (playerName: string, limit: number = 20) => {
-  const text = `
-    SELECT
-      gh.game_id,
-      gh.winning_team,
-      gh.team1_score,
-      gh.team2_score,
-      gh.rounds,
-      gh.is_finished,
-      gh.created_at,
-      gh.finished_at,
-      gp.team_id,
-      gp.tricks_won,
-      gp.points_earned,
-      gp.bet_amount,
-      gp.bet_won,
-      CASE
-        WHEN gh.winning_team = gp.team_id THEN TRUE
-        ELSE FALSE
-      END as won_game
-    FROM game_history gh
-    JOIN game_participants gp ON gh.game_id = gp.game_id
-    WHERE gp.player_name = $1
-      AND (
-        gh.is_finished = FALSE
-        OR (gh.is_finished = TRUE AND gh.round_history IS NOT NULL AND jsonb_array_length(gh.round_history) > 0)
-      )
-    ORDER BY gh.created_at DESC
-    LIMIT $2
-  `;
-  const result = await query(text, [playerName, limit]);
-  return result.rows;
+  const cacheKey = `player_history:${playerName}:${limit}`;
+
+  return withCache(cacheKey, CACHE_TTL.PLAYER_HISTORY, async () => {
+    const text = `
+      SELECT
+        gh.game_id,
+        gh.winning_team,
+        gh.team1_score,
+        gh.team2_score,
+        gh.rounds,
+        gh.is_finished,
+        gh.created_at,
+        gh.finished_at,
+        gp.team_id,
+        gp.tricks_won,
+        gp.points_earned,
+        gp.bet_amount,
+        gp.bet_won,
+        CASE
+          WHEN gh.winning_team = gp.team_id THEN TRUE
+          ELSE FALSE
+        END as won_game
+      FROM game_history gh
+      JOIN game_participants gp ON gh.game_id = gp.game_id
+      WHERE gp.player_name = $1
+        AND (
+          gh.is_finished = FALSE
+          OR (gh.is_finished = TRUE AND gh.round_history IS NOT NULL AND jsonb_array_length(gh.round_history) > 0)
+        )
+      ORDER BY gh.created_at DESC
+      LIMIT $2
+    `;
+    const result = await query(text, [playerName, limit]);
+    return result.rows;
+  });
 };
 
 /**

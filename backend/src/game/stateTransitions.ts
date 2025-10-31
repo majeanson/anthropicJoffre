@@ -274,8 +274,9 @@ export function resolveTrick(game: GameState): GameState {
   // Determine winner (returns player ID)
   const winnerId = determineWinner(game.currentTrick, game.trump);
 
-  // Calculate points
-  const points = calculateTrickPoints(game.currentTrick);
+  // Calculate points (base 1 point + special card points)
+  const specialCardPoints = calculateTrickPoints(game.currentTrick);
+  const points = 1 + specialCardPoints;
 
   // Find winner's player index
   const winnerPlayerIndex = game.players.findIndex(p => p.id === winnerId);

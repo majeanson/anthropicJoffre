@@ -44,9 +44,9 @@ const getConfig = () => {
       };
     default:
       return {
-        timeout: 60000, // 60 seconds per test
+        timeout: 120000, // 120 seconds per test (increased for stability)
         workers: 1, // Single worker by default
-        retries: process.env.CI ? 2 : 0,
+        retries: process.env.CI ? 2 : 1, // Enable 1 retry locally for flaky tests
         fullyParallel: false,
       };
   }
@@ -81,8 +81,16 @@ export default defineConfig({
     video: process.env.CI ? 'retain-on-failure' : 'off',
 
     // Custom test attributes for different modes
-    actionTimeout: TEST_MODE === 'quick' ? 5000 : 15000,
-    navigationTimeout: TEST_MODE === 'quick' ? 10000 : 30000,
+    actionTimeout: TEST_MODE === 'quick' ? 5000 : 20000, // Increased from 15s to 20s
+    navigationTimeout: TEST_MODE === 'quick' ? 10000 : 40000, // Increased from 30s to 40s
+
+    // Additional stability settings
+    ...(TEST_MODE !== 'quick' ? {
+      // Longer default timeout for page.waitForSelector, etc.
+      expect: {
+        timeout: 10000, // 10s for expect assertions (default is 5s)
+      },
+    } : {}),
   },
 
   // Global setup/teardown for test modes

@@ -8,13 +8,14 @@
  */
 
 import { GameState, Card, Player } from '../types/game';
+import { Result, ok, err } from '../types/result';
 
 /**
- * Validation result type - either success or error with message
+ * Validation result type - either success (void) or error with message
+ *
+ * @deprecated Use Result<void, string> directly instead
  */
-export type ValidationResult =
-  | { valid: true }
-  | { valid: false; error: string };
+export type ValidationResult = Result<void, string>;
 
 /**
  * Validates if a card play is allowed.
@@ -35,7 +36,7 @@ export type ValidationResult =
  *
  * @example
  * const result = validateCardPlay(game, 'player-1', { color: 'red', value: 7 });
- * if (!result.valid) {
+ * if (!result.success) {
  *   socket.emit('invalid_move', { message: result.error });
  * }
  */
@@ -46,29 +47,29 @@ export function validateCardPlay(
 ): ValidationResult {
   // Check game phase
   if (game.phase !== 'playing') {
-    return { valid: false, error: 'Game is not in playing phase' };
+    return err('Game is not in playing phase');
   }
 
   // Check if player has already played in this trick
   const hasAlreadyPlayed = game.currentTrick.some(tc => tc.playerId === playerId);
   if (hasAlreadyPlayed) {
-    return { valid: false, error: 'You have already played a card this trick' };
+    return err('You have already played a card this trick');
   }
 
   // Check if trick is complete
   if (game.currentTrick.length >= 4) {
-    return { valid: false, error: 'Please wait for the current trick to be resolved' };
+    return err('Please wait for the current trick to be resolved');
   }
 
   // Check if it's player's turn
   const currentPlayer = game.players[game.currentPlayerIndex];
   if (currentPlayer.id !== playerId) {
-    return { valid: false, error: 'It is not your turn' };
+    return err('It is not your turn');
   }
 
   // Validate card data structure
   if (!card || !card.color || card.value === undefined) {
-    return { valid: false, error: 'Invalid card data' };
+    return err('Invalid card data');
   }
 
   // Validate card is in player's hand
@@ -76,7 +77,7 @@ export function validateCardPlay(
     c => c.color === card.color && c.value === card.value
   );
   if (!cardInHand) {
-    return { valid: false, error: 'You do not have that card in your hand' };
+    return err('You do not have that card in your hand');
   }
 
   // Validate suit-following rule
@@ -85,11 +86,11 @@ export function validateCardPlay(
     const hasLedSuit = currentPlayer.hand.some(c => c.color === ledSuit);
 
     if (hasLedSuit && card.color !== ledSuit) {
-      return { valid: false, error: 'You must follow suit if you have it in your hand' };
+      return err('You must follow suit if you have it in your hand');
     }
   }
 
-  return { valid: true };
+  return ok(undefined);
 }
 
 /**
@@ -111,7 +112,7 @@ export function validateCardPlay(
  *
  * @example
  * const result = validateBet(game, 'player-1', 10, false);
- * if (!result.valid) {
+ * if (!result.success) {
  *   socket.emit('invalid_bet', { message: result.error });
  * }
  */
@@ -124,24 +125,24 @@ export function validateBet(
 ): ValidationResult {
   // Check game phase
   if (game.phase !== 'betting') {
-    return { valid: false, error: 'Game is not in betting phase' };
+    return err('Game is not in betting phase');
   }
 
   // Check if it's player's turn
   const currentPlayer = game.players[game.currentPlayerIndex];
   if (currentPlayer.id !== playerId) {
-    return { valid: false, error: 'It is not your turn to bet' };
+    return err('It is not your turn to bet');
   }
 
   // Check if player has already bet
   const hasAlreadyBet = game.currentBets.some(b => b.playerId === playerId);
   if (hasAlreadyBet) {
-    return { valid: false, error: 'You have already placed your bet' };
+    return err('You have already placed your bet');
   }
 
   // Validate bet amount range (only for non-skip bets)
   if (!skipped && (amount < 7 || amount > 12)) {
-    return { valid: false, error: 'Bet amount must be between 7 and 12' };
+    return err('Bet amount must be between 7 and 12');
   }
 
   // Handle skip bet validation
@@ -151,11 +152,11 @@ export function validateBet(
 
     // Dealer cannot skip if no one has bet
     if (isDealer && !hasValidBets) {
-      return { valid: false, error: 'As dealer, you must bet at least 7 points when no one has bet.' };
+      return err('As dealer, you must bet at least 7 points when no one has bet.');
     }
   }
 
-  return { valid: true };
+  return ok(undefined);
 }
 
 /**
@@ -174,7 +175,7 @@ export function validateBet(
  *
  * @example
  * const result = validateTeamSelection(game, 'player-1', 1);
- * if (!result.valid) {
+ * if (!result.success) {
  *   socket.emit('error', { message: result.error });
  * }
  */
@@ -185,26 +186,26 @@ export function validateTeamSelection(
 ): ValidationResult {
   // Check game phase
   if (game.phase !== 'team_selection') {
-    return { valid: false, error: 'Game is not in team selection phase' };
+    return err('Game is not in team selection phase');
   }
 
   const player = game.players.find(p => p.id === playerId);
   if (!player) {
-    return { valid: false, error: 'Player not found in game' };
+    return err('Player not found in game');
   }
 
   // Check if player is already on the team
   if (player.teamId === teamId) {
-    return { valid: false, error: 'You are already on this team' };
+    return err('You are already on this team');
   }
 
   // Check if team is full (2 players per team)
   const teamPlayers = game.players.filter(p => p.teamId === teamId);
   if (teamPlayers.length >= 2) {
-    return { valid: false, error: 'Team is full' };
+    return err('Team is full');
   }
 
-  return { valid: true };
+  return ok(undefined);
 }
 
 /**
@@ -222,7 +223,7 @@ export function validateTeamSelection(
  *
  * @example
  * const result = validatePositionSwap(game, 'player-1', 'player-2');
- * if (!result.valid) {
+ * if (!result.success) {
  *   socket.emit('error', { message: result.error });
  * }
  */
@@ -233,27 +234,27 @@ export function validatePositionSwap(
 ): ValidationResult {
   // Check game phase
   if (game.phase !== 'team_selection') {
-    return { valid: false, error: 'Position swapping is only allowed during team selection' };
+    return err('Position swapping is only allowed during team selection');
   }
 
   const initiator = game.players.find(p => p.id === initiatorId);
   const target = game.players.find(p => p.id === targetPlayerId);
 
   if (!initiator || !target) {
-    return { valid: false, error: 'Player not found' };
+    return err('Player not found');
   }
 
   // Can't swap with yourself
   if (initiatorId === targetPlayerId) {
-    return { valid: false, error: 'Cannot swap position with yourself' };
+    return err('Cannot swap position with yourself');
   }
 
   // Can only swap with players on the same team
   if (initiator.teamId !== target.teamId) {
-    return { valid: false, error: 'Can only swap positions with teammates' };
+    return err('Can only swap positions with teammates');
   }
 
-  return { valid: true };
+  return ok(undefined);
 }
 
 /**
@@ -269,7 +270,7 @@ export function validatePositionSwap(
  *
  * @example
  * const result = validateGameStart(game);
- * if (!result.valid) {
+ * if (!result.success) {
  *   socket.emit('error', { message: result.error });
  * } else {
  *   startNewRound(gameId);
@@ -278,12 +279,12 @@ export function validatePositionSwap(
 export function validateGameStart(game: GameState): ValidationResult {
   // Check game phase
   if (game.phase !== 'team_selection') {
-    return { valid: false, error: 'Game cannot be started from this phase' };
+    return err('Game cannot be started from this phase');
   }
 
   // Check player count
   if (game.players.length !== 4) {
-    return { valid: false, error: 'Need exactly 4 players to start' };
+    return err('Need exactly 4 players to start');
   }
 
   // Check team balance
@@ -291,8 +292,8 @@ export function validateGameStart(game: GameState): ValidationResult {
   const team2Count = game.players.filter(p => p.teamId === 2).length;
 
   if (team1Count !== 2 || team2Count !== 2) {
-    return { valid: false, error: 'Teams must be balanced (2 players per team)' };
+    return err('Teams must be balanced (2 players per team)');
   }
 
-  return { valid: true };
+  return ok(undefined);
 }

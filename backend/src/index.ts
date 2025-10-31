@@ -37,7 +37,7 @@ import cors from 'cors';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import { ConnectionManager } from './connection/ConnectionManager';
-import { GameState, Player, Bet, TrickCard, Card, PlayerSession } from './types/game';
+import { GameState, Player, Bet, TrickCard, Card, PlayerSession, GamePhase } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
 import {
   determineWinner,
@@ -89,6 +89,8 @@ import {
   cleanupStaleGames,
   saveGameSnapshot,
   loadGameSnapshots,
+  getPoolStats,
+  closePool,
 } from './db';
 import {
   saveGameState as saveGameToDB,
@@ -105,6 +107,7 @@ import {
   validateCardValue,
   validateCardColor,
 } from './utils/sanitization';
+import { queryCache } from './utils/queryCache';
 import {
   createSession as createDBSession,
   validateSession as validateDBSession,
@@ -118,6 +121,14 @@ import {
   getPlayerPresence,
   markPlayerOffline,
 } from './db/presence';
+import { errorBoundaries, getAllMetrics } from './middleware/errorBoundary';
+import logger, {
+  createLogger,
+  logGameAction,
+  logError,
+  requestLogger,
+  PerformanceTimer,
+} from './utils/logger';
 
 const app = express();
 const httpServer = createServer(app);
@@ -175,6 +186,11 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+
+// Add structured logging for HTTP requests
+if (process.env.NODE_ENV !== 'test') {
+  app.use(requestLogger);
+}
 
 // Configure rate limiting
 const apiLimiter = rateLimit({
@@ -543,10 +559,33 @@ const startOnlinePlayersInterval = () => {
   onlinePlayersInterval = setInterval(broadcastOnlinePlayers, 5000);
 };
 
-const cleanup = () => {
+const cleanup = async () => {
+  logger.info('Starting graceful shutdown');
+
+  // Clear intervals
   if (onlinePlayersInterval) {
     clearInterval(onlinePlayersInterval);
+    logger.debug('Cleared online players interval');
   }
+
+  // Destroy query cache
+  try {
+    queryCache.destroy();
+    logger.debug('Query cache destroyed');
+  } catch (error) {
+    logError(error as Error, 'destroy query cache');
+  }
+
+  // Close database pool
+  try {
+    await closePool();
+    logger.info('Database pool closed');
+  } catch (error) {
+    logError(error as Error, 'close database pool');
+  }
+
+  logger.info('Graceful shutdown complete');
+  process.exit(0);
 };
 
 // Start the interval
@@ -659,7 +698,7 @@ function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'bett
   }, timeoutDuration);
 
   activeTimeouts.set(key, timeout);
-  activeTimeouts.set(`${key}-interval`, countdownInterval as any);
+  activeTimeouts.set(`${key}-interval`, countdownInterval);
 }
 
 // Handle betting timeout - auto-skip bet (uses stable playerName)
@@ -798,7 +837,8 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
       const player = game.players.find(p => p.id === tc.playerId);
       console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
     });
-    // Emit socket update so clients see the 4th card added (but DON'T save to DB yet)
+    // HOT PATH: Emit immediately for client rendering, skip DB save (trick will be saved after resolution)
+    // Using direct emit() instead of emitGameUpdate() to avoid unnecessary DB writes
     io.to(gameId).emit('game_updated', game);
     console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
     // Small delay to ensure clients render the 4-card state before resolution
@@ -839,15 +879,181 @@ function broadcastGameUpdate(gameId: string, event: string, data: GameState | { 
   }
 }
 
+// Helper functions for health endpoints
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+function formatUptime(seconds: number): string {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+
+  const parts = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0) parts.push(`${hours}h`);
+  if (minutes > 0) parts.push(`${minutes}m`);
+  parts.push(`${secs}s`);
+
+  return parts.join(' ');
+}
+
 // REST endpoints
 app.get('/api/health', (req, res) => {
+  const poolStats = getPoolStats();
+  const cacheStats = queryCache.getStats();
+
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
-    database: process.env.DATABASE_URL ? 'configured' : 'missing',
+    database: {
+      configured: process.env.DATABASE_URL ? true : false,
+      pool: {
+        total: poolStats.totalCount,
+        idle: poolStats.idleCount,
+        waiting: poolStats.waitingCount,
+      },
+    },
+    cache: {
+      size: cacheStats.size,
+      keys: cacheStats.keys.length,
+    },
     cors: corsOrigin,
+    uptime: process.uptime(),
+    memory: {
+      heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
+      heapTotal: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + 'MB',
+    },
   });
+});
+
+// Detailed health check endpoint
+app.get('/api/health/detailed', (req, res) => {
+  try {
+    const poolStats = getPoolStats();
+    const cacheStats = queryCache.getStats();
+    const memUsage = process.memoryUsage();
+    const errorMetrics = getAllMetrics();
+
+    // Calculate error rates
+    let totalHandlerCalls = 0;
+    let totalHandlerErrors = 0;
+    errorMetrics.forEach((value) => {
+      totalHandlerCalls += value.totalCalls;
+      totalHandlerErrors += value.totalErrors;
+    });
+
+    res.json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: {
+        seconds: Math.floor(process.uptime()),
+        formatted: formatUptime(process.uptime()),
+      },
+      environment: process.env.NODE_ENV || 'development',
+
+      // Database health
+      database: {
+        configured: !!process.env.DATABASE_URL,
+        pool: {
+          total: poolStats.totalCount,
+          idle: poolStats.idleCount,
+          waiting: poolStats.waitingCount,
+          utilization: poolStats.totalCount > 0
+            ? `${Math.round(((poolStats.totalCount - poolStats.idleCount) / poolStats.totalCount) * 100)}%`
+            : '0%',
+        },
+      },
+
+      // Cache health
+      cache: {
+        enabled: true,
+        size: cacheStats.size,
+        keys: cacheStats.keys.length,
+        sampleKeys: cacheStats.keys.slice(0, 5), // First 5 cache keys
+      },
+
+      // Memory health
+      memory: {
+        heapUsed: formatBytes(memUsage.heapUsed),
+        heapTotal: formatBytes(memUsage.heapTotal),
+        heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
+        heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024),
+        rss: formatBytes(memUsage.rss),
+        external: formatBytes(memUsage.external),
+        heapUtilization: `${Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100)}%`,
+      },
+
+      // Game state health
+      game: {
+        activeGames: games.size,
+        connectedSockets: io.sockets.sockets.size,
+        onlinePlayers: onlinePlayers.size,
+        activeBotTimeouts: activeBotTimeouts.size,
+        activePlayerTimeouts: activeTimeouts.size,
+      },
+
+      // Error handling health
+      errorHandling: {
+        totalHandlers: errorMetrics.size,
+        totalCalls: totalHandlerCalls,
+        totalErrors: totalHandlerErrors,
+        errorRate: totalHandlerCalls > 0
+          ? `${((totalHandlerErrors / totalHandlerCalls) * 100).toFixed(2)}%`
+          : '0%',
+        successRate: totalHandlerCalls > 0
+          ? `${(((totalHandlerCalls - totalHandlerErrors) / totalHandlerCalls) * 100).toFixed(2)}%`
+          : '100%',
+      },
+
+      // CORS configuration
+      cors: {
+        origin: corsOrigin === '*' ? 'All origins (development)' : allowedOrigins,
+      },
+    });
+  } catch (error) {
+    logger.error('Error generating detailed health check', { error });
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to generate health check',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+// Error boundary metrics endpoint
+app.get('/api/metrics/error-boundaries', (req, res) => {
+  try {
+    const metrics = getAllMetrics();
+    const formattedMetrics: Record<string, any> = {};
+
+    metrics.forEach((value, key) => {
+      formattedMetrics[key] = {
+        totalCalls: value.totalCalls,
+        totalErrors: value.totalErrors,
+        totalSuccess: value.totalSuccess,
+        errorRate: value.totalCalls > 0 ? (value.totalErrors / value.totalCalls * 100).toFixed(2) + '%' : '0%',
+        successRate: value.totalCalls > 0 ? (value.totalSuccess / value.totalCalls * 100).toFixed(2) + '%' : '0%',
+        averageExecutionTime: value.averageExecutionTime.toFixed(2) + 'ms',
+        lastError: value.lastError?.toISOString() || null,
+        errorsByType: Object.fromEntries(value.errorsByType),
+      };
+    });
+
+    res.json({
+      timestamp: new Date().toISOString(),
+      totalHandlers: metrics.size,
+      handlers: formattedMetrics,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve metrics' });
+  }
 });
 
 // Test-only endpoint to manipulate game state
@@ -938,8 +1144,14 @@ app.post('/api/__test/set-game-state', express.json(), (req, res) => {
 
     // Set phase if provided (and not already set to game_over by score logic)
     if (phase && game.phase !== 'game_over') {
-      game.phase = phase as any;
-      console.log(`TEST API: Set phase to ${phase}`);
+      // Validate phase value
+      const validPhases: GamePhase[] = ['team_selection', 'betting', 'playing', 'scoring', 'game_over'];
+      if (validPhases.includes(phase as GamePhase)) {
+        game.phase = phase as GamePhase;
+        console.log(`TEST API: Set phase to ${phase}`);
+      } else {
+        console.error(`TEST API: Invalid phase '${phase}' - must be one of: ${validPhases.join(', ')}`);
+      }
     }
 
     // Emit game update
@@ -1145,9 +1357,18 @@ app.get('/api/players/:playerName/games', async (req, res) => {
       }));
 
     // Merge results (prefer in-memory)
-    const gameMap = new Map<string, any>();
-    dbGames.forEach((g: any) => gameMap.set(g.gameId, g));
-    inMemoryGames.forEach((g: any) => gameMap.set(g.gameId, g));
+    interface PlayerGameSummary {
+      gameId: string;
+      playerNames: string[];
+      teamIds: (number | null)[];
+      createdAt: number;
+      isFinished: boolean;
+      team1Score?: number;
+      team2Score?: number;
+    }
+    const gameMap = new Map<string, PlayerGameSummary>();
+    dbGames.forEach((g) => gameMap.set(g.gameId, g));
+    inMemoryGames.forEach((g) => gameMap.set(g.gameId, g));
 
     const playerGames = Array.from(gameMap.values())
       .sort((a, b) => b.createdAt - a.createdAt);
@@ -1218,9 +1439,10 @@ io.on('connection', (socket) => {
   // Register connection with ConnectionManager
   connectionManager.registerConnection(socket);
 
-  socket.on('create_game', async (playerName: string) => {
+  socket.on('create_game', errorBoundaries.gameAction('create_game')(async (playerName: string) => {
     // Apply game creation rate limiting
-    const clientIp = (socket.request as any).connection.remoteAddress;
+    // Access remote address via socket.handshake (standard Socket.IO API)
+    const clientIp = socket.handshake.address;
 
     // Sanitize player name
     const sanitizedName = sanitizePlayerName(playerName);
@@ -1285,9 +1507,9 @@ io.on('connection', (socket) => {
     if (creator) {
       connectionManager.associatePlayer(socket.id, sanitizedName, creator.id, gameId, false);
     }
-  });
+  }));
 
-  socket.on('join_game', async ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
+  socket.on('join_game', errorBoundaries.gameAction('join_game')(async ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
     // Sanitize player name
     const sanitizedName = sanitizePlayerName(playerName);
 
@@ -1451,9 +1673,9 @@ io.on('connection', (socket) => {
 
     // Associate player with connection manager
     connectionManager.associatePlayer(socket.id, playerName, player.id, gameId, isBot || false);
-  });
+  }));
 
-  socket.on('select_team', ({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
+  socket.on('select_team', errorBoundaries.gameAction('select_team')(({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
     // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) {
@@ -1463,7 +1685,7 @@ io.on('connection', (socket) => {
 
     // VALIDATION - Use pure validation function
     const validation = validateTeamSelection(game, socket.id, teamId);
-    if (!validation.valid) {
+    if (!validation.success) {
       socket.emit('error', { message: validation.error });
       return;
     }
@@ -1473,9 +1695,9 @@ io.on('connection', (socket) => {
 
     // I/O - Emit updates
     emitGameUpdate(gameId, game);
-  });
+  }));
 
-  socket.on('swap_position', ({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
+  socket.on('swap_position', errorBoundaries.gameAction('swap_position')(({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
     // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) {
@@ -1485,7 +1707,7 @@ io.on('connection', (socket) => {
 
     // VALIDATION - Use pure validation function
     const validation = validatePositionSwap(game, socket.id, targetPlayerId);
-    if (!validation.valid) {
+    if (!validation.success) {
       socket.emit('error', { message: validation.error });
       return;
     }
@@ -1495,10 +1717,10 @@ io.on('connection', (socket) => {
 
     // I/O - Emit updates
     emitGameUpdate(gameId, game);
-  });
+  }));
 
   // Team selection chat
-  socket.on('send_team_selection_chat', ({ gameId, message }: { gameId: string; message: string }) => {
+  socket.on('send_team_selection_chat', errorBoundaries.gameAction('send_team_selection_chat')(({ gameId, message }: { gameId: string; message: string }) => {
     // Rate limiting: Check if user is sending messages too quickly
     const lastChatTime = socketRateLimiters.chat.get(socket.id);
     const now = Date.now();
@@ -1539,10 +1761,10 @@ io.on('connection', (socket) => {
       message: sanitizedMessage,
       timestamp: Date.now()
     });
-  });
+  }));
 
   // In-game chat (betting, playing, and scoring phases)
-  socket.on('send_game_chat', ({ gameId, message }: { gameId: string; message: string }) => {
+  socket.on('send_game_chat', errorBoundaries.gameAction('send_game_chat')(({ gameId, message }: { gameId: string; message: string }) => {
     // Rate limiting: Check if user is sending messages too quickly
     const lastChatTime = socketRateLimiters.chat.get(socket.id);
     const now = Date.now();
@@ -1583,10 +1805,10 @@ io.on('connection', (socket) => {
       message: sanitizedMessage,
       timestamp: Date.now()
     });
-  });
+  }));
 
   // Player ready for next round
-  socket.on('player_ready', ({ gameId }: { gameId: string }) => {
+  socket.on('player_ready', errorBoundaries.gameAction('player_ready')(({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1617,9 +1839,9 @@ io.on('connection', (socket) => {
       // Broadcast updated game state
       broadcastGameUpdate(gameId, 'game_updated', game);
     }
-  });
+  }));
 
-  socket.on('start_game', ({ gameId }: { gameId: string }) => {
+  socket.on('start_game', errorBoundaries.gameAction('start_game')(({ gameId }: { gameId: string }) => {
     // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) {
@@ -1629,7 +1851,7 @@ io.on('connection', (socket) => {
 
     // VALIDATION - Use pure validation function
     const validation = validateGameStart(game);
-    if (!validation.valid) {
+    if (!validation.success) {
       socket.emit('error', { message: validation.error });
       return;
     }
@@ -1641,16 +1863,16 @@ io.on('connection', (socket) => {
 
     // Start the game (handles state transitions and I/O)
     startNewRound(gameId);
-  });
+  }));
 
-  socket.on('place_bet', ({ gameId, amount, withoutTrump, skipped }: { gameId: string; amount: number; withoutTrump: boolean; skipped?: boolean }) => {
+  socket.on('place_bet', errorBoundaries.gameAction('place_bet')(({ gameId, amount, withoutTrump, skipped }: { gameId: string; amount: number; withoutTrump: boolean; skipped?: boolean }) => {
     // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) return;
 
     // VALIDATION - Use pure validation function
     const validation = validateBet(game, socket.id, amount, withoutTrump, skipped);
-    if (!validation.valid) {
+    if (!validation.success) {
       socket.emit('invalid_bet', { message: validation.error });
       return;
     }
@@ -1716,9 +1938,9 @@ io.on('connection', (socket) => {
       emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
     }
-  });
+  }));
 
-  socket.on('play_card', ({ gameId, card }: { gameId: string; card: Card }) => {
+  socket.on('play_card', errorBoundaries.gameAction('play_card')(({ gameId, card }: { gameId: string; card: Card }) => {
     // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) return;
@@ -1742,7 +1964,7 @@ io.on('connection', (socket) => {
 
     // VALIDATION - Use pure validation function
     const validation = validateCardPlay(game, socket.id, card);
-    if (!validation.valid) {
+    if (!validation.success) {
       console.log(`   ❌ REJECTED: ${validation.error}`);
       socket.emit('invalid_move', { message: validation.error });
       return;
@@ -1794,7 +2016,8 @@ io.on('connection', (socket) => {
         const player = game.players.find(p => p.id === tc.playerId);
         console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
       });
-      // Emit socket update so clients see the 4th card added (but DON'T save to DB yet)
+      // HOT PATH: Emit immediately for client rendering, skip DB save (trick will be saved after resolution)
+      // Using direct emit() instead of emitGameUpdate() to avoid unnecessary DB writes
       io.to(gameId).emit('game_updated', game);
       console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
       // Small delay to ensure clients render the 4-card state before resolution
@@ -1817,10 +2040,10 @@ io.on('connection', (socket) => {
         startPlayerTimeout(gameId, nextPlayer.id, 'playing');
       }
     }
-  });
+  }));
 
   // Spectator mode - join game as observer
-  socket.on('spectate_game', ({ gameId, spectatorName }: { gameId: string; spectatorName?: string }) => {
+  socket.on('spectate_game', errorBoundaries.gameAction('spectate_game')(({ gameId, spectatorName }: { gameId: string; spectatorName?: string }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1855,10 +2078,10 @@ io.on('connection', (socket) => {
       message: `${spectatorName || 'A spectator'} is now watching`,
       spectatorCount: io.sockets.adapter.rooms.get(`${gameId}-spectators`)?.size || 0
     });
-  });
+  }));
 
   // Leave spectator mode
-  socket.on('leave_spectate', ({ gameId }: { gameId: string }) => {
+  socket.on('leave_spectate', errorBoundaries.gameAction('leave_spectate')(({ gameId }: { gameId: string }) => {
     socket.leave(`${gameId}-spectators`);
     console.log(`Spectator ${socket.id} left game ${gameId}`);
 
@@ -1869,10 +2092,10 @@ io.on('connection', (socket) => {
     });
 
     socket.emit('spectator_left', { success: true });
-  });
+  }));
 
   // Test-only handler to set scores
-  socket.on('__test_set_scores', ({ team1, team2 }: { team1: number; team2: number }) => {
+  socket.on('__test_set_scores', errorBoundaries.gameAction('__test_set_scores')(({ team1, team2 }: { team1: number; team2: number }) => {
     // Find game for this socket
     games.forEach((game) => {
       if (game.players.some(p => p.id === socket.id)) {
@@ -1896,10 +2119,10 @@ io.on('connection', (socket) => {
         emitGameUpdate(game.id, game);
       }
     });
-  });
+  }));
 
   // Leave game handler
-  socket.on('leave_game', async ({ gameId }: { gameId: string }) => {
+  socket.on('leave_game', errorBoundaries.gameAction('leave_game')(async ({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1954,10 +2177,10 @@ io.on('connection', (socket) => {
       // Confirm to the leaving player
       socket.emit('leave_game_success', { success: true });
     }
-  });
+  }));
 
   // Kick player handler
-  socket.on('kick_player', async ({ gameId, playerId }: { gameId: string; playerId: string }) => {
+  socket.on('kick_player', errorBoundaries.gameAction('kick_player')(async ({ gameId, playerId }: { gameId: string; playerId: string }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -2029,10 +2252,10 @@ io.on('connection', (socket) => {
     // Broadcast updated game state
     io.to(gameId).emit('player_left', { playerId, gameState: game });
     console.log(`Player ${kickedPlayer.name} was kicked from game ${gameId} by host`);
-  });
+  }));
 
   // Replace human player with bot
-  socket.on('replace_with_bot', async ({
+  socket.on('replace_with_bot', errorBoundaries.gameAction('replace_with_bot')(async ({
     gameId,
     playerNameToReplace,
     requestingPlayerName
@@ -2145,10 +2368,10 @@ io.on('connection', (socket) => {
     });
 
     console.log(`Player ${playerNameToReplace} replaced with ${botName} in game ${gameId}`);
-  });
+  }));
 
   // Take over a bot with a human player
-  socket.on('take_over_bot', async ({
+  socket.on('take_over_bot', errorBoundaries.gameAction('take_over_bot')(async ({
     gameId,
     botNameToReplace,
     newPlayerName
@@ -2239,10 +2462,10 @@ io.on('connection', (socket) => {
     });
 
     console.log(`Bot ${botNameToReplace} taken over by ${newPlayerName} in game ${gameId}`);
-  });
+  }));
 
   // Change bot difficulty
-  socket.on('change_bot_difficulty', async ({
+  socket.on('change_bot_difficulty', errorBoundaries.gameAction('change_bot_difficulty')(async ({
     gameId,
     botName,
     difficulty
@@ -2283,10 +2506,10 @@ io.on('connection', (socket) => {
     emitGameUpdate(gameId, game);
 
     console.log(`Bot ${botName} difficulty changed to ${difficulty} in game ${gameId}`);
-  });
+  }));
 
   // Reconnection handler
-  socket.on('reconnect_to_game', async ({ token }: { token: string }) => {
+  socket.on('reconnect_to_game', errorBoundaries.gameAction('reconnect_to_game')(async ({ token }: { token: string }) => {
     console.log('Reconnection attempt with token:', token.substring(0, 10) + '...');
 
     // Validate session from database
@@ -2456,10 +2679,10 @@ io.on('connection', (socket) => {
       playerName: session.playerName,
       oldSocketId
     });
-  });
+  }));
 
   // Handle rematch vote
-  socket.on('vote_rematch', ({ gameId }: { gameId: string }) => {
+  socket.on('vote_rematch', errorBoundaries.gameAction('vote_rematch')(({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -2532,12 +2755,12 @@ io.on('connection', (socket) => {
       io.to(gameId).emit('rematch_started', { gameState: game });
       console.log(`Rematch started for game ${gameId}`);
     }
-  });
+  }));
 
   // ============= STATS & LEADERBOARD EVENTS =============
 
   // Get player statistics
-  socket.on('get_player_stats', async ({ playerName }: { playerName: string }) => {
+  socket.on('get_player_stats', errorBoundaries.readOnly('get_player_stats')(async ({ playerName }: { playerName: string }) => {
     try {
       const stats = await getPlayerStats(playerName);
       socket.emit('player_stats_response', { stats, playerName });
@@ -2545,10 +2768,10 @@ io.on('connection', (socket) => {
       console.error('Error fetching player stats:', error);
       socket.emit('error', { message: 'Failed to fetch player statistics' });
     }
-  });
+  }));
 
   // Get global leaderboard
-  socket.on('get_leaderboard', async ({ limit = 100, excludeBots = true }: { limit?: number; excludeBots?: boolean }) => {
+  socket.on('get_leaderboard', errorBoundaries.readOnly('get_leaderboard')(async ({ limit = 100, excludeBots = true }: { limit?: number; excludeBots?: boolean }) => {
     try {
       const leaderboard = await getLeaderboard(limit, excludeBots);
       socket.emit('leaderboard_response', { players: leaderboard });
@@ -2556,10 +2779,10 @@ io.on('connection', (socket) => {
       console.error('Error fetching leaderboard:', error);
       socket.emit('error', { message: 'Failed to fetch leaderboard' });
     }
-  });
+  }));
 
   // Get player game history
-  socket.on('get_player_history', async ({ playerName, limit = 20 }: { playerName: string; limit?: number }) => {
+  socket.on('get_player_history', errorBoundaries.readOnly('get_player_history')(async ({ playerName, limit = 20 }: { playerName: string; limit?: number }) => {
     try {
       const history = await getPlayerGameHistory(playerName, limit);
       socket.emit('player_history_response', { games: history, playerName });
@@ -2567,10 +2790,10 @@ io.on('connection', (socket) => {
       console.error('Error fetching player history:', error);
       socket.emit('error', { message: 'Failed to fetch player game history' });
     }
-  });
+  }));
 
   // Get game replay data
-  socket.on('get_game_replay', async ({ gameId }: { gameId: string }) => {
+  socket.on('get_game_replay', errorBoundaries.readOnly('get_game_replay')(async ({ gameId }: { gameId: string }) => {
     try {
       const replayData = await getGameReplayData(gameId);
 
@@ -2584,10 +2807,10 @@ io.on('connection', (socket) => {
       console.error('Error fetching game replay:', error);
       socket.emit('error', { message: 'Failed to fetch game replay data' });
     }
-  });
+  }));
 
   // Get all finished games (for browsing replays)
-  socket.on('get_all_finished_games', async ({ limit = 50, offset = 0 }: { limit?: number; offset?: number }) => {
+  socket.on('get_all_finished_games', errorBoundaries.readOnly('get_all_finished_games')(async ({ limit = 50, offset = 0 }: { limit?: number; offset?: number }) => {
     try {
       const games = await getAllFinishedGames(limit, offset);
       socket.emit('finished_games_list', { games });
@@ -2595,9 +2818,9 @@ io.on('connection', (socket) => {
       console.error('Error fetching finished games:', error);
       socket.emit('error', { message: 'Failed to fetch finished games list' });
     }
-  });
+  }));
 
-  socket.on('disconnect', async () => {
+  socket.on('disconnect', errorBoundaries.background('disconnect')(async () => {
     console.log('Client disconnected:', socket.id);
 
     // Clean up rate limiters
@@ -2704,8 +2927,8 @@ io.on('connection', (socket) => {
       reconnectTimeLeft: 900
     });
 
-    // Update game state for all players
-    io.to(gameId).emit('game_updated', game);
+    // Update game state for all players with persistence
+    emitGameUpdate(gameId, game);
 
     // Set timeout to remove player if they don't reconnect
     const disconnectTimeout = setTimeout(async () => {
@@ -2739,7 +2962,7 @@ io.on('connection', (socket) => {
 
     // Store the timeout so it can be cancelled on reconnection
     disconnectTimeouts.set(socket.id, disconnectTimeout);
-  });
+  }));
 });
 
 function startNewRound(gameId: string) {
@@ -3086,10 +3309,16 @@ const PORT = parseInt(process.env.PORT || '3001', 10);
 const HOST = '0.0.0.0';
 
 httpServer.listen(PORT, HOST, async () => {
-  console.log(`🚀 Trick Card Game Server running on ${HOST}:${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  if (process.env.NODE_ENV === 'development') {
-    console.log(`🌐 CORS: ${corsOrigin === '*' ? 'All origins' : allowedOrigins.join(', ')}`);
+  logger.info('Trick Card Game Server started', {
+    host: HOST,
+    port: PORT,
+    environment: process.env.NODE_ENV || 'development',
+    cors: corsOrigin === '*' ? 'All origins' : allowedOrigins,
+  });
+
+  // Legacy console.log for quick visibility in non-production
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`🚀 Server running on ${HOST}:${PORT}`);
   }
 
   // ============= GAME STATE RECOVERY =============

@@ -9,14 +9,7 @@ import { DebugInfo } from './DebugInfo';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
-
-interface OnlinePlayer {
-  socketId: string;
-  playerName: string;
-  status: 'in_lobby' | 'in_game' | 'in_team_selection';
-  gameId?: string;
-  lastActivity: number;
-}
+import { OnlinePlayer } from '../types/game';
 
 interface LobbyProps {
   onCreateGame: (playerName: string) => void;
