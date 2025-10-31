@@ -165,6 +165,7 @@ import {
   leaveSpectatePayloadSchema,
 } from './validation/schemas';
 import { registerRoutes } from './api/routes';
+import { registerLobbyHandlers } from './socketHandlers/lobby';
 
 const app = express();
 const httpServer = createServer(app);
@@ -1668,6 +1669,43 @@ io.on('connection', (socket) => {
   // Register connection with ConnectionManager
   connectionManager.registerConnection(socket);
 
+  // ============================================================================
+  // Lobby Handlers - Refactored (Sprint 3)
+  // ============================================================================
+  // Register all lobby-related socket handlers from the extracted module
+  registerLobbyHandlers(socket, {
+    games,
+    gameCreationTimes,
+    activeTimeouts,
+    disconnectTimeouts,
+    gameDeletionTimeouts,
+    io,
+    saveGame: saveGameToDB,
+    deletePlayerSessions,
+    updatePlayerPresence,
+    createDBSession,
+    createPlayerSession,
+    connectionManager,
+    updateOnlinePlayer,
+    startPlayerTimeout,
+    clearPlayerTimeout,
+    startNewRound,
+    emitGameUpdate,
+    broadcastGameUpdate,
+    validateTeamSelection,
+    validatePositionSwap,
+    validateGameStart,
+    applyTeamSelection,
+    applyPositionSwap,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Original lobby handlers - COMMENTED OUT (replaced by socketHandlers/lobby.ts)
+  // Kept for reference during refactoring, will be removed after verification
+  // ============================================================================
+  /*
   socket.on('create_game', errorBoundaries.gameAction('create_game')(async (playerName: string) => {
     // Sprint 2: Validate input with Zod schema
     const validation = validateInput(createGamePayloadSchema, { playerName });
@@ -2516,6 +2554,10 @@ io.on('connection', (socket) => {
       socket.emit('leave_game_success', { success: true });
     }
   }));
+  */
+  // ============================================================================
+  // End of commented out lobby handlers
+  // ============================================================================
 
   // Kick player handler
   socket.on('kick_player', errorBoundaries.gameAction('kick_player')(async ({ gameId, playerId }: { gameId: string; playerId: string }) => {
