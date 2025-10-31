@@ -232,9 +232,34 @@ connectionManager.on('connection_timeout', ({ playerName, socketId }) => {
   console.log(`Connection timeout: ${playerName} (${socketId})`);
 });
 
-// Configure CORS for Express
+// Configure CORS for Express with validation logging
 app.use(cors({
-  origin: corsOrigin,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g., mobile apps, Postman)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // Check if origin is allowed
+    if (corsOrigin === '*') {
+      // Development mode - allow all
+      logger.debug('CORS: Allowing origin (development mode)', { origin });
+      return callback(null, true);
+    }
+
+    // Production mode - check whitelist
+    const isAllowed = Array.isArray(corsOrigin) && corsOrigin.includes(origin);
+    if (isAllowed) {
+      logger.debug('CORS: Allowing whitelisted origin', { origin });
+      return callback(null, true);
+    } else {
+      logger.warn('CORS: Blocked non-whitelisted origin', {
+        origin,
+        allowedOrigins: corsOrigin,
+      });
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -1118,7 +1143,12 @@ app.get('/api/health/detailed', (req, res) => {
 
       // CORS configuration
       cors: {
-        origin: corsOrigin === '*' ? 'All origins (development)' : allowedOrigins,
+        mode: corsOrigin === '*' ? 'development' : 'production',
+        origin: corsOrigin === '*' ? 'All origins (wildcard)' : allowedOrigins,
+        credentials: true,
+        methods: ['GET', 'POST'],
+        clientUrlConfigured: !!clientUrl,
+        totalAllowedOrigins: corsOrigin === '*' ? 'unlimited' : allowedOrigins.length,
       },
 
       // WebSocket configuration
