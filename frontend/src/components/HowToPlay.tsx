@@ -57,7 +57,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         </h3>
         <ul className="space-y-2 text-lg">
           <li>• <strong className="text-red-600">Red 0:</strong> +5 bonus points (6 total for that trick)</li>
-          <li>• <strong className="text-amber-800">Brown 0:</strong> -2 penalty points (-1 total for that trick)</li>
+          <li>• <strong className="text-amber-800">Brown 0:</strong> -3 penalty points (-2 total for that trick)</li>
           <li>• All other tricks worth 1 point</li>
         </ul>
       </section>

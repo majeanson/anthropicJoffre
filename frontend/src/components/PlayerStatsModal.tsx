@@ -368,7 +368,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                         🟤 Brown Zeros Received
                       </p>
                       <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">{stats.brown_zeros_received || 0}</p>
-                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">-2 penalty points each</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">-3 penalty points each</p>
                     </div>
                   </div>
                 </div>

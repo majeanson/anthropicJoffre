@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-30T21:49:26.000Z",
-  "version": "1.0.12",
+  "buildDate": "2025-10-30T22:30:00.000Z",
+  "version": "1.0.13",
   "git": {
-    "commitMessage": "test(e2e): Skip unstable multi-page tests and improve test reliability",
-    "commitHash": "a232f60",
-    "commitDate": "2025-10-30 21:49:26 -0400",
+    "commitMessage": "feat: Add REST API endpoints, game replay caching, and documentation overhaul",
+    "commitHash": "d73f4f1",
+    "commitDate": "2025-10-30 22:30:00 -0400",
     "branch": "main"
   },
   "futureTodos": [
