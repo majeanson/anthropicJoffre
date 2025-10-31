@@ -62,18 +62,25 @@
 
 ---
 
+### 4. REST API Integration (COMPLETE)
+**Impact**: Phase 1 refactoring fully integrated and tested
+**Status**: ✅ Integrated and verified
+**Commit**: `1b1e023`
+
+**Changes Made**:
+1. ✅ Added `registerRoutes` import to index.ts
+2. ✅ Created dependencies object with all required shared state
+3. ✅ Registered routes with dependency injection
+4. ✅ Commented out all original route definitions (lines 1056-1662)
+5. ✅ Verified all 113 tests pass
+
+**Result**: REST API module fully integrated, zero regressions, 26 insertions to index.ts
+
+---
+
 ## 🔄 In Progress Tasks
 
-### 4. REST API Integration (IN PROGRESS)
-**Status**: 🟡 Next step
-**Remaining Work**:
-1. Update `index.ts` to import `registerRoutes`
-2. Create dependencies object
-3. Call `registerRoutes(app, deps)`
-4. Remove/comment out duplicate route definitions
-5. Verify all 113 tests still pass
-
-**Estimated Time**: 30-60 minutes
+*None currently - Ready for Phase 2*
 
 ---
 
@@ -149,35 +156,29 @@
 
 ## 🎯 Current Focus
 
-### Immediate Next Step: Complete REST API Integration
-1. Add import in `index.ts`:
-   ```typescript
-   import { registerRoutes } from './api/routes';
-   ```
+### ✅ Phase 1 Complete: REST API Module Fully Integrated
 
-2. Create dependencies object after state initialization:
-   ```typescript
-   const routesDeps = {
-     games,
-     gameCreationTimes,
-     io,
-     corsOrigin,
-     allowedOrigins,
-     getGame,
-     emitGameUpdate,
-     formatUptime,
-     formatBytes,
-   };
-   ```
+**What Was Accomplished**:
+- ✅ Created `backend/src/api/routes.ts` (754 lines)
+- ✅ Implemented dependency injection pattern
+- ✅ Integrated into index.ts with clean dependencies object
+- ✅ All 113 backend tests passing
+- ✅ Zero regressions or breaking changes
 
-3. Register routes:
-   ```typescript
-   registerRoutes(app, routesDeps);
-   ```
+### Next Phase: Socket.io Handler Extraction
 
-4. Comment out original route definitions (keep for reference initially)
+**Phase 2 Overview**:
+- Extract 26 Socket.io handlers → 8 separate modules
+- Estimated time: 4-6 hours
+- Approach: One module at a time, test after each
 
-5. Test compilation and all 113 tests
+**First Module to Extract**: `socketHandlers/lobby.ts` (6 handlers)
+1. `create_game` - Game creation
+2. `join_game` - Player joining
+3. `select_team` - Team selection
+4. `swap_position` - Position swapping
+5. `start_game` - Game start
+6. `leave_game` - Player leaving
 
 ---
 
@@ -203,20 +204,20 @@
 
 ## 📈 Progress Visualization
 
-**Overall Sprint 3 Completion**: 40%
+**Overall Sprint 3 Completion**: 50%
 
 ```
 Database Optimization    [████████████████████] 100% ✅
 Refactoring Plan        [████████████████████] 100% ✅
 REST API Extraction     [████████████████████] 100% ✅
-REST API Integration    [████████░░░░░░░░░░░░]  40% 🔄
+REST API Integration    [████████████████████] 100% ✅
 Socket.io Extraction    [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 Core Logic Extraction   [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 Health Monitoring       [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 Error Standardization   [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
 ```
 
-**Refactoring Completion**: 20%
+**Refactoring Completion**: 11% (1 of 9 modules)
 ```
 REST API Module         [████████████████████] 100% ✅
 lobby.ts                [░░░░░░░░░░░░░░░░░░░░]   0% ⏳
@@ -258,9 +259,9 @@ admin.ts                [░░░░░░░░░░░░░░░░░░�
 - ✅ Database optimization (Day 1)
 - ✅ Refactoring plan (Day 1)
 - ✅ REST API extraction (Day 2)
-- 🔄 REST API integration (Day 2)
+- ✅ REST API integration (Day 2)
 
-**Week 2** (Planned):
+**Week 2** (Next):
 - Socket.io handler extraction (2-3 sessions)
 - Core logic extraction (1 session)
 - Integration testing (1 session)
@@ -276,29 +277,30 @@ admin.ts                [░░░░░░░░░░░░░░░░░░�
 
 1. **Critical Database Issue Resolved** - From 100% → expected 60-70% usage
 2. **Clear Architecture Plan** - Roadmap for entire refactoring
-3. **First Module Complete** - REST API routes extracted and compiling
+3. **Phase 1 Complete** - REST API routes extracted, integrated, and tested
 4. **Zero Downtime** - All changes backward compatible
 5. **Tests Green** - 113/113 backend tests passing
+6. **Clean Code Structure** - Dependency injection pattern established
 
 ---
 
 ## 🔜 Next Session Goals
 
-**Primary Goal**: Complete REST API integration
-1. Import and register routes in index.ts
-2. Verify all tests pass (113/113)
-3. Test manually (create game, play round)
-4. Commit integration
+**Primary Goal**: Start Socket.io handler extraction (Phase 2)
+1. Create `socketHandlers/lobby.ts` module
+2. Extract 6 lobby handlers (create_game, join_game, select_team, swap_position, start_game, leave_game)
+3. Implement dependency injection pattern (similar to routes.ts)
+4. Integrate into index.ts and verify tests pass
 
-**Stretch Goal**: Start Socket.io lobby extraction
-1. Create `socketHandlers/lobby.ts`
-2. Extract first 2 handlers (create_game, join_game)
+**Stretch Goal**: Extract gameplay handlers
+1. Create `socketHandlers/gameplay.ts`
+2. Extract 3 gameplay handlers (place_bet, play_card, player_ready)
 3. Verify tests pass
 
 **Time Estimate**: 1-2 hours
 
 ---
 
-*Last Updated*: 2025-10-31
-*Sprint Status*: 40% Complete
-*Next Review*: After REST API integration
+*Last Updated*: 2025-10-31 (Phase 1 Complete)
+*Sprint Status*: 50% Complete
+*Next Review*: After Socket.io lobby extraction
