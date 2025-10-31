@@ -525,13 +525,13 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                                   </span>
                                 </div>
                                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                                  {new Date(game.finished_at).toLocaleDateString('en-US', {
+                                  {game.finished_at ? new Date(game.finished_at).toLocaleDateString('en-US', {
                                     year: 'numeric',
                                     month: 'short',
                                     day: 'numeric',
                                     hour: '2-digit',
                                     minute: '2-digit'
-                                  })}
+                                  }) : 'In Progress'}
                                 </div>
                               </div>
 
