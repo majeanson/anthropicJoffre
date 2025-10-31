@@ -173,6 +173,20 @@ import { registerBotHandlers } from './socketHandlers/bots';
 import { registerStatsHandlers } from './socketHandlers/stats';
 import { registerConnectionHandlers } from './socketHandlers/connection';
 import { registerAdminHandlers } from './socketHandlers/admin';
+import {
+  generateSessionToken as generateSessionTokenUtil,
+  createPlayerSession as createPlayerSessionUtil,
+  validateSessionToken as validateSessionTokenUtil
+} from './utils/sessionManager';
+import { findPlayer, findPlayerIndex, hasAtLeastOneHuman } from './utils/playerHelpers';
+import { getNextBotName, canAddBot, areTeammates } from './utils/botHelpers';
+import {
+  updateOnlinePlayer as updateOnlinePlayerUtil,
+  broadcastOnlinePlayers as broadcastOnlinePlayersUtil,
+  startOnlinePlayersInterval,
+  OnlinePlayer
+} from './utils/onlinePlayerManager';
+import { formatBytes, formatUptime } from './utils/formatting';
 
 const app = express();
 const httpServer = createServer(app);
@@ -307,43 +321,6 @@ const socketRateLimiters = {
   card: new Map<string, number>(), // Last card play timestamp
 };
 
-// Input sanitization helpers
-const sanitizePlayerName = (name: string): string => {
-  // Remove leading/trailing whitespace
-  let sanitized = name.trim();
-
-  // Limit length to 20 characters
-  sanitized = sanitized.substring(0, 20);
-
-  // Remove any HTML tags or script tags
-  sanitized = sanitized.replace(/<[^>]*>/g, '');
-
-  // Remove any potential XSS characters
-  sanitized = sanitized.replace(/[<>'"]/g, '');
-
-  // Ensure name is not empty after sanitization
-  if (!sanitized) {
-    sanitized = 'Player';
-  }
-
-  return sanitized;
-};
-
-const sanitizeChatMessage = (message: string): string => {
-  // Remove leading/trailing whitespace
-  let sanitized = message.trim();
-
-  // Limit length to 200 characters
-  sanitized = sanitized.substring(0, 200);
-
-  // Remove any HTML tags or script tags
-  sanitized = sanitized.replace(/<[^>]*>/g, '');
-
-  // Remove any potential XSS characters but allow some punctuation
-  sanitized = sanitized.replace(/[<>]/g, '');
-
-  return sanitized;
-};
 
 // In-memory game storage (can be moved to Redis for production)
 const games = new Map<string, GameState>();
@@ -369,16 +346,34 @@ const gameDeletionTimeouts = new Map<string, NodeJS.Timeout>();
 // Database save debounce timeouts (prevent rapid concurrent saves)
 const gameSaveTimeouts = new Map<string, NodeJS.Timeout>();
 
-// Online players tracking
-interface OnlinePlayer {
-  socketId: string;
-  playerName: string;
-  status: 'in_lobby' | 'in_game' | 'in_team_selection';
-  gameId?: string;
-  lastActivity: number;
-}
 
 const onlinePlayers = new Map<string, OnlinePlayer>();
+
+// Wrapper functions that use closure over Maps for handler compatibility
+function generateSessionToken(): string {
+  return generateSessionTokenUtil();
+}
+
+function createPlayerSession(gameId: string, playerId: string, playerName: string): PlayerSession {
+  return createPlayerSessionUtil(gameId, playerId, playerName, playerSessions);
+}
+
+function validateSessionToken(token: string): PlayerSession | null {
+  return validateSessionTokenUtil(token, playerSessions);
+}
+
+function updateOnlinePlayer(
+  socketId: string,
+  playerName: string,
+  status: 'in_lobby' | 'in_game' | 'in_team_selection',
+  gameId?: string
+): void {
+  updateOnlinePlayerUtil(socketId, playerName, status, gameId, onlinePlayers);
+}
+
+function broadcastOnlinePlayers(): void {
+  broadcastOnlinePlayersUtil(io, onlinePlayers);
+}
 
 // Previous game states for delta generation (gameId -> previous GameState)
 // Enables sending only changed data instead of full state (80-90% bandwidth reduction)
@@ -554,148 +549,9 @@ function emitGameUpdate(gameId: string, gameState: GameState, forceFull: boolean
   gameSaveTimeouts.set(gameId, saveTimeout);
 }
 
-// Helper to generate secure random token
-function generateSessionToken(): string {
-  return crypto.randomBytes(32).toString('hex');
-}
 
-/**
- * Helper to find player by socket ID or name (stable across reconnections)
- * Prefers socket ID for speed, falls back to name if ID not found
- */
-function findPlayer(game: GameState, socketId: string, playerName?: string): Player | undefined {
-  // First try by socket ID (fast path)
-  let player = game.players.find(p => p.id === socketId);
-
-  // If not found and we have a name, try by name (reconnection case)
-  if (!player && playerName) {
-    player = game.players.find(p => p.name === playerName);
-  }
-
-  return player;
-}
-
-/**
- * Helper to get the next available bot name (Bot 1, Bot 2, Bot 3)
- */
-function getNextBotName(game: GameState): string {
-  const existingBotNumbers = game.players
-    .filter(p => p.name.startsWith('Bot '))
-    .map(p => parseInt(p.name.split(' ')[1]))
-    .filter(n => !isNaN(n));
-
-  for (let i = 1; i <= 3; i++) {
-    if (!existingBotNumbers.includes(i)) {
-      return `Bot ${i}`;
-    }
-  }
-
-  // Fallback (should never happen with validation)
-  return `Bot ${Date.now() % 1000}`;
-}
-
-/**
- * Helper to check if game can add another bot (max 3 bots)
- */
-function canAddBot(game: GameState): boolean {
-  const botCount = game.players.filter(p => p.isBot).length;
-  return botCount < 3;
-}
-
-/**
- * Helper to check if two players are teammates
- */
-function areTeammates(game: GameState, player1Name: string, player2Name: string): boolean {
-  const p1 = game.players.find(p => p.name === player1Name);
-  const p2 = game.players.find(p => p.name === player2Name);
-
-  if (!p1 || !p2) return false;
-
-  return p1.teamId === p2.teamId;
-}
-
-/**
- * Helper to ensure at least 1 human player remains
- */
-function hasAtLeastOneHuman(game: GameState): boolean {
-  const humanCount = game.players.filter(p => !p.isBot).length;
-  return humanCount >= 1;
-}
-
-/**
- * Helper to find player index by socket ID or name
- */
-function findPlayerIndex(game: GameState, socketId: string, playerName?: string): number {
-  // First try by socket ID
-  let index = game.players.findIndex(p => p.id === socketId);
-
-  // If not found and we have a name, try by name
-  if (index === -1 && playerName) {
-    index = game.players.findIndex(p => p.name === playerName);
-  }
-
-  return index;
-}
-
-// Helper to create and store player session
-function createPlayerSession(gameId: string, playerId: string, playerName: string): PlayerSession {
-  const token = generateSessionToken();
-  const session: PlayerSession = {
-    gameId,
-    playerId,
-    playerName,
-    token,
-    timestamp: Date.now(),
-  };
-  playerSessions.set(token, session);
-  return session;
-}
-
-// Helper to validate session token
-function validateSessionToken(token: string): PlayerSession | null {
-  const session = playerSessions.get(token);
-  if (!session) return null;
-
-  // Check if session is expired (15 minutes = 900000ms for mobile AFK)
-  const SESSION_TIMEOUT = 900000;
-  if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
-    playerSessions.delete(token);
-    return null;
-  }
-
-  return session;
-}
-
-// Helper to update online player status
-function updateOnlinePlayer(socketId: string, playerName: string, status: 'in_lobby' | 'in_game' | 'in_team_selection', gameId?: string) {
-  onlinePlayers.set(socketId, {
-    socketId,
-    playerName,
-    status,
-    gameId,
-    lastActivity: Date.now()
-  });
-}
-
-// Helper to broadcast online players list
-function broadcastOnlinePlayers() {
-  const now = Date.now();
-  const ACTIVITY_THRESHOLD = 30000; // 30 seconds
-
-  // Filter active players (active in last 30 seconds)
-  const activePlayers = Array.from(onlinePlayers.values())
-    .filter(p => now - p.lastActivity < ACTIVITY_THRESHOLD);
-
-  // Broadcast to all connected clients
-  io.emit('online_players_update', activePlayers);
-}
-
-// Broadcast online players every 5 seconds
+// Online players interval (needed for cleanup)
 let onlinePlayersInterval: NodeJS.Timeout;
-
-const startOnlinePlayersInterval = () => {
-  onlinePlayersInterval = setInterval(broadcastOnlinePlayers, 5000);
-};
 
 const cleanup = async () => {
   logger.info('Starting graceful shutdown');
@@ -727,7 +583,7 @@ const cleanup = async () => {
 };
 
 // Start the interval
-startOnlinePlayersInterval();
+onlinePlayersInterval = startOnlinePlayersInterval(io, onlinePlayers);
 
 // Graceful shutdown
 process.on('SIGTERM', cleanup);
@@ -1017,29 +873,6 @@ function broadcastGameUpdate(gameId: string, event: string, data: GameState | { 
   }
 }
 
-// Helper functions for health endpoints
-function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-}
-
-function formatUptime(seconds: number): string {
-  const days = Math.floor(seconds / 86400);
-  const hours = Math.floor((seconds % 86400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  const parts = [];
-  if (days > 0) parts.push(`${days}d`);
-  if (hours > 0) parts.push(`${hours}h`);
-  if (minutes > 0) parts.push(`${minutes}m`);
-  parts.push(`${secs}s`);
-
-  return parts.join(' ');
-}
 
 // ============================================================================
 // REST API Routes - Refactored (Sprint 3)
