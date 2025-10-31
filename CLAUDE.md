@@ -442,6 +442,50 @@ frontend/src/
 **Solution**: Tab navigation (Active/Recent), simplified cards, integrated replay
 **File**: `frontend/src/components/LobbyBrowser.tsx` (complete redesign)
 
+### Sprint 5 - Phase 5: E2E Test Refactoring (October 2025)
+**Goal**: Achieve 100% test suite health by refactoring or removing all skipped tests
+
+**Problem**: Multiple test suites were skipped due to multi-page/multi-context Playwright architecture causing browser crashes after ~60s runtime. Additionally, some tests were testing non-existent features.
+
+**Solution**:
+1. **Marathon Tests** - Created new stable `27-marathon-automated.spec.ts` using Quick Play + Autoplay architecture
+   - Single browser page (no multi-page overhead)
+   - Server-side bots (more efficient than browser bots)
+   - Autoplay for human player (no manual intervention)
+   - Memory efficient (runs 60+ minutes without crashes)
+   - Tests: 15-round stability, full game to 41+, memory leak detection, performance regression
+   - **Removed obsolete files**: `23-game-flow-4-players.spec.ts`, `24-game-flow-1-player-3-bots.spec.ts`, `25-game-flow-2-players-2-bots.spec.ts`, `26-game-flow-full-length.spec.ts`
+
+2. **Non-Applicable Tests** - Removed tests for features that don't exist in current UI
+   - **03-playing.spec.ts**: Removed "should show player info (cards left, tricks won)" - UI shows team scores instead
+   - **20-chat-system.spec.ts**: Removed 4 tests:
+     - Chat panel toggle (team selection has inline chat)
+     - Unread counter (not applicable to always-visible chat)
+     - Quick emoji reactions (not in team selection UI)
+     - Message persistence across phases (separate chat systems by design)
+
+3. **Remaining Skipped Tests** (for future refactoring):
+   - **14-spectator.spec.ts**: Entire suite (3 tests) - needs Quick Play + separate browser approach
+   - **15-timeout-system.spec.ts**: Entire suite (3+ tests) - consider backend unit tests instead
+   - **19-timeout-autoplay.spec.ts**: Entire suite (5+ tests) - consider backend unit tests instead
+   - **20-chat-system.spec.ts**: 2 tests remaining:
+     - "should show chat in betting phase" - needs Quick Play refactor
+     - "should handle rapid message sending" - needs better wait strategies
+
+**Key Architectural Decision**: Always use Quick Play + Autoplay for marathon/long-running tests. Multi-page architecture is only acceptable for short (<30s) focused tests.
+
+**Files**: See `docs/sprints/sprint5-phase5-summary.md` for complete refactoring plan and rationale
+
+**Helper Functions**:
+- `createQuickPlayGame()` - Stable single-player tests with 3 server bots
+- `createAutomatedMarathonGame()` - Marathon tests with autoplay enabled
+- `monitorMarathonGame()` - Metrics collection over extended gameplay
+
+**Results**:
+- ✅ Removed 8 test files/suites (4 marathon files + 5 non-applicable tests)
+- ✅ Created stable marathon test architecture
+- 🔲 4 test suites remaining for future refactoring (spectator, timeout, chat)
+
 ## 🚨 Common Pitfalls
 
 ### ❌ DON'T

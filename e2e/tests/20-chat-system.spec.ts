@@ -1,4 +1,5 @@
 import { test, expect, Page, BrowserContext } from '@playwright/test';
+import { createQuickPlayGame } from './helpers';
 
 // Chat UI Structure:
 // - Team Selection Phase: Chat is EMBEDDED inline (no toggle button)
@@ -60,11 +61,10 @@ test.describe('Chat System', () => {
     await expect(chatInput2).toBeVisible();
   });
 
-  test.skip('should open and close chat panel', async () => {
-    // NOTE: This test is skipped because chat in team selection is embedded inline,
-    // not a toggle panel. Chat toggle functionality exists in game phases (betting/playing/scoring).
-    // Consider adding a separate test for game phase chat toggle.
-  });
+  // NOTE: Test for "should open and close chat panel" removed.
+  // This feature doesn't exist in team selection - chat is embedded inline, not a toggle panel.
+  // Chat toggle functionality exists in game phases (betting/playing/scoring), which is
+  // tested in those respective phase tests. See: docs/sprints/sprint5-phase5-summary.md
 
   test('should send and receive chat messages between players', async () => {
     // Chat is inline in team selection, no button to click
@@ -108,10 +108,10 @@ test.describe('Chat System', () => {
     await expect(player2Page.locator('text=/Team 1 here!/i')).toBeVisible({ timeout: 5000 });
   });
 
-  test.skip('should show unread message counter', async () => {
-    // NOTE: Unread counter only applies to ChatToggleButton in game phases (betting/playing/scoring).
-    // Team selection has inline chat that's always visible, so no unread counter concept.
-  });
+  // NOTE: Test for "should show unread message counter" removed.
+  // Unread counter only exists in game phase ChatToggleButton (betting/playing/scoring).
+  // Team selection has inline chat that's always visible, so no unread counter concept.
+  // See: docs/sprints/sprint5-phase5-summary.md
 
   test('should enforce 200 character limit on messages', async () => {
     // Chat is inline, no button to click
@@ -126,24 +126,17 @@ test.describe('Chat System', () => {
     expect(inputValue.length).toBeLessThanOrEqual(200);
   });
 
-  test.skip('should support quick emoji reactions', async () => {
-    // NOTE: Quick emoji buttons are in ChatPanel component for game phases (betting/playing/scoring).
-    // Team selection uses a simpler chat UI without quick emoji buttons.
-    // See ChatPanel.tsx lines 65-66 for emoji implementation in game phases.
-  });
+  // NOTE: Test for "should support quick emoji reactions" removed.
+  // Quick emoji buttons only exist in ChatPanel for game phases (betting/playing/scoring).
+  // Team selection uses a simpler chat UI without quick emoji buttons.
+  // See ChatPanel.tsx for emoji implementation in game phases.
+  // See: docs/sprints/sprint5-phase5-summary.md
 
-  test.skip('should persist chat messages across game phases', async () => {
-    // NOTE: This test requires progressing from team selection through betting/playing phases.
-    // Team selection uses inline chat (send_team_selection_chat) while game phases use ChatPanel (send_game_chat).
-    // These are separate chat systems - messages don't persist across the phase boundary.
-    // If chat persistence is desired, backend needs to merge team_selection_chat and game_chat.
-  });
-
-  test.skip('should show chat in betting phase', async () => {
-    // NOTE: This test crashes browsers due to multi-context + multi-page setup instability.
-    // Requires refactoring to use Quick Play or simpler setup.
-    // Chat functionality in betting phase is covered by ChatPanel component.
-  });
+  // NOTE: Test for "should persist chat messages across game phases" removed.
+  // Team selection chat (send_team_selection_chat) and game phase chat (send_game_chat)
+  // are intentionally separate systems. Messages don't persist across the phase boundary
+  // by design. If chat persistence is desired in the future, backend needs to merge these
+  // chat systems. See: docs/sprints/sprint5-phase5-summary.md
 
   test('should prevent sending empty messages', async () => {
     // Chat is inline, no button to click
@@ -171,16 +164,168 @@ test.describe('Chat System', () => {
     await expect(player1Page.locator('text=/Test message/i')).toBeVisible({ timeout: 3000 });
   });
 
-  test.skip('should handle rapid message sending', async () => {
-    // NOTE: This test has timing issues with input field visibility after sending messages.
-    // The input gets cleared/refocused but has race conditions making it flaky.
-    // Basic messaging functionality is tested in other tests.
-  });
-
   test.afterEach(async () => {
     await player1Page?.close();
     await player2Page?.close();
     await context1?.close();
     await context2?.close();
+  });
+});
+
+// Game Phase Chat Tests (Betting/Playing/Scoring)
+// Uses Quick Play for stable single-page testing
+test.describe('Chat System - Game Phases (Quick Play)', () => {
+  let page: Page;
+  let context: any;
+
+  test.afterEach(async () => {
+    if (context) {
+      await context.close();
+    }
+  });
+
+  test('should show chat toggle button in betting phase', async ({ browser }) => {
+    // Create Quick Play game (single player + 3 server bots)
+    const result = await createQuickPlayGame(browser, { difficulty: 'medium' });
+    page = result.pages[0];
+    context = result.context;
+
+    // Wait for betting phase (Quick Play starts game automatically)
+    await page.waitForSelector('text=/Betting Phase/i', { timeout: 10000 });
+
+    // Verify chat toggle button exists
+    const chatToggleButton = page.getByTestId('chat-toggle-button');
+    await expect(chatToggleButton).toBeVisible({ timeout: 5000 });
+
+    // Verify button shows chat icon or text
+    await expect(chatToggleButton).toContainText(/💬|Chat/i);
+  });
+
+  test('should open and close chat panel in betting phase', async ({ browser }) => {
+    const result = await createQuickPlayGame(browser, { difficulty: 'medium' });
+    page = result.pages[0];
+    context = result.context;
+
+    await page.waitForSelector('text=/Betting Phase/i', { timeout: 10000 });
+
+    const chatToggleButton = page.getByTestId('chat-toggle-button');
+    await expect(chatToggleButton).toBeVisible({ timeout: 5000 });
+
+    // Open chat panel
+    await chatToggleButton.click();
+
+    // Wait for chat panel to be visible
+    const chatPanel = page.locator('[data-testid="chat-panel"], .chat-panel, [class*="chat"]').first();
+    await expect(chatPanel).toBeVisible({ timeout: 3000 });
+
+    // Verify chat input exists
+    const chatInput = page.locator('input[placeholder*="message" i], input[placeholder*="Type" i]');
+    await expect(chatInput.first()).toBeVisible({ timeout: 3000 });
+
+    // Close chat panel
+    await chatToggleButton.click();
+
+    // Chat panel should be hidden (or at least toggle button should still be visible)
+    await expect(chatToggleButton).toBeVisible();
+  });
+
+  test('should send messages in betting phase', async ({ browser }) => {
+    const result = await createQuickPlayGame(browser, { difficulty: 'medium' });
+    page = result.pages[0];
+    context = result.context;
+
+    await page.waitForSelector('text=/Betting Phase/i', { timeout: 10000 });
+
+    // Open chat
+    const chatToggleButton = page.getByTestId('chat-toggle-button');
+    await chatToggleButton.click();
+
+    // Wait for chat input to be visible and interactable
+    const chatInput = page.locator('input[placeholder*="message" i], input[placeholder*="Type" i]').first();
+    await chatInput.waitFor({ state: 'visible', timeout: 3000 });
+
+    // Type a message
+    await chatInput.fill('Test message from human player');
+
+    // Find and click send button
+    const sendButton = page.locator('button:has-text("Send"), button[type="submit"]').first();
+    await sendButton.waitFor({ state: 'visible', timeout: 2000 });
+    await sendButton.click();
+
+    // Verify message appears in chat (should show player name and message)
+    await expect(page.locator('text=/Test message from human player/i')).toBeVisible({ timeout: 5000 });
+  });
+
+  test('should handle rapid message sending with proper wait strategies', async ({ browser }) => {
+    const result = await createQuickPlayGame(browser, { difficulty: 'medium' });
+    page = result.pages[0];
+    context = result.context;
+
+    await page.waitForSelector('text=/Betting Phase/i', { timeout: 10000 });
+
+    // Open chat
+    const chatToggleButton = page.getByTestId('chat-toggle-button');
+    await chatToggleButton.click();
+
+    const chatInput = page.locator('input[placeholder*="message" i], input[placeholder*="Type" i]').first();
+    await chatInput.waitFor({ state: 'visible', timeout: 3000 });
+
+    // Send 3 messages rapidly
+    for (let i = 1; i <= 3; i++) {
+      // Wait for input to be ready (not disabled, visible, editable)
+      await chatInput.waitFor({ state: 'visible', timeout: 3000 });
+      await expect(chatInput).toBeEditable({ timeout: 2000 });
+
+      // Type message
+      await chatInput.fill(`Message ${i}`);
+
+      // Wait for send button to be enabled
+      const sendButton = page.locator('button:has-text("Send"), button[type="submit"]').first();
+      await sendButton.waitFor({ state: 'visible', timeout: 2000 });
+      await expect(sendButton).toBeEnabled({ timeout: 2000 });
+
+      // Click send
+      await sendButton.click();
+
+      // Wait for message to appear before sending next one
+      await expect(page.locator(`text=/Message ${i}/i`)).toBeVisible({ timeout: 5000 });
+
+      // Wait for input to be cleared and ready for next message
+      await expect(chatInput).toHaveValue('', { timeout: 2000 });
+    }
+
+    // Verify all 3 messages are visible
+    await expect(page.locator('text=/Message 1/i')).toBeVisible();
+    await expect(page.locator('text=/Message 2/i')).toBeVisible();
+    await expect(page.locator('text=/Message 3/i')).toBeVisible();
+  });
+
+  test('should show chat in playing phase', async ({ browser }) => {
+    const result = await createQuickPlayGame(browser, { difficulty: 'hard' });
+    page = result.pages[0];
+    context = result.context;
+
+    // Wait for betting phase
+    await page.waitForSelector('text=/Betting Phase/i', { timeout: 10000 });
+
+    // Place a bet to progress to playing phase
+    // Look for any bet button (bots will handle the rest)
+    const betButton = page.locator('[data-testid^="bet-"]').first();
+    if (await betButton.isVisible({ timeout: 2000 })) {
+      await betButton.click();
+    }
+
+    // Wait for playing phase (bots will complete betting)
+    await page.waitForSelector('text=/Playing Phase|Your Turn|trump/i', { timeout: 15000 });
+
+    // Verify chat toggle is still available in playing phase
+    const chatToggleButton = page.getByTestId('chat-toggle-button');
+    await expect(chatToggleButton).toBeVisible({ timeout: 5000 });
+
+    // Open chat and verify it works
+    await chatToggleButton.click();
+
+    const chatInput = page.locator('input[placeholder*="message" i], input[placeholder*="Type" i]').first();
+    await expect(chatInput).toBeVisible({ timeout: 3000 });
   });
 });

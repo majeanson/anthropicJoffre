@@ -821,12 +821,29 @@ export async function fastForwardToEndGame(page: Page, gameId: string) {
  * but only pages[0] is a real page (others are references to it).
  *
  * @param browser - Playwright browser instance
+ * @param options - Configuration options
  * @returns Object with context, pages array (all point to same page), and gameId
  */
-export async function createQuickPlayGame(browser: any) {
+export async function createQuickPlayGame(
+  browser: any,
+  options: {
+    difficulty?: 'easy' | 'medium' | 'hard';
+    enableAutoplay?: boolean;
+  } = {}
+) {
+  const { difficulty = 'medium', enableAutoplay = false } = options;
+
   const context = await browser.newContext();
   const page = await context.newPage();
   await page.goto('/');
+
+  // Select difficulty if not default
+  if (difficulty !== 'medium') {
+    const difficultyButton = page.getByTestId(`difficulty-${difficulty}`);
+    if (await difficultyButton.isVisible({ timeout: 2000 })) {
+      await difficultyButton.click();
+    }
+  }
 
   // Use Quick Play to create game with 3 server-side bots
   await page.getByTestId('quick-play-button').click();
@@ -835,6 +852,15 @@ export async function createQuickPlayGame(browser: any) {
 
   // Wait for bots to join (3 bots)
   await page.waitForTimeout(2000);
+
+  // Enable autoplay if requested (for marathon tests)
+  if (enableAutoplay) {
+    const autoplayToggle = page.getByTestId('autoplay-toggle');
+    if (await autoplayToggle.isVisible({ timeout: 2000 })) {
+      await autoplayToggle.click();
+      console.log('✓ Autoplay enabled for human player');
+    }
+  }
 
   // Start the game
   await page.getByTestId('start-game-button').click();
@@ -847,6 +873,42 @@ export async function createQuickPlayGame(browser: any) {
   const pages = [page, page, page, page];
 
   return { context, pages, gameId };
+}
+
+/**
+ * Creates a fully automated game for marathon testing.
+ * Uses Quick Play + Autoplay so the game runs without manual intervention.
+ * Ideal for stability tests and long-running scenarios.
+ *
+ * @param browser - Playwright browser instance
+ * @param options - Configuration options
+ * @returns Object with context, page, and gameId
+ */
+export async function createAutomatedMarathonGame(
+  browser: any,
+  options: {
+    difficulty?: 'easy' | 'medium' | 'hard';
+    targetRounds?: number;
+  } = {}
+) {
+  const { difficulty = 'hard', targetRounds } = options;
+
+  console.log(`Creating automated marathon game (difficulty: ${difficulty})`);
+
+  const result = await createQuickPlayGame(browser, {
+    difficulty,
+    enableAutoplay: true
+  });
+
+  if (targetRounds) {
+    console.log(`Target: ${targetRounds} rounds (estimated ${Math.ceil(targetRounds * 0.5)} minutes)`);
+  }
+
+  return {
+    context: result.context,
+    page: result.pages[0],
+    gameId: result.gameId
+  };
 }
 
 /**
@@ -903,4 +965,168 @@ export async function playCompleteGameWithAutoplay(page: Page, maxRounds: number
 
   console.log(`Game still running after ${maxRounds} rounds`);
   return false;
+}
+
+/**
+ * Monitors an automated marathon game and collects performance metrics.
+ * Waits for game completion while tracking round progress, memory usage, and errors.
+ *
+ * @param page - Page instance
+ * @param options - Monitoring options
+ * @returns Marathon game metrics
+ */
+export async function monitorMarathonGame(
+  page: Page,
+  options: {
+    maxRounds?: number;
+    maxDurationMinutes?: number;
+    collectMetrics?: boolean;
+  } = {}
+) {
+  const {
+    maxRounds = 30,
+    maxDurationMinutes = 60,
+    collectMetrics = true
+  } = options;
+
+  const startTime = Date.now();
+  const maxDurationMs = maxDurationMinutes * 60 * 1000;
+
+  const metrics = {
+    roundDurations: [] as number[],
+    memorySnapshots: [] as number[],
+    roundNumbers: [] as number[],
+    teamScores: [] as { team1: number; team2: number; round: number }[],
+    errorCount: 0,
+    totalDuration: 0,
+    gameCompleted: false
+  };
+
+  console.log(`\n=== Marathon Game Monitoring Started ===`);
+  console.log(`Max Rounds: ${maxRounds}`);
+  console.log(`Max Duration: ${maxDurationMinutes} minutes`);
+  console.log(`Metrics Collection: ${collectMetrics ? 'Enabled' : 'Disabled'}`);
+
+  let currentRound = 0;
+  let roundStartTime = Date.now();
+  let lastRoundNumber = 0;
+
+  while (currentRound < maxRounds) {
+    try {
+      const elapsed = Date.now() - startTime;
+
+      // Check timeout
+      if (elapsed > maxDurationMs) {
+        console.log(`⚠ Max duration reached (${maxDurationMinutes} minutes)`);
+        break;
+      }
+
+      // Check if game is over
+      const gameOver = await page.locator('text=/Game Over/i').isVisible({ timeout: 1000 }).catch(() => false);
+      if (gameOver) {
+        metrics.gameCompleted = true;
+        console.log(`\n✓ Game completed after ${currentRound} rounds`);
+        break;
+      }
+
+      // Get current round number
+      try {
+        const roundText = await page.getByTestId('round-number').textContent({ timeout: 1000 });
+        const roundMatch = roundText?.match(/Round (\d+)/);
+        if (roundMatch) {
+          const roundNum = parseInt(roundMatch[1]);
+          if (roundNum > lastRoundNumber) {
+            // New round started
+            const roundDuration = Date.now() - roundStartTime;
+            if (lastRoundNumber > 0) {
+              metrics.roundDurations.push(roundDuration);
+              console.log(`Round ${lastRoundNumber} completed in ${(roundDuration / 1000).toFixed(1)}s`);
+            }
+
+            lastRoundNumber = roundNum;
+            currentRound = roundNum;
+            roundStartTime = Date.now();
+            metrics.roundNumbers.push(roundNum);
+
+            // Collect metrics every round
+            if (collectMetrics) {
+              // Memory usage
+              try {
+                const memory = await page.evaluate(() => {
+                  // @ts-ignore
+                  if (window.performance && window.performance.memory) {
+                    // @ts-ignore
+                    return Math.round(window.performance.memory.usedJSHeapSize / 1024 / 1024);
+                  }
+                  return null;
+                });
+                if (memory) {
+                  metrics.memorySnapshots.push(memory);
+                }
+              } catch (e) {
+                // Memory API not available
+              }
+
+              // Team scores
+              try {
+                const team1Score = await page.getByTestId('team1-score').textContent({ timeout: 1000 });
+                const team2Score = await page.getByTestId('team2-score').textContent({ timeout: 1000 });
+                if (team1Score && team2Score) {
+                  metrics.teamScores.push({
+                    team1: parseInt(team1Score),
+                    team2: parseInt(team2Score),
+                    round: roundNum
+                  });
+                }
+              } catch (e) {
+                // Scores not available yet
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // Round number not available yet
+      }
+
+      // Wait before next check
+      await page.waitForTimeout(1000);
+
+    } catch (error) {
+      metrics.errorCount++;
+      console.error(`Error during monitoring (round ${currentRound}):`, error);
+
+      if (metrics.errorCount > 10) {
+        console.error(`⚠ Too many errors (${metrics.errorCount}), stopping monitoring`);
+        break;
+      }
+    }
+  }
+
+  metrics.totalDuration = Date.now() - startTime;
+
+  // Print summary
+  console.log(`\n=== Marathon Game Summary ===`);
+  console.log(`Total Duration: ${(metrics.totalDuration / 1000 / 60).toFixed(1)} minutes`);
+  console.log(`Rounds Completed: ${metrics.roundNumbers.length}`);
+  console.log(`Game Completed: ${metrics.gameCompleted ? 'Yes' : 'No'}`);
+  console.log(`Errors Encountered: ${metrics.errorCount}`);
+
+  if (metrics.roundDurations.length > 0) {
+    const avgRoundDuration = metrics.roundDurations.reduce((a, b) => a + b, 0) / metrics.roundDurations.length;
+    console.log(`Average Round Duration: ${(avgRoundDuration / 1000).toFixed(1)}s`);
+  }
+
+  if (metrics.memorySnapshots.length > 1) {
+    const initialMemory = metrics.memorySnapshots[0];
+    const finalMemory = metrics.memorySnapshots[metrics.memorySnapshots.length - 1];
+    const memoryGrowth = finalMemory - initialMemory;
+    console.log(`Memory Usage: ${initialMemory}MB → ${finalMemory}MB (${memoryGrowth > 0 ? '+' : ''}${memoryGrowth}MB)`);
+  }
+
+  if (metrics.teamScores.length > 0) {
+    const finalScores = metrics.teamScores[metrics.teamScores.length - 1];
+    console.log(`Final Scores: Team 1: ${finalScores.team1}, Team 2: ${finalScores.team2}`);
+  }
+
+  return metrics;
 }

@@ -56,30 +56,10 @@ test.describe('Card Playing Phase', () => {
     await expect(pages[0].getByTestId('round-number')).toHaveText('R1');
   });
 
-  test.skip('should show player info (cards left, tricks won)', async ({ browser }) => {
-    // NOTE: Skipping this test because the UI doesn't display individual player
-    // card counts or tricks won. The game shows team scores and round points instead.
-    // If this feature is added in the future, this test can be re-enabled.
-
-    const result = await createGameWith4Players(browser);
-    context = result.context;
-    const pages = result.pages;
-    await placeAllBets(pages);
-
-    // Should show all 4 players - use .first() to handle duplicates
-    await expect(pages[0].getByText('Player 1').first()).toBeVisible();
-    await expect(pages[0].getByText('Player 2').first()).toBeVisible();
-    await expect(pages[0].getByText('Player 3').first()).toBeVisible();
-    await expect(pages[0].getByText('Player 4').first()).toBeVisible();
-
-    // Should show tricks won (0 initially)
-    const tricksElements = pages[0].locator('text=/tricks.*0/i');
-    await expect(tricksElements.first()).toBeVisible();
-
-    // Should show cards count (8 initially)
-    const cardsElements = pages[0].locator('text=/cards.*8/i');
-    await expect(cardsElements.first()).toBeVisible();
-  });
+  // NOTE: Test for "should show player info (cards left, tricks won)" removed
+  // because this feature doesn't exist in the current UI implementation.
+  // The game displays team scores and round points instead of individual
+  // player card counts or tricks won. See: docs/sprints/sprint5-phase5-summary.md
 
   test('should indicate whose turn it is', async ({ browser }) => {
     const result = await createGameWith4Players(browser);

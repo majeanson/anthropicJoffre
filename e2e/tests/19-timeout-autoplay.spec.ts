@@ -1,12 +1,34 @@
 import { test, expect, Page } from '@playwright/test';
 
-// NOTE: These tests are skipped because they test timeout/autoplay behavior
-// that requires long waits (60s+) and human player turns.
-// Quick Play creates 3 bots which auto-play too quickly for these tests.
-// To properly test timeout/autoplay, these would need manual 4-player setup
-// without bots, which is complex and slow (90s+ per test).
-// The timeout system is tested at a basic level in 15-timeout-system.spec.ts.
-test.describe.skip('Timeout and Autoplay System', () => {
+/**
+ * DEPRECATED: E2E Timeout and Autoplay Tests
+ *
+ * These tests are permanently skipped because timeout/autoplay logic should be
+ * tested via BACKEND UNIT TESTS, not E2E tests.
+ *
+ * WHY BACKEND UNIT TESTS ARE BETTER:
+ * 1. Timeout and autoplay logic lives in backend (server-side)
+ * 2. E2E tests require 60s+ waits per test (extremely slow)
+ * 3. E2E tests need human players (Quick Play bots auto-play too fast)
+ * 4. Multi-page setup is unstable and crash-prone
+ * 5. Backend tests can mock time (instant tests)
+ *
+ * RECOMMENDED APPROACH:
+ * Create backend/src/utils/timeoutManager.test.ts and backend/src/utils/autoplayManager.test.ts:
+ * - Test timeout triggers autoplay
+ * - Test autoplay selects valid actions
+ * - Test autoplay respects game rules
+ * - Test autoplay doesn't override manual actions
+ * - Test autoplay works with different player states
+ *
+ * E2E tests should only verify UI elements:
+ * - Autoplay toggle displays
+ * - Autoplay indicator shows active state
+ * - Actions taken by autoplay are visible
+ *
+ * See: docs/sprints/sprint5-phase5-summary.md (Priority 5)
+ */
+test.describe.skip('Timeout and Autoplay System - DEPRECATED (Use backend unit tests)', () => {
   let playerPage: Page;
   let gameId: string;
 

@@ -2,12 +2,34 @@ import { test, expect, Page } from '@playwright/test';
 import { createGameWith4Players } from './helpers';
 
 /**
- * NOTE: These timeout tests are temporarily skipped due to multi-browser stability issues.
- * Timeout testing requires multiple real players, which uses multi-page architecture that
- * crashes after ~60s in marathon runs.
- * TODO: Refactor to test timeouts with single player or via API manipulation.
+ * DEPRECATED: E2E Timeout System Tests
+ *
+ * These tests are permanently skipped because timeout logic should be tested
+ * via BACKEND UNIT TESTS, not E2E tests.
+ *
+ * WHY BACKEND UNIT TESTS ARE BETTER:
+ * 1. Timeout logic lives in backend/src/utils/timeoutManager.ts (server-side)
+ * 2. E2E tests require 60s+ waits (slow, flaky)
+ * 3. E2E tests need multi-page setup (unstable, crash-prone)
+ * 4. Backend tests are faster (milliseconds vs minutes)
+ * 5. Backend tests are more reliable (no browser overhead)
+ *
+ * RECOMMENDED APPROACH:
+ * Create backend/src/utils/timeoutManager.test.ts with:
+ * - Test timeout duration calculations
+ * - Test auto-skip logic for betting phase
+ * - Test auto-play logic for playing phase
+ * - Test timeout cancellation on player action
+ * - Test timeout notifications
+ *
+ * E2E tests should only verify UI elements:
+ * - Timeout indicator displays correctly
+ * - Countdown timer updates
+ * - Timeout warnings appear
+ *
+ * See: docs/sprints/sprint5-phase5-summary.md (Priority 5)
  */
-test.describe.skip('@slow Timeout System', () => {
+test.describe.skip('@slow Timeout System - DEPRECATED (Use backend unit tests)', () => {
   let context: any;
 
   test.afterEach(async () => {
