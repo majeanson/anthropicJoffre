@@ -14,7 +14,7 @@ import { ReconnectingBanner } from './components/ReconnectingBanner';
 import { CatchUpModal } from './components/CatchUpModal';
 import { BotManagementPanel } from './components/BotManagementPanel';
 import { BotTakeoverModal } from './components/BotTakeoverModal';
-import { Toast, ToastProps } from './components/Toast';
+import { Toast } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
 import { GameReplay } from './components/GameReplay';
 // Use enhanced bot AI with advanced strategic concepts
@@ -22,31 +22,57 @@ import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayer
 // Fallback to original bot player if needed:
 // import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
-import { addRecentPlayers } from './utils/recentPlayers';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { applyStateDelta, GameStateDelta } from './utils/stateDelta';
+// Sprint 5 Phase 2: Custom hooks for state management
+import { useSocketConnection, checkValidSession } from './hooks/useSocketConnection';
+import { useGameState } from './hooks/useGameState';
+import { useChatMessages } from './hooks/useChatMessages';
+import { useToast } from './hooks/useToast';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 function App() {
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [gameState, setGameState] = useState<GameState | null>(null);
-  const [gameId, setGameId] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
+  const { socket, reconnecting, error, setError } = useSocketConnection();
+  const {
+    gameState,
+    gameId,
+    currentTrickWinnerId,
+    isSpectator,
+    showCatchUpModal,
+    setGameState,
+    setGameId,
+    setShowCatchUpModal,
+    setIsSpectator,
+  } = useGameState({ socket, onSpawnBots: undefined }); // Bot spawning handled separately below
+  const { chatMessages, setChatMessages } = useChatMessages({ socket });
+  const { toast, setToast, showToast } = useToast();
+
+  // Bot management state and refs
   const botSocketsRef = useRef<Map<string, Socket>>(new Map()); // Track bot sockets by bot player NAME (stable across reconnects)
+  const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const botDifficultiesRef = useRef<Map<string, BotDifficulty>>(new Map()); // Track per-bot difficulty by bot name
+  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('medium');
+  const [botManagementOpen, setBotManagementOpen] = useState<boolean>(false);
+  const [botTakeoverModal, setBotTakeoverModal] = useState<{
+    gameId: string;
+    availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
+    playerName: string;
+  } | null>(null);
+
+  // Debug mode state
   const [debugMode, setDebugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
-  const [reconnecting, setReconnecting] = useState<boolean>(false);
-  const [showCatchUpModal, setShowCatchUpModal] = useState<boolean>(false);
-  const [toast, setToast] = useState<Omit<ToastProps, 'onClose'> | null>(null);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [isSpectator, setIsSpectator] = useState<boolean>(false);
-  const [currentTrickWinnerId, setCurrentTrickWinnerId] = useState<string | null>(null);
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
+
+  // UI state
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
-  const [botManagementOpen, setBotManagementOpen] = useState<boolean>(false);
+  const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
+  const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Online players tracking
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
     socketId: string;
     playerName: string;
@@ -54,19 +80,6 @@ function App() {
     gameId?: string;
     lastActivity: number;
   }>>([]);
-  const lastToastRef = useRef<string>(''); // Track last toast to prevent duplicates
-  const catchUpModalTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // Track catch-up modal timeout
-  const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-  const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const botDifficultiesRef = useRef<Map<string, BotDifficulty>>(new Map()); // Track per-bot difficulty by bot name
-  const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('medium');
-  const [botTakeoverModal, setBotTakeoverModal] = useState<{
-    gameId: string;
-    availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
-    playerName: string;
-  } | null>(null);
-
-  const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
 
   useEffect(() => {
     preloadCardImages();
@@ -80,400 +93,165 @@ function App() {
     });
   }, [])
 
-  // Helper function to check if there's a valid session
-  // Uses sessionStorage for multi-tab isolation - each tab maintains its own player session
-  const checkValidSession = (): boolean => {
-    const sessionData = sessionStorage.getItem('gameSession');
-    if (!sessionData) return false;
-
-    try {
-      const session: PlayerSession = JSON.parse(sessionData);
-      const SESSION_TIMEOUT = 120000; // 2 minutes
-      if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
-        sessionStorage.removeItem('gameSession');
-        return false;
-      }
-      return true;
-    } catch (e) {
-      sessionStorage.removeItem('gameSession');
-      return false;
-    }
-  };
-
+  // Sprint 5 Phase 2: Additional socket event listeners not handled by hooks
+  // These events have UI-specific side effects (toasts, bot management, spectator mode)
   useEffect(() => {
-    const newSocket = io(SOCKET_URL, {
-      // Enable automatic reconnection with exponential backoff
-      reconnection: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      // Connection timeout
-      timeout: 10000,
-    });
-    setSocket(newSocket);
+    if (!socket) return;
 
-    // Expose socket on window for E2E tests
-    if (typeof window !== 'undefined') {
-      (window as any).socket = newSocket;
-    }
-
-    newSocket.on('connect', () => {
-      setError(''); // Clear any connection errors
-      // Note: Removed automatic reconnection - now requires explicit Rejoin button click
-    });
-
-    newSocket.on('connect_error', () => {
-      setReconnecting(false);
-
-      // If we have a stale session, clear it
-      const sessionData = sessionStorage.getItem('gameSession');
-      if (sessionData) {
-        try {
-          const session: PlayerSession = JSON.parse(sessionData);
-          const SESSION_TIMEOUT = 900000; // 15 minutes
-          if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
-            sessionStorage.removeItem('gameSession');
-            setGameState(null);
-            setGameId('');
-          }
-        } catch (e) {
-          sessionStorage.removeItem('gameSession');
-        }
-      }
-    });
-
-    newSocket.on('disconnect', (reason) => {
-      // Don't immediately clear state - allow for reconnection
-      if (reason === 'io server disconnect') {
-        // Server forcefully disconnected, clear session
-        sessionStorage.removeItem('gameSession');
-        setGameState(null);
-        setGameId('');
-      }
-    });
-
-    newSocket.on('reconnect_attempt', () => {
-      setReconnecting(true);
-    });
-
-    newSocket.on('reconnect', () => {
-      setReconnecting(false);
-    });
-
-    newSocket.on('reconnect_failed', () => {
-      setReconnecting(false);
-      setError('Unable to reconnect to server. Please refresh the page.');
-    });
-
-    newSocket.on('game_created', ({ gameId, gameState, session }: { gameId: string; gameState: GameState; session: PlayerSession }) => {
-      setGameId(gameId);
-      setGameState(gameState);
-
-      // Save session to sessionStorage (multi-tab isolation)
-      if (session) {
-        sessionStorage.setItem('gameSession', JSON.stringify(session));
-      }
-    });
-
-    newSocket.on('player_joined', ({ gameState, session }: { gameState: GameState; session?: PlayerSession }) => {
-      setGameState(gameState);
-
-      // Save session to sessionStorage (multi-tab isolation)
-      if (session) {
-        sessionStorage.setItem('gameSession', JSON.stringify(session));
-      } else {
-      }
-    });
-
-    newSocket.on('reconnection_successful', ({ gameState, session }: { gameState: GameState; session: PlayerSession }) => {
-      setReconnecting(false);
-      setGameId(gameState.id);
-      setGameState(gameState);
-
-      // Show catch-up modal and auto-close after 5 seconds (prevent flickering)
-      if (catchUpModalTimeoutRef.current) {
-        clearTimeout(catchUpModalTimeoutRef.current);
-      }
-      // Only show modal if not already showing (prevents flickering)
-      setShowCatchUpModal(prev => {
-        if (!prev) {
-          catchUpModalTimeoutRef.current = setTimeout(() => {
-            setShowCatchUpModal(false);
-            catchUpModalTimeoutRef.current = null;
-          }, 5000);
-        }
-        return true;
-      });
-
-      // Respawn bot sockets after successful reconnection
-      // This ensures bots continue playing after human player reconnects
-      spawnBotsForGame(gameState);
-
-      // Update session in sessionStorage (multi-tab isolation)
-      sessionStorage.setItem('gameSession', JSON.stringify(session));
-    });
-
-    newSocket.on('reconnection_failed', ({ message }: { message: string }) => {
-      setReconnecting(false);
-
-      // Clear invalid session
-      sessionStorage.removeItem('gameSession');
-
-      // Reset game state to go back to lobby
-      setGameState(null);
-      setGameId('');
-
-      // Don't show error for expired sessions or invalid tokens, just go back to lobby silently
-      if (!message.includes('expired') && !message.includes('Invalid')) {
-        setError(message);
-      }
-    });
-
-    newSocket.on('player_reconnected', ({ playerName }: { playerName: string; playerId: string; oldSocketId: string }) => {
-      // Player online/offline badges will show reconnection status instead of toast
-      console.log(`Player reconnected: ${playerName}`);
-    });
-
-    newSocket.on('player_disconnected', ({ playerId, waitingForReconnection }: { playerId: string; waitingForReconnection: boolean }) => {
-
-      // Show toast notification if waiting for reconnection (prevent duplicates)
+    // Player disconnection with toast notification
+    const handlePlayerDisconnected = ({ playerId, waitingForReconnection }: { playerId: string; waitingForReconnection: boolean }) => {
       if (waitingForReconnection && gameState) {
         const player = gameState.players.find(p => p.id === playerId);
         if (player) {
-          const toastMessage = `${player.name} disconnected`;
-          if (lastToastRef.current !== toastMessage) {
-            lastToastRef.current = toastMessage;
-            setToast({
-              message: toastMessage,
-              type: 'warning',
-              duration: 3000,
-            });
-            // Clear the ref after duration
-            setTimeout(() => {
-              if (lastToastRef.current === toastMessage) {
-                lastToastRef.current = '';
-              }
-            }, 3000);
-          }
+          showToast(`${player.name} disconnected`, 'warning');
         }
       }
-    });
+    };
 
-    newSocket.on('round_started', (gameState) => {
-      setGameState(gameState);
-    });
-
-    newSocket.on('game_updated', (gameState) => {
-      console.log(`📥 Frontend received game_updated, currentTrick.length = ${gameState.currentTrick.length}`);
-      setGameState(gameState);
-      // Clear winner ID when trick is cleared
-      if (gameState.currentTrick.length === 0) {
-        setCurrentTrickWinnerId(null);
-      }
-    });
-
-    // Sprint 2: Handle delta updates for reduced bandwidth (80-90% reduction)
-    newSocket.on('game_updated_delta', (delta: GameStateDelta) => {
-      console.log(`📥 Frontend received game_updated_delta`);
-      setGameState(prevState => {
-        if (!prevState) return prevState; // Can't apply delta without previous state
-        const newState = applyStateDelta(prevState, delta);
-        // Clear winner ID when trick is cleared
-        if (newState.currentTrick.length === 0) {
-          setCurrentTrickWinnerId(null);
-        }
-        return newState;
-      });
-    });
-
-    newSocket.on('trick_resolved', ({ winnerId, gameState }) => {
-      console.log(`📥 Frontend received trick_resolved, currentTrick.length = ${gameState.currentTrick.length}`);
-      setGameState(gameState);
-      // Store the winner ID for highlighting during the 3-second delay
-      setCurrentTrickWinnerId(winnerId);
-    });
-
-    newSocket.on('round_ended', (gameState) => {
-      setGameState(gameState);
-    });
-
-    newSocket.on('game_over', ({ gameState }: { gameState: GameState }) => {
-      setGameState(gameState);
-
-      // Save recent players (excluding yourself)
-      const currentPlayer = gameState.players.find(p => p.id === newSocket.id);
-      if (currentPlayer) {
-        const otherPlayers = gameState.players
-          .map(p => p.name)
-          .filter(name => name !== currentPlayer.name);
-        addRecentPlayers(otherPlayers, currentPlayer.name);
-      }
-
-      // Clear session on game over
-      sessionStorage.removeItem('gameSession');
-    });
-
-    // Listen for rematch events
-    newSocket.on('rematch_vote_update', ({ voters }: { votes: number; totalPlayers: number; voters: string[] }) => {
-      // Update game state with new vote count
-      if (gameState) {
-        setGameState({
-          ...gameState,
-          rematchVotes: voters
-        });
-      }
-    });
-
-    newSocket.on('rematch_started', ({ gameState }: { gameState: GameState }) => {
-      setGameState(gameState);
-
-      // Save session for the new game
-      const currentPlayer = gameState.players.find(p => p.id === newSocket.id);
-      if (currentPlayer) {
-        const session: PlayerSession = {
-          gameId: gameState.id,
-          playerId: currentPlayer.id,
-          playerName: currentPlayer.name,
-          token: `${gameState.id}_${currentPlayer.id}_${Date.now()}`,
-          timestamp: Date.now()
-        };
-        sessionStorage.setItem('gameSession', JSON.stringify(session));
-      }
-    });
-
-    // Listen for online players updates
-    newSocket.on('online_players_update', (players: typeof onlinePlayers) => {
+    // Online players list updates
+    const handleOnlinePlayersUpdate = (players: typeof onlinePlayers) => {
       setOnlinePlayers(players);
-    });
+    };
 
-    // Listen for timeout events
-    newSocket.on('timeout_warning', ({ playerName, secondsRemaining }: { playerName: string; secondsRemaining: number }) => {
-      setToast({
-        message: `⏰ ${playerName === (gameState?.players.find(p => p.id === newSocket.id)?.name) ? 'You have' : `${playerName} has`} ${secondsRemaining} seconds!`,
-        type: 'warning',
-        duration: 3000,
-      });
-    });
+    // Timeout warnings
+    const handleTimeoutWarning = ({ playerName, secondsRemaining }: { playerName: string; secondsRemaining: number }) => {
+      const message = `⏰ ${playerName === (gameState?.players.find(p => p.id === socket.id)?.name) ? 'You have' : `${playerName} has`} ${secondsRemaining} seconds!`;
+      showToast(message, 'warning');
+    };
 
-    newSocket.on('auto_action_taken', ({ playerName, phase }: { playerName: string; phase: 'betting' | 'playing' }) => {
-      setToast({
-        message: `🤖 Auto-${phase === 'betting' ? 'bet' : 'play'} for ${playerName}`,
-        type: 'info',
-        duration: 3000,
-      });
-    });
+    // Auto-action notifications
+    const handleAutoActionTaken = ({ playerName, phase }: { playerName: string; phase: 'betting' | 'playing' }) => {
+      showToast(`🤖 Auto-${phase === 'betting' ? 'bet' : 'play'} for ${playerName}`, 'info');
+    };
 
-    newSocket.on('error', ({ message }) => {
+    // Error events
+    const handleError = ({ message }: { message: string }) => {
       setError(message);
-    });
+    };
 
-    newSocket.on('player_left', ({ gameState }) => {
-      setGameState(gameState);
-    });
+    // Player left
+    const handlePlayerLeft = ({ gameState: newGameState }: { gameState: GameState }) => {
+      setGameState(newGameState);
+    };
 
-    newSocket.on('kicked_from_game', ({ message }) => {
-      setToast({
-        message,
-        type: 'error',
-        duration: 5000,
-      });
-      // Clear session and reset state
+    // Kicked from game
+    const handleKickedFromGame = ({ message }: { message: string }) => {
+      showToast(message, 'error', 5000);
       sessionStorage.removeItem('gameSession');
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
-    });
+    };
 
-    newSocket.on('leave_game_success', () => {
-      // Clear session and reset state
+    // Leave game success
+    const handleLeaveGameSuccess = () => {
       sessionStorage.removeItem('gameSession');
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
-    });
+    };
 
-    newSocket.on('spectator_joined', ({ gameState }: { gameState: GameState }) => {
+    // Spectator joined
+    const handleSpectatorJoined = ({ gameState: newGameState }: { gameState: GameState }) => {
       setIsSpectator(true);
-      setGameId(gameState.id);
-      setGameState(gameState);
-    });
+      setGameId(newGameState.id);
+      setGameState(newGameState);
+    };
 
-    // Bot management listeners
-    newSocket.on('bot_replaced', ({ gameState, replacedPlayerName, botName }: {
+    // Bot management events
+    const handleBotReplaced = ({ gameState: newGameState, replacedPlayerName, botName }: {
       gameState: GameState;
       replacedPlayerName: string;
       botName: string;
     }) => {
-      setGameState(gameState);
-      setToast({
-        message: `${replacedPlayerName} has been replaced by ${botName}`,
-        type: 'info',
-        duration: 3000,
-      });
-      // Respawn bot socket for the new bot
-      spawnBotsForGame(gameState);
-    });
+      setGameState(newGameState);
+      showToast(`${replacedPlayerName} has been replaced by ${botName}`, 'info');
+      spawnBotsForGame(newGameState);
+    };
 
-    newSocket.on('bot_taken_over', ({ gameState, botName, newPlayerName, session }: {
+    const handleBotTakenOver = ({ gameState: newGameState, botName, newPlayerName, session }: {
       gameState: GameState;
       botName: string;
       newPlayerName: string;
       session: PlayerSession | null;
     }) => {
-      setGameState(gameState);
-      setToast({
-        message: `${botName} has been taken over by ${newPlayerName}`,
-        type: 'info',
-        duration: 3000,
-      });
+      setGameState(newGameState);
+      showToast(`${botName} has been taken over by ${newPlayerName}`, 'info');
 
-      // If we're the one taking over, save our session
       if (session) {
         sessionStorage.setItem('gameSession', JSON.stringify(session));
       }
 
-      // Clean up old bot socket if it exists
       const botSocket = botSocketsRef.current.get(botName);
       if (botSocket) {
         botSocket.disconnect();
         botSocketsRef.current.delete(botName);
       }
-    });
+    };
 
-    newSocket.on('replaced_by_bot', ({ message }: {
-      message: string;
-      gameId: string;
-    }) => {
-      setToast({
-        message,
-        type: 'warning',
-        duration: 5000,
-      });
-      // Clear session and reset state
+    const handleReplacedByBot = ({ message }: { message: string; gameId: string }) => {
+      showToast(message, 'warning', 5000);
       sessionStorage.removeItem('gameSession');
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
-    });
+    };
 
-    newSocket.on('game_full_with_bots', ({ gameId, availableBots }: {
+    const handleGameFullWithBots = ({ gameId, availableBots }: {
       gameId: string;
       availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
     }) => {
-      // Store the pending join info to show bot takeover modal
-      // We need to get the player name from somewhere - let's add it to the modal state
       const storedPlayerName = localStorage.getItem('pendingPlayerName') || '';
       setBotTakeoverModal({
         gameId,
         availableBots,
         playerName: storedPlayerName
       });
-    });
-
-    return () => {
-      newSocket.close();
     };
-  }, []);
+
+    // Register all event listeners
+    socket.on('player_disconnected', handlePlayerDisconnected);
+    socket.on('online_players_update', handleOnlinePlayersUpdate);
+    socket.on('timeout_warning', handleTimeoutWarning);
+    socket.on('auto_action_taken', handleAutoActionTaken);
+    socket.on('error', handleError);
+    socket.on('player_left', handlePlayerLeft);
+    socket.on('kicked_from_game', handleKickedFromGame);
+    socket.on('leave_game_success', handleLeaveGameSuccess);
+    socket.on('spectator_joined', handleSpectatorJoined);
+    socket.on('bot_replaced', handleBotReplaced);
+    socket.on('bot_taken_over', handleBotTakenOver);
+    socket.on('replaced_by_bot', handleReplacedByBot);
+    socket.on('game_full_with_bots', handleGameFullWithBots);
+
+    // Cleanup function
+    return () => {
+      socket.off('player_disconnected', handlePlayerDisconnected);
+      socket.off('online_players_update', handleOnlinePlayersUpdate);
+      socket.off('timeout_warning', handleTimeoutWarning);
+      socket.off('auto_action_taken', handleAutoActionTaken);
+      socket.off('error', handleError);
+      socket.off('player_left', handlePlayerLeft);
+      socket.off('kicked_from_game', handleKickedFromGame);
+      socket.off('leave_game_success', handleLeaveGameSuccess);
+      socket.off('spectator_joined', handleSpectatorJoined);
+      socket.off('bot_replaced', handleBotReplaced);
+      socket.off('bot_taken_over', handleBotTakenOver);
+      socket.off('replaced_by_bot', handleReplacedByBot);
+      socket.off('game_full_with_bots', handleGameFullWithBots);
+    };
+  }, [socket, gameState, showToast, setError, setGameState, setGameId, setIsSpectator, botSocketsRef]);
+
+  // Sprint 5 Phase 2: Handle bot spawning on reconnection
+  // This ensures bots continue playing after human player reconnects
+  useEffect(() => {
+    if (gameState && socket && gameState.players.some(p => p.isBot)) {
+      // Check if we just reconnected by looking for showCatchUpModal
+      if (showCatchUpModal) {
+        spawnBotsForGame(gameState);
+      }
+    }
+  }, [showCatchUpModal]); // Trigger when catch-up modal is shown (indicates reconnection)
 
   // URL parameter parsing for auto-join from shared links
   const [autoJoinGameId, setAutoJoinGameId] = useState<string>('');
@@ -620,7 +398,7 @@ function App() {
 
     try {
       const session: PlayerSession = JSON.parse(sessionData);
-      setReconnecting(true);
+      // Reconnecting state is now managed automatically by useSocketConnection hook
       socket.emit('reconnect_to_game', { token: session.token });
     } catch (e) {
       sessionStorage.removeItem('gameSession');
