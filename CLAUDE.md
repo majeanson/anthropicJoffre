@@ -363,11 +363,37 @@ backend/src/
 ├── game/              # Game logic (pure functions)
 │   ├── deck.ts       # Card creation and dealing
 │   ├── logic.ts      # Winner determination, scoring
-│   ├── state.ts      # State transformations (NEW)
-│   └── validation.ts # Input validation (NEW)
+│   ├── state.ts      # State transformations
+│   ├── stateTransitions.ts  # Immutable state functions
+│   └── validation.ts # Input validation
+├── socketHandlers/    # Socket.io event handlers (modular)
+│   ├── lobby.ts      # Game creation, joining, team selection
+│   ├── gameplay.ts   # Betting, card playing, ready states
+│   ├── chat.ts       # Team selection and in-game chat
+│   ├── spectator.ts  # Spectator mode handlers
+│   ├── bots.ts       # Bot management (add, replace, difficulty)
+│   ├── stats.ts      # Player stats, leaderboard, game history
+│   ├── connection.ts # Reconnection and disconnection
+│   └── admin.ts      # Kick player, rematch voting, test utils
+├── utils/            # Utility functions
+│   ├── sessionManager.ts      # Session token management
+│   ├── playerHelpers.ts       # Player finding and validation
+│   ├── botHelpers.ts          # Bot naming and validation
+│   ├── onlinePlayerManager.ts # Online player tracking
+│   ├── timeoutManager.ts      # Action timeout management
+│   └── formatting.ts          # String formatting (bytes, uptime)
+├── api/              # REST API endpoints
+│   └── routes.ts     # Health check, lobby list, stats
 ├── types/            # TypeScript definitions
-│   └── game.ts       # Shared game types
-└── index.ts          # Socket.io event handlers (orchestration)
+│   ├── game.ts       # Shared game types
+│   ├── events.ts     # Socket.io event types
+│   └── result.ts     # Result type for error handling
+├── connection/       # Connection management
+│   └── ConnectionManager.ts  # Socket.io connection lifecycle
+├── middleware/       # Express/Socket middleware
+│   ├── errorBoundary.ts   # Error handling wrapper
+│   └── rateLimiter.ts     # Rate limiting utilities
+└── index.ts          # Main server + orchestration (1,540 lines)
 ```
 
 ### Frontend
