@@ -166,6 +166,7 @@ import {
 } from './validation/schemas';
 import { registerRoutes } from './api/routes';
 import { registerLobbyHandlers } from './socketHandlers/lobby';
+import { registerGameplayHandlers } from './socketHandlers/gameplay';
 
 const app = express();
 const httpServer = createServer(app);
@@ -2129,7 +2130,16 @@ io.on('connection', (socket) => {
       timestamp: Date.now()
     });
   }));
+  */
+  // ============================================================================
+  // End of commented out lobby handlers (continued)
+  // ============================================================================
 
+  // ============================================================================
+  // Original gameplay handlers - COMMENTED OUT (replaced by socketHandlers/gameplay.ts)
+  // Kept for reference during refactoring, will be removed after verification
+  // ============================================================================
+  /*
   // Player ready for next round
   socket.on('player_ready', errorBoundaries.gameAction('player_ready')(({ gameId }: { gameId: string }) => {
     const game = games.get(gameId);
@@ -2417,6 +2427,10 @@ io.on('connection', (socket) => {
       }
     }
   }));
+  */
+  // ============================================================================
+  // End of commented out gameplay handlers
+  // ============================================================================
 
   // Spectator mode - join game as observer
   socket.on('spectate_game', errorBoundaries.gameAction('spectate_game')(({ gameId, spectatorName }: { gameId: string; spectatorName?: string }) => {
@@ -2554,10 +2568,32 @@ io.on('connection', (socket) => {
       socket.emit('leave_game_success', { success: true });
     }
   }));
-  */
+
   // ============================================================================
-  // End of commented out lobby handlers
+  // Gameplay Handlers - Refactored (Sprint 3)
   // ============================================================================
+  // Register all gameplay-related socket handlers from the extracted module
+  registerGameplayHandlers(socket, {
+    games,
+    roundStats,
+    io,
+    rateLimiters,
+    getSocketIP,
+    startPlayerTimeout,
+    clearPlayerTimeout,
+    getHighestBet,
+    isBetHigher,
+    validateBet,
+    validateCardPlay,
+    applyBet,
+    resetBetting,
+    applyCardPlay,
+    resolveTrick,
+    emitGameUpdate,
+    broadcastGameUpdate,
+    logger,
+    errorBoundaries,
+  });
 
   // Kick player handler
   socket.on('kick_player', errorBoundaries.gameAction('kick_player')(async ({ gameId, playerId }: { gameId: string; playerId: string }) => {
