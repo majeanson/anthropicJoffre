@@ -1,19 +1,19 @@
 {
-  "buildDate": "2025-10-31T18:10:00.000Z",
-  "version": "1.0.24",
+  "buildDate": "2025-10-31T18:25:00.000Z",
+  "version": "1.0.25",
   "git": {
-    "commitMessage": "docs(sprint3): Update Sprint 3 summary and architecture docs with Phase 4 results",
-    "commitHash": "f1d0c3a",
-    "commitDate": "2025-10-31 14:08:45 -0400",
+    "commitMessage": "refactor(backend): Sprint 4 Phase 2 - Extract broadcast utilities module",
+    "commitHash": "0b2ac94",
+    "commitDate": "2025-10-31 14:24:20 -0400",
     "branch": "main"
   },
   "futureTodos": [
+    "Sprint 5: Frontend Refactoring - Extract App.tsx handlers to hooks",
     "Refactor E2E Tests - Single-browser architecture for stability",
     "Redis Caching Layer - Further optimize database usage",
     "WebSocket Integration Tests - Backend multi-player test suite",
     "CI/CD Pipeline - Automated deployment and testing",
     "Improve Bot AI - Advanced strategy and card tracking",
-    "Enhanced Leaderboard - Charts, statistics, and CSV export",
-    "Achievements & Badges System - Earn rewards for milestones"
+    "Enhanced Leaderboard - Charts, statistics, and CSV export"
   ]
 }
