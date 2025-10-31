@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-28T21:00:00.000Z",
-  "version": "1.0.11",
+  "buildDate": "2025-10-30T21:49:26.000Z",
+  "version": "1.0.12",
   "git": {
-    "commitMessage": "feat: Add multi-tab support with sessionStorage isolation",
-    "commitHash": "pending",
-    "commitDate": "2025-10-28 21:00:00 +0000",
+    "commitMessage": "test(e2e): Skip unstable multi-page tests and improve test reliability",
+    "commitHash": "a232f60",
+    "commitDate": "2025-10-30 21:49:26 -0400",
     "branch": "main"
   },
   "futureTodos": [
