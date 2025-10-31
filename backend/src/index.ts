@@ -52,6 +52,12 @@ import {
   getTrumpMaster,
   getLuckiestPlayer,
 } from './game/logic';
+import {
+  calculateRoundStatistics,
+  initializeRoundStats,
+  RoundStatsData,
+  RoundStatistics,
+} from './game/roundStatistics';
 import { selectBotCard } from './game/botLogic';
 import {
   validateCardPlay,
@@ -379,38 +385,7 @@ function broadcastOnlinePlayers(): void {
 // Enables sending only changed data instead of full state (80-90% bandwidth reduction)
 const previousGameStates = new Map<string, GameState>();
 
-// Round statistics tracking
-interface RoundStatsData {
-  cardPlayTimes: Map<string, number[]>; // playerId -> array of play times in ms
-  trumpsPlayed: Map<string, number>; // playerId -> count of trump cards played
-  redZerosCollected: Map<string, number>; // playerId -> count of red 0 cards collected
-  brownZerosReceived: Map<string, number>; // playerId -> count of brown 0 cards received
-  trickStartTime: number; // timestamp when trick started
-}
-
-interface RoundStatistics {
-  fastestPlay?: {
-    playerId: string;
-    playerName: string;
-    timeMs: number;
-  };
-  mostAggressiveBidder?: {
-    playerId: string;
-    playerName: string;
-    bidAmount: number;
-  };
-  trumpMaster?: {
-    playerId: string;
-    playerName: string;
-    trumpsPlayed: number;
-  };
-  luckyPlayer?: {
-    playerId: string;
-    playerName: string;
-    reason: string;
-  };
-}
-
+// Round statistics tracking (imported types from game/roundStatistics.ts)
 const roundStats = new Map<string, RoundStatsData>(); // gameId -> stats data
 
 // Timeout configuration
@@ -1090,22 +1065,7 @@ function startNewRound(gameId: string) {
   game.currentPlayerIndex = (game.dealerIndex + 1) % 4;
 
   // Initialize round statistics tracking
-  roundStats.set(gameId, {
-    cardPlayTimes: new Map(),
-    trumpsPlayed: new Map(),
-    redZerosCollected: new Map(),
-    brownZerosReceived: new Map(),
-    trickStartTime: Date.now(),
-  });
-  game.players.forEach(player => {
-    const stats = roundStats.get(gameId);
-    if (stats) {
-      stats.cardPlayTimes.set(player.name, []);
-      stats.trumpsPlayed.set(player.name, 0);
-      stats.redZerosCollected.set(player.name, 0);
-      stats.brownZerosReceived.set(player.name, 0);
-    }
-  });
+  roundStats.set(gameId, initializeRoundStats(game.players));
 
   broadcastGameUpdate(gameId, 'round_started', game);
 
@@ -1197,65 +1157,6 @@ function resolveTrick(gameId: string) {
   }
 }
 
-function calculateRoundStatistics(gameId: string, game: GameState): RoundStatistics | undefined {
-  const stats = roundStats.get(gameId);
-  if (!stats) return undefined;
-
-  const statistics: RoundStatistics = {};
-
-  // 1. Fastest Play - player with fastest average card play time
-  const fastestResult = getFastestPlayer(stats.cardPlayTimes);
-  if (fastestResult) {
-    const player = game.players.find(p => p.name === fastestResult.playerName);
-    if (player) {
-      statistics.fastestPlay = {
-        playerId: player.id,
-        playerName: player.name,
-        timeMs: Math.round(fastestResult.avgTime),
-      };
-    }
-  }
-
-  // 2. Most Aggressive Bidder - highest bet amount
-  if (game.highestBet) {
-    const player = game.players.find(p => p.id === game.highestBet?.playerId);
-    if (player) {
-      statistics.mostAggressiveBidder = {
-        playerId: player.id,
-        playerName: player.name,
-        bidAmount: game.highestBet.amount,
-      };
-    }
-  }
-
-  // 3. Trump Master - player who played most trump cards
-  const trumpMasterResult = getTrumpMaster(stats.trumpsPlayed);
-  if (trumpMasterResult) {
-    const player = game.players.find(p => p.name === trumpMasterResult.playerName);
-    if (player) {
-      statistics.trumpMaster = {
-        playerId: player.id,
-        playerName: player.name,
-        trumpsPlayed: trumpMasterResult.count,
-      };
-    }
-  }
-
-  // 4. Lucky Player - player who won most points with fewest tricks
-  const luckyResult = getLuckiestPlayer(game.players);
-  if (luckyResult) {
-    statistics.luckyPlayer = {
-      playerId: luckyResult.player.id,
-      playerName: luckyResult.player.name,
-      reason: `${luckyResult.pointsPerTrick.toFixed(1)} pts/trick`,
-    };
-  }
-
-  // Clean up stats for this game
-  roundStats.delete(gameId);
-
-  return Object.keys(statistics).length > 0 ? statistics : undefined;
-}
 
 async function endRound(gameId: string) {
   const game = games.get(gameId);
@@ -1273,11 +1174,15 @@ async function endRound(gameId: string) {
   applyRoundScoring(game, scoring);
 
   // 3. Add round statistics to the round history entry
-  const statistics = calculateRoundStatistics(gameId, game);
+  const statsData = roundStats.get(gameId);
+  const statistics = calculateRoundStatistics(statsData, game);
   const lastRound = game.roundHistory[game.roundHistory.length - 1];
   if (lastRound) {
     lastRound.statistics = statistics;
   }
+
+  // Clean up stats after calculation
+  roundStats.delete(gameId);
 
   // Log scoring results
   console.log(`Offensive Team ${scoring.offensiveTeamId} ${scoring.betMade ? 'made' : 'failed'} bet (${scoring.offensiveTeamPoints}/${scoring.betAmount}): ${scoring.offensiveScore > 0 ? '+' : ''}${scoring.offensiveScore}`);
