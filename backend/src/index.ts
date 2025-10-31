@@ -141,6 +141,11 @@ import {
   isSignificantChange,
   GameStateDelta,
 } from './utils/stateDelta';
+import {
+  rateLimiters,
+  startRateLimiterCleanup,
+  getSocketIP,
+} from './utils/rateLimiter';
 
 const app = express();
 const httpServer = createServer(app);
@@ -1864,20 +1869,28 @@ io.on('connection', (socket) => {
 
   // Team selection chat
   socket.on('send_team_selection_chat', errorBoundaries.gameAction('send_team_selection_chat')(({ gameId, message }: { gameId: string; message: string }) => {
-    // Rate limiting: Check if user is sending messages too quickly
-    const lastChatTime = socketRateLimiters.chat.get(socket.id);
-    const now = Date.now();
-    if (lastChatTime && now - lastChatTime < 1000) { // 1 second between messages
-      socket.emit('error', { message: 'Please wait 1 second between messages' });
-      return;
-    }
-    socketRateLimiters.chat.set(socket.id, now);
-
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
       return;
     }
+
+    // Rate limiting: Check per-player rate limit (Sprint 2)
+    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+    const ipAddress = getSocketIP(socket);
+    const rateLimit = rateLimiters.chat.checkLimit(playerName, ipAddress);
+    if (!rateLimit.allowed) {
+      socket.emit('error', {
+        message: 'You are sending messages too fast. Please slow down.',
+      });
+      logger.warn('Rate limit exceeded for send_team_selection_chat', {
+        playerName,
+        ipAddress,
+        gameId,
+      });
+      return;
+    }
+    rateLimiters.chat.recordRequest(playerName, ipAddress);
 
     const player = game.players.find(p => p.id === socket.id);
     if (!player) {
@@ -1908,20 +1921,28 @@ io.on('connection', (socket) => {
 
   // In-game chat (betting, playing, and scoring phases)
   socket.on('send_game_chat', errorBoundaries.gameAction('send_game_chat')(({ gameId, message }: { gameId: string; message: string }) => {
-    // Rate limiting: Check if user is sending messages too quickly
-    const lastChatTime = socketRateLimiters.chat.get(socket.id);
-    const now = Date.now();
-    if (lastChatTime && now - lastChatTime < 1000) { // 1 second between messages
-      socket.emit('error', { message: 'Please wait 1 second between messages' });
-      return;
-    }
-    socketRateLimiters.chat.set(socket.id, now);
-
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
       return;
     }
+
+    // Rate limiting: Check per-player rate limit (Sprint 2)
+    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+    const ipAddress = getSocketIP(socket);
+    const rateLimit = rateLimiters.chat.checkLimit(playerName, ipAddress);
+    if (!rateLimit.allowed) {
+      socket.emit('error', {
+        message: 'You are sending messages too fast. Please slow down.',
+      });
+      logger.warn('Rate limit exceeded for send_game_chat', {
+        playerName,
+        ipAddress,
+        gameId,
+      });
+      return;
+    }
+    rateLimiters.chat.recordRequest(playerName, ipAddress);
 
     const player = game.players.find(p => p.id === socket.id);
     if (!player) {
@@ -2013,6 +2034,23 @@ io.on('connection', (socket) => {
     const game = games.get(gameId);
     if (!game) return;
 
+    // Rate limiting: Check per-player rate limit (Sprint 2)
+    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+    const ipAddress = getSocketIP(socket);
+    const rateLimit = rateLimiters.gameActions.checkLimit(playerName, ipAddress);
+    if (!rateLimit.allowed) {
+      socket.emit('error', {
+        message: 'You are betting too fast. Please wait a moment.',
+      });
+      logger.warn('Rate limit exceeded for place_bet', {
+        playerName,
+        ipAddress,
+        gameId,
+      });
+      return;
+    }
+    rateLimiters.gameActions.recordRequest(playerName, ipAddress);
+
     // VALIDATION - Use pure validation function
     const validation = validateBet(game, socket.id, amount, withoutTrump, skipped);
     if (!validation.success) {
@@ -2090,6 +2128,22 @@ io.on('connection', (socket) => {
 
     const currentPlayer = game.players[game.currentPlayerIndex];
     const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+
+    // Rate limiting: Check per-player rate limit (Sprint 2)
+    const ipAddress = getSocketIP(socket);
+    const rateLimit = rateLimiters.gameActions.checkLimit(playerName, ipAddress);
+    if (!rateLimit.allowed) {
+      socket.emit('error', {
+        message: 'You are playing too fast. Please wait a moment before playing again.',
+      });
+      logger.warn('Rate limit exceeded for play_card', {
+        playerName,
+        ipAddress,
+        gameId,
+      });
+      return;
+    }
+    rateLimiters.gameActions.recordRequest(playerName, ipAddress);
 
     // Log current trick state and player's hand (debugging)
     console.log(`\n🃏 PLAY_CARD - Player: ${playerName} (${socket.id})`);
@@ -3532,6 +3586,13 @@ httpServer.listen(PORT, HOST, async () => {
       console.error('[Cleanup] Error during cleanup:', error);
     }
   }, 3600000); // Run every hour
+
+  // ============= RATE LIMITER CLEANUP =============
+  // Clean up expired rate limit entries every 5 minutes
+  const rateLimiterCleanupInterval = startRateLimiterCleanup();
+  logger.info('Rate limiter cleanup started', {
+    interval: '5 minutes',
+  });
 
   // ============= PERIODIC STATE SNAPSHOTS =============
   // Save game snapshots every 30 seconds for recovery (ONLY when active games exist)
