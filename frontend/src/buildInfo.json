@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-31T20:30:00.000Z",
-  "version": "1.0.26",
+  "buildDate": "2025-10-31T22:00:00.000Z",
+  "version": "1.0.27",
   "git": {
-    "commitMessage": "refactor(frontend): Sprint 5 Phase 2 - Integrate hooks into App.tsx",
-    "commitHash": "b8c514e",
-    "commitDate": "2025-10-31 16:30:00 -0400",
+    "commitMessage": "refactor(frontend): Sprint 5 Phase 3 - Extract bot management to custom hook",
+    "commitHash": "8b75d53",
+    "commitDate": "2025-10-31 18:00:00 -0400",
     "branch": "main"
   },
   "futureTodos": [
