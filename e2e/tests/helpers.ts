@@ -107,19 +107,23 @@ export async function playCard(page: Page, cardIndex: number = 0) {
 
 /**
  * Finds which player currently has their turn.
+ * Uses deadline-based timeout with throttled checking to prevent browser crashes.
  *
  * @param pages - Array of all player page instances
+ * @param timeout - Maximum time to search in milliseconds (default: 5000ms)
  * @returns Index of the player with current turn, or -1 if not found
  */
-export async function findCurrentPlayerIndex(pages: Page[]): Promise<number> {
-  // Try multiple times with increasing waits for multi-browser sync
-  for (let attempt = 0; attempt < 3; attempt++) {
+export async function findCurrentPlayerIndex(pages: Page[], timeout: number = 5000): Promise<number> {
+  const deadline = Date.now() + timeout;
+  const throttleDelay = 300; // Wait between page check attempts to reduce browser load
+
+  while (Date.now() < deadline) {
     // Check pages sequentially to avoid "Target crashed" errors
     for (let i = 0; i < pages.length; i++) {
       try {
         // First try the turn-indicator (shows during active play with countdown)
         const turnIndicator = pages[i].getByTestId('turn-indicator');
-        const hasCountdown = await turnIndicator.isVisible({ timeout: attempt === 0 ? 500 : 2000 });
+        const hasCountdown = await turnIndicator.isVisible({ timeout: 500 });
         if (hasCountdown) {
           const text = await turnIndicator.textContent();
           if (text === 'Your turn') {
@@ -127,7 +131,7 @@ export async function findCurrentPlayerIndex(pages: Page[]): Promise<number> {
           }
         }
       } catch {
-        // Turn indicator might not be visible yet
+        // Turn indicator might not be visible yet, or page crashed - continue
       }
 
       // Also check if current-turn-player shows this player's name
@@ -139,16 +143,16 @@ export async function findCurrentPlayerIndex(pages: Page[]): Promise<number> {
           return i;
         }
       } catch {
-        // Page might not have current-turn-player element yet
+        // Page might not have current-turn-player element yet, or page crashed - continue
       }
     }
 
-    // If not found, wait before retrying
-    if (attempt < 2) {
-      await pages[0].waitForTimeout(1000);
-    }
+    // Throttle between attempts to reduce browser load and prevent crashes
+    await pages[0].waitForTimeout(throttleDelay);
   }
 
+  // Timeout reached without finding current player
+  console.error(`findCurrentPlayerIndex: No current player found within ${timeout}ms timeout`);
   return -1;
 }
 
@@ -356,15 +360,19 @@ export async function enableAutoplayForPlayer(page: Page) {
 
 /**
  * Waits for a bot to make its decision.
+ * Timeout is CI-adaptive: longer in CI environments where bots may be slower.
  *
  * @param page - Page instance to monitor
- * @param timeout - Maximum time to wait (default: 5000ms)
+ * @param timeout - Maximum time to wait (optional, auto-detects CI)
  */
-export async function waitForBotAction(page: Page, timeout: number = 5000) {
+export async function waitForBotAction(page: Page, timeout?: number) {
+  // CI-adaptive timeout: use 15s in CI, 5s locally (unless explicitly overridden)
+  const adaptiveTimeout = timeout ?? (process.env.CI ? 15000 : 5000);
+
   // Wait for either "Waiting for other players" or a state change
   // Use try-catch to prevent timeout errors from failing the test
   try {
-    await page.waitForSelector('text=/Waiting for other players/i', { timeout });
+    await page.waitForSelector('text=/Waiting for other players/i', { timeout: adaptiveTimeout });
   } catch (error) {
     // Timeout is acceptable - bot may have already acted
     // Just wait a bit for UI to update
@@ -546,6 +554,130 @@ export async function playCompleteGame(pages: Page[], botIndices: number[] = [],
 }
 
 /**
+ * Plays a game in segments to prevent memory bloat and browser crashes.
+ * Closes and reinitializes browser context between segments.
+ *
+ * This pattern is essential for marathon tests (10+ rounds) to maintain stability.
+ *
+ * @param browser - Browser instance
+ * @param totalRounds - Total number of rounds to play
+ * @param segmentSize - Rounds per segment before context reset (default: 5)
+ * @param gameConfig - Configuration for game creation (humans vs bots)
+ * @returns Aggregated results from all segments
+ */
+export async function playGameInSegments(
+  browser: any,
+  totalRounds: number,
+  segmentSize: number = 5,
+  gameConfig: {
+    humanPlayers?: number;
+    botPlayers?: number;
+    playerNames?: string[];
+  } = {}
+) {
+  const segments = Math.ceil(totalRounds / segmentSize);
+  const results = {
+    totalRounds: 0,
+    segments: segments,
+    segmentResults: [] as any[],
+    errors: [] as string[]
+  };
+
+  console.log(`\n=== Playing ${totalRounds} rounds in ${segments} segments of ${segmentSize} rounds each ===\n`);
+
+  let previousGameId: string | null = null;
+  let context: any = null;
+  let pages: any[] = [];
+
+  try {
+    for (let segment = 1; segment <= segments; segment++) {
+      const roundsInSegment = Math.min(segmentSize, totalRounds - results.totalRounds);
+      console.log(`\n--- Segment ${segment}/${segments}: Playing ${roundsInSegment} rounds ---`);
+
+      // Close previous context if exists (memory cleanup)
+      if (context) {
+        console.log('Closing previous context to free memory...');
+        await context.close();
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Brief pause for cleanup
+      }
+
+      // Create new game or reconnect to existing one
+      if (segment === 1) {
+        // First segment: create new game
+        if (gameConfig.botPlayers && gameConfig.botPlayers > 0) {
+          const result = await createGameWithBots(browser, gameConfig);
+          context = result.context;
+          pages = result.pages;
+          previousGameId = result.gameId;
+        } else {
+          const result = await createGameWith4Players(browser);
+          context = result.context;
+          pages = result.pages;
+          previousGameId = result.gameId;
+        }
+        console.log(`Game created: ${previousGameId}`);
+      } else {
+        // Subsequent segments: would need reconnection logic
+        // For now, we'll create a new game for each segment
+        // TODO: Implement reconnection for seamless multi-segment games
+        console.warn('Multi-segment reconnection not yet implemented - creating new game');
+        if (gameConfig.botPlayers && gameConfig.botPlayers > 0) {
+          const result = await createGameWithBots(browser, gameConfig);
+          context = result.context;
+          pages = result.pages;
+          previousGameId = result.gameId;
+        } else {
+          const result = await createGameWith4Players(browser);
+          context = result.context;
+          pages = result.pages;
+          previousGameId = result.gameId;
+        }
+      }
+
+      // Play rounds in this segment
+      const segmentStart = Date.now();
+      const botIndices = gameConfig.botPlayers ? Array.from({ length: gameConfig.botPlayers }, (_, i) => i + (gameConfig.humanPlayers || 0)) : [];
+
+      try {
+        await playMultipleRounds(pages, roundsInSegment, botIndices);
+        results.totalRounds += roundsInSegment;
+
+        const segmentDuration = Date.now() - segmentStart;
+        results.segmentResults.push({
+          segment,
+          rounds: roundsInSegment,
+          duration: segmentDuration,
+          avgRoundTime: Math.round(segmentDuration / roundsInSegment / 1000)
+        });
+
+        console.log(`Segment ${segment} completed: ${roundsInSegment} rounds in ${Math.round(segmentDuration / 1000)}s`);
+      } catch (error: any) {
+        const errorMsg = `Segment ${segment} failed: ${error.message}`;
+        console.error(errorMsg);
+        results.errors.push(errorMsg);
+        // Continue to next segment despite error
+      }
+    }
+  } finally {
+    // Cleanup final context
+    if (context) {
+      await context.close();
+    }
+  }
+
+  // Print summary
+  console.log(`\n=== Segmented Game Complete ===`);
+  console.log(`Total rounds played: ${results.totalRounds}/${totalRounds}`);
+  console.log(`Segments completed: ${results.segmentResults.length}/${segments}`);
+  if (results.errors.length > 0) {
+    console.log(`Errors encountered: ${results.errors.length}`);
+    results.errors.forEach(err => console.log(`  - ${err}`));
+  }
+
+  return results;
+}
+
+/**
  * Sets game state via REST API (more reliable than UI interactions).
  * Use this instead of TestPanel UI for manipulating game state in tests.
  *
@@ -591,6 +723,94 @@ export async function setGameStateViaAPI(
   await page.waitForTimeout(500);
 
   return response;
+}
+
+/**
+ * Jumps to a specific round with given scores.
+ * Useful for testing end-game scenarios without playing full game.
+ *
+ * @param page - Page instance
+ * @param gameId - Game ID to manipulate
+ * @param roundNumber - Round number to jump to (note: affects dealer rotation)
+ * @param scores - Team scores to set
+ * @example
+ * // Jump to round 10 with scores near winning condition
+ * await jumpToRound(page, gameId, 10, { team1: 38, team2: 35 });
+ */
+export async function jumpToRound(
+  page: Page,
+  gameId: string,
+  roundNumber: number,
+  scores: { team1: number; team2: number }
+) {
+  console.log(`Jumping to round ${roundNumber} with scores Team1: ${scores.team1}, Team2: ${scores.team2}`);
+
+  // Set scores first
+  await setGameStateViaAPI(page, gameId, {
+    teamScores: scores
+  });
+
+  // Note: Round number manipulation would require backend API support
+  // For now, we can only set scores and let the game continue naturally
+  console.warn('Round number manipulation not yet implemented in backend API');
+
+  return { roundNumber, scores };
+}
+
+/**
+ * Sets scores and advances to a specific phase.
+ * Useful for testing specific phase scenarios.
+ *
+ * @param page - Page instance
+ * @param gameId - Game ID
+ * @param scores - Team scores
+ * @param phase - Phase to advance to ('Betting Phase', 'Playing Phase', 'Scoring Phase')
+ * @example
+ * // Test end-game betting with high scores
+ * await setScoresAndPhase(page, gameId, { team1: 40, team2: 38 }, 'Betting Phase');
+ */
+export async function setScoresAndPhase(
+  page: Page,
+  gameId: string,
+  scores: { team1: number; team2: number },
+  phase: 'Betting Phase' | 'Playing Phase' | 'Scoring Phase'
+) {
+  console.log(`Setting scores to Team1: ${scores.team1}, Team2: ${scores.team2} and phase to '${phase}'`);
+
+  await setGameStateViaAPI(page, gameId, {
+    teamScores: scores,
+    phase
+  });
+
+  // Wait for phase transition to complete
+  await page.waitForSelector(`text=/${phase}/i`, { timeout: 5000 });
+
+  return { scores, phase };
+}
+
+/**
+ * Fast-forwards a game to near-completion state (scores 35-38).
+ * Perfect for testing end-game mechanics quickly.
+ *
+ * @param page - Page instance
+ * @param gameId - Game ID
+ * @example
+ * // Start testing end-game scenarios immediately
+ * await fastForwardToEndGame(page, gameId);
+ */
+export async function fastForwardToEndGame(page: Page, gameId: string) {
+  const nearEndScores = {
+    team1: 35 + Math.floor(Math.random() * 4), // 35-38
+    team2: 35 + Math.floor(Math.random() * 4)  // 35-38
+  };
+
+  console.log(`Fast-forwarding to end-game state: Team1: ${nearEndScores.team1}, Team2: ${nearEndScores.team2}`);
+
+  await setGameStateViaAPI(page, gameId, {
+    teamScores: nearEndScores
+  });
+
+  return nearEndScores;
 }
 
 /**
