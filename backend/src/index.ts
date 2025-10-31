@@ -164,6 +164,7 @@ import {
   spectateGamePayloadSchema,
   leaveSpectatePayloadSchema,
 } from './validation/schemas';
+import { registerRoutes } from './api/routes';
 
 const app = express();
 const httpServer = createServer(app);
@@ -1032,7 +1033,27 @@ function formatUptime(seconds: number): string {
   return parts.join(' ');
 }
 
-// REST endpoints
+// ============================================================================
+// REST API Routes - Refactored (Sprint 3)
+// ============================================================================
+// Register all REST API routes from the extracted module
+registerRoutes(app, {
+  games,
+  gameCreationTimes,
+  io,
+  corsOrigin,
+  allowedOrigins,
+  getGame,
+  emitGameUpdate,
+  formatUptime,
+  formatBytes,
+});
+
+// ============================================================================
+// Original REST endpoints - COMMENTED OUT (replaced by routes.ts)
+// Kept for reference during refactoring, will be removed after verification
+// ============================================================================
+/*
 app.get('/api/health', (req, res) => {
   const poolStats = getPoolStats();
   const cacheStats = queryCache.getStats();
@@ -1635,6 +1656,10 @@ app.get('/api/leaderboard', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
+*/
+// ============================================================================
+// End of commented out REST endpoints
+// ============================================================================
 
 // Socket.io event handlers
 io.on('connection', (socket) => {
