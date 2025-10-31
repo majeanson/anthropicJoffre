@@ -87,9 +87,9 @@ cleanupStaleGames()
 
 ### 4. Query Caching System
 
-**Status**: ✅ Complete
+**Status**: 🚧 Partial - Infrastructure created, integration deferred
 **File**: `backend/src/utils/queryCache.ts`
-**Impact**: 20-100x faster query response times
+**Impact**: Potential 20-100x faster query response times (when integrated)
 
 **Architecture**:
 - **In-memory cache**: Map-based storage with TTL expiration
@@ -108,14 +108,16 @@ CACHE_TTL = {
 }
 ```
 
-**Performance Impact**:
+**Performance Impact** (Projected, not yet measured):
 | Query Type | Before | After | Improvement |
 |------------|--------|-------|-------------|
-| getLeaderboard | ~100ms | <1ms | **100x faster** |
-| getPlayerStats | ~20ms | <1ms | **20x faster** |
-| getRecentGames | ~30ms | <1ms | **30x faster** |
+| getLeaderboard | ~100ms | <1ms (projected) | **100x faster** |
+| getPlayerStats | ~20ms | <1ms (projected) | **20x faster** |
+| getRecentGames | ~30ms | <1ms (projected) | **30x faster** |
 
-**Cache Invalidation Strategy**:
+**Note**: Cache infrastructure created but `withCache()` function not yet integrated into database queries. Integration deferred to low priority (see ROADMAP_2025_Q4.md).
+
+**Cache Invalidation Strategy** (designed, not yet implemented):
 - **updatePlayerStats**: Invalidates player cache + leaderboard
 - **updateRoundStats**: Invalidates player cache + leaderboard
 - **updateGameStats**: Invalidates player cache + leaderboard
@@ -435,15 +437,125 @@ WHERE schemaname = 'public';
 
 ---
 
+## 📅 October 30, 2025 Additions
+
+### REST API Endpoints for Player Stats
+
+**Status**: ✅ Complete
+**Files**: `backend/src/index.ts` (lines 1136-1168)
+**Impact**: Enables HTTP-based stat queries for external integrations
+
+**New Endpoints**:
+1. **`GET /api/stats/:playerName`** - Retrieve individual player statistics
+   - Returns 404 if player not found
+   - JSON response with full player stats (games, ELO, win rate, etc.)
+
+2. **`GET /api/leaderboard`** - Retrieve global leaderboard
+   - Query params: `limit` (default 100), `excludeBots` (default true)
+   - Returns sorted list of top players by ELO
+
+**Implementation**:
+```typescript
+app.get('/api/stats/:playerName', async (req, res) => {
+  const stats = await getPlayerStats(req.params.playerName);
+  if (!stats) return res.status(404).json({ error: 'Player not found' });
+  res.json(stats);
+});
+
+app.get('/api/leaderboard', async (req, res) => {
+  const limit = parseInt(req.query.limit as string) || 100;
+  const excludeBots = req.query.excludeBots !== 'false';
+  const leaderboard = await getLeaderboard(limit, excludeBots);
+  res.json({ players: leaderboard, total: leaderboard.length });
+});
+```
+
+---
+
+### Vite Proxy Configuration
+
+**Status**: ✅ Complete
+**File**: `frontend/vite.config.ts` (lines 8-17)
+**Impact**: Enables frontend to make API requests without CORS issues
+
+**Configuration**:
+```typescript
+server: {
+  port: 5173,
+  proxy: {
+    '/api': {
+      target: 'http://localhost:3000',
+      changeOrigin: true,
+    },
+    '/socket.io': {
+      target: 'http://localhost:3000',
+      ws: true,
+    },
+  },
+}
+```
+
+**Benefits**:
+- Frontend API requests automatically proxied to backend
+- WebSocket connections properly forwarded
+- Eliminates CORS complexity in development
+
+---
+
+### Test API Enhancements
+
+**Status**: ✅ Complete
+**File**: `backend/src/index.ts` (lines 887-929)
+**Impact**: Test endpoint now properly finalizes games and saves stats
+
+**Enhancement**: Added stat-saving logic to `POST /api/__test/set-game-state`:
+- Calls `markGameFinished()` when score >= 41
+- Calculates ELO changes for all human players
+- Updates player stats via `updateGameStats()`
+- Matches natural game completion flow
+
+---
+
+### E2E Test Fix: Player Stats Recording
+
+**Status**: ✅ Complete
+**File**: `e2e/tests/22-game-completion-stats.spec.ts`
+**Impact**: Fixed test design flaw causing false failures
+
+**Issue**: Test created game with custom player name, then fell back to Quick Play with default "You" name, then tried to verify stats for the custom name that was never used.
+
+**Fix**: Simplified test to use Quick Play from the start with consistent "You" player name.
+
+---
+
+### Architecture Decision: WebSocket-Primary Design
+
+**Status**: ✅ Documented
+**Impact**: Clarifies API strategy and prevents architectural drift
+
+**Decision**:
+- **Primary**: WebSocket for live multiplayer game state and real-time events
+- **Secondary**: Database for persistence at round end and game end
+- **Support**: REST API for stats queries, leaderboard, lobby browsing
+- **No architectural shift planned**: REST is supplementary, not replacing WebSocket
+
+**Rationale**:
+- Live multiplayer requires low-latency bidirectional communication (WebSocket)
+- Database ensures stats persist across server restarts
+- REST API enables external integrations and simpler stat queries
+- Maintains existing event-driven architecture
+
+---
+
 ## 🎉 Conclusion
 
-All 12 improvement tasks completed successfully:
+October 2025 improvements summary:
 
 1. ✅ Automated stale game cleanup (already existed)
 2. ✅ Rate limiting for API/Socket.IO (already existed)
 3. ✅ Input sanitization & XSS prevention (NEW)
-4. ✅ Database performance indexes (NEW)
-5. ✅ Query caching system (NEW)
+4. ✅ Database performance indexes (NEW - 8 indexes)
+5. 🚧 Query caching system (PARTIAL - file created, integration deferred)
 6. ✅ React error boundaries (already existed)
 7. ✅ Connection status indicators (already existed)
 8. ✅ Mobile responsiveness fixes (ENHANCED)
@@ -451,12 +563,17 @@ All 12 improvement tasks completed successfully:
 10. ✅ TypeScript strict mode (already enabled)
 11. ✅ Socket.IO integration tests (E2E tests cover this)
 12. ✅ Documentation updates (THIS FILE)
+13. ✅ REST API endpoints (NEW - Oct 30: stats, leaderboard)
+14. ✅ Vite proxy configuration (NEW - Oct 30)
+15. ✅ Test API enhancements (NEW - Oct 30)
+16. ✅ Architecture decisions documented (NEW - Oct 30)
 
 **Performance Metrics**:
-- **Query Speed**: 20-100x improvement for cached queries
-- **Test Coverage**: 131 backend + 22 E2E test files
+- **Query Speed**: 20-100x improvement projected (cache infrastructure ready, integration deferred)
+- **Test Coverage**: 131 backend tests (100%), E2E tests ⏳ (running verification)
 - **Mobile UX**: Cards 25% larger, chat no longer obstructs gameplay
 - **Security**: Comprehensive input sanitization prevents XSS/injection
+- **API**: 9 REST endpoints (2 new: stats, leaderboard)
 
 **Code Quality**:
 - TypeScript strict mode: 100% coverage
@@ -466,5 +583,6 @@ All 12 improvement tasks completed successfully:
 
 ---
 
-*Last Updated: October 28, 2025*
-*Author: Claude Code (Autonomous Development Session)*
+*Last Updated: October 30, 2025*
+*Author: Claude Code (Autonomous Development Sessions)*
+*Recent additions: REST API endpoints, Vite proxy, test enhancements, architecture decisions*

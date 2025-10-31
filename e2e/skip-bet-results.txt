@@ -1,0 +1,212 @@
+
+Running 7 tests using 1 worker
+
+  ✓  1 [chromium] › tests\05-skip-bet.spec.ts:13:7 › Skip Bet Functionality › should allow first player to skip bet (3.2s)
+  ✓  2 [chromium] › tests\05-skip-bet.spec.ts:35:7 › Skip Bet Functionality › should allow all non-dealer players to skip (3.9s)
+  ✘  3 [chromium] › tests\05-skip-bet.spec.ts:61:7 › Skip Bet Functionality › should NOT allow dealer to skip when there are bets (17.4s)
+  ✘  4 [chromium] › tests\05-skip-bet.spec.ts:92:7 › Skip Bet Functionality › should force dealer to bet minimum when all others skip (6.9s)
+  ✘  5 [chromium] › tests\05-skip-bet.spec.ts:123:7 › Skip Bet Functionality › should show validation message when bet is too low (6.6s)
+  ✘  6 [chromium] › tests\05-skip-bet.spec.ts:146:7 › Skip Bet Functionality › should allow dealer to match highest bet (18.7s)
+  ✘  7 [chromium] › tests\05-skip-bet.spec.ts:182:7 › Skip Bet Functionality › should handle skip then bet scenario without infinite rerender (6.4s)
+
+
+  1) [chromium] › tests\05-skip-bet.spec.ts:61:7 › Skip Bet Functionality › should NOT allow dealer to skip when there are bets 
+
+    TimeoutError: locator.waitFor: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: /skip/i }) to be visible[22m
+
+
+      73 |
+      74 |     // Players 4 and 1 skip
+    > 75 |     await pages[3].getByRole('button', { name: /skip/i }).waitFor({ timeout: 15000 });
+         |                                                           ^
+      76 |     await pages[3].getByRole('button', { name: /skip/i }).click();
+      77 |     await pages[0].waitForTimeout(500);
+      78 |
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\05-skip-bet.spec.ts:75:59
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-e4eff-to-skip-when-there-are-bets-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-e4eff-to-skip-when-there-are-bets-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-e4eff-to-skip-when-there-are-bets-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-e4eff-to-skip-when-there-are-bets-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\05-skip-bet-Skip-Bet-Funct-e4eff-to-skip-when-there-are-bets-chromium\error-context.md
+
+  2) [chromium] › tests\05-skip-bet.spec.ts:92:7 › Skip Bet Functionality › should force dealer to bet minimum when all others skip 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByText(/you must bet at least 7/i)
+    Expected: visible
+    Timeout: 2000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 2000ms[22m
+    [2m  - waiting for getByText(/you must bet at least 7/i)[22m
+
+
+      118 |
+      119 |     // Should see message that dealer must bet
+    > 120 |     await expect(page2.getByText(/you must bet at least 7/i)).toBeVisible({ timeout: 2000 });
+          |                                                               ^
+      121 |   });
+      122 |
+      123 |   test('should show validation message when bet is too low', async ({ browser }) => {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\05-skip-bet.spec.ts:120:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-3f183-inimum-when-all-others-skip-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-3f183-inimum-when-all-others-skip-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-3f183-inimum-when-all-others-skip-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-3f183-inimum-when-all-others-skip-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\05-skip-bet-Skip-Bet-Funct-3f183-inimum-when-all-others-skip-chromium\error-context.md
+
+  3) [chromium] › tests\05-skip-bet.spec.ts:123:7 › Skip Bet Functionality › should show validation message when bet is too low 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeDisabled[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("10")').first()
+    Expected: disabled
+    Timeout: 2000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeDisabled" with timeout 2000ms[22m
+    [2m  - waiting for locator('button:has-text("10")').first()[22m
+
+
+      141 |     // Button for 10 should be disabled (non-dealer can't match)
+      142 |     const bet10ButtonP4 = page4.locator('button:has-text("10")').first();
+    > 143 |     await expect(bet10ButtonP4).toBeDisabled({ timeout: 2000 });
+          |                                 ^
+      144 |   });
+      145 |
+      146 |   test('should allow dealer to match highest bet', async ({ browser }) => {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\05-skip-bet.spec.ts:143:33
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-f5b08-message-when-bet-is-too-low-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-f5b08-message-when-bet-is-too-low-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-f5b08-message-when-bet-is-too-low-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-f5b08-message-when-bet-is-too-low-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\05-skip-bet-Skip-Bet-Funct-f5b08-message-when-bet-is-too-low-chromium\error-context.md
+
+  4) [chromium] › tests\05-skip-bet.spec.ts:146:7 › Skip Bet Functionality › should allow dealer to match highest bet 
+
+    TimeoutError: locator.waitFor: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button:has-text("8")').first() to be visible[22m
+
+
+      160 |
+      161 |       const betButton = page.locator(`button:has-text("${betAmounts[i]}")`).first();
+    > 162 |       await betButton.waitFor({ state: 'visible', timeout: 15000 });
+          |                       ^
+      163 |       await betButton.click();
+      164 |
+      165 |       if (i < bettingOrder.length - 1) {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\05-skip-bet.spec.ts:162:23
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-d24db-dealer-to-match-highest-bet-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-d24db-dealer-to-match-highest-bet-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-d24db-dealer-to-match-highest-bet-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-d24db-dealer-to-match-highest-bet-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\05-skip-bet-Skip-Bet-Funct-d24db-dealer-to-match-highest-bet-chromium\error-context.md
+
+  5) [chromium] › tests\05-skip-bet.spec.ts:182:7 › Skip Bet Functionality › should handle skip then bet scenario without infinite rerender 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeDisabled[2m([22m[2m)[22m failed
+
+    Locator:  locator('button:has-text("7")').first()
+    Expected: disabled
+    Received: enabled
+    Timeout:  2000ms
+
+    Call log:
+    [2m  - Expect "toBeDisabled" with timeout 2000ms[22m
+    [2m  - waiting for locator('button:has-text("7")').first()[22m
+    [2m    6 × locator resolved to <button title="Click to copy game link" class="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0 hover:bg-white/30 dark:hover:bg-black/30 transition-all cursor-pointer border border-transparent hover:border-white/50">…</button>[22m
+    [2m      - unexpected value "enabled"[22m
+
+
+      206 |     // Button for 7 should be disabled (must raise)
+      207 |     const bet7ButtonP1 = page1.locator('button:has-text("7")').first();
+    > 208 |     await expect(bet7ButtonP1).toBeDisabled({ timeout: 2000 });
+          |                                ^
+      209 |
+      210 |     // Button for 8 should be enabled (valid raise)
+      211 |     const bet8ButtonP1 = page1.locator('button:has-text("8")').first();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\05-skip-bet.spec.ts:208:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-1d6d1-o-without-infinite-rerender-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-1d6d1-o-without-infinite-rerender-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-1d6d1-o-without-infinite-rerender-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\05-skip-bet-Skip-Bet-Funct-1d6d1-o-without-infinite-rerender-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\05-skip-bet-Skip-Bet-Funct-1d6d1-o-without-infinite-rerender-chromium\error-context.md
+
+  5 failed
+    [chromium] › tests\05-skip-bet.spec.ts:61:7 › Skip Bet Functionality › should NOT allow dealer to skip when there are bets 
+    [chromium] › tests\05-skip-bet.spec.ts:92:7 › Skip Bet Functionality › should force dealer to bet minimum when all others skip 
+    [chromium] › tests\05-skip-bet.spec.ts:123:7 › Skip Bet Functionality › should show validation message when bet is too low 
+    [chromium] › tests\05-skip-bet.spec.ts:146:7 › Skip Bet Functionality › should allow dealer to match highest bet 
+    [chromium] › tests\05-skip-bet.spec.ts:182:7 › Skip Bet Functionality › should handle skip then bet scenario without infinite rerender 
+  2 passed (1.1m)

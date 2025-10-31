@@ -191,7 +191,7 @@ export async function createGameWith4PlayersEnhanced(browser: any) {
     // Start game with verification
     await retryOperation(async () => {
       const startButton = pages[0].getByTestId('start-game-button');
-      await startButton.waitFor({ state: 'enabled', timeout: TIMEOUTS.SHORT });
+      await startButton.waitFor({ state: 'visible', timeout: TIMEOUTS.SHORT });
       await startButton.click();
 
       // Verify game started for all players
@@ -220,10 +220,11 @@ export async function createGameWith4PlayersEnhanced(browser: any) {
 
 /**
  * Enhanced bet placement with stability improvements
+ * Default bets follow betting order: P3(7) → P4(8) → P1(9) → P2(10)
  */
 export async function placeAllBetsEnhanced(
   pages: Page[],
-  bets: number[] = [9, 9, 7, 8],
+  bets: number[] = [9, 10, 7, 8],
   withoutTrump: boolean[] = [false, false, false, false]
 ) {
   const bettingOrder = [2, 3, 0, 1]; // P3, P4, P1, P2 (betting order)
@@ -266,7 +267,7 @@ export async function placeAllBetsEnhanced(
         : new RegExp(`Place Bet: ${betAmount}`);
 
       const placeBetButton = page.getByRole('button', { name: placeBetPattern });
-      await placeBetButton.waitFor({ state: 'enabled', timeout: TIMEOUTS.SHORT });
+      await placeBetButton.waitFor({ state: 'visible', timeout: TIMEOUTS.SHORT });
       await placeBetButton.click();
 
       // Verify bet was placed

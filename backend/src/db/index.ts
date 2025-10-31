@@ -527,38 +527,42 @@ export const getPlayerGameHistory = async (playerName: string, limit: number = 2
  * Returns all rounds with full trick-by-trick history
  */
 export const getGameReplayData = async (gameId: string) => {
-  const text = `
-    SELECT
-      game_id,
-      winning_team,
-      team1_score,
-      team2_score,
-      rounds,
-      player_names,
-      player_teams,
-      round_history,
-      trump_suit,
-      game_duration_seconds,
-      is_bot_game,
-      created_at,
-      finished_at
-    FROM game_history
-    WHERE game_id = $1 AND is_finished = TRUE
-  `;
-  const result = await query(text, [gameId]);
+  const cacheKey = `game_replay:${gameId}`;
 
-  if (result.rows.length === 0) {
-    return null;
-  }
+  return withCache(cacheKey, CACHE_TTL.GAME_REPLAY, async () => {
+    const text = `
+      SELECT
+        game_id,
+        winning_team,
+        team1_score,
+        team2_score,
+        rounds,
+        player_names,
+        player_teams,
+        round_history,
+        trump_suit,
+        game_duration_seconds,
+        is_bot_game,
+        created_at,
+        finished_at
+      FROM game_history
+      WHERE game_id = $1 AND is_finished = TRUE
+    `;
+    const result = await query(text, [gameId]);
 
-  const game = result.rows[0];
+    if (result.rows.length === 0) {
+      return null;
+    }
 
-  // Parse round_history from JSONB
-  if (typeof game.round_history === 'string') {
-    game.round_history = JSON.parse(game.round_history);
-  }
+    const game = result.rows[0];
 
-  return game;
+    // Parse round_history from JSONB
+    if (typeof game.round_history === 'string') {
+      game.round_history = JSON.parse(game.round_history);
+    }
+
+    return game;
+  });
 };
 
 /**

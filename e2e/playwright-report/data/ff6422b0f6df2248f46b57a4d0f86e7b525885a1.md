@@ -1,0 +1,92 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - button "KVG15Z" [ref=e7] [cursor=pointer]:
+      - paragraph [ref=e8]: KVG15Z
+    - paragraph [ref=e10]: R1
+    - generic [ref=e11]:
+      - generic [ref=e12]: "Team 1: 0 Team 2: 0"
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: T1
+        - paragraph [ref=e15]: "0"
+      - generic [ref=e16]: ":"
+      - generic [ref=e17]:
+        - paragraph [ref=e18]: T2
+        - paragraph [ref=e19]: "0"
+    - generic [ref=e20]:
+      - button "💬 Chat" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 💬
+        - generic [ref=e23]: Chat
+      - button "🏆 Stats" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: 🏆
+        - generic [ref=e26]: Stats
+      - button "🤖 Bots (0/3)" [ref=e27] [cursor=pointer]:
+        - generic [ref=e28]: 🤖
+        - generic [ref=e29]: Bots (0/3)
+      - button "🎮 Manual" [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]: 🎮
+        - generic [ref=e32]: Manual
+      - button "☀️ Light" [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: ☀️
+        - generic [ref=e35]: Light
+      - button "🔊 On" [ref=e36] [cursor=pointer]:
+        - generic [ref=e37]: 🔊
+        - generic [ref=e38]: "On"
+      - button "🚪 Leave" [ref=e39] [cursor=pointer]:
+        - generic [ref=e40]: 🚪
+        - generic [ref=e41]: Leave
+  - generic [ref=e42]:
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - heading "Team 1" [level=3] [ref=e47]
+        - paragraph [ref=e48]: +0 pts
+      - generic [ref=e49]:
+        - generic [ref=e51]: "Waiting for: Player 2"
+        - paragraph [ref=e53]: 🎲 9
+        - generic [ref=e54]:
+          - paragraph
+      - generic [ref=e55]:
+        - heading "Team 2" [level=3] [ref=e56]
+        - paragraph [ref=e57]: +0 pts
+    - generic [ref=e60]:
+      - generic [ref=e65]: Player 1 (You)
+      - generic [ref=e67]: Player 2
+      - generic [ref=e72]: Player 3
+      - generic [ref=e80]: Player 4
+    - generic [ref=e81]:
+      - paragraph [ref=e84]: Waiting for first card from Player 2...
+      - generic [ref=e91]:
+        - button "1 red emblem 1" [disabled] [ref=e93]:
+          - generic [ref=e94]: "1"
+          - img "red emblem" [ref=e95]
+          - generic [ref=e96]: "1"
+        - button "2 red emblem 2" [disabled] [ref=e98]:
+          - generic [ref=e99]: "2"
+          - img "red emblem" [ref=e100]
+          - generic [ref=e101]: "2"
+        - button "3 red emblem 3" [disabled] [ref=e103]:
+          - generic [ref=e104]: "3"
+          - img "red emblem" [ref=e105]
+          - generic [ref=e106]: "3"
+        - button "brown bon -2" [disabled] [ref=e108]:
+          - img "brown bon" [ref=e109]
+          - generic [ref=e110]: "-2"
+        - button "5 brown emblem 5" [disabled] [ref=e112]:
+          - generic [ref=e113]: "5"
+          - img "brown emblem" [ref=e114]
+          - generic [ref=e115]: "5"
+        - button "6 brown emblem 6" [disabled] [ref=e117]:
+          - generic [ref=e118]: "6"
+          - img "brown emblem" [ref=e119]
+          - generic [ref=e120]: "6"
+        - button "3 green emblem 3" [disabled] [ref=e122]:
+          - generic [ref=e123]: "3"
+          - img "green emblem" [ref=e124]
+          - generic [ref=e125]: "3"
+        - button "4 green emblem 4" [disabled] [ref=e127]:
+          - generic [ref=e128]: "4"
+          - img "green emblem" [ref=e129]
+          - generic [ref=e130]: "4"
+```

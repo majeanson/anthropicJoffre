@@ -884,6 +884,50 @@ app.post('/api/__test/set-game-state', express.json(), (req, res) => {
         const winningTeam = game.teamScores.team1 >= 41 ? 1 : 2;
         console.log(`TEST API: Game over triggered, Team ${winningTeam} wins`);
 
+        // Save stats for all human players (same logic as endRound)
+        (async () => {
+          try {
+            await markGameFinished(gameId, winningTeam);
+            console.log(`TEST API: Game ${gameId} marked as finished, Team ${winningTeam} won`);
+
+            const humanPlayers = game.players.filter(p => !p.isBot);
+            const createdAtMs = gameCreationTimes.get(gameId) || Date.now();
+            const gameDurationMinutes = Math.floor((Date.now() - createdAtMs) / 1000 / 60);
+
+            for (const player of humanPlayers) {
+              const won = player.teamId === winningTeam;
+              let currentStats = await getPlayerStats(player.name);
+              const currentElo = currentStats?.elo_rating || 1200;
+
+              const opposingTeam = humanPlayers.filter(p => p.teamId !== player.teamId);
+              const opponentElos = await Promise.all(
+                opposingTeam.map(async (opp) => {
+                  const stats = await getPlayerStats(opp.name);
+                  return stats?.elo_rating || 1200;
+                })
+              );
+              const avgOpponentElo = opponentElos.length > 0
+                ? opponentElos.reduce((sum, elo) => sum + elo, 0) / opponentElos.length
+                : 1200;
+
+              const eloChange = calculateEloChange(currentElo, avgOpponentElo, won);
+              await updateGameStats(
+                player.name,
+                {
+                  won,
+                  gameRounds: game.roundNumber,
+                  gameDurationMinutes,
+                },
+                eloChange
+              );
+
+              console.log(`TEST API: Updated game stats for ${player.name}: ${won ? 'WIN' : 'LOSS'}, ELO ${eloChange > 0 ? '+' : ''}${eloChange}`);
+            }
+          } catch (error) {
+            console.error('TEST API: Error finalizing game:', error);
+          }
+        })();
+
         // Emit game_over event
         io.to(game.id).emit('game_over', {
           winningTeam,
@@ -1130,6 +1174,40 @@ app.get('/api/players/online', async (req, res) => {
   } catch (error) {
     console.error('Error fetching online players:', error);
     res.status(500).json({ error: 'Failed to fetch online players' });
+  }
+});
+
+// Get player statistics
+app.get('/api/stats/:playerName', async (req, res) => {
+  try {
+    const { playerName } = req.params;
+    const stats = await getPlayerStats(playerName);
+
+    if (!stats) {
+      return res.status(404).json({ error: 'Player not found' });
+    }
+
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching player stats:', error);
+    res.status(500).json({ error: 'Failed to fetch player stats' });
+  }
+});
+
+// Get global leaderboard
+app.get('/api/leaderboard', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 100;
+    const excludeBots = req.query.excludeBots !== 'false'; // Default to true
+
+    const leaderboard = await getLeaderboard(limit, excludeBots);
+    res.json({
+      players: leaderboard,
+      total: leaderboard.length,
+    });
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({ error: 'Failed to fetch leaderboard' });
   }
 });
 

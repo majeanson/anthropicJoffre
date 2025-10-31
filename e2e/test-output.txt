@@ -1,282 +1,48 @@
+==========================================
+E2E Test Suite with Safety Checks
+==========================================
+
+Checking TypeScript in Backend...
+✅ Backend TypeScript check passed!
+Checking TypeScript in Frontend...
+✅ Frontend TypeScript check passed!
+
+Checking Backend at http://localhost:3000/api/health...
+  Waiting for Backend... (attempt 1/30)
+  Waiting for Backend... (attempt 2/30)
+  Waiting for Backend... (attempt 3/30)
+  Waiting for Backend... (attempt 4/30)
+  Waiting for Backend... (attempt 5/30)
+  Waiting for Backend... (attempt 6/30)
+  Waiting for Backend... (attempt 7/30)
+  Waiting for Backend... (attempt 8/30)
+  Waiting for Backend... (attempt 9/30)
+  Waiting for Backend... (attempt 10/30)
+  Waiting for Backend... (attempt 11/30)
+  Waiting for Backend... (attempt 12/30)
+  Waiting for Backend... (attempt 13/30)
+  Waiting for Backend... (attempt 14/30)
+  Waiting for Backend... (attempt 15/30)
+  Waiting for Backend... (attempt 16/30)
+  Waiting for Backend... (attempt 17/30)
+  Waiting for Backend... (attempt 18/30)
+  Waiting for Backend... (attempt 19/30)
+  Waiting for Backend... (attempt 20/30)
+  Waiting for Backend... (attempt 21/30)
+  Waiting for Backend... (attempt 22/30)
+  Waiting for Backend... (attempt 23/30)
+  Waiting for Backend... (attempt 24/30)
+  Waiting for Backend... (attempt 25/30)
+  Waiting for Backend... (attempt 26/30)
+  Waiting for Backend... (attempt 27/30)
+  Waiting for Backend... (attempt 28/30)
+  Waiting for Backend... (attempt 29/30)
+  Waiting for Backend... (attempt 30/30)
+❌ Backend failed to start after 30 seconds
+
+ERROR: Backend server is not running!
+
+Please start the backend server first:
+  cd backend
+  npm run dev
 
-> trick-card-game-e2e@1.0.0 test:e2e
-> playwright test
-
-
-Running 51 tests using 1 worker
-
-[1A[2K[1/51] [chromium] › tests\01-lobby.spec.ts:4:7 › Lobby and Player Joining › should display lobby with create and join options
-[1A[2K[2/51] [chromium] › tests\01-lobby.spec.ts:15:7 › Lobby and Player Joining › should allow player to create a game
-[1A[2K[3/51] [chromium] › tests\01-lobby.spec.ts:40:7 › Lobby and Player Joining › should allow multiple players to join a game
-[1A[2K[4/51] [chromium] › tests\01-lobby.spec.ts:97:7 › Lobby and Player Joining › should show error for invalid game ID
-[1A[2K[5/51] [chromium] › tests\01-lobby.spec.ts:109:7 › Lobby and Player Joining › should not allow 5th player to join
-[1A[2K[6/51] [chromium] › tests\02-betting.spec.ts:44:7 › Betting Phase › should show betting phase after 4 players join
-[1A[2K[7/51] [chromium] › tests\02-betting.spec.ts:55:7 › Betting Phase › should display bet amount selector (7-12)
-[1A[2K[8/51] [chromium] › tests\02-betting.spec.ts:71:7 › Betting Phase › should allow selecting different bet amounts
-[1A[2K[9/51] [chromium] › tests\02-betting.spec.ts:91:7 › Betting Phase › should allow selecting "without trump" option
-[1A[2K[10/51] [chromium] › tests\02-betting.spec.ts:105:7 › Betting Phase › should show all players and their bet status
-[1A[2K[11/51] [chromium] › tests\02-betting.spec.ts:123:7 › Betting Phase › should submit bet and show waiting state
-[1A[2K[12/51] [chromium] › tests\02-betting.spec.ts:144:7 › Betting Phase › should show "No Trump" indicator for without-trump bets
-[1A[2K[13/51] [chromium] › tests\02-betting.spec.ts:159:7 › Betting Phase › should transition to playing phase when all bets are placed
-[1A[2K[14/51] [chromium] › tests\02-betting.spec.ts:179:7 › Betting Phase › should correctly identify highest bidder
-[1A[2K[15/51] [chromium] › tests\03-playing.spec.ts:70:7 › Card Playing Phase › should display player hands after betting
-[1A[2K[16/51] [chromium] › tests\03-playing.spec.ts:85:7 › Card Playing Phase › should show current trick area
-[1A[2K[17/51] [chromium] › tests\03-playing.spec.ts:94:7 › Card Playing Phase › should show score board with team scores
-[1A[2K[18/51] [chromium] › tests\03-playing.spec.ts:107:7 › Card Playing Phase › should show player info (cards left, tricks won)
-[1A[2K[19/51] [chromium] › tests\03-playing.spec.ts:127:7 › Card Playing Phase › should indicate whose turn it is
-[1A[2K[20/51] [chromium] › tests\03-playing.spec.ts:140:7 › Card Playing Phase › should disable cards when not player turn
-[1A[2K  1) [chromium] › tests\03-playing.spec.ts:140:7 › Card Playing Phase › should disable cards when not player turn 
-
-    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
-
-    Locator: getByText(/waiting for other players/i)
-    Expected: visible
-    Timeout: 5000ms
-    Error: element(s) not found
-
-    Call log:
-    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
-    [2m  - waiting for getByText(/waiting for other players/i)[22m
-
-
-      155 |     for (let i = 0; i < 4; i++) {
-      156 |       if (i !== currentPlayerIndex) {
-    > 157 |         await expect(pages[i].getByText(/waiting for other players/i)).toBeVisible();
-          |                                                                        ^
-      158 |       }
-      159 |     }
-      160 |
-        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\03-playing.spec.ts:157:72
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\03-playing-Card-Playing-Ph-e2281--cards-when-not-player-turn-chromium\test-failed-3.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\03-playing-Card-Playing-Ph-e2281--cards-when-not-player-turn-chromium\test-failed-4.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\03-playing-Card-Playing-Ph-e2281--cards-when-not-player-turn-chromium\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\03-playing-Card-Playing-Ph-e2281--cards-when-not-player-turn-chromium\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results\03-playing-Card-Playing-Ph-e2281--cards-when-not-player-turn-chromium\error-context.md
-
-
-[1A[2K[21/51] [chromium] › tests\03-playing.spec.ts:164:7 › Card Playing Phase › should allow current player to play a card
-[1A[2K[22/51] [chromium] › tests\03-playing.spec.ts:188:7 › Card Playing Phase › should set trump suit from first card played
-[1A[2K[23/51] [chromium] › tests\03-playing.spec.ts:209:7 › Card Playing Phase › should complete a full trick with 4 cards
-[1A[2K[24/51] [chromium] › tests\03-playing.spec.ts:240:7 › Card Playing Phase › should decrease card count after playing
-[1A[2K[25/51] [chromium] › tests\03-playing.spec.ts:273:7 › Card Playing Phase › should show special card indicators (+5 for Red 0, -2 for Brown 0)
-[1A[2K[26/51] [chromium] › tests\04-game-flow.spec.ts:5:7 › Game Flow and Scoring › should complete a full round and show scoring phase
-[1A[2K  2) [chromium] › tests\04-game-flow.spec.ts:5:7 › Game Flow and Scoring › should complete a full round and show scoring phase 
-
-    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
-    Call log:
-    [2m  - waiting for locator('text=/round.*complete/i') to be visible[22m
-
-
-       at helpers.ts:129
-
-      127 |
-      128 |   // Wait for scoring phase to appear
-    > 129 |   await pages[0].waitForSelector('text=/round.*complete/i', { timeout: 10000 });
-          |                  ^
-      130 | }
-      131 |
-        at playFullRound (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:129:18)
-        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\04-game-flow.spec.ts:15:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-438f0-ound-and-show-scoring-phase-chromium\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-438f0-ound-and-show-scoring-phase-chromium\test-failed-3.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-438f0-ound-and-show-scoring-phase-chromium\test-failed-4.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-438f0-ound-and-show-scoring-phase-chromium\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results\04-game-flow-Game-Flow-and-438f0-ound-and-show-scoring-phase-chromium\error-context.md
-
-
-[1A[2K[27/51] [chromium] › tests\04-game-flow.spec.ts:27:7 › Game Flow and Scoring › should award points when bet is met
-[1A[2K  3) [chromium] › tests\04-game-flow.spec.ts:27:7 › Game Flow and Scoring › should award points when bet is met 
-
-    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
-    Call log:
-    [2m  - waiting for locator('text=/round.*complete/i') to be visible[22m
-
-
-       at helpers.ts:129
-
-      127 |
-      128 |   // Wait for scoring phase to appear
-    > 129 |   await pages[0].waitForSelector('text=/round.*complete/i', { timeout: 10000 });
-          |                  ^
-      130 | }
-      131 |
-        at playFullRound (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:129:18)
-        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\04-game-flow.spec.ts:39:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-523d4-ward-points-when-bet-is-met-chromium\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-523d4-ward-points-when-bet-is-met-chromium\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-523d4-ward-points-when-bet-is-met-chromium\test-failed-3.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-523d4-ward-points-when-bet-is-met-chromium\test-failed-4.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results\04-game-flow-Game-Flow-and-523d4-ward-points-when-bet-is-met-chromium\error-context.md
-
-
-[1A[2K[28/51] [chromium] › tests\04-game-flow.spec.ts:54:7 › Game Flow and Scoring › should deduct points when bet is not met
-[1A[2K  4) [chromium] › tests\04-game-flow.spec.ts:54:7 › Game Flow and Scoring › should deduct points when bet is not met 
-
-    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
-    Call log:
-    [2m  - waiting for locator('text=/round.*complete/i') to be visible[22m
-
-
-       at helpers.ts:129
-
-      127 |
-      128 |   // Wait for scoring phase to appear
-    > 129 |   await pages[0].waitForSelector('text=/round.*complete/i', { timeout: 10000 });
-          |                  ^
-      130 | }
-      131 |
-        at playFullRound (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:129:18)
-        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\04-game-flow.spec.ts:64:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-a572e--points-when-bet-is-not-met-chromium\test-failed-3.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-a572e--points-when-bet-is-not-met-chromium\test-failed-4.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-a572e--points-when-bet-is-not-met-chromium\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-a572e--points-when-bet-is-not-met-chromium\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results\04-game-flow-Game-Flow-and-a572e--points-when-bet-is-not-met-chromium\error-context.md
-
-
-[1A[2K[29/51] [chromium] › tests\04-game-flow.spec.ts:77:7 › Game Flow and Scoring › should double points for "without trump" bets
-[1A[2K  5) [chromium] › tests\04-game-flow.spec.ts:77:7 › Game Flow and Scoring › should double points for "without trump" bets 
-
-    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
-    Call log:
-    [2m  - waiting for locator('text=/round.*complete/i') to be visible[22m
-
-
-       at helpers.ts:129
-
-      127 |
-      128 |   // Wait for scoring phase to appear
-    > 129 |   await pages[0].waitForSelector('text=/round.*complete/i', { timeout: 10000 });
-          |                  ^
-      130 | }
-      131 |
-        at playFullRound (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:129:18)
-        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\04-game-flow.spec.ts:87:5
-
-    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-6fdb2-ints-for-without-trump-bets-chromium\test-failed-2.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-6fdb2-ints-for-without-trump-bets-chromium\test-failed-1.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-6fdb2-ints-for-without-trump-bets-chromium\test-failed-4.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
-    test-results\04-game-flow-Game-Flow-and-6fdb2-ints-for-without-trump-bets-chromium\test-failed-3.png
-    ────────────────────────────────────────────────────────────────────────────────────────────────
-
-    Error Context: test-results\04-game-flow-Game-Flow-and-6fdb2-ints-for-without-trump-bets-chromium\error-context.md
-
-
-[1A[2K[30/51] [chromium] › tests\04-game-flow.spec.ts:95:7 › Game Flow and Scoring › should start new round after scoring
-[1A[2K  6) [chromium] › tests\04-game-flow.spec.ts:95:7 › Game Flow and Scoring › should start new round after scoring 
-
-    Error: worker process exited unexpectedly (code=3221225794, signal=null)
-
-
-[1A[2K[31/51] [chromium] › tests\04-game-flow.spec.ts:117:7 › Game Flow and Scoring › should end game when a team reaches 41 points
-[1A[2K[32/51] [chromium] › tests\04-game-flow.spec.ts:124:7 › Game Flow and Scoring › should show game over screen with winner
-[1A[2K[33/51] [chromium] › tests\04-game-flow.spec.ts:130:7 › Game Flow and Scoring › should display trick winner correctly
-[1A[2K[34/51] [chromium] › tests\04-game-flow.spec.ts:146:7 › Game Flow and Scoring › should track tricks won for each player
-[1A[2K[35/51] [chromium] › tests\04-game-flow.spec.ts:183:7 › Game Flow and Scoring › should show correct card counts as game progresses
-[1A[2K[36/51] [chromium] › tests\05-skip-bet.spec.ts:5:7 › Skip Bet Functionality › should allow first player to skip bet
-[1A[2K  7) [chromium] › tests\05-skip-bet.spec.ts:5:7 › Skip Bet Functionality › should allow first player to skip bet 
-
-    Error: worker process exited unexpectedly (code=3221225794, signal=null)
-
-
-[1A[2K[37/51] [chromium] › tests\05-skip-bet.spec.ts:29:7 › Skip Bet Functionality › should allow all non-dealer players to skip
-[1A[2K[38/51] [chromium] › tests\05-skip-bet.spec.ts:55:7 › Skip Bet Functionality › should NOT allow dealer to skip when there are bets
-[1A[2K[39/51] [chromium] › tests\05-skip-bet.spec.ts:86:7 › Skip Bet Functionality › should restart betting when all 4 players skip
-[1A[2K[40/51] [chromium] › tests\05-skip-bet.spec.ts:114:7 › Skip Bet Functionality › should show validation message when bet is too low
-[1A[2K[41/51] [chromium] › tests\05-skip-bet.spec.ts:137:7 › Skip Bet Functionality › should allow dealer to match highest bet
-[1A[2K[42/51] [chromium] › tests\05-skip-bet.spec.ts:173:7 › Skip Bet Functionality › should handle skip then bet scenario without infinite rerender
-[1A[2K[43/51] [chromium] › tests\06-validation.spec.ts:6:9 › Validation Feedback › Team Selection Validation › should disable Start Game when teams are unbalanced
-[1A[2K  8) [chromium] › tests\06-validation.spec.ts:6:9 › Validation Feedback › Team Selection Validation › should disable Start Game when teams are unbalanced 
-
-    Error: worker process exited unexpectedly (code=3221225794, signal=null)
-
-
-[1A[2K[44/51] [chromium] › tests\06-validation.spec.ts:47:9 › Validation Feedback › Team Selection Validation › should show message when teams are unbalanced (3 vs 1)
-[1A[2K[45/51] [chromium] › tests\06-validation.spec.ts:68:9 › Validation Feedback › Betting Phase Validation › should disable Place Bet button when bet is too low
-[1A[2K[46/51] [chromium] › tests\06-validation.spec.ts:95:9 › Validation Feedback › Betting Phase Validation › should show validation message explaining bet requirements
-[1A[2K[47/51] [chromium] › tests\06-validation.spec.ts:122:9 › Validation Feedback › Betting Phase Validation › should show dealer indicator during betting
-[1A[2K[48/51] [chromium] › tests\06-validation.spec.ts:136:9 › Validation Feedback › Playing Phase Validation › should show validation message when trying to play wrong suit
-[1A[2K[49/51] [chromium] › tests\06-validation.spec.ts:181:9 › Validation Feedback › Playing Phase Validation › should visually disable unplayable cards
-[1A[2K[50/51] [chromium] › tests\06-validation.spec.ts:227:9 › Validation Feedback › Playing Phase Validation › should show which player we are waiting for
-[1A[2K[51/51] [chromium] › tests\07-full-game.spec.ts:12:7 › Full Game Flow › should play through a complete game with predetermined actions
-[1A[2K  9) [chromium] › tests\07-full-game.spec.ts:12:7 › Full Game Flow › should play through a complete game with predetermined actions 
-
-    Error: worker process exited unexpectedly (code=3221225794, signal=null)
-
-
-[1A[2K  9 failed
-    [chromium] › tests\03-playing.spec.ts:140:7 › Card Playing Phase › should disable cards when not player turn 
-    [chromium] › tests\04-game-flow.spec.ts:5:7 › Game Flow and Scoring › should complete a full round and show scoring phase 
-    [chromium] › tests\04-game-flow.spec.ts:27:7 › Game Flow and Scoring › should award points when bet is met 
-    [chromium] › tests\04-game-flow.spec.ts:54:7 › Game Flow and Scoring › should deduct points when bet is not met 
-    [chromium] › tests\04-game-flow.spec.ts:77:7 › Game Flow and Scoring › should double points for "without trump" bets 
-    [chromium] › tests\04-game-flow.spec.ts:95:7 › Game Flow and Scoring › should start new round after scoring 
-    [chromium] › tests\05-skip-bet.spec.ts:5:7 › Skip Bet Functionality › should allow first player to skip bet 
-    [chromium] › tests\06-validation.spec.ts:6:9 › Validation Feedback › Team Selection Validation › should disable Start Game when teams are unbalanced 
-    [chromium] › tests\07-full-game.spec.ts:12:7 › Full Game Flow › should play through a complete game with predetermined actions 
-  18 did not run
-  24 passed (3.1m)
-
-[36m  Serving HTML report at http://localhost:60889. Press Ctrl+C to quit.[39m

@@ -1,0 +1,112 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e4]:
+    - generic [ref=e5]: ℹ
+    - generic [ref=e6]: 🤖 Auto-bet for Player 1
+    - button "Close" [ref=e7] [cursor=pointer]: ×
+  - generic [ref=e8]:
+    - generic [ref=e11]:
+      - button "0RAR2" [ref=e12] [cursor=pointer]:
+        - paragraph [ref=e13]: 0RAR2
+      - paragraph [ref=e15]: R1
+      - generic [ref=e16]:
+        - generic [ref=e17]: "Team 1: 0 Team 2: 0"
+        - generic [ref=e18]:
+          - paragraph [ref=e19]: T1
+          - paragraph [ref=e20]: "0"
+        - generic [ref=e21]: ":"
+        - generic [ref=e22]:
+          - paragraph [ref=e23]: T2
+          - paragraph [ref=e24]: "0"
+      - generic [ref=e25]:
+        - button "💬 Chat" [ref=e26] [cursor=pointer]:
+          - generic [ref=e27]: 💬
+          - generic [ref=e28]: Chat
+        - button "🏆 Stats" [ref=e29] [cursor=pointer]:
+          - generic [ref=e30]: 🏆
+          - generic [ref=e31]: Stats
+        - button "🤖 Bots (0/3)" [ref=e32] [cursor=pointer]:
+          - generic [ref=e33]: 🤖
+          - generic [ref=e34]: Bots (0/3)
+        - button "🎮 Manual" [ref=e35] [cursor=pointer]:
+          - generic [ref=e36]: 🎮
+          - generic [ref=e37]: Manual
+        - button "☀️ Light" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: ☀️
+          - generic [ref=e40]: Light
+        - button "🔊 On" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: 🔊
+          - generic [ref=e43]: "On"
+        - button "🚪 Leave" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: 🚪
+          - generic [ref=e46]: Leave
+    - generic [ref=e47]:
+      - generic [ref=e50]:
+        - generic [ref=e51]:
+          - heading "Team 1" [level=3] [ref=e52]
+          - paragraph [ref=e53]: +0 pts
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: "Waiting for: Player 1"
+            - generic [ref=e57]: ⏱️ 57s
+          - paragraph [ref=e59]: 🎲 7
+          - paragraph [ref=e61]: green
+        - generic [ref=e62]:
+          - heading "Team 2" [level=3] [ref=e63]
+          - paragraph [ref=e64]: +0 pts
+      - generic [ref=e67]:
+        - generic [ref=e72]: Player 1 (You)
+        - generic [ref=e73]:
+          - generic [ref=e74]: Bot 1
+          - button "4 green emblem 4" [ref=e76]:
+            - generic [ref=e77]: "4"
+            - img "green emblem" [ref=e78]
+            - generic [ref=e79]: "4"
+        - generic [ref=e80]:
+          - generic [ref=e81]: Bot 2
+          - button "0 green emblem 0" [ref=e83]:
+            - generic [ref=e84]: "0"
+            - img "green emblem" [ref=e85]
+            - generic [ref=e86]: "0"
+        - generic [ref=e87]:
+          - button "6 green emblem 6" [ref=e89]:
+            - generic [ref=e90]: "6"
+            - img "green emblem" [ref=e91]
+            - generic [ref=e92]: "6"
+          - generic [ref=e93]: Bot 3
+      - generic [ref=e97]:
+        - button "5 brown emblem 5" [disabled] [ref=e99]:
+          - generic [ref=e100]: "5"
+          - img "brown emblem" [ref=e101]
+          - generic [ref=e102]: "5"
+        - button "7 brown emblem 7" [disabled] [ref=e104]:
+          - generic [ref=e105]: "7"
+          - img "brown emblem" [ref=e106]
+          - generic [ref=e107]: "7"
+        - button "3 green emblem 3" [ref=e109] [cursor=pointer]:
+          - generic [ref=e110]: "3"
+          - img "green emblem" [ref=e111]
+          - generic [ref=e112]: "3"
+        - button "5 green emblem 5" [ref=e114] [cursor=pointer]:
+          - generic [ref=e115]: "5"
+          - img "green emblem" [ref=e116]
+          - generic [ref=e117]: "5"
+        - button "1 blue emblem 1" [disabled] [ref=e119]:
+          - generic [ref=e120]: "1"
+          - img "blue emblem" [ref=e121]
+          - generic [ref=e122]: "1"
+        - button "4 blue emblem 4" [disabled] [ref=e124]:
+          - generic [ref=e125]: "4"
+          - img "blue emblem" [ref=e126]
+          - generic [ref=e127]: "4"
+        - button "5 blue emblem 5" [disabled] [ref=e129]:
+          - generic [ref=e130]: "5"
+          - img "blue emblem" [ref=e131]
+          - generic [ref=e132]: "5"
+        - button "7 blue emblem 7" [disabled] [ref=e134]:
+          - generic [ref=e135]: "7"
+          - img "blue emblem" [ref=e136]
+          - generic [ref=e137]: "7"
+```

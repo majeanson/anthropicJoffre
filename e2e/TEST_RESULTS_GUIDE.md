@@ -34,10 +34,27 @@ bash run-tracked-tests.sh
 
 ## Running Tests with Tracking
 
-**Quick Run:**
+**Quick Run (Recommended):**
 ```bash
 cd e2e
 bash run-tracked-tests.sh
+# OR use npm script
+npm run test:integration
+```
+
+**Run All Tests (including @marathon and @slow):**
+```bash
+cd e2e
+TEST_MODE=marathon bash run-tracked-tests.sh
+# OR use npm script
+npm run test:marathon
+```
+
+**Alternative: Direct Playwright (no tracking):**
+```bash
+cd e2e
+npm run test:all        # All tests without tracking
+npm run test:e2e        # Standard tests (skip @marathon, @slow)
 ```
 
 **What happens:**

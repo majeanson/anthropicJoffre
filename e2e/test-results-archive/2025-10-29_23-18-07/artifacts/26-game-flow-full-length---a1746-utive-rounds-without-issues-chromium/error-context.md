@@ -1,0 +1,89 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - button "7OZHXO" [ref=e7] [cursor=pointer]:
+      - paragraph [ref=e8]: 7OZHXO
+    - paragraph [ref=e10]: R1
+    - generic [ref=e11]:
+      - generic [ref=e12]: "Team 1: 0 Team 2: 0"
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: T1
+        - paragraph [ref=e15]: "0"
+      - generic [ref=e16]: ":"
+      - generic [ref=e17]:
+        - paragraph [ref=e18]: T2
+        - paragraph [ref=e19]: "0"
+    - generic [ref=e20]:
+      - button "💬 Chat" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 💬
+        - generic [ref=e23]: Chat
+      - button "🏆 Stats" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: 🏆
+        - generic [ref=e26]: Stats
+      - button "🤖 Bots (0/3)" [ref=e27] [cursor=pointer]:
+        - generic [ref=e28]: 🤖
+        - generic [ref=e29]: Bots (0/3)
+      - button "🎮 Manual" [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]: 🎮
+        - generic [ref=e32]: Manual
+      - button "☀️ Light" [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: ☀️
+        - generic [ref=e35]: Light
+      - button "🚪 Leave" [ref=e36] [cursor=pointer]:
+        - generic [ref=e37]: 🚪
+        - generic [ref=e38]: Leave
+  - generic [ref=e40]:
+    - heading "Betting Phase" [level=2] [ref=e41]
+    - generic [ref=e42]:
+      - heading "Players & Bets" [level=3] [ref=e43]
+      - generic [ref=e44]:
+        - generic [ref=e45]:
+          - generic [ref=e48]: Player 1
+          - generic [ref=e49]: Skipped
+        - generic [ref=e50]:
+          - generic [ref=e53]: Player 2(Dealer)
+          - generic [ref=e54]: Waiting...
+        - generic [ref=e55]:
+          - generic [ref=e58]: Player 3
+          - generic [ref=e59]: Skipped
+        - generic [ref=e60]:
+          - generic [ref=e63]: Player 4
+          - generic [ref=e64]: Skipped
+    - generic [ref=e65]:
+      - heading "Your Hand" [level=3] [ref=e66]
+      - generic [ref=e67]:
+        - button "3 red emblem 3" [ref=e69]:
+          - generic [ref=e70]: "3"
+          - img "red emblem" [ref=e71]
+          - generic [ref=e72]: "3"
+        - button "brown bon -2" [ref=e74]:
+          - img "brown bon" [ref=e75]
+          - generic [ref=e76]: "-2"
+        - button "5 brown emblem 5" [ref=e78]:
+          - generic [ref=e79]: "5"
+          - img "brown emblem" [ref=e80]
+          - generic [ref=e81]: "5"
+        - button "1 green emblem 1" [ref=e83]:
+          - generic [ref=e84]: "1"
+          - img "green emblem" [ref=e85]
+          - generic [ref=e86]: "1"
+        - button "2 green emblem 2" [ref=e88]:
+          - generic [ref=e89]: "2"
+          - img "green emblem" [ref=e90]
+          - generic [ref=e91]: "2"
+        - button "3 green emblem 3" [ref=e93]:
+          - generic [ref=e94]: "3"
+          - img "green emblem" [ref=e95]
+          - generic [ref=e96]: "3"
+        - button "7 green emblem 7" [ref=e98]:
+          - generic [ref=e99]: "7"
+          - img "green emblem" [ref=e100]
+          - generic [ref=e101]: "7"
+        - button "6 blue emblem 6" [ref=e103]:
+          - generic [ref=e104]: "6"
+          - img "blue emblem" [ref=e105]
+          - generic [ref=e106]: "6"
+    - generic [ref=e107]: Waiting for other players to bet...
+```

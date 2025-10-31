@@ -109,10 +109,32 @@ GET /api/games/lobby             // List active games
 GET /api/games/recent            // List recent finished games (for replay)
 GET /api/games/:gameId           // Get specific game details
 GET /api/games/history           // Get game history (deprecated, use /recent)
-GET /api/leaderboard             // Global leaderboard
-GET /api/stats/:playerName       // Player statistics
+GET /api/leaderboard             // Global leaderboard (query: ?limit=100&excludeBots=true)
+GET /api/stats/:playerName       // Player statistics (returns 404 if player not found)
 GET /api/player-history/:playerName // Player game history
 ```
+
+**Implementation Notes**:
+- `/api/stats/:playerName` - Returns player stats object or 404 error
+  ```typescript
+  Response: {
+    player_name: string;
+    games_played: number;
+    games_won: number;
+    // ... other PlayerStats fields
+  }
+  ```
+
+- `/api/leaderboard` - Returns top players with optional filters
+  ```typescript
+  Query params:
+    - limit: number (default: 100) - Max players to return
+    - excludeBots: boolean (default: true) - Filter out bot players
+  Response: {
+    players: LeaderboardEntry[];
+    total: number;
+  }
+  ```
 
 ---
 
@@ -506,6 +528,8 @@ npm run test:e2e     # Run E2E tests
 ---
 
 ## 📚 Additional Resources
+
+**Quick Navigation**: See **[docs/DOCUMENTATION_INDEX.md](docs/DOCUMENTATION_INDEX.md)** for complete documentation index
 
 ### Core Documentation
 - **README.md** - Project overview and setup

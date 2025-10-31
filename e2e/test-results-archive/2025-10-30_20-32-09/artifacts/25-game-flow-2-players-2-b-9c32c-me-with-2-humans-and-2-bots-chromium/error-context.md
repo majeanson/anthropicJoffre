@@ -1,0 +1,91 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - button "65D5QO" [ref=e7] [cursor=pointer]:
+      - paragraph [ref=e8]: 65D5QO
+    - paragraph [ref=e10]: R1
+    - generic [ref=e11]:
+      - generic [ref=e12]: "Team 1: 0 Team 2: 0"
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: T1
+        - paragraph [ref=e15]: "0"
+      - generic [ref=e16]: ":"
+      - generic [ref=e17]:
+        - paragraph [ref=e18]: T2
+        - paragraph [ref=e19]: "0"
+    - generic [ref=e20]:
+      - button "💬 Chat" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 💬
+        - generic [ref=e23]: Chat
+      - button "🏆 Stats" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: 🏆
+        - generic [ref=e26]: Stats
+      - button "🤖 Bots (0/3)" [ref=e27] [cursor=pointer]:
+        - generic [ref=e28]: 🤖
+        - generic [ref=e29]: Bots (0/3)
+      - button "🎮 Manual" [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]: 🎮
+        - generic [ref=e32]: Manual
+      - button "☀️ Light" [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: ☀️
+        - generic [ref=e35]: Light
+      - button "🚪 Leave" [ref=e36] [cursor=pointer]:
+        - generic [ref=e37]: 🚪
+        - generic [ref=e38]: Leave
+  - generic [ref=e40]:
+    - heading "Betting Phase" [level=2] [ref=e41]
+    - generic [ref=e43]: "Waiting for: Bot1"
+    - generic [ref=e44]:
+      - heading "Players & Bets" [level=3] [ref=e45]
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e50]: Human1
+          - generic [ref=e51]: Waiting...
+        - generic [ref=e52]:
+          - generic [ref=e55]: Human2(Dealer)
+          - generic [ref=e56]: Waiting...
+        - generic [ref=e57]:
+          - generic [ref=e60]: Bot1
+          - generic [ref=e61]: Waiting...
+        - generic [ref=e62]:
+          - generic [ref=e65]: Bot2
+          - generic [ref=e66]: Waiting...
+    - generic [ref=e67]:
+      - heading "Your Hand" [level=3] [ref=e68]
+      - generic [ref=e69]:
+        - button "1 red emblem 1" [ref=e71]:
+          - generic [ref=e72]: "1"
+          - img "red emblem" [ref=e73]
+          - generic [ref=e74]: "1"
+        - button "3 brown emblem 3" [ref=e76]:
+          - generic [ref=e77]: "3"
+          - img "brown emblem" [ref=e78]
+          - generic [ref=e79]: "3"
+        - button "1 green emblem 1" [ref=e81]:
+          - generic [ref=e82]: "1"
+          - img "green emblem" [ref=e83]
+          - generic [ref=e84]: "1"
+        - button "7 green emblem 7" [ref=e86]:
+          - generic [ref=e87]: "7"
+          - img "green emblem" [ref=e88]
+          - generic [ref=e89]: "7"
+        - button "1 blue emblem 1" [ref=e91]:
+          - generic [ref=e92]: "1"
+          - img "blue emblem" [ref=e93]
+          - generic [ref=e94]: "1"
+        - button "4 blue emblem 4" [ref=e96]:
+          - generic [ref=e97]: "4"
+          - img "blue emblem" [ref=e98]
+          - generic [ref=e99]: "4"
+        - button "5 blue emblem 5" [ref=e101]:
+          - generic [ref=e102]: "5"
+          - img "blue emblem" [ref=e103]
+          - generic [ref=e104]: "5"
+        - button "6 blue emblem 6" [ref=e106]:
+          - generic [ref=e107]: "6"
+          - img "blue emblem" [ref=e108]
+          - generic [ref=e109]: "6"
+    - generic [ref=e112]: It's Bot1's turn to bet
+```

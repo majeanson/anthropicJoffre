@@ -1,0 +1,116 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - button "XRA6IN" [ref=e7] [cursor=pointer]:
+      - paragraph [ref=e8]: XRA6IN
+    - paragraph [ref=e10]: R1
+    - generic [ref=e11]:
+      - generic [ref=e12]: "Team 1: 0 Team 2: 0"
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: T1
+        - paragraph [ref=e15]: "0"
+      - generic [ref=e16]: ":"
+      - generic [ref=e17]:
+        - paragraph [ref=e18]: T2
+        - paragraph [ref=e19]: "0"
+    - generic [ref=e20]:
+      - button "💬 Chat" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 💬
+        - generic [ref=e23]: Chat
+      - button "🏆 Stats" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: 🏆
+        - generic [ref=e26]: Stats
+      - button "🤖 Bots (0/3)" [ref=e27] [cursor=pointer]:
+        - generic [ref=e28]: 🤖
+        - generic [ref=e29]: Bots (0/3)
+      - button "🎮 Manual" [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]: 🎮
+        - generic [ref=e32]: Manual
+      - button "☀️ Light" [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: ☀️
+        - generic [ref=e35]: Light
+      - button "🚪 Leave" [ref=e36] [cursor=pointer]:
+        - generic [ref=e37]: 🚪
+        - generic [ref=e38]: Leave
+  - generic [ref=e40]:
+    - heading "Betting Phase" [level=2] [ref=e41]
+    - generic [ref=e42]:
+      - generic [ref=e43]: "Waiting for: Player 1"
+      - generic [ref=e44]: ⏱️ 47s
+    - generic [ref=e45]:
+      - heading "Players & Bets" [level=3] [ref=e46]
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - generic [ref=e51]: Player 1
+          - generic [ref=e52]: Waiting...
+        - generic [ref=e53]:
+          - generic [ref=e56]: Player 2(Dealer)
+          - generic [ref=e57]: Waiting...
+        - generic [ref=e58]:
+          - generic [ref=e61]: Bot 1
+          - generic [ref=e62]: Skipped
+        - generic [ref=e63]:
+          - generic [ref=e66]: Bot 2
+          - generic [ref=e67]: 7 points
+    - generic [ref=e68]:
+      - heading "Your Hand" [level=3] [ref=e69]
+      - generic [ref=e70]:
+        - button "red bon +5" [ref=e72]:
+          - img "red bon" [ref=e73]
+          - generic [ref=e74]: "+5"
+        - button "3 red emblem 3" [ref=e76]:
+          - generic [ref=e77]: "3"
+          - img "red emblem" [ref=e78]
+          - generic [ref=e79]: "3"
+        - button "6 red emblem 6" [ref=e81]:
+          - generic [ref=e82]: "6"
+          - img "red emblem" [ref=e83]
+          - generic [ref=e84]: "6"
+        - button "2 brown emblem 2" [ref=e86]:
+          - generic [ref=e87]: "2"
+          - img "brown emblem" [ref=e88]
+          - generic [ref=e89]: "2"
+        - button "7 green emblem 7" [ref=e91]:
+          - generic [ref=e92]: "7"
+          - img "green emblem" [ref=e93]
+          - generic [ref=e94]: "7"
+        - button "3 blue emblem 3" [ref=e96]:
+          - generic [ref=e97]: "3"
+          - img "blue emblem" [ref=e98]
+          - generic [ref=e99]: "3"
+        - button "4 blue emblem 4" [ref=e101]:
+          - generic [ref=e102]: "4"
+          - img "blue emblem" [ref=e103]
+          - generic [ref=e104]: "4"
+        - button "6 blue emblem 6" [ref=e106]:
+          - generic [ref=e107]: "6"
+          - img "blue emblem" [ref=e108]
+          - generic [ref=e109]: "6"
+    - generic [ref=e111]:
+      - generic [ref=e112]:
+        - generic [ref=e113]: "Select Bet Amount:"
+        - generic [ref=e114]:
+          - button "7" [disabled] [ref=e115]
+          - button "8" [ref=e116] [cursor=pointer]
+          - button "9" [ref=e117] [cursor=pointer]
+          - button "10" [ref=e118] [cursor=pointer]
+          - button "11" [ref=e119] [cursor=pointer]
+          - button "12" [ref=e120] [cursor=pointer]
+      - generic [ref=e121]:
+        - generic [ref=e122]: "Trump Option:"
+        - generic [ref=e123]:
+          - generic [ref=e124] [cursor=pointer]:
+            - radio "With Trump (1x)" [checked] [ref=e125]
+            - generic [ref=e126]: With Trump (1x)
+          - generic [ref=e127] [cursor=pointer]:
+            - radio "Without Trump (2x multiplier)" [ref=e128]
+            - generic [ref=e129]: Without Trump (2x multiplier)
+      - generic [ref=e130]:
+        - button "SKIP" [ref=e131] [cursor=pointer]
+        - 'button "Place Bet: 7" [disabled] [ref=e132]'
+      - generic [ref=e133]:
+        - strong [ref=e134]: "Too low:"
+        - text: Current highest is 7 points. You must raise.
+```

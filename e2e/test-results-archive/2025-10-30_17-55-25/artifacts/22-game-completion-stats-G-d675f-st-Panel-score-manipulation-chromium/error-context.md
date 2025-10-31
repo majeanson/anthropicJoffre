@@ -1,0 +1,91 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - button "QME5V" [ref=e7] [cursor=pointer]:
+      - paragraph [ref=e8]: QME5V
+    - paragraph [ref=e10]: R1
+    - generic [ref=e11]:
+      - generic [ref=e12]: "Team 1: 40 Team 2: 40"
+      - generic [ref=e13]:
+        - paragraph [ref=e14]: T1
+        - paragraph [ref=e15]: "40"
+      - generic [ref=e16]: ":"
+      - generic [ref=e17]:
+        - paragraph [ref=e18]: T2
+        - paragraph [ref=e19]: "40"
+    - generic [ref=e20]:
+      - button "💬 Chat" [ref=e21] [cursor=pointer]:
+        - generic [ref=e22]: 💬
+        - generic [ref=e23]: Chat
+      - button "🏆 Stats" [ref=e24] [cursor=pointer]:
+        - generic [ref=e25]: 🏆
+        - generic [ref=e26]: Stats
+      - button "🤖 Bots (3/3)" [ref=e27] [cursor=pointer]:
+        - generic [ref=e28]: 🤖
+        - generic [ref=e29]: Bots (3/3)
+      - button "⚡ Auto" [ref=e30] [cursor=pointer]:
+        - generic [ref=e31]: ⚡
+        - generic [ref=e32]: Auto
+      - button "☀️ Light" [ref=e33] [cursor=pointer]:
+        - generic [ref=e34]: ☀️
+        - generic [ref=e35]: Light
+      - button "🔊 On" [ref=e36] [cursor=pointer]:
+        - generic [ref=e37]: 🔊
+        - generic [ref=e38]: "On"
+      - button "🚪 Leave" [ref=e39] [cursor=pointer]:
+        - generic [ref=e40]: 🚪
+        - generic [ref=e41]: Leave
+  - generic [ref=e42]:
+    - generic [ref=e45]:
+      - generic [ref=e46]:
+        - heading "Team 1" [level=3] [ref=e47]
+        - paragraph [ref=e48]:
+          - text: +3 pts
+          - generic [ref=e50]: "+1"
+      - generic [ref=e51]:
+        - generic [ref=e53]: Waiting for trick to end...
+        - paragraph [ref=e55]: 🎲 9 NO TRUMP
+        - paragraph [ref=e57]: NO TRUMP
+      - generic [ref=e58]:
+        - heading "Team 2" [level=3] [ref=e59]
+        - paragraph [ref=e60]: +5 pts
+    - generic [ref=e62]:
+      - button "⏮️ Previous" [ref=e63] [cursor=pointer]:
+        - generic [ref=e64]: ⏮️ Previous
+      - generic [ref=e65]:
+        - generic [ref=e66]:
+          - button "0 green emblem 0" [ref=e68]:
+            - generic [ref=e69]: "0"
+            - img "green emblem" [ref=e70]
+            - generic [ref=e71]: "0"
+          - generic [ref=e72]: You (You)
+        - generic [ref=e73]:
+          - generic [ref=e74]: Bot 1
+          - button "2 blue emblem 2" [ref=e76]:
+            - generic [ref=e77]: "2"
+            - img "blue emblem" [ref=e78]
+            - generic [ref=e79]: "2"
+        - generic [ref=e80]:
+          - generic [ref=e81]: Bot 2
+          - button "7 brown emblem 7" [ref=e83]:
+            - generic [ref=e84]: "7"
+            - img "brown emblem" [ref=e85]
+            - generic [ref=e86]: "7"
+        - generic [ref=e87]:
+          - button "2 green emblem 2" [ref=e89]:
+            - generic [ref=e90]: "2"
+            - img "green emblem" [ref=e91]
+            - generic [ref=e92]: "2"
+          - generic [ref=e93]: Bot 3
+    - generic [ref=e97]:
+      - button "1 green emblem 1" [disabled] [ref=e99]:
+        - generic [ref=e100]: "1"
+        - img "green emblem" [ref=e101]
+        - generic [ref=e102]: "1"
+      - button "6 green emblem 6" [disabled] [ref=e104]:
+        - generic [ref=e105]: "6"
+        - img "green emblem" [ref=e106]
+        - generic [ref=e107]: "6"
+```

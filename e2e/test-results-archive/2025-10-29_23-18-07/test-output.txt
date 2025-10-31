@@ -1,0 +1,1720 @@
+
+Running 155 tests using 1 worker
+
+[1A[2K[1/155] [chromium] › tests\01-lobby.spec.ts:12:7 › Lobby and Player Joining › should display lobby with create and join options
+[1A[2K[2/155] [chromium] › tests\01-lobby.spec.ts:24:7 › Lobby and Player Joining › should allow player to create a game
+[1A[2K[3/155] [chromium] › tests\01-lobby.spec.ts:50:7 › Lobby and Player Joining › should allow multiple players to join a game
+[1A[2K[4/155] [chromium] › tests\01-lobby.spec.ts:111:7 › Lobby and Player Joining › should show error for invalid game ID
+[1A[2K[5/155] [chromium] › tests\01-lobby.spec.ts:123:7 › Lobby and Player Joining › should not allow 5th player to join
+[1A[2K[6/155] [chromium] › tests\02-betting.spec.ts:12:7 › Betting Phase › should show betting phase after 4 players join
+[1A[2K[7/155] [chromium] › tests\02-betting.spec.ts:23:7 › Betting Phase › should display bet amount selector (7-12)
+[1A[2K[8/155] [chromium] › tests\02-betting.spec.ts:40:7 › Betting Phase › should allow selecting different bet amounts
+[1A[2K[9/155] [chromium] › tests\02-betting.spec.ts:60:7 › Betting Phase › should allow selecting "without trump" option
+[1A[2K[10/155] [chromium] › tests\02-betting.spec.ts:73:7 › Betting Phase › should show all players and their bet status
+[1A[2K[11/155] [chromium] › tests\02-betting.spec.ts:91:7 › Betting Phase › should submit bet and show waiting state
+[1A[2K[12/155] [chromium] › tests\02-betting.spec.ts:115:7 › Betting Phase › should show "No Trump" indicator for without-trump bets
+[1A[2K[13/155] [chromium] › tests\02-betting.spec.ts:136:7 › Betting Phase › should transition to playing phase when all bets are placed
+[1A[2K[14/155] [chromium] › tests\02-betting.spec.ts:161:7 › Betting Phase › should correctly identify highest bidder
+[1A[2K[15/155] [chromium] › tests\03-playing.spec.ts:13:7 › Card Playing Phase › should display player hands after betting
+[1A[2K[16/155] [chromium] › tests\03-playing.spec.ts:29:7 › Card Playing Phase › should show current trick area
+[1A[2K[17/155] [chromium] › tests\03-playing.spec.ts:41:7 › Card Playing Phase › should show score board with team scores
+[1A[2K[18/155] [chromium] › tests\03-playing.spec.ts:59:8 › Card Playing Phase › should show player info (cards left, tricks won)
+[1A[2K[19/155] [chromium] › tests\03-playing.spec.ts:84:7 › Card Playing Phase › should indicate whose turn it is
+[1A[2K[20/155] [chromium] › tests\03-playing.spec.ts:112:7 › Card Playing Phase › should disable cards when not player turn
+[1A[2K[21/155] [chromium] › tests\03-playing.spec.ts:138:7 › Card Playing Phase › should allow current player to play a card
+[1A[2K[22/155] [chromium] › tests\03-playing.spec.ts:162:7 › Card Playing Phase › should set trump suit from first card played
+[1A[2K[23/155] [chromium] › tests\03-playing.spec.ts:189:7 › Card Playing Phase › should complete a full trick with 4 cards
+[1A[2K[24/155] [chromium] › tests\03-playing.spec.ts:214:7 › Card Playing Phase › should decrease card count after playing
+[1A[2K[25/155] [chromium] › tests\03-playing.spec.ts:239:7 › Card Playing Phase › should show special card indicators (+5 for Red 0, -2 for Brown 0)
+[1A[2K[26/155] [chromium] › tests\05-skip-bet.spec.ts:13:7 › Skip Bet Functionality › should allow first player to skip bet
+[1A[2K[27/155] [chromium] › tests\05-skip-bet.spec.ts:35:7 › Skip Bet Functionality › should allow all non-dealer players to skip
+[1A[2K[28/155] [chromium] › tests\05-skip-bet.spec.ts:61:7 › Skip Bet Functionality › should NOT allow dealer to skip when there are bets
+[1A[2K[29/155] [chromium] › tests\05-skip-bet.spec.ts:93:7 › Skip Bet Functionality › should force dealer to bet minimum when all others skip
+[1A[2K[30/155] [chromium] › tests\05-skip-bet.spec.ts:124:7 › Skip Bet Functionality › should show validation message when bet is too low
+[1A[2K[31/155] [chromium] › tests\05-skip-bet.spec.ts:146:7 › Skip Bet Functionality › should allow dealer to match highest bet
+[1A[2K[32/155] [chromium] › tests\05-skip-bet.spec.ts:181:7 › Skip Bet Functionality › should handle skip then bet scenario without infinite rerender
+[1A[2K[33/155] [chromium] › tests\06-validation.spec.ts:14:9 › Validation Feedback › Team Selection Validation › should disable Start Game when teams are unbalanced
+[1A[2K[34/155] [chromium] › tests\06-validation.spec.ts:53:9 › Validation Feedback › Team Selection Validation › should show dealer indicator during team selection
+[1A[2K[35/155] [chromium] › tests\06-validation.spec.ts:99:9 › Validation Feedback › Betting Phase Validation › should disable Place Bet button when bet is too low
+[1A[2K[36/155] [chromium] › tests\06-validation.spec.ts:124:9 › Validation Feedback › Betting Phase Validation › should show validation message explaining bet requirements
+[1A[2K[37/155] [chromium] › tests\06-validation.spec.ts:150:9 › Validation Feedback › Betting Phase Validation › should show dealer indicator during betting
+[1A[2K[38/155] [chromium] › tests\06-validation.spec.ts:172:9 › Validation Feedback › Playing Phase Validation › should show validation message when trying to play wrong suit
+[1A[2K[39/155] [chromium] › tests\06-validation.spec.ts:190:9 › Validation Feedback › Playing Phase Validation › should visually disable unplayable cards
+[1A[2K[40/155] [chromium] › tests\06-validation.spec.ts:217:9 › Validation Feedback › Playing Phase Validation › should show which player we are waiting for
+[1A[2K[41/155] [chromium] › tests\07-full-game.spec.ts:12:7 › Full Game Flow › should play through a complete game with predetermined actions
+[1A[2K[chromium] › tests\07-full-game.spec.ts:12:7 › Full Game Flow › should play through a complete game with predetermined actions
+=== PHASE 1: Lobby & Team Selection ===
+
+[1A[2KGame created with ID: KF5PK
+
+[1A[2KPlayer 2 joined
+
+[1A[2KPlayer 3 joined
+
+[1A[2KPlayer 4 joined
+
+[1A[2KTeams auto-assigned, ready to start...
+
+[1A[2KGame started
+
+[1A[2K
+=== PHASE 2: Round 1 - Betting ===
+
+[1A[2KP3 betting 9...
+
+[1A[2KP4 betting 10...
+
+[1A[2KP1 skipping...
+
+[1A[2KP2 (dealer) matching with 10...
+
+[1A[2K
+=== PHASE 3: Playing Rounds Until 41 Points ===
+
+[1A[2K
+📊 Starting score tracking from 25-25...
+
+[1A[2KInitial Scores - Team 1: 25, Team 2: 25
+
+[1A[2K
+--- Round 1 ---
+
+[1A[2K  Playing 8 tricks...
+
+[1A[2K📊 Round 1 Results:
+
+[1A[2K   Team 1: 25 → 25 (+0)
+
+[1A[2K   Team 2: 25 → 25 (+0)
+
+[1A[2K  Betting...
+
+[1A[2K
+--- Round 2 ---
+
+[1A[2K  Playing 8 tricks...
+
+[1A[2K📊 Round 2 Results:
+
+[1A[2K   Team 1: 25 → 25 (+0)
+
+[1A[2K   Team 2: 25 → 25 (+0)
+
+[1A[2K  Betting...
+
+[1A[2K
+--- Round 3 ---
+
+[1A[2K  Playing 8 tricks...
+
+[1A[2K  1) [chromium] › tests\07-full-game.spec.ts:12:7 › Full Game Flow › should play through a complete game with predetermined actions 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-card-value]') to be visible[22m
+
+
+      120 |       for (let trick = 1; trick <= 8; trick++) {
+      121 |         // Wait for cards to be available
+    > 122 |         await pages[0].waitForSelector('[data-card-value]', { timeout: 15000 });
+          |                        ^
+      123 |
+      124 |         // Each player plays a card
+      125 |         for (let i = 0; i < 4; i++) {
+        at playRound (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\07-full-game.spec.ts:122:24)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\07-full-game.spec.ts:203:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\07-full-game-Full-Game-Flo-1836c--with-predetermined-actions-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\07-full-game-Full-Game-Flo-1836c--with-predetermined-actions-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\07-full-game-Full-Game-Flo-1836c--with-predetermined-actions-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\07-full-game-Full-Game-Flo-1836c--with-predetermined-actions-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\07-full-game-Full-Game-Flo-1836c--with-predetermined-actions-chromium\error-context.md
+
+
+[1A[2K[42/155] [chromium] › tests\09-reconnection-simple.spec.ts:15:7 › Reconnection Support - Basic Tests › should save session to sessionStorage when creating game
+[1A[2K[43/155] [chromium] › tests\09-reconnection-simple.spec.ts:46:7 › Reconnection Support - Basic Tests › should reconnect after page reload
+[1A[2K[44/155] [chromium] › tests\09-reconnection-simple.spec.ts:78:7 › Reconnection Support - Basic Tests › should clear expired session
+[1A[2K[45/155] [chromium] › tests\09-reconnection.spec.ts:4:7 › Reconnection Support › should save session to sessionStorage when joining game
+[1A[2K[46/155] [chromium] › tests\09-reconnection.spec.ts:39:7 › Reconnection Support › should allow player to reconnect after page reload
+[1A[2K[47/155] [chromium] › tests\09-reconnection.spec.ts:77:7 › Reconnection Support › should show reconnecting state during reconnection
+[1A[2K[48/155] [chromium] › tests\09-reconnection.spec.ts:107:7 › Reconnection Support › should update socket ID on reconnection
+[1A[2K[49/155] [chromium] › tests\09-reconnection.spec.ts:150:7 › Reconnection Support › should notify other players of reconnection
+[1A[2K[50/155] [chromium] › tests\09-reconnection.spec.ts:190:7 › Reconnection Support › should handle expired session token gracefully
+[1A[2K[51/155] [chromium] › tests\09-reconnection.spec.ts:211:7 › Reconnection Support › should clear session on explicit disconnect
+[1A[2K[52/155] [chromium] › tests\09-reconnection.spec.ts:234:7 › Reconnection Support › should prevent reconnection to finished game
+[1A[2K[53/155] [chromium] › tests\09-reconnection.spec.ts:263:7 › Reconnection Support › should maintain game state after reconnection
+[1A[2K[54/155] [chromium] › tests\14-spectator.spec.ts:35:7 › Spectator Mode › should allow joining game as spectator
+[1A[2K[55/155] [chromium] › tests\14-spectator.spec.ts:63:7 › Spectator Mode › should hide player hands from spectators
+[1A[2K[56/155] [chromium] › tests\14-spectator.spec.ts:82:7 › Spectator Mode › should show game state to spectators (scores, tricks, current player)
+[1A[2K[57/155] [chromium] › tests\14-spectator.spec.ts:102:7 › Spectator Mode › should update spectator view in real-time as game progresses
+[1A[2K[58/155] [chromium] › tests\14-spectator.spec.ts:124:7 › Spectator Mode › should prevent spectators from playing cards or making bets
+[1A[2K[59/155] [chromium] › tests\14-spectator.spec.ts:147:7 › Spectator Mode › should allow spectators to view leaderboard
+[1A[2K[60/155] [chromium] › tests\14-spectator.spec.ts:177:7 › Spectator Mode › should show spectator notification to players
+[1A[2K[61/155] [chromium] › tests\14-spectator.spec.ts:201:7 › Spectator Mode › should handle spectator joining during different game phases
+[1A[2K[62/155] [chromium] › tests\14-spectator.spec.ts:217:7 › Spectator Mode › should not allow spectator to join with invalid game ID
+[1A[2K[63/155] [chromium] › tests\14-spectator.spec.ts:229:7 › Spectator Mode › should show spectator info message on spectate form
+[1A[2K[64/155] [chromium] › tests\14-spectator.spec.ts:244:7 › Spectator Mode › should allow anonymous spectators (no name provided)
+[1A[2K[65/155] [chromium] › tests\15-timeout-system.spec.ts:12:7 › Timeout System › should show timeout indicator during betting phase
+[1A[2K  2) [chromium] › tests\15-timeout-system.spec.ts:12:7 › Timeout System › should show timeout indicator during betting phase 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m55[39m
+    Received:    [31mNaN[39m
+
+      26 |     // Verify timer starts around 60 seconds
+      27 |     const seconds = parseInt(timeoutText!.replace('s', ''));
+    > 28 |     expect(seconds).toBeGreaterThanOrEqual(55);
+         |                     ^
+      29 |     expect(seconds).toBeLessThanOrEqual(60);
+      30 |   });
+      31 |
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\15-timeout-system.spec.ts:28:21
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--50da1-icator-during-betting-phase-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--50da1-icator-during-betting-phase-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--50da1-icator-during-betting-phase-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--50da1-icator-during-betting-phase-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--50da1-icator-during-betting-phase-chromium\error-context.md
+
+
+[1A[2K[66/155] [chromium] › tests\15-timeout-system.spec.ts:32:7 › Timeout System › should auto-skip bet after timeout in betting phase
+[1A[2K  3) [chromium] › tests\15-timeout-system.spec.ts:32:7 › Timeout System › should auto-skip bet after timeout in betting phase 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=Player 3').locator('..').locator('text=Skipped')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=Player 3').locator('..').locator('text=Skipped')[22m
+
+
+      48 |     // Verify Player 3 shows "Skipped" badge
+      49 |     const player3Badge = await pages[0].locator('text=Player 3').locator('..').locator('text=Skipped');
+    > 50 |     await expect(player3Badge).toBeVisible({ timeout: 5000 });
+         |                                ^
+      51 |   });
+      52 |
+      53 |   test('should show timeout indicator during playing phase', async ({ browser }) => {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\15-timeout-system.spec.ts:50:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--614bd-er-timeout-in-betting-phase-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--614bd-er-timeout-in-betting-phase-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--614bd-er-timeout-in-betting-phase-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--614bd-er-timeout-in-betting-phase-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--614bd-er-timeout-in-betting-phase-chromium\error-context.md
+
+
+[1A[2K[67/155] [chromium] › tests\15-timeout-system.spec.ts:53:7 › Timeout System › should show timeout indicator during playing phase
+[1A[2K  4) [chromium] › tests\15-timeout-system.spec.ts:53:7 › Timeout System › should show timeout indicator during playing phase 
+
+    TimeoutError: locator.textContent: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/\\d+s/').first()[22m
+
+
+      83 |
+      84 |     // Check for timeout indicator
+    > 85 |     const timeoutText = await firstTurnPage.locator('text=/\\d+s/').first().textContent();
+         |                                                                             ^
+      86 |     expect(timeoutText).toMatch(/\d+s/);
+      87 |   });
+      88 |
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\15-timeout-system.spec.ts:85:77
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--16532-icator-during-playing-phase-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--16532-icator-during-playing-phase-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--16532-icator-during-playing-phase-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--16532-icator-during-playing-phase-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--16532-icator-during-playing-phase-chromium\error-context.md
+
+
+[1A[2K[68/155] [chromium] › tests\15-timeout-system.spec.ts:89:7 › Timeout System › should auto-play random valid card after timeout in playing phase
+[1A[2K  5) [chromium] › tests\15-timeout-system.spec.ts:89:7 › Timeout System › should auto-play random valid card after timeout in playing phase 
+
+    TimeoutError: page.waitForSelector: Timeout 70000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Trump/') to be visible[22m
+
+
+      115 |     // After 60 seconds, server should auto-play a card
+      116 |     // Next player should get their turn
+    > 117 |     await pages[0].waitForSelector('text=/Trump/', { timeout: 70000 });
+          |                    ^
+      118 |
+      119 |     // Verify at least 1 card is in the trick (auto-played)
+      120 |     // Check any page's display for trick cards
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\15-timeout-system.spec.ts:117:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--d71de-er-timeout-in-playing-phase-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--d71de-er-timeout-in-playing-phase-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--d71de-er-timeout-in-playing-phase-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--d71de-er-timeout-in-playing-phase-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\15-timeout-system-Timeout--d71de-er-timeout-in-playing-phase-chromium\error-context.md
+
+
+[1A[2K[69/155] [chromium] › tests\15-timeout-system.spec.ts:125:7 › Timeout System › should not timeout if player takes action
+[1A[2K[70/155] [chromium] › tests\16-ui-improvements.spec.ts:13:7 › UI Improvements › should show leaderboard button in betting phase
+[1A[2K[71/155] [chromium] › tests\16-ui-improvements.spec.ts:36:7 › UI Improvements › should show autoplay toggle button in betting and playing phases
+[1A[2K[72/155] [chromium] › tests\16-ui-improvements.spec.ts:66:7 › UI Improvements › should maintain consistent height for waiting badge
+[1A[2K[73/155] [chromium] › tests\16-ui-improvements.spec.ts:90:7 › UI Improvements › should display team-based round summary with points badges
+[1A[2K[74/155] [chromium] › tests\16-ui-improvements.spec.ts:104:7 › UI Improvements › should enable autoplay and have bot make decisions
+[1A[2K[75/155] [chromium] › tests\17-recent-online-players.spec.ts:17:7 › Recent and Online Players › should show SOCIAL tab and Recent/Online sub-tabs in lobby
+[1A[2K[76/155] [chromium] › tests\17-recent-online-players.spec.ts:32:7 › Recent and Online Players › should switch between Recent and Online sub-tabs
+[1A[2K[77/155] [chromium] › tests\17-recent-online-players.spec.ts:52:7 › Recent and Online Players › should show online players when multiple users connect
+[1A[2K[78/155] [chromium] › tests\17-recent-online-players.spec.ts:83:7 › Recent and Online Players › should load recent players from localStorage on mount
+[1A[2K[79/155] [chromium] › tests\17-recent-online-players.spec.ts:100:7 › Recent and Online Players › should show player status correctly
+[1A[2K[80/155] [chromium] › tests\17-recent-online-players.spec.ts:131:7 › Recent and Online Players › should show Join button for online players in games
+[1A[2K[81/155] [chromium] › tests\18-reconnection.spec.ts:35:7 › Reconnection Flow › should store session in sessionStorage when joining game
+[1A[2K[82/155] [chromium] › tests\18-reconnection.spec.ts:50:7 › Reconnection Flow › should auto-reconnect when refreshing page within grace period
+[1A[2K[83/155] [chromium] › tests\18-reconnection.spec.ts:86:7 › Reconnection Flow › should show catch-up modal after reconnection
+[1A[2K[84/155] [chromium] › tests\18-reconnection.spec.ts:121:7 › Reconnection Flow › should maintain game state across disconnection
+[1A[2K[85/155] [chromium] › tests\18-reconnection.spec.ts:151:7 › Reconnection Flow › should show reconnection toast notification
+[1A[2K[86/155] [chromium] › tests\18-reconnection.spec.ts:172:7 › Reconnection Flow › should fail reconnection after session expires
+[1A[2K[87/155] [chromium] › tests\18-reconnection.spec.ts:198:7 › Reconnection Flow › should handle multiple reconnection attempts
+[1A[2K[88/155] [chromium] › tests\18-reconnection.spec.ts:230:7 › Reconnection Flow › should preserve player position in team after reconnection
+[1A[2K[89/155] [chromium] › tests\18-reconnection.spec.ts:261:7 › Reconnection Flow › should handle reconnection during different game phases
+[1A[2K[90/155] [chromium] › tests\18-reconnection.spec.ts:298:7 › Reconnection Flow › should clear session when explicitly leaving game
+[1A[2K[91/155] [chromium] › tests\18-team-selection-chat.spec.ts:12:7 › Team Selection Chat › should show chat box in team selection phase
+[1A[2K[92/155] [chromium] › tests\18-team-selection-chat.spec.ts:28:7 › Team Selection Chat › should send and receive chat messages
+[1A[2K[93/155] [chromium] › tests\18-team-selection-chat.spec.ts:77:7 › Team Selection Chat › should show different colors for different teams
+[1A[2K[94/155] [chromium] › tests\18-team-selection-chat.spec.ts:101:7 › Team Selection Chat › should limit message length to 200 characters
+[1A[2K[95/155] [chromium] › tests\18-team-selection-chat.spec.ts:121:7 › Team Selection Chat › should clear input after sending message
+[1A[2K[96/155] [chromium] › tests\18-team-selection-chat.spec.ts:140:7 › Team Selection Chat › should disable send button when input is empty
+[1A[2K[97/155] [chromium] › tests\19-timeout-autoplay.spec.ts:37:7 › Timeout and Autoplay System › should show autoplay toggle button during betting phase
+[1A[2K[98/155] [chromium] › tests\19-timeout-autoplay.spec.ts:54:7 › Timeout and Autoplay System › should show autoplay toggle button during playing phase
+[1A[2K[99/155] [chromium] › tests\19-timeout-autoplay.spec.ts:68:7 › Timeout and Autoplay System › should manually toggle autoplay mode
+[1A[2K[100/155] [chromium] › tests\19-timeout-autoplay.spec.ts:99:7 › Timeout and Autoplay System › should show countdown timer when it is player turn
+[1A[2K[101/155] [chromium] › tests\19-timeout-autoplay.spec.ts:118:7 › Timeout and Autoplay System › should automatically enable autoplay after timeout
+[1A[2K[102/155] [chromium] › tests\19-timeout-autoplay.spec.ts:153:7 › Timeout and Autoplay System › should make valid moves when autoplay is enabled
+[1A[2K[103/155] [chromium] › tests\19-timeout-autoplay.spec.ts:179:7 › Timeout and Autoplay System › should respect game rules when autoplay makes bets
+[1A[2K[104/155] [chromium] › tests\19-timeout-autoplay.spec.ts:202:7 › Timeout and Autoplay System › should respect suit-following rules when autoplay plays cards
+[1A[2K[105/155] [chromium] › tests\19-timeout-autoplay.spec.ts:225:7 › Timeout and Autoplay System › should show countdown timer decreasing over time
+[1A[2K[106/155] [chromium] › tests\19-timeout-autoplay.spec.ts:252:7 › Timeout and Autoplay System › should not show countdown when not player turn
+[1A[2K[107/155] [chromium] › tests\19-timeout-autoplay.spec.ts:274:7 › Timeout and Autoplay System › should persist autoplay preference across game phases
+[1A[2K[108/155] [chromium] › tests\20-chat-system.spec.ts:46:7 › Chat System › should show chat in team selection phase (embedded inline)
+[1A[2K[109/155] [chromium] › tests\20-chat-system.spec.ts:63:8 › Chat System › should open and close chat panel
+[1A[2K[110/155] [chromium] › tests\20-chat-system.spec.ts:69:7 › Chat System › should send and receive chat messages between players
+[1A[2K[111/155] [chromium] › tests\20-chat-system.spec.ts:95:7 › Chat System › should show team-colored messages in team selection phase
+[1A[2K[112/155] [chromium] › tests\20-chat-system.spec.ts:111:8 › Chat System › should show unread message counter
+[1A[2K[113/155] [chromium] › tests\20-chat-system.spec.ts:116:7 › Chat System › should enforce 200 character limit on messages
+[1A[2K[114/155] [chromium] › tests\20-chat-system.spec.ts:129:8 › Chat System › should support quick emoji reactions
+[1A[2K[115/155] [chromium] › tests\20-chat-system.spec.ts:135:8 › Chat System › should persist chat messages across game phases
+[1A[2K[116/155] [chromium] › tests\20-chat-system.spec.ts:142:8 › Chat System › should show chat in betting phase
+[1A[2K[117/155] [chromium] › tests\20-chat-system.spec.ts:148:7 › Chat System › should prevent sending empty messages
+[1A[2K[118/155] [chromium] › tests\20-chat-system.spec.ts:159:7 › Chat System › should show player names with messages
+[1A[2K[119/155] [chromium] › tests\20-chat-system.spec.ts:174:8 › Chat System › should handle rapid message sending
+[1A[2K[120/155] [chromium] › tests\21-game-over-stats.spec.ts:4:7 › Game Over Stats › should display game over screen with final scores and history
+[1A[2K  6) [chromium] › tests\21-game-over-stats.spec.ts:4:7 › Game Over Stats › should display game over screen with final scores and history 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: locator.waitFor: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('heading', { name: /game over/i }) to be visible[22m
+
+
+      52 |
+      53 |       // Wait for game over (with longer timeout)
+    > 54 |       await gameOverHeading.waitFor({ timeout: 120000 });
+         |                             ^
+      55 |     }
+      56 |
+      57 |     // Verify game over screen elements
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\21-game-over-stats.spec.ts:54:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-e5bdb-th-final-scores-and-history-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-e5bdb-th-final-scores-and-history-chromium\error-context.md
+
+
+[1A[2K[121/155] [chromium] › tests\21-game-over-stats.spec.ts:92:7 › Game Over Stats › should show correct winning team and crown icon
+[1A[2K  7) [chromium] › tests\21-game-over-stats.spec.ts:92:7 › Game Over Stats › should show correct winning team and crown icon 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: page.waitForSelector: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/game over/i') to be visible[22m
+
+
+      116 |
+      117 |     // Wait for game over
+    > 118 |     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
+          |                ^
+      119 |
+      120 |     // Verify Team 2 wins
+      121 |     await expect(page.getByText(/team 2 wins!/i)).toBeVisible();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\21-game-over-stats.spec.ts:118:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-4d8c1-winning-team-and-crown-icon-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-4d8c1-winning-team-and-crown-icon-chromium\error-context.md
+
+
+[1A[2K[122/155] [chromium] › tests\21-game-over-stats.spec.ts:128:7 › Game Over Stats › should allow starting a new game from game over screen
+[1A[2K  8) [chromium] › tests\21-game-over-stats.spec.ts:128:7 › Game Over Stats › should allow starting a new game from game over screen 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: page.waitForSelector: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/game over/i') to be visible[22m
+
+
+      145 |     }
+      146 |
+    > 147 |     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
+          |                ^
+      148 |
+      149 |     // Click "New Game" button
+      150 |     await page.getByRole('button', { name: /new game/i }).click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\21-game-over-stats.spec.ts:147:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-bd2db--game-from-game-over-screen-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-bd2db--game-from-game-over-screen-chromium\error-context.md
+
+
+[1A[2K[123/155] [chromium] › tests\21-game-over-stats.spec.ts:157:7 › Game Over Stats › should allow returning to lobby from game over screen
+[1A[2K  9) [chromium] › tests\21-game-over-stats.spec.ts:157:7 › Game Over Stats › should allow returning to lobby from game over screen 
+
+    [31mTest timeout of 60000ms exceeded.[39m
+
+    Error: page.waitForSelector: Test timeout of 60000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/game over/i') to be visible[22m
+
+
+      174 |     }
+      175 |
+    > 176 |     await page.waitForSelector('text=/game over/i', { timeout: 120000 });
+          |                ^
+      177 |
+      178 |     // Click "Back to Lobby" button
+      179 |     await page.getByRole('button', { name: /back to lobby/i }).click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\21-game-over-stats.spec.ts:176:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-a7b43-lobby-from-game-over-screen-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\21-game-over-stats-Game-Ov-a7b43-lobby-from-game-over-screen-chromium\error-context.md
+
+
+[1A[2K[124/155] [chromium] › tests\22-game-completion-stats.spec.ts:4:7 › Game Completion Stats Recording › should record player stats when game completes after Test Panel score manipulation
+[1A[2K  10) [chromium] › tests\22-game-completion-stats.spec.ts:4:7 › Game Completion Stats Recording › should record player stats when game completes after Test Panel score manipulation 
+
+    TimeoutError: locator.waitFor: Timeout 5000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[placeholder*="Team 1"]') to be visible[22m
+
+
+      35 |     // Set both teams to 40 points (one point away from winning)
+      36 |     const team1Input = page.locator('input[placeholder*="Team 1"]');
+    > 37 |     await team1Input.waitFor({ state: 'visible', timeout: 5000 });
+         |                      ^
+      38 |     await team1Input.fill('40');
+      39 |
+      40 |     const team2Input = page.locator('input[placeholder*="Team 2"]');
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\22-game-completion-stats.spec.ts:37:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\22-game-completion-stats-G-d675f-st-Panel-score-manipulation-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\22-game-completion-stats-G-d675f-st-Panel-score-manipulation-chromium\error-context.md
+
+
+[1A[2K[125/155] [chromium] › tests\22-game-completion-stats.spec.ts:102:7 › Game Completion Stats Recording › should update player stats correctly when completing a game (E2E with real player name)
+[1A[2K[chromium] › tests\22-game-completion-stats.spec.ts:102:7 › Game Completion Stats Recording › should update player stats correctly when completing a game (E2E with real player name)
+Start button not enabled, may need manual bot addition
+
+[1A[2K  11) [chromium] › tests\22-game-completion-stats.spec.ts:102:7 › Game Completion Stats Recording › should update player stats correctly when completing a game (E2E with real player name) 
+
+    TimeoutError: locator.waitFor: Timeout 5000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[placeholder*="Team 1"]') to be visible[22m
+
+
+      150 |     // Set Team 1 to 41 points (winning score)
+      151 |     const team1Input = page.locator('input[placeholder*="Team 1"]');
+    > 152 |     await team1Input.waitFor({ state: 'visible', timeout: 5000 });
+          |                      ^
+      153 |     await team1Input.fill('41');
+      154 |
+      155 |     const team2Input = page.locator('input[placeholder*="Team 2"]');
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\22-game-completion-stats.spec.ts:152:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\22-game-completion-stats-G-ff37e--E2E-with-real-player-name--chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\22-game-completion-stats-G-ff37e--E2E-with-real-player-name--chromium\error-context.md
+
+
+[1A[2K[126/155] [chromium] › tests\22-game-completion-stats.spec.ts:202:7 › Game Completion Stats Recording › should verify stats are recorded in database after game completion
+[1A[2K[chromium] › tests\22-game-completion-stats.spec.ts:202:7 › Game Completion Stats Recording › should verify stats are recorded in database after game completion
+🔍 Monitoring backend logs for stat recording...
+
+[1A[2K  12) [chromium] › tests\22-game-completion-stats.spec.ts:202:7 › Game Completion Stats Recording › should verify stats are recorded in database after game completion 
+
+    TimeoutError: locator.fill: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('input[placeholder*="Team 1"]')[22m
+
+
+      220 |     }
+      221 |
+    > 222 |     await page.locator('input[placeholder*="Team 1"]').fill('41');
+          |                                                        ^
+      223 |     await page.locator('input[placeholder*="Team 2"]').fill('35');
+      224 |     await page.getByRole('button', { name: /apply scores/i }).click();
+      225 |     await page.getByRole('button', { name: /close/i }).click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\22-game-completion-stats.spec.ts:222:56
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\22-game-completion-stats-G-934e1-abase-after-game-completion-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\22-game-completion-stats-G-934e1-abase-after-game-completion-chromium\error-context.md
+
+
+[1A[2K[127/155] [chromium] › tests\23-game-flow-4-players.spec.ts:31:9 › Game Flow - 4 Real Players › @full Full-Length Games › should play a complete game from 0-0 to 41+
+[1A[2K[chromium] › tests\23-game-flow-4-players.spec.ts:31:9 › Game Flow - 4 Real Players › @full Full-Length Games › should play a complete game from 0-0 to 41+
+Full game started with ID: SYCJT
+
+[1A[2K  13) [chromium] › tests\23-game-flow-4-players.spec.ts:31:9 › Game Flow - 4 Real Players › @full Full-Length Games › should play a complete game from 0-0 to 41+ 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/Round 1/i').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=/Round 1/i').first()[22m
+
+
+       at helpers.ts:463
+
+      461 |   if (expectedState.roundNumber !== undefined) {
+      462 |     const roundText = await page.locator('text=/Round ' + expectedState.roundNumber + '/i').first();
+    > 463 |     await expect(roundText).toBeVisible({ timeout: 10000 });
+          |                             ^
+      464 |   }
+      465 | }
+      466 |
+        at verifyGameState (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:463:29)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\23-game-flow-4-players.spec.ts:42:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-49db3-mplete-game-from-0-0-to-41--chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-49db3-mplete-game-from-0-0-to-41--chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-49db3-mplete-game-from-0-0-to-41--chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-49db3-mplete-game-from-0-0-to-41--chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-49db3-mplete-game-from-0-0-to-41--chromium\error-context.md
+
+
+[1A[2K[128/155] [chromium] › tests\23-game-flow-4-players.spec.ts:144:9 › Game Flow - 4 Real Players › @full Full-Length Games › should handle special cards correctly over multiple rounds
+[1A[2K[chromium] › tests\23-game-flow-4-players.spec.ts:144:9 › Game Flow - 4 Real Players › @full Full-Length Games › should handle special cards correctly over multiple rounds
+Playing round 1/3
+
+[1A[2K  14) [chromium] › tests\23-game-flow-4-players.spec.ts:144:9 › Game Flow - 4 Real Players › @full Full-Length Games › should handle special cards correctly over multiple rounds 
+
+    Error: Could not find current player at card 1 of trick
+
+       at helpers.ts:169
+
+      167 |
+      168 |     if (pageWithTurn === -1) {
+    > 169 |       throw new Error(`Could not find current player at card ${i + 1} of trick`);
+          |             ^
+      170 |     }
+      171 |
+      172 |     const currentPage = pages[pageWithTurn];
+        at playFullTrick (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:169:13)
+        at playFullRound (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:190:5)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\23-game-flow-4-players.spec.ts:171:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-a632a-rectly-over-multiple-rounds-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-a632a-rectly-over-multiple-rounds-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-a632a-rectly-over-multiple-rounds-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-a632a-rectly-over-multiple-rounds-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-a632a-rectly-over-multiple-rounds-chromium\error-context.md
+
+
+[1A[2K[129/155] [chromium] › tests\23-game-flow-4-players.spec.ts:209:9 › Game Flow - 4 Real Players › @stress Stress Testing › should maintain performance over 10 consecutive quick rounds
+[1A[2K  15) [chromium] › tests\23-game-flow-4-players.spec.ts:209:9 › Game Flow - 4 Real Players › @stress Stress Testing › should maintain performance over 10 consecutive quick rounds 
+
+    Error: Could not find current player at card 1 of trick
+
+       at helpers.ts:169
+
+      167 |
+      168 |     if (pageWithTurn === -1) {
+    > 169 |       throw new Error(`Could not find current player at card ${i + 1} of trick`);
+          |             ^
+      170 |     }
+      171 |
+      172 |     const currentPage = pages[pageWithTurn];
+        at playFullTrick (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:169:13)
+        at playFullRound (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:190:5)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\23-game-flow-4-players.spec.ts:243:9
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-dfc3f-10-consecutive-quick-rounds-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-dfc3f-10-consecutive-quick-rounds-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-dfc3f-10-consecutive-quick-rounds-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-dfc3f-10-consecutive-quick-rounds-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\23-game-flow-4-players-Gam-dfc3f-10-consecutive-quick-rounds-chromium\error-context.md
+
+
+[1A[2K[130/155] [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:28:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should complete a game with 3 bots
+[1A[2K[chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:28:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should complete a game with 3 bots
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KBot game created with ID: N78LXW
+
+[1A[2KBot indices: 1, 2, 3
+
+[1A[2KRound 1
+
+[1A[2K  16) [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:28:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should complete a game with 3 bots 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Waiting for other players/i') to be visible[22m
+
+
+       at helpers.ts:366
+
+      364 |   // Wait for either "Waiting for other players" or a state change
+      365 |   await Promise.race([
+    > 366 |     page.waitForSelector('text=/Waiting for other players/i', { timeout }),
+          |          ^
+      367 |     page.waitForTimeout(timeout)
+      368 |   ]);
+      369 | }
+        at waitForBotAction (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:366:10)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\24-game-flow-1-player-3-bots.spec.ts:78:31
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-bb4b1-complete-a-game-with-3-bots-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-bb4b1-complete-a-game-with-3-bots-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-bb4b1-complete-a-game-with-3-bots-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-bb4b1-complete-a-game-with-3-bots-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-bb4b1-complete-a-game-with-3-bots-chromium\error-context.md
+
+
+[1A[2K[131/155] [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:122:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should verify bot decision-making quality
+[1A[2K[chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:122:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should verify bot decision-making quality
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2K  17) [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:122:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should verify bot decision-making quality 
+
+    [31mTest timeout of 180000ms exceeded.[39m
+
+    Error: page.waitForTimeout: Target page, context or browser has been closed
+
+      163 |         }
+      164 |
+    > 165 |         await pages[0].waitForTimeout(500);
+          |                        ^
+      166 |       }
+      167 |
+      168 |       const bettingDuration = Date.now() - bettingStartTime;
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\24-game-flow-1-player-3-bots.spec.ts:165:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-b95e3-bot-decision-making-quality-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-b95e3-bot-decision-making-quality-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-b95e3-bot-decision-making-quality-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-b95e3-bot-decision-making-quality-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-b95e3-bot-decision-making-quality-chromium\error-context.md
+
+
+[1A[2K[132/155] [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:229:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should play a complete game with bots from 0-0
+[1A[2K[chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:229:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should play a complete game with bots from 0-0
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KFull bot game started with ID: 28WF8
+
+[1A[2K  18) [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:229:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should play a complete game with bots from 0-0 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/Round 1/i').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=/Round 1/i').first()[22m
+
+
+       at helpers.ts:463
+
+      461 |   if (expectedState.roundNumber !== undefined) {
+      462 |     const roundText = await page.locator('text=/Round ' + expectedState.roundNumber + '/i').first();
+    > 463 |     await expect(roundText).toBeVisible({ timeout: 10000 });
+          |                             ^
+      464 |   }
+      465 | }
+      466 |
+        at verifyGameState (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:463:29)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\24-game-flow-1-player-3-bots.spec.ts:246:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-cd01b-ete-game-with-bots-from-0-0-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-cd01b-ete-game-with-bots-from-0-0-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-cd01b-ete-game-with-bots-from-0-0-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-cd01b-ete-game-with-bots-from-0-0-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-cd01b-ete-game-with-bots-from-0-0-chromium\error-context.md
+
+
+[1A[2K[133/155] [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:340:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should test different bot difficulty levels
+[1A[2K[chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:340:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should test different bot difficulty levels
+Testing with EASY bots...
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2K  19) [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:340:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should test different bot difficulty levels 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Playing Phase/i') to be visible[22m
+
+
+      365 |
+      366 |       // Wait for bots to bet
+    > 367 |       await pages[0].waitForSelector('text=/Playing Phase/i', { timeout: 15000 });
+          |                      ^
+      368 |
+      369 |       // Verify bots made simpler decisions (lower bets expected for easy bots)
+      370 |       const betTexts = await pages[0].locator('[data-testid="player-bet"]').allTextContents();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\24-game-flow-1-player-3-bots.spec.ts:367:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-ecdf2-erent-bot-difficulty-levels-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-ecdf2-erent-bot-difficulty-levels-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-ecdf2-erent-bot-difficulty-levels-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-ecdf2-erent-bot-difficulty-levels-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-ecdf2-erent-bot-difficulty-levels-chromium\error-context.md
+
+
+[1A[2K[134/155] [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:408:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should handle rapid bot decisions without crashes
+[1A[2K[chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:408:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should handle rapid bot decisions without crashes
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KRapid round 1/5
+
+[1A[2K  20) [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:408:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should handle rapid bot decisions without crashes 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Playing Phase/i') to be visible[22m
+
+
+      433 |
+      434 |         // Wait for playing phase
+    > 435 |         await pages[0].waitForSelector('text=/Playing Phase/i', { timeout: 10000 });
+          |                        ^
+      436 |
+      437 |         // Rapid card playing
+      438 |         for (let trick = 0; trick < 8; trick++) {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\24-game-flow-1-player-3-bots.spec.ts:435:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-0ab7f-t-decisions-without-crashes-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-0ab7f-t-decisions-without-crashes-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-0ab7f-t-decisions-without-crashes-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-0ab7f-t-decisions-without-crashes-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-0ab7f-t-decisions-without-crashes-chromium\error-context.md
+
+
+[1A[2K[135/155] [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:463:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should maintain bot consistency over extended play
+[1A[2K[chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:463:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should maintain bot consistency over extended play
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2K  21) [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:463:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should maintain bot consistency over extended play 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Playing Phase/i') to be visible[22m
+
+
+      498 |
+      499 |         // Wait for all bets
+    > 500 |         await pages[0].waitForSelector('text=/Playing Phase/i', { timeout: 15000 });
+          |                        ^
+      501 |
+      502 |         const betDuration = Date.now() - betStartTime;
+      503 |         roundData.avgResponseTime = betDuration / 4; // Average per player
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\24-game-flow-1-player-3-bots.spec.ts:500:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-17f92-sistency-over-extended-play-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-17f92-sistency-over-extended-play-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-17f92-sistency-over-extended-play-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-17f92-sistency-over-extended-play-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\24-game-flow-1-player-3-bo-17f92-sistency-over-extended-play-chromium\error-context.md
+
+
+[1A[2K[136/155] [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:28:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should complete a game with 2 humans and 2 bots
+[1A[2K[chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:28:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should complete a game with 2 humans and 2 bots
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KMixed game created with ID: 5ZTOF
+
+[1A[2KBot indices: 2, 3
+
+[1A[2K  22) [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:28:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should complete a game with 2 humans and 2 bots 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected substring: [32m"Team 1: 36"[39m
+    Received string:    [31m"Team 1: 0 Team 2: 0T10:T20"[39m
+
+       at helpers.ts:454
+
+      452 |     const scores = await scoresElement.textContent();
+      453 |     if (expectedState.team1Score !== undefined) {
+    > 454 |       expect(scores).toContain(`Team 1: ${expectedState.team1Score}`);
+          |                      ^
+      455 |     }
+      456 |     if (expectedState.team2Score !== undefined) {
+      457 |       expect(scores).toContain(`Team 2: ${expectedState.team2Score}`);
+        at verifyGameState (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:454:22)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\25-game-flow-2-players-2-bots.spec.ts:48:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-a5659-me-with-2-humans-and-2-bots-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-a5659-me-with-2-humans-and-2-bots-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-a5659-me-with-2-humans-and-2-bots-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-a5659-me-with-2-humans-and-2-bots-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-a5659-me-with-2-humans-and-2-bots-chromium\error-context.md
+
+
+[1A[2K[137/155] [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:127:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should test human-bot team coordination
+[1A[2K[chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:127:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should test human-bot team coordination
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2K  23) [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:127:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should test human-bot team coordination 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Playing Phase/i') to be visible[22m
+
+
+      158 |
+      159 |       // Wait for playing phase
+    > 160 |       await pages[0].waitForSelector('text=/Playing Phase/i', { timeout: 15000 });
+          |                      ^
+      161 |
+      162 |       // Play 4 tricks to analyze coordination
+      163 |       for (let trick = 0; trick < 4; trick++) {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\25-game-flow-2-players-2-bots.spec.ts:160:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-f2aa7-human-bot-team-coordination-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-f2aa7-human-bot-team-coordination-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-f2aa7-human-bot-team-coordination-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-f2aa7-human-bot-team-coordination-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-f2aa7-human-bot-team-coordination-chromium\error-context.md
+
+
+[1A[2K[138/155] [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:216:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should play a complete mixed game from 0-0
+[1A[2K[chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:216:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should play a complete mixed game from 0-0
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KFull mixed game started with ID: ZZTHZQ
+
+[1A[2K  24) [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:216:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should play a complete mixed game from 0-0 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/Round 1/i').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=/Round 1/i').first()[22m
+
+
+       at helpers.ts:463
+
+      461 |   if (expectedState.roundNumber !== undefined) {
+      462 |     const roundText = await page.locator('text=/Round ' + expectedState.roundNumber + '/i').first();
+    > 463 |     await expect(roundText).toBeVisible({ timeout: 10000 });
+          |                             ^
+      464 |   }
+      465 | }
+      466 |
+        at verifyGameState (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:463:29)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\25-game-flow-2-players-2-bots.spec.ts:233:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7d8a0-omplete-mixed-game-from-0-0-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7d8a0-omplete-mixed-game-from-0-0-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7d8a0-omplete-mixed-game-from-0-0-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7d8a0-omplete-mixed-game-from-0-0-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7d8a0-omplete-mixed-game-from-0-0-chromium\error-context.md
+
+
+[1A[2K[139/155] [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:345:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should handle human-bot communication patterns
+[1A[2K[chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:345:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should handle human-bot communication patterns
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2K
+=== Communication Pattern Test - Round 1 ===
+
+[1A[2K  25) [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:345:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should handle human-bot communication patterns 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Playing Phase/i') to be visible[22m
+
+
+      382 |
+      383 |         // Wait for bots to adapt
+    > 384 |         await pages[0].waitForSelector('text=/Playing Phase/i', { timeout: 15000 });
+          |                        ^
+      385 |
+      386 |         // Check bot betting patterns
+      387 |         const betTexts = await pages[0].locator('[data-testid="player-bet"]').allTextContents();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\25-game-flow-2-players-2-bots.spec.ts:384:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-2ffea--bot-communication-patterns-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-2ffea--bot-communication-patterns-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-2ffea--bot-communication-patterns-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-2ffea--bot-communication-patterns-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-2ffea--bot-communication-patterns-chromium\error-context.md
+
+
+[1A[2K[140/155] [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:423:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should handle asymmetric player response times
+[1A[2K[chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:423:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should handle asymmetric player response times
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2K
+Asymmetric timing test - Round 1
+
+[1A[2K  26) [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:423:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should handle asymmetric player response times 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Playing Phase/i') to be visible[22m
+
+
+      455 |
+      456 |         // Play round with varying speeds
+    > 457 |         await pages[0].waitForSelector('text=/Playing Phase/i', { timeout: 15000 });
+          |                        ^
+      458 |
+      459 |         for (let trick = 0; trick < 8; trick++) {
+      460 |           for (let card = 0; card < 4; card++) {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\25-game-flow-2-players-2-bots.spec.ts:457:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-08cb3-etric-player-response-times-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-08cb3-etric-player-response-times-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-08cb3-etric-player-response-times-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-08cb3-etric-player-response-times-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-08cb3-etric-player-response-times-chromium\error-context.md
+
+
+[1A[2K[141/155] [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:494:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should maintain sync between all players in mixed game
+[1A[2K[chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:494:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should maintain sync between all players in mixed game
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2K
+Sync test - Round 1
+
+[1A[2K  27) [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:494:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should maintain sync between all players in mixed game 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('skip-bet-button')[22m
+
+
+      516 |           ),
+      517 |           pages[1].getByTestId('bet-10-with-trump').click().catch(() =>
+    > 518 |             pages[1].getByTestId('skip-bet-button').click()
+          |                                                     ^
+      519 |           )
+      520 |         ]);
+      521 |
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\25-game-flow-2-players-2-bots.spec.ts:518:53
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\25-game-flow-2-players-2-bots.spec.ts:513:40
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7a548-n-all-players-in-mixed-game-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7a548-n-all-players-in-mixed-game-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7a548-n-all-players-in-mixed-game-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7a548-n-all-players-in-mixed-game-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\25-game-flow-2-players-2-b-7a548-n-all-players-in-mixed-game-chromium\error-context.md
+
+
+[1A[2K[142/155] [chromium] › tests\26-game-flow-full-length.spec.ts:32:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should complete a natural full-length game from 0-0
+[1A[2K[chromium] › tests\26-game-flow-full-length.spec.ts:32:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should complete a natural full-length game from 0-0
+Marathon game started with ID: WSSR9R
+
+[1A[2K  28) [chromium] › tests\26-game-flow-full-length.spec.ts:32:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should complete a natural full-length game from 0-0 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=/Round 1/i').first()
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=/Round 1/i').first()[22m
+
+
+       at helpers.ts:463
+
+      461 |   if (expectedState.roundNumber !== undefined) {
+      462 |     const roundText = await page.locator('text=/Round ' + expectedState.roundNumber + '/i').first();
+    > 463 |     await expect(roundText).toBeVisible({ timeout: 10000 });
+          |                             ^
+      464 |   }
+      465 | }
+      466 |
+        at verifyGameState (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:463:29)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\26-game-flow-full-length.spec.ts:43:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---34283-l-full-length-game-from-0-0-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---34283-l-full-length-game-from-0-0-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---34283-l-full-length-game-from-0-0-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---34283-l-full-length-game-from-0-0-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---34283-l-full-length-game-from-0-0-chromium\error-context.md
+
+
+[1A[2K[143/155] [chromium] › tests\26-game-flow-full-length.spec.ts:298:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should handle 10+ consecutive rounds without issues
+[1A[2K[chromium] › tests\26-game-flow-full-length.spec.ts:298:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should handle 10+ consecutive rounds without issues
+Playing round 1/10
+
+[1A[2K  29) [chromium] › tests\26-game-flow-full-length.spec.ts:298:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should handle 10+ consecutive rounds without issues 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Scoring Phase/i') to be visible[22m
+
+
+      353 |
+      354 |         // Wait for scoring and ready up
+    > 355 |         await pages[0].waitForSelector('text=/Scoring Phase/i', { timeout: 10000 });
+          |                        ^
+      356 |
+      357 |         for (const page of pages) {
+      358 |           const readyBtn = page.getByTestId('ready-for-next-round-button');
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\26-game-flow-full-length.spec.ts:355:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---a1746-utive-rounds-without-issues-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---a1746-utive-rounds-without-issues-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---a1746-utive-rounds-without-issues-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---a1746-utive-rounds-without-issues-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---a1746-utive-rounds-without-issues-chromium\error-context.md
+
+
+[1A[2K[144/155] [chromium] › tests\26-game-flow-full-length.spec.ts:373:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should complete full game with 2 humans and 2 bots from 0-0
+[1A[2K[chromium] › tests\26-game-flow-full-length.spec.ts:373:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should complete full game with 2 humans and 2 bots from 0-0
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KMixed marathon game started with ID: 3HUQL
+
+[1A[2KBot players at indices: 2, 3
+
+[1A[2KStarting round 1
+
+[1A[2KPlaying round 1/1
+
+[1A[2K  30) [chromium] › tests\26-game-flow-full-length.spec.ts:373:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should complete full game with 2 humans and 2 bots from 0-0 
+
+    TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Waiting for other players/i') to be visible[22m
+
+
+       at helpers.ts:366
+
+      364 |   // Wait for either "Waiting for other players" or a state change
+      365 |   await Promise.race([
+    > 366 |     page.waitForSelector('text=/Waiting for other players/i', { timeout }),
+          |          ^
+      367 |     page.waitForTimeout(timeout)
+      368 |   ]);
+      369 | }
+        at waitForBotAction (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:366:10)
+        at playMultipleRounds (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:403:15)
+        at playCompleteGame (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:517:5)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\26-game-flow-full-length.spec.ts:392:41
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---27552--humans-and-2-bots-from-0-0-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---27552--humans-and-2-bots-from-0-0-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---27552--humans-and-2-bots-from-0-0-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---27552--humans-and-2-bots-from-0-0-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---27552--humans-and-2-bots-from-0-0-chromium\error-context.md
+
+
+[1A[2K[145/155] [chromium] › tests\26-game-flow-full-length.spec.ts:408:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should handle 15-round marathon with 1 human and 3 bots
+[1A[2K[chromium] › tests\26-game-flow-full-length.spec.ts:408:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should handle 15-round marathon with 1 human and 3 bots
+Autoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KAutoplay enabled successfully
+
+[1A[2KPlaying round 1/15
+
+[1A[2K  31) [chromium] › tests\26-game-flow-full-length.spec.ts:408:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should handle 15-round marathon with 1 human and 3 bots 
+
+    TimeoutError: page.waitForSelector: Timeout 5000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Waiting for other players/i') to be visible[22m
+
+
+       at helpers.ts:366
+
+      364 |   // Wait for either "Waiting for other players" or a state change
+      365 |   await Promise.race([
+    > 366 |     page.waitForSelector('text=/Waiting for other players/i', { timeout }),
+          |          ^
+      367 |     page.waitForTimeout(timeout)
+      368 |   ]);
+      369 | }
+        at waitForBotAction (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:366:10)
+        at playMultipleRounds (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:403:15)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\26-game-flow-full-length.spec.ts:422:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---f57f0-hon-with-1-human-and-3-bots-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---f57f0-hon-with-1-human-and-3-bots-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---f57f0-hon-with-1-human-and-3-bots-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---f57f0-hon-with-1-human-and-3-bots-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---f57f0-hon-with-1-human-and-3-bots-chromium\error-context.md
+
+
+[1A[2K[146/155] [chromium] › tests\26-game-flow-full-length.spec.ts:435:9 › @marathon Full-Length Games (No Score Manipulation) › Endurance Testing › should maintain stable performance over 20+ rounds
+[1A[2K  32) [chromium] › tests\26-game-flow-full-length.spec.ts:435:9 › @marathon Full-Length Games (No Score Manipulation) › Endurance Testing › should maintain stable performance over 20+ rounds 
+
+    TimeoutError: page.waitForSelector: Timeout 10000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('text=/Scoring Phase/i') to be visible[22m
+
+
+      484 |
+      485 |         // Quick ready
+    > 486 |         await pages[0].waitForSelector('text=/Scoring Phase/i', { timeout: 10000 });
+          |                        ^
+      487 |         for (const page of pages) {
+      488 |           const readyBtn = page.getByTestId('ready-for-next-round-button');
+      489 |           if (await readyBtn.isVisible({ timeout: 500 })) {
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\26-game-flow-full-length.spec.ts:486:24
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---d9b56--performance-over-20-rounds-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---d9b56--performance-over-20-rounds-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---d9b56--performance-over-20-rounds-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---d9b56--performance-over-20-rounds-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results-archive\2025-10-29_23-18-07\artifacts\26-game-flow-full-length---d9b56--performance-over-20-rounds-chromium\error-context.md
+
+
+[1A[2K[147/155] [chromium] › tests\network-resilience.spec.ts:17:7 › Network Resilience › should handle temporary network disconnection
+[1A[2K[148/155] [chromium] › tests\network-resilience.spec.ts:35:7 › Network Resilience › should handle slow network conditions
+[1A[2K[149/155] [chromium] › tests\network-resilience.spec.ts:55:7 › Network Resilience › should handle WebSocket reconnection
+[1A[2K[150/155] [chromium] › tests\network-resilience.spec.ts:102:7 › Network Resilience › should queue actions during network interruption
+[1A[2K[chromium] › tests\network-resilience.spec.ts:102:7 › Network Resilience › should queue actions during network interruption
+Actions sent: 0, received: 0
+
+[1A[2K[151/155] [chromium] › tests\network-resilience.spec.ts:141:7 › Network Resilience › should handle packet loss simulation
+[1A[2K[152/155] [chromium] › tests\network-resilience.spec.ts:164:7 › Network Resilience › should maintain game state consistency after reconnection
+[1A[2K[153/155] [chromium] › tests\stability-test-example.spec.ts:27:7 › Stability Test Example › should handle game flow with enhanced stability
+[1A[2K[chromium] › tests\stability-test-example.spec.ts:27:7 › Stability Test Example › should handle game flow with enhanced stability
+[0ms] Creating game
+
+[1A[2KAttempt 1/2 failed: Error: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+[1A[2KRetrying in 1000ms...
+
+[1A[2KAttempt 2/2 failed: Error: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+[1A[2KGame creation failed: Error: Failed to start game after 2 attempts: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+    at retryOperation [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\helpers-enhanced.ts:64:9[90m)[39m
+    at createGameWith4PlayersEnhanced [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\helpers-enhanced.ts:192:5[90m)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\stability-test-example.spec.ts:32:20
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:310:9
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\testInfo.js:305:11
+    at TimeoutManager.withRunnable [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\timeoutManager.js:67:14[90m)[39m
+    at TestInfoImpl._runWithTimeout [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\testInfo.js:303:7[90m)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:308:7
+    at WorkerMain._runTest [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:283:5[90m)[39m
+    at WorkerMain.runTestGroup [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:198:11[90m)[39m
+    at process.<anonymous> [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\common\process.js:65:22[90m)[39m
+
+[1A[2K
+Test Performance Report (Total: 4477ms)
+==================================================
+Creating game: 0ms (+0ms)
+
+
+[1A[2KInternal error: step id not found: fixture@53
+
+[1A[2KInternal error: step id not found: fixture@53
+
+[1A[2KInternal error: step id not found: fixture@53
+
+[1A[2KInternal error: step id not found: fixture@53
+
+[1A[2K  33) [chromium] › tests\stability-test-example.spec.ts:27:7 › Stability Test Example › should handle game flow with enhanced stability 
+
+    Error: Failed to start game after 2 attempts: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+       at helpers-enhanced.ts:64
+
+      62 |   }
+      63 |
+    > 64 |   throw new Error(`${errorMessage} after ${maxAttempts} attempts: ${lastError?.message}`);
+         |         ^
+      65 | }
+      66 |
+      67 | /**
+        at retryOperation (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers-enhanced.ts:64:9)
+        at createGameWith4PlayersEnhanced (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers-enhanced.ts:192:5)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\stability-test-example.spec.ts:32:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-d109d-low-with-enhanced-stability-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-d109d-low-with-enhanced-stability-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-d109d-low-with-enhanced-stability-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-d109d-low-with-enhanced-stability-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[154/155] [chromium] › tests\stability-test-example.spec.ts:87:7 › Stability Test Example › should recover from network errors
+[1A[2K[chromium] › tests\stability-test-example.spec.ts:87:7 › Stability Test Example › should recover from network errors
+Attempt 1/2 failed: Error: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+[1A[2KRetrying in 1000ms...
+
+[1A[2KAttempt 2/2 failed: Error: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+[1A[2KGame creation failed: Error: Failed to start game after 2 attempts: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+    at retryOperation [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\helpers-enhanced.ts:64:9[90m)[39m
+[90m    at runNextTicks (node:internal/process/task_queues:65:5)[39m
+[90m    at processTimers (node:internal/timers:520:9)[39m
+    at createGameWith4PlayersEnhanced [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\helpers-enhanced.ts:192:5[90m)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\stability-test-example.spec.ts:91:20
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:310:9
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\testInfo.js:305:11
+    at TimeoutManager.withRunnable [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\timeoutManager.js:67:14[90m)[39m
+    at TestInfoImpl._runWithTimeout [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\testInfo.js:303:7[90m)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:308:7
+    at WorkerMain._runTest [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:283:5[90m)[39m
+    at WorkerMain.runTestGroup [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:198:11[90m)[39m
+    at process.<anonymous> [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\common\process.js:65:22[90m)[39m
+
+[1A[2K
+Test Performance Report (Total: 4837ms)
+==================================================
+
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2K  34) [chromium] › tests\stability-test-example.spec.ts:87:7 › Stability Test Example › should recover from network errors 
+
+    Error: Failed to start game after 2 attempts: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+       at helpers-enhanced.ts:64
+
+      62 |   }
+      63 |
+    > 64 |   throw new Error(`${errorMessage} after ${maxAttempts} attempts: ${lastError?.message}`);
+         |         ^
+      65 | }
+      66 |
+      67 | /**
+        at retryOperation (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers-enhanced.ts:64:9)
+        at createGameWith4PlayersEnhanced (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers-enhanced.ts:192:5)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\stability-test-example.spec.ts:91:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-8aa38-recover-from-network-errors-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-8aa38-recover-from-network-errors-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-8aa38-recover-from-network-errors-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-8aa38-recover-from-network-errors-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K[155/155] [chromium] › tests\stability-test-example.spec.ts:128:7 › Stability Test Example › should handle rapid actions without race conditions
+[1A[2K[chromium] › tests\stability-test-example.spec.ts:128:7 › Stability Test Example › should handle rapid actions without race conditions
+Attempt 1/2 failed: Error: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+[1A[2KRetrying in 1000ms...
+
+[1A[2KAttempt 2/2 failed: Error: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+[1A[2KGame creation failed: Error: Failed to start game after 2 attempts: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+    at retryOperation [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\helpers-enhanced.ts:64:9[90m)[39m
+    at createGameWith4PlayersEnhanced [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\helpers-enhanced.ts:192:5[90m)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mtests\stability-test-example.spec.ts:131:20
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:310:9
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\testInfo.js:305:11
+    at TimeoutManager.withRunnable [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\timeoutManager.js:67:14[90m)[39m
+    at TestInfoImpl._runWithTimeout [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\testInfo.js:303:7[90m)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:308:7
+    at WorkerMain._runTest [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:283:5[90m)[39m
+    at WorkerMain.runTestGroup [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\worker\workerMain.js:198:11[90m)[39m
+    at process.<anonymous> [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\[39mnode_modules\[4mplaywright[24m\lib\common\process.js:65:22[90m)[39m
+
+[1A[2K
+Test Performance Report (Total: 4650ms)
+==================================================
+
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2KInternal error: step id not found: fixture@60
+
+[1A[2K  35) [chromium] › tests\stability-test-example.spec.ts:128:7 › Stability Test Example › should handle rapid actions without race conditions 
+
+    Error: Failed to start game after 2 attempts: locator.waitFor: state: expected one of (attached|detached|visible|hidden)
+
+       at helpers-enhanced.ts:64
+
+      62 |   }
+      63 |
+    > 64 |   throw new Error(`${errorMessage} after ${maxAttempts} attempts: ${lastError?.message}`);
+         |         ^
+      65 | }
+      66 |
+      67 | /**
+        at retryOperation (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers-enhanced.ts:64:9)
+        at createGameWith4PlayersEnhanced (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers-enhanced.ts:192:5)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\stability-test-example.spec.ts:131:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-6f497-ons-without-race-conditions-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-6f497-ons-without-race-conditions-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-6f497-ons-without-race-conditions-chromium\test-failed-3.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results-archive\2025-10-29_23-18-07\artifacts\stability-test-example-Sta-6f497-ons-without-race-conditions-chromium\test-failed-4.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+[1A[2K  35 failed
+    [chromium] › tests\07-full-game.spec.ts:12:7 › Full Game Flow › should play through a complete game with predetermined actions 
+    [chromium] › tests\15-timeout-system.spec.ts:12:7 › Timeout System › should show timeout indicator during betting phase 
+    [chromium] › tests\15-timeout-system.spec.ts:32:7 › Timeout System › should auto-skip bet after timeout in betting phase 
+    [chromium] › tests\15-timeout-system.spec.ts:53:7 › Timeout System › should show timeout indicator during playing phase 
+    [chromium] › tests\15-timeout-system.spec.ts:89:7 › Timeout System › should auto-play random valid card after timeout in playing phase 
+    [chromium] › tests\21-game-over-stats.spec.ts:4:7 › Game Over Stats › should display game over screen with final scores and history 
+    [chromium] › tests\21-game-over-stats.spec.ts:92:7 › Game Over Stats › should show correct winning team and crown icon 
+    [chromium] › tests\21-game-over-stats.spec.ts:128:7 › Game Over Stats › should allow starting a new game from game over screen 
+    [chromium] › tests\21-game-over-stats.spec.ts:157:7 › Game Over Stats › should allow returning to lobby from game over screen 
+    [chromium] › tests\22-game-completion-stats.spec.ts:4:7 › Game Completion Stats Recording › should record player stats when game completes after Test Panel score manipulation 
+    [chromium] › tests\22-game-completion-stats.spec.ts:102:7 › Game Completion Stats Recording › should update player stats correctly when completing a game (E2E with real player name) 
+    [chromium] › tests\22-game-completion-stats.spec.ts:202:7 › Game Completion Stats Recording › should verify stats are recorded in database after game completion 
+    [chromium] › tests\23-game-flow-4-players.spec.ts:31:9 › Game Flow - 4 Real Players › @full Full-Length Games › should play a complete game from 0-0 to 41+ 
+    [chromium] › tests\23-game-flow-4-players.spec.ts:144:9 › Game Flow - 4 Real Players › @full Full-Length Games › should handle special cards correctly over multiple rounds 
+    [chromium] › tests\23-game-flow-4-players.spec.ts:209:9 › Game Flow - 4 Real Players › @stress Stress Testing › should maintain performance over 10 consecutive quick rounds 
+    [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:28:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should complete a game with 3 bots 
+    [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:122:9 › Game Flow - 1 Player + 3 Bots › @quick Quick Bot Games › should verify bot decision-making quality 
+    [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:229:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should play a complete game with bots from 0-0 
+    [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:340:9 › Game Flow - 1 Player + 3 Bots › @full Full-Length Bot Games › should test different bot difficulty levels 
+    [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:408:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should handle rapid bot decisions without crashes 
+    [chromium] › tests\24-game-flow-1-player-3-bots.spec.ts:463:9 › Game Flow - 1 Player + 3 Bots › @stress Bot Stress Testing › should maintain bot consistency over extended play 
+    [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:28:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should complete a game with 2 humans and 2 bots 
+    [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:127:9 › Game Flow - 2 Players + 2 Bots › @quick Quick Mixed Games › should test human-bot team coordination 
+    [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:216:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should play a complete mixed game from 0-0 
+    [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:345:9 › Game Flow - 2 Players + 2 Bots › @full Full-Length Mixed Games › should handle human-bot communication patterns 
+    [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:423:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should handle asymmetric player response times 
+    [chromium] › tests\25-game-flow-2-players-2-bots.spec.ts:494:9 › Game Flow - 2 Players + 2 Bots › @stress Mixed Game Stress Testing › should maintain sync between all players in mixed game 
+    [chromium] › tests\26-game-flow-full-length.spec.ts:32:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should complete a natural full-length game from 0-0 
+    [chromium] › tests\26-game-flow-full-length.spec.ts:298:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - 4 Real Players › should handle 10+ consecutive rounds without issues 
+    [chromium] › tests\26-game-flow-full-length.spec.ts:373:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should complete full game with 2 humans and 2 bots from 0-0 
+    [chromium] › tests\26-game-flow-full-length.spec.ts:408:9 › @marathon Full-Length Games (No Score Manipulation) › Marathon Games - Mixed Players and Bots › should handle 15-round marathon with 1 human and 3 bots 
+    [chromium] › tests\26-game-flow-full-length.spec.ts:435:9 › @marathon Full-Length Games (No Score Manipulation) › Endurance Testing › should maintain stable performance over 20+ rounds 
+    [chromium] › tests\stability-test-example.spec.ts:27:7 › Stability Test Example › should handle game flow with enhanced stability 
+    [chromium] › tests\stability-test-example.spec.ts:87:7 › Stability Test Example › should recover from network errors 
+    [chromium] › tests\stability-test-example.spec.ts:128:7 › Stability Test Example › should handle rapid actions without race conditions 
+  18 skipped
+  102 passed (35.2m)
+
+[36m  Serving HTML report at http://localhost:52212. Press Ctrl+C to quit.[39m
