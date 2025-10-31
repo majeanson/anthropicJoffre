@@ -94,16 +94,7 @@
 
 **See**: docs/technical/BACKEND_ARCHITECTURE.md
 
-### 2. Database Integration Completion
-**Effort**: 2-3 hours
-**Impact**: Data persistence
-
-- [ ] Replace all `emit('game_updated')` with `emitGameUpdate()`
-- [ ] Add database connection pooling
-- [ ] Implement automatic cleanup jobs
-- [ ] Add database migration versioning
-
-### 3. Fix E2E Test Reliability ✅ COMPLETE
+### 2. Fix E2E Test Reliability ✅ COMPLETE
 **Effort**: 4.5 hours (completed)
 **Impact**: Development velocity
 
@@ -119,31 +110,31 @@
 
 **See**: docs/sprints/sprint5-phase5-complete.md
 
+### 3. Database Integration Completion ✅ COMPLETE
+**Effort**: 1.5 hours (completed)
+**Impact**: Data persistence, maintainability
+
+**Completed**: Sprint 5 - Database integration already robust, added migration versioning
+
+**Findings**:
+- ✅ **Connection pooling** - Already implemented (5 connections, optimized for Neon)
+- ✅ **Automatic cleanup** - Already implemented (hourly stale game cleanup, 5-min rate limiter cleanup, 30s snapshots)
+- ✅ **Database persistence** - emitGameUpdate() already used in 57 locations with delta compression
+- ⚠️ **Direct emit() calls** - 2 intentional "HOT PATH" optimizations to skip DB saves during card play (performance feature, not a bug)
+
+**New Additions**:
+- ✅ Created `migrationSystem.ts` - Versioned migration tracking and execution
+- ✅ Created `runMigrations.ts` - CLI migration runner with status and dry-run modes
+- ✅ Added `schema_migrations` table tracking
+- ✅ Added npm scripts: `db:migrate`, `db:migrate:status`, `db:migrate:dry-run`
+
+**Impact**: Proper migration versioning enables safe schema evolution
+
 ---
 
 ## 🎯 Medium-term Goals (1-3 Months)
 
-### 1. Tournament Mode
-**Effort**: 1 week
-**Impact**: User engagement
-
-- Bracket generation and management
-- Tournament leaderboards
-- Custom tournament rules
-- Scheduled tournaments
-- Tournament history and replays
-
-### 2. Enhanced Bot AI
-**Effort**: 3-4 days
-**Impact**: Single-player experience
-
-- Probability-based betting
-- Card counting and memory
-- Partner awareness improvements
-- Personality types (aggressive/conservative)
-- Difficulty curve tuning
-
-### 3. Performance Optimizations
+### 1. Performance Optimizations
 **Effort**: 3-4 days
 **Impact**: User experience
 

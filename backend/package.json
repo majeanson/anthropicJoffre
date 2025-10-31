@@ -12,7 +12,10 @@
     "test:coverage": "vitest --coverage",
     "db:setup": "tsx src/db/setup.ts",
     "db:init": "tsx src/db/init.ts",
-    "db:reset": "tsx src/db/reset-database.ts"
+    "db:reset": "tsx src/db/reset-database.ts",
+    "db:migrate": "tsx src/db/runMigrations.ts run",
+    "db:migrate:dry-run": "tsx src/db/runMigrations.ts dry-run",
+    "db:migrate:status": "tsx src/db/runMigrations.ts status"
   },
   "dependencies": {
     "@sentry/node": "^10.21.0",
