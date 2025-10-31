@@ -271,9 +271,9 @@ function App() {
     }
   }, []);
 
-  const handleCreateGame = (playerName: string) => {
+  const handleCreateGame = (playerName: string, persistenceMode: 'elo' | 'casual' = 'elo') => {
     if (socket) {
-      socket.emit('create_game', playerName);
+      socket.emit('create_game', { playerName, persistenceMode });
     }
   };
 

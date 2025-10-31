@@ -124,6 +124,13 @@ export const cardSchema = z.object({
  */
 export const botDifficultySchema = z.enum(['easy', 'medium', 'hard']);
 
+/**
+ * Persistence mode validation
+ * - 'elo': Full database persistence with stats and ranking
+ * - 'casual': Memory-only, no database saves
+ */
+export const persistenceModeSchema = z.enum(['elo', 'casual']);
+
 // ============= SOCKET EVENT PAYLOAD SCHEMAS =============
 
 /**
@@ -131,6 +138,7 @@ export const botDifficultySchema = z.enum(['easy', 'medium', 'hard']);
  */
 export const createGamePayloadSchema = z.object({
   playerName: playerNameSchema,
+  persistenceMode: persistenceModeSchema.default('elo').optional(),
 }).strict();
 
 /**

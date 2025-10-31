@@ -114,16 +114,16 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   // ============================================================================
   // create_game - Create new game
   // ============================================================================
-  socket.on('create_game', errorBoundaries.gameAction('create_game')(async (playerName: string) => {
+  socket.on('create_game', errorBoundaries.gameAction('create_game')(async (payload: unknown) => {
     // Sprint 2: Validate input with Zod schema
-    const validation = validateInput(createGamePayloadSchema, { playerName });
+    const validation = validateInput(createGamePayloadSchema, payload);
     if (!validation.success) {
       socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid create_game payload', { playerName, error: validation.error });
+      logger.warn('Invalid create_game payload', { payload, error: validation.error });
       return;
     }
 
-    const { playerName: validatedPlayerName } = validation.data;
+    const { playerName: validatedPlayerName, persistenceMode = 'elo' } = validation.data;
 
     // Apply game creation rate limiting
     // Access remote address via socket.handshake (standard Socket.IO API)
@@ -146,6 +146,8 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     const gameState: GameState = {
       id: gameId,
       creatorId: socket.id, // Track who created the game
+      persistenceMode, // ELO (default) or casual mode
+      isBotGame: false, // Will be set to true when bots join
       phase: 'team_selection',
       players: [player],
       currentBets: [],
@@ -328,6 +330,11 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
 
     game.players.push(player);
     socket.join(gameId);
+
+    // Mark game as bot game if a bot joins
+    if (isBot) {
+      game.isBotGame = true;
+    }
 
     // Cancel any pending disconnect timeout for this socket
     const disconnectTimeout = disconnectTimeouts.get(socket.id);

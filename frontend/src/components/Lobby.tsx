@@ -12,10 +12,10 @@ import { sounds } from '../utils/sounds';
 import { OnlinePlayer } from '../types/game';
 
 interface LobbyProps {
-  onCreateGame: (playerName: string) => void;
+  onCreateGame: (playerName: string, persistenceMode?: 'elo' | 'casual') => void;
   onJoinGame: (gameId: string, playerName: string) => void;
   onSpectateGame: (gameId: string, spectatorName?: string) => void;
-  onQuickPlay: (difficulty: BotDifficulty) => void;
+  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') => void;
   onRejoinGame?: () => void;
   hasValidSession?: boolean;
   autoJoinGameId?: string;
@@ -42,6 +42,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
+  const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual'); // Default to casual for Quick Play
 
 
   // Load recent players on mount
@@ -289,9 +290,38 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </p>
                       </div>
 
+                      {/* Persistence Mode Selector */}
+                      <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3">
+                        <div className="flex items-center justify-between gap-3">
+                          <label className="flex items-center gap-2 cursor-pointer flex-1">
+                            <input
+                              type="checkbox"
+                              checked={quickPlayPersistence === 'elo'}
+                              onChange={(e) => setQuickPlayPersistence(e.target.checked ? 'elo' : 'casual')}
+                              className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2"
+                            />
+                            <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
+                              Save Stats & ELO
+                            </span>
+                          </label>
+                          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                            quickPlayPersistence === 'elo'
+                              ? 'bg-amber-200 dark:bg-purple-900 text-amber-900 dark:text-purple-200'
+                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}>
+                            {quickPlayPersistence === 'elo' ? '🏆 Ranked' : '🎮 Casual'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
+                          {quickPlayPersistence === 'elo'
+                            ? 'Game will be saved to your profile and affect your ranking'
+                            : 'No stats saved - play without affecting your ELO rating'}
+                        </p>
+                      </div>
+
                       <button
                         data-testid="quick-play-button"
-                        onClick={() => { sounds.buttonClick(); onQuickPlay(botDifficulty); }}
+                        onClick={() => { sounds.buttonClick(); onQuickPlay(botDifficulty, quickPlayPersistence); }}
                         className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-violet-700 dark:to-violet-800 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-violet-600 dark:hover:to-violet-700 transition-all duration-200 flex items-center justify-center gap-2 border border-umber-900 dark:border-violet-600 shadow"
                       >
                         <span>⚡</span>

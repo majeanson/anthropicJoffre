@@ -84,6 +84,8 @@ export interface RoundHistory {
 export interface GameState {
   id: string;
   creatorId: string; // Socket ID of the player who created the game
+  persistenceMode: 'elo' | 'casual'; // ELO = full database persistence, Casual = memory-only
+  isBotGame: boolean; // True if game was created via Quick Play (has bots)
   phase: GamePhase;
   players: Player[];
   currentBets: Bet[];
