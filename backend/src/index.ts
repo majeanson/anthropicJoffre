@@ -167,6 +167,12 @@ import {
 import { registerRoutes } from './api/routes';
 import { registerLobbyHandlers } from './socketHandlers/lobby';
 import { registerGameplayHandlers } from './socketHandlers/gameplay';
+import { registerChatHandlers } from './socketHandlers/chat';
+import { registerSpectatorHandlers } from './socketHandlers/spectator';
+import { registerBotHandlers } from './socketHandlers/bots';
+import { registerStatsHandlers } from './socketHandlers/stats';
+import { registerConnectionHandlers } from './socketHandlers/connection';
+import { registerAdminHandlers } from './socketHandlers/admin';
 
 const app = express();
 const httpServer = createServer(app);
@@ -2432,6 +2438,10 @@ io.on('connection', (socket) => {
   // End of commented out gameplay handlers
   // ============================================================================
 
+  // ============================================================================
+  // Original spectator handlers - COMMENTED OUT (replaced by socketHandlers/spectator.ts)
+  // ============================================================================
+  /*
   // Spectator mode - join game as observer
   socket.on('spectate_game', errorBoundaries.gameAction('spectate_game')(({ gameId, spectatorName }: { gameId: string; spectatorName?: string }) => {
     const game = games.get(gameId);
@@ -2483,7 +2493,15 @@ io.on('connection', (socket) => {
 
     socket.emit('spectator_left', { success: true });
   }));
+  */
+  // ============================================================================
+  // End of commented out spectator handlers
+  // ============================================================================
 
+  // ============================================================================
+  // Original admin handlers - COMMENTED OUT (replaced by socketHandlers/admin.ts)
+  // ============================================================================
+  /*
   // Test-only handler to set scores
   socket.on('__test_set_scores', errorBoundaries.gameAction('__test_set_scores')(({ team1, team2 }: { team1: number; team2: number }) => {
     // Find game for this socket
@@ -2568,6 +2586,11 @@ io.on('connection', (socket) => {
       socket.emit('leave_game_success', { success: true });
     }
   }));
+  */
+  // ============================================================================
+  // End of commented out admin handlers (part 1: __test_set_scores)
+  // Note: leave_game handler above should be moved to lobby module
+  // ============================================================================
 
   // ============================================================================
   // Gameplay Handlers - Refactored (Sprint 3)
@@ -2595,7 +2618,111 @@ io.on('connection', (socket) => {
     errorBoundaries,
   });
 
-  // Kick player handler
+  // ============================================================================
+  // Chat Handlers - Refactored (Sprint 3)
+  // ============================================================================
+  registerChatHandlers(socket, {
+    games,
+    io,
+    rateLimiters,
+    getSocketIP,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Spectator Handlers - Refactored (Sprint 3)
+  // ============================================================================
+  registerSpectatorHandlers(socket, {
+    games,
+    io,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Bot Handlers - Refactored (Sprint 3)
+  // ============================================================================
+  registerBotHandlers(socket, {
+    games,
+    playerSessions,
+    onlinePlayers,
+    io,
+    deletePlayerSessions,
+    createDBSession,
+    areTeammates,
+    canAddBot,
+    getNextBotName,
+    generateSessionToken,
+    broadcastOnlinePlayers,
+    emitGameUpdate,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Stats Handlers - Refactored (Sprint 3)
+  // ============================================================================
+  registerStatsHandlers(socket, {
+    getPlayerStats,
+    getLeaderboard,
+    getPlayerGameHistory,
+    getGameReplayData,
+    getAllFinishedGames,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Connection Handlers - Refactored (Sprint 3)
+  // ============================================================================
+  registerConnectionHandlers(socket, {
+    games,
+    playerSessions,
+    activeTimeouts,
+    disconnectTimeouts,
+    gameDeletionTimeouts,
+    countdownIntervals,
+    onlinePlayers,
+    socketRateLimiters: {
+      chat: socketRateLimiters.chat,
+      bet: socketRateLimiters.bet,
+      card: socketRateLimiters.card,
+    },
+    io,
+    validateDBSession,
+    updateSessionActivity,
+    deletePlayerSessions,
+    markPlayerOffline,
+    validateSessionToken,
+    getGame,
+    startPlayerTimeout,
+    emitGameUpdate,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Admin Handlers - Refactored (Sprint 3)
+  // ============================================================================
+  registerAdminHandlers(socket, {
+    games,
+    playerSessions,
+    onlinePlayers,
+    io,
+    deletePlayerSessions,
+    broadcastOnlinePlayers,
+    emitGameUpdate,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Original handlers below - COMMENTED OUT (replaced by socketHandlers modules)
+  // These include: admin (kick_player, vote_rematch), bot, connection, stats handlers
+  // ============================================================================
+  /*
+  // Kick player handler (admin)
   socket.on('kick_player', errorBoundaries.gameAction('kick_player')(async ({ gameId, playerId }: { gameId: string; playerId: string }) => {
     const game = games.get(gameId);
     if (!game) {
@@ -3379,6 +3506,10 @@ io.on('connection', (socket) => {
     // Store the timeout so it can be cancelled on reconnection
     disconnectTimeouts.set(socket.id, disconnectTimeout);
   }));
+  */
+  // ============================================================================
+  // End of commented out handlers (admin, bot, connection, stats)
+  // ============================================================================
 });
 
 function startNewRound(gameId: string) {
