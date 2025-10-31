@@ -8,7 +8,8 @@
  *   npm run migrate:status    - Show migration status
  */
 
-import { runMigrations, getMigrationStatus, closePool } from './migrationSystem';
+import { runMigrations, getMigrationStatus } from './migrationSystem';
+import { closePool } from './index';
 import { join } from 'path';
 import { config } from 'dotenv';
 
