@@ -146,6 +146,24 @@ import {
   startRateLimiterCleanup,
   getSocketIP,
 } from './utils/rateLimiter';
+import {
+  validateInput,
+  playCardPayloadSchema,
+  placeBetPayloadSchema,
+  selectTeamPayloadSchema,
+  swapPositionPayloadSchema,
+  startGamePayloadSchema,
+  joinGamePayloadSchema,
+  createGamePayloadSchema,
+  teamChatPayloadSchema,
+  gameChatPayloadSchema,
+  playerReadyPayloadSchema,
+  voteRematchPayloadSchema,
+  kickPlayerPayloadSchema,
+  leaveGamePayloadSchema,
+  spectateGamePayloadSchema,
+  leaveSpectatePayloadSchema,
+} from './validation/schemas';
 
 const app = express();
 const httpServer = createServer(app);
@@ -1588,12 +1606,22 @@ io.on('connection', (socket) => {
   connectionManager.registerConnection(socket);
 
   socket.on('create_game', errorBoundaries.gameAction('create_game')(async (playerName: string) => {
+    // Sprint 2: Validate input with Zod schema
+    const validation = validateInput(createGamePayloadSchema, { playerName });
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid create_game payload', { playerName, error: validation.error });
+      return;
+    }
+
+    const { playerName: validatedPlayerName } = validation.data;
+
     // Apply game creation rate limiting
     // Access remote address via socket.handshake (standard Socket.IO API)
     const clientIp = socket.handshake.address;
 
-    // Sanitize player name
-    const sanitizedName = sanitizePlayerName(playerName);
+    // Player name is already validated and sanitized by Zod schema
+    const sanitizedName = validatedPlayerName;
 
     const gameId = Math.random().toString(36).substring(7).toUpperCase();
     const player: Player = {
@@ -1657,9 +1685,19 @@ io.on('connection', (socket) => {
     }
   }));
 
-  socket.on('join_game', errorBoundaries.gameAction('join_game')(async ({ gameId, playerName, isBot }: { gameId: string; playerName: string; isBot?: boolean }) => {
-    // Sanitize player name
-    const sanitizedName = sanitizePlayerName(playerName);
+  socket.on('join_game', errorBoundaries.gameAction('join_game')(async (payload: { gameId: string; playerName: string; isBot?: boolean }) => {
+    // Sprint 2: Validate input with Zod schema
+    const validation = validateInput(joinGamePayloadSchema, payload);
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid join_game payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, playerName: validatedPlayerName, isBot } = validation.data;
+
+    // Player name is already validated and sanitized by Zod schema
+    const sanitizedName = validatedPlayerName;
 
     const game = games.get(gameId);
     if (!game) {
@@ -1868,7 +1906,17 @@ io.on('connection', (socket) => {
   }));
 
   // Team selection chat
-  socket.on('send_team_selection_chat', errorBoundaries.gameAction('send_team_selection_chat')(({ gameId, message }: { gameId: string; message: string }) => {
+  socket.on('send_team_selection_chat', errorBoundaries.gameAction('send_team_selection_chat')((payload: { gameId: string; message: string }) => {
+    // Sprint 2: Validate input with Zod schema
+    const validation = validateInput(teamChatPayloadSchema, payload);
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid send_team_selection_chat payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, message: validatedMessage } = validation.data;
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1903,8 +1951,8 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Sanitize message
-    const sanitizedMessage = sanitizeChatMessage(message);
+    // Message is already validated and sanitized by Zod schema
+    const sanitizedMessage = validatedMessage;
     if (!sanitizedMessage) {
       return;
     }
@@ -1920,7 +1968,17 @@ io.on('connection', (socket) => {
   }));
 
   // In-game chat (betting, playing, and scoring phases)
-  socket.on('send_game_chat', errorBoundaries.gameAction('send_game_chat')(({ gameId, message }: { gameId: string; message: string }) => {
+  socket.on('send_game_chat', errorBoundaries.gameAction('send_game_chat')((payload: { gameId: string; message: string }) => {
+    // Sprint 2: Validate input with Zod schema
+    const validation = validateInput(gameChatPayloadSchema, payload);
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid send_game_chat payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, message: validatedMessage } = validation.data;
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -1955,8 +2013,8 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Sanitize message
-    const sanitizedMessage = sanitizeChatMessage(message);
+    // Message is already validated and sanitized by Zod schema
+    const sanitizedMessage = validatedMessage;
     if (!sanitizedMessage) {
       return;
     }
@@ -2029,7 +2087,17 @@ io.on('connection', (socket) => {
     startNewRound(gameId);
   }));
 
-  socket.on('place_bet', errorBoundaries.gameAction('place_bet')(({ gameId, amount, withoutTrump, skipped }: { gameId: string; amount: number; withoutTrump: boolean; skipped?: boolean }) => {
+  socket.on('place_bet', errorBoundaries.gameAction('place_bet')((payload: { gameId: string; amount: number; withoutTrump: boolean; skipped?: boolean }) => {
+    // Sprint 2: Validate input with Zod schema
+    const validation = validateInput(placeBetPayloadSchema, payload);
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid place_bet payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, amount, withoutTrump, skipped } = validation.data;
+
     // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) return;
@@ -2052,9 +2120,9 @@ io.on('connection', (socket) => {
     rateLimiters.gameActions.recordRequest(playerName, ipAddress);
 
     // VALIDATION - Use pure validation function
-    const validation = validateBet(game, socket.id, amount, withoutTrump, skipped);
-    if (!validation.success) {
-      socket.emit('invalid_bet', { message: validation.error });
+    const betValidation = validateBet(game, socket.id, amount, withoutTrump, skipped);
+    if (!betValidation.success) {
+      socket.emit('invalid_bet', { message: betValidation.error });
       return;
     }
 
@@ -2121,7 +2189,17 @@ io.on('connection', (socket) => {
     }
   }));
 
-  socket.on('play_card', errorBoundaries.gameAction('play_card')(({ gameId, card }: { gameId: string; card: Card }) => {
+  socket.on('play_card', errorBoundaries.gameAction('play_card')((payload: { gameId: string; card: Card }) => {
+    // Sprint 2: Validate input with Zod schema
+    const validation = validateInput(playCardPayloadSchema, payload);
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid play_card payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, card } = validation.data;
+
     // Basic validation: game exists
     const game = games.get(gameId);
     if (!game) return;
