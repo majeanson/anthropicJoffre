@@ -1,0 +1,127 @@
+/**
+ * Socket Connection Hook
+ * Sprint 5 Phase 1: Extracted from App.tsx
+ *
+ * Manages Socket.io connection lifecycle:
+ * - Initial connection with reconnection strategy
+ * - Connection event handlers
+ * - Session validation
+ * - Reconnection state management
+ */
+
+import { useEffect, useState } from 'react';
+import { io, Socket } from 'socket.io-client';
+import { PlayerSession } from '../types/game';
+
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+const SESSION_TIMEOUT = 900000; // 15 minutes
+
+/**
+ * Check if there's a valid session in sessionStorage
+ * Uses sessionStorage for multi-tab isolation
+ *
+ * @returns True if valid session exists, false otherwise
+ */
+export function checkValidSession(): boolean {
+  const sessionData = sessionStorage.getItem('gameSession');
+  if (!sessionData) return false;
+
+  try {
+    const session: PlayerSession = JSON.parse(sessionData);
+    const SHORT_TIMEOUT = 120000; // 2 minutes
+    if (Date.now() - session.timestamp > SHORT_TIMEOUT) {
+      sessionStorage.removeItem('gameSession');
+      return false;
+    }
+    return true;
+  } catch (e) {
+    sessionStorage.removeItem('gameSession');
+    return false;
+  }
+}
+
+/**
+ * Socket connection hook with reconnection management
+ *
+ * Features:
+ * - Automatic reconnection with exponential backoff
+ * - Session validation and cleanup
+ * - Reconnection state tracking
+ * - Connection error handling
+ *
+ * @returns Socket instance, reconnecting state, and error state
+ */
+export function useSocketConnection() {
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [reconnecting, setReconnecting] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
+
+  useEffect(() => {
+    const newSocket = io(SOCKET_URL, {
+      // Enable automatic reconnection with exponential backoff
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      // Connection timeout
+      timeout: 10000,
+    });
+
+    setSocket(newSocket);
+
+    // Expose socket on window for E2E tests
+    if (typeof window !== 'undefined') {
+      (window as any).socket = newSocket;
+    }
+
+    // Connection event handlers
+    newSocket.on('connect', () => {
+      setError(''); // Clear any connection errors
+    });
+
+    newSocket.on('connect_error', () => {
+      setReconnecting(false);
+
+      // If we have a stale session, clear it
+      const sessionData = sessionStorage.getItem('gameSession');
+      if (sessionData) {
+        try {
+          const session: PlayerSession = JSON.parse(sessionData);
+          if (Date.now() - session.timestamp > SESSION_TIMEOUT) {
+            sessionStorage.removeItem('gameSession');
+          }
+        } catch (e) {
+          sessionStorage.removeItem('gameSession');
+        }
+      }
+    });
+
+    newSocket.on('disconnect', (reason) => {
+      // Don't immediately clear state - allow for reconnection
+      if (reason === 'io server disconnect') {
+        // Server forcefully disconnected, clear session
+        sessionStorage.removeItem('gameSession');
+      }
+    });
+
+    newSocket.on('reconnect_attempt', () => {
+      setReconnecting(true);
+    });
+
+    newSocket.on('reconnect', () => {
+      setReconnecting(false);
+    });
+
+    newSocket.on('reconnect_failed', () => {
+      setReconnecting(false);
+      setError('Unable to reconnect to server. Please refresh the page.');
+    });
+
+    // Cleanup on unmount
+    return () => {
+      newSocket.close();
+    };
+  }, []);
+
+  return { socket, reconnecting, error, setError };
+}
