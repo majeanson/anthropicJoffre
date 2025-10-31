@@ -22,6 +22,9 @@ import {
   joinGamePayloadSchema,
 } from '../validation/schemas';
 
+// Import conditional persistence manager
+import * as PersistenceManager from '../db/persistenceManager';
+
 /**
  * Dependencies needed by the lobby handlers
  */
@@ -163,29 +166,32 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       currentRoundTricks: [],
     };
 
-    // Persist game to database (with fallback to cache-only)
-    await saveGame(gameState);
-    gameCreationTimes.set(gameId, Date.now()); // Store actual creation timestamp
+    // Persist game to database (conditional on persistence mode)
+    const createdAt = new Date();
+    await PersistenceManager.saveOrUpdateGame(gameState, createdAt);
+    gameCreationTimes.set(gameId, createdAt.getTime()); // Store actual creation timestamp
     socket.join(gameId);
 
-    // Create session for reconnection (using DB-backed sessions)
-    let session: PlayerSession;
-    try {
-      session = await createDBSession(playerName, socket.id, gameId);
-    } catch (error) {
-      console.error('Failed to create DB session, falling back to in-memory:', error);
-      session = createPlayerSession(gameId, socket.id, playerName);
-    }
+    // Create session for reconnection (conditional on persistence mode)
+    const session = await PersistenceManager.createSession(
+      sanitizedName,
+      socket.id,
+      gameId,
+      persistenceMode,
+      false // isBot
+    );
 
     // Track online player status
-    updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
+    updateOnlinePlayer(socket.id, sanitizedName, 'in_team_selection', gameId);
 
-    // Update player presence in database
-    try {
-      await updatePlayerPresence(playerName, 'online', socket.id, gameId);
-    } catch (error) {
-      console.error('Failed to update player presence:', error);
-    }
+    // Update player presence in database (conditional on persistence mode)
+    await PersistenceManager.updatePlayerPresence(
+      sanitizedName,
+      'online',
+      persistenceMode,
+      socket.id,
+      gameId
+    );
 
     socket.emit('game_created', { gameId, gameState, session });
 
@@ -238,16 +244,14 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       // Join game room
       socket.join(gameId);
 
-      // Create new session for human players only (DB-backed)
-      let session: PlayerSession | undefined;
-      if (!existingPlayer.isBot) {
-        try {
-          session = await createDBSession(sanitizedName, socket.id, gameId);
-        } catch (error) {
-          console.error('Failed to create DB session for rejoin, falling back to in-memory:', error);
-          session = createPlayerSession(gameId, socket.id, sanitizedName);
-        }
-      }
+      // Create new session (conditional on persistence mode and player type)
+      const session = await PersistenceManager.createSession(
+        sanitizedName,
+        socket.id,
+        gameId,
+        game.persistenceMode,
+        existingPlayer.isBot || false
+      );
 
       // Update timeout if this player had an active timeout
       const oldTimeoutKey = `${gameId}-${oldSocketId}`;
@@ -344,19 +348,14 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       console.log(`Cancelled disconnect timeout for rejoining player ${socket.id}`);
     }
 
-    // Create session for reconnection (only for human players, not bots) - DB-backed
-    let session: PlayerSession | undefined;
-    if (!isBot) {
-      try {
-        session = await createDBSession(sanitizedName, socket.id, gameId);
-        console.log('Created DB session for human player:', sanitizedName, 'socket:', socket.id);
-      } catch (error) {
-        console.error('Failed to create DB session, falling back to in-memory:', error);
-        session = createPlayerSession(gameId, socket.id, sanitizedName);
-      }
-    } else {
-      console.log('Skipping session for bot:', sanitizedName);
-    }
+    // Create session for reconnection (conditional on persistence mode and player type)
+    const session = await PersistenceManager.createSession(
+      sanitizedName,
+      socket.id,
+      gameId,
+      game.persistenceMode,
+      isBot || false
+    );
 
     // Track online player status
     updateOnlinePlayer(socket.id, sanitizedName, 'in_team_selection', gameId);

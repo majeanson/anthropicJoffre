@@ -89,21 +89,42 @@ export function emitGameUpdate(
   // Store current state as previous for next delta
   previousGameStates.set(gameId, JSON.parse(JSON.stringify(gameState))); // Deep clone
 
-  // Clear any pending save for this game
-  const existingSaveTimeout = gameSaveTimeouts.get(gameId);
-  if (existingSaveTimeout) {
-    clearTimeout(existingSaveTimeout);
+  // **OPTIMIZATION: Only save to database on significant events**
+  // This reduces DB calls from ~50+ per game to ~5 (phase transitions only)
+  //
+  // Save triggers:
+  // 1. Phase changes (team_selection → betting → playing → scoring → game_over)
+  // 2. Force-saved events (player join, game creation, etc.)
+  //
+  // Skipped: Card plays, bets within same phase (saved at round/game end anyway)
+  const shouldSaveToDatabase = shouldSendFull; // Phase change or forced
+
+  if (shouldSaveToDatabase) {
+    // Clear any pending save for this game
+    const existingSaveTimeout = gameSaveTimeouts.get(gameId);
+    if (existingSaveTimeout) {
+      clearTimeout(existingSaveTimeout);
+      gameSaveTimeouts.delete(gameId);
+    }
+
+    // Debounce database save (wait 100ms for any additional updates)
+    const saveTimeout = setTimeout(() => {
+      saveGame(gameState).catch(err => {
+        console.error(`Failed to persist game ${gameId}:`, err);
+      });
+      gameSaveTimeouts.delete(gameId);
+    }, 100);
+
+    gameSaveTimeouts.set(gameId, saveTimeout);
+
+    if (process.env.NODE_ENV === 'development') {
+      logger.debug('Scheduled DB save', {
+        gameId,
+        phase: gameState.phase,
+        reason: forceFull ? 'forced' : 'phase_change',
+      });
+    }
   }
-
-  // Debounce database save (wait 100ms for any additional updates)
-  const saveTimeout = setTimeout(() => {
-    saveGame(gameState).catch(err => {
-      console.error(`Failed to persist game ${gameId}:`, err);
-    });
-    gameSaveTimeouts.delete(gameId);
-  }, 100);
-
-  gameSaveTimeouts.set(gameId, saveTimeout);
 }
 
 /**
