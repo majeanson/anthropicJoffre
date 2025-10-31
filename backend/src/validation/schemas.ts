@@ -259,7 +259,7 @@ export function validateInput<T>(
   } catch (error) {
     if (error instanceof z.ZodError) {
       // Format Zod errors into user-friendly message
-      const firstError = error.errors[0];
+      const firstError = error.issues[0];
       const path = firstError.path.join('.');
       const message = firstError.message;
       return {
@@ -283,7 +283,7 @@ export function validateInputOrThrow<T>(
     return schema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const firstError = error.errors[0];
+      const firstError = error.issues[0];
       const path = firstError.path.join('.');
       const message = firstError.message;
       const errorMsg = context

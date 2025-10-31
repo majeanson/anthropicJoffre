@@ -203,3 +203,45 @@ export interface OnlinePlayer {
   gameId?: string;
   lastActivity: number;
 }
+
+/**
+ * Player statistics from database
+ */
+export interface PlayerStats {
+  id: number;
+  player_name: string;
+  games_played: number;
+  games_won: number;
+  games_lost: number;
+  games_abandoned: number;
+  win_percentage: number;
+  total_tricks_won: number;
+  total_points_earned: number;
+  avg_tricks_per_game: number;
+  total_bets_made: number;
+  bets_won: number;
+  bets_lost: number;
+  avg_bet_amount: number;
+  total_bet_amount: number;
+  highest_bet: number;
+  without_trump_bets: number;
+  trump_cards_played: number;
+  red_zeros_collected: number;
+  brown_zeros_received: number;
+  elo_rating: number;
+  highest_rating: number;
+  is_bot: boolean;
+  created_at: Date;
+  updated_at: Date;
+  // Additional calculated fields from query
+  total_rounds_played?: number;
+  rounds_won?: number;
+  rounds_win_percentage?: number;
+  avg_tricks_per_round?: number;
+  bet_success_rate?: number;
+  avg_points_per_round?: number;
+  ranking_tier?: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+  current_win_streak?: number;
+  current_loss_streak?: number;
+  best_win_streak?: number;
+}

@@ -1124,7 +1124,6 @@ app.get('/api/health/detailed', (req, res) => {
         activeGames: games.size,
         connectedSockets: io.sockets.sockets.size,
         onlinePlayers: onlinePlayers.size,
-        activeBotTimeouts: activeBotTimeouts.size,
         activePlayerTimeouts: activeTimeouts.size,
       },
 
@@ -1532,27 +1531,7 @@ app.get('/api/players/:playerName/games', async (req, res) => {
   try {
     const { playerName } = req.params;
 
-    // Get games from database
-    const dbGames = await getPlayerGames(playerName);
-
-    // Also check in-memory games
-    const inMemoryGames = Array.from(games.values())
-      .filter((game: GameState) => game.players.some((p: Player) => p.name === playerName))
-      .map((game: GameState) => ({
-        gameId: game.id,
-        phase: game.phase,
-        status: game.phase === 'game_over' ? 'finished' :
-                game.phase === 'team_selection' ? 'waiting' : 'in_progress',
-        playerCount: game.players.length,
-        playerNames: game.players.map(p => p.name),
-        teamAssignments: game.players.reduce((acc, p) => {
-          acc[p.name] = p.teamId;
-          return acc;
-        }, {} as Record<string, number>),
-        createdAt: gameCreationTimes.get(game.id) || Date.now(),
-      }));
-
-    // Merge results (prefer in-memory)
+    // Define response format
     interface PlayerGameSummary {
       gameId: string;
       playerNames: string[];
@@ -1562,8 +1541,37 @@ app.get('/api/players/:playerName/games', async (req, res) => {
       team1Score?: number;
       team2Score?: number;
     }
+
+    // Get games from database
+    const dbGames = await getPlayerGames(playerName);
+
+    // Transform dbGames (GameListItem[]) to PlayerGameSummary[]
+    const dbGamesSummary: PlayerGameSummary[] = dbGames.map(g => ({
+      gameId: g.gameId,
+      playerNames: g.playerNames,
+      teamIds: g.playerNames.map(name => g.teamAssignments[name] || null),
+      createdAt: g.createdAt instanceof Date ? g.createdAt.getTime() : g.createdAt,
+      isFinished: g.status === 'finished',
+      team1Score: undefined, // Not available from GameListItem
+      team2Score: undefined, // Not available from GameListItem
+    }));
+
+    // Also check in-memory games and transform to PlayerGameSummary
+    const inMemoryGames: PlayerGameSummary[] = Array.from(games.values())
+      .filter((game: GameState) => game.players.some((p: Player) => p.name === playerName))
+      .map((game: GameState) => ({
+        gameId: game.id,
+        playerNames: game.players.map(p => p.name),
+        teamIds: game.players.map(p => p.teamId),
+        createdAt: gameCreationTimes.get(game.id) || Date.now(),
+        isFinished: game.phase === 'game_over',
+        team1Score: game.phase === 'game_over' ? game.teamScores.team1 : undefined,
+        team2Score: game.phase === 'game_over' ? game.teamScores.team2 : undefined,
+      }));
+
+    // Merge results (prefer in-memory)
     const gameMap = new Map<string, PlayerGameSummary>();
-    dbGames.forEach((g) => gameMap.set(g.gameId, g));
+    dbGamesSummary.forEach((g) => gameMap.set(g.gameId, g));
     inMemoryGames.forEach((g) => gameMap.set(g.gameId, g));
 
     const playerGames = Array.from(gameMap.values())
@@ -1758,10 +1766,10 @@ io.on('connection', (socket) => {
       let session: PlayerSession | undefined;
       if (!existingPlayer.isBot) {
         try {
-          session = await createDBSession(playerName, socket.id, gameId);
+          session = await createDBSession(sanitizedName, socket.id, gameId);
         } catch (error) {
           console.error('Failed to create DB session for rejoin, falling back to in-memory:', error);
-          session = createPlayerSession(gameId, socket.id, playerName);
+          session = createPlayerSession(gameId, socket.id, sanitizedName);
         }
       }
 
@@ -1783,7 +1791,7 @@ io.on('connection', (socket) => {
 
       // Track online player status (only for human players)
       if (!existingPlayer.isBot) {
-        updateOnlinePlayer(socket.id, playerName, 'in_game', gameId);
+        updateOnlinePlayer(socket.id, sanitizedName, 'in_game', gameId);
       }
 
       // Emit appropriate response
@@ -1799,7 +1807,7 @@ io.on('connection', (socket) => {
 
         // Notify other players
         socket.to(gameId).emit('player_reconnected', {
-          playerName,
+          playerName: sanitizedName,
           playerId: socket.id,
           oldSocketId
         });
@@ -1808,7 +1816,7 @@ io.on('connection', (socket) => {
         emitGameUpdate(gameId, game);
       }
 
-      console.log(`Player ${playerName} successfully rejoined game ${gameId}`);
+      console.log(`Player ${sanitizedName} successfully rejoined game ${gameId}`);
       return;
     }
 
@@ -1859,23 +1867,23 @@ io.on('connection', (socket) => {
     let session: PlayerSession | undefined;
     if (!isBot) {
       try {
-        session = await createDBSession(playerName, socket.id, gameId);
-        console.log('Created DB session for human player:', playerName, 'socket:', socket.id);
+        session = await createDBSession(sanitizedName, socket.id, gameId);
+        console.log('Created DB session for human player:', sanitizedName, 'socket:', socket.id);
       } catch (error) {
         console.error('Failed to create DB session, falling back to in-memory:', error);
-        session = createPlayerSession(gameId, socket.id, playerName);
+        session = createPlayerSession(gameId, socket.id, sanitizedName);
       }
     } else {
-      console.log('Skipping session for bot:', playerName);
+      console.log('Skipping session for bot:', sanitizedName);
     }
 
     // Track online player status
-    updateOnlinePlayer(socket.id, playerName, 'in_team_selection', gameId);
+    updateOnlinePlayer(socket.id, sanitizedName, 'in_team_selection', gameId);
 
     // Update player presence in database (only for human players)
     if (!isBot) {
       try {
-        await updatePlayerPresence(playerName, 'online', socket.id, gameId);
+        await updatePlayerPresence(sanitizedName, 'online', socket.id, gameId);
       } catch (error) {
         console.error('Failed to update player presence:', error);
       }
@@ -1888,7 +1896,7 @@ io.on('connection', (socket) => {
     socket.to(gameId).emit('player_joined', { player, gameState: game });
 
     // Associate player with connection manager
-    connectionManager.associatePlayer(socket.id, playerName, player.id, gameId, isBot || false);
+    connectionManager.associatePlayer(socket.id, sanitizedName, player.id, gameId, isBot || false);
   }));
 
   socket.on('select_team', errorBoundaries.gameAction('select_team')(({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
@@ -2221,14 +2229,14 @@ io.on('connection', (socket) => {
 
   socket.on('play_card', errorBoundaries.gameAction('play_card')((payload: { gameId: string; card: Card }) => {
     // Sprint 2: Validate input with Zod schema
-    const validation = validateInput(playCardPayloadSchema, payload);
-    if (!validation.success) {
-      socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid play_card payload', { payload, error: validation.error });
+    const inputValidation = validateInput(playCardPayloadSchema, payload);
+    if (!inputValidation.success) {
+      socket.emit('error', { message: `Invalid input: ${inputValidation.error}` });
+      logger.warn('Invalid play_card payload', { payload, error: inputValidation.error });
       return;
     }
 
-    const { gameId, card } = validation.data;
+    const { gameId, card } = inputValidation.data;
 
     // Basic validation: game exists
     const game = games.get(gameId);
@@ -2268,10 +2276,10 @@ io.on('connection', (socket) => {
     console.log(`   Current turn index: ${game.currentPlayerIndex} (${currentPlayer.name})`);
 
     // VALIDATION - Use pure validation function
-    const validation = validateCardPlay(game, socket.id, card);
-    if (!validation.success) {
-      console.log(`   ❌ REJECTED: ${validation.error}`);
-      socket.emit('invalid_move', { message: validation.error });
+    const playValidation = validateCardPlay(game, socket.id, card);
+    if (!playValidation.success) {
+      console.log(`   ❌ REJECTED: ${playValidation.error}`);
+      socket.emit('invalid_move', { message: playValidation.error });
       return;
     }
 

@@ -214,13 +214,13 @@ export class ConnectionManager extends EventEmitter {
     const queue = [...conn.messageQueue];
     conn.messageQueue = [];
 
-    for (const { event, data } of queue) {
+    for (const message of queue) {
       try {
-        conn.socket.emit(event, data);
+        conn.socket.emit(message.event, message.data);
       } catch (error) {
-        this.log(`Error flushing message '${event}' to ${socketId}: ${error}`);
+        this.log(`Error flushing message '${message.event}' to ${socketId}: ${error}`);
         // Re-queue if failed
-        conn.messageQueue.push({ event, data });
+        conn.messageQueue.push(message);
       }
     }
   }
