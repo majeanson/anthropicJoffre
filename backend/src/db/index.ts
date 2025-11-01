@@ -25,7 +25,7 @@ const getPool = () => {
       max: 5,                        // Reduced to 5 for Neon Free Tier (was 10)
       min: 0,                        // Allow pool to scale to 0 when idle
       idleTimeoutMillis: 30000,      // Close idle connections after 30s (Neon scale-to-zero)
-      connectionTimeoutMillis: 3000, // Fail fast if can't connect in 3s
+      connectionTimeoutMillis: 10000, // 10s timeout (was 3s - too aggressive for cold starts)
       allowExitOnIdle: true,         // Allow process to exit when pool is idle
     });
 
