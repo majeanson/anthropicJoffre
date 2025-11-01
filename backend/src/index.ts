@@ -449,18 +449,16 @@ async function getGame(gameId: string): Promise<GameState | undefined> {
 /**
  * Save game to both cache and database
  * Ensures persistence across server restarts
+ * Uses conditional persistence based on game mode
  */
 async function saveGame(gameState: GameState): Promise<void> {
-  // Update cache
+  // Update cache (always)
   games.set(gameState.id, gameState);
 
-  // Persist to database (async, non-blocking)
-  try {
-    await saveGameToDB(gameState);
-  } catch (error) {
-    console.error(`Failed to save game ${gameState.id} to database:`, error);
-    // Continue execution - cache is still valid
-  }
+  // Persist to database (conditional on persistence mode)
+  const createdAtMs = gameCreationTimes.get(gameState.id) || Date.now();
+  const createdAt = new Date(createdAtMs);
+  await PersistenceManager.saveOrUpdateGame(gameState, createdAt);
 }
 
 /**
