@@ -725,10 +725,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                   <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
                     {(() => {
                       // Create combined hand: actual hand + card in transition (if it's no longer in hand)
-                      const displayHand = [...currentPlayer.hand];
+                      const displayHand = [...currentPlayer!.hand];
 
                       // If a card is in transition and not in the current hand, add it temporarily
-                      if (cardInTransition && !currentPlayer.hand.some(c => c.color === cardInTransition.color && c.value === cardInTransition.value)) {
+                      if (cardInTransition && !currentPlayer!.hand.some(c => c.color === cardInTransition.color && c.value === cardInTransition.value)) {
                         displayHand.push(cardInTransition);
                       }
 
