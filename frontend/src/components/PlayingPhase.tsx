@@ -240,9 +240,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     setPreviousRoundScores({ team1: team1RoundScore, team2: team2RoundScore });
   }, [gameState.players]);
 
-  if (!currentPlayer) return null;
-
-  // Find current player's index
+  // Find current player's index (currentPlayer is guaranteed to exist here due to early return at line 55)
   const currentPlayerIndex = gameState.players.findIndex(p => p.id === currentPlayerId);
 
   // Arrange cards in circular order relative to current player (bottom)
