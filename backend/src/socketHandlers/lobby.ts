@@ -135,7 +135,8 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // Player name is already validated and sanitized by Zod schema
     const sanitizedName = validatedPlayerName;
 
-    const gameId = Math.random().toString(36).substring(7).toUpperCase();
+    // Generate 8-character game ID (matches validation schema minimum)
+    const gameId = Math.random().toString(36).substring(2, 10).toUpperCase();
     const player: Player = {
       id: socket.id,
       name: sanitizedName,
