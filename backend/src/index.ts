@@ -777,7 +777,11 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
     console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
     // Small delay to ensure clients render the 4-card state before resolution
     setTimeout(() => {
+      console.log(`   ⏰ 100ms setTimeout fired, calling resolveTrick()`);
+      const resolveStart = Date.now();
       resolveTrick(gameId);
+      const resolveDuration = Date.now() - resolveStart;
+      console.log(`   ⏰ resolveTrick() returned after ${resolveDuration}ms`);
     }, 100);
     // Note: timeout will be started by resolveTrick after 2-second delay
   } else {
@@ -1109,11 +1113,17 @@ function resolveTrick(gameId: string) {
   }
 
   // 4. I/O - Emit trick resolution event with trick still visible
+  console.log(`   📤 BEFORE broadcastGameUpdate (trick_resolved)`);
+  const emitStart = Date.now();
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: gameToSend || game });
+  const emitDuration = Date.now() - emitStart;
+  console.log(`   📤 AFTER broadcastGameUpdate (took ${emitDuration}ms)`);
 
   // 5. ORCHESTRATION - Handle round completion or continue playing
   // Sprint 5 Phase 2.3: Extracted setTimeout logic to schedulePostTrickActions()
+  console.log(`   🔜 Calling schedulePostTrickActions (isRoundOver: ${result.isRoundOver})`);
   schedulePostTrickActions(gameId, winnerName, result.isRoundOver);
+  console.log(`   ✅ resolveTrick function complete, returning to caller`);
 }
 
 
