@@ -360,13 +360,15 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // Track online player status
     updateOnlinePlayer(socket.id, sanitizedName, 'in_team_selection', gameId);
 
-    // Update player presence in database (only for human players)
+    // Update player presence in database (conditional on persistence mode, only for human players)
     if (!isBot) {
-      try {
-        await updatePlayerPresence(sanitizedName, 'online', socket.id, gameId);
-      } catch (error) {
-        console.error('Failed to update player presence:', error);
-      }
+      await PersistenceManager.updatePlayerPresence(
+        sanitizedName,
+        'online',
+        game.persistenceMode,
+        socket.id,
+        gameId
+      );
     }
 
     // Send session only to the joining player (not broadcast to everyone)
@@ -472,13 +474,8 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       return;
     }
 
-    // Clean up player sessions from database
-    try {
-      await deletePlayerSessions(player.name, gameId);
-      console.log(`Deleted DB sessions for ${player.name} leaving game ${gameId}`);
-    } catch (error) {
-      console.error('Failed to delete player sessions from DB:', error);
-    }
+    // Clean up player sessions from database (conditional on persistence mode)
+    await PersistenceManager.deletePlayerSessions(player.name, gameId, game.persistenceMode);
 
     // Remove player from game
     const playerIndex = game.players.findIndex(p => p.id === socket.id);
