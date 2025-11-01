@@ -606,7 +606,8 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 </div>
 
                 {/* Left - Next player anti-clockwise (position 1) */}
-                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                  {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId, 1)}
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(1) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
@@ -614,7 +615,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                   } ${previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
-                  {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId, 1)}
                 </div>
 
                 {/* Top - Opposite player (position 2) */}
@@ -630,7 +630,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 </div>
 
                 {/* Right - Previous player anti-clockwise (position 3) */}
-                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId, 3)}
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
@@ -662,7 +662,8 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 </div>
 
                 {/* Left - Next player anti-clockwise (position 1) */}
-                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                  {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(1) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
@@ -670,7 +671,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                   } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
                     {getPlayerName(1)}
                   </div>
-                  {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
                 </div>
 
                 {/* Top - Opposite player (position 2) */}
@@ -686,7 +686,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 </div>
 
                 {/* Right - Previous player anti-clockwise (position 3) */}
-                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex items-center gap-1.5 md:gap-2">
+                <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(3) === 1
