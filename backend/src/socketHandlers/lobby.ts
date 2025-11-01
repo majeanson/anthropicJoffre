@@ -168,6 +168,9 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       currentRoundTricks: [],
     };
 
+    // Add game to in-memory cache (ALWAYS - required for gameplay)
+    games.set(gameId, gameState);
+
     // Persist game to database (conditional on persistence mode)
     const createdAt = new Date();
     await PersistenceManager.saveOrUpdateGame(gameState, createdAt);
