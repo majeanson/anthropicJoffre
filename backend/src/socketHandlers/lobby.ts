@@ -209,6 +209,11 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // Sprint 2: Validate input with Zod schema
     const validation = validateInput(joinGamePayloadSchema, payload);
     if (!validation.success) {
+      console.error('[VALIDATION ERROR] join_game failed:', {
+        payload: JSON.stringify(payload),
+        error: validation.error,
+        socketId: socket.id
+      });
       socket.emit('error', { message: `Invalid input: ${validation.error}` });
       logger.warn('Invalid join_game payload', { payload, error: validation.error });
       return;
