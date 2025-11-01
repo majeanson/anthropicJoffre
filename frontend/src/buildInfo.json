@@ -1,11 +1,25 @@
 {
-  "buildDate": "2025-10-31T22:28:00.000Z",
-  "version": "1.0.29",
+  "buildDate": "2025-10-31T22:59:36.000Z",
+  "version": "1.0.30",
   "git": {
-    "commitMessage": "fix(bots): Prevent timeout rescheduling race condition",
-    "commitHash": "6bce324",
-    "commitDate": "2025-10-31 22:28:00 -0400",
+    "commitMessage": "fix(ui): Move left/right player badges below cards to prevent layout shifting",
+    "commitHash": "dd1ec64",
+    "commitDate": "2025-10-31 22:59:36 -0400",
     "branch": "main"
+  },
+  "lastSession": {
+    "date": "2025-10-31",
+    "summary": "Fixed critical connection timeout issues and UI layout",
+    "achievements": [
+      "Identified and fixed Socket.IO pingTimeout (10s → 60s) causing mass disconnections",
+      "Fixed bot timeout rescheduling race condition preventing duplicate actions",
+      "Fixed database connection timeout for cold starts (3s → 10s)",
+      "Fixed circular trick layout - moved left/right player badges below cards",
+      "Added extensive debug logging to diagnose event loop blocking",
+      "Audited all timeouts and rate limits across the codebase"
+    ],
+    "commits": 7,
+    "linesChanged": "~200 added, ~50 modified"
   },
   "futureTodos": [
     "Sprint 6: E2E Test Refactoring - Single-browser architecture for stability",
@@ -13,6 +27,8 @@
     "WebSocket Integration Tests - Backend multi-player test suite",
     "CI/CD Pipeline - Automated deployment and testing",
     "Improve Bot AI - Advanced strategy and card tracking",
-    "Enhanced Leaderboard - Charts, statistics, and CSV export"
+    "Enhanced Leaderboard - Charts, statistics, and CSV export",
+    "Performance optimization - Bundle splitting and code optimization",
+    "Mobile UX improvements - Touch gestures and responsive tweaks"
   ]
 }
