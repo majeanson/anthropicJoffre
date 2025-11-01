@@ -40,7 +40,11 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             Your player data could not be found in this game.
           </p>
           <button
-            onClick={onLeaveGame}
+            onClick={() => {
+              // Force reload to lobby - handles cases where socket is disconnected
+              sessionStorage.removeItem('gameSession');
+              window.location.reload();
+            }}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
           >
             Return to Lobby

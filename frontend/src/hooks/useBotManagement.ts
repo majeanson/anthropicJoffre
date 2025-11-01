@@ -17,6 +17,17 @@ import { applyStateDelta, GameStateDelta } from '../utils/stateDelta';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
+// Socket.IO configuration for bot sockets - must match main socket configuration
+// to prevent connection timeouts (server has 10s pingTimeout)
+const BOT_SOCKET_CONFIG = {
+  transports: ['websocket', 'polling'],
+  reconnection: true,
+  reconnectionAttempts: 10,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  timeout: 10000,
+};
+
 interface BotTakeoverModalState {
   gameId: string;
   availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
@@ -188,9 +199,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
       // Create new socket for the bot
       console.log(`Spawning new bot socket for ${botName}`);
-      const botSocket = io(SOCKET_URL, {
-        transports: ['websocket', 'polling'],
-      });
+      const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
 
       // Store the bot socket reference using NAME as key (stable across reconnects)
       botSocketsRef.current.set(botName, botSocket);
@@ -280,7 +289,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     const botName = `Bot ${botNumber}`;
 
-    const botSocket = io(SOCKET_URL);
+    const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
 
     botSocket.on('connect', () => {
       botSocket.emit('join_game', { gameId, playerName: botName, isBot: true });
@@ -361,7 +370,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
       setTimeout(() => {
         console.log('[Quick Play] Spawning 3 bots...');
         for (let i = 0; i < 3; i++) {
-          const botSocket = io(SOCKET_URL);
+          const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
           const botName = `Bot ${i + 1}`;
           console.log(`[Quick Play] Creating bot socket for ${botName}, SOCKET_URL:`, SOCKET_URL);
 
