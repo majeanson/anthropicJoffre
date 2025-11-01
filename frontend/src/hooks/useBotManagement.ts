@@ -337,9 +337,14 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
           });
 
           botSocket.on('game_updated', (state: GameState) => {
+            console.log(`[Quick Play] ${botName} received game_updated - Current turn: ${state.players[state.currentPlayerIndex]?.name} (index ${state.currentPlayerIndex}), phase: ${state.phase}`);
             const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
             if (botPlayerId) {
               handleBotAction(botSocket, state, botPlayerId);
+            } else {
+              console.warn(`[Quick Play] ${botName} not found in game state on game_updated`, {
+                players: state.players.map(p => ({ name: p.name, id: p.id, isBot: p.isBot }))
+              });
             }
           });
 
