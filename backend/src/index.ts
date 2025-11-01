@@ -205,6 +205,9 @@ import { formatBytes, formatUptime } from './utils/formatting';
 const app = express();
 const httpServer = createServer(app);
 
+// Trust proxy for Railway deployment (enables X-Forwarded-For header)
+app.set('trust proxy', true);
+
 // Configure CORS for Socket.io
 const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, ''); // Remove trailing slash
 const allowedOrigins: string[] = [
