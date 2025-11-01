@@ -80,12 +80,12 @@ import {
 import {
   saveGameHistory,
   getRecentGames,
-  saveOrUpdateGame,
-  markGameFinished,
-  saveGameParticipants,
+  saveOrUpdateGame as dbSaveOrUpdateGame,
+  markGameFinished as dbMarkGameFinished,
+  saveGameParticipants as dbSaveGameParticipants,
   updatePlayerStats,
-  updateRoundStats,
-  updateGameStats,
+  updateRoundStats as dbUpdateRoundStats,
+  updateGameStats as dbUpdateGameStats,
   calculateEloChange,
   getPlayerStats,
   getLeaderboard,
@@ -99,6 +99,8 @@ import {
   getPoolStats,
   closePool,
 } from './db';
+// Import conditional persistence manager
+import * as PersistenceManager from './db/persistenceManager';
 import {
   saveGameState as saveGameToDB,
   loadGameState as loadGameFromDB,
@@ -1128,15 +1130,15 @@ async function endRound(gameId: string) {
   console.log(`Defensive Team ${scoring.defensiveTeamId}: +${scoring.defensiveScore}`);
   console.log(`Round ${game.roundNumber} Scores - Team 1: ${game.teamScores.team1}, Team 2: ${game.teamScores.team2}`);
 
-  // Save game state incrementally after each round
+  // Save game state incrementally after each round (conditional on persistence mode)
   try {
     const createdAtMs = gameCreationTimes.get(gameId) || Date.now();
     const createdAt = new Date(createdAtMs);
-    await saveOrUpdateGame(game, createdAt);
-    await saveGameParticipants(gameId, game.players);
-    console.log(`Game ${gameId} saved after round ${game.roundNumber}`);
+    await PersistenceManager.saveOrUpdateGame(game, createdAt);
+    await PersistenceManager.saveGameParticipants(gameId, game.players, game.persistenceMode);
+    console.log(`[${game.persistenceMode.toUpperCase()}] Game ${gameId} saved after round ${game.roundNumber}`);
 
-    // Update round-level stats for NON-BOT players
+    // Update round-level stats for NON-BOT players (conditional on persistence mode)
     const humanPlayers = game.players.filter(p => !p.isBot);
     const stats = roundStats.get(gameId);
 
@@ -1145,7 +1147,7 @@ async function endRound(gameId: string) {
       const roundWon = playerTeamId === scoring.offensiveTeamId && scoring.betMade;
       const wasBidder = game.highestBet?.playerId === player.id;
 
-      await updateRoundStats(player.name, {
+      await PersistenceManager.updateRoundStats(player.name, {
         roundWon,
         tricksWon: player.tricksWon,
         pointsEarned: player.pointsWon,
@@ -1156,9 +1158,9 @@ async function endRound(gameId: string) {
         redZerosCollected: stats?.redZerosCollected.get(player.name) || 0,
         brownZerosReceived: stats?.brownZerosReceived.get(player.name) || 0,
         trumpsPlayed: stats?.trumpsPlayed.get(player.name) || 0,
-      });
+      }, game.persistenceMode);
 
-      console.log(`Updated round stats for ${player.name}: ${roundWon ? 'WIN' : 'LOSS'}`);
+      console.log(`[${game.persistenceMode.toUpperCase()}] Updated round stats for ${player.name}: ${roundWon ? 'WIN' : 'LOSS'}`);
     }
   } catch (error) {
     console.error('Error saving game progress:', error);
@@ -1170,49 +1172,39 @@ async function endRound(gameId: string) {
     const winningTeam = scoring.winningTeam;
 
     try {
-      // Mark game as finished in database
-      await markGameFinished(gameId, winningTeam);
-      console.log(`Game ${gameId} marked as finished, Team ${winningTeam} won`);
+      // Mark game as finished in database (conditional on persistence mode)
+      await PersistenceManager.markGameFinished(gameId, winningTeam, game.persistenceMode);
+      console.log(`[${game.persistenceMode.toUpperCase()}] Game ${gameId} marked as finished, Team ${winningTeam} won`);
 
-      // Update game-level stats for NON-BOT players only
+      // Update game-level stats for NON-BOT players only (conditional on persistence mode)
       const humanPlayers = game.players.filter(p => !p.isBot);
       const createdAtMs = gameCreationTimes.get(gameId) || Date.now();
       const gameDurationMinutes = Math.floor((Date.now() - createdAtMs) / 1000 / 60);
 
+      // Calculate ELO changes for all players (returns 0 for casual mode)
+      const eloChanges = await PersistenceManager.calculateEloChangesForGame(
+        game.players,
+        winningTeam,
+        game.persistenceMode
+      );
+
       for (const player of humanPlayers) {
         const won = player.teamId === winningTeam;
-
-        // Get current player stats to calculate ELO
-        let currentStats = await getPlayerStats(player.name);
-        const currentElo = currentStats?.elo_rating || 1200;
-
-        // Calculate opponent average ELO (opposing team's average)
-        const opposingTeam = humanPlayers.filter(p => p.teamId !== player.teamId);
-        const opponentElos = await Promise.all(
-          opposingTeam.map(async (opp) => {
-            const stats = await getPlayerStats(opp.name);
-            return stats?.elo_rating || 1200;
-          })
-        );
-        const avgOpponentElo = opponentElos.length > 0
-          ? opponentElos.reduce((sum, elo) => sum + elo, 0) / opponentElos.length
-          : 1200;
-
-        // Calculate ELO change
-        const eloChange = calculateEloChange(currentElo, avgOpponentElo, won);
+        const eloChange = eloChanges.get(player.name) || 0;
 
         // Update game-level stats (ELO, win/loss, streaks)
-        await updateGameStats(
+        await PersistenceManager.updateGameStats(
           player.name,
           {
             won,
             gameRounds: game.roundNumber,
             gameDurationMinutes,
           },
-          eloChange
+          eloChange,
+          game.persistenceMode
         );
 
-        console.log(`Updated game stats for ${player.name}: ${won ? 'WIN' : 'LOSS'}, ELO ${eloChange > 0 ? '+' : ''}${eloChange}`);
+        console.log(`[${game.persistenceMode.toUpperCase()}] Updated game stats for ${player.name}: ${won ? 'WIN' : 'LOSS'}, ELO ${eloChange > 0 ? '+' : ''}${eloChange}`);
       }
     } catch (error) {
       console.error('Error finalizing game:', error);
