@@ -20,6 +20,7 @@ import {
   validateInput,
   createGamePayloadSchema,
   joinGamePayloadSchema,
+  leaveGamePayloadSchema,
 } from '../validation/schemas';
 
 // Import conditional persistence manager
