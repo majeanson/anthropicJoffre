@@ -51,10 +51,8 @@ export function emitGameUpdate(
   const { io, previousGameStates, gameSaveTimeouts, logger, saveGame } = deps;
   const previousState = previousGameStates.get(gameId);
 
-  // TEMPORARY: Always send full state to debug timeout issue
-  // Delta updates may be causing client event loop blocking
-  // const shouldSendFull = forceFull || !previousState || previousState.phase !== gameState.phase;
-  const shouldSendFull = true; // Force full state, disable delta updates
+  // Send full state if forced, no previous state, or phase changed
+  const shouldSendFull = forceFull || !previousState || previousState.phase !== gameState.phase;
 
   if (shouldSendFull) {
     // Send full game state
@@ -71,11 +69,7 @@ export function emitGameUpdate(
       });
     }
   } else {
-    // Generate and send delta update (DISABLED - will not execute while shouldSendFull is forced true)
-    if (!previousState) {
-      console.log(`📡 emitGameUpdate: No previous state, cannot generate delta`);
-      return;
-    }
+    // Generate and send delta update
     console.log(`📡 emitGameUpdate: Generating DELTA for room ${gameId} (phase: ${gameState.phase}, trick: ${gameState.currentTrick.length} cards)`);
     const delta = generateStateDelta(previousState, gameState);
 

@@ -360,8 +360,8 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       reconnectTimeLeft: 900
     });
 
-    // Update game state for all players with persistence
-    emitGameUpdate(gameId, game);
+    // Skip emitGameUpdate on disconnect - it causes duplicate updates during mass disconnections
+    // The game state doesn't actually change on disconnect (just connectionStatus which is sent separately)
 
     // Set timeout to remove player if they don't reconnect
     const disconnectTimeout = setTimeout(async () => {

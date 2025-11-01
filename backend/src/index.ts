@@ -886,6 +886,8 @@ io.on('connection', (socket) => {
     resetBetting,
     applyCardPlay,
     resolveTrick,
+    handlePlayingTimeout,
+    handleBettingTimeout,
     emitGameUpdate,
     broadcastGameUpdate,
     logger,
@@ -1028,6 +1030,21 @@ function startNewRound(gameId: string) {
   const currentPlayer = game.players[game.currentPlayerIndex];
   if (currentPlayer) {
     startPlayerTimeout(gameId, currentPlayer.id, 'betting');
+
+    // Schedule bot action if first player is a bot
+    if (currentPlayer.isBot) {
+      console.log(`   🤖 Scheduling bot action for ${currentPlayer.name} in 2 seconds (new round)`);
+      setTimeout(() => {
+        const currentGame = games.get(gameId);
+        if (!currentGame || currentGame.phase !== 'betting') return;
+
+        const currentBot = currentGame.players[currentGame.currentPlayerIndex];
+        if (!currentBot || currentBot.name !== currentPlayer.name) return;
+
+        console.log(`   🤖 Bot ${currentPlayer.name} taking automatic action (start of round)`);
+        handleBettingTimeout(gameId, currentPlayer.name);
+      }, 2000); // 2 second delay for bot actions
+    }
   }
 }
 
@@ -1073,6 +1090,27 @@ function schedulePostTrickActions(
       console.log(`⏰ schedulePostTrickActions: Round continues, emitting game update and starting player timeout for ${winnerName}`);
       emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, winnerName, 'playing');
+
+      // Schedule bot action if winner is a bot
+      const winner = game.players.find(p => p.name === winnerName);
+      if (winner?.isBot) {
+        console.log(`   🤖 Scheduling bot action for ${winnerName} in 2 seconds`);
+        setTimeout(() => {
+          const currentGame = games.get(gameId);
+          if (!currentGame || currentGame.phase !== 'playing') return;
+
+          // Verify it's still this bot's turn
+          const currentBot = currentGame.players[currentGame.currentPlayerIndex];
+          if (!currentBot || currentBot.name !== winnerName) return;
+
+          // Check if bot already played
+          const hasPlayed = currentGame.currentTrick.some(tc => tc.playerName === winnerName);
+          if (hasPlayed) return;
+
+          console.log(`   🤖 Bot ${winnerName} taking automatic action (post-trick)`);
+          handlePlayingTimeout(gameId, winnerName);
+        }, 2000); // 2 second delay for bot actions
+      }
     }
     console.log(`⏰ schedulePostTrickActions: Post-trick actions complete`);
   }, delayMs);

@@ -76,6 +76,8 @@ export interface GameplayHandlersDependencies {
 
   // Game lifecycle
   resolveTrick: (gameId: string) => void;
+  handlePlayingTimeout: (gameId: string, playerName: string) => void;
+  handleBettingTimeout: (gameId: string, playerName: string) => void;
 
   // Emission helpers
   emitGameUpdate: (gameId: string, gameState: GameState, forceFull?: boolean) => void;
@@ -222,13 +224,45 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
       game.currentPlayerIndex = highestBidderIndex;
       console.log(`[PLACE_BET] 📡 Emitting game_updated (phase transition to playing)...`);
       emitGameUpdate(gameId, game);
-      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
+      const firstPlayer = game.players[game.currentPlayerIndex];
+      startPlayerTimeout(gameId, firstPlayer.id, 'playing');
+
+      // Schedule bot action if first player is a bot
+      if (firstPlayer?.isBot) {
+        console.log(`   🤖 Scheduling bot action for ${firstPlayer.name} in 2 seconds (playing phase)`);
+        setTimeout(() => {
+          const currentGame = games.get(gameId);
+          if (!currentGame || currentGame.phase !== 'playing') return;
+
+          const currentBot = currentGame.players[currentGame.currentPlayerIndex];
+          if (!currentBot || currentBot.name !== firstPlayer.name) return;
+
+          console.log(`   🤖 Bot ${firstPlayer.name} taking automatic action (start of playing)`);
+          deps.handlePlayingTimeout(gameId, firstPlayer.name);
+        }, 2000);
+      }
     } else {
       // Betting continues - emit update and start next player's timeout
       console.log(`[PLACE_BET] ➡️  Betting continues. Next player: ${game.players[game.currentPlayerIndex]?.name}`);
       console.log(`[PLACE_BET] 📡 Emitting game_updated (betting continues)...`);
       emitGameUpdate(gameId, game);
-      startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
+      const nextPlayer = game.players[game.currentPlayerIndex];
+      startPlayerTimeout(gameId, nextPlayer.id, 'betting');
+
+      // Schedule bot action if next player is a bot
+      if (nextPlayer?.isBot) {
+        console.log(`   🤖 Scheduling bot action for ${nextPlayer.name} in 2 seconds (betting)`);
+        setTimeout(() => {
+          const currentGame = games.get(gameId);
+          if (!currentGame || currentGame.phase !== 'betting') return;
+
+          const currentBot = currentGame.players[currentGame.currentPlayerIndex];
+          if (!currentBot || currentBot.name !== nextPlayer.name) return;
+
+          console.log(`   🤖 Bot ${nextPlayer.name} taking automatic action (betting)`);
+          deps.handleBettingTimeout(gameId, nextPlayer.name);
+        }, 2000);
+      }
     }
   }));
 
@@ -359,6 +393,27 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
       const nextPlayer = game.players[game.currentPlayerIndex];
       if (nextPlayer) {
         startPlayerTimeout(gameId, nextPlayer.id, 'playing');
+
+        // Schedule bot action if next player is a bot
+        if (nextPlayer.isBot) {
+          console.log(`   🤖 Scheduling bot action for ${nextPlayer.name} in 2 seconds`);
+          setTimeout(() => {
+            const currentGame = games.get(gameId);
+            if (!currentGame || currentGame.phase !== 'playing') return;
+
+            // Verify it's still this bot's turn
+            const currentBot = currentGame.players[currentGame.currentPlayerIndex];
+            if (!currentBot || currentBot.name !== nextPlayer.name) return;
+
+            // Check if bot already played
+            const hasPlayed = currentGame.currentTrick.some(tc => tc.playerName === nextPlayer.name);
+            if (hasPlayed) return;
+
+            console.log(`   🤖 Bot ${nextPlayer.name} taking automatic action`);
+            // Trigger the playing timeout handler which has bot logic
+            deps.handlePlayingTimeout(gameId, nextPlayer.name);
+          }, 2000); // 2 second delay for bot actions
+        }
       }
     }
   }));
