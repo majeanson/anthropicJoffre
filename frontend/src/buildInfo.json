@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-10-31T22:00:00.000Z",
-  "version": "1.0.27",
+  "buildDate": "2025-10-31T22:18:35.000Z",
+  "version": "1.0.28",
   "git": {
-    "commitMessage": "refactor(frontend): Sprint 5 Phase 3 - Extract bot management to custom hook",
-    "commitHash": "8b75d53",
-    "commitDate": "2025-10-31 18:00:00 -0400",
+    "commitMessage": "fix(bots): Prevent duplicate actions from delta updates",
+    "commitHash": "d8fa1d8",
+    "commitDate": "2025-10-31 22:18:35 -0400",
     "branch": "main"
   },
   "futureTodos": [
