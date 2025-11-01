@@ -467,7 +467,21 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   // ============================================================================
   // leave_game - Leave the game
   // ============================================================================
-  socket.on('leave_game', errorBoundaries.gameAction('leave_game')(async ({ gameId }: { gameId: string }) => {
+  socket.on('leave_game', errorBoundaries.gameAction('leave_game')(async (payload: unknown) => {
+    // Validate input with Zod schema
+    const validation = validateInput(leaveGamePayloadSchema, payload);
+    if (!validation.success) {
+      console.error('[VALIDATION ERROR] leave_game failed:', {
+        payload: JSON.stringify(payload),
+        error: validation.error,
+        socketId: socket.id
+      });
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      return;
+    }
+
+    const { gameId } = validation.data;
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });

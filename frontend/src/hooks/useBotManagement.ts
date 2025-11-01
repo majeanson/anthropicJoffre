@@ -281,14 +281,22 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     // Listen for game creation to spawn bots
     const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string }) => {
+      console.log('[Quick Play] Game created, spawning bots for game:', createdGameId);
       // Spawn 3 bot players after game is created
       setTimeout(() => {
+        console.log('[Quick Play] Spawning 3 bots...');
         for (let i = 0; i < 3; i++) {
           const botSocket = io(SOCKET_URL);
           const botName = `Bot ${i + 1}`;
+          console.log(`[Quick Play] Creating bot socket for ${botName}, SOCKET_URL:`, SOCKET_URL);
 
           botSocket.on('connect', () => {
+            console.log(`[Quick Play] ${botName} connected, joining game ${createdGameId}`);
             botSocket.emit('join_game', { gameId: createdGameId, playerName: botName, isBot: true });
+          });
+
+          botSocket.on('error', (error: any) => {
+            console.error(`[Quick Play] ${botName} error:`, error);
           });
 
           // Listen to all game state updates
