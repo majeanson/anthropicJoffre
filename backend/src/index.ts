@@ -232,9 +232,10 @@ const io = new Server(httpServer, {
     // Skip middleware on recovery
     skipMiddlewares: true,
   },
-  // Ping timeout and interval for faster disconnect detection
-  pingTimeout: 10000, // 10 seconds
-  pingInterval: 5000,  // 5 seconds
+  // Ping timeout and interval
+  // Increased to 60s to prevent false timeouts when clients are busy processing bot actions/deltas
+  pingTimeout: 60000, // 60 seconds (was 10s - too aggressive)
+  pingInterval: 25000,  // 25 seconds (was 5s)
   // Enable WebSocket compression (reduces bandwidth by 30-60%)
   perMessageDeflate: {
     threshold: 1024, // Only compress messages > 1KB
