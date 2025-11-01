@@ -72,13 +72,6 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     const botDifficulty = botDifficultiesRef.current.get(bot.name) || 'hard';
     BotPlayer.setDifficulty(botDifficulty);
 
-    // Clear any existing timeout for this bot
-    const existingTimeout = botTimeoutsRef.current.get(botId);
-    if (existingTimeout) {
-      clearTimeout(existingTimeout);
-      botTimeoutsRef.current.delete(botId);
-    }
-
     // Don't act if trick is being resolved (4 cards played, waiting for resolution)
     if (state.phase === 'playing' && state.currentTrick.length >= 4) {
       console.log(`Bot ${botId} waiting for trick resolution...`);
@@ -132,19 +125,29 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     if (!currentPlayer || currentPlayer.id !== botId) return;
 
-    // Betting phase: Check if bot has already placed a bet
+    // Betting phase: Check if bot has already placed a bet OR has pending action
     if (state.phase === 'betting') {
       if (state.currentBets?.some(bet => bet.playerId === botId)) {
         console.log(`[Bot Action] ${currentPlayer.name} has already placed a bet, skipping`);
         return;
       }
+      // Check if bot already has a pending bet action
+      if (botTimeoutsRef.current.has(botId)) {
+        console.log(`[Bot Action] ${currentPlayer.name} already has pending bet action, skipping reschedule`);
+        return;
+      }
     }
 
-    // Playing phase: Check if bot has already played in this trick
+    // Playing phase: Check if bot has already played in this trick OR has pending action
     if (state.phase === 'playing') {
       const hasAlreadyPlayed = state.currentTrick.some(play => play.playerId === botId);
       if (hasAlreadyPlayed) {
         console.log(`[Bot Action] ${currentPlayer.name} has already played in this trick, skipping`);
+        return;
+      }
+      // Check if bot already has a pending play action
+      if (botTimeoutsRef.current.has(botId)) {
+        console.log(`[Bot Action] ${currentPlayer.name} already has pending play action, skipping reschedule`);
         return;
       }
     }
