@@ -132,6 +132,23 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     if (!currentPlayer || currentPlayer.id !== botId) return;
 
+    // Betting phase: Check if bot has already placed a bet
+    if (state.phase === 'betting') {
+      if (state.currentBets?.some(bet => bet.playerId === botId)) {
+        console.log(`[Bot Action] ${currentPlayer.name} has already placed a bet, skipping`);
+        return;
+      }
+    }
+
+    // Playing phase: Check if bot has already played in this trick
+    if (state.phase === 'playing') {
+      const hasAlreadyPlayed = state.currentTrick.some(play => play.playerId === botId);
+      if (hasAlreadyPlayed) {
+        console.log(`[Bot Action] ${currentPlayer.name} has already played in this trick, skipping`);
+        return;
+      }
+    }
+
     console.log(`[Bot Action] ${currentPlayer.name} taking action in ${state.phase} phase`);
 
     // Schedule bot action with delay
