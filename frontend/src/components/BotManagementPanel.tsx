@@ -17,6 +17,8 @@ export function BotManagementPanel({
   onReplaceWithBot,
   onChangeBotDifficulty,
 }: BotManagementPanelProps) {
+  // ✅ Follow PlayerStatsModal pattern: early return AFTER all potential hooks
+  // (This component has no hooks, but we follow the pattern for consistency)
   if (!isOpen) return null;
 
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
@@ -39,36 +41,40 @@ export function BotManagementPanel({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn" onClick={onClose}>
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 max-w-2xl w-full mx-4 border-4 border-blue-600 shadow-2xl animate-slideUp max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-3xl font-black text-blue-900">
-              🤖 Bot Management
-            </h2>
-            <p className="text-blue-700 font-semibold mt-1">
-              Bots: {botCount}/3 • {canAddMoreBots ? 'Can add more' : 'Max reached'}
-            </p>
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-blue-600 dark:border-gray-600">
+        {/* Header - Match PlayerStatsModal pattern */}
+        <div className="sticky top-0 bg-gradient-to-r from-blue-700 to-blue-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-blue-950 dark:border-gray-900 z-10">
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">🤖</span>
+            <div>
+              <h2 className="text-2xl font-bold text-white">Bot Management</h2>
+              <p className="text-blue-200 dark:text-gray-300 font-semibold">
+                Bots: {botCount}/3 • {canAddMoreBots ? 'Can add more' : 'Max reached'}
+              </p>
+            </div>
           </div>
           <button
             onClick={onClose}
-            className="text-blue-900 hover:bg-blue-200 rounded-full p-2 transition-colors"
-            title="Close"
+            className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            ✕
           </button>
         </div>
 
-        {/* Players List */}
-        <div className="space-y-3">
+        {/* Content - Match PlayerStatsModal pattern */}
+        <div className="p-6 space-y-3">
           {gameState.players.map((player, index) => {
             const isMe = player.id === currentPlayerId;
-            const bgColor = player.teamId === 1 ? 'bg-orange-50' : 'bg-purple-50';
-            const borderColor = player.teamId === 1 ? 'border-orange-300' : 'border-purple-300';
-            const textColor = player.teamId === 1 ? 'text-orange-700' : 'text-purple-700';
+            const bgColor = player.teamId === 1
+              ? 'bg-orange-50 dark:bg-orange-900/20'
+              : 'bg-purple-50 dark:bg-purple-900/20';
+            const borderColor = player.teamId === 1
+              ? 'border-orange-300 dark:border-orange-600'
+              : 'border-purple-300 dark:border-purple-600';
+            const textColor = player.teamId === 1
+              ? 'text-orange-700 dark:text-orange-300'
+              : 'text-purple-700 dark:text-purple-300';
             const isPlayerTurn = gameState.currentPlayerIndex === index;
 
             return (
@@ -108,11 +114,14 @@ export function BotManagementPanel({
                         <span className="text-sm font-bold text-gray-700">🤖 Bot</span>
                       </div>
 
-                      {/* Difficulty Selector */}
+                      {/* Difficulty Selector - Dark mode support */}
                       <select
                         value={player.botDifficulty || 'hard'}
-                        onChange={(e) => onChangeBotDifficulty(player.name, e.target.value as BotDifficulty)}
-                        className="bg-white border-2 border-gray-300 rounded-lg px-3 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onChange={(e) => {
+                          e.stopPropagation(); // Prevent modal closing on select
+                          onChangeBotDifficulty(player.name, e.target.value as BotDifficulty);
+                        }}
+                        className="bg-white dark:bg-gray-700 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
                         title="Change bot difficulty"
                       >
                         <option value="easy">😊 Easy</option>
@@ -129,7 +138,10 @@ export function BotManagementPanel({
                       {/* Replace Button */}
                       {canReplace(player) ? (
                         <button
-                          onClick={() => onReplaceWithBot(player.name)}
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent modal closing on click
+                            onReplaceWithBot(player.name);
+                          }}
                           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold transition-colors"
                           title="Replace with bot"
                         >
@@ -144,7 +156,7 @@ export function BotManagementPanel({
 
                 {/* Replacement Restrictions Tooltip */}
                 {!player.isBot && !canReplace(player) && player.id !== currentPlayerId && (
-                  <div className="mt-2 text-xs text-gray-600 italic">
+                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 italic">
                     {!isTeammate(player) && "⛔ Not your teammate"}
                     {isTeammate(player) && !canAddMoreBots && "⛔ Max 3 bots reached"}
                   </div>
@@ -153,14 +165,7 @@ export function BotManagementPanel({
             );
           })}
         </div>
-
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-3 rounded-xl font-black text-lg shadow-lg transition-all transform hover:scale-105"
-        >
-          Close
-        </button>
+        </div>
       </div>
     </div>
   );
