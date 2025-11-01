@@ -592,9 +592,9 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               </div>
 
               {/* Circular Layout for both mobile and desktop - ANTI-CLOCKWISE */}
-              <div className="relative h-[320px] md:h-[350px] z-40">
+              <div className="relative h-[340px] md:h-[380px] z-40">
                 {/* Bottom - You (position 0) */}
-                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
                   {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
@@ -618,7 +618,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 </div>
 
                 {/* Top - Opposite player (position 2) */}
-                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(2) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
@@ -646,11 +646,11 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             // Current Trick View - Circular layout on both mobile and desktop - ANTI-CLOCKWISE
             <>
               {/* Circular Layout for both mobile and desktop */}
-              <div className="relative h-[320px] md:h-[350px]" data-testid="trick-area">
-              
+              <div className="relative h-[340px] md:h-[380px]" data-testid="trick-area">
+
 
                 {/* Bottom - You (position 0) */}
-                <div className="absolute bottom-4 md:bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
                   {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(0) === 1
@@ -674,7 +674,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 </div>
 
                 {/* Top - Opposite player (position 2) */}
-                <div className="absolute top-4 md:top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
                   <div className={`max-w-[120px] truncate px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
                     getPlayerTeam(2) === 1
                       ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
