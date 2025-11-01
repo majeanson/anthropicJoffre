@@ -59,7 +59,9 @@ export class ConnectionManager extends EventEmitter {
       enableLogging: config.enableLogging || false
     };
 
-    this.startHeartbeat();
+    // Disabled: Socket.IO has built-in ping/pong mechanism (60s timeout configured in index.ts)
+    // The custom heartbeat was creating duplicate ping events that clients don't respond to
+    // this.startHeartbeat();
     this.startCleanup();
   }
 
@@ -84,14 +86,8 @@ export class ConnectionManager extends EventEmitter {
     this.connections.set(socket.id, connectionInfo);
     this.log(`New connection registered: ${socket.id}`);
 
-    // Setup heartbeat ping/pong
-    socket.on('pong', () => {
-      const conn = this.connections.get(socket.id);
-      if (conn) {
-        conn.lastHeartbeat = Date.now();
-        conn.isAlive = true;
-      }
-    });
+    // Note: Custom ping/pong disabled - using Socket.IO's built-in heartbeat
+    // Socket.IO automatically handles ping/pong with 60s timeout (configured in index.ts)
 
     // Handle disconnection
     socket.on('disconnect', () => {
