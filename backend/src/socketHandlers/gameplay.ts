@@ -132,8 +132,10 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     const game = games.get(gameId);
     if (!game) return;
 
-    // Rate limiting: Check per-player rate limit (Sprint 2)
     const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+    console.log(`\n[PLACE_BET] Player: ${playerName}, Amount: ${amount}, WithoutTrump: ${withoutTrump}, Skipped: ${skipped}`);
+
+    // Rate limiting: Check per-player rate limit (Sprint 2)
     const ipAddress = getSocketIP(socket);
     const rateLimit = rateLimiters.gameActions.checkLimit(playerName, ipAddress);
     if (!rateLimit.allowed) {
@@ -150,11 +152,15 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     rateLimiters.gameActions.recordRequest(playerName, ipAddress);
 
     // VALIDATION - Use pure validation function
+    console.log(`[PLACE_BET] Validating bet - amount: ${amount}, withoutTrump: ${withoutTrump}, skipped: ${skipped}`);
     const betValidation = validateBet(game, socket.id, amount, withoutTrump, skipped);
     if (!betValidation.success) {
+      console.log(`[PLACE_BET] ❌ Validation failed: ${betValidation.error}`);
       socket.emit('invalid_bet', { message: betValidation.error });
       return;
     }
+    console.log(`[PLACE_BET] ✅ Validation passed`);
+
 
     // Clear timeout for current player (side effect)
     clearPlayerTimeout(gameId, socket.id);
@@ -190,7 +196,10 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     }
 
     // STATE TRANSFORMATION - Use pure state function
+    console.log(`[PLACE_BET] Applying bet to game state...`);
     const result = applyBet(game, socket.id, amount, withoutTrump, skipped);
+    console.log(`[PLACE_BET] Result: bettingComplete=${result.bettingComplete}, allPlayersSkipped=${result.allPlayersSkipped}`);
+    console.log(`[PLACE_BET] Current player index: ${game.currentPlayerIndex}, Current player: ${game.players[game.currentPlayerIndex]?.name}`);
 
     // Handle all-players-skipped scenario
     if (result.allPlayersSkipped) {
@@ -203,6 +212,7 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
 
     // Handle betting completion - transition to playing phase
     if (result.bettingComplete) {
+      console.log(`[PLACE_BET] 🎯 Betting complete! Transitioning to playing phase...`);
       const dealerPlayerId = game.players[game.dealerIndex].id;
       game.highestBet = getHighestBet(game.currentBets, dealerPlayerId);
       game.phase = 'playing';
@@ -210,10 +220,13 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
         (p) => p.id === game.highestBet?.playerId
       );
       game.currentPlayerIndex = highestBidderIndex;
+      console.log(`[PLACE_BET] 📡 Emitting game_updated (phase transition to playing)...`);
       emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'playing');
     } else {
       // Betting continues - emit update and start next player's timeout
+      console.log(`[PLACE_BET] ➡️  Betting continues. Next player: ${game.players[game.currentPlayerIndex]?.name}`);
+      console.log(`[PLACE_BET] 📡 Emitting game_updated (betting continues)...`);
       emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, game.players[game.currentPlayerIndex].id, 'betting');
     }

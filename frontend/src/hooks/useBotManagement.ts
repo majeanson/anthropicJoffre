@@ -13,6 +13,7 @@ import { useRef, useState, useCallback } from 'react';
 import { Socket, io } from 'socket.io-client';
 import { GameState, PlayerSession } from '../types/game';
 import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from '../utils/botPlayerEnhanced';
+import { applyStateDelta, GameStateDelta } from '../utils/stateDelta';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
@@ -38,6 +39,8 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
   const botSocketsRef = useRef<Map<string, Socket>>(new Map());
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
   const botDifficultiesRef = useRef<Map<string, BotDifficulty>>(new Map());
+  // Track last known state for each bot socket (needed for delta updates)
+  const botStatesRef = useRef<Map<string, GameState>>(new Map());
   const [botDifficulty, setBotDifficulty] = useState<BotDifficulty>('medium');
   const [botManagementOpen, setBotManagementOpen] = useState<boolean>(false);
   const [botTakeoverModal, setBotTakeoverModal] = useState<BotTakeoverModalState | null>(null);
@@ -50,6 +53,9 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     // Find bot player and set difficulty
     const bot = state.players.find(p => p.id === botId && p.isBot);
     if (!bot) return; // Not a bot, exit early
+
+    // Store the latest state for this bot (needed for delta updates)
+    botStatesRef.current.set(bot.name, state);
 
     // Set bot difficulty from ref (default to hard if not found)
     const botDifficulty = botDifficultiesRef.current.get(bot.name) || 'hard';
@@ -211,6 +217,27 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
         }
       });
 
+      botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
+        // Get the last known state for this bot
+        const lastState = botStatesRef.current.get(botName);
+        if (!lastState) {
+          console.warn(`[spawnBotsForGame] ${botName} has no previous state, cannot apply delta`);
+          return;
+        }
+
+        // Apply delta to get new state
+        const newState = applyStateDelta(lastState, delta);
+
+        // Store the new state for next delta (CRITICAL: prevents state drift)
+        botStatesRef.current.set(botName, newState);
+
+        // Find bot player ID and handle action
+        const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
+        if (botPlayerId) {
+          handleBotAction(botSocket, newState, botPlayerId);
+        }
+      });
+
       botSocket.on('round_started', (state: GameState) => {
         const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
         if (botPlayerId) {
@@ -272,6 +299,27 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
       const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
       if (botPlayerId) {
         handleBotAction(botSocket, state, botPlayerId);
+      }
+    });
+
+    botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
+      // Get the last known state for this bot
+      const lastState = botStatesRef.current.get(botName);
+      if (!lastState) {
+        console.warn(`[handleAddBot] ${botName} has no previous state, cannot apply delta`);
+        return;
+      }
+
+      // Apply delta to get new state
+      const newState = applyStateDelta(lastState, delta);
+
+      // Store the new state for next delta (CRITICAL: prevents state drift)
+      botStatesRef.current.set(botName, newState);
+
+      // Find bot player ID and handle action
+      const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, newState, botPlayerId);
       }
     });
 
@@ -345,6 +393,29 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
               console.warn(`[Quick Play] ${botName} not found in game state on game_updated`, {
                 players: state.players.map(p => ({ name: p.name, id: p.id, isBot: p.isBot }))
               });
+            }
+          });
+
+          botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
+            console.log(`[Quick Play] ${botName} received game_updated_delta`);
+            // Get the last known state for this bot
+            const lastState = botStatesRef.current.get(botName);
+            if (!lastState) {
+              console.warn(`[Quick Play] ${botName} has no previous state, cannot apply delta`);
+              return;
+            }
+
+            // Apply delta to get new state
+            const newState = applyStateDelta(lastState, delta);
+            console.log(`[Quick Play] ${botName} applied delta - Current turn: ${newState.players[newState.currentPlayerIndex]?.name} (index ${newState.currentPlayerIndex}), phase: ${newState.phase}`);
+
+            // Store the new state for next delta (CRITICAL: prevents state drift)
+            botStatesRef.current.set(botName, newState);
+
+            // Find bot player ID and handle action
+            const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, newState, botPlayerId);
             }
           });
 
