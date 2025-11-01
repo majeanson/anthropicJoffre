@@ -165,7 +165,6 @@ export function BotManagementPanel({
             );
           })}
         </div>
-        </div>
       </div>
     </div>
   );
