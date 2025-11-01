@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import buildInfo from '../buildInfo.json';
 
+// Use environment-aware API URL (same as Socket.io connection)
+const API_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+
 interface DebugInfoProps {
   isOpen: boolean;
   onClose: () => void;
@@ -52,7 +55,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
     setHealthLoading(true);
     setHealthError(null);
     try {
-      const response = await fetch('http://localhost:3001/api/health/detailed');
+      const response = await fetch(`${API_URL}/api/health/detailed`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
