@@ -264,24 +264,36 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
       const botPlayer = state.players.find(p => p.name === botName && p.isBot);
       if (botPlayer) {
         botSocketsRef.current.set(botPlayer.id, botSocket);
+        handleBotAction(botSocket, state, botPlayer.id);
       }
-      handleBotAction(botSocket, state, botSocket.id || '');
     });
 
     botSocket.on('game_updated', (state: GameState) => {
-      handleBotAction(botSocket, state, botSocket.id || '');
+      const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, state, botPlayerId);
+      }
     });
 
     botSocket.on('round_started', (state: GameState) => {
-      handleBotAction(botSocket, state, botSocket.id || '');
+      const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, state, botPlayerId);
+      }
     });
 
     botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) => {
-      handleBotAction(botSocket, newState, botSocket.id || '');
+      const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, newState, botPlayerId);
+      }
     });
 
     botSocket.on('round_ended', (state: GameState) => {
-      handleBotAction(botSocket, state, botSocket.id || '');
+      const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, state, botPlayerId);
+      }
     });
   }, [socket, gameId, gameState, handleBotAction]);
 
@@ -320,26 +332,36 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
             const botPlayer = newGameState.players.find(p => p.name === botName && p.isBot);
             if (botPlayer) {
               botSocketsRef.current.set(botPlayer.id, botSocket);
+              handleBotAction(botSocket, newGameState, botPlayer.id);
             }
-            // Don't save bot sessions to localStorage - they are ephemeral
-            // and should not interfere with human player reconnection
-            handleBotAction(botSocket, newGameState, botSocket.id || '');
           });
 
           botSocket.on('game_updated', (state: GameState) => {
-            handleBotAction(botSocket, state, botSocket.id || '');
+            const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, state, botPlayerId);
+            }
           });
 
           botSocket.on('round_started', (state: GameState) => {
-            handleBotAction(botSocket, state, botSocket.id || '');
+            const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, state, botPlayerId);
+            }
           });
 
           botSocket.on('trick_resolved', ({ gameState }: { gameState: GameState }) => {
-            handleBotAction(botSocket, gameState, botSocket.id || '');
+            const botPlayerId = gameState.players.find(p => p.name === botName && p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, gameState, botPlayerId);
+            }
           });
 
           botSocket.on('round_ended', (state: GameState) => {
-            handleBotAction(botSocket, state, botSocket.id || '');
+            const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, state, botPlayerId);
+            }
           });
         }
       }, 500);
