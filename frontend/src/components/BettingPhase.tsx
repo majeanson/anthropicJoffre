@@ -114,7 +114,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   };
 
   const handleSkip = () => {
-    onPlaceBet(0, false, true);
+    onPlaceBet(-1, false, true);
   };
 
   // Check if a specific bet amount is valid (for button disabling)
