@@ -1038,21 +1038,30 @@ function schedulePostTrickActions(
   isRoundOver: boolean,
   delayMs: number = 2000
 ) {
+  console.log(`⏰ schedulePostTrickActions: Scheduling post-trick actions in ${delayMs}ms (roundOver: ${isRoundOver})`);
   setTimeout(() => {
+    console.log(`⏰ schedulePostTrickActions: Timeout fired! Processing post-trick actions...`);
     const game = games.get(gameId);
-    if (!game) return;
+    if (!game) {
+      console.log(`⏰ schedulePostTrickActions: Game ${gameId} not found, aborting`);
+      return;
+    }
 
     // Clear trick after frontend has shown the animation
+    console.log(`⏰ schedulePostTrickActions: Clearing trick (had ${game.currentTrick.length} cards)`);
     game.currentTrick = [];
 
     if (isRoundOver) {
       // All hands empty - proceed to round end
+      console.log(`⏰ schedulePostTrickActions: Round is over, calling endRound()`);
       endRound(gameId);
     } else {
       // Continue playing - emit update and start timeout for next card
+      console.log(`⏰ schedulePostTrickActions: Round continues, emitting game update and starting player timeout for ${winnerName}`);
       emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, winnerName, 'playing');
     }
+    console.log(`⏰ schedulePostTrickActions: Post-trick actions complete`);
   }, delayMs);
 }
 
