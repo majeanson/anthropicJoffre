@@ -25,34 +25,13 @@ interface PlayingPhaseProps {
 }
 
 function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
-  const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
-  const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
-  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
-  const [showDealingAnimation, setShowDealingAnimation] = useState<boolean>(false);
-  const [chatOpen, setChatOpen] = useState<boolean>(false);
-  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
-  const [dealingCardIndex, setDealingCardIndex] = useState<number>(0);
-  const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
-  const [lastTrickLength, setLastTrickLength] = useState<number>(0);
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
-  const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
-  const [previousRoundScores, setPreviousRoundScores] = useState<{team1: number, team2: number} | null>(null);
-  const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
-  const [cardInTransition, setCardInTransition] = useState<CardType | null>(null);
+  // ✅ CRITICAL: Check player existence BEFORE any hooks to prevent "Rendered fewer hooks than expected" error
+  // Rules of Hooks: All hooks must be called in the same order on every render
+  // Early returns before hooks are safe, but early returns AFTER hooks will cause React to crash
+  const playerLookup = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
 
-  // Memoize expensive computations
-  const currentPlayer = useMemo(
-    () => isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId),
-    [gameState.players, currentPlayerId, isSpectator]
-  );
-
-  const isCurrentTurn = useMemo(
-    () => !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId,
-    [isSpectator, gameState.players, gameState.currentPlayerIndex, currentPlayerId]
-  );
-
-  // Safety check: If player not found and not spectator, show error
-  if (!currentPlayer && !isSpectator) {
+  // Safety check: If player not found and not spectator, show error BEFORE calling any hooks
+  if (!playerLookup && !isSpectator) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-900 to-blue-900">
         <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl text-center">
@@ -70,6 +49,33 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       </div>
     );
   }
+
+  // ✅ NOW it's safe to call hooks - all conditional returns are done
+  const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
+  const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
+  const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
+  const [showDealingAnimation, setShowDealingAnimation] = useState<boolean>(false);
+  const [chatOpen, setChatOpen] = useState<boolean>(false);
+  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
+  const [dealingCardIndex, setDealingCardIndex] = useState<number>(0);
+  const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
+  const [lastTrickLength, setLastTrickLength] = useState<number>(0);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
+  const [previousRoundScores, setPreviousRoundScores] = useState<{team1: number, team2: number} | null>(null);
+  const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
+  const [cardInTransition, setCardInTransition] = useState<CardType | null>(null);
+
+  // Memoize expensive computations (now using the pre-validated playerLookup)
+  const currentPlayer = useMemo(
+    () => playerLookup,
+    [playerLookup]
+  );
+
+  const isCurrentTurn = useMemo(
+    () => !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId,
+    [isSpectator, gameState.players, gameState.currentPlayerIndex, currentPlayerId]
+  );
 
   // Listen for chat messages to update unread count
   useEffect(() => {

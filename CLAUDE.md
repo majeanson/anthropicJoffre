@@ -33,6 +33,99 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 - Use composition over large monolithic components
 - Example: `Card.tsx`, `BettingPhase.tsx`, `TeamSelection.tsx` - each handles one concern
 
+### React Hooks Safety (Rules of Hooks)
+
+**CRITICAL**: Always follow the Rules of Hooks to prevent "Rendered fewer hooks than expected" errors.
+
+#### ✅ Correct Pattern: Early Returns BEFORE Hooks
+
+```tsx
+function Component({ isOpen, currentPlayer }) {
+  // ✅ STEP 1: Do early returns FIRST (before any hooks)
+  if (!isOpen) return null;
+  if (!currentPlayer) return <ErrorView />;
+
+  // ✅ STEP 2: Now call all hooks (always in same order)
+  const [state, setState] = useState();
+  useEffect(() => {...}, []);
+  const memoValue = useMemo(() => {...}, []);
+
+  // ✅ STEP 3: Render logic
+  return <div>...</div>;
+}
+```
+
+#### ❌ VIOLATION: Hooks Before Early Returns
+
+```tsx
+function Component({ isOpen, currentPlayer }) {
+  // ❌ BAD: Hooks called first
+  const [state, setState] = useState();
+  const player = useMemo(() => findPlayer(), []);
+  useEffect(() => {...}, []);
+
+  // ❌ FATAL: Early return AFTER hooks
+  // If this condition changes between renders, React will crash!
+  if (!player) return <ErrorView />;
+
+  // More hooks here...
+  const [more, setMore] = useState();
+  // ⚠️ React Error: "Rendered fewer hooks than expected"
+}
+```
+
+#### Why This Breaks
+
+React tracks hooks by call order. If you return early after calling some hooks:
+1. **First render**: `player` exists → 5 hooks called
+2. **Second render**: `player` is null → early return → only 3 hooks called
+3. **React crashes**: Expected 5 hooks, got 3!
+
+#### Fixing Components
+
+**Before (BROKEN):**
+```tsx
+function PlayingPhase({ gameState, currentPlayerId }) {
+  const [showTrick, setShowTrick] = useState(false);  // Hook 1
+  const [isPlaying, setIsPlaying] = useState(false);  // Hook 2
+
+  const player = useMemo(() =>                        // Hook 3
+    gameState.players.find(p => p.id === currentPlayerId),
+    [gameState, currentPlayerId]
+  );
+
+  if (!player) return <Error />;  // ❌ Early return AFTER hooks 1-3
+
+  useEffect(() => {...}, []);     // Hook 4
+  // React error if player becomes null!
+}
+```
+
+**After (FIXED):**
+```tsx
+function PlayingPhase({ gameState, currentPlayerId }) {
+  // ✅ Check BEFORE any hooks
+  const player = gameState.players.find(p => p.id === currentPlayerId);
+
+  // ✅ Early return BEFORE hooks
+  if (!player) return <Error />;
+
+  // ✅ NOW safe to call hooks (always called in same order)
+  const [showTrick, setShowTrick] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  useEffect(() => {...}, []);
+}
+```
+
+#### Checklist Before Committing
+
+- [ ] All hooks called at the top of the component
+- [ ] No hooks inside `if`, `for`, or `while` statements
+- [ ] All early returns happen BEFORE the first hook
+- [ ] Component tested with props that cause early returns
+
+**Reference**: [PlayingPhase.tsx:28-78](frontend/src/components/PlayingPhase.tsx) - Correct implementation
+
 ---
 
 ## 🔌 WebSocket Event System
