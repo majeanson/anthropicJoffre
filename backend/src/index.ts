@@ -549,15 +549,23 @@ function clearPlayerTimeout(gameId: string, playerNameOrId: string) {
 
 // Helper to start timeout for current player (uses stable playerName)
 function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'betting' | 'playing') {
+  console.log(`⏲️  startPlayerTimeout: Called for game ${gameId}, player ${playerNameOrId}, phase ${phase}`);
   const game = games.get(gameId);
-  if (!game) return;
+  if (!game) {
+    console.log(`⏲️  startPlayerTimeout: Game not found, returning`);
+    return;
+  }
 
   // Look up player by name (stable), fallback to ID
   let player = game.players.find(p => p.name === playerNameOrId);
   if (!player) {
     player = game.players.find(p => p.id === playerNameOrId);
   }
-  if (!player) return;
+  if (!player) {
+    console.log(`⏲️  startPlayerTimeout: Player ${playerNameOrId} not found, returning`);
+    return;
+  }
+  console.log(`⏲️  startPlayerTimeout: Found player ${player.name}, starting 15s timeout`);
 
   const playerName = player.name;
   const key = `${gameId}-${playerName}`; // Use stable playerName for key

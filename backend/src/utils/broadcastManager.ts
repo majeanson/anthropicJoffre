@@ -56,7 +56,9 @@ export function emitGameUpdate(
 
   if (shouldSendFull) {
     // Send full game state
+    console.log(`📡 emitGameUpdate: Sending FULL state to room ${gameId} (phase: ${gameState.phase}, trick: ${gameState.currentTrick.length} cards)`);
     io.to(gameId).emit('game_updated', gameState);
+    console.log(`📡 emitGameUpdate: Full state emitted`);
 
     if (process.env.NODE_ENV === 'development') {
       const fullSize = JSON.stringify(gameState).length;
@@ -68,10 +70,13 @@ export function emitGameUpdate(
     }
   } else {
     // Generate and send delta update
+    console.log(`📡 emitGameUpdate: Generating DELTA for room ${gameId} (phase: ${gameState.phase}, trick: ${gameState.currentTrick.length} cards)`);
     const delta = generateStateDelta(previousState, gameState);
 
     if (isSignificantChange(delta)) {
+      console.log(`📡 emitGameUpdate: Sending DELTA to room ${gameId}`);
       io.to(gameId).emit('game_updated_delta', delta);
+      console.log(`📡 emitGameUpdate: Delta emitted`);
 
       if (process.env.NODE_ENV === 'development') {
         const { deltaSize, estimatedFullSize, reduction } = calculateDeltaSize(delta);
@@ -83,6 +88,8 @@ export function emitGameUpdate(
           reduction,
         });
       }
+    } else {
+      console.log(`📡 emitGameUpdate: Delta NOT significant, skipping emit`);
     }
   }
 
