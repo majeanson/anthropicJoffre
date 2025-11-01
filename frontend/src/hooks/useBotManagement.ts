@@ -102,13 +102,28 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     // For other phases, only act when it's the bot's turn
     const currentPlayer = state.players[state.currentPlayerIndex];
+
+    // Debug logging for bot turn detection
+    console.log('[Bot Action] Current player check:', {
+      botId,
+      currentPlayerId: currentPlayer?.id,
+      currentPlayerName: currentPlayer?.name,
+      currentPlayerIndex: state.currentPlayerIndex,
+      phase: state.phase,
+      matches: currentPlayer?.id === botId
+    });
+
     if (!currentPlayer || currentPlayer.id !== botId) return;
+
+    console.log(`[Bot Action] ${currentPlayer.name} taking action in ${state.phase} phase`);
 
     // Schedule bot action with delay
     const timeout = setTimeout(() => {
       // Betting phase
       if (state.phase === 'betting') {
+        console.log(`[Bot Action] ${currentPlayer.name} making bet...`);
         const bet = BotPlayer.makeBet(state, botId);
+        console.log(`[Bot Action] ${currentPlayer.name} bet:`, bet);
         botSocket.emit('place_bet', {
           gameId: state.id,
           amount: bet.amount,
