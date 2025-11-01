@@ -10,6 +10,7 @@
 import { Socket, Server } from 'socket.io';
 import { GameState, PlayerSession, Player } from '../types/game';
 import { Logger } from 'winston';
+import * as PersistenceManager from '../db/persistenceManager';
 
 /**
  * Dependencies needed by the connection handlers
@@ -110,12 +111,8 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     const game = await getGame(session.gameId);
     if (!game) {
       socket.emit('reconnection_failed', { message: 'Game no longer exists' });
-      // Clean up invalid session from DB
-      try {
-        await deletePlayerSessions(session.playerName, session.gameId);
-      } catch (err) {
-        console.error('Failed to delete session:', err);
-      }
+      // Clean up invalid session from DB (default to 'elo' for cleanup of orphaned sessions)
+      await PersistenceManager.deletePlayerSessions(session.playerName, session.gameId, 'elo');
       playerSessions.delete(token);
       return;
     }
@@ -130,11 +127,8 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     const player = game.players.find(p => p.name === session.playerName);
     if (!player) {
       socket.emit('reconnection_failed', { message: 'Player no longer in game' });
-      try {
-        await deletePlayerSessions(session.playerName, session.gameId);
-      } catch (err) {
-        console.error('Failed to delete session:', err);
-      }
+      // Clean up invalid session (conditional on persistence mode)
+      await PersistenceManager.deletePlayerSessions(session.playerName, session.gameId, game.persistenceMode);
       playerSessions.delete(token);
       return;
     }
@@ -142,11 +136,8 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     // Don't allow reconnection to bot players (safety check)
     if (player.isBot) {
       socket.emit('reconnection_failed', { message: 'Cannot reconnect as bot player' });
-      try {
-        await deletePlayerSessions(session.playerName, session.gameId);
-      } catch (err) {
-        console.error('Failed to delete session:', err);
-      }
+      // Clean up bot session (conditional on persistence mode)
+      await PersistenceManager.deletePlayerSessions(session.playerName, session.gameId, game.persistenceMode);
       playerSessions.delete(token);
       return;
     }

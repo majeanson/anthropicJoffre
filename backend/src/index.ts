@@ -465,16 +465,24 @@ async function saveGame(gameState: GameState): Promise<void> {
  * Delete game from both cache and database
  */
 async function deleteGame(gameId: string): Promise<void> {
+  const game = games.get(gameId);
+  const persistenceMode = game?.persistenceMode || 'elo'; // Default to 'elo' if game not found
+
   // Remove from cache
   games.delete(gameId);
   gameCreationTimes.delete(gameId);
   previousGameStates.delete(gameId); // Clean up delta tracking
 
-  // Remove from database (async)
-  try {
-    await deleteGameFromDB(gameId);
-  } catch (error) {
-    console.error(`Failed to delete game ${gameId} from database:`, error);
+  // Remove from database (conditional on persistence mode)
+  if (persistenceMode === 'elo') {
+    try {
+      await deleteGameFromDB(gameId);
+      console.log(`[ELO] Deleted game ${gameId} from database`);
+    } catch (error) {
+      console.error(`Failed to delete game ${gameId} from database:`, error);
+    }
+  } else {
+    console.log(`[Casual] Skipped database deletion for game ${gameId}`);
   }
 }
 
@@ -1330,17 +1338,20 @@ httpServer.listen(PORT, HOST, async () => {
   });
 
   // ============= PERIODIC STATE SNAPSHOTS =============
-  // Save game snapshots every 30 seconds for recovery (ONLY when active games exist)
+  // Save game snapshots every 30 seconds for recovery (ONLY ELO games, NOT casual)
   setInterval(async () => {
     // Skip if no games at all (reduces Neon compute usage)
     if (games.size === 0) {
       return;
     }
 
-    const activeGames = Array.from(games.values()).filter(game => game.phase !== 'game_over');
+    // Only save snapshots for ELO games (casual games are memory-only)
+    const eloGames = Array.from(games.values()).filter(
+      game => game.phase !== 'game_over' && game.persistenceMode === 'elo'
+    );
 
-    if (activeGames.length > 0) {
-      for (const game of activeGames) {
+    if (eloGames.length > 0) {
+      for (const game of eloGames) {
         try {
           await saveGameSnapshot(game.id, game);
         } catch (error) {
@@ -1350,7 +1361,7 @@ httpServer.listen(PORT, HOST, async () => {
 
       // Only log if we're actually saving snapshots
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Snapshot] Saved ${activeGames.length} game snapshot(s)`);
+        console.log(`[Snapshot] Saved ${eloGames.length} ELO game snapshot(s)`);
       }
     }
   }, 30000); // Save every 30 seconds

@@ -41,6 +41,7 @@ import {
   getPlayerGames,
 } from '../db/gameState';
 import { getOnlinePlayers } from '../db/presence';
+import * as PersistenceManager from '../db/persistenceManager';
 import { queryCache } from '../utils/queryCache';
 import { getAllMetrics } from '../middleware/errorBoundary';
 import { responseTimeTracker } from '../utils/responseTime';
@@ -380,12 +381,12 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
           const winningTeam = game.teamScores.team1 >= 41 ? 1 : 2;
           console.log(`TEST API: Game over triggered, Team ${winningTeam} wins`);
 
-          // Save stats for all human players
+          // Save stats for all human players (conditional on persistence mode)
           (async () => {
             try {
-              await markGameFinished(gameId, winningTeam);
+              await PersistenceManager.markGameFinished(gameId, winningTeam, game.persistenceMode);
               console.log(
-                `TEST API: Game ${gameId} marked as finished, Team ${winningTeam} won`
+                `TEST API: Game ${gameId} marked as finished (${game.persistenceMode} mode), Team ${winningTeam} won`
               );
 
               const humanPlayers = game.players.filter((p) => !p.isBot);
@@ -394,35 +395,26 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
                 (Date.now() - createdAtMs) / 1000 / 60
               );
 
+              // Calculate ELO changes (returns 0 for casual mode)
+              const eloChanges = await PersistenceManager.calculateEloChangesForGame(
+                game.players,
+                winningTeam,
+                game.persistenceMode
+              );
+
               for (const player of humanPlayers) {
                 const won = player.teamId === winningTeam;
-                const currentStats = await getPlayerStats(player.name);
-                const currentElo = currentStats?.elo_rating || 1200;
+                const eloChange = eloChanges.get(player.name) || 0;
 
-                const opposingTeam = humanPlayers.filter(
-                  (p) => p.teamId !== player.teamId
-                );
-                const opponentElos = await Promise.all(
-                  opposingTeam.map(async (opp) => {
-                    const stats = await getPlayerStats(opp.name);
-                    return stats?.elo_rating || 1200;
-                  })
-                );
-                const avgOpponentElo =
-                  opponentElos.length > 0
-                    ? opponentElos.reduce((sum, elo) => sum + elo, 0) /
-                      opponentElos.length
-                    : 1200;
-
-                const eloChange = calculateEloChange(currentElo, avgOpponentElo, won);
-                await updateGameStats(
+                await PersistenceManager.updateGameStats(
                   player.name,
                   {
                     won,
                     gameRounds: game.roundNumber,
                     gameDurationMinutes,
                   },
-                  eloChange
+                  eloChange,
+                  game.persistenceMode
                 );
 
                 console.log(

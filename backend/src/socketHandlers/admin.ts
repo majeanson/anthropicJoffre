@@ -11,6 +11,7 @@
 import { Socket, Server } from 'socket.io';
 import { GameState, PlayerSession } from '../types/game';
 import { Logger } from 'winston';
+import * as PersistenceManager from '../db/persistenceManager';
 
 /**
  * Dependencies needed by the admin handlers
@@ -122,13 +123,8 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
 
     const kickedPlayer = game.players[playerIndex];
 
-    // Clean up kicked player's sessions from database
-    try {
-      await deletePlayerSessions(kickedPlayer.name, gameId);
-      console.log(`Deleted DB sessions for kicked player ${kickedPlayer.name} from game ${gameId}`);
-    } catch (error) {
-      console.error('Failed to delete kicked player sessions from DB:', error);
-    }
+    // Clean up kicked player's sessions from database (conditional on persistence mode)
+    await PersistenceManager.deletePlayerSessions(kickedPlayer.name, gameId, game.persistenceMode);
 
     // Remove player from game
     game.players.splice(playerIndex, 1);

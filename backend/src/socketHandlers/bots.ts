@@ -11,6 +11,7 @@
 import { Socket, Server } from 'socket.io';
 import { GameState, PlayerSession } from '../types/game';
 import { Logger } from 'winston';
+import * as PersistenceManager from '../db/persistenceManager';
 
 /**
  * Dependencies needed by the bot handlers
@@ -146,13 +147,8 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
       game.highestBet.playerId = newBotId;
     }
 
-    // Clean up old player's sessions
-    try {
-      await deletePlayerSessions(playerNameToReplace, gameId);
-      console.log(`Deleted DB sessions for replaced player ${playerNameToReplace}`);
-    } catch (error) {
-      console.error('Failed to delete replaced player sessions from DB:', error);
-    }
+    // Clean up old player's sessions (conditional on persistence mode)
+    await PersistenceManager.deletePlayerSessions(playerNameToReplace, gameId, game.persistenceMode);
 
     // Remove from player sessions
     for (const [token, session] of playerSessions.entries()) {
@@ -231,15 +227,21 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
     // Join the socket room
     socket.join(gameId);
 
-    // Create and save session token
+    // Create and save session token (conditional on persistence mode)
+    const sessionResult = await PersistenceManager.createSession(
+      newPlayerName,
+      socket.id,
+      gameId,
+      game.persistenceMode,
+      false // isBot = false (this is a human taking over)
+    );
+
     let session: PlayerSession;
-    try {
-      session = await createDBSession(newPlayerName, socket.id, gameId);
+    if (sessionResult) {
+      session = sessionResult;
       playerSessions.set(session.token, session);
-      console.log(`Saved DB session for takeover player ${newPlayerName}`);
-    } catch (error) {
-      console.error('Failed to save takeover session to DB:', error);
-      // Fallback to in-memory session
+    } else {
+      // Fallback to in-memory session (casual mode or DB error)
       const token = generateSessionToken();
       session = {
         gameId,
