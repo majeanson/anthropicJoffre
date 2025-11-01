@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { GameState, Card, PlayerSession } from './types/game';
 import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
@@ -293,17 +293,17 @@ function App() {
     }
   };
 
-  const handlePlaceBet = (amount: number, withoutTrump: boolean, skipped?: boolean) => {
+  const handlePlaceBet = useCallback((amount: number, withoutTrump: boolean, skipped?: boolean) => {
     if (socket && gameId) {
       socket.emit('place_bet', { gameId, amount, withoutTrump, skipped });
     }
-  };
+  }, [socket, gameId]);
 
-  const handlePlayCard = (card: Card) => {
+  const handlePlayCard = useCallback((card: Card) => {
     if (socket && gameId) {
       socket.emit('play_card', { gameId, card });
     }
-  };
+  }, [socket, gameId]);
 
   const handleSelectTeam = (teamId: 1 | 2) => {
     if (socket && gameId) {
@@ -352,6 +352,11 @@ function App() {
   // Sprint 5 Phase 3: Bot management handlers now in useBotManagement hook
   // (handleReplaceWithBot, handleChangeBotDifficulty, handleTakeOverBot)
 
+  // Autoplay toggle handler (stable reference to prevent infinite re-renders)
+  const handleAutoplayToggle = useCallback(() => {
+    setAutoplayEnabled(prev => !prev);
+  }, []);
+
   const handleNewChatMessage = (message: ChatMessage) => {
     setChatMessages(prev => [...prev, message]);
   };
@@ -381,17 +386,23 @@ function App() {
   // (spawnBotsForGame, handleAddBot, handleQuickPlay, handleBotAction)
 
   // Autoplay effect: when enabled and it's the player's turn, act as a bot
+  // Extract specific values from gameState to prevent infinite re-renders
+  const phase = gameState?.phase;
+  const currentPlayerIndex = gameState?.currentPlayerIndex;
+  const currentPlayerId = gameState?.players[currentPlayerIndex || 0]?.id;
+  const playersReadyList = gameState?.playersReady;
+
   useEffect(() => {
     if (!autoplayEnabled || !gameState || !socket) return;
-    if (gameState.phase !== 'betting' && gameState.phase !== 'playing' && gameState.phase !== 'scoring') return;
+    if (phase !== 'betting' && phase !== 'playing' && phase !== 'scoring') return;
 
     const myPlayerId = socket.id || '';
 
     // For scoring phase, auto-ready
-    if (gameState.phase === 'scoring') {
+    if (phase === 'scoring') {
       // playersReady now stores names, not IDs
       const me = gameState.players.find(p => p.id === myPlayerId);
-      const isAlreadyReady = me ? (gameState.playersReady?.includes(me.name) || false) : false;
+      const isAlreadyReady = me ? (playersReadyList?.includes(me.name) || false) : false;
       if (!isAlreadyReady) {
         // Clear any existing autoplay timeout
         if (autoplayTimeoutRef.current) {
@@ -408,10 +419,8 @@ function App() {
       return;
     }
 
-    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-
-    // Only act if it's my turn
-    if (!currentPlayer || currentPlayer.id !== myPlayerId) return;
+    // Only act if it's my turn (use extracted currentPlayerId to prevent stale closure)
+    if (!currentPlayerId || currentPlayerId !== myPlayerId) return;
 
     // Clear any existing autoplay timeout
     if (autoplayTimeoutRef.current) {
@@ -421,10 +430,10 @@ function App() {
 
     // Schedule autoplay action with bot delay
     autoplayTimeoutRef.current = setTimeout(() => {
-      if (gameState.phase === 'betting') {
+      if (phase === 'betting') {
         const bet = BotPlayer.makeBet(gameState, myPlayerId);
         handlePlaceBet(bet.amount, bet.withoutTrump, bet.skipped);
-      } else if (gameState.phase === 'playing') {
+      } else if (phase === 'playing') {
         const card = BotPlayer.playCard(gameState, myPlayerId);
         if (card) {
           handlePlayCard(card);
@@ -439,7 +448,7 @@ function App() {
         autoplayTimeoutRef.current = null;
       }
     };
-  }, [autoplayEnabled, gameState, socket]);
+  }, [autoplayEnabled, phase, currentPlayerId, playersReadyList, socket, gameState, handlePlaceBet, handlePlayCard]);
 
   if (error) {
     return (
@@ -666,7 +675,7 @@ function App() {
             onLeaveGame={handleLeaveGame}
             gameState={gameState}
             autoplayEnabled={autoplayEnabled}
-            onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
+            onAutoplayToggle={handleAutoplayToggle}
             onOpenBotManagement={() => setBotManagementOpen(true)}
             socket={socket}
             gameId={gameId}
@@ -699,7 +708,7 @@ function App() {
           currentTrickWinnerId={currentTrickWinnerId}
           onLeaveGame={handleLeaveGame}
           autoplayEnabled={autoplayEnabled}
-          onAutoplayToggle={() => setAutoplayEnabled(!autoplayEnabled)}
+          onAutoplayToggle={handleAutoplayToggle}
           onOpenBotManagement={() => setBotManagementOpen(true)}
           socket={socket}
           gameId={gameId}
