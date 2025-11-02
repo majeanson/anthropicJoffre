@@ -133,6 +133,15 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       return;
     }
 
+    // Don't allow reconnection to empty seats (they explicitly left the game)
+    if (player.isEmpty) {
+      socket.emit('reconnection_failed', { message: 'Cannot reconnect to empty seat. Fill the seat from team selection instead.' });
+      // Clean up session (player explicitly left, so session is invalid)
+      await PersistenceManager.deletePlayerSessions(session.playerName, session.gameId, game.persistenceMode);
+      playerSessions.delete(token);
+      return;
+    }
+
     // Don't allow reconnection to bot players (safety check)
     if (player.isBot) {
       socket.emit('reconnection_failed', { message: 'Cannot reconnect as bot player' });
@@ -363,7 +372,7 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     // Skip emitGameUpdate on disconnect - it causes duplicate updates during mass disconnections
     // The game state doesn't actually change on disconnect (just connectionStatus which is sent separately)
 
-    // Set timeout to remove player if they don't reconnect
+    // Set timeout to convert player to empty seat if they don't reconnect
     const disconnectTimeout = setTimeout(async () => {
       const currentGame = games.get(gameId);
       if (!currentGame) {
@@ -373,12 +382,28 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
 
       const player = currentGame.players.find((p) => p.id === socket.id);
       if (player) {
-        // Player didn't reconnect - remove them
+        // Player didn't reconnect within 15 minutes - convert to empty seat
         const playerIndex = currentGame.players.findIndex((p) => p.id === socket.id);
         if (playerIndex !== -1) {
-          currentGame.players.splice(playerIndex, 1);
-          io.to(gameId).emit('player_left', { playerId: socket.id, gameState: currentGame });
-          console.log(`Player ${socket.id} removed from game ${gameId} (no reconnection)`);
+          console.log(`Player ${player.name} (${socket.id}) disconnected for 15 min - converting to empty seat`);
+
+          // Convert player to empty seat (preserve team and position)
+          currentGame.players[playerIndex] = {
+            ...player,
+            id: `empty_${playerIndex}_${Date.now()}`, // Unique ID for empty seat
+            name: `Empty Seat (${player.name})`, // Show who left
+            hand: [], // Clear hand
+            isEmpty: true,
+            emptySlotName: `Empty Seat`,
+            isBot: false,
+            botDifficulty: undefined,
+            connectionStatus: 'disconnected',
+            tricksWon: 0, // Reset stats for new player
+            pointsWon: 0,
+          };
+
+          io.to(gameId).emit('game_updated', currentGame);
+          console.log(`Empty seat created for player ${playerName} in game ${gameId}`);
 
           // Mark player as offline in database
           if (playerName) {
