@@ -13,7 +13,7 @@ Remove obsolete 6-character game IDs from production database.
 
 ```bash
 # Replace YOUR_PROD_API_URL with your actual production API URL
-curl -X POST https://YOUR_PROD_API_URL/api/admin/cleanup-obsolete-games
+curl -X POST https://YOUR_PROD_API_URL/api
 
 # Expected response:
 {
@@ -31,7 +31,7 @@ curl -X POST https://YOUR_PROD_API_URL/api/admin/cleanup-obsolete-games
 
 ## Option 2: Direct SQL Queries
 
-**Prerequisites:**
+**Pr/admin/cleanup-obsolete-gameserequisites:**
 - Direct access to production PostgreSQL database
 - psql or database admin tool
 
