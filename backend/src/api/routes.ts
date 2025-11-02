@@ -641,8 +641,9 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
             })),
           };
         })
-        // Only show joinable games in the active games list
-        .filter((game) => game.isJoinable);
+        // Show both joinable games (for joining) and in-progress games (for spectating)
+        // Filter out finished games and games in team_selection with no open spots
+        .filter((game) => game.isJoinable || game.isInProgress);
 
       // Sort by creation time (newest first)
       activeGames.sort((a, b) => b.createdAt - a.createdAt);
