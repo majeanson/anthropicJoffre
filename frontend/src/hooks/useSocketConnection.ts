@@ -54,6 +54,7 @@ export function checkValidSession(): boolean {
 export function useSocketConnection() {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [reconnecting, setReconnecting] = useState<boolean>(false);
+  const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export function useSocketConnection() {
     // Connection event handlers
     newSocket.on('connect', () => {
       setError(''); // Clear any connection errors
+      setReconnectAttempt(0); // Reset attempt counter on successful connection
     });
 
     newSocket.on('connect_error', () => {
@@ -104,16 +106,19 @@ export function useSocketConnection() {
       }
     });
 
-    newSocket.on('reconnect_attempt', () => {
+    newSocket.on('reconnect_attempt', (attemptNumber) => {
       setReconnecting(true);
+      setReconnectAttempt(attemptNumber);
     });
 
     newSocket.on('reconnect', () => {
       setReconnecting(false);
+      setReconnectAttempt(0);
     });
 
     newSocket.on('reconnect_failed', () => {
       setReconnecting(false);
+      setReconnectAttempt(0);
       setError('Unable to reconnect to server. Please refresh the page.');
     });
 
@@ -123,5 +128,5 @@ export function useSocketConnection() {
     };
   }, []);
 
-  return { socket, reconnecting, error, setError };
+  return { socket, reconnecting, reconnectAttempt, error, setError };
 }

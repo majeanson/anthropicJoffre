@@ -369,11 +369,35 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
             </div>
           )}
 
-          {/* Loading State */}
+          {/* Loading State - Sprint 6: Skeleton Loaders */}
           {loading && (
-            <div className="text-center py-12">
-              <div className="animate-spin h-12 w-12 border-4 border-amber-600 dark:border-gray-500 border-t-transparent rounded-full mx-auto"></div>
-              <p className="text-umber-700 dark:text-gray-300 mt-4">Loading games...</p>
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600 animate-pulse"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 space-y-2">
+                      {/* Game ID skeleton */}
+                      <div className="flex items-center gap-3">
+                        <div className="h-6 w-24 bg-parchment-300 dark:bg-gray-600 rounded"></div>
+                        <div className="h-6 w-20 bg-parchment-300 dark:bg-gray-600 rounded-full"></div>
+                      </div>
+                      {/* Player info skeleton */}
+                      <div className="flex items-center gap-4">
+                        <div className="h-4 w-16 bg-parchment-300 dark:bg-gray-600 rounded"></div>
+                        <div className="h-4 w-16 bg-parchment-300 dark:bg-gray-600 rounded"></div>
+                        <div className="h-4 w-20 bg-parchment-300 dark:bg-gray-600 rounded"></div>
+                      </div>
+                    </div>
+                    {/* Button skeleton */}
+                    <div className="flex gap-2">
+                      <div className="h-10 w-16 bg-parchment-300 dark:bg-gray-600 rounded-lg"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 

@@ -34,7 +34,7 @@ import { useConnectionQuality } from './hooks/useConnectionQuality';
 
 function App() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
-  const { socket, reconnecting, error, setError } = useSocketConnection();
+  const { socket, reconnecting, reconnectAttempt, error, setError } = useSocketConnection();
   const {
     gameState,
     gameId,
@@ -518,7 +518,7 @@ function App() {
   // Global UI components (shown across all phases)
   const GlobalUI = () => (
     <>
-      {reconnecting && <ReconnectingBanner />}
+      {reconnecting && <ReconnectingBanner attempt={reconnectAttempt} maxAttempts={10} />}
       {toast && <Toast {...toast} onClose={() => setToast(null)} />}
       {gameState && (
         <CatchUpModal

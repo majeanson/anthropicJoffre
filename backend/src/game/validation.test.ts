@@ -147,7 +147,7 @@ describe('validateCardPlay', () => {
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toBe('You must follow suit if you have it in your hand');
+      expect(result.error).toBe('You must follow the led suit (red) because you have red cards in your hand');
     }
   });
 

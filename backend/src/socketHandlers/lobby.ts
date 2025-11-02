@@ -232,7 +232,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
 
     const game = games.get(gameId);
     if (!game) {
-      socket.emit('error', { message: 'Game not found' });
+      socket.emit('error', { message: `Game ${gameId} not found. It may have ended or the ID is incorrect.` });
       return;
     }
 
@@ -327,7 +327,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
         return;
       }
       // Game is full with no bots - cannot join
-      socket.emit('error', { message: 'Game is full' });
+      socket.emit('error', { message: `Game is full (4/4 players). Try spectating or join a different game.` });
       return;
     }
 

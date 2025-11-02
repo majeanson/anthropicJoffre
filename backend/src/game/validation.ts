@@ -86,7 +86,7 @@ export function validateCardPlay(
     const hasLedSuit = currentPlayer.hand.some(c => c.color === ledSuit);
 
     if (hasLedSuit && card.color !== ledSuit) {
-      return err('You must follow suit if you have it in your hand');
+      return err(`You must follow the led suit (${ledSuit}) because you have ${ledSuit} cards in your hand`);
     }
   }
 
