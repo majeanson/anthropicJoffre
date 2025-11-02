@@ -693,6 +693,77 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
   // Player Endpoints
   // ============================================================================
 
+  // Get player's active (resumable) games
+  app.get('/api/players/:playerName/active-games', async (req: Request, res: Response) => {
+    try {
+      const { playerName } = req.params;
+
+      interface ActiveGameSummary {
+        gameId: string;
+        playerNames: string[];
+        phase: GamePhase;
+        teamScores: { team1: number; team2: number };
+        myTeamId: number | null;
+        createdAt: number;
+      }
+
+      // Check in-memory games first
+      const inMemoryActiveGames: ActiveGameSummary[] = Array.from(games.values())
+        .filter((game: GameState) =>
+          game.players.some((p: Player) => p.name === playerName) &&
+          game.phase !== 'team_selection' // Active games only (not waiting for players)
+        )
+        .map((game: GameState) => {
+          const myPlayer = game.players.find((p: Player) => p.name === playerName);
+          return {
+            gameId: game.id,
+            playerNames: game.players.map((p) => p.name),
+            phase: game.phase,
+            teamScores: game.teamScores,
+            myTeamId: myPlayer?.teamId || null,
+            createdAt: gameCreationTimes.get(game.id) || Date.now(),
+          };
+        });
+
+      // Also check database for active games not in memory
+      const dbGames = await getPlayerGames(playerName);
+      const dbActiveGames: ActiveGameSummary[] = [];
+
+      for (const dbGame of dbGames) {
+        // Skip if already in memory or finished
+        if (inMemoryActiveGames.some(g => g.gameId === dbGame.gameId) || dbGame.status === 'finished') {
+          continue;
+        }
+
+        // Load full game state to check phase
+        const fullGame = await getGame(dbGame.gameId);
+        if (fullGame && fullGame.phase !== 'team_selection') {
+          const myPlayer = fullGame.players.find((p: Player) => p.name === playerName);
+          dbActiveGames.push({
+            gameId: fullGame.id,
+            playerNames: fullGame.players.map((p) => p.name),
+            phase: fullGame.phase,
+            teamScores: fullGame.teamScores,
+            myTeamId: myPlayer?.teamId || null,
+            createdAt: dbGame.createdAt instanceof Date ? dbGame.createdAt.getTime() : dbGame.createdAt,
+          });
+        }
+      }
+
+      // Combine and sort by creation time (newest first)
+      const allActiveGames = [...inMemoryActiveGames, ...dbActiveGames]
+        .sort((a, b) => b.createdAt - a.createdAt);
+
+      res.json({
+        games: allActiveGames,
+        total: allActiveGames.length,
+      });
+    } catch (error) {
+      console.error('Error fetching player active games:', error);
+      res.status(500).json({ error: 'Failed to fetch active games' });
+    }
+  });
+
   app.get('/api/players/:playerName/games', async (req: Request, res: Response) => {
     try {
       const { playerName } = req.params;

@@ -7,6 +7,7 @@ import { GlobalLeaderboard } from './GlobalLeaderboard';
 import { HowToPlay } from './HowToPlay';
 import { DebugInfo } from './DebugInfo';
 import { LobbyChat } from './LobbyChat';
+import { ActiveGames } from './ActiveGames';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
@@ -209,6 +210,16 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         <span>Rejoin Game</span>
                       </button>
                     )}
+
+                    {/* Active Games (Resumable) */}
+                    <ActiveGames
+                      playerName={playerName}
+                      socket={socket}
+                      onResumeGame={(gameId) => {
+                        // Use join game to resume - it will handle reconnection automatically
+                        onJoinGame(gameId, playerName);
+                      }}
+                    />
 
                     {/* Multiplayer Section */}
                     <div className="bg-parchment-200 dark:bg-gray-700/50 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600">
