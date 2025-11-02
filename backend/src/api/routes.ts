@@ -104,13 +104,13 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
 
       // Delete from game_history table (finished games) - use game_id column
       const finishedGamesResult = await query(
-        `DELETE FROM game_history WHERE LENGTH(game_id) = 6 RETURNING game_id`,
+        `DELETE FROM game_history WHERE LENGTH(game_id) < 8 RETURNING game_id`,
         []
       );
 
       // Delete from game_sessions table
       const sessionsResult = await query(
-        `DELETE FROM game_sessions WHERE LENGTH(game_id) = 6 RETURNING game_id`,
+        `DELETE FROM game_sessions WHERE LENGTH(game_id) < 8 RETURNING game_id`,
         []
       );
 
@@ -120,11 +120,11 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
         sessions: sessionsResult.rowCount || 0,
       };
 
-      console.log(`[Cleanup] Purged obsolete 6-char game IDs:`, deletedCount);
+      console.log(`[Cleanup] Purged obsolete < 8 char game IDs:`, deletedCount);
 
       res.json({
         success: true,
-        message: 'Successfully purged obsolete 6-character game IDs',
+        message: 'Successfully purged obsolete < 8 character game IDs',
         deletedCount,
         activeGames: activeGamesResult.rows.map((r: any) => r.game_id || r.id),
         finishedGames: finishedGamesResult.rows.map((r: any) => r.game_id || r.id),

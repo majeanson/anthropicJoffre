@@ -106,9 +106,9 @@ async function cleanup() {
       'DELETE FROM active_games WHERE LENGTH(game_id) = 6 RETURNING game_id'
     );
 
-    // Delete from game_history (finished games)
+    // Delete from games
     const gamesResult = await client.query(
-      'DELETE FROM game_history WHERE LENGTH(game_id) = 6 RETURNING game_id'
+      'DELETE FROM games WHERE LENGTH(id) = 6 RETURNING id'
     );
 
     // Delete from game_sessions
@@ -156,4 +156,4 @@ After running cleanup, verify in production:
 - The API endpoint has built-in transaction safety (auto-rollback on error)
 - Current game ID format is 8 characters (e.g., "A1B2C3D4")
 - All 6-character IDs are from old format and safe to delete
-- Cleanup affects 3 tables: `active_games`, `game_history`, `game_sessions`
+- Cleanup affects 3 tables: `active_games`, `games`, `game_sessions`

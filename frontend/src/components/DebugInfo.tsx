@@ -201,7 +201,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                   <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Latest Done Features</h3>
                   <button
                     onClick={() => setShowLatestFeatures(!showLatestFeatures)}
-                    className="text-xs bg-green-600 dark:bg-green-700 text-white px-3 py-1 rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                    className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
                   >
                     {showLatestFeatures ? 'Hide' : 'Show'}
                   </button>
