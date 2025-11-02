@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-02T15:30:00-05:00",
-  "version": "1.0.34",
+  "buildDate": "2025-11-02T16:00:00-05:00",
+  "version": "1.0.35",
   "git": {
-    "commitMessage": "feat(ui): Complete empty seat UI across all game phases",
-    "commitHash": "6818dad",
-    "commitDate": "2025-11-02T15:28:00-05:00",
+    "commitMessage": "fix(reconnection): Ensure empty seat compatibility with rejoin mechanic",
+    "commitHash": "bf3744d",
+    "commitDate": "2025-11-02T15:58:00-05:00",
     "branch": "main"
   },
   "latestDoneFeatures": [
@@ -17,7 +17,9 @@
         "New players can fill empty seats via TeamSelection 'Fill Seat' button",
         "Backend: fill_empty_seat socket handler with session management",
         "Frontend: Consistent empty seat UI across all phases (💺, gray, dashed borders)",
-        "LobbyBrowser shows empty seat count for each game"
+        "LobbyBrowser shows empty seat count for each game",
+        "Reconnection compatibility: Empty seats cannot reconnect (must fill seat)",
+        "15-min disconnect timeout creates empty seats instead of removing players"
       ]
     },
     {
@@ -52,7 +54,7 @@
   ],
   "lastSession": {
     "date": "2025-11-02",
-    "summary": "Empty seat system for game continuity when players leave mid-session",
+    "summary": "Empty seat system with full reconnection compatibility",
     "achievements": [
       "✅ Empty seat backend implementation:",
       "  - Added isEmpty and emptySlotName fields to Player interface",
@@ -69,13 +71,19 @@
       "  - Gray color scheme for empty seats",
       "  - Dashed borders indicating placeholder status",
       "  - 💺 seat emoji for visual consistency",
-      "  - Italic text to distinguish from active players"
+      "  - Italic text to distinguish from active players",
+      "✅ Reconnection compatibility fixes:",
+      "  - Prevent empty seats from reconnecting (isEmpty check in handler)",
+      "  - Convert disconnected players to empty seats after 15-min timeout",
+      "  - Clear error messages guide users to fill seats properly",
+      "  - Maintain consistency between explicit leave and timeout behavior"
     ],
-    "commits": 3,
-    "linesChanged": "~250 added, ~100 modified",
+    "commits": 5,
+    "linesChanged": "~280 added, ~105 modified",
     "filesModified": [
       "backend/src/types/game.ts",
       "backend/src/socketHandlers/lobby.ts",
+      "backend/src/socketHandlers/connection.ts",
       "backend/src/validation/schemas.ts",
       "frontend/src/types/game.ts",
       "frontend/src/components/TeamSelection.tsx",
