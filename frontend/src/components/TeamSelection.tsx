@@ -93,18 +93,33 @@ export function TeamSelection({
 
   // Validation for starting game
   const canStartGame = (): boolean => {
-    if (players.length !== 4) return false;
-    if (team1Players.length !== 2) return false;
-    if (team2Players.length !== 2) return false;
+    // Must have 4 players (including real players, bots, but NOT empty seats)
+    const realPlayers = players.filter(p => !p.isEmpty);
+    if (realPlayers.length !== 4) return false;
+
+    // Must have 2 real players per team (no empty seats)
+    const team1RealPlayers = team1Players.filter(p => !p.isEmpty);
+    const team2RealPlayers = team2Players.filter(p => !p.isEmpty);
+    if (team1RealPlayers.length !== 2) return false;
+    if (team2RealPlayers.length !== 2) return false;
     return true;
   };
 
   const getStartGameMessage = (): string => {
-    if (players.length !== 4) {
-      return `Waiting for ${4 - players.length} more player(s) to join`;
+    const realPlayers = players.filter(p => !p.isEmpty);
+    const emptySeats = players.filter(p => p.isEmpty).length;
+
+    if (emptySeats > 0) {
+      return `${emptySeats} empty seat(s) - fill them to start`;
     }
-    if (team1Players.length !== 2 || team2Players.length !== 2) {
-      return 'Teams must have 2 players each';
+    if (realPlayers.length !== 4) {
+      return `Waiting for ${4 - realPlayers.length} more player(s) to join`;
+    }
+
+    const team1RealPlayers = team1Players.filter(p => !p.isEmpty);
+    const team2RealPlayers = team2Players.filter(p => !p.isEmpty);
+    if (team1RealPlayers.length !== 2 || team2RealPlayers.length !== 2) {
+      return 'Teams must have 2 players each (no empty seats)';
     }
     return '';
   };
@@ -186,6 +201,7 @@ export function TeamSelection({
               {[0, 1].map((position) => {
                 const playerAtPosition = team1Players[position];
                 const isCurrentPlayer = playerAtPosition?.id === currentPlayerId;
+                const isEmptySeat = playerAtPosition?.isEmpty;
 
                 return (
                   <div
@@ -193,12 +209,12 @@ export function TeamSelection({
                     className={`p-4 rounded-lg border-2 ${
                       isCurrentPlayer
                         ? 'bg-orange-200 dark:bg-orange-700/60 border-orange-500 dark:border-orange-500'
-                        : playerAtPosition
+                        : playerAtPosition && !isEmptySeat
                         ? 'bg-parchment-50 dark:bg-gray-700 border-orange-200 dark:border-orange-700'
                         : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
                     }`}
                   >
-                    {playerAtPosition ? (
+                    {playerAtPosition && !isEmptySeat ? (
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
@@ -235,7 +251,35 @@ export function TeamSelection({
                       </div>
                     ) : (
                       <div className="text-center">
-                        {currentPlayer?.teamId !== 1 ? (
+                        {isEmptySeat ? (
+                          <div className="space-y-2">
+                            <div className="text-umber-400 dark:text-gray-500 text-sm italic">
+                              💺 {playerAtPosition.emptySlotName || 'Empty Seat'}
+                            </div>
+                            {!currentPlayer && socket && (
+                              <button
+                                onClick={() => {
+                                  // Get player index to fill the seat
+                                  const allPlayers = players;
+                                  const seatIndex = allPlayers.findIndex(p => p.id === playerAtPosition.id);
+                                  if (seatIndex !== -1) {
+                                    const playerName = prompt('Enter your name to fill this seat:');
+                                    if (playerName && playerName.trim()) {
+                                      socket.emit('fill_empty_seat', {
+                                        gameId,
+                                        playerName: playerName.trim(),
+                                        emptySlotIndex: seatIndex,
+                                      });
+                                    }
+                                  }
+                                }}
+                                className="text-xs bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm"
+                              >
+                                Fill Seat
+                              </button>
+                            )}
+                          </div>
+                        ) : currentPlayer?.teamId !== 1 ? (
                           <button
                             onClick={() => onSelectTeam(1)}
                             className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 font-medium"
@@ -260,6 +304,7 @@ export function TeamSelection({
               {[0, 1].map((position) => {
                 const playerAtPosition = team2Players[position];
                 const isCurrentPlayer = playerAtPosition?.id === currentPlayerId;
+                const isEmptySeat = playerAtPosition?.isEmpty;
 
                 return (
                   <div
@@ -267,12 +312,12 @@ export function TeamSelection({
                     className={`p-4 rounded-lg border-2 ${
                       isCurrentPlayer
                         ? 'bg-purple-200 dark:bg-purple-700/60 border-purple-500 dark:border-purple-500'
-                        : playerAtPosition
+                        : playerAtPosition && !isEmptySeat
                         ? 'bg-parchment-50 dark:bg-gray-700 border-purple-200 dark:border-purple-700'
                         : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
                     }`}
                   >
-                    {playerAtPosition ? (
+                    {playerAtPosition && !isEmptySeat ? (
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
@@ -309,7 +354,35 @@ export function TeamSelection({
                       </div>
                     ) : (
                       <div className="text-center">
-                        {currentPlayer?.teamId !== 2 ? (
+                        {isEmptySeat ? (
+                          <div className="space-y-2">
+                            <div className="text-umber-400 dark:text-gray-500 text-sm italic">
+                              💺 {playerAtPosition.emptySlotName || 'Empty Seat'}
+                            </div>
+                            {!currentPlayer && socket && (
+                              <button
+                                onClick={() => {
+                                  // Get player index to fill the seat
+                                  const allPlayers = players;
+                                  const seatIndex = allPlayers.findIndex(p => p.id === playerAtPosition.id);
+                                  if (seatIndex !== -1) {
+                                    const playerName = prompt('Enter your name to fill this seat:');
+                                    if (playerName && playerName.trim()) {
+                                      socket.emit('fill_empty_seat', {
+                                        gameId,
+                                        playerName: playerName.trim(),
+                                        emptySlotIndex: seatIndex,
+                                      });
+                                    }
+                                  }
+                                }}
+                                className="text-xs bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm"
+                              >
+                                Fill Seat
+                              </button>
+                            )}
+                          </div>
+                        ) : currentPlayer?.teamId !== 2 ? (
                           <button
                             onClick={() => onSelectTeam(2)}
                             className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium"
