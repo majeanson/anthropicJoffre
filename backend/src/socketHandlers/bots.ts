@@ -68,6 +68,111 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
   } = deps;
 
   // ============================================================================
+  // replace_me_with_bot - Sprint 6: Allow player to replace themselves with bot
+  // ============================================================================
+  socket.on('replace_me_with_bot', errorBoundaries.gameAction('replace_me_with_bot')(async ({
+    gameId,
+    playerName
+  }: {
+    gameId: string;
+    playerName: string;
+  }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Find the player
+    const player = game.players.find(p => p.name === playerName && p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'Player not found or unauthorized' });
+      return;
+    }
+
+    // Cannot replace a bot
+    if (player.isBot) {
+      socket.emit('error', { message: 'Bots cannot be replaced' });
+      return;
+    }
+
+    // Check bot limit (max 3 bots)
+    if (!canAddBot(game)) {
+      socket.emit('error', { message: 'Maximum of 3 bots allowed per game' });
+      return;
+    }
+
+    // Check if at least 1 human would remain
+    const humanCountAfterReplace = game.players.filter(p => !p.isBot && p.name !== playerName).length;
+    if (humanCountAfterReplace < 1) {
+      socket.emit('error', { message: 'Cannot replace - you are the last human player' });
+      return;
+    }
+
+    // Get next available bot name
+    const botName = getNextBotName(game);
+    const oldSocketId = player.id;
+
+    // Generate new unique ID for bot
+    const newBotId = `bot-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+
+    // Update player to be a bot (preserve team, hand, scores, position)
+    player.name = botName;
+    player.isBot = true;
+    player.botDifficulty = 'medium'; // Default to medium difficulty for self-replacement
+    player.id = newBotId;
+
+    // Update player ID in currentTrick
+    game.currentTrick.forEach(tc => {
+      if (tc.playerId === oldSocketId) {
+        tc.playerId = newBotId;
+      }
+    });
+
+    // Update player ID in bets
+    game.currentBets.forEach(bet => {
+      if (bet.playerId === oldSocketId) {
+        bet.playerId = newBotId;
+      }
+    });
+    if (game.highestBet && game.highestBet.playerId === oldSocketId) {
+      game.highestBet.playerId = newBotId;
+    }
+
+    // Clean up player sessions
+    await PersistenceManager.deletePlayerSessions(playerName, gameId, game.persistenceMode);
+    for (const [token, session] of playerSessions.entries()) {
+      if (session.playerName === playerName && session.gameId === gameId) {
+        playerSessions.delete(token);
+        break;
+      }
+    }
+
+    // Remove from online players
+    onlinePlayers.delete(socket.id);
+    broadcastOnlinePlayers();
+
+    // Notify the leaving player
+    socket.emit('replaced_by_bot', {
+      message: 'You have been replaced by a bot',
+      gameId,
+      botName
+    });
+
+    // Remove socket from room
+    socket.leave(gameId);
+
+    // Broadcast to remaining players
+    io.to(gameId).emit('player_replaced_self', {
+      gameState: game,
+      replacedPlayerName: playerName,
+      botName
+    });
+
+    logger.info(`Player ${playerName} replaced themselves with ${botName} in game ${gameId}`);
+  }));
+
+  // ============================================================================
   // replace_with_bot - Replace a human player with a bot
   // ============================================================================
   socket.on('replace_with_bot', errorBoundaries.gameAction('replace_with_bot')(async ({

@@ -7,6 +7,7 @@ interface GameHeaderProps {
   team1Score: number;
   team2Score: number;
   onLeaveGame?: () => void;
+  onReplaceMeWithBot?: () => void;
   onOpenLeaderboard?: () => void;
   onOpenChat?: () => void;
   onOpenBotManagement?: () => void;
@@ -25,6 +26,7 @@ export function GameHeader({
   team1Score,
   team2Score,
   onLeaveGame,
+  onReplaceMeWithBot,
   onOpenLeaderboard,
   onOpenChat,
   onOpenBotManagement,
@@ -175,6 +177,18 @@ export function GameHeader({
               </button>
             )}
 
+            {/* Replace Me with Bot Button - Sprint 6 */}
+            {!isSpectator && onReplaceMeWithBot && (
+              <button
+                onClick={onReplaceMeWithBot}
+                className="bg-orange-500/80 hover:bg-orange-500 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-orange-600 flex items-center gap-1.5"
+                title="Replace me with Bot"
+              >
+                <span className="text-base md:text-lg">🤖</span>
+                <span className="hidden md:inline text-white font-semibold text-sm">Replace</span>
+              </button>
+            )}
+
             {/* Leave Game Button */}
             {onLeaveGame && (
               <button
@@ -297,6 +311,17 @@ export function GameHeader({
                 title={soundEnabled ? 'Sound ON' : 'Sound OFF'}
               >
                 <span className="text-base">{soundEnabled ? '🔊' : '🔇'}</span>
+              </button>
+            )}
+
+            {/* Replace Me with Bot Button - Sprint 6 */}
+            {!isSpectator && onReplaceMeWithBot && (
+              <button
+                onClick={onReplaceMeWithBot}
+                className="bg-orange-500/80 hover:bg-orange-500 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-orange-600"
+                title="Replace me with Bot"
+              >
+                <span className="text-base">🤖</span>
               </button>
             )}
 

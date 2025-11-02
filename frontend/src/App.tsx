@@ -180,6 +180,17 @@ function App() {
       spawnBotsForGame(newGameState);
     };
 
+    // Sprint 6: Handle player self-replacement
+    const handlePlayerReplacedSelf = ({ gameState: newGameState, replacedPlayerName, botName }: {
+      gameState: GameState;
+      replacedPlayerName: string;
+      botName: string;
+    }) => {
+      setGameState(newGameState);
+      showToast(`${replacedPlayerName} left and was replaced by ${botName}`, 'info');
+      spawnBotsForGame(newGameState);
+    };
+
     const handleBotTakenOver = ({ gameState: newGameState, botName, newPlayerName, session }: {
       gameState: GameState;
       botName: string;
@@ -228,6 +239,7 @@ function App() {
     socket.on('leave_game_success', handleLeaveGameSuccess);
     socket.on('spectator_joined', handleSpectatorJoined);
     socket.on('bot_replaced', handleBotReplaced);
+    socket.on('player_replaced_self', handlePlayerReplacedSelf);
     socket.on('bot_taken_over', handleBotTakenOver);
     socket.on('replaced_by_bot', handleReplacedByBot);
     socket.on('game_full_with_bots', handleGameFullWithBots);
@@ -244,6 +256,7 @@ function App() {
       socket.off('leave_game_success', handleLeaveGameSuccess);
       socket.off('spectator_joined', handleSpectatorJoined);
       socket.off('bot_replaced', handleBotReplaced);
+      socket.off('player_replaced_self', handlePlayerReplacedSelf);
       socket.off('bot_taken_over', handleBotTakenOver);
       socket.off('replaced_by_bot', handleReplacedByBot);
       socket.off('game_full_with_bots', handleGameFullWithBots);
@@ -352,6 +365,32 @@ function App() {
     if (socket && gameId) {
       socket.emit('kick_player', { gameId, playerId });
     }
+  };
+
+  // Sprint 6: Replace me with bot
+  const handleReplaceMeWithBot = () => {
+    if (!socket || !gameId || !gameState) return;
+
+    const currentPlayer = gameState.players.find(p => p.id === socket.id);
+    if (!currentPlayer) {
+      showToast('Unable to replace yourself - player not found', 'error');
+      return;
+    }
+
+    if (currentPlayer.isBot) {
+      showToast('Bots cannot be replaced', 'error');
+      return;
+    }
+
+    // Confirm with user
+    if (!confirm('Are you sure you want to leave? You will be replaced by a bot and cannot rejoin this game.')) {
+      return;
+    }
+
+    socket.emit('replace_me_with_bot', {
+      gameId,
+      playerName: currentPlayer.name
+    });
   };
 
   // Sprint 5 Phase 3: Bot management handlers now in useBotManagement hook
@@ -712,6 +751,7 @@ function App() {
           isSpectator={isSpectator}
           currentTrickWinnerId={currentTrickWinnerId}
           onLeaveGame={handleLeaveGame}
+          onReplaceMeWithBot={handleReplaceMeWithBot}
           autoplayEnabled={autoplayEnabled}
           onAutoplayToggle={handleAutoplayToggle}
           onOpenBotManagement={() => setBotManagementOpen(true)}
