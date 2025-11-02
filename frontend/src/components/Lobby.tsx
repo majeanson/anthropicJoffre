@@ -379,7 +379,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                                   <div className="flex items-center gap-2 flex-1 min-w-0">
                                     <span className="text-green-500 text-lg flex-shrink-0">🟢</span>
                                     <div className="min-w-0 flex-1">
-                                      <p className="font-bold text-umber-900 dark:text-gray-100 truncate">{player.playerName}</p>
+                                      <p className="font-bold text-umber-900 dark:text-gray-100 truncate">
+                                        {player.playerName || player.socketId || 'Unknown'}
+                                      </p>
                                       <p className="text-xs text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
                                     </div>
                                   </div>
