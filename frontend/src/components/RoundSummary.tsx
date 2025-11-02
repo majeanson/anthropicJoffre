@@ -8,7 +8,7 @@
  * - Starting hands and bets for each player
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { GameState, Card } from '../types/game';
 
 interface RoundStatistics {
@@ -54,11 +54,53 @@ const suitColors: { [key: string]: string } = {
 };
 
 const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
+  const [dataReady, setDataReady] = useState(false);
+
   const lastRound = gameState.roundHistory[gameState.roundHistory.length - 1];
   const statistics = lastRound?.statistics as RoundStatistics | undefined;
 
+  // Check if round data is ready (prevents showing stale data during transition)
+  useEffect(() => {
+    const latestRound = gameState.roundHistory[gameState.roundHistory.length - 1];
+    const expectedRoundNumber = gameState.roundNumber;
+
+    // Wait for the latest round to match the expected round number
+    // This ensures we don't show stale data from the previous round
+    if (latestRound && latestRound.roundNumber === expectedRoundNumber) {
+      // Add a small delay to ensure all data is fully computed
+      const timer = setTimeout(() => {
+        setDataReady(true);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setDataReady(false);
+    }
+  }, [gameState.roundHistory, gameState.roundNumber]);
+
   if (!lastRound) {
     return null;
+  }
+
+  // Show loading animation while data is being calculated
+  if (!dataReady) {
+    return (
+      <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="relative">
+            {/* Spinning cards animation */}
+            <div className="flex gap-2 mb-4">
+              <div className="w-12 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg animate-bounce" style={{animationDelay: '0s'}}></div>
+              <div className="w-12 h-16 bg-gradient-to-br from-amber-700 to-amber-900 rounded-lg animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-12 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-12 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg animate-bounce" style={{animationDelay: '0.3s'}}></div>
+            </div>
+            <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
+              Calculating round results...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // Function to calculate "interestingness" score for each stat
