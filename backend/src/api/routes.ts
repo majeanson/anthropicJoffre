@@ -48,6 +48,16 @@ import { getAllMetrics } from '../middleware/errorBoundary';
 import { responseTimeTracker } from '../utils/responseTime';
 import logger from '../utils/logger';
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+/**
+ * Standard game ID length (8 characters)
+ * All game IDs shorter than this are considered obsolete/legacy
+ */
+export const GAME_ID_LENGTH = 8;
+
 /**
  * Dependencies needed by the routes
  */
@@ -93,39 +103,51 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
   // Admin Endpoints
   // ============================================================================
 
-  // Cleanup obsolete 6-character game IDs
+  // Cleanup obsolete short game IDs (< GAME_ID_LENGTH)
   app.post('/api/admin/cleanup-obsolete-games', async (req: Request, res: Response) => {
     try {
+      // Delete from in-memory games Map first
+      const inMemoryDeleted: string[] = [];
+      games.forEach((game, gameId) => {
+        if (gameId.length < GAME_ID_LENGTH) {
+          games.delete(gameId);
+          inMemoryDeleted.push(gameId);
+          console.log(`[Cleanup] Deleted in-memory game: ${gameId} (length: ${gameId.length})`);
+        }
+      });
+
       // Delete from active_games table
       const activeGamesResult = await query(
-        `DELETE FROM active_games WHERE LENGTH(game_id) = 6 RETURNING game_id`,
-        []
+        `DELETE FROM active_games WHERE LENGTH(game_id) < $1 RETURNING game_id`,
+        [GAME_ID_LENGTH]
       );
 
-      // Delete from game_history table (finished games) - use game_id column
+      // Delete from game_history table (finished games)
       const finishedGamesResult = await query(
-        `DELETE FROM game_history WHERE LENGTH(game_id) < 8 RETURNING game_id`,
-        []
+        `DELETE FROM game_history WHERE LENGTH(game_id) < $1 RETURNING game_id`,
+        [GAME_ID_LENGTH]
       );
 
       // Delete from game_sessions table
       const sessionsResult = await query(
-        `DELETE FROM game_sessions WHERE LENGTH(game_id) < 8 RETURNING game_id`,
-        []
+        `DELETE FROM game_sessions WHERE LENGTH(game_id) < $1 RETURNING game_id`,
+        [GAME_ID_LENGTH]
       );
 
       const deletedCount = {
+        inMemory: inMemoryDeleted.length,
         activeGames: activeGamesResult.rowCount || 0,
         finishedGames: finishedGamesResult.rowCount || 0,
         sessions: sessionsResult.rowCount || 0,
       };
 
-      console.log(`[Cleanup] Purged obsolete < 8 char game IDs:`, deletedCount);
+      console.log(`[Cleanup] Purged obsolete game IDs (< ${GAME_ID_LENGTH} chars):`, deletedCount);
 
       res.json({
         success: true,
-        message: 'Successfully purged obsolete < 8 character game IDs',
+        message: `Successfully purged obsolete game IDs (< ${GAME_ID_LENGTH} characters)`,
         deletedCount,
+        inMemoryGames: inMemoryDeleted,
         activeGames: activeGamesResult.rows.map((r: any) => r.game_id || r.id),
         finishedGames: finishedGamesResult.rows.map((r: any) => r.game_id || r.id),
       });
@@ -578,9 +600,9 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
             console.warn('[Lobby] Filtering out invalid game:', game?.id);
             return false;
           }
-          // Filter out obsolete 6-character game IDs (current format is 8 characters)
-          if (game.id.length === 6) {
-            console.log('[Lobby] Filtering out obsolete 6-char game ID:', game.id);
+          // Filter out obsolete short game IDs
+          if (game.id.length < GAME_ID_LENGTH) {
+            console.log('[Lobby] Filtering out obsolete short game ID:', game.id, `(length: ${game.id.length})`);
             return false;
           }
           return true;

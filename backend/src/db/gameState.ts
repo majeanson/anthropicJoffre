@@ -7,6 +7,7 @@
 
 import { query } from './index';
 import type { GameState } from '../types/game';
+import { GAME_ID_LENGTH } from '../api/routes';
 
 export interface GameListItem {
   gameId: string;
@@ -137,7 +138,7 @@ export async function listActiveGames(options?: {
       game_state
     FROM active_games
     WHERE 1=1
-      AND LENGTH(game_id) != 6
+      AND LENGTH(game_id) >= ${GAME_ID_LENGTH}
   `;
 
   const values: any[] = [];

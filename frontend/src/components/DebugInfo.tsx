@@ -430,8 +430,9 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                       ✅ {cleanupResult.message}
                     </p>
                     <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
-                      <p>• Active games deleted: {cleanupResult.deletedCount?.activeGames || 0}</p>
-                      <p>• Finished games deleted: {cleanupResult.deletedCount?.finishedGames || 0}</p>
+                      <p>• In-memory games deleted: {cleanupResult.deletedCount?.inMemory || 0}</p>
+                      <p>• Active games (DB) deleted: {cleanupResult.deletedCount?.activeGames || 0}</p>
+                      <p>• Finished games (DB) deleted: {cleanupResult.deletedCount?.finishedGames || 0}</p>
                       <p>• Sessions deleted: {cleanupResult.deletedCount?.sessions || 0}</p>
                     </div>
                   </div>
