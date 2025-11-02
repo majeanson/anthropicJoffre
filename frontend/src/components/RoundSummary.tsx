@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { GameState, Card } from '../types/game';
+import { TrickHistory } from './TrickHistory';
 
 interface RoundStatistics {
   // Performance-based stats
@@ -159,14 +160,6 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
 
-  // Calculate team points for the round
-  const team1Points = gameState.players
-    .filter(p => p.teamId === 1)
-    .reduce((sum, p) => sum + p.pointsWon, 0);
-  const team2Points = gameState.players
-    .filter(p => p.teamId === 2)
-    .reduce((sum, p) => sum + p.pointsWon, 0);
-
   const renderCard = (card: Card) => {
     const colorClass = suitColors[card.color] || 'text-gray-500';
     const symbol = suitSymbols[card.color] || '?';
@@ -268,14 +261,24 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
             : 'bg-orange-50 dark:bg-gray-800 border-orange-200 dark:border-gray-700'
         }`}>
           <h3 className="font-bold text-lg sm:text-xl text-orange-600 dark:text-orange-400 mb-2">Team 1</h3>
-          <div className="text-4xl sm:text-5xl font-black text-orange-700 dark:text-orange-300">{team1Points} pts</div>
+
+          {/* Round Points - Main Focus */}
+          <div className="mb-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
+            <div className="text-5xl sm:text-6xl font-black text-orange-700 dark:text-orange-300">
+              +{lastRound.roundScore.team1}
+            </div>
+          </div>
+
           {lastRound.offensiveTeam === 1 && (
-            <div className={`text-sm sm:text-base mt-2 font-semibold ${lastRound.betMade ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {lastRound.betMade ? '✓ Made bet!' : `✗ Missed by ${lastRound.betAmount - team1Points}`}
+            <div className={`text-sm sm:text-base mb-2 font-semibold ${lastRound.betMade ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {lastRound.betMade ? '✓ Made bet!' : `✗ Missed bet`}
             </div>
           )}
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Total: {gameState.teamScores.team1}
+
+          {/* Total Score - Less Prominent */}
+          <div className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mt-3 pt-3 border-t-2 border-orange-200 dark:border-gray-600">
+            Total Score: <span className="font-bold">{gameState.teamScores.team1}</span>
           </div>
         </div>
 
@@ -285,14 +288,24 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
             : 'bg-purple-50 dark:bg-gray-800 border-purple-200 dark:border-gray-700'
         }`}>
           <h3 className="font-bold text-lg sm:text-xl text-purple-600 dark:text-purple-400 mb-2">Team 2</h3>
-          <div className="text-4xl sm:text-5xl font-black text-purple-700 dark:text-purple-300">{team2Points} pts</div>
+
+          {/* Round Points - Main Focus */}
+          <div className="mb-3">
+            <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
+            <div className="text-5xl sm:text-6xl font-black text-purple-700 dark:text-purple-300">
+              +{lastRound.roundScore.team2}
+            </div>
+          </div>
+
           {lastRound.offensiveTeam === 2 && (
-            <div className={`text-sm sm:text-base mt-2 font-semibold ${lastRound.betMade ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-              {lastRound.betMade ? '✓ Made bet!' : `✗ Missed by ${lastRound.betAmount - team2Points}`}
+            <div className={`text-sm sm:text-base mb-2 font-semibold ${lastRound.betMade ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+              {lastRound.betMade ? '✓ Made bet!' : `✗ Missed bet`}
             </div>
           )}
-          <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-2">
-            Total: {gameState.teamScores.team2}
+
+          {/* Total Score - Less Prominent */}
+          <div className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mt-3 pt-3 border-t-2 border-purple-200 dark:border-gray-600">
+            Total Score: <span className="font-bold">{gameState.teamScores.team2}</span>
           </div>
         </div>
       </div>
@@ -305,6 +318,22 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {displayedStats.map((item, index) => renderHighlight(item.title, item.icon, item.stat, index))}
+          </div>
+        </div>
+      )}
+
+      {/* Trick History */}
+      {lastRound.tricks && lastRound.tricks.length > 0 && (
+        <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '300ms' }}>
+          <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">🃏 Trick History</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-amber-200 dark:border-gray-600 shadow-lg">
+            <TrickHistory
+              tricks={lastRound.tricks}
+              players={gameState.players}
+              trump={lastRound.trump}
+              compact={true}
+              showWinner={true}
+            />
           </div>
         </div>
       )}

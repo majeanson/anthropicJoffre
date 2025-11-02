@@ -181,10 +181,13 @@ export function calculateRoundStatistics(
   }
 
   // 4. Team MVP - player with highest contribution to team's points
+  // Calculate team totals using only positive contributions to avoid >100% when teammates have negative points
   const teamPoints = { team1: 0, team2: 0 };
   game.players.forEach((player: Player) => {
-    if (player.teamId === 1) teamPoints.team1 += player.pointsWon;
-    else if (player.teamId === 2) teamPoints.team2 += player.pointsWon;
+    // Only count positive points to avoid MVP >100% when teammate has negative points from brown zeros
+    const positivePoints = Math.max(0, player.pointsWon);
+    if (player.teamId === 1) teamPoints.team1 += positivePoints;
+    else if (player.teamId === 2) teamPoints.team2 += positivePoints;
   });
 
   let maxContribution = 0;
@@ -192,7 +195,8 @@ export function calculateRoundStatistics(
   let mvpName = '';
   game.players.forEach((player: Player) => {
     const teamTotal = player.teamId === 1 ? teamPoints.team1 : teamPoints.team2;
-    if (teamTotal > 0) {
+    if (teamTotal > 0 && player.pointsWon > 0) {
+      // Calculate contribution as percentage of positive team points
       const contribution = (player.pointsWon / teamTotal) * 100;
       if (contribution > maxContribution) {
         maxContribution = contribution;

@@ -1187,10 +1187,8 @@ async function endRound(gameId: string) {
   const game = games.get(gameId);
   if (!game) return;
 
-  // Phase may already be set to 'scoring' by resolveTrick (to allow player_ready during 3s delay)
-  if (game.phase !== 'scoring') {
-    game.phase = 'scoring';
-  }
+  // Set phase to 'scoring' (called after 2s trick display delay from schedulePostTrickActions)
+  game.phase = 'scoring';
 
   // 1. PURE CALCULATION - Calculate round scoring
   const scoring = calculateRoundScoring(game);

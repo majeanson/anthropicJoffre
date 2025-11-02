@@ -461,10 +461,9 @@ export function applyTrickResolution(
   // Set winner as next player
   game.currentPlayerIndex = winnerIndex;
 
-  // If round is over, transition to scoring phase
-  if (isRoundOver) {
-    game.phase = 'scoring';
-  }
+  // DON'T transition to scoring phase here - let schedulePostTrickActions() do it after the 2s trick display
+  // This allows the last trick to remain visible for 2 seconds before showing round summary
+  // The phase will be set to 'scoring' in endRound() after the delay
 
   console.log(`🔧 applyTrickResolution END: currentTrick.length = ${game.currentTrick.length}`);
 
