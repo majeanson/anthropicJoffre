@@ -72,15 +72,22 @@ export function BotManagementPanel({
         <div className="p-6 space-y-3">
           {gameState.players.map((player, index) => {
             const isMe = player.id === currentPlayerId;
-            const bgColor = player.teamId === 1
-              ? 'bg-orange-50 dark:bg-orange-900/20'
-              : 'bg-purple-50 dark:bg-purple-900/20';
-            const borderColor = player.teamId === 1
-              ? 'border-orange-300 dark:border-orange-600'
-              : 'border-purple-300 dark:border-purple-600';
-            const textColor = player.teamId === 1
-              ? 'text-orange-700 dark:text-orange-300'
-              : 'text-purple-700 dark:text-purple-300';
+            const isEmptySeat = player.isEmpty;
+            const bgColor = isEmptySeat
+              ? 'bg-gray-100 dark:bg-gray-800'
+              : player.teamId === 1
+                ? 'bg-orange-50 dark:bg-orange-900/20'
+                : 'bg-purple-50 dark:bg-purple-900/20';
+            const borderColor = isEmptySeat
+              ? 'border-gray-400 dark:border-gray-600 border-dashed'
+              : player.teamId === 1
+                ? 'border-orange-300 dark:border-orange-600'
+                : 'border-purple-300 dark:border-purple-600';
+            const textColor = isEmptySeat
+              ? 'text-gray-500 dark:text-gray-500'
+              : player.teamId === 1
+                ? 'text-orange-700 dark:text-orange-300'
+                : 'text-purple-700 dark:text-purple-300';
             const isPlayerTurn = gameState.currentPlayerIndex === index;
 
             return (
@@ -94,27 +101,35 @@ export function BotManagementPanel({
                   {/* Player Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className={`font-bold text-lg ${textColor}`}>
-                        {player.name}
+                      <span className={`font-bold text-lg ${textColor} ${isEmptySeat ? 'italic' : ''}`}>
+                        {isEmptySeat ? '💺 ' : ''}{isEmptySeat ? (player.emptySlotName || 'Empty Seat') : player.name}
                       </span>
-                      {isMe && (
+                      {isMe && !isEmptySeat && (
                         <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
                           YOU
                         </span>
                       )}
-                      {isPlayerTurn && (
+                      {isPlayerTurn && !isEmptySeat && (
                         <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-pulse">
                           TURN
                         </span>
                       )}
-                      <span className={`${textColor} text-sm font-semibold ml-2`}>
-                        Team {player.teamId}
-                      </span>
+                      {!isEmptySeat && (
+                        <span className={`${textColor} text-sm font-semibold ml-2`}>
+                          Team {player.teamId}
+                        </span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Bot Indicator & Difficulty */}
-                  {player.isBot ? (
+                  {/* Bot Indicator & Difficulty / Empty Seat Indicator */}
+                  {isEmptySeat ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 px-3 py-1.5 rounded-full">
+                        <span className="text-sm font-bold text-gray-600 dark:text-gray-400 italic">Empty</span>
+                      </div>
+                    </div>
+                  ) : player.isBot ? (
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2 bg-gray-200 px-3 py-1.5 rounded-full">
                         <span className="text-sm font-bold text-gray-700">🤖 Bot</span>
@@ -161,7 +176,7 @@ export function BotManagementPanel({
                 </div>
 
                 {/* Replacement Restrictions Tooltip */}
-                {!player.isBot && !canReplace(player) && player.id !== currentPlayerId && (
+                {!player.isBot && !isEmptySeat && !canReplace(player) && player.id !== currentPlayerId && (
                   <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 italic">
                     {!isTeammate(player) && "⛔ Not your teammate"}
                     {isTeammate(player) && !canAddMoreBots && "⛔ Max 3 bots reached"}

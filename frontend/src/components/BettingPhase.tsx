@@ -194,16 +194,33 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
           {players.map((player, index) => {
             const bet = currentBets.find(b => b.playerId === player.id);
             const isDealerPlayer = index === dealerIndex;
+            const isEmptySeat = player.isEmpty;
             return (
-              <div key={player.id} className="flex items-center justify-between p-3 bg-parchment-100 dark:bg-gray-700 rounded-lg border border-parchment-300 dark:border-gray-600" data-testid={`player-list-item-${player.name}`}>
+              <div key={player.id} className={`flex items-center justify-between p-3 rounded-lg border ${
+                isEmptySeat
+                  ? 'bg-gray-100 dark:bg-gray-800 border-dashed border-gray-400 dark:border-gray-600'
+                  : 'bg-parchment-100 dark:bg-gray-700 border-parchment-300 dark:border-gray-600'
+              }`} data-testid={`player-list-item-${player.name}`}>
                 <div className="flex items-center gap-3">
-                  <span className={`w-3 h-3 rounded-full ${player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'}`}></span>
-                  <span className="font-medium text-umber-900 dark:text-gray-100" data-testid={`player-name-${player.name}`}>
-                    {player.name}
-                    {isDealerPlayer && <span className="ml-2 text-xs text-umber-600 dark:text-gray-400">(Dealer)</span>}
+                  <span className={`w-3 h-3 rounded-full ${
+                    isEmptySeat
+                      ? 'bg-gray-400 dark:bg-gray-600'
+                      : player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
+                  }`}></span>
+                  <span className={`font-medium ${
+                    isEmptySeat
+                      ? 'text-gray-500 dark:text-gray-500 italic'
+                      : 'text-umber-900 dark:text-gray-100'
+                  }`} data-testid={`player-name-${player.name}`}>
+                    {isEmptySeat ? '💺 ' : ''}{isEmptySeat ? (player.emptySlotName || 'Empty Seat') : player.name}
+                    {isDealerPlayer && !isEmptySeat && <span className="ml-2 text-xs text-umber-600 dark:text-gray-400">(Dealer)</span>}
                   </span>
                 </div>
-                {bet ? (
+                {isEmptySeat ? (
+                  <span className="text-sm text-gray-400 dark:text-gray-600 italic">
+                    Empty
+                  </span>
+                ) : bet ? (
                   bet.skipped ? (
                     <span className="text-sm bg-parchment-300 text-umber-600 dark:text-gray-400 px-3 py-1 rounded-full border border-umber-300">
                       Skipped

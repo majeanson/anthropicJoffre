@@ -305,6 +305,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                           {game.botPlayerCount > 0 && (
                             <span>🤖 {game.botPlayerCount} bot{game.botPlayerCount !== 1 ? 's' : ''}</span>
                           )}
+                          {(() => {
+                            const emptySeats = 4 - (game.humanPlayerCount + game.botPlayerCount);
+                            return emptySeats > 0 && (
+                              <span className="text-gray-500 dark:text-gray-500 italic">
+                                💺 {emptySeats} empty seat{emptySeats !== 1 ? 's' : ''}
+                              </span>
+                            );
+                          })()}
                           {game.isInProgress && (
                             <span>📊 Round {game.roundNumber}</span>
                           )}
