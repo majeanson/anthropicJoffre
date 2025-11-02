@@ -454,10 +454,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     return gameState.players[playerIndex];
   };
 
-  const isPlayerBot = (positionIndex: number): boolean => {
-    return getPlayer(positionIndex)?.isBot || false;
-  };
-
   const isPlayerThinking = (positionIndex: number): boolean => {
     const playerIndex = (currentPlayerIndex + positionIndex) % 4;
     const player = gameState.players[playerIndex];
