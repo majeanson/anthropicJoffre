@@ -4,7 +4,6 @@ import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
 import { PlayingPhase } from './components/PlayingPhase';
 import { TeamSelection } from './components/TeamSelection';
-import { ScoringPhase } from './components/ScoringPhase';
 import RoundSummary from './components/RoundSummary';
 import { RematchVoting } from './components/RematchVoting';
 import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';

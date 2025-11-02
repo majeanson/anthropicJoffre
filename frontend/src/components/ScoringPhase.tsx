@@ -336,28 +336,28 @@ export function ScoringPhase({
           <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600 mb-4">
             <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center">🏅 Round Highlights</h3>
             <div className="grid grid-cols-2 gap-4">
-              {statistics.fastestPlay && (
+              {statistics.trickMaster && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-yellow-300 shadow-sm">
-                  <div className="text-3xl mb-2 text-center">⚡</div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Fastest Play</p>
+                  <div className="text-3xl mb-2 text-center">🏆</div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Trick Master</p>
                   <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
-                    {statistics.fastestPlay.playerName}
+                    {statistics.trickMaster.playerName}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    {(statistics.fastestPlay.timeMs / 1000).toFixed(1)}s avg
+                    {statistics.trickMaster.tricksWon} tricks
                   </p>
                 </div>
               )}
 
-              {statistics.mostAggressiveBidder && (
+              {statistics.pointLeader && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-red-300 shadow-sm">
-                  <div className="text-3xl mb-2 text-center">🎲</div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Most Aggressive</p>
+                  <div className="text-3xl mb-2 text-center">💎</div>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 text-center">Point Leader</p>
                   <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
-                    {statistics.mostAggressiveBidder.playerName}
+                    {statistics.pointLeader.playerName}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    {statistics.mostAggressiveBidder.bidAmount} pts
+                    {statistics.pointLeader.pointsEarned} pts
                   </p>
                 </div>
               )}
@@ -383,7 +383,7 @@ export function ScoringPhase({
                     {statistics.luckyPlayer.playerName}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                    {statistics.luckyPlayer.reason}
+                    {statistics.luckyPlayer.redZeros} red 0{statistics.luckyPlayer.redZeros > 1 ? 's' : ''}
                   </p>
                 </div>
               )}

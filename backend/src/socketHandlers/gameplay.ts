@@ -29,6 +29,8 @@ export interface RoundStatsData {
   redZerosCollected: Map<string, number>; // playerId -> count of red 0 cards collected
   brownZerosReceived: Map<string, number>; // playerId -> count of brown 0 cards received
   trickStartTime: number; // timestamp when trick started
+  initialHands: Map<string, Card[]>; // playerName -> starting hand
+  playerBets: Map<string, { amount: number; withoutTrump: boolean } | null>; // playerName -> bet or null if skipped
 }
 
 /**

@@ -104,10 +104,9 @@ export interface RoundStatistics {
     trumpCount: number;
   };
 
-  // Detailed data for round summary
-  initialHands?: Map<string, Card[]>;
-  playerBets?: Map<string, { amount: number; withoutTrump: boolean } | null>;
-  handAnalyses?: Map<string, HandAnalysis>;
+  // Detailed data for round summary (Maps will be serialized to objects for JSON)
+  initialHands?: { [playerName: string]: Card[] };
+  playerBets?: { [playerName: string]: { amount: number; withoutTrump: boolean } | null };
 }
 
 /**
@@ -130,34 +129,38 @@ export function calculateRoundStatistics(
 
   // 1. Trick Master - player who won the most tricks
   let maxTricks = 0;
-  let trickMaster: Player | null = null;
-  game.players.forEach(player => {
+  let trickMasterId = '';
+  let trickMasterName = '';
+  game.players.forEach((player: Player) => {
     if (player.tricksWon > maxTricks) {
       maxTricks = player.tricksWon;
-      trickMaster = player;
+      trickMasterId = player.id;
+      trickMasterName = player.name;
     }
   });
-  if (trickMaster && maxTricks > 0) {
+  if (trickMasterId && maxTricks > 0) {
     statistics.trickMaster = {
-      playerId: trickMaster.id,
-      playerName: trickMaster.name,
+      playerId: trickMasterId,
+      playerName: trickMasterName,
       tricksWon: maxTricks,
     };
   }
 
   // 2. Point Leader - player who earned the most points
   let maxPoints = 0;
-  let pointLeader: Player | null = null;
-  game.players.forEach(player => {
+  let pointLeaderId = '';
+  let pointLeaderName = '';
+  game.players.forEach((player: Player) => {
     if (player.pointsWon > maxPoints) {
       maxPoints = player.pointsWon;
-      pointLeader = player;
+      pointLeaderId = player.id;
+      pointLeaderName = player.name;
     }
   });
-  if (pointLeader && maxPoints > 0) {
+  if (pointLeaderId && maxPoints > 0) {
     statistics.pointLeader = {
-      playerId: pointLeader.id,
-      playerName: pointLeader.name,
+      playerId: pointLeaderId,
+      playerName: pointLeaderName,
       pointsEarned: maxPoints,
     };
   }
@@ -179,27 +182,29 @@ export function calculateRoundStatistics(
 
   // 4. Team MVP - player with highest contribution to team's points
   const teamPoints = { team1: 0, team2: 0 };
-  game.players.forEach(player => {
+  game.players.forEach((player: Player) => {
     if (player.teamId === 1) teamPoints.team1 += player.pointsWon;
     else if (player.teamId === 2) teamPoints.team2 += player.pointsWon;
   });
 
   let maxContribution = 0;
-  let mvp: Player | null = null;
-  game.players.forEach(player => {
+  let mvpId = '';
+  let mvpName = '';
+  game.players.forEach((player: Player) => {
     const teamTotal = player.teamId === 1 ? teamPoints.team1 : teamPoints.team2;
     if (teamTotal > 0) {
       const contribution = (player.pointsWon / teamTotal) * 100;
       if (contribution > maxContribution) {
         maxContribution = contribution;
-        mvp = player;
+        mvpId = player.id;
+        mvpName = player.name;
       }
     }
   });
-  if (mvp && maxContribution > 50) { // Only show MVP if they contributed >50%
+  if (mvpId && maxContribution > 50) { // Only show MVP if they contributed >50%
     statistics.teamMVP = {
-      playerId: mvp.id,
-      playerName: mvp.name,
+      playerId: mvpId,
+      playerName: mvpName,
       contribution: Math.round(maxContribution),
     };
   }
@@ -240,7 +245,6 @@ export function calculateRoundStatistics(
   // ===== STARTING HAND STATS =====
   if (statsData.initialHands && statsData.initialHands.size > 0) {
     const handAnalyses = analyzeStartingHands(statsData.initialHands, game.trump);
-    statistics.handAnalyses = handAnalyses;
 
     // Find interesting hand patterns
     handAnalyses.forEach((analysis, playerName) => {

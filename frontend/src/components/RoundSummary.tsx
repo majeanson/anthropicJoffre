@@ -284,7 +284,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-amber-100 dark:divide-gray-700">
-                {gameState.players.map((player, idx) => {
+                {gameState.players.map((player) => {
                   const redZeros = lastRound.playerStats?.find(ps => ps.playerName === player.name)?.redZerosCollected || 0;
                   const brownZeros = lastRound.playerStats?.find(ps => ps.playerName === player.name)?.brownZerosReceived || 0;
 
@@ -317,7 +317,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '500ms' }}>
         <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">🃏 Bets & Starting Hands</h3>
         <div className="space-y-2">
-          {gameState.players.map((player, idx) => (
+          {gameState.players.map((player) => (
             <div
               key={player.id}
               className="p-3 sm:p-4 bg-amber-50 dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-gray-700 hover:shadow-md transition-shadow"
