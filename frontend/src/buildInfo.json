@@ -1,13 +1,28 @@
 {
-  "buildDate": "2025-11-02T16:00:00-05:00",
-  "version": "1.0.35",
+  "buildDate": "2025-11-02T19:41:09.000Z",
+  "version": "1.0.36",
   "git": {
-    "commitMessage": "fix(reconnection): Ensure empty seat compatibility with rejoin mechanic",
-    "commitHash": "bf3744d",
-    "commitDate": "2025-11-02T15:58:00-05:00",
+    "commitMessage": "fix(frontend): Fix ActiveGames CORS error by using correct env variable",
+    "commitHash": "b3fe2c6",
+    "commitDate": "2025-11-02 14:40:16 -0500",
     "branch": "main"
   },
   "latestDoneFeatures": [
+    {
+      "date": "2025-11-02",
+      "title": "Connection Stability & Bot Autonomy Fixes",
+      "features": [
+        "Fixed bot freezing - Added server-side bot action scheduling",
+        "Bots now independent of frontend sockets (schedule actions automatically)",
+        "Disabled duplicate ConnectionManager heartbeat causing mass disconnections",
+        "Socket.IO built-in ping/pong now sole heartbeat mechanism (60s timeout)",
+        "Removed duplicate emitGameUpdate on disconnect (prevented update cascades)",
+        "Bot actions scheduled at all turn transitions (betting, playing, post-trick)",
+        "Games with bots now visible in lobby browser (isJoinable includes bot replacement)",
+        "In-progress games now shown in lobby for spectating",
+        "Fixed ActiveGames CORS error (VITE_API_URL → VITE_SOCKET_URL)"
+      ]
+    },
     {
       "date": "2025-11-02",
       "title": "Empty Seat System",
@@ -40,58 +55,65 @@
         "Added admin cleanup endpoint: POST /api/admin/cleanup-observelete-games",
         "Show player names in Online page with socket ID fallback"
       ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Global Lobby Chat",
-      "features": [
-        "New chat tab in social section with real-time messaging",
-        "Backend: send_lobby_chat handler with rate limiting and validation",
-        "Frontend: LobbyChat component (158 lines) with auto-scroll and timestamps",
-        "Broadcasts messages to all connected players in lobby"
-      ]
     }
   ],
   "lastSession": {
     "date": "2025-11-02",
-    "summary": "Empty seat system with full reconnection compatibility",
+    "summary": "Fixed critical connection timeouts and bot freezing issues",
     "achievements": [
-      "✅ Empty seat backend implementation:",
-      "  - Added isEmpty and emptySlotName fields to Player interface",
-      "  - Modified leave_game handler to create empty seats instead of removing players",
-      "  - New fill_empty_seat socket handler with validation",
-      "  - Added fillEmptySeatPayloadSchema for input validation",
-      "✅ Empty seat UI across all phases:",
-      "  - PlayingPhase: Gray badges with dashed borders in circular layout",
-      "  - BettingPhase: Grayed-out empty seat entries in player list",
-      "  - BotManagementPanel: Empty seat cards with 'Empty' badge",
-      "  - TeamSelection: Fill Seat button with player name prompt",
-      "  - LobbyBrowser: Shows empty seat count for each game",
-      "✅ Consistent visual design:",
-      "  - Gray color scheme for empty seats",
-      "  - Dashed borders indicating placeholder status",
-      "  - 💺 seat emoji for visual consistency",
-      "  - Italic text to distinguish from active players",
-      "✅ Reconnection compatibility fixes:",
-      "  - Prevent empty seats from reconnecting (isEmpty check in handler)",
-      "  - Convert disconnected players to empty seats after 15-min timeout",
-      "  - Clear error messages guide users to fill seats properly",
-      "  - Maintain consistency between explicit leave and timeout behavior"
+      "🔧 Root Cause Analysis: ConnectionManager duplicate heartbeat system",
+      "  - ConnectionManager sent custom 'ping' events every 25s",
+      "  - Clients don't have handlers for custom ping (only Socket.IO built-in)",
+      "  - After 60s without pong, forced disconnect → reconnection loops",
+      "  - Disabled ConnectionManager.startHeartbeat()",
+      "  - Now relies solely on Socket.IO's built-in ping/pong",
+      "",
+      "🤖 Bot Action Scheduling (Server-Side Autonomy):",
+      "  - Added handlePlayingTimeout and handleBettingTimeout to gameplay deps",
+      "  - Bots schedule actions (2s delay) when turn advances:",
+      "    * After card play (gameplay.ts:363-382)",
+      "    * After bet placement for betting/playing phases (gameplay.ts:230-265)",
+      "    * After trick resolution if winner is bot (index.ts:1079-1098)",
+      "    * New round start if first player is bot (index.ts:1034-1047)",
+      "  - Bots no longer depend on frontend socket connections",
+      "",
+      "📡 Removed Duplicate emitGameUpdate:",
+      "  - Disconnect handler no longer calls emitGameUpdate (connection.ts:363-364)",
+      "  - Prevents update cascade during mass disconnections",
+      "  - Game state unchanged on disconnect (only connectionStatus)",
+      "",
+      "🎮 Lobby Browser Improvements:",
+      "  - Show in-progress games for spectating (routes.ts:646)",
+      "  - Games with bots marked as joinable (bot takeover flow)",
+      "  - Filter: isJoinable OR isInProgress (not just isJoinable)",
+      "",
+      "🌐 Fixed ActiveGames Component:",
+      "  - Changed VITE_API_URL → VITE_SOCKET_URL for consistency",
+      "  - All components now use same env variable",
+      "  - Better error messages for network failures"
     ],
-    "commits": 5,
-    "linesChanged": "~280 added, ~105 modified",
+    "commits": 4,
+    "linesChanged": "~180 added, ~25 modified",
     "filesModified": [
-      "backend/src/types/game.ts",
-      "backend/src/socketHandlers/lobby.ts",
+      "backend/src/connection/ConnectionManager.ts",
       "backend/src/socketHandlers/connection.ts",
-      "backend/src/validation/schemas.ts",
-      "frontend/src/types/game.ts",
-      "frontend/src/components/TeamSelection.tsx",
-      "frontend/src/components/PlayingPhase.tsx",
-      "frontend/src/components/BettingPhase.tsx",
-      "frontend/src/components/BotManagementPanel.tsx",
-      "frontend/src/components/LobbyBrowser.tsx"
-    ]
+      "backend/src/socketHandlers/gameplay.ts",
+      "backend/src/utils/broadcastManager.ts",
+      "backend/src/index.ts",
+      "backend/src/api/routes.ts",
+      "frontend/src/components/ActiveGames.tsx"
+    ],
+    "technicalDetails": {
+      "rootCause": "Duplicate heartbeat system - ConnectionManager vs Socket.IO built-in",
+      "primaryFix": "Disabled ConnectionManager custom heartbeat, rely on Socket.IO (60s timeout)",
+      "secondaryFix": "Server-side bot scheduling makes bots autonomous from frontend",
+      "impactedSystems": [
+        "Connection management (heartbeat/ping-pong)",
+        "Bot action lifecycle (betting + playing phases)",
+        "Game state broadcasting (disconnect handling)",
+        "Lobby visibility (joinable games with bots)"
+      ]
+    }
   },
   "futureTodos": [
     "Sprint 6: E2E Test Refactoring - Single-browser architecture for stability",
