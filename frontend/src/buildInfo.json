@@ -1,13 +1,25 @@
 {
-  "buildDate": "2025-11-02T10:05:00-05:00",
-  "version": "1.0.33",
+  "buildDate": "2025-11-02T15:30:00-05:00",
+  "version": "1.0.34",
   "git": {
-    "commitMessage": "chore: Update buildInfo with latestDoneFeatures section and EST timestamps",
-    "commitHash": "8f0a2c3",
-    "commitDate": "2025-11-02T10:03:00-05:00",
+    "commitMessage": "feat(ui): Complete empty seat UI across all game phases",
+    "commitHash": "6818dad",
+    "commitDate": "2025-11-02T15:28:00-05:00",
     "branch": "main"
   },
   "latestDoneFeatures": [
+    {
+      "date": "2025-11-02",
+      "title": "Empty Seat System",
+      "features": [
+        "Players leaving games create empty seats instead of being removed",
+        "Empty seats preserve team assignments and positions",
+        "New players can fill empty seats via TeamSelection 'Fill Seat' button",
+        "Backend: fill_empty_seat socket handler with session management",
+        "Frontend: Consistent empty seat UI across all phases (💺, gray, dashed borders)",
+        "LobbyBrowser shows empty seat count for each game"
+      ]
+    },
     {
       "date": "2025-11-02",
       "title": "Round Summary Enhancements",
@@ -36,50 +48,41 @@
         "Frontend: LobbyChat component (158 lines) with auto-scroll and timestamps",
         "Broadcasts messages to all connected players in lobby"
       ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Pause/Resume Functionality",
-      "features": [
-        "New endpoint: GET /api/players/:playerName/active-games",
-        "ActiveGames component (184 lines) shows resumable games in Play tab",
-        "Resume button rejoins games after disconnection or server restart",
-        "Auto-refreshes every 30 seconds to detect new active games"
-      ]
     }
   ],
   "lastSession": {
     "date": "2025-11-02",
-    "summary": "Comprehensive lobby improvements: global chat, game filtering, pause/resume, and round summary enhancements",
+    "summary": "Empty seat system for game continuity when players leave mid-session",
     "achievements": [
-      "✅ Round summary improvements (4 features):",
-      "  - Fixed last trick visibility timing (2s delay before round summary)",
-      "  - Added TrickHistory component to RoundSummary",
-      "  - Fixed Team MVP calculation bug (>100% issue)",
-      "  - Made round points delta prominent (+X display)",
-      "✅ Game management (3 features):",
-      "  - Filter and purge obsolete 6-char game IDs from lobby and database",
-      "  - Added POST /api/admin/cleanup-obsolete-games endpoint",
-      "  - Show player names in Online page with socket ID fallback",
-      "✅ Global lobby chat:",
-      "  - New chat tab in social section with real-time messaging",
-      "  - Rate limiting and validation on backend",
-      "  - Auto-scrolling UI with message timestamps",
-      "✅ Pause/Resume functionality:",
-      "  - New GET /api/players/:playerName/active-games endpoint",
-      "  - ActiveGames component shows resumable games in Play tab",
-      "  - Supports reconnection after disconnection or server restart",
-      "  - Auto-refreshes every 30 seconds"
+      "✅ Empty seat backend implementation:",
+      "  - Added isEmpty and emptySlotName fields to Player interface",
+      "  - Modified leave_game handler to create empty seats instead of removing players",
+      "  - New fill_empty_seat socket handler with validation",
+      "  - Added fillEmptySeatPayloadSchema for input validation",
+      "✅ Empty seat UI across all phases:",
+      "  - PlayingPhase: Gray badges with dashed borders in circular layout",
+      "  - BettingPhase: Grayed-out empty seat entries in player list",
+      "  - BotManagementPanel: Empty seat cards with 'Empty' badge",
+      "  - TeamSelection: Fill Seat button with player name prompt",
+      "  - LobbyBrowser: Shows empty seat count for each game",
+      "✅ Consistent visual design:",
+      "  - Gray color scheme for empty seats",
+      "  - Dashed borders indicating placeholder status",
+      "  - 💺 seat emoji for visual consistency",
+      "  - Italic text to distinguish from active players"
     ],
-    "commits": 7,
-    "linesChanged": "~740 added, ~75 modified",
-    "newComponents": [
-      "LobbyChat.tsx (158 lines)",
-      "ActiveGames.tsx (184 lines)"
-    ],
-    "newEndpoints": [
-      "POST /api/admin/cleanup-obsolete-games",
-      "GET /api/players/:playerName/active-games"
+    "commits": 3,
+    "linesChanged": "~250 added, ~100 modified",
+    "filesModified": [
+      "backend/src/types/game.ts",
+      "backend/src/socketHandlers/lobby.ts",
+      "backend/src/validation/schemas.ts",
+      "frontend/src/types/game.ts",
+      "frontend/src/components/TeamSelection.tsx",
+      "frontend/src/components/PlayingPhase.tsx",
+      "frontend/src/components/BettingPhase.tsx",
+      "frontend/src/components/BotManagementPanel.tsx",
+      "frontend/src/components/LobbyBrowser.tsx"
     ]
   },
   "futureTodos": [
