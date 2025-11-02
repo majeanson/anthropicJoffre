@@ -993,6 +993,15 @@ io.on('connection', (socket) => {
     errorBoundaries,
   });
 
+  // ============================================================================
+  // Connection Quality - Sprint 6
+  // ============================================================================
+  // Simple ping measurement for connection quality monitoring
+  socket.on('ping_measurement', ({ timestamp }, callback) => {
+    // Echo back the timestamp so client can calculate latency
+    callback({ timestamp });
+  });
+
 });
 
 function startNewRound(gameId: string) {

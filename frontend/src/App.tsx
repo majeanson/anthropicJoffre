@@ -29,6 +29,8 @@ import { useChatMessages } from './hooks/useChatMessages';
 import { useToast } from './hooks/useToast';
 // Sprint 5 Phase 3: Bot management hook
 import { useBotManagement } from './hooks/useBotManagement';
+// Sprint 6: Connection quality monitoring
+import { useConnectionQuality } from './hooks/useConnectionQuality';
 
 function App() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
@@ -65,6 +67,9 @@ function App() {
     handleTakeOverBot,
     cleanupBotSocket,
   } = useBotManagement(socket, gameId, gameState);
+
+  // Sprint 6: Connection quality monitoring
+  const connectionStats = useConnectionQuality(socket);
 
   // Debug mode state
   const [debugMode, setDebugMode] = useState<boolean>(false);
@@ -714,6 +719,7 @@ function App() {
           gameId={gameId}
           chatMessages={chatMessages}
           onNewChatMessage={handleNewChatMessage}
+          connectionStats={connectionStats}
         />
         </ErrorBoundary>
       </>

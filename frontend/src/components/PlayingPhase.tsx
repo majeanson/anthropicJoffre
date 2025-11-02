@@ -7,6 +7,8 @@ import { ChatPanel, ChatMessage } from './ChatPanel';
 import { GameHeader } from './GameHeader';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
+import { ConnectionStats } from '../hooks/useConnectionQuality';
+import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -22,9 +24,10 @@ interface PlayingPhaseProps {
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
+  connectionStats?: ConnectionStats;
 }
 
-function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: PlayingPhaseProps) {
+function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
   // ✅ CRITICAL: Check player existence BEFORE any hooks to prevent "Rendered fewer hooks than expected" error
   // Rules of Hooks: All hooks must be called in the same order on every render
   // Early returns before hooks are safe, but early returns AFTER hooks will cause React to crash
@@ -69,6 +72,9 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
   const [previousRoundScores, setPreviousRoundScores] = useState<{team1: number, team2: number} | null>(null);
   const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
   const [cardInTransition, setCardInTransition] = useState<CardType | null>(null);
+
+  // Sprint 6: Keyboard navigation state
+  const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
 
   // Memoize expensive computations (now using the pre-validated playerLookup)
   const currentPlayer = useMemo(
@@ -249,6 +255,98 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
 
     setPreviousRoundScores({ team1: team1RoundScore, team2: team2RoundScore });
   }, [gameState.players]);
+
+  // Sprint 6: Keyboard navigation for cards
+  useEffect(() => {
+    if (!isCurrentTurn || !currentPlayer) return;
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      const playableCardsIndexes = currentPlayer.hand
+        .map((card, index) => ({ card, index }))
+        .filter(({ card }) => {
+          // Check if card is playable using same logic as isCardPlayable
+          if (gameState.currentTrick.length === 0) return true;
+          const ledSuit = gameState.currentTrick[0].card.color;
+          const hasLedSuit = currentPlayer.hand.some(c => c.color === ledSuit);
+          if (hasLedSuit) return card.color === ledSuit;
+          return true;
+        })
+        .map(({ index }) => index);
+
+      if (playableCardsIndexes.length === 0) return;
+
+      // Arrow keys: navigate through playable cards
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        sounds.cardDeal(); // Subtle sound effect for navigation
+
+        if (selectedCardIndex === null) {
+          // No selection yet - select first playable card
+          setSelectedCardIndex(playableCardsIndexes[0]);
+        } else {
+          // Find current position in playable cards
+          const currentPos = playableCardsIndexes.indexOf(selectedCardIndex);
+
+          if (e.key === 'ArrowRight') {
+            // Move right (next card)
+            const nextPos = (currentPos + 1) % playableCardsIndexes.length;
+            setSelectedCardIndex(playableCardsIndexes[nextPos]);
+          } else {
+            // Move left (previous card)
+            const prevPos = (currentPos - 1 + playableCardsIndexes.length) % playableCardsIndexes.length;
+            setSelectedCardIndex(playableCardsIndexes[prevPos]);
+          }
+        }
+      }
+      // Tab: cycle through playable cards only
+      else if (e.key === 'Tab') {
+        e.preventDefault();
+        sounds.cardDeal();
+
+        if (selectedCardIndex === null || playableCardsIndexes.length === 0) {
+          setSelectedCardIndex(playableCardsIndexes[0]);
+        } else {
+          const currentPos = playableCardsIndexes.indexOf(selectedCardIndex);
+          const nextPos = e.shiftKey
+            ? (currentPos - 1 + playableCardsIndexes.length) % playableCardsIndexes.length
+            : (currentPos + 1) % playableCardsIndexes.length;
+          setSelectedCardIndex(playableCardsIndexes[nextPos]);
+        }
+      }
+      // Enter or Space: play selected card
+      else if ((e.key === 'Enter' || e.key === ' ') && selectedCardIndex !== null) {
+        e.preventDefault();
+        const card = currentPlayer.hand[selectedCardIndex];
+        if (card && playableCardsIndexes.includes(selectedCardIndex)) {
+          sounds.cardPlay(); // Play card sound
+          handleCardClick(card);
+          setSelectedCardIndex(null); // Reset selection after playing
+        }
+      }
+      // Number keys 1-9: quick select card by position
+      else if (e.key >= '1' && e.key <= '9') {
+        const cardIndex = parseInt(e.key) - 1;
+        if (cardIndex < currentPlayer.hand.length && playableCardsIndexes.includes(cardIndex)) {
+          e.preventDefault();
+          sounds.cardDeal();
+          setSelectedCardIndex(cardIndex);
+        }
+      }
+      // Escape: clear selection
+      else if (e.key === 'Escape' && selectedCardIndex !== null) {
+        e.preventDefault();
+        setSelectedCardIndex(null);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [isCurrentTurn, currentPlayer, selectedCardIndex, gameState.currentTrick]);
+
+  // Reset selection when turn changes
+  useEffect(() => {
+    setSelectedCardIndex(null);
+  }, [gameState.currentPlayerIndex]);
 
   // Find current player's index (currentPlayer is guaranteed to exist here due to early return at line 55)
   const currentPlayerIndex = gameState.players.findIndex(p => p.id === currentPlayerId);
@@ -432,6 +530,13 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         soundEnabled={soundEnabled}
         onSoundToggle={toggleSound}
       />
+
+      {/* Connection Quality Indicator - Sprint 6 */}
+      {connectionStats && (
+        <div className="absolute top-20 right-4 z-10">
+          <ConnectionQualityBadge stats={connectionStats} />
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col overflow-hidden md:overflow-visible">
         {/* Score Board - Fixed height */}
@@ -773,19 +878,25 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
                         const dealDelay = index * 80; // Stagger animation for each card
                         const isTransitioning = cardInTransition && card.color === cardInTransition.color && card.value === cardInTransition.value;
+                        const isSelected = selectedCardIndex === index; // Sprint 6: Keyboard selection
 
                         return (
                           <div
                             key={`${card.color}-${card.value}-${index}`}
                             className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
                               playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
-                            } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0' : 'opacity-100 scale-100'}`}
+                            } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0' : 'opacity-100 scale-100'}
+                            ${isSelected ? '-translate-y-4 scale-110' : ''}`}
                             style={{
                               transition: isTransitioning
                                 ? 'opacity 400ms ease-out, transform 400ms ease-out'
                                 : `opacity 200ms ease-out ${dealDelay}ms, transform 200ms ease-out ${dealDelay}ms`
                             }}
                           >
+                            {/* Sprint 6: Selection indicator ring */}
+                            {isSelected && (
+                              <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none" />
+                            )}
                             <CardComponent
                               card={card}
                               size="small"
