@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameReplay } from './GameReplay';
 
@@ -55,6 +55,12 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   const [gameId, setGameId] = useState('');
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [replayGameId, setReplayGameId] = useState<string | null>(null);
+
+  // Sprint 6: Filter and sort state
+  const [filterWithBots, setFilterWithBots] = useState(false);
+  const [filterNeedsPlayers, setFilterNeedsPlayers] = useState(false);
+  const [filterInProgress, setFilterInProgress] = useState(false);
+  const [sortBy, setSortBy] = useState<'newest' | 'players' | 'score'>('newest');
 
   // Track if we've done the initial load for each tab
   const hasLoadedActiveGames = useRef(false);
@@ -132,6 +138,42 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
       fetchRecentGames(true); // Initial load
     }
   }, [activeTab]);
+
+  // Sprint 6: Filter and sort games
+  const filteredAndSortedGames = useMemo(() => {
+    let filtered = [...games];
+
+    // Apply filters
+    if (filterWithBots) {
+      filtered = filtered.filter(game => game.botPlayerCount > 0);
+    }
+    if (filterNeedsPlayers) {
+      filtered = filtered.filter(game =>
+        game.humanPlayerCount < 4 || game.botPlayerCount > 0
+      );
+    }
+    if (filterInProgress) {
+      filtered = filtered.filter(game => game.isInProgress);
+    }
+
+    // Apply sorting
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'newest':
+          return b.createdAt - a.createdAt;
+        case 'players':
+          return b.humanPlayerCount - a.humanPlayerCount;
+        case 'score':
+          const aScore = a.teamScores.team1 + a.teamScores.team2;
+          const bScore = b.teamScores.team1 + b.teamScores.team2;
+          return bScore - aScore;
+        default:
+          return 0;
+      }
+    });
+
+    return filtered;
+  }, [games, filterWithBots, filterNeedsPlayers, filterInProgress, sortBy]);
 
   const getPhaseColor = (phase: string) => {
     switch (phase) {
@@ -258,6 +300,75 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
             </div>
           )}
 
+          {/* Sprint 6: Filter and Sort Bar - Only in Active Games tab */}
+          {activeTab === 'active' && games.length > 0 && (
+            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600">
+              <div className="flex flex-wrap items-center gap-4">
+                {/* Filter Checkboxes */}
+                <div className="flex items-center gap-4 flex-wrap">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterWithBots}
+                      onChange={(e) => setFilterWithBots(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
+                      🤖 With Bots
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterNeedsPlayers}
+                      onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
+                      💺 Needs Players
+                    </span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filterInProgress}
+                      onChange={(e) => setFilterInProgress(e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
+                      🎮 In Progress
+                    </span>
+                  </label>
+                </div>
+
+                {/* Sort Dropdown */}
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
+                    Sort by:
+                  </span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
+                    className="px-3 py-1.5 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-600 text-umber-900 dark:text-gray-100 text-sm font-medium cursor-pointer"
+                  >
+                    <option value="newest">⏰ Newest</option>
+                    <option value="players">👥 Most Players</option>
+                    <option value="score">📊 Highest Score</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Active filter count */}
+              {(filterWithBots || filterNeedsPlayers || filterInProgress) && (
+                <div className="mt-2 text-xs text-umber-600 dark:text-gray-400">
+                  Showing {filteredAndSortedGames.length} of {games.length} games
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Loading State */}
           {loading && (
             <div className="text-center py-12">
@@ -284,8 +395,16 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                     Create a new game to get started!
                   </p>
                 </div>
+              ) : filteredAndSortedGames.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-2xl mb-2">🔍</p>
+                  <p className="text-umber-700 dark:text-gray-300 font-semibold">No games match your filters</p>
+                  <p className="text-umber-600 dark:text-gray-400 text-sm mt-1">
+                    Try adjusting your filters to see more games
+                  </p>
+                </div>
               ) : (
-                games.map(game => (
+                filteredAndSortedGames.map(game => (
                   <div
                     key={game.gameId}
                     className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow-md"

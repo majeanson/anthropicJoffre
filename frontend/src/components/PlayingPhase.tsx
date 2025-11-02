@@ -447,6 +447,57 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     return gameState.players[playerIndex]?.isEmpty || false;
   };
 
+  // Sprint 6: Bot indicator helpers
+  const getPlayer = (positionIndex: number) => {
+    const playerIndex = (currentPlayerIndex + positionIndex) % 4;
+    return gameState.players[playerIndex];
+  };
+
+  const isPlayerBot = (positionIndex: number): boolean => {
+    return getPlayer(positionIndex)?.isBot || false;
+  };
+
+  const isPlayerThinking = (positionIndex: number): boolean => {
+    const playerIndex = (currentPlayerIndex + positionIndex) % 4;
+    const player = gameState.players[playerIndex];
+    // Bot is thinking if it's their turn and they haven't played yet
+    return (
+      player?.isBot === true &&
+      gameState.currentPlayerIndex === playerIndex &&
+      !gameState.currentTrick.some(tc => tc.playerId === player.id)
+    );
+  };
+
+  const getBotDifficultyBadge = (positionIndex: number): JSX.Element | null => {
+    const player = getPlayer(positionIndex);
+    if (!player?.isBot || !player.botDifficulty) return null;
+
+    const badges = {
+      easy: { color: 'bg-green-500/90 text-white', icon: '🤖', label: 'Easy' },
+      medium: { color: 'bg-yellow-500/90 text-white', icon: '🤖', label: 'Med' },
+      hard: { color: 'bg-red-500/90 text-white', icon: '🤖', label: 'Hard' },
+    };
+
+    const badge = badges[player.botDifficulty];
+    const isThinking = isPlayerThinking(positionIndex);
+
+    return (
+      <span
+        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${badge.color} ml-1`}
+        title={`Bot (${badge.label} difficulty)${isThinking ? ' - Thinking...' : ''}`}
+      >
+        <span className={isThinking ? 'animate-pulse' : ''}>{badge.icon}</span>
+        {isThinking && (
+          <span className="flex gap-0.5">
+            <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+            <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+            <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+          </span>
+        )}
+      </span>
+    );
+  };
+
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
       return (
@@ -718,7 +769,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(0) ? '💺 ' : ''}{getPlayerName(0)} (You)
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(0) ? '💺 ' : ''}{getPlayerName(0)} (You)
+                      {getBotDifficultyBadge(0)}
+                    </span>
                   </div>
                 </div>
 
@@ -732,7 +786,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(1) ? '💺 ' : ''}{getPlayerName(1)}
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(1) ? '💺 ' : ''}{getPlayerName(1)}
+                      {getBotDifficultyBadge(1)}
+                    </span>
                   </div>
                 </div>
 
@@ -745,7 +802,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(2) ? '💺 ' : ''}{getPlayerName(2)}
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(2) ? '💺 ' : ''}{getPlayerName(2)}
+                      {getBotDifficultyBadge(2)}
+                    </span>
                   </div>
                   {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId, 2)}
                 </div>
@@ -760,7 +820,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(3) ? '💺 ' : ''}{getPlayerName(3)}
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(3) ? '💺 ' : ''}{getPlayerName(3)}
+                      {getBotDifficultyBadge(3)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -782,7 +845,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(0) ? '💺 ' : ''}{getPlayerName(0)} (You)
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(0) ? '💺 ' : ''}{getPlayerName(0)} (You)
+                      {getBotDifficultyBadge(0)}
+                    </span>
                   </div>
                 </div>
 
@@ -796,7 +862,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(1) ? '💺 ' : ''}{getPlayerName(1)}
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(1) ? '💺 ' : ''}{getPlayerName(1)}
+                      {getBotDifficultyBadge(1)}
+                    </span>
                   </div>
                 </div>
 
@@ -809,7 +878,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(2) ? '💺 ' : ''}{getPlayerName(2)}
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(2) ? '💺 ' : ''}{getPlayerName(2)}
+                      {getBotDifficultyBadge(2)}
+                    </span>
                   </div>
                   {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId, 2)}
                 </div>
@@ -824,7 +896,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
                         : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
                   } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    {isPlayerEmpty(3) ? '💺 ' : ''}{getPlayerName(3)}
+                    <span className="flex items-center justify-center">
+                      {isPlayerEmpty(3) ? '💺 ' : ''}{getPlayerName(3)}
+                      {getBotDifficultyBadge(3)}
+                    </span>
                   </div>
                 </div>
               </div>
