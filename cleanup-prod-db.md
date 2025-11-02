@@ -43,9 +43,9 @@ SELECT 'active_games' as table_name, COUNT(*) as count
 FROM active_games
 WHERE LENGTH(game_id) = 6
 UNION ALL
-SELECT 'games' as table_name, COUNT(*) as count
-FROM games
-WHERE LENGTH(id) = 6
+SELECT 'game_history' as table_name, COUNT(*) as count
+FROM game_history
+WHERE LENGTH(game_id) = 6
 UNION ALL
 SELECT 'game_sessions' as table_name, COUNT(*) as count
 FROM game_sessions
@@ -61,9 +61,9 @@ ORDER BY created_at DESC;
 DELETE FROM active_games
 WHERE LENGTH(game_id) = 6;
 
--- 4. Delete from finished games table
-DELETE FROM games
-WHERE LENGTH(id) = 6;
+-- 4. Delete from finished games table (game_history)
+DELETE FROM game_history
+WHERE LENGTH(game_id) = 6;
 
 -- 5. Delete from game_sessions table
 DELETE FROM game_sessions
@@ -74,9 +74,9 @@ SELECT 'active_games' as table_name, COUNT(*) as remaining
 FROM active_games
 WHERE LENGTH(game_id) = 6
 UNION ALL
-SELECT 'games' as table_name, COUNT(*) as remaining
-FROM games
-WHERE LENGTH(id) = 6
+SELECT 'game_history' as table_name, COUNT(*) as remaining
+FROM game_history
+WHERE LENGTH(game_id) = 6
 UNION ALL
 SELECT 'game_sessions' as table_name, COUNT(*) as remaining
 FROM game_sessions
@@ -106,9 +106,9 @@ async function cleanup() {
       'DELETE FROM active_games WHERE LENGTH(game_id) = 6 RETURNING game_id'
     );
 
-    // Delete from games
+    // Delete from game_history (finished games)
     const gamesResult = await client.query(
-      'DELETE FROM games WHERE LENGTH(id) = 6 RETURNING id'
+      'DELETE FROM game_history WHERE LENGTH(game_id) = 6 RETURNING game_id'
     );
 
     // Delete from game_sessions
@@ -156,4 +156,4 @@ After running cleanup, verify in production:
 - The API endpoint has built-in transaction safety (auto-rollback on error)
 - Current game ID format is 8 characters (e.g., "A1B2C3D4")
 - All 6-character IDs are from old format and safe to delete
-- Cleanup affects 3 tables: `active_games`, `games`, `game_sessions`
+- Cleanup affects 3 tables: `active_games`, `game_history`, `game_sessions`

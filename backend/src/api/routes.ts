@@ -102,9 +102,9 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
         []
       );
 
-      // Delete from games table (finished games)
+      // Delete from game_history table (finished games) - use game_id column
       const finishedGamesResult = await query(
-        `DELETE FROM games WHERE LENGTH(id) = 6 RETURNING id`,
+        `DELETE FROM game_history WHERE LENGTH(game_id) = 6 RETURNING game_id`,
         []
       );
 
