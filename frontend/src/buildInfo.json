@@ -1,29 +1,32 @@
 {
-  "buildDate": "2025-11-01T20:30:06.000Z",
-  "version": "1.0.31",
+  "buildDate": "2025-11-02T14:47:46.000Z",
+  "version": "1.0.32",
   "git": {
-    "commitMessage": "feat(stats): Enhance round statistics with creative highlights and fix tracking bugs",
-    "commitHash": "92e1423",
-    "commitDate": "2025-11-01 20:30:06 -0400",
+    "commitMessage": "feat(gameplay): Improve round summary with trick history and better UX",
+    "commitHash": "ac41e5e",
+    "commitDate": "2025-11-02 09:47:46 -0500",
     "branch": "main"
   },
   "lastSession": {
-    "date": "2025-11-01",
-    "summary": "Enhanced round statistics system with creative highlights and fixed tracking bugs",
+    "date": "2025-11-02",
+    "summary": "Enhanced round summary UX with trick history and fixed timing/calculation bugs",
     "achievements": [
-      "Fixed red/brown card stat tracking bug (roundStats deleted too early)",
-      "Created comprehensive RoundSummary component with 13 creative statistics",
-      "Implemented smart stat prioritization showing top 3 most impressive achievements",
-      "Added hand analysis for starting hand patterns (Monochrome, Suited Up, Lucky Sevens, etc.)",
-      "Stored initial hands and player bets for end-of-round display",
-      "Added smooth staggered animations and mobile-responsive design",
-      "Theme-aware colors (amber/orange light mode, blue/purple dark mode)",
-      "All statistics fully persisted to database for game replay support"
+      "Fixed last trick visibility timing (phase transition now happens after 2s delay)",
+      "Added TrickHistory component to RoundSummary for complete trick replay",
+      "Redesigned team score cards to emphasize round points delta (+X large display)",
+      "Fixed Team MVP calculation bug showing >100% (now only counts positive contributions)",
+      "Improved round summary layout with staggered animations and clear sections",
+      "All tricks from completed round now beautifully displayed with winner highlights"
     ],
     "commits": 1,
-    "linesChanged": "~860 added, ~57 modified"
+    "linesChanged": "~59 added, ~29 modified"
   },
   "futureTodos": [
+    "Add pause/restart/resume functionality for persisted games",
+    "Fix Active Games list to only show re-joinable games (filter 6-char IDs)",
+    "Purge all obsolete 6-char game IDs from database",
+    "Show player names in Online page (or socket ID fallback)",
+    "Add global chat in lobby's social section",
     "Sprint 6: E2E Test Refactoring - Single-browser architecture for stability",
     "Redis Caching Layer - Further optimize database usage",
     "WebSocket Integration Tests - Backend multi-player test suite",
