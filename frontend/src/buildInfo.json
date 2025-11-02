@@ -1,32 +1,47 @@
 {
-  "buildDate": "2025-11-02T14:47:46.000Z",
-  "version": "1.0.32",
+  "buildDate": "2025-11-02T19:15:30.000Z",
+  "version": "1.0.33",
   "git": {
-    "commitMessage": "feat(gameplay): Improve round summary with trick history and better UX",
-    "commitHash": "ac41e5e",
-    "commitDate": "2025-11-02 09:47:46 -0500",
+    "commitMessage": "feat(lobby): Add pause/resume functionality for persisted games",
+    "commitHash": "ac67185",
+    "commitDate": "2025-11-02 10:01:29 -0500",
     "branch": "main"
   },
   "lastSession": {
     "date": "2025-11-02",
-    "summary": "Enhanced round summary UX with trick history and fixed timing/calculation bugs",
+    "summary": "Comprehensive lobby improvements: global chat, game filtering, pause/resume, and round summary enhancements",
     "achievements": [
-      "Fixed last trick visibility timing (phase transition now happens after 2s delay)",
-      "Added TrickHistory component to RoundSummary for complete trick replay",
-      "Redesigned team score cards to emphasize round points delta (+X large display)",
-      "Fixed Team MVP calculation bug showing >100% (now only counts positive contributions)",
-      "Improved round summary layout with staggered animations and clear sections",
-      "All tricks from completed round now beautifully displayed with winner highlights"
+      "✅ Round summary improvements (4 features):",
+      "  - Fixed last trick visibility timing (2s delay before round summary)",
+      "  - Added TrickHistory component to RoundSummary",
+      "  - Fixed Team MVP calculation bug (>100% issue)",
+      "  - Made round points delta prominent (+X display)",
+      "✅ Game management (3 features):",
+      "  - Filter and purge obsolete 6-char game IDs from lobby and database",
+      "  - Added POST /api/admin/cleanup-obsolete-games endpoint",
+      "  - Show player names in Online page with socket ID fallback",
+      "✅ Global lobby chat:",
+      "  - New chat tab in social section with real-time messaging",
+      "  - Rate limiting and validation on backend",
+      "  - Auto-scrolling UI with message timestamps",
+      "✅ Pause/Resume functionality:",
+      "  - New GET /api/players/:playerName/active-games endpoint",
+      "  - ActiveGames component shows resumable games in Play tab",
+      "  - Supports reconnection after disconnection or server restart",
+      "  - Auto-refreshes every 30 seconds"
     ],
-    "commits": 1,
-    "linesChanged": "~59 added, ~29 modified"
+    "commits": 5,
+    "linesChanged": "~680 added, ~35 modified",
+    "newComponents": [
+      "LobbyChat.tsx (158 lines)",
+      "ActiveGames.tsx (184 lines)"
+    ],
+    "newEndpoints": [
+      "POST /api/admin/cleanup-obsolete-games",
+      "GET /api/players/:playerName/active-games"
+    ]
   },
   "futureTodos": [
-    "Add pause/restart/resume functionality for persisted games",
-    "Fix Active Games list to only show re-joinable games (filter 6-char IDs)",
-    "Purge all obsolete 6-char game IDs from database",
-    "Show player names in Online page (or socket ID fallback)",
-    "Add global chat in lobby's social section",
     "Sprint 6: E2E Test Refactoring - Single-browser architecture for stability",
     "Redis Caching Layer - Further optimize database usage",
     "WebSocket Integration Tests - Backend multi-player test suite",
@@ -34,6 +49,8 @@
     "Improve Bot AI - Advanced strategy and card tracking",
     "Enhanced Leaderboard - Charts, statistics, and CSV export",
     "Performance optimization - Bundle splitting and code optimization",
-    "Mobile UX improvements - Touch gestures and responsive tweaks"
+    "Mobile UX improvements - Touch gestures and responsive tweaks",
+    "Tournament mode - Bracket system for competitive play",
+    "Replay system enhancements - Download/share replays"
   ]
 }
