@@ -320,7 +320,10 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                       </div>
 
                       <div className="flex gap-2">
-                        {game.isJoinable && (
+                        {/* Show Join button for:
+                            1. Team selection games with open spots or bots
+                            2. In-progress games with bots (to replace them) */}
+                        {(game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) && (
                           <button
                             onClick={() => {
                               onJoinGame(game.gameId);
