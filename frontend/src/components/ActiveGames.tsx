@@ -40,7 +40,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
       setError(null);
 
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const apiUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
         const response = await fetch(`${apiUrl}/api/players/${encodeURIComponent(playerName)}/active-games`);
 
         if (!response.ok) {
@@ -51,7 +51,12 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
         setActiveGames(data.games || []);
       } catch (err) {
         console.error('Error fetching active games:', err);
-        setError('Failed to load active games');
+        // More specific error message for CORS/network failures
+        if (err instanceof TypeError) {
+          setError('Cannot connect to server. Is the backend running?');
+        } else {
+          setError('Failed to load active games');
+        }
       } finally {
         setLoading(false);
       }
