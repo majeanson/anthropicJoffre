@@ -203,6 +203,19 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     console.log(`[PLACE_BET] Result: bettingComplete=${result.bettingComplete}, allPlayersSkipped=${result.allPlayersSkipped}`);
     console.log(`[PLACE_BET] Current player index: ${game.currentPlayerIndex}, Current player: ${game.players[game.currentPlayerIndex]?.name}`);
 
+    // Save bet to round stats for end-of-round display
+    const stats = roundStats.get(gameId);
+    if (stats) {
+      const player = game.players.find(p => p.id === socket.id);
+      if (player) {
+        if (skipped) {
+          stats.playerBets.set(player.name, null); // null indicates skip
+        } else {
+          stats.playerBets.set(player.name, { amount, withoutTrump });
+        }
+      }
+    }
+
     // Handle all-players-skipped scenario
     if (result.allPlayersSkipped) {
       resetBetting(game);

@@ -5,6 +5,7 @@ import { BettingPhase } from './components/BettingPhase';
 import { PlayingPhase } from './components/PlayingPhase';
 import { TeamSelection } from './components/TeamSelection';
 import { ScoringPhase } from './components/ScoringPhase';
+import RoundSummary from './components/RoundSummary';
 import { RematchVoting } from './components/RematchVoting';
 import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
 import { DebugPanel } from './components/DebugPanel';
@@ -721,6 +722,11 @@ function App() {
   }
 
   if (gameState.phase === 'scoring') {
+    const handleReady = () => {
+      if (!socket) return;
+      socket.emit('player_ready', { gameId });
+    };
+
     return (
       <>
         <GlobalUI />
@@ -733,17 +739,14 @@ function App() {
           onClose={() => setDebugPanelOpen(false)}
         />
         <ErrorBoundary>
-          <ScoringPhase
-            gameState={gameState}
-            socket={socket || null}
-            gameId={gameId}
-            currentPlayerId={socket?.id || ''}
-            chatMessages={chatMessages}
-            onNewChatMessage={handleNewChatMessage}
-            onLeaveGame={handleLeaveGame}
-            onOpenBotManagement={() => setBotManagementOpen(true)}
-            isSpectator={isSpectator}
-          />
+          <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-5xl w-full">
+              <RoundSummary
+                gameState={gameState}
+                onReady={handleReady}
+              />
+            </div>
+          </div>
         </ErrorBoundary>
       </>
     );

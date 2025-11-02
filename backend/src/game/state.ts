@@ -632,7 +632,7 @@ export function applyRoundScoring(
   game.teamScores.team1 = scoring.newTeamScores.team1;
   game.teamScores.team2 = scoring.newTeamScores.team2;
 
-  // Add to round history
+  // Add to round history (playerStats will be added later in endRound)
   game.roundHistory.push({
     roundNumber: game.roundNumber,
     bets: [...game.currentBets],

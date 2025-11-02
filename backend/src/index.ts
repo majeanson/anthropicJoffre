@@ -1024,6 +1024,15 @@ function startNewRound(gameId: string) {
   // Initialize round statistics tracking
   roundStats.set(gameId, initializeRoundStats(game.players));
 
+  // Store initial hands in round stats for end-of-round display
+  const stats = roundStats.get(gameId);
+  if (stats) {
+    game.players.forEach(player => {
+      // Deep copy the hand to preserve the initial state
+      stats.initialHands.set(player.name, [...player.hand]);
+    });
+  }
+
   broadcastGameUpdate(gameId, 'round_started', game);
 
   // Start timeout for first player's bet
@@ -1189,16 +1198,24 @@ async function endRound(gameId: string) {
   // 2. STATE TRANSFORMATION - Apply scoring to game state (updates scores, adds to history, checks game over)
   applyRoundScoring(game, scoring);
 
-  // 3. Add round statistics to the round history entry
+  // 3. Add round statistics and player stats to the round history entry
   const statsData = roundStats.get(gameId);
   const statistics = calculateRoundStatistics(statsData, game);
   const lastRound = game.roundHistory[game.roundHistory.length - 1];
   if (lastRound) {
     lastRound.statistics = statistics;
+
+    // Add player stats for detailed round summary display
+    lastRound.playerStats = game.players.map(player => ({
+      playerName: player.name,
+      tricksWon: player.tricksWon,
+      pointsWon: player.pointsWon,
+      redZerosCollected: statsData?.redZerosCollected.get(player.name) || 0,
+      brownZerosReceived: statsData?.brownZerosReceived.get(player.name) || 0,
+    }));
   }
 
-  // Clean up stats after calculation
-  roundStats.delete(gameId);
+  // DON'T delete stats yet - we need them for database updates below!
 
   // Log scoring results
   console.log(`Offensive Team ${scoring.offensiveTeamId} ${scoring.betMade ? 'made' : 'failed'} bet (${scoring.offensiveTeamPoints}/${scoring.betAmount}): ${scoring.offensiveScore > 0 ? '+' : ''}${scoring.offensiveScore}`);
@@ -1285,6 +1302,9 @@ async function endRound(gameId: string) {
       console.error('Error finalizing game:', error);
     }
 
+    // Clean up round stats after all database updates
+    roundStats.delete(gameId);
+
     broadcastGameUpdate(gameId, 'game_over', { winningTeam, gameState: game });
   } else {
     // Initialize player ready tracking and round end timestamp
@@ -1293,6 +1313,9 @@ async function endRound(gameId: string) {
 
     // Emit round ended
     broadcastGameUpdate(gameId, 'round_ended', game);
+
+    // NOW we can clean up stats after all database updates are complete
+    roundStats.delete(gameId);
 
     // Check for ready or timeout every second
     const roundSummaryInterval = setInterval(() => {

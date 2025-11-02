@@ -52,10 +52,26 @@ export interface TrickResult {
 }
 
 export interface RoundStatistics {
-  fastestPlay?: { playerId: string; playerName: string; timeMs: number };
-  mostAggressiveBidder?: { playerId: string; playerName: string; bidAmount: number };
+  // Performance-based stats
+  trickMaster?: { playerId: string; playerName: string; tricksWon: number };
+  pointLeader?: { playerId: string; playerName: string; pointsEarned: number };
+  perfectBet?: { playerId: string; playerName: string; betAmount: number };
+  teamMVP?: { playerId: string; playerName: string; contribution: number };
   trumpMaster?: { playerId: string; playerName: string; trumpsPlayed: number };
-  luckyPlayer?: { playerId: string; playerName: string; reason: string };
+  luckyPlayer?: { playerId: string; playerName: string; redZeros: number };
+
+  // Starting hand stats
+  monochrome?: { playerId: string; playerName: string };
+  suitedUp?: { playerId: string; playerName: string; suit: string; count: number };
+  luckySevens?: { playerId: string; playerName: string; sevensCount: number };
+  rainbow?: { playerId: string; playerName: string };
+  lowball?: { playerId: string; playerName: string; avgValue: number };
+  highRoller?: { playerId: string; playerName: string; avgValue: number };
+  trumpHeavy?: { playerId: string; playerName: string; trumpCount: number };
+
+  // Raw data for detailed display (Maps will be serialized to objects for JSON)
+  initialHands?: { [playerName: string]: Card[] };
+  playerBets?: { [playerName: string]: { amount: number; withoutTrump: boolean } | null };
 }
 
 export interface RoundHistory {
@@ -79,6 +95,13 @@ export interface RoundHistory {
   tricks: TrickResult[]; // All tricks played in this round
   trump: CardColor | null; // Trump suit for this round
   statistics?: RoundStatistics; // Fun stats for this round
+  playerStats?: Array<{
+    playerName: string;
+    tricksWon: number;
+    pointsWon: number;
+    redZerosCollected: number;
+    brownZerosReceived: number;
+  }>;
 }
 
 export interface GameState {
