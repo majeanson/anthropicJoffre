@@ -96,6 +96,11 @@ export type ServerToClientEvents = {
     waitingForReconnection: boolean;
     reconnectTimeLeft?: number;
   };
+  lobby_chat_message: {
+    playerName: string;
+    message: string;
+    timestamp: number;
+  };
   team_selection_chat: {
     playerName: string;
     message: string;
@@ -157,6 +162,7 @@ export type ClientToServerEvents = {
   place_bet: (data: { gameId: string; amount: number; withoutTrump: boolean }) => void;
   play_card: (data: { gameId: string; card: Card }) => void;
   player_ready: (data: { gameId: string }) => void;
+  send_lobby_chat: (data: { playerName: string; message: string }) => void;
   send_team_selection_chat: (data: { gameId: string; message: string }) => void;
   send_game_chat: (data: { gameId: string; message: string }) => void;
   reconnect_to_game: (data: { gameId: string; session: PlayerSession }) => void;

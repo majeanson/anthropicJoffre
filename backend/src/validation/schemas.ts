@@ -192,6 +192,14 @@ export const playCardPayloadSchema = z.object({
 }).strict();
 
 /**
+ * Chat message payload (lobby/global)
+ */
+export const lobbyChatPayloadSchema = z.object({
+  playerName: playerNameSchema,
+  message: chatMessageSchema,
+}).strict();
+
+/**
  * Chat message payload (team selection)
  */
 export const teamChatPayloadSchema = z.object({

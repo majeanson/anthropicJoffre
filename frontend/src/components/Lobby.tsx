@@ -6,6 +6,7 @@ import { PlayerStatsModal } from './PlayerStatsModal';
 import { GlobalLeaderboard } from './GlobalLeaderboard';
 import { HowToPlay } from './HowToPlay';
 import { DebugInfo } from './DebugInfo';
+import { LobbyChat } from './LobbyChat';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
@@ -35,7 +36,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [showDebugInfo, setShowDebugInfo] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
-  const [socialTab, setSocialTab] = useState<'recent' | 'online'>('online');
+  const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat'>('online');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -348,6 +349,16 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         🟢 Online ({onlinePlayers.length})
                       </button>
                       <button
+                        onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
+                        className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
+                          socialTab === 'chat'
+                            ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg'
+                            : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        💬 Chat
+                      </button>
+                      <button
                         onClick={() => { sounds.buttonClick(); setSocialTab('recent'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'recent'
@@ -359,7 +370,10 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       </button>
                     </div>
 
-                    {/* Players List */}
+                    {/* Players List / Chat */}
+                    {socialTab === 'chat' ? (
+                      <LobbyChat socket={socket} playerName={playerName} />
+                    ) : (
                     <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 min-h-[320px] max-h-[320px] overflow-y-auto">
                       {socialTab === 'online' && (
                         <div className="space-y-2">
@@ -438,6 +452,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </div>
                       )}
                     </div>
+                    )}
                   </div>
                 )}
 

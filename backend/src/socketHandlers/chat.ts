@@ -3,6 +3,7 @@
  * Sprint 3 Refactoring: Extracted from index.ts
  *
  * Handles all chat-related socket events:
+ * - send_lobby_chat: Global lobby chat (social section)
  * - send_team_selection_chat: Team selection phase chat
  * - send_game_chat: In-game chat (betting, playing, scoring phases)
  */
@@ -14,6 +15,7 @@ import { Logger } from 'winston';
 // Import validation schemas
 import {
   validateInput,
+  lobbyChatPayloadSchema,
   teamChatPayloadSchema,
   gameChatPayloadSchema,
 } from '../validation/schemas';
@@ -56,6 +58,49 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
     logger,
     errorBoundaries,
   } = deps;
+
+  // ============================================================================
+  // send_lobby_chat - Global lobby chat (accessible to all connected clients)
+  // ============================================================================
+  socket.on('send_lobby_chat', errorBoundaries.gameAction('send_lobby_chat')((payload: { playerName: string; message: string }) => {
+    // Validate input
+    const validation = validateInput(lobbyChatPayloadSchema, payload);
+    if (!validation.success) {
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid send_lobby_chat payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { playerName, message: validatedMessage } = validation.data;
+
+    // Rate limiting: Check per-player rate limit
+    const ipAddress = getSocketIP(socket);
+    const rateLimit = rateLimiters.chat.checkLimit(playerName, ipAddress);
+    if (!rateLimit.allowed) {
+      socket.emit('error', {
+        message: 'You are sending messages too fast. Please slow down.',
+      });
+      logger.warn('Rate limit exceeded for send_lobby_chat', {
+        playerName,
+        ipAddress,
+      });
+      return;
+    }
+    rateLimiters.chat.recordRequest(playerName, ipAddress);
+
+    // Message is already validated and sanitized by Zod schema
+    const sanitizedMessage = validatedMessage;
+    if (!sanitizedMessage) {
+      return;
+    }
+
+    // Broadcast message to all connected clients
+    io.emit('lobby_chat_message', {
+      playerName,
+      message: sanitizedMessage,
+      timestamp: Date.now()
+    });
+  }));
 
   // ============================================================================
   // send_team_selection_chat - Team selection phase chat
