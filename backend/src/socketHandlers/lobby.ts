@@ -21,6 +21,7 @@ import {
   createGamePayloadSchema,
   joinGamePayloadSchema,
   leaveGamePayloadSchema,
+  fillEmptySeatPayloadSchema,
 } from '../validation/schemas';
 
 // Import conditional persistence manager
@@ -501,11 +502,25 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // Clean up player sessions from database (conditional on persistence mode)
     await PersistenceManager.deletePlayerSessions(player.name, gameId, game.persistenceMode);
 
-    // Remove player from game
+    // Instead of removing player, convert to empty seat
     const playerIndex = game.players.findIndex(p => p.id === socket.id);
     if (playerIndex !== -1) {
-      game.players.splice(playerIndex, 1);
-      console.log(`Player ${player.name} (${socket.id}) left game ${gameId}`);
+      console.log(`Player ${player.name} (${socket.id}) leaving game ${gameId} - converting to empty seat`);
+
+      // Convert player to empty seat (preserve team and position)
+      game.players[playerIndex] = {
+        ...player,
+        id: `empty_${playerIndex}_${Date.now()}`, // Unique ID for empty seat
+        name: `Empty Seat (${player.name})`, // Show who left
+        hand: [], // Clear hand
+        isEmpty: true,
+        emptySlotName: `Empty Seat`,
+        isBot: false,
+        botDifficulty: undefined,
+        connectionStatus: 'disconnected',
+        tricksWon: 0, // Reset stats for new player
+        pointsWon: 0,
+      };
 
       // Leave the game room
       socket.leave(gameId);
@@ -513,18 +528,19 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       // Notify remaining players
       io.to(gameId).emit('player_left', { playerId: socket.id, gameState: game });
 
-      // If game is empty, schedule deletion after 5 minutes (allows reconnection)
-      if (game.players.length === 0) {
-        console.log(`Game ${gameId} is now empty, scheduling deletion in 5 minutes`);
+      // Check if all seats are empty - if so, schedule game deletion
+      const allEmpty = game.players.every(p => p.isEmpty);
+      if (allEmpty) {
+        console.log(`Game ${gameId} - all seats are now empty, scheduling deletion in 5 minutes`);
 
         const deletionTimeout = setTimeout(() => {
           if (games.has(gameId)) {
             const currentGame = games.get(gameId);
-            // Only delete if still empty
-            if (currentGame && currentGame.players.length === 0) {
+            // Only delete if all seats still empty
+            if (currentGame && currentGame.players.every(p => p.isEmpty)) {
               games.delete(gameId);
               gameDeletionTimeouts.delete(gameId);
-              console.log(`Game ${gameId} deleted after timeout (no players returned)`);
+              console.log(`Game ${gameId} deleted after timeout (all seats empty)`);
             }
           }
         }, 5 * 60 * 1000); // 5 minutes
@@ -535,5 +551,89 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       // Confirm to the leaving player
       socket.emit('leave_game_success', { success: true });
     }
+  }));
+
+  // ============================================================================
+  // fill_empty_seat - Fill an empty seat with a new player or bot
+  // ============================================================================
+  socket.on('fill_empty_seat', errorBoundaries.gameAction('fill_empty_seat')(async (payload: unknown) => {
+    // Validate input with Zod schema
+    const validation = validateInput(fillEmptySeatPayloadSchema, payload);
+    if (!validation.success) {
+      console.error('[VALIDATION ERROR] fill_empty_seat failed:', {
+        payload: JSON.stringify(payload),
+        error: validation.error,
+        socketId: socket.id
+      });
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      return;
+    }
+
+    const { gameId, playerName, emptySlotIndex } = validation.data;
+
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Validate slot index
+    if (emptySlotIndex < 0 || emptySlotIndex >= game.players.length) {
+      socket.emit('error', { message: 'Invalid seat index' });
+      return;
+    }
+
+    // Check if seat is actually empty
+    const seat = game.players[emptySlotIndex];
+    if (!seat.isEmpty) {
+      socket.emit('error', { message: 'Seat is not empty' });
+      return;
+    }
+
+    // Check if player is already in the game
+    const existingPlayer = game.players.find(p => !p.isEmpty && (p.id === socket.id || p.name === playerName));
+    if (existingPlayer) {
+      socket.emit('error', { message: 'You are already in this game' });
+      return;
+    }
+
+    console.log(`Player ${playerName} (${socket.id}) filling empty seat ${emptySlotIndex} in game ${gameId}`);
+
+    // Fill the empty seat
+    game.players[emptySlotIndex] = {
+      id: socket.id,
+      name: playerName,
+      teamId: seat.teamId, // Preserve team assignment
+      hand: [], // Will be dealt cards if in progress
+      tricksWon: 0,
+      pointsWon: 0,
+      isBot: false,
+      connectionStatus: 'connected',
+      isEmpty: false,
+      emptySlotName: undefined,
+    };
+
+    // Join the game room
+    socket.join(gameId);
+
+    // Update online player status
+    updateOnlinePlayer(socket.id, playerName, 'in_game', gameId);
+
+    // Create player session for reconnection
+    const session = await PersistenceManager.createSession(
+      playerName,
+      socket.id,
+      gameId,
+      game.persistenceMode,
+      false // isBot
+    );
+
+    // Notify all players
+    io.to(gameId).emit('game_updated', game);
+
+    // Confirm to the new player
+    socket.emit('game_joined', { gameState: game, session });
+
+    console.log(`Player ${playerName} successfully filled empty seat ${emptySlotIndex} in game ${gameId}`);
   }));
 }

@@ -245,6 +245,15 @@ export const leaveGamePayloadSchema = z.object({
 }).strict();
 
 /**
+ * Fill empty seat payload
+ */
+export const fillEmptySeatPayloadSchema = z.object({
+  gameId: gameIdSchema,
+  playerName: playerNameSchema,
+  emptySlotIndex: z.number().int().min(0).max(3), // Index of the empty seat to fill (0-3)
+}).strict();
+
+/**
  * Spectate game payload
  */
 export const spectateGamePayloadSchema = z.object({
