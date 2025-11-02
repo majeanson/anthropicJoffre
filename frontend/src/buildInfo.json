@@ -1,12 +1,53 @@
 {
-  "buildDate": "2025-11-02T19:15:30.000Z",
+  "buildDate": "2025-11-02 10:05:00 EST",
   "version": "1.0.33",
   "git": {
-    "commitMessage": "feat(lobby): Add pause/resume functionality for persisted games",
-    "commitHash": "ac67185",
-    "commitDate": "2025-11-02 10:01:29 -0500",
+    "commitMessage": "chore: Update buildInfo to v1.0.33 with comprehensive lobby improvements",
+    "commitHash": "f0b917b",
+    "commitDate": "2025-11-02 10:02:13 EST",
     "branch": "main"
   },
+  "latestDoneFeatures": [
+    {
+      "date": "2025-11-02",
+      "title": "Round Summary Enhancements",
+      "features": [
+        "Fixed last trick visibility - shows for 2 seconds before round summary",
+        "Added TrickHistory component to round summary",
+        "Fixed Team MVP calculation bug (was showing >100%)",
+        "Made round points delta prominent with large +X display"
+      ]
+    },
+    {
+      "date": "2025-11-02",
+      "title": "Game Management Improvements",
+      "features": [
+        "Filter obsolete 6-character game IDs from lobby displays",
+        "Added admin cleanup endpoint: POST /api/admin/cleanup-obsolete-games",
+        "Show player names in Online page with socket ID fallback"
+      ]
+    },
+    {
+      "date": "2025-11-02",
+      "title": "Global Lobby Chat",
+      "features": [
+        "New chat tab in social section with real-time messaging",
+        "Backend: send_lobby_chat handler with rate limiting and validation",
+        "Frontend: LobbyChat component (158 lines) with auto-scroll and timestamps",
+        "Broadcasts messages to all connected players in lobby"
+      ]
+    },
+    {
+      "date": "2025-11-02",
+      "title": "Pause/Resume Functionality",
+      "features": [
+        "New endpoint: GET /api/players/:playerName/active-games",
+        "ActiveGames component (184 lines) shows resumable games",
+        "Resume button rejoins games after disconnection or server restart",
+        "Auto-refreshes every 30 seconds to detect new active games"
+      ]
+    }
+  ],
   "lastSession": {
     "date": "2025-11-02",
     "summary": "Comprehensive lobby improvements: global chat, game filtering, pause/resume, and round summary enhancements",
@@ -30,8 +71,8 @@
       "  - Supports reconnection after disconnection or server restart",
       "  - Auto-refreshes every 30 seconds"
     ],
-    "commits": 5,
-    "linesChanged": "~680 added, ~35 modified",
+    "commits": 6,
+    "linesChanged": "~740 added, ~75 modified",
     "newComponents": [
       "LobbyChat.tsx (158 lines)",
       "ActiveGames.tsx (184 lines)"
