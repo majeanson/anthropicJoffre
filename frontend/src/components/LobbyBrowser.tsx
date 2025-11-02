@@ -232,7 +232,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
               </button>
 
               {showJoinInput && (
-                <div className="mt-3 space-y-2 animate-slideDown">
+                <div className="mt-3 space-y-2 animate-fadeIn origin-top">
                   <input
                     type="text"
                     value={gameId}

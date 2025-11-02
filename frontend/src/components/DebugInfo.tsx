@@ -50,6 +50,8 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
   const [healthLoading, setHealthLoading] = useState(false);
   const [healthError, setHealthError] = useState<string | null>(null);
   const [showHealth, setShowHealth] = useState(false);
+  const [showLatestFeatures, setShowLatestFeatures] = useState(false);
+  const [showFutureFeatures, setShowFutureFeatures] = useState(false);
 
   const fetchHealthData = async () => {
     setHealthLoading(true);
@@ -158,22 +160,82 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             </div>
           </div>
 
-          {/* Future Todos */}
+          {/* Latest Done Features (Collapsible) */}
+          {buildInfo.latestDoneFeatures && buildInfo.latestDoneFeatures.length > 0 && (
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">✨</span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Latest Done Features</h3>
+                  <button
+                    onClick={() => setShowLatestFeatures(!showLatestFeatures)}
+                    className="text-xs bg-green-600 dark:bg-green-700 text-white px-3 py-1 rounded hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
+                  >
+                    {showLatestFeatures ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+
+                {showLatestFeatures && (
+                  <div className="space-y-3">
+                    {buildInfo.latestDoneFeatures.map((featureGroup: any, index: number) => (
+                      <div
+                        key={index}
+                        className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-semibold text-indigo-900 dark:text-indigo-200">
+                            {featureGroup.title}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {featureGroup.date}
+                          </span>
+                        </div>
+                        <ul className="space-y-1 ml-4">
+                          {featureGroup.features.map((feature: string, fIndex: number) => (
+                            <li
+                              key={fIndex}
+                              className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
+                            >
+                              <span className="text-green-500 dark:text-green-400 flex-shrink-0">✓</span>
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Future Features (Collapsible) */}
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0">🚀</span>
             <div className="flex-1">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-2">Future Features</h3>
-              <ul className="space-y-2">
-                {buildInfo.futureTodos.map((todo: string, index: number) => (
-                  <li
-                    key={index}
-                    className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700"
-                  >
-                    <span className="text-indigo-500 dark:text-indigo-400 flex-shrink-0">▸</span>
-                    <span>{todo}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
+                <button
+                  onClick={() => setShowFutureFeatures(!showFutureFeatures)}
+                  className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                >
+                  {showFutureFeatures ? 'Hide' : 'Show'}
+                </button>
+              </div>
+
+              {showFutureFeatures && (
+                <ul className="space-y-2">
+                  {buildInfo.futureTodos.map((todo: string, index: number) => (
+                    <li
+                      key={index}
+                      className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700"
+                    >
+                      <span className="text-indigo-500 dark:text-indigo-400 flex-shrink-0">▸</span>
+                      <span>{todo}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 

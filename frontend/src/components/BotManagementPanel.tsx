@@ -41,8 +41,14 @@ export function BotManagementPanel({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-blue-600 dark:border-gray-600">
+    <div
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
+      onClick={onClose}
+    >
+      <div
+        className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-blue-600 dark:border-gray-600"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header - Match PlayerStatsModal pattern */}
         <div className="sticky top-0 bg-gradient-to-r from-blue-700 to-blue-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-blue-950 dark:border-gray-900 z-10">
           <div className="flex items-center gap-3">

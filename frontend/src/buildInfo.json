@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-02 10:05:00 EST",
+  "buildDate": "2025-11-02T10:05:00-05:00",
   "version": "1.0.33",
   "git": {
-    "commitMessage": "chore: Update buildInfo to v1.0.33 with comprehensive lobby improvements",
-    "commitHash": "f0b917b",
-    "commitDate": "2025-11-02 10:02:13 EST",
+    "commitMessage": "chore: Update buildInfo with latestDoneFeatures section and EST timestamps",
+    "commitHash": "8f0a2c3",
+    "commitDate": "2025-11-02T10:03:00-05:00",
     "branch": "main"
   },
   "latestDoneFeatures": [
@@ -23,7 +23,7 @@
       "title": "Game Management Improvements",
       "features": [
         "Filter obsolete 6-character game IDs from lobby displays",
-        "Added admin cleanup endpoint: POST /api/admin/cleanup-obsolete-games",
+        "Added admin cleanup endpoint: POST /api/admin/cleanup-observelete-games",
         "Show player names in Online page with socket ID fallback"
       ]
     },
@@ -42,7 +42,7 @@
       "title": "Pause/Resume Functionality",
       "features": [
         "New endpoint: GET /api/players/:playerName/active-games",
-        "ActiveGames component (184 lines) shows resumable games",
+        "ActiveGames component (184 lines) shows resumable games in Play tab",
         "Resume button rejoins games after disconnection or server restart",
         "Auto-refreshes every 30 seconds to detect new active games"
       ]
@@ -71,7 +71,7 @@
       "  - Supports reconnection after disconnection or server restart",
       "  - Auto-refreshes every 30 seconds"
     ],
-    "commits": 6,
+    "commits": 7,
     "linesChanged": "~740 added, ~75 modified",
     "newComponents": [
       "LobbyChat.tsx (158 lines)",
