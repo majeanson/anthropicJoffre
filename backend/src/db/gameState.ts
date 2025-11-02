@@ -137,6 +137,7 @@ export async function listActiveGames(options?: {
       game_state
     FROM active_games
     WHERE 1=1
+      AND LENGTH(game_id) != 6
   `;
 
   const values: any[] = [];

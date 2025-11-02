@@ -34,6 +34,7 @@ import {
   updateGameStats,
   calculateEloChange,
   getPoolStats,
+  query,
 } from '../db';
 import {
   loadGameState as loadGameFromDB,
@@ -87,6 +88,56 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
     formatUptime,
     formatBytes,
   } = deps;
+
+  // ============================================================================
+  // Admin Endpoints
+  // ============================================================================
+
+  // Cleanup obsolete 6-character game IDs
+  app.post('/api/admin/cleanup-obsolete-games', async (req: Request, res: Response) => {
+    try {
+      // Delete from active_games table
+      const activeGamesResult = await query(
+        `DELETE FROM active_games WHERE LENGTH(game_id) = 6 RETURNING game_id`,
+        []
+      );
+
+      // Delete from games table (finished games)
+      const finishedGamesResult = await query(
+        `DELETE FROM games WHERE LENGTH(id) = 6 RETURNING id`,
+        []
+      );
+
+      // Delete from game_sessions table
+      const sessionsResult = await query(
+        `DELETE FROM game_sessions WHERE LENGTH(game_id) = 6 RETURNING game_id`,
+        []
+      );
+
+      const deletedCount = {
+        activeGames: activeGamesResult.rowCount || 0,
+        finishedGames: finishedGamesResult.rowCount || 0,
+        sessions: sessionsResult.rowCount || 0,
+      };
+
+      console.log(`[Cleanup] Purged obsolete 6-char game IDs:`, deletedCount);
+
+      res.json({
+        success: true,
+        message: 'Successfully purged obsolete 6-character game IDs',
+        deletedCount,
+        activeGames: activeGamesResult.rows.map((r: any) => r.game_id || r.id),
+        finishedGames: finishedGamesResult.rows.map((r: any) => r.game_id || r.id),
+      });
+    } catch (error) {
+      console.error('[Cleanup] Failed to purge obsolete game IDs:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to purge obsolete game IDs',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+    }
+  });
 
   // ============================================================================
   // Root Endpoint
@@ -525,6 +576,11 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
           // Pre-filter: Only include games with valid structure
           if (!game || !game.id || !game.players || !Array.isArray(game.players)) {
             console.warn('[Lobby] Filtering out invalid game:', game?.id);
+            return false;
+          }
+          // Filter out obsolete 6-character game IDs (current format is 8 characters)
+          if (game.id.length === 6) {
+            console.log('[Lobby] Filtering out obsolete 6-char game ID:', game.id);
             return false;
           }
           return true;
