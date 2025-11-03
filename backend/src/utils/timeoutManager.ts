@@ -135,12 +135,14 @@ export function startPlayerTimeout(
 
     console.log(`⏰ Timeout: ${player.name} in ${phase} phase`);
 
-    // Emit auto-action notification
-    io.to(gameId).emit('auto_action_taken', {
-      playerId: player.id,
-      playerName: player.name,
-      phase
-    });
+    // Emit auto-action notification (skip for bots - they're already in autoplay)
+    if (!player.isBot) {
+      io.to(gameId).emit('auto_action_taken', {
+        playerId: player.id,
+        playerName: player.name,
+        phase
+      });
+    }
 
     // Call the timeout handler
     timeoutHandler(gameId, playerName);

@@ -1,13 +1,20 @@
 {
-  "buildDate": "2025-11-02T22:30:00.000Z",
-  "version": "1.0.39",
+  "buildDate": "2025-11-02T22:45:00.000Z",
+  "version": "1.0.40",
   "git": {
-    "commitMessage": "fix: Complete remaining bug fixes - leaderboard persistence + empty seat joining",
+    "commitMessage": "fix: Don't show autoplay toast for bots",
     "commitHash": "pending",
     "commitDate": "pending",
     "branch": "main"
   },
   "latestDoneFeatures": [
+    {
+      "date": "2025-11-02",
+      "title": "Bot Toast Fix",
+      "features": [
+        "Fixed: Bots no longer show 'autoplay on' toast after timeout (they're always in autoplay)"
+      ]
+    },
     {
       "date": "2025-11-02",
       "title": "Final Bug Fixes - Persistence & Empty Seats",

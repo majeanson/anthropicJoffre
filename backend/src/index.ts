@@ -626,12 +626,14 @@ function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'bett
 
     console.log(`⏰ Timeout: ${player.name} in ${phase} phase`);
 
-    // Emit auto-action notification
-    io.to(gameId).emit('auto_action_taken', {
-      playerId: player.id,
-      playerName: player.name,
-      phase
-    });
+    // Emit auto-action notification (skip for bots - they're already in autoplay)
+    if (!player.isBot) {
+      io.to(gameId).emit('auto_action_taken', {
+        playerId: player.id,
+        playerName: player.name,
+        phase
+      });
+    }
 
     if (phase === 'betting') {
       handleBettingTimeout(gameId, playerName);
