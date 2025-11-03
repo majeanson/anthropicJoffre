@@ -1,8 +1,8 @@
 {
-  "buildDate": "2025-11-02T21:50:00.000Z",
-  "version": "1.0.38",
+  "buildDate": "2025-11-02T22:30:00.000Z",
+  "version": "1.0.39",
   "git": {
-    "commitMessage": "fix: Bug fixes from user testing - chat, buttons, toasts, rules",
+    "commitMessage": "fix: Complete remaining bug fixes - leaderboard persistence + empty seat joining",
     "commitHash": "pending",
     "commitDate": "pending",
     "branch": "main"
@@ -10,7 +10,17 @@
   "latestDoneFeatures": [
     {
       "date": "2025-11-02",
-      "title": "Bug Fixes from User Testing",
+      "title": "Final Bug Fixes - Persistence & Empty Seats",
+      "features": [
+        "Leaderboard now only shows stats from persistent (ELO) games - casual games don't count",
+        "Added persistence_mode column to database with migration",
+        "Empty seats now joinable directly - no separate 'Fill Seat' button needed",
+        "Join flow automatically detects and fills empty seats before checking for bots"
+      ]
+    },
+    {
+      "date": "2025-11-02",
+      "title": "Bug Fixes from User Testing (Round 1)",
       "features": [
         "Lobby chat now requires name - prompts users instead of allowing anonymous messages",
         "Consolidated 'Leave Game' button - automatically replaces player with bot (removed separate button)",

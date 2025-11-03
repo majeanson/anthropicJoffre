@@ -116,9 +116,9 @@ export const saveOrUpdateGame = async (gameState: GameState, createdAt: Date) =>
   const text = `
     INSERT INTO game_history (
       game_id, team1_score, team2_score, rounds, player_names, player_teams,
-      round_history, game_duration_seconds, trump_suit, is_bot_game, is_finished
+      round_history, game_duration_seconds, trump_suit, is_bot_game, is_finished, persistence_mode
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
     ON CONFLICT (game_id) DO UPDATE SET
       team1_score = EXCLUDED.team1_score,
       team2_score = EXCLUDED.team2_score,
@@ -140,7 +140,8 @@ export const saveOrUpdateGame = async (gameState: GameState, createdAt: Date) =>
     gameDuration,
     gameState.trump,
     isBotGame,
-    false // is_finished defaults to false for incremental saves
+    false, // is_finished defaults to false for incremental saves
+    gameState.persistenceMode // Save persistence mode
   ];
 
   const result = await query(text, values);

@@ -312,6 +312,53 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     }
 
     if (game.players.length >= 4) {
+      // Check for empty seats first
+      const emptySeatIndex = game.players.findIndex(p => p.isEmpty);
+      if (emptySeatIndex !== -1) {
+        // There's an empty seat - redirect to fill_empty_seat flow
+        console.log(`Player ${sanitizedName} joining game ${gameId} via empty seat ${emptySeatIndex}`);
+
+        const seat = game.players[emptySeatIndex];
+
+        // Fill the empty seat
+        game.players[emptySeatIndex] = {
+          id: socket.id,
+          name: sanitizedName,
+          teamId: seat.teamId, // Preserve team assignment
+          hand: [], // Will be dealt cards if in progress
+          tricksWon: 0,
+          pointsWon: 0,
+          isBot: isBot || false,
+          botDifficulty: undefined,
+          connectionStatus: 'connected',
+        };
+
+        socket.join(gameId);
+
+        // Create session for reconnection
+        const session = await PersistenceManager.createSession(
+          sanitizedName,
+          socket.id,
+          gameId,
+          game.persistenceMode,
+          isBot || false
+        );
+
+        // Track online player status (only for human players)
+        if (!isBot) {
+          updateOnlinePlayer(socket.id, sanitizedName, game.phase === 'team_selection' ? 'in_team_selection' : 'in_game', gameId);
+        }
+
+        // Notify everyone
+        io.to(gameId).emit('game_updated', game);
+
+        // Confirm to the new player
+        socket.emit('player_joined', { player: game.players[emptySeatIndex], gameState: game, session });
+
+        console.log(`Player ${sanitizedName} successfully filled empty seat ${emptySeatIndex} in game ${gameId}`);
+        return;
+      }
+
       // Check if there are bots that can be replaced
       const availableBots = game.players.filter(p => p.isBot);
       if (availableBots.length > 0) {
@@ -326,7 +373,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
         });
         return;
       }
-      // Game is full with no bots - cannot join
+      // Game is full with no bots or empty seats - cannot join
       socket.emit('error', { message: `Game is full (4/4 players). Try spectating or join a different game.` });
       return;
     }
