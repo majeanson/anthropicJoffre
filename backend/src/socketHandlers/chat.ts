@@ -20,6 +20,9 @@ import {
   gameChatPayloadSchema,
 } from '../validation/schemas';
 
+// Import chat persistence functions
+import { saveChatMessage, getLobbyChat, getGameChat } from '../db/index';
+
 /**
  * Dependencies needed by the chat handlers
  */
@@ -95,11 +98,16 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
     }
 
     // Broadcast message to all connected clients
+    const timestamp = Date.now();
     io.emit('lobby_chat_message', {
       playerName,
       message: sanitizedMessage,
-      timestamp: Date.now()
+      timestamp
     });
+
+    // Persist message to database (async, don't block)
+    saveChatMessage('lobby', playerName, sanitizedMessage)
+      .catch(err => logger.error('Failed to save lobby chat message to database', { error: err, playerName }));
   }));
 
   // ============================================================================
@@ -157,13 +165,18 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
     }
 
     // Broadcast message to all players in the game
+    const timestamp = Date.now();
     io.to(gameId).emit('team_selection_chat_message', {
       playerId: socket.id,
       playerName: player.name,
       teamId: player.teamId,
       message: sanitizedMessage,
-      timestamp: Date.now()
+      timestamp
     });
+
+    // Persist message to database (async, don't block)
+    saveChatMessage('game', player.name, sanitizedMessage, gameId, player.teamId)
+      .catch(err => logger.error('Failed to save team selection chat message to database', { error: err, gameId, playerName: player.name }));
   }));
 
   // ============================================================================
@@ -221,12 +234,49 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
     }
 
     // Broadcast message to all players in the game
+    const timestamp = Date.now();
     io.to(gameId).emit('game_chat_message', {
       playerId: socket.id,
       playerName: player.name,
       teamId: player.teamId,
       message: sanitizedMessage,
-      timestamp: Date.now()
+      timestamp
     });
+
+    // Persist message to database (async, don't block)
+    saveChatMessage('game', player.name, sanitizedMessage, gameId, player.teamId)
+      .catch(err => logger.error('Failed to save game chat message to database', { error: err, gameId, playerName: player.name }));
+  }));
+
+  // ============================================================================
+  // load_lobby_chat - Load lobby chat history (on connect)
+  // ============================================================================
+  socket.on('load_lobby_chat', errorBoundaries.gameAction('load_lobby_chat')(async () => {
+    try {
+      const messages = await getLobbyChat(100); // Last 100 messages or 24 hours
+      socket.emit('lobby_chat_history', { messages });
+    } catch (err) {
+      logger.error('Failed to load lobby chat history', { error: err, socketId: socket.id });
+      socket.emit('error', { message: 'Failed to load chat history' });
+    }
+  }));
+
+  // ============================================================================
+  // load_game_chat - Load game chat history (when joining game)
+  // ============================================================================
+  socket.on('load_game_chat', errorBoundaries.gameAction('load_game_chat')(async (payload: { gameId: string }) => {
+    const { gameId } = payload;
+    if (!gameId) {
+      socket.emit('error', { message: 'Game ID required' });
+      return;
+    }
+
+    try {
+      const messages = await getGameChat(gameId);
+      socket.emit('game_chat_history', { gameId, messages });
+    } catch (err) {
+      logger.error('Failed to load game chat history', { error: err, gameId, socketId: socket.id });
+      socket.emit('error', { message: 'Failed to load chat history' });
+    }
   }));
 }
