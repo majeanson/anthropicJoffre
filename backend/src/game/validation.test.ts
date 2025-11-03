@@ -241,7 +241,7 @@ describe('validateBet', () => {
     }
   });
 
-  it('should reject dealer skip when no valid bets', () => {
+  it('should allow dealer to skip when no valid bets', () => {
     const game = createTestGame({
       phase: 'betting',
       dealerIndex: 0,
@@ -254,13 +254,10 @@ describe('validateBet', () => {
     });
     const result = validateBet(game, 'p1', 0, false, true); // dealer trying to skip
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error).toBe('As dealer, you must bet at least 7 points when no one has bet.');
-    }
+    expect(result.success).toBe(true);
   });
 
-  it('should allow dealer to skip when there are valid bets', () => {
+  it('should reject dealer skip when there are valid bets', () => {
     const game = createTestGame({
       phase: 'betting',
       dealerIndex: 0,
@@ -271,7 +268,10 @@ describe('validateBet', () => {
     });
     const result = validateBet(game, 'p1', 0, false, true);
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe('As dealer, you cannot skip once betting has started. You must match or raise the current bet.');
+    }
   });
 
   it('should allow valid bet', () => {

@@ -1,13 +1,24 @@
 {
-  "buildDate": "2025-11-02T20:40:00.000Z",
-  "version": "1.0.37",
+  "buildDate": "2025-11-02T21:50:00.000Z",
+  "version": "1.0.38",
   "git": {
-    "commitMessage": "feat(ux): Add graceful player exit with bot replacement",
-    "commitHash": "2a15a51",
-    "commitDate": "2025-11-02 15:33:17 -0500",
+    "commitMessage": "fix: Bug fixes from user testing - chat, buttons, toasts, rules",
+    "commitHash": "pending",
+    "commitDate": "pending",
     "branch": "main"
   },
   "latestDoneFeatures": [
+    {
+      "date": "2025-11-02",
+      "title": "Bug Fixes from User Testing",
+      "features": [
+        "Lobby chat now requires name - prompts users instead of allowing anonymous messages",
+        "Consolidated 'Leave Game' button - automatically replaces player with bot (removed separate button)",
+        "Fixed auto-play toast flickering - added 2s deduplication to prevent rapid duplicate notifications",
+        "Fixed mobile button overflow - Join/Spectate buttons now wrap and scale responsively",
+        "Corrected dealer skip rules - dealer can skip ONLY when no one has bet (not vice versa)"
+      ]
+    },
     {
       "date": "2025-11-02",
       "title": "Sprint 6: UX Enhancements",

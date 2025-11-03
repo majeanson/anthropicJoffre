@@ -150,9 +150,9 @@ export function validateBet(
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
     const hasValidBets = game.currentBets.some(b => !b.skipped);
 
-    // Dealer cannot skip if no one has bet
-    if (isDealer && !hasValidBets) {
-      return err('As dealer, you must bet at least 7 points when no one has bet.');
+    // Dealer cannot skip once betting has started (if anyone has bet)
+    if (isDealer && hasValidBets) {
+      return err('As dealer, you cannot skip once betting has started. You must match or raise the current bet.');
     }
   }
 

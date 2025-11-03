@@ -383,7 +383,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
                     {/* Players List / Chat */}
                     {socialTab === 'chat' ? (
-                      <LobbyChat socket={socket} playerName={playerName} />
+                      <LobbyChat
+                        socket={socket}
+                        playerName={playerName}
+                        onSetPlayerName={setPlayerName}
+                      />
                     ) : (
                     <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 min-h-[320px] max-h-[320px] overflow-y-auto">
                       {socialTab === 'online' && (

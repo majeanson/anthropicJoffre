@@ -17,9 +17,10 @@ interface LobbyChatMessage {
 interface LobbyChatProps {
   socket: Socket | null;
   playerName: string;
+  onSetPlayerName?: (name: string) => void;
 }
 
-export function LobbyChat({ socket, playerName }: LobbyChatProps) {
+export function LobbyChat({ socket, playerName, onSetPlayerName }: LobbyChatProps) {
   const [messages, setMessages] = useState<LobbyChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -47,17 +48,42 @@ export function LobbyChat({ socket, playerName }: LobbyChatProps) {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!socket || !inputMessage.trim() || !playerName.trim()) {
+    if (!socket || !inputMessage.trim()) {
       return;
     }
 
-    // Send message to server
+    // Prompt for name if not set
+    if (!playerName.trim()) {
+      const name = window.prompt('Please enter your name to chat:');
+      if (name && name.trim() && onSetPlayerName) {
+        onSetPlayerName(name.trim());
+        // After setting name, retry sending the message
+        socket.emit('send_lobby_chat', {
+          playerName: name.trim(),
+          message: inputMessage.trim(),
+        });
+        setInputMessage('');
+      }
+      return;
+    }
+
+    // Send message to server (no 'Anonymous' fallback)
     socket.emit('send_lobby_chat', {
-      playerName: playerName.trim() || 'Anonymous',
+      playerName: playerName.trim(),
       message: inputMessage.trim(),
     });
 
     setInputMessage('');
+  };
+
+  const handleInputFocus = () => {
+    // Prompt for name when focusing input if not set
+    if (!playerName.trim() && onSetPlayerName) {
+      const name = window.prompt('Please enter your name to chat:');
+      if (name && name.trim()) {
+        onSetPlayerName(name.trim());
+      }
+    }
   };
 
   const formatTime = (timestamp: number) => {
@@ -120,22 +146,22 @@ export function LobbyChat({ socket, playerName }: LobbyChatProps) {
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            placeholder={playerName.trim() ? "Type a message..." : "Enter your name first..."}
-            disabled={!playerName.trim()}
+            onFocus={handleInputFocus}
+            placeholder={playerName.trim() ? "Type a message..." : "Click to enter your name..."}
             maxLength={200}
-            className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-umber-900 dark:text-gray-100 placeholder-umber-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-umber-900 dark:text-gray-100 placeholder-umber-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
             type="submit"
-            disabled={!inputMessage.trim() || !playerName.trim()}
+            disabled={!inputMessage.trim()}
             className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-500"
           >
             Send
           </button>
         </div>
         {!playerName.trim() && (
-          <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-            ⚠️ Please enter your name above to use chat
+          <p className="text-xs text-blue-600 dark:text-blue-400 mt-2">
+            💬 Click the input above to set your name and start chatting
           </p>
         )}
       </form>

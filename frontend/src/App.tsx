@@ -82,6 +82,7 @@ function App() {
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
   const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastAutoActionRef = useRef<{ message: string; timestamp: number } | null>(null);
 
   // Online players tracking
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
@@ -130,9 +131,18 @@ function App() {
       showToast(message, 'warning');
     };
 
-    // Auto-action notifications
+    // Auto-action notifications with deduplication to prevent flickering
     const handleAutoActionTaken = ({ playerName, phase }: { playerName: string; phase: 'betting' | 'playing' }) => {
-      showToast(`🤖 Auto-${phase === 'betting' ? 'bet' : 'play'} for ${playerName}`, 'info');
+      const message = `🤖 Auto-${phase === 'betting' ? 'bet' : 'play'} for ${playerName}`;
+      const now = Date.now();
+
+      // Only show toast if it's a different message OR more than 2 seconds have passed
+      if (!lastAutoActionRef.current ||
+          lastAutoActionRef.current.message !== message ||
+          now - lastAutoActionRef.current.timestamp > 2000) {
+        showToast(message, 'info', 1500); // Shorter duration for auto-actions
+        lastAutoActionRef.current = { message, timestamp: now };
+      }
     };
 
     // Error events
@@ -342,7 +352,12 @@ function App() {
   };
 
   const handleLeaveGame = () => {
-    if (socket && gameId) {
+    if (!socket || !gameId || !gameState) return;
+
+    const currentPlayer = gameState.players.find(p => p.id === socket.id);
+
+    // If spectator or player not found, just leave normally
+    if (isSpectator || !currentPlayer || currentPlayer.isBot) {
       socket.emit('leave_game', { gameId });
       // Clear chat messages when leaving game
       setChatMessages([]);
@@ -358,39 +373,27 @@ function App() {
         clearTimeout(timeout);
       });
       botTimeoutsRef.current.clear();
+      return;
     }
+
+    // For players, confirm and replace with bot
+    if (!confirm('Leave game? You will be replaced by a bot and cannot rejoin this game.')) {
+      return;
+    }
+
+    // Replace player with bot
+    socket.emit('replace_me_with_bot', {
+      gameId,
+      playerName: currentPlayer.name
+    });
+
+    // Note: cleanup happens when 'replaced_by_bot' event is received
   };
 
   const handleKickPlayer = (playerId: string) => {
     if (socket && gameId) {
       socket.emit('kick_player', { gameId, playerId });
     }
-  };
-
-  // Sprint 6: Replace me with bot
-  const handleReplaceMeWithBot = () => {
-    if (!socket || !gameId || !gameState) return;
-
-    const currentPlayer = gameState.players.find(p => p.id === socket.id);
-    if (!currentPlayer) {
-      showToast('Unable to replace yourself - player not found', 'error');
-      return;
-    }
-
-    if (currentPlayer.isBot) {
-      showToast('Bots cannot be replaced', 'error');
-      return;
-    }
-
-    // Confirm with user
-    if (!confirm('Are you sure you want to leave? You will be replaced by a bot and cannot rejoin this game.')) {
-      return;
-    }
-
-    socket.emit('replace_me_with_bot', {
-      gameId,
-      playerName: currentPlayer.name
-    });
   };
 
   // Sprint 5 Phase 3: Bot management handlers now in useBotManagement hook
@@ -751,7 +754,6 @@ function App() {
           isSpectator={isSpectator}
           currentTrickWinnerId={currentTrickWinnerId}
           onLeaveGame={handleLeaveGame}
-          onReplaceMeWithBot={handleReplaceMeWithBot}
           autoplayEnabled={autoplayEnabled}
           onAutoplayToggle={handleAutoplayToggle}
           onOpenBotManagement={() => setBotManagementOpen(true)}

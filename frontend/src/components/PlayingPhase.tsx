@@ -17,7 +17,6 @@ interface PlayingPhaseProps {
   isSpectator?: boolean;
   currentTrickWinnerId?: string | null;
   onLeaveGame?: () => void;
-  onReplaceMeWithBot?: () => void;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
   onOpenBotManagement?: () => void;
@@ -28,7 +27,7 @@ interface PlayingPhaseProps {
   connectionStats?: ConnectionStats;
 }
 
-function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, onReplaceMeWithBot, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
+function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
   // ✅ CRITICAL: Check player existence BEFORE any hooks to prevent "Rendered fewer hooks than expected" error
   // Rules of Hooks: All hooks must be called in the same order on every render
   // Early returns before hooks are safe, but early returns AFTER hooks will cause React to crash
@@ -567,7 +566,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         team1Score={gameState.teamScores.team1}
         team2Score={gameState.teamScores.team2}
         onLeaveGame={onLeaveGame}
-        onReplaceMeWithBot={onReplaceMeWithBot}
         onOpenLeaderboard={() => setShowLeaderboard(true)}
         onOpenChat={() => setChatOpen(true)}
         onOpenBotManagement={onOpenBotManagement}
