@@ -92,7 +92,7 @@ export function BotManagementPanel({
 
             return (
               <div
-                key={player.id}
+                key={`${player.name}-${index}`}
                 className={`${bgColor} border-2 ${borderColor} rounded-lg p-4 transition-all ${
                   isMe ? 'ring-2 ring-blue-500' : ''
                 }`}
