@@ -323,11 +323,81 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
       return;
     }
 
+    const oldBotId = botToReplace.id;
+
     // Update bot to be a human player (preserve team, hand, scores, position)
     botToReplace.name = newPlayerName;
     botToReplace.isBot = false;
     botToReplace.botDifficulty = undefined;
     botToReplace.id = socket.id; // Update to new player's socket
+
+    // IMPORTANT: Update player ID in currentTrick to maintain game state consistency
+    game.currentTrick.forEach(tc => {
+      if (tc.playerId === oldBotId) {
+        tc.playerId = socket.id;
+      }
+    });
+
+    // IMPORTANT: Update player ID in bets to ensure correct round scoring
+    game.currentBets.forEach(bet => {
+      if (bet.playerId === oldBotId) {
+        bet.playerId = socket.id;
+      }
+    });
+    if (game.highestBet && game.highestBet.playerId === oldBotId) {
+      game.highestBet.playerId = socket.id;
+    }
+
+    // CRITICAL: Update previousTrick to prevent "Player data not found" errors
+    if (game.previousTrick) {
+      game.previousTrick.trick.forEach(tc => {
+        if (tc.playerId === oldBotId) {
+          tc.playerId = socket.id;
+          tc.playerName = newPlayerName;
+        }
+      });
+      if (game.previousTrick.winnerId === oldBotId) {
+        game.previousTrick.winnerId = socket.id;
+      }
+    }
+
+    // CRITICAL: Update roundHistory to prevent "Player data not found" errors in round/game end
+    game.roundHistory.forEach(round => {
+      // Update player names in tricks (TrickResult contains trick: TrickCard[])
+      round.tricks.forEach(trickResult => {
+        trickResult.trick.forEach(tc => {
+          if (tc.playerName === botNameToReplace) {
+            tc.playerName = newPlayerName;
+            tc.playerId = socket.id;
+          }
+        });
+        // Update winner name if it matches
+        if (trickResult.winnerName === botNameToReplace) {
+          trickResult.winnerName = newPlayerName;
+          trickResult.winnerId = socket.id;
+        }
+      });
+
+      // Update player stats if they exist
+      if (round.playerStats) {
+        const botStats = round.playerStats.find(ps => ps.playerName === botNameToReplace);
+        if (botStats) {
+          botStats.playerName = newPlayerName;
+        }
+      }
+
+      // Update initial hands mapping
+      if (round.statistics?.initialHands && round.statistics.initialHands[botNameToReplace]) {
+        round.statistics.initialHands[newPlayerName] = round.statistics.initialHands[botNameToReplace];
+        delete round.statistics.initialHands[botNameToReplace];
+      }
+
+      // Update player bets mapping
+      if (round.statistics?.playerBets && round.statistics.playerBets[botNameToReplace] !== undefined) {
+        round.statistics.playerBets[newPlayerName] = round.statistics.playerBets[botNameToReplace];
+        delete round.statistics.playerBets[botNameToReplace];
+      }
+    });
 
     // Join the socket room
     socket.join(gameId);

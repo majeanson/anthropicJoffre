@@ -226,6 +226,17 @@ BEGIN
     END IF;
 END $$;
 
+-- Chat messages table for lobby and game chat
+CREATE TABLE IF NOT EXISTS chat_messages (
+    message_id SERIAL PRIMARY KEY,
+    room_type VARCHAR(20) NOT NULL CHECK (room_type IN ('lobby', 'game')),
+    room_id VARCHAR(255),
+    player_name VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    team_id INTEGER CHECK (team_id IN (1, 2)),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for better query performance
 CREATE INDEX IF NOT EXISTS idx_game_history_created_at ON game_history(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_game_history_finished ON game_history(is_finished, created_at DESC);
@@ -234,3 +245,5 @@ CREATE INDEX IF NOT EXISTS idx_player_stats_elo ON player_stats(is_bot, elo_rati
 CREATE INDEX IF NOT EXISTS idx_player_stats_win_pct ON player_stats(is_bot, win_percentage DESC);
 CREATE INDEX IF NOT EXISTS idx_game_participants_player ON game_participants(player_name);
 CREATE INDEX IF NOT EXISTS idx_game_participants_game ON game_participants(game_id);
+CREATE INDEX IF NOT EXISTS idx_chat_messages_lobby ON chat_messages(room_type, created_at DESC) WHERE room_type = 'lobby';
+CREATE INDEX IF NOT EXISTS idx_chat_messages_game ON chat_messages(room_type, room_id, created_at ASC) WHERE room_type = 'game';

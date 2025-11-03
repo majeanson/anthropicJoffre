@@ -54,6 +54,28 @@ export function ContextualGameInfo({
             ⏱️ {timeRemaining}s
           </div>
         )}
+        {/* Always show bet and trump info */}
+        {(betAmount || trumpColor) && (
+          <div className="mt-2 pt-2 border-t border-umber-300 dark:border-gray-700">
+            <div className="flex items-center justify-center gap-2 text-xs">
+              {betAmount && (
+                <div className="flex items-center gap-1">
+                  <span className="text-lg">🎲</span>
+                  <span className="text-umber-900 dark:text-gray-100 font-bold">{betAmount}</span>
+                  {withoutTrump && (
+                    <span className="text-umber-700 dark:text-gray-400 text-xs">(No Trump)</span>
+                  )}
+                </div>
+              )}
+              {!withoutTrump && trumpColor && betAmount && <span className="text-umber-400">•</span>}
+              {!withoutTrump && trumpColor && (
+                <span className={`font-semibold ${colorClasses[trumpColor]}`}>
+                  ({colorNames[trumpColor]})
+                </span>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   }

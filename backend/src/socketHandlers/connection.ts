@@ -174,6 +174,28 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       }
     });
 
+    // CRITICAL: Update player ID in previousTrick to prevent display issues
+    if (game.previousTrick) {
+      game.previousTrick.trick.forEach(tc => {
+        if (tc.playerId === oldSocketId) {
+          tc.playerId = socket.id;
+        }
+      });
+      if (game.previousTrick.winnerId === oldSocketId) {
+        game.previousTrick.winnerId = socket.id;
+      }
+    }
+
+    // CRITICAL: Update player ID in bets to ensure correct round scoring
+    game.currentBets.forEach(bet => {
+      if (bet.playerId === oldSocketId) {
+        bet.playerId = socket.id;
+      }
+    });
+    if (game.highestBet && game.highestBet.playerId === oldSocketId) {
+      game.highestBet.playerId = socket.id;
+    }
+
     // Update session with new socket ID and timestamp in database
     try {
       await updateSessionActivity(token, socket.id);

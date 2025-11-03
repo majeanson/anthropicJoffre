@@ -11,6 +11,7 @@
 import React, { useState, useEffect } from 'react';
 import { GameState, Card } from '../types/game';
 import { TrickHistory } from './TrickHistory';
+import { Card as CardComponent } from './Card';
 
 interface RoundStatistics {
   // Performance-based stats
@@ -39,20 +40,6 @@ interface RoundSummaryProps {
   gameState: GameState;
   onReady: () => void;
 }
-
-const suitSymbols: { [key: string]: string } = {
-  red: '♦',
-  brown: '♠',
-  green: '♣',
-  yellow: '♥',
-};
-
-const suitColors: { [key: string]: string } = {
-  red: 'text-red-500',
-  brown: 'text-amber-700 dark:text-amber-600',
-  green: 'text-green-600 dark:text-green-500',
-  yellow: 'text-yellow-500',
-};
 
 const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
   const [dataReady, setDataReady] = useState(false);
@@ -161,12 +148,12 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     .slice(0, 3);
 
   const renderCard = (card: Card) => {
-    const colorClass = suitColors[card.color] || 'text-gray-500';
-    const symbol = suitSymbols[card.color] || '?';
     return (
-      <span key={`${card.color}-${card.value}`} className={`${colorClass} font-mono text-sm mx-0.5`}>
-        {symbol}{card.value}
-      </span>
+      <CardComponent
+        key={`${card.color}-${card.value}`}
+        card={card}
+        size="tiny"
+      />
     );
   };
 
@@ -204,9 +191,9 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     });
 
     return (
-      <div className="flex flex-wrap gap-0.5">
+      <div className="flex flex-wrap gap-1">
         {sortedHand.map((card, idx) => (
-          <span key={idx}>{renderCard(card)}</span>
+          <div key={idx}>{renderCard(card)}</div>
         ))}
       </div>
     );
@@ -387,23 +374,29 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       {/* Bets and Starting Hands */}
       <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '500ms' }}>
         <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">🃏 Bets & Starting Hands</h3>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {gameState.players.map((player) => (
             <div
               key={player.id}
               className="p-3 sm:p-4 bg-amber-50 dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-gray-700 hover:shadow-md transition-shadow"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
-                <span className="font-bold text-gray-900 dark:text-gray-100">{player.name}</span>
-                <div className="flex items-center gap-2 text-sm">
-                  <span className={`font-semibold ${player.teamId === 1 ? 'text-orange-600 dark:text-orange-400' : 'text-purple-600 dark:text-purple-400'}`}>
-                    Team {player.teamId}
-                  </span>
-                  <span className="text-gray-500 dark:text-gray-400">•</span>
-                  {renderBet(player.name)}
-                </div>
+              {/* Player Name and Team */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-bold text-base text-gray-900 dark:text-gray-100">{player.name}</span>
+                <span className={`px-2 py-1 rounded-md text-xs font-bold ${player.teamId === 1 ? 'bg-orange-500 text-white' : 'bg-purple-500 text-white'}`}>
+                  Team {player.teamId}
+                </span>
               </div>
+
+              {/* Bet */}
+              <div className="mb-3 text-sm">
+                <span className="text-gray-600 dark:text-gray-400 font-medium">Bet: </span>
+                {renderBet(player.name)}
+              </div>
+
+              {/* Starting Hand */}
               <div className="text-sm">
+                <span className="text-gray-600 dark:text-gray-400 font-medium mb-1 block">Starting Hand:</span>
                 {renderHand(player.name)}
               </div>
             </div>

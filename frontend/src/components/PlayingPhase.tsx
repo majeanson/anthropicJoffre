@@ -470,12 +470,13 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
 
     return (
       <span
-        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold ${badge.color} ml-1`}
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg`}
         title={`Bot (${badge.label} difficulty)${isThinking ? ' - Thinking...' : ''}`}
       >
         <span className={isThinking ? 'animate-pulse' : ''}>{badge.icon}</span>
+        <span className="hidden md:inline">{badge.label}</span>
         {isThinking && (
-          <span className="flex gap-0.5">
+          <span className="flex gap-0.5 text-base md:text-xs">
             <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
             <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
             <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
@@ -567,7 +568,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-orange-500 relative">
                 {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
                 {floatingTrickPoints.team1 !== null && (
-                  <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team1 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -629,7 +630,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-purple-500 relative">
                 {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
                 {floatingTrickPoints.team2 !== null && (
-                  <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team2 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -684,13 +685,15 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg z-30" />
 
               {/* Title - always visible */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-40">
-                <div className="text-yellow-400 text-sm md:text-2xl font-bold mb-1 md:mb-2">Previous Trick</div>
-                <div className="text-white text-xs md:text-lg">
-                  Winner: {gameState.previousTrick ? gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name : ''}
-                </div>
-                <div className="text-white/80 text-xs md:text-sm">
-                  +{gameState.previousTrick?.points || 0} points
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50">
+                <div className="bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2 border-2 border-yellow-400/50">
+                  <div className="text-yellow-400 text-sm md:text-2xl font-bold mb-1 md:mb-2 drop-shadow-lg">Previous Trick</div>
+                  <div className="text-white text-xs md:text-lg drop-shadow-md">
+                    Winner: {gameState.previousTrick ? gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name : ''}
+                  </div>
+                  <div className="text-white/80 text-xs md:text-sm">
+                    +{gameState.previousTrick?.points || 0} points
+                  </div>
                 </div>
               </div>
 
