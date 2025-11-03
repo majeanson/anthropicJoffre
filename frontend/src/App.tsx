@@ -22,6 +22,7 @@ import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayer
 // import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import * as sounds from './utils/sounds';
 // Sprint 5 Phase 2: Custom hooks for state management
 import { useSocketConnection, checkValidSession } from './hooks/useSocketConnection';
 import { useGameState } from './hooks/useGameState';
@@ -80,6 +81,7 @@ function App() {
   // UI state
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
+  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastAutoActionRef = useRef<{ message: string; timestamp: number } | null>(null);
@@ -430,6 +432,16 @@ function App() {
   const handleAutoplayToggle = useCallback(() => {
     setAutoplayEnabled(prev => !prev);
   }, []);
+
+  // Sound toggle handler
+  const toggleSound = useCallback(() => {
+    const newState = !soundEnabled;
+    setSoundEnabled(newState);
+    sounds.setEnabled(newState);
+    if (newState) {
+      sounds.buttonClick(); // Play test sound when enabling
+    }
+  }, [soundEnabled]);
 
   const handleNewChatMessage = (message: ChatMessage) => {
     setChatMessages(prev => [...prev, message]);
@@ -783,6 +795,8 @@ function App() {
           onLeaveGame={handleLeaveGame}
           autoplayEnabled={autoplayEnabled}
           onAutoplayToggle={handleAutoplayToggle}
+          soundEnabled={soundEnabled}
+          onSoundToggle={toggleSound}
           onOpenBotManagement={() => setBotManagementOpen(true)}
           socket={socket}
           gameId={gameId}

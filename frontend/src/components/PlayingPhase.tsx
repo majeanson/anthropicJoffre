@@ -19,6 +19,8 @@ interface PlayingPhaseProps {
   onLeaveGame?: () => void;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
+  soundEnabled?: boolean;
+  onSoundToggle?: () => void;
   onOpenBotManagement?: () => void;
   socket?: Socket | null;
   gameId?: string;
@@ -27,7 +29,7 @@ interface PlayingPhaseProps {
   connectionStats?: ConnectionStats;
 }
 
-function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
+function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, soundEnabled = true, onSoundToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
   // ✅ CRITICAL: Check player existence BEFORE any hooks to prevent "Rendered fewer hooks than expected" error
   // Rules of Hooks: All hooks must be called in the same order on every render
   // Early returns before hooks are safe, but early returns AFTER hooks will cause React to crash
@@ -67,7 +69,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
   const [dealingCardIndex, setDealingCardIndex] = useState<number>(0);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState<boolean>(false);
   const [lastTrickLength, setLastTrickLength] = useState<number>(0);
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [floatingPoints, setFloatingPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
   const [previousRoundScores, setPreviousRoundScores] = useState<{team1: number, team2: number} | null>(null);
   const [floatingTrickPoints, setFloatingTrickPoints] = useState<{team1: number | null, team2: number | null}>({team1: null, team2: null});
@@ -114,16 +115,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       setUnreadChatCount(0);
     }
   }, [chatOpen]);
-
-  // Toggle sound on/off
-  const toggleSound = useCallback(() => {
-    const newState = !soundEnabled;
-    setSoundEnabled(newState);
-    sounds.setEnabled(newState);
-    if (newState) {
-      sounds.buttonClick(); // Play test sound when enabling
-    }
-  }, [soundEnabled]);
 
   // Reset isPlayingCard flag when it's no longer the player's turn or when trick changes
   useEffect(() => {
@@ -575,7 +566,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         isSpectator={isSpectator}
         unreadChatCount={unreadChatCount}
         soundEnabled={soundEnabled}
-        onSoundToggle={toggleSound}
+        onSoundToggle={onSoundToggle}
       />
 
       {/* Connection Quality Indicator - Sprint 6 */}
