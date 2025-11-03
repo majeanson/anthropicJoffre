@@ -22,7 +22,7 @@ import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayer
 // import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import * as sounds from './utils/sounds';
+import { sounds } from './utils/sounds';
 // Sprint 5 Phase 2: Custom hooks for state management
 import { useSocketConnection, checkValidSession } from './hooks/useSocketConnection';
 import { useGameState } from './hooks/useGameState';

@@ -9,6 +9,7 @@ import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game
 import { sounds } from '../utils/sounds';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
+import { ContextualGameInfo } from './ContextualGameInfo';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -521,21 +522,8 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     );
   };
 
-  // Get color class for trump suit
-  const getTrumpColor = (trump: CardColor | null): string => {
-    if (!trump) return 'text-umber-900 dark:text-gray-100';
-    switch (trump) {
-      case 'red': return 'text-red-600';
-      case 'green': return 'text-green-600';
-      case 'blue': return 'text-blue-600';
-      case 'brown': return 'text-amber-700';
-      default: return 'text-umber-900 dark:text-gray-100';
-    }
-  };
-
-  // Get current player and their team
+  // Get current player
   const currentTurnPlayer = gameState.players[gameState.currentPlayerIndex];
-  const currentTurnTeam = currentTurnPlayer?.teamId || 1;
 
   // Calculate round scores (points earned this round)
   const team1RoundScore = gameState.players
@@ -544,10 +532,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
   const team2RoundScore = gameState.players
     .filter(p => p.teamId === 2)
     .reduce((sum, p) => sum + p.pointsWon, 0);
-
-  // Get betting team
-  const bettingPlayer = gameState.highestBet ? gameState.players.find(p => p.id === gameState.highestBet?.playerId) : null;
-  const bettingTeam = bettingPlayer?.teamId || null;
 
   return (
     <div className="h-screen md:min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-hidden md:overflow-visible">
@@ -613,62 +597,32 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               )}
             </div>
 
-            {/* Center Info */}
-            <div className="text-center flex-shrink-0 space-y-1.5 md:space-y-2">
-              {/* Current Turn Indicator with Timeout */}
-              <div className={`px-3 md:px-4 py-1.5 md:py-2 rounded-xl text-[10px] md:text-sm font-bold shadow-lg flex items-center justify-center gap-1 md:gap-2 border-2 min-h-[2.5rem] md:min-h-[3rem] ${
-                gameState.currentTrick.length >= 4
-                  ? 'bg-gradient-to-r from-umber-500 to-umber-600 text-parchment-50 border-umber-700'
-                  : currentTurnTeam === 1
-                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white border-orange-700'
-                    : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white border-purple-700'
-              }`}>
-                {gameState.currentTrick.length >= 4 ? (
-                  <span className="whitespace-nowrap">Waiting for trick to end...</span>
-                ) : (
-                  <>
-                    <span className="whitespace-nowrap" data-testid="current-turn-player">Waiting for: {currentTurnPlayer?.name}</span>
-                    <TimeoutIndicator
-                      duration={60000}
-                      isActive={gameState.currentTrick.length < 4 && isCurrentTurn}
-                      resetKey={gameState.currentPlayerIndex}
-                      onTimeout={() => {
-                        // Auto-enable autoplay when timeout expires (only for current player)
-                        if (isCurrentTurn && onAutoplayToggle && !autoplayEnabled) {
-                          onAutoplayToggle();
-                        }
-                      }}
-                    />
-                  </>
-                )}
-              </div>
-
-              {/* Current Bet */}
-              {gameState.highestBet && (
-                <div className={`backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 shadow-md ${
-                  bettingTeam === 1
-                    ? 'bg-orange-100/90 dark:bg-orange-900/70 border-orange-400 dark:border-orange-600'
-                    : 'bg-purple-100/90 dark:bg-purple-900/70 border-purple-400 dark:border-purple-600'
-                }`}>
-                  <p className={`text-xs md:text-base font-black ${
-                    bettingTeam === 1 ? 'text-orange-800 dark:text-orange-200' : 'text-purple-800 dark:text-purple-200'
-                  }`}>
-                    🎲 {gameState.highestBet.amount} {gameState.highestBet.withoutTrump ? 'NO TRUMP' : ''}
-                  </p>
-                </div>
-              )}
-              {/* Trump (or NO TRUMP if withoutTrump bet) */}
-              {gameState.highestBet && (
-                <div className="bg-parchment-300/80 dark:bg-gray-800/80 backdrop-blur px-3 md:px-4 py-1 md:py-1.5 rounded-lg border-2 border-parchment-400 dark:border-gray-600">
-                  {gameState.highestBet.withoutTrump ? (
-                    <p className="text-xs md:text-base font-bold text-gray-500 dark:text-gray-400">
-                      NO TRUMP
-                    </p>
-                  ) : (
-                    <p className={`text-xs md:text-base font-bold ${getTrumpColor(gameState.trump)}`}>
-                      <span className="capitalize">{gameState.trump}</span>
-                    </p>
-                  )}
+            {/* Center Info - Contextual Display */}
+            <div className="text-center flex-shrink-0">
+              <ContextualGameInfo
+                state={
+                  gameState.currentTrick.length >= 4 ? 'trick_complete' :
+                  gameState.currentTrick.length === 0 ? 'waiting' :
+                  'in_progress'
+                }
+                currentPlayerName={currentTurnPlayer?.name}
+                betAmount={gameState.highestBet?.amount}
+                withoutTrump={gameState.highestBet?.withoutTrump}
+                trumpColor={gameState.trump as CardColor}
+              />
+              {/* Keep timeout indicator for autoplay trigger (hidden) */}
+              {gameState.currentTrick.length < 4 && isCurrentTurn && (
+                <div className="hidden">
+                  <TimeoutIndicator
+                    duration={60000}
+                    isActive={true}
+                    resetKey={gameState.currentPlayerIndex}
+                    onTimeout={() => {
+                      if (isCurrentTurn && onAutoplayToggle && !autoplayEnabled) {
+                        onAutoplayToggle();
+                      }
+                    }}
+                  />
                 </div>
               )}
             </div>

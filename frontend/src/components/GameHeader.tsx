@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSettings } from '../contexts/SettingsContext';
+import { SettingsPanel } from './SettingsPanel';
 
 interface GameHeaderProps {
   gameId: string;
@@ -10,6 +10,7 @@ interface GameHeaderProps {
   onOpenLeaderboard?: () => void;
   onOpenChat?: () => void;
   onOpenBotManagement?: () => void;
+  onOpenRules?: () => void;
   botCount?: number;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
@@ -28,6 +29,7 @@ export function GameHeader({
   onOpenLeaderboard,
   onOpenChat,
   onOpenBotManagement,
+  onOpenRules,
   botCount = 0,
   autoplayEnabled = false,
   onAutoplayToggle,
@@ -36,8 +38,8 @@ export function GameHeader({
   soundEnabled = true,
   onSoundToggle
 }: GameHeaderProps) {
-  const { darkMode, setDarkMode } = useSettings();
   const [linkCopied, setLinkCopied] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleCopyGameLink = async () => {
     const gameLink = `${window.location.origin}?gameId=${gameId}`;
@@ -94,6 +96,7 @@ export function GameHeader({
                 onClick={onOpenChat}
                 className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
                 title="Chat"
+                data-testid="header-chat-button"
               >
                 <span className="text-base md:text-lg">💬</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Chat</span>
@@ -111,81 +114,23 @@ export function GameHeader({
                 onClick={onOpenLeaderboard}
                 className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
                 title="Leaderboard"
+                data-testid="header-leaderboard-button"
               >
                 <span className="text-base md:text-lg">🏆</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Stats</span>
               </button>
             )}
 
-            {/* Bot Management Button */}
-            {!isSpectator && onOpenBotManagement && (
-              <button
-                onClick={onOpenBotManagement}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
-                title="Bot Management"
-              >
-                <span className="text-base md:text-lg">🤖</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
-                  Bots ({botCount}/3)
-                </span>
-              </button>
-            )}
-
-            {/* Autoplay Toggle */}
-            {!isSpectator && onAutoplayToggle && (
-              <button
-                onClick={onAutoplayToggle}
-                className={`p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border flex items-center gap-1.5 ${
-                  autoplayEnabled
-                    ? 'bg-green-500/80 hover:bg-green-500 border-green-600'
-                    : 'bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 border-white/30 dark:border-gray-600'
-                }`}
-                title={autoplayEnabled ? 'Autoplay ON' : 'Autoplay OFF'}
-              >
-                <span className="text-base md:text-lg">{autoplayEnabled ? '⚡' : '🎮'}</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
-                  {autoplayEnabled ? 'Auto' : 'Manual'}
-                </span>
-              </button>
-            )}
-
-            {/* Dark Mode Toggle */}
+            {/* Settings Button - Opens unified settings panel */}
             <button
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={() => setSettingsOpen(true)}
               className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
-              title={darkMode ? 'Light Mode' : 'Dark Mode'}
+              title="Settings"
+              data-testid="header-settings-button"
             >
-              <span className="text-base md:text-lg">{darkMode ? '🌙' : '☀️'}</span>
-              <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
-                {darkMode ? 'Dark' : 'Light'}
-              </span>
+              <span className="text-base md:text-lg">⚙️</span>
+              <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Settings</span>
             </button>
-
-            {/* Sound Toggle */}
-            {onSoundToggle && (
-              <button
-                onClick={onSoundToggle}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
-                title={soundEnabled ? 'Sound ON' : 'Sound OFF'}
-              >
-                <span className="text-base md:text-lg">{soundEnabled ? '🔊' : '🔇'}</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">
-                  {soundEnabled ? 'On' : 'Off'}
-                </span>
-              </button>
-            )}
-
-            {/* Leave Game Button */}
-            {onLeaveGame && (
-              <button
-                onClick={onLeaveGame}
-                className="bg-red-500/80 hover:bg-red-500 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-red-600 flex items-center gap-1.5"
-                title="Leave Game"
-              >
-                <span className="text-base md:text-lg">🚪</span>
-                <span className="hidden md:inline text-white font-semibold text-sm">Leave</span>
-              </button>
-            )}
           </div>
         </div>
 
@@ -250,65 +195,32 @@ export function GameHeader({
               </button>
             )}
 
-            {/* Bot Management Button */}
-            {!isSpectator && onOpenBotManagement && (
-              <button
-                onClick={onOpenBotManagement}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
-                title="Bot Management"
-              >
-                <span className="text-base">🤖</span>
-              </button>
-            )}
-
-            {/* Autoplay Toggle */}
-            {!isSpectator && onAutoplayToggle && (
-              <button
-                onClick={onAutoplayToggle}
-                className={`p-1.5 rounded backdrop-blur-sm transition-all duration-200 border ${
-                  autoplayEnabled
-                    ? 'bg-green-500/80 hover:bg-green-500 border-green-600'
-                    : 'bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 border-white/30 dark:border-gray-600'
-                }`}
-                title={autoplayEnabled ? 'Autoplay ON' : 'Autoplay OFF'}
-              >
-                <span className="text-base">{autoplayEnabled ? '⚡' : '🎮'}</span>
-              </button>
-            )}
-
-            {/* Dark Mode Toggle */}
+            {/* Settings Button */}
             <button
-              onClick={() => setDarkMode(!darkMode)}
+              onClick={() => setSettingsOpen(true)}
               className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
-              title={darkMode ? 'Light Mode' : 'Dark Mode'}
+              title="Settings"
             >
-              <span className="text-base">{darkMode ? '🌙' : '☀️'}</span>
+              <span className="text-base">⚙️</span>
             </button>
-
-            {/* Sound Toggle */}
-            {onSoundToggle && (
-              <button
-                onClick={onSoundToggle}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
-                title={soundEnabled ? 'Sound ON' : 'Sound OFF'}
-              >
-                <span className="text-base">{soundEnabled ? '🔊' : '🔇'}</span>
-              </button>
-            )}
-
-            {/* Leave Game Button */}
-            {onLeaveGame && (
-              <button
-                onClick={onLeaveGame}
-                className="bg-red-500/80 hover:bg-red-500 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-red-600"
-                title="Leave Game"
-              >
-                <span className="text-base">🚪</span>
-              </button>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Settings Panel */}
+      <SettingsPanel
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        soundEnabled={soundEnabled}
+        onSoundToggle={onSoundToggle}
+        autoplayEnabled={autoplayEnabled}
+        onAutoplayToggle={onAutoplayToggle}
+        botCount={botCount}
+        onOpenBotManagement={onOpenBotManagement}
+        onLeaveGame={onLeaveGame}
+        onOpenRules={onOpenRules}
+        isSpectator={isSpectator}
+      />
     </div>
   );
 }

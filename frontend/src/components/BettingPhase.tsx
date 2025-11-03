@@ -7,6 +7,8 @@ import { Leaderboard } from './Leaderboard';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { GameHeader } from './GameHeader';
 import { sounds } from '../utils/sounds';
+import { InlineBetStatus } from './InlineBetStatus';
+import { SmartValidationMessage } from './SmartValidationMessage';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -188,55 +190,14 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
         </div>
       )}
 
+      {/* Inline Bet Status - Compact horizontal display */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-umber-800 dark:text-gray-200">Players & Bets</h3>
-        <div className="space-y-2">
-          {players.map((player, index) => {
-            const bet = currentBets.find(b => b.playerId === player.id);
-            const isDealerPlayer = index === dealerIndex;
-            const isEmptySeat = player.isEmpty;
-            return (
-              <div key={player.id} className={`flex items-center justify-between p-3 rounded-lg border ${
-                isEmptySeat
-                  ? 'bg-gray-100 dark:bg-gray-800 border-dashed border-gray-400 dark:border-gray-600'
-                  : 'bg-parchment-100 dark:bg-gray-700 border-parchment-300 dark:border-gray-600'
-              }`} data-testid={`player-list-item-${player.name}`}>
-                <div className="flex items-center gap-3">
-                  <span className={`w-3 h-3 rounded-full ${
-                    isEmptySeat
-                      ? 'bg-gray-400 dark:bg-gray-600'
-                      : player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
-                  }`}></span>
-                  <span className={`font-medium ${
-                    isEmptySeat
-                      ? 'text-gray-500 dark:text-gray-500 italic'
-                      : 'text-umber-900 dark:text-gray-100'
-                  }`} data-testid={`player-name-${player.name}`}>
-                    {isEmptySeat ? '💺 ' : ''}{isEmptySeat ? (player.emptySlotName || 'Empty Seat') : player.name}
-                    {isDealerPlayer && !isEmptySeat && <span className="ml-2 text-xs text-umber-600 dark:text-gray-400">(Dealer)</span>}
-                  </span>
-                </div>
-                {isEmptySeat ? (
-                  <span className="text-sm text-gray-400 dark:text-gray-600 italic">
-                    Empty
-                  </span>
-                ) : bet ? (
-                  bet.skipped ? (
-                    <span className="text-sm bg-parchment-300 text-umber-600 dark:text-gray-400 px-3 py-1 rounded-full border border-umber-300">
-                      Skipped
-                    </span>
-                  ) : (
-                    <span className="text-sm bg-forest-100 text-forest-800 px-3 py-1 rounded-full border border-forest-300">
-                      {bet.amount} points {bet.withoutTrump ? '(No Trump)' : ''}
-                    </span>
-                  )
-                ) : (
-                  <span className="text-sm text-umber-500">Waiting...</span>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <InlineBetStatus
+          players={players}
+          currentBets={new Map(currentBets.map(b => [b.playerId, { amount: b.amount, withoutTrump: b.withoutTrump }]))}
+          skippedPlayers={new Set(currentBets.filter(b => b.skipped).map(b => b.playerId))}
+          currentPlayerIndex={currentPlayerIndex}
+        />
       </div>
 
       {/* Player's Hand Display - 4x2 Grid */}
@@ -345,27 +306,29 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                     Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
                   </button>
                 </div>
-
-                {/* Validation message */}
-                {!isCurrentBetValid() && highestBet && (
-                  <div className="bg-parchment-200 dark:bg-gray-600 border-2 border-umber-400 text-umber-800 dark:text-gray-200 px-3 py-2 rounded-lg text-xs">
-                    <strong>Too low:</strong> Current highest is {highestBet.amount} points{highestBet.withoutTrump ? ' (No Trump)' : ''}.
-                    {isDealer ? ' You can match or raise.' : ' You must raise.'}
-                  </div>
-                )}
               </div>
 
-              {isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) && (
-                <div className="bg-sapphire-50 border-2 border-sapphire-300 text-sapphire-800 px-3 py-2 rounded-lg text-xs">
-                  <strong>Dealer:</strong> You can match or raise
-                </div>
-              )}
-
-              {isDealer && !currentBets.some(b => !b.skipped) && (
-                <div className="bg-parchment-200 dark:bg-gray-600 border-2 border-umber-400 text-umber-800 dark:text-gray-200 px-3 py-2 rounded-lg text-xs">
-                  <strong>Dealer:</strong> You must bet at least 7
-                </div>
-              )}
+              {/* Smart Validation Messages - Single priority-based display */}
+              <SmartValidationMessage
+                messages={[
+                  ...(!isCurrentBetValid() && highestBet ? [{
+                    type: 'warning' as const,
+                    text: `Too low: Current highest is ${highestBet.amount} points${highestBet.withoutTrump ? ' (No Trump)' : ''}. ${isDealer ? 'You can match or raise.' : 'You must raise.'}`
+                  }] : []),
+                  ...(isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) ? [{
+                    type: 'info' as const,
+                    text: 'Dealer Privilege: You can match or raise the current bet'
+                  }] : []),
+                  ...(isDealer && !currentBets.some(b => !b.skipped) ? [{
+                    type: 'info' as const,
+                    text: 'Dealer: You must bet at least 7 points'
+                  }] : []),
+                  ...(isCurrentBetValid() ? [{
+                    type: 'success' as const,
+                    text: `Ready to place bet: ${selectedAmount} ${withoutTrump ? '(No Trump)' : ''}`
+                  }] : [])
+                ]}
+              />
             </>
           ) : (
             <div className="text-center text-umber-700 dark:text-gray-300 font-medium py-3 text-sm">

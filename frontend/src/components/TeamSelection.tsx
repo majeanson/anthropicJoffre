@@ -1,10 +1,11 @@
 import { Player, ChatMessage } from '../types/game';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { useSettings } from '../contexts/SettingsContext';
 import { HowToPlay } from './HowToPlay';
 import { BotDifficulty } from '../utils/botPlayer';
 import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
+import { FloatingTeamChat } from './FloatingTeamChat';
 
 interface TeamSelectionProps {
   players: Player[];
@@ -43,12 +44,9 @@ export function TeamSelection({
   const team2Players = players.filter(p => p.teamId === 2);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputMessage, setInputMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const [showRules, setShowRules] = useState(false);
 
-  // Listen for chat messages
+  // Listen for chat messages (for FloatingTeamChat)
   useEffect(() => {
     if (!socket) return;
 
@@ -63,11 +61,6 @@ export function TeamSelection({
     };
   }, [socket]);
 
-  // Auto-scroll to bottom of messages
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
   const handleCopyGameLink = async () => {
     const gameUrl = `${window.location.origin}?join=${gameId}`;
     try {
@@ -76,19 +69,6 @@ export function TeamSelection({
       setTimeout(() => setShowCopyToast(false), 3000);
     } catch (err) {
     }
-  };
-
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!socket || !inputMessage.trim()) return;
-
-    socket.emit('send_team_selection_chat', {
-      gameId,
-      message: inputMessage.trim()
-    });
-
-    setInputMessage('');
-    inputRef.current?.focus();
   };
 
   // Validation for starting game
@@ -126,20 +106,7 @@ export function TeamSelection({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Animated background cards */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
-        <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
-        <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
-        <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
-      </div>
-
-      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-4xl w-full relative border-4 border-amber-700 dark:border-gray-600">
-        {/* Decorative corners */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl"></div>
-        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl"></div>
-        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
+      <div className="bg-parchment-50 dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-4xl w-full relative border-2 border-amber-700 dark:border-gray-600 backdrop-blur-sm">
 
         {/* Top-left buttons */}
         <div className="absolute top-4 left-4 flex gap-2 z-10">
@@ -401,63 +368,6 @@ export function TeamSelection({
           </div>
         </div>
 
-        {/* Chat Box */}
-        {socket && (
-          <div className="mb-6 border-2 border-parchment-400 dark:border-gray-600 rounded-lg p-4 bg-parchment-100 dark:bg-gray-700">
-            <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-              💬 Team Chat
-            </h3>
-
-            {/* Messages */}
-            <div className="bg-parchment-50 dark:bg-gray-800 rounded-lg p-3 mb-3 max-h-40 overflow-y-auto border border-parchment-300 dark:border-gray-600">
-              {messages.length === 0 ? (
-                <p className="text-sm text-umber-500 text-center py-4">No messages yet. Say hi!</p>
-              ) : (
-                <div className="space-y-2">
-                  {messages.map((msg, idx) => (
-                    <div
-                      key={`${msg.timestamp}-${idx}`}
-                      className={`p-2 rounded text-sm ${
-                        msg.teamId === 1
-                          ? 'bg-orange-100 dark:bg-orange-900/40 border-l-4 border-orange-400 dark:border-orange-600'
-                          : msg.teamId === 2
-                          ? 'bg-purple-100 dark:bg-purple-900/40 border-l-4 border-purple-400 dark:border-purple-600'
-                          : 'bg-parchment-200 dark:bg-gray-600 border-l-4 border-parchment-400 dark:border-gray-600'
-                      }`}
-                    >
-                      <div className="font-bold text-umber-900 dark:text-gray-100">
-                        {msg.playerName}
-                        {msg.playerId === currentPlayerId && ' (You)'}:
-                      </div>
-                      <div className="text-umber-800 dark:text-gray-200 mt-1">{msg.message}</div>
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
-            </div>
-
-            {/* Input */}
-            <form onSubmit={handleSendMessage} className="flex gap-2">
-              <input
-                ref={inputRef}
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Type a message... (max 200 chars)"
-                maxLength={200}
-                className="flex-1 px-3 py-2 border-2 border-parchment-400 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-50 dark:bg-gray-800 text-umber-900 dark:text-gray-100 text-sm"
-              />
-              <button
-                type="submit"
-                disabled={!inputMessage.trim()}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 text-white px-4 py-2 rounded-lg font-bold transition-all duration-300 border-2 border-blue-800 disabled:border-gray-600 shadow-sm"
-              >
-                Send
-              </button>
-            </form>
-          </div>
-        )}
 
         {/* Bot Difficulty & Start Game Section */}
         <div className="text-center space-y-3">
@@ -552,6 +462,17 @@ export function TeamSelection({
 
       {/* Game Rules Modal */}
       <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
+
+      {/* Floating Team Chat */}
+      {socket && (
+        <FloatingTeamChat
+          gameId={gameId}
+          socket={socket}
+          messages={messages}
+          currentPlayerId={currentPlayerId}
+          currentPlayerTeamId={currentPlayer?.teamId}
+        />
+      )}
     </div>
   );
 }
