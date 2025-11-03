@@ -145,6 +145,42 @@ export default {
           '0%': { transform: 'translateY(20px) scale(0.95)', opacity: '0' },
           '100%': { transform: 'translateY(0) scale(1)', opacity: '1' },
         },
+        'shimmer': {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
+        },
+        'card-play-arc': {
+          '0%': {
+            transform: 'translateY(0) translateX(0) scale(1) rotate(0deg)',
+            opacity: '1'
+          },
+          '30%': {
+            transform: 'translateY(-60px) translateX(0) scale(1.1) rotate(5deg)',
+            opacity: '1'
+          },
+          '100%': {
+            transform: 'translateY(-120px) translateX(0) scale(0.9) rotate(0deg)',
+            opacity: '0.8'
+          }
+        },
+        'card-hover-lift': {
+          '0%': { transform: 'translateY(0) scale(1)' },
+          '100%': { transform: 'translateY(-8px) scale(1.05)' },
+        },
+        'ghost-fade': {
+          '0%': { opacity: '0.3' },
+          '100%': { opacity: '0' },
+        },
+        'special-card-glow': {
+          '0%, 100%': {
+            boxShadow: '0 0 10px rgba(255, 215, 0, 0.3)',
+            transform: 'scale(1)'
+          },
+          '50%': {
+            boxShadow: '0 0 20px rgba(255, 215, 0, 0.6)',
+            transform: 'scale(1.02)'
+          },
+        },
       },
       animation: {
         'slide-from-bottom': 'slide-from-bottom 0.4s ease-out',
@@ -163,6 +199,10 @@ export default {
         'fadeInUp': 'fadeInUp 0.5s ease-out',
         'fadeInDown': 'fadeInDown 0.5s ease-out',
         'slide-in': 'slide-in 0.2s ease-out',
+        'card-play-arc': 'card-play-arc 0.6s ease-out forwards',
+        'card-hover-lift': 'card-hover-lift 0.15s ease-out forwards',
+        'ghost-fade': 'ghost-fade 0.4s ease-out forwards',
+        'special-card-glow': 'special-card-glow 2s ease-in-out infinite',
       },
     },
   },

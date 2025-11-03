@@ -555,15 +555,15 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
 
       {/* Connection Quality Indicator - Sprint 6 */}
       {connectionStats && (
-        <div className="absolute top-20 right-4 z-10">
+        <div className="absolute top-20 right-4 lg:right-6 z-10">
           <ConnectionQualityBadge stats={connectionStats} />
         </div>
       )}
 
       <div className="flex-1 flex flex-col overflow-hidden md:overflow-visible">
-        {/* Score Board - Fixed height */}
-      <div className="w-full mb-2 md:mb-4 flex-shrink-0 px-2 md:px-4 pt-2 md:pt-4">
-        <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600" data-testid="score-board">
+        {/* Score Board - Fixed height - Sprint 5: Tablet optimized spacing */}
+      <div className="w-full mb-2 md:mb-4 lg:mb-6 flex-shrink-0 px-2 md:px-4 lg:px-6 pt-2 md:pt-4 lg:pt-6">
+        <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600" data-testid="score-board">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
             <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible">
@@ -662,9 +662,9 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         </div>
       </div>
 
-      {/* Circular Card Layout - Takes remaining space */}
-      <div className="mb-2 md:mb-4 relative px-2 md:px-4">
-        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 md:min-h-[400px] relative border-2 border-parchment-400 dark:border-gray-600 shadow-2xl">
+      {/* Circular Card Layout - Takes remaining space - Sprint 5: Tablet optimized */}
+      <div className="mb-2 md:mb-4 lg:mb-6 relative px-2 md:px-4 lg:px-6">
+        <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 lg:p-8 md:min-h-[400px] lg:min-h-[450px] relative border-2 border-parchment-400 dark:border-gray-600 shadow-2xl">
           {/* Previous Trick Button - Top Left Corner */}
           {gameState.previousTrick && (
             <button
@@ -851,23 +851,23 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       </div>
 
 
-      {/* Player Hand */}
-      <div className="md:max-w-6xl md:mx-auto px-2 md:px-6 pb-2 md:pb-6 z-10">
+      {/* Player Hand - Sprint 5: Tablet optimized spacing */}
+      <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-10">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 border-2 border-parchment-400 dark:border-gray-600 shadow-xl" data-testid="waiting-first-card">
-                    <p className="text-parchment-50 text-lg md:text-2xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
+                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 lg:px-8 lg:py-6 border-2 border-parchment-400 dark:border-gray-600 shadow-xl" data-testid="waiting-first-card">
+                    <p className="text-parchment-50 text-lg md:text-2xl lg:text-3xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
                     <div className="mt-2 flex gap-1 justify-center">
-                      <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-parchment-300 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
                   </div>
                 </div>
               )}
         {/* Only show player hand section if spectator OR if player has cards */}
         {(isSpectator || (currentPlayer && currentPlayer.hand.length > 0)) && (
-          <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 shadow-2xl border-2 border-parchment-400 dark:border-gray-600" data-testid="player-hand">
+          <div className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600" data-testid="player-hand">
             {/* Card Hand - Hidden for spectators, horizontal scrollable on mobile for players */}
             {isSpectator ? (
               <div className="text-center py-8">
@@ -879,7 +879,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             ) : (
               <>
                 <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
-                  <div className="flex gap-2 md:gap-4 md:flex-wrap md:justify-center min-w-min">
+                  <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap md:justify-center min-w-min">
                     {(() => {
                       // Create combined hand: actual hand + card in transition (if it's no longer in hand)
                       const displayHand = [...currentPlayer!.hand];
@@ -896,13 +896,17 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         const isTransitioning = cardInTransition && card.color === cardInTransition.color && card.value === cardInTransition.value;
                         const isSelected = selectedCardIndex === index; // Sprint 6: Keyboard selection
 
+                        // Sprint 5: Check if card is special (Red 0 or Brown 0) for glow effect
+                        const isSpecialCard = (card.color === 'red' && card.value === 0) || (card.color === 'brown' && card.value === 0);
+
                         return (
                           <div
                             key={`${card.color}-${card.value}-${index}`}
                             className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
-                              playable && isCurrentTurn ? 'hover:-translate-y-2' : ''
-                            } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0' : 'opacity-100 scale-100'}
-                            ${isSelected ? '-translate-y-4 scale-110' : ''}`}
+                              playable && isCurrentTurn ? 'motion-safe:hover:animate-card-hover-lift' : ''
+                            } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0 motion-safe:animate-card-play-arc' : 'opacity-100 scale-100'}
+                            ${isSelected ? '-translate-y-4 scale-110' : ''}
+                            ${isSpecialCard && playable ? 'motion-safe:animate-special-card-glow' : ''}`}
                             style={{
                               transition: isTransitioning
                                 ? 'opacity 400ms ease-out, transform 400ms ease-out'
@@ -912,6 +916,12 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                             {/* Sprint 6: Selection indicator ring */}
                             {isSelected && (
                               <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none" />
+                            )}
+                            {/* Sprint 5: Special card indicator badge */}
+                            {isSpecialCard && (
+                              <div className="absolute -top-1 -right-1 z-10 bg-yellow-400 text-yellow-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-lg border-2 border-yellow-300">
+                                ★
+                              </div>
                             )}
                             <CardComponent
                               card={card}
