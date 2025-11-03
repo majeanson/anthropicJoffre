@@ -197,7 +197,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     // Sort hand by suit then value
     const sortedHand = [...hand].sort((a, b) => {
       if (a.color !== b.color) {
-        const suitOrder = ['red', 'brown', 'green', 'yellow'];
+        const suitOrder = ['red', 'blue', 'green', 'brown'];
         return suitOrder.indexOf(a.color) - suitOrder.indexOf(b.color);
       }
       return a.value - b.value;

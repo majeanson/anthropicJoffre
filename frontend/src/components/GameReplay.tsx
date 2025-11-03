@@ -572,6 +572,15 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                       const teamId = replayData.player_teams[playerIndex];
                       const teamColor = teamId === 1 ? 'from-orange-500/20 to-orange-600/20 border-orange-400' : 'from-purple-500/20 to-purple-600/20 border-purple-400';
 
+                      // Sort cards by color then value
+                      const sortedCards = [...(cards as any[])].sort((a, b) => {
+                        if (a.color !== b.color) {
+                          const suitOrder = ['red', 'blue', 'green', 'brown'];
+                          return suitOrder.indexOf(a.color) - suitOrder.indexOf(b.color);
+                        }
+                        return a.value - b.value;
+                      });
+
                       return (
                         <div key={playerName} className={`bg-gradient-to-r ${teamColor} rounded-lg p-3 border-2`}>
                           <div className="flex items-center justify-between mb-2">
@@ -581,7 +590,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                             </span>
                           </div>
                           <div className="grid grid-cols-4 gap-1">
-                            {(cards as any[]).map((card, idx) => (
+                            {sortedCards.map((card, idx) => (
                               <div key={idx} className="bg-gray-800/50 rounded p-1 text-center">
                                 <div className={`text-lg font-bold ${
                                   card.color === 'red' ? 'text-red-400' :
