@@ -35,57 +35,12 @@ export function ContextualGameInfo({
     blue: 'text-blue-600 dark:text-blue-400'
   };
 
-  // Waiting for first card in trick
-  if (state === 'waiting' && currentPlayerName) {
-    return (
-      <div
-        className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-700 dark:border-gray-600 rounded-lg px-4 py-3 text-center shadow-lg max-w-xs mx-auto"
-        data-testid="contextual-info-waiting"
-      >
-        <div className="text-umber-900 dark:text-gray-100 font-semibold text-sm mb-1">
-          Waiting for:
-        </div>
-        <div className="text-umber-900 dark:text-gray-100 font-bold text-lg flex items-center justify-center gap-2">
-          <span>{currentPlayerName}</span>
-          <span className="text-blue-500">🎯</span>
-        </div>
-        {timeRemaining !== undefined && (
-          <div className="text-umber-700 dark:text-gray-400 text-xs mt-1">
-            ⏱️ {timeRemaining}s
-          </div>
-        )}
-        {/* Always show bet and trump info */}
-        {(betAmount || trumpColor) && (
-          <div className="mt-2 pt-2 border-t border-umber-300 dark:border-gray-700">
-            <div className="flex items-center justify-center gap-2 text-xs">
-              {betAmount && (
-                <div className="flex items-center gap-1">
-                  <span className="text-lg">🎲</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-bold">{betAmount}</span>
-                  {withoutTrump && (
-                    <span className="text-umber-700 dark:text-gray-400 text-xs">(No Trump)</span>
-                  )}
-                </div>
-              )}
-              {!withoutTrump && trumpColor && betAmount && <span className="text-umber-400">•</span>}
-              {!withoutTrump && trumpColor && (
-                <span className={`font-semibold ${colorClasses[trumpColor]}`}>
-                  ({colorNames[trumpColor]})
-                </span>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Trick in progress
-  if (state === 'in_progress' && betAmount) {
+  // Waiting or in progress - unified display with consistent height
+  if ((state === 'waiting' || state === 'in_progress') && (betAmount || trumpColor)) {
     return (
       <div
         className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-700 dark:border-gray-600 rounded-lg px-4 py-2 text-center shadow-lg max-w-xs mx-auto"
-        data-testid="contextual-info-in-progress"
+        data-testid={state === 'waiting' ? 'contextual-info-waiting' : 'contextual-info-in-progress'}
       >
         <div className="flex items-center justify-center gap-3 text-sm">
           <div className="flex items-center gap-1">
@@ -103,6 +58,7 @@ export function ContextualGameInfo({
         </div>
         {currentPlayerName && (
           <div className="text-umber-700 dark:text-gray-400 text-xs mt-1 flex items-center justify-center gap-1">
+            {state === 'waiting' && <span className="font-semibold">(Waiting...)</span>}
             <span>{currentPlayerName}</span>
             {timeRemaining !== undefined && <span>⏱️ {timeRemaining}s</span>}
           </div>

@@ -90,19 +90,20 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
       setGameState(newGameState);
 
       // Show catch-up modal and auto-close after 5 seconds
+      // Clear any existing timeout to prevent flickering
       if (catchUpModalTimeoutRef.current) {
         clearTimeout(catchUpModalTimeoutRef.current);
+        catchUpModalTimeoutRef.current = null;
       }
 
-      setShowCatchUpModal(prev => {
-        if (!prev) {
-          catchUpModalTimeoutRef.current = setTimeout(() => {
-            setShowCatchUpModal(false);
-            catchUpModalTimeoutRef.current = null;
-          }, 5000);
-        }
-        return true;
-      });
+      // Set modal to true immediately (no conditional check to prevent flicker)
+      setShowCatchUpModal(true);
+
+      // Auto-close after 5 seconds
+      catchUpModalTimeoutRef.current = setTimeout(() => {
+        setShowCatchUpModal(false);
+        catchUpModalTimeoutRef.current = null;
+      }, 5000);
 
       // Respawn bot sockets after successful reconnection
       if (onSpawnBots) {

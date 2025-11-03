@@ -54,25 +54,27 @@ export function InlineBetStatus({
 
   return (
     <div
-      className="bg-parchment-100 dark:bg-gray-800 border border-umber-700 dark:border-gray-600 rounded-lg px-3 py-2 shadow-md"
+      className="bg-parchment-100 dark:bg-gray-800 border border-umber-700 dark:border-gray-600 rounded-lg px-3 py-3 shadow-md"
       data-testid="inline-bet-status"
     >
-      <div className="flex items-center justify-center flex-wrap gap-2 text-sm">
-        <span className="text-umber-700 dark:text-gray-400 font-semibold text-xs mr-1">
-          Bets:
-        </span>
+      <div className="text-umber-700 dark:text-gray-400 font-semibold text-sm mb-2 text-center">
+        Bets
+      </div>
+      <div className="space-y-2">
         {players.map((player) => {
           const display = getBetDisplay(player);
           return (
             <div
               key={player.id}
-              className={`${display.color} px-2 py-1 rounded font-semibold flex items-center gap-1 transition-all shadow-sm`}
+              className={`${display.color} px-3 py-2 rounded font-semibold flex items-center justify-between transition-all shadow-sm`}
               data-testid={`bet-status-${player.name}`}
               title={`${player.name} - ${display.text === '?' ? 'Waiting' : display.text === 'skip' ? 'Skipped' : `Bet: ${display.text}`}`}
             >
-              <span className="text-xs">{display.icon}</span>
-              <span>{player.name}</span>
-              <span className="font-bold">{display.text}</span>
+              <div className="flex items-center gap-2">
+                <span className="text-base">{display.icon}</span>
+                <span className="font-bold">{player.name}</span>
+              </div>
+              <span className="font-black text-lg">{display.text}</span>
             </div>
           );
         })}

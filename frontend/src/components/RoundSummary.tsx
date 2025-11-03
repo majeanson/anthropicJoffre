@@ -337,8 +337,6 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
                   <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Team</th>
                   <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Tricks</th>
                   <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Points</th>
-                  <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Red 0s</th>
-                  <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Brown 0s</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-amber-100 dark:divide-gray-700">
@@ -348,7 +346,23 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
 
                   return (
                     <tr key={player.id} className="hover:bg-amber-50 dark:hover:bg-gray-700/50 transition-colors">
-                      <td className="px-3 sm:px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100">{player.name}</td>
+                      <td className="px-3 sm:px-4 py-3 text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        <div className="flex items-center gap-2">
+                          <span>{player.name}</span>
+                          {redZeros > 0 && (
+                            <span className="inline-flex items-center gap-1 text-xs" title={`${redZeros} Red 0 card${redZeros > 1 ? 's' : ''} collected`}>
+                              <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                              <span className="font-bold text-green-600 dark:text-green-400">×{redZeros}</span>
+                            </span>
+                          )}
+                          {brownZeros > 0 && (
+                            <span className="inline-flex items-center gap-1 text-xs" title={`${brownZeros} Brown 0 card${brownZeros > 1 ? 's' : ''} received`}>
+                              <span className="w-2 h-2 rounded-full bg-amber-800"></span>
+                              <span className="font-bold text-red-600 dark:text-red-400">×{brownZeros}</span>
+                            </span>
+                          )}
+                        </div>
+                      </td>
                       <td className="px-3 sm:px-4 py-3 text-sm text-center">
                         <span className={`font-bold ${player.teamId === 1 ? 'text-orange-600 dark:text-orange-400' : 'text-purple-600 dark:text-purple-400'}`}>
                           {player.teamId}
@@ -356,12 +370,6 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
                       </td>
                       <td className="px-3 sm:px-4 py-3 text-sm text-center font-medium text-gray-800 dark:text-gray-200">{player.tricksWon}</td>
                       <td className="px-3 sm:px-4 py-3 text-sm text-center font-bold text-gray-900 dark:text-gray-100">{player.pointsWon}</td>
-                      <td className="px-3 sm:px-4 py-3 text-sm text-center">
-                        {redZeros > 0 ? <span className="font-bold text-green-600 dark:text-green-400">+{redZeros}</span> : <span className="text-gray-400">-</span>}
-                      </td>
-                      <td className="px-3 sm:px-4 py-3 text-sm text-center">
-                        {brownZeros > 0 ? <span className="font-bold text-red-600 dark:text-red-400">+{brownZeros}</span> : <span className="text-gray-400">-</span>}
-                      </td>
                     </tr>
                   );
                 })}
