@@ -827,4 +827,72 @@ export const getRecentGames = async (limit: number = 10) => {
   });
 };
 
+// ============= CHAT PERSISTENCE FUNCTIONS =============
+
+/**
+ * Save a chat message to the database
+ */
+export const saveChatMessage = async (
+  roomType: 'lobby' | 'game',
+  playerName: string,
+  message: string,
+  roomId?: string,
+  teamId?: number
+) => {
+  const text = `
+    INSERT INTO chat_messages (room_type, room_id, player_name, message, team_id)
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING message_id, created_at
+  `;
+  const values = [roomType, roomId || null, playerName, message, teamId || null];
+  const result = await query(text, values);
+  return result.rows[0];
+};
+
+/**
+ * Get lobby chat history
+ * Returns most recent messages (default: last 100 messages or last 24 hours)
+ */
+export const getLobbyChat = async (limit: number = 100) => {
+  const text = `
+    SELECT message_id, player_name, message, created_at
+    FROM chat_messages
+    WHERE room_type = 'lobby'
+      AND created_at > NOW() - INTERVAL '24 hours'
+    ORDER BY created_at DESC
+    LIMIT $1
+  `;
+  const result = await query(text, [limit]);
+  return result.rows.reverse(); // Return in chronological order
+};
+
+/**
+ * Get game chat history
+ * Returns all messages for a specific game
+ */
+export const getGameChat = async (gameId: string) => {
+  const text = `
+    SELECT message_id, player_name, message, team_id, created_at
+    FROM chat_messages
+    WHERE room_type = 'game' AND room_id = $1
+    ORDER BY created_at ASC
+  `;
+  const result = await query(text, [gameId]);
+  return result.rows;
+};
+
+/**
+ * Clean up old chat messages (older than 7 days)
+ * Should be called periodically by a cleanup job
+ */
+export const cleanupOldChatMessages = async () => {
+  const text = `
+    DELETE FROM chat_messages
+    WHERE created_at < NOW() - INTERVAL '7 days'
+    RETURNING message_id
+  `;
+  const result = await query(text);
+  return result.rows.length; // Return count of deleted messages
+};
+
 export default getPool();

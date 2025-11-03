@@ -1,13 +1,26 @@
 {
-  "buildDate": "2025-11-02T23:00:00.000Z",
-  "version": "1.0.41",
+  "buildDate": "2025-11-02T23:30:00.000Z",
+  "version": "1.0.42",
   "git": {
-    "commitMessage": "fix: UI polish - negative points display & card format consistency",
+    "commitMessage": "feat: UX improvements - simplified toggles, lobby refinements, chat persistence",
     "commitHash": "pending",
     "commitDate": "pending",
     "branch": "main"
   },
   "latestDoneFeatures": [
+    {
+      "date": "2025-11-02",
+      "title": "Lobby & UX Improvements",
+      "features": [
+        "Changed 'Save Stats & ELO' checkbox to simpler 'Ranked Mode' toggle",
+        "Removed duplicate 'Join Game' button - now integrated into 'Browse & Join Games'",
+        "Added 'Joined as [playername]' display below Joffre logo on homepage",
+        "Social tab now filters out bot players from Recent players list",
+        "Fixed duplicate leave game confirmation prompts (removed from GameHeader)",
+        "Fixed: Leaving game with 3 bots no longer shows 'max bots' error",
+        "Database: Added chat_messages table for persistent chat across server restarts"
+      ]
+    },
     {
       "date": "2025-11-02",
       "title": "UI Polish Fixes",
@@ -103,8 +116,29 @@
   ],
   "lastSession": {
     "date": "2025-11-02",
-    "summary": "Sprint 6: Major UX enhancements - connection quality, keyboard nav, filters, bot indicators",
+    "summary": "Post-Sprint 6: Lobby UX polish and chat persistence foundation",
     "achievements": [
+      "🎨 Simplified UI Controls:",
+      "  - Changed 'Save Stats & ELO' to clearer 'Ranked Mode' toggle",
+      "  - Removed duplicate 'Join Game' button (now in Browse & Join)",
+      "  - Shows 'Joined as [name]' under Joffre logo when logged in",
+      "",
+      "👥 Social Tab Improvements:",
+      "  - Recent players now filters out bots (only shows humans)",
+      "  - Cleaner player history display",
+      "",
+      "🚪 Leave Game Flow:",
+      "  - Fixed duplicate confirmation prompts",
+      "  - Smart handling for last human player with 3 bots",
+      "  - No longer tries to add 4th bot (avoids max bots error)",
+      "",
+      "💾 Chat Persistence Foundation:",
+      "  - Created chat_messages database table",
+      "  - Added migration file (006_chat_persistence.sql)",
+      "  - Implemented saveChatMessage, getLobbyChat, getGameChat functions",
+      "  - Ready for socket handler integration",
+      "",
+      "Previous session:"
       "✅ Connection Quality Indicator:",
       "  - Real-time ping measurement every 5 seconds",
       "  - Color-coded badges (Excellent/Good/Fair/Poor/Offline)",

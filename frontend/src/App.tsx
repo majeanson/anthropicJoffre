@@ -376,6 +376,33 @@ function App() {
       return;
     }
 
+    // Count current bots
+    const botCount = gameState.players.filter(p => p.isBot).length;
+
+    // If already 3 bots, just leave without replacement (max bots would be exceeded)
+    if (botCount >= 3) {
+      if (!confirm('Leave game? You are the only human player.')) {
+        return;
+      }
+
+      socket.emit('leave_game', { gameId });
+      // Clear chat messages when leaving game
+      setChatMessages([]);
+
+      // Clean up bot sockets
+      botSocketsRef.current.forEach((botSocket) => {
+        botSocket.disconnect();
+      });
+      botSocketsRef.current.clear();
+
+      // Clear bot timeouts
+      botTimeoutsRef.current.forEach((timeout) => {
+        clearTimeout(timeout);
+      });
+      botTimeoutsRef.current.clear();
+      return;
+    }
+
     // For players, confirm and replace with bot
     if (!confirm('Leave game? You will be replaced by a bot and cannot rejoin this game.')) {
       return;

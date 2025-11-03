@@ -178,11 +178,7 @@ export function GameHeader({
             {/* Leave Game Button */}
             {onLeaveGame && (
               <button
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to leave the game?')) {
-                    onLeaveGame();
-                  }
-                }}
+                onClick={onLeaveGame}
                 className="bg-red-500/80 hover:bg-red-500 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-red-600 flex items-center gap-1.5"
                 title="Leave Game"
               >
@@ -303,11 +299,7 @@ export function GameHeader({
             {/* Leave Game Button */}
             {onLeaveGame && (
               <button
-                onClick={() => {
-                  if (window.confirm('Are you sure you want to leave the game?')) {
-                    onLeaveGame();
-                  }
-                }}
+                onClick={onLeaveGame}
                 className="bg-red-500/80 hover:bg-red-500 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-red-600"
                 title="Leave Game"
               >

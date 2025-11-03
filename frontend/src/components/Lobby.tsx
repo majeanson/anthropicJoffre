@@ -142,6 +142,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 dark:from-blue-400 dark:via-purple-500 dark:to-pink-500 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
                 J⋀ffre
               </h1>
+              {playerName.trim() && (
+                <p className="text-sm text-umber-600 dark:text-gray-400 mt-2 font-medium">
+                  Joined as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
+                </p>
+              )}
             </div>
 
             {/* Horizontal Tab Navigation */}
@@ -236,19 +241,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </button>
 
                         <button
-                          data-testid="join-game-button"
-                          onClick={() => { sounds.buttonClick(); setMode('join'); }}
-                          className="w-full bg-gradient-to-r from-amber-600 to-orange-600 dark:from-indigo-700 dark:to-indigo-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-orange-700 dark:hover:from-indigo-600 dark:hover:to-indigo-700 transition-all duration-200 border border-amber-800 dark:border-indigo-600 shadow"
-                        >
-                          🎮 Join Game
-                        </button>
-
-                        <button
                           onClick={() => { sounds.buttonClick(); setShowBrowser(true); }}
                           className="w-full bg-gradient-to-r from-amber-600 to-orange-600 dark:from-indigo-700 dark:to-indigo-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-orange-700 dark:hover:from-indigo-600 dark:hover:to-indigo-700 transition-all duration-200 border border-amber-800 dark:border-indigo-600 shadow flex items-center justify-center gap-2"
                         >
                           <span>🔍</span>
-                          Browse Games
+                          Browse & Join Games
                         </button>
                       </div>
                     </div>
@@ -314,7 +311,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                               className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2"
                             />
                             <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
-                              Save Stats & ELO
+                              Ranked Mode
                             </span>
                           </label>
                           <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
@@ -441,14 +438,21 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
                       {socialTab === 'recent' && (
                         <div className="space-y-2">
-                          {recentPlayers.length === 0 ? (
-                            <div className="text-center text-umber-600 dark:text-gray-400 py-16">
-                              <p className="text-2xl mb-2">📭</p>
-                              <p className="text-lg font-semibold">No recent players yet</p>
-                              <p className="text-sm mt-2">Players you've played with will appear here</p>
-                            </div>
-                          ) : (
-                            recentPlayers.map(player => (
+                          {(() => {
+                            // Filter out bots (names starting with "Bot ")
+                            const humanPlayers = recentPlayers.filter(p => !p.name.startsWith('Bot '));
+
+                            if (humanPlayers.length === 0) {
+                              return (
+                                <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+                                  <p className="text-2xl mb-2">📭</p>
+                                  <p className="text-lg font-semibold">No recent players yet</p>
+                                  <p className="text-sm mt-2">Players you've played with will appear here</p>
+                                </div>
+                              );
+                            }
+
+                            return humanPlayers.map(player => (
                               <div
                                 key={player.name}
                                 className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
@@ -462,8 +466,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                                   </div>
                                 </div>
                               </div>
-                            ))
-                          )}
+                            ));
+                          })()}
                         </div>
                       )}
                     </div>
@@ -713,7 +717,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2"
                   />
                   <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
-                    Save Stats & ELO
+                    Ranked Mode
                   </span>
                 </label>
                 <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
