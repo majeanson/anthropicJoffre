@@ -1,4 +1,5 @@
 import { TrickResult, Player, CardColor } from '../types/game';
+import { Card as CardComponent } from './Card';
 
 interface TrickHistoryProps {
   tricks: TrickResult[];
@@ -9,23 +10,6 @@ interface TrickHistoryProps {
   showWinner?: boolean;
   className?: string;
 }
-
-// Suit symbols and colors (matching RoundSummary)
-const suitSymbols: { [key: string]: string } = {
-  red: '♥',
-  blue: '♠',
-  green: '♣',
-  yellow: '♦',
-  brown: '♦', // Brown uses diamond symbol
-};
-
-const suitColors: { [key: string]: string } = {
-  red: 'text-red-600 dark:text-red-500',
-  blue: 'text-blue-600 dark:text-blue-500',
-  green: 'text-green-600 dark:text-green-500',
-  yellow: 'text-yellow-600 dark:text-yellow-500',
-  brown: 'text-amber-800 dark:text-amber-600',
-};
 
 export function TrickHistory({
   tricks,
@@ -82,20 +66,12 @@ export function TrickHistory({
 
                 return (
                   <div key={cardIndex} className="text-center">
-                    <div
-                      className={`mb-1 p-2 rounded-lg border-2 ${
-                        isWinner
-                          ? 'bg-yellow-100 dark:bg-yellow-900/50 border-yellow-400'
-                          : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                      } ${compact ? 'p-1' : 'p-2'} flex items-center justify-center`}
-                    >
-                      <div
-                        className={`font-mono font-bold ${
-                          suitColors[trickCard.card.color] || 'text-gray-600'
-                        } ${compact ? 'text-xl' : 'text-2xl'}`}
-                      >
-                        {suitSymbols[trickCard.card.color] || '?'}{trickCard.card.value}
-                      </div>
+                    <div className={`mb-1 inline-block ${isWinner ? 'ring-2 ring-yellow-400 rounded-lg' : ''}`}>
+                      <CardComponent
+                        card={trickCard.card}
+                        size={compact ? "tiny" : "small"}
+                        disabled={true}
+                      />
                     </div>
                     <p className={`font-medium text-gray-700 dark:text-gray-300 truncate ${compact ? 'text-xs' : 'text-xs'}`}>
                       {trickCard.playerName || 'Unknown'}
