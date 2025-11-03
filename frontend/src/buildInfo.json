@@ -1,13 +1,22 @@
 {
-  "buildDate": "2025-11-02T22:45:00.000Z",
-  "version": "1.0.40",
+  "buildDate": "2025-11-02T23:00:00.000Z",
+  "version": "1.0.41",
   "git": {
-    "commitMessage": "fix: Don't show autoplay toast for bots",
+    "commitMessage": "fix: UI polish - negative points display & card format consistency",
     "commitHash": "pending",
     "commitDate": "pending",
     "branch": "main"
   },
   "latestDoneFeatures": [
+    {
+      "date": "2025-11-02",
+      "title": "UI Polish Fixes",
+      "features": [
+        "Fixed: Round Complete now shows negative points correctly (-7, not +-7)",
+        "Fixed: Trick History card display now matches Stats panel format (suit symbols + value)",
+        "Cards now display consistently across all panels with suit symbols (♥7, ♠3, etc.)"
+      ]
+    },
     {
       "date": "2025-11-02",
       "title": "Bot Toast Fix",

@@ -10,6 +10,23 @@ interface TrickHistoryProps {
   className?: string;
 }
 
+// Suit symbols and colors (matching RoundSummary)
+const suitSymbols: { [key: string]: string } = {
+  red: '♥',
+  blue: '♠',
+  green: '♣',
+  yellow: '♦',
+  brown: '♦', // Brown uses diamond symbol
+};
+
+const suitColors: { [key: string]: string } = {
+  red: 'text-red-600 dark:text-red-500',
+  blue: 'text-blue-600 dark:text-blue-500',
+  green: 'text-green-600 dark:text-green-500',
+  yellow: 'text-yellow-600 dark:text-yellow-500',
+  brown: 'text-amber-800 dark:text-amber-600',
+};
+
 export function TrickHistory({
   tricks,
   players,
@@ -70,25 +87,14 @@ export function TrickHistory({
                         isWinner
                           ? 'bg-yellow-100 dark:bg-yellow-900/50 border-yellow-400'
                           : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
-                      } ${compact ? 'p-1' : 'p-2'}`}
+                      } ${compact ? 'p-1' : 'p-2'} flex items-center justify-center`}
                     >
                       <div
-                        className={`font-bold mb-1 ${
-                          trickCard.card.color === 'red'
-                            ? 'text-red-600'
-                            : trickCard.card.color === 'blue'
-                            ? 'text-blue-600'
-                            : trickCard.card.color === 'green'
-                            ? 'text-green-600'
-                            : trickCard.card.color === 'brown'
-                            ? 'text-amber-800 dark:text-amber-600'
-                            : 'text-gray-600'
+                        className={`font-mono font-bold ${
+                          suitColors[trickCard.card.color] || 'text-gray-600'
                         } ${compact ? 'text-xl' : 'text-2xl'}`}
                       >
-                        {trickCard.card.value}
-                      </div>
-                      <div className={`font-semibold text-gray-500 dark:text-gray-400 capitalize ${compact ? 'text-xs' : 'text-xs'}`}>
-                        {trickCard.card.color}
+                        {suitSymbols[trickCard.card.color] || '?'}{trickCard.card.value}
                       </div>
                     </div>
                     <p className={`font-medium text-gray-700 dark:text-gray-300 truncate ${compact ? 'text-xs' : 'text-xs'}`}>

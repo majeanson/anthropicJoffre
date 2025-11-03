@@ -266,7 +266,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           <div className="mb-3">
             <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
             <div className="text-5xl sm:text-6xl font-black text-orange-700 dark:text-orange-300">
-              +{lastRound.roundScore.team1}
+              {lastRound.roundScore.team1 >= 0 ? '+' : ''}{lastRound.roundScore.team1}
             </div>
           </div>
 
@@ -293,7 +293,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           <div className="mb-3">
             <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
             <div className="text-5xl sm:text-6xl font-black text-purple-700 dark:text-purple-300">
-              +{lastRound.roundScore.team2}
+              {lastRound.roundScore.team2 >= 0 ? '+' : ''}{lastRound.roundScore.team2}
             </div>
           </div>
 
