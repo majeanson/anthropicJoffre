@@ -154,13 +154,13 @@ export default {
             transform: 'translateY(0) translateX(0) scale(1) rotate(0deg)',
             opacity: '1'
           },
-          '30%': {
-            transform: 'translateY(-60px) translateX(0) scale(1.1) rotate(5deg)',
-            opacity: '1'
+          '50%': {
+            transform: 'translateY(0) translateX(0) scale(0.95) rotate(0deg)',
+            opacity: '0.5'
           },
           '100%': {
-            transform: 'translateY(-120px) translateX(0) scale(0.9) rotate(0deg)',
-            opacity: '0.8'
+            transform: 'translateY(0) translateX(0) scale(0.9) rotate(0deg)',
+            opacity: '0'
           }
         },
         'card-hover-lift': {

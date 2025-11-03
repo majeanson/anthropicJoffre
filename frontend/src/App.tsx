@@ -232,7 +232,7 @@ function App() {
       gameId: string;
       availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
     }) => {
-      const storedPlayerName = localStorage.getItem('pendingPlayerName') || '';
+      const storedPlayerName = localStorage.getItem('playerName') || '';
       setBotTakeoverModal({
         gameId,
         availableBots,
@@ -303,14 +303,16 @@ function App() {
 
   const handleCreateGame = (playerName: string, persistenceMode: 'elo' | 'casual' = 'elo') => {
     if (socket) {
+      // Store player name in localStorage for persistence
+      localStorage.setItem('playerName', playerName);
       socket.emit('create_game', { playerName, persistenceMode });
     }
   };
 
   const handleJoinGame = (gameId: string, playerName: string) => {
     if (socket) {
-      // Store player name temporarily in case game is full with bots
-      localStorage.setItem('pendingPlayerName', playerName);
+      // Store player name in localStorage for persistence
+      localStorage.setItem('playerName', playerName);
       socket.emit('join_game', { gameId, playerName });
       setGameId(gameId);
     }
@@ -587,7 +589,6 @@ function App() {
           onTakeOver={handleTakeOverBot}
           onCancel={() => {
             setBotTakeoverModal(null);
-            localStorage.removeItem('pendingPlayerName');
           }}
         />
       )}

@@ -235,14 +235,18 @@ export function calculateRoundStatistics(
       luckyPlayerName = playerName;
     }
   });
+  // Lucky Player requires BOTH red 0 AND brown 0
   if (luckyPlayerName && maxRedZeros > 0) {
-    const player = game.players.find(p => p.name === luckyPlayerName);
-    if (player) {
-      statistics.luckyPlayer = {
-        playerId: player.id,
-        playerName: player.name,
-        redZeros: maxRedZeros,
-      };
+    const brownZeros = statsData.brownZerosReceived.get(luckyPlayerName) || 0;
+    if (brownZeros > 0) {
+      const player = game.players.find(p => p.name === luckyPlayerName);
+      if (player) {
+        statistics.luckyPlayer = {
+          playerId: player.id,
+          playerName: player.name,
+          redZeros: maxRedZeros,
+        };
+      }
     }
   }
 

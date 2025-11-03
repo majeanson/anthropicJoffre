@@ -29,7 +29,7 @@ interface LobbyProps {
 
 
 export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange }: LobbyProps) {
-  const [playerName, setPlayerName] = useState('');
+  const [playerName, setPlayerName] = useState(() => localStorage.getItem('playerName') || '');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
@@ -52,6 +52,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   useEffect(() => {
     setRecentPlayers(getRecentPlayers());
   }, []);
+
+  // Save playerName to localStorage whenever it changes
+  useEffect(() => {
+    if (playerName.trim()) {
+      localStorage.setItem('playerName', playerName.trim());
+    }
+  }, [playerName]);
 
   // React to autoJoinGameId prop changes
   useEffect(() => {

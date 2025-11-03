@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { SettingsPanel } from './SettingsPanel';
+import { ConnectionStats } from '../hooks/useConnectionQuality';
+import { CardColor } from '../types/game';
 
 interface GameHeaderProps {
   gameId: string;
@@ -18,6 +20,10 @@ interface GameHeaderProps {
   unreadChatCount?: number;
   soundEnabled?: boolean;
   onSoundToggle?: () => void;
+  connectionStats?: ConnectionStats;
+  highestBet?: { amount: number; withoutTrump: boolean; playerId: string };
+  trump?: CardColor | null;
+  bettingTeamId?: 1 | 2 | null;
 }
 
 export function GameHeader({
@@ -36,10 +42,31 @@ export function GameHeader({
   isSpectator = false,
   unreadChatCount = 0,
   soundEnabled = true,
-  onSoundToggle
+  onSoundToggle,
+  connectionStats,
+  highestBet,
+  trump,
+  bettingTeamId
 }: GameHeaderProps) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Helper to get trump color display
+  const getTrumpColorClass = (color: CardColor | null | undefined): string => {
+    if (!color) return 'bg-gray-500';
+    const colorMap: Record<CardColor, string> = {
+      red: 'bg-red-500',
+      brown: 'bg-amber-700',
+      green: 'bg-green-600',
+      blue: 'bg-blue-500'
+    };
+    return colorMap[color];
+  };
+
+  const getTrumpColorName = (color: CardColor | null | undefined): string => {
+    if (!color) return '?';
+    return color.charAt(0).toUpperCase() + color.slice(1);
+  };
 
   const handleCopyGameLink = async () => {
     const gameLink = `${window.location.origin}?gameId=${gameId}`;
@@ -53,7 +80,7 @@ export function GameHeader({
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg">
+    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg min-h-[60px]">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1 sm:py-1.5">
         {/* Desktop: Single row - All items on same horizontal line */}
         <div className="hidden md:flex items-center gap-3">
@@ -71,15 +98,35 @@ export function GameHeader({
             <p className="text-xs text-white dark:text-gray-100 font-bold" data-testid="round-number">R{roundNumber}</p>
           </div>
 
+          {/* Bet and Trump Display */}
+          {(highestBet || trump) && (
+            <div className="flex items-center gap-1 bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
+              {highestBet && (
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-white/80 dark:text-gray-300">Bet:</span>
+                  <span className="text-xs text-white dark:text-gray-100 font-bold">{highestBet.amount}</span>
+                  {highestBet.withoutTrump && <span className="text-xs text-yellow-300 font-bold" title="Without Trump">!</span>}
+                </div>
+              )}
+              {highestBet && trump && <span className="text-white/50">|</span>}
+              {trump && (
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-white/80 dark:text-gray-300">Trump:</span>
+                  <div className={`w-3 h-3 rounded-sm ${getTrumpColorClass(trump)}`} title={getTrumpColorName(trump)}></div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Team Scores */}
           <div className="flex items-center gap-1" data-testid="team-scores">
             <span className="sr-only">Team 1: {team1Score} Team 2: {team2Score}</span>
-            <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+            <div className={`bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''}`}>
               <p className="text-xs text-white/90 font-semibold">T1</p>
               <p className="text-base text-white font-black">{team1Score}</p>
             </div>
             <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-            <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+            <div className={`bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''}`}>
               <p className="text-xs text-white/90 font-semibold">T2</p>
               <p className="text-base text-white font-black">{team2Score}</p>
             </div>
@@ -151,15 +198,27 @@ export function GameHeader({
               <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
             </div>
 
+            {/* Mobile Bet and Trump Display */}
+            {(highestBet || trump) && (
+              <div className="flex items-center gap-0.5 bg-white/20 dark:bg-black/20 px-1.5 py-1 rounded backdrop-blur-sm flex-shrink-0">
+                {highestBet && (
+                  <span className="text-[10px] text-white dark:text-gray-100 font-bold">{highestBet.amount}{highestBet.withoutTrump ? '!' : ''}</span>
+                )}
+                {trump && (
+                  <div className={`w-2.5 h-2.5 rounded-sm ${getTrumpColorClass(trump)}`}></div>
+                )}
+              </div>
+            )}
+
             <div className="flex-1"></div>
 
             <div className="flex items-center gap-1">
-              <div className="bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+              <div className={`bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300' : ''}`}>
                 <p className="text-xs text-white/90 font-semibold">T1</p>
                 <p className="text-base text-white font-black">{team1Score}</p>
               </div>
               <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-              <div className="bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0">
+              <div className={`bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300' : ''}`}>
                 <p className="text-xs text-white/90 font-semibold">T2</p>
                 <p className="text-base text-white font-black">{team2Score}</p>
               </div>
@@ -220,6 +279,7 @@ export function GameHeader({
         onLeaveGame={onLeaveGame}
         onOpenRules={onOpenRules}
         isSpectator={isSpectator}
+        connectionStats={connectionStats}
       />
     </div>
   );

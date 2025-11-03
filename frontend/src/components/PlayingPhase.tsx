@@ -8,7 +8,6 @@ import { GameHeader } from './GameHeader';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
-import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
 import { ContextualGameInfo } from './ContextualGameInfo';
 
 interface PlayingPhaseProps {
@@ -551,14 +550,11 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         unreadChatCount={unreadChatCount}
         soundEnabled={soundEnabled}
         onSoundToggle={onSoundToggle}
+        connectionStats={connectionStats}
+        highestBet={gameState.highestBet || undefined}
+        trump={gameState.trump}
+        bettingTeamId={gameState.players[gameState.currentPlayerIndex]?.teamId || null}
       />
-
-      {/* Connection Quality Indicator - Sprint 6 */}
-      {connectionStats && (
-        <div className="absolute top-20 right-4 lg:right-6 z-10">
-          <ConnectionQualityBadge stats={connectionStats} />
-        </div>
-      )}
 
       <div className="flex-1 flex flex-col overflow-hidden md:overflow-visible">
         {/* Score Board - Fixed height - Sprint 5: Tablet optimized spacing */}
@@ -571,7 +567,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-orange-500 relative">
                 {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
                 {floatingTrickPoints.team1 !== null && (
-                  <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
+                  <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team1 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -633,7 +629,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-purple-500 relative">
                 {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
                 {floatingTrickPoints.team2 !== null && (
-                  <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
+                  <span className="absolute left-full ml-2 top-1/2 -translate-y-1/2 animate-points-float-up z-50">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team2 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -879,7 +875,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             ) : (
               <>
                 <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
-                  <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap md:justify-center min-w-min">
+                  <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min">
                     {(() => {
                       // Create combined hand: actual hand + card in transition (if it's no longer in hand)
                       const displayHand = [...currentPlayer!.hand];
@@ -896,17 +892,13 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         const isTransitioning = cardInTransition && card.color === cardInTransition.color && card.value === cardInTransition.value;
                         const isSelected = selectedCardIndex === index; // Sprint 6: Keyboard selection
 
-                        // Sprint 5: Check if card is special (Red 0 or Brown 0) for glow effect
-                        const isSpecialCard = (card.color === 'red' && card.value === 0) || (card.color === 'brown' && card.value === 0);
-
                         return (
                           <div
                             key={`${card.color}-${card.value}-${index}`}
                             className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
                               playable && isCurrentTurn ? 'motion-safe:hover:animate-card-hover-lift' : ''
                             } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0 motion-safe:animate-card-play-arc' : 'opacity-100 scale-100'}
-                            ${isSelected ? '-translate-y-4 scale-110' : ''}
-                            ${isSpecialCard && playable ? 'motion-safe:animate-special-card-glow' : ''}`}
+                            ${isSelected ? '-translate-y-4 scale-110' : ''}`}
                             style={{
                               transition: isTransitioning
                                 ? 'opacity 400ms ease-out, transform 400ms ease-out'
@@ -916,12 +908,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                             {/* Sprint 6: Selection indicator ring */}
                             {isSelected && (
                               <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none" />
-                            )}
-                            {/* Sprint 5: Special card indicator badge */}
-                            {isSpecialCard && (
-                              <div className="absolute -top-1 -right-1 z-10 bg-yellow-400 text-yellow-900 rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold shadow-lg border-2 border-yellow-300">
-                                ★
-                              </div>
                             )}
                             <CardComponent
                               card={card}

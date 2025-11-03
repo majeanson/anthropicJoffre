@@ -1,4 +1,6 @@
 import { useSettings } from '../contexts/SettingsContext';
+import { ConnectionStats } from '../hooks/useConnectionQuality';
+import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -12,6 +14,7 @@ interface SettingsPanelProps {
   onLeaveGame?: () => void;
   onOpenRules?: () => void;
   isSpectator?: boolean;
+  connectionStats?: ConnectionStats;
 }
 
 export function SettingsPanel({
@@ -25,7 +28,8 @@ export function SettingsPanel({
   onOpenBotManagement,
   onLeaveGame,
   onOpenRules,
-  isSpectator = false
+  isSpectator = false,
+  connectionStats
 }: SettingsPanelProps) {
   const { darkMode, setDarkMode } = useSettings();
 
@@ -143,6 +147,17 @@ export function SettingsPanel({
                   }`}
                 />
               </button>
+            </div>
+          )}
+
+          {/* Connection Quality */}
+          {connectionStats && (
+            <div className="flex items-center justify-between" data-testid="settings-connection">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">📡</span>
+                <span className="text-umber-900 dark:text-gray-100 font-semibold">Connection</span>
+              </div>
+              <ConnectionQualityBadge stats={connectionStats} />
             </div>
           )}
 
