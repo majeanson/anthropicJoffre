@@ -1,13 +1,28 @@
 {
-  "buildDate": "2025-01-02T12:00:00.000Z",
-  "version": "1.3.0",
+  "buildDate": "2025-01-02T18:00:00.000Z",
+  "version": "1.4.0",
   "git": {
-    "commitMessage": "fix: 9 UX improvements - animations, storage, header, stats (card fade, localStorage, bet/trump display)",
+    "commitMessage": "fix: 5 critical bug fixes - bot badges, ready status, chat persistence, API resilience, player takeover",
     "commitHash": "pending",
     "commitDate": "pending",
     "branch": "main"
   },
   "latestDoneFeatures": [
+    {
+      "date": "2025-01-02",
+      "title": "Critical Bug Fixes - 5 Issues Resolved",
+      "features": [
+        "✅ Fixed bot difficulty badges visibility - Removed text truncation that was hiding badges",
+        "✅ Show ready/not-ready players in round summary - Added visual ready status display with checkmarks",
+        "✅ Lobby chat persistence - Chat history now loads from database on mount (last 100 messages)",
+        "✅ Fixed 'Failed to load active games' error - Added graceful database error handling",
+        "✅ Fixed 'Player not found' error on takeover - Improved bet player lookup with multiple fallbacks",
+        "Frontend: Updated 3 components (PlayingPhase, RoundSummary, LobbyChat)",
+        "Backend: Updated 3 files (chat handlers, API routes, game state logic)",
+        "All changes tested with TypeScript compilation - no errors",
+        "Build successful: 755KB bundle, 3.11s build time"
+      ]
+    },
     {
       "date": "2025-01-02",
       "title": "UX Improvements - 9 Fixes",

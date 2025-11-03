@@ -411,6 +411,40 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
         </div>
       </div>
 
+      {/* Player Ready Status */}
+      <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '550ms' }}>
+        <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200 text-center">👥 Ready Status</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 max-w-3xl mx-auto">
+          {gameState.players.map((player) => {
+            const isReady = gameState.playersReady?.includes(player.name) || false;
+            return (
+              <div
+                key={player.id}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  isReady
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600'
+                    : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">
+                    {isReady ? '✓' : '⏳'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-sm text-gray-900 dark:text-gray-100 truncate">
+                      {player.name}
+                    </div>
+                    <div className={`text-xs ${isReady ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                      {isReady ? 'Ready' : 'Waiting...'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Ready Button */}
       <div className="flex justify-center pt-4 animate-fadeInUp" style={{ animationDelay: '600ms' }}>
         <button

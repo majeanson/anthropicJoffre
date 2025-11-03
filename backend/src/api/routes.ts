@@ -749,28 +749,39 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
         });
 
       // Also check database for active games not in memory
-      const dbGames = await getPlayerGames(playerName);
-      const dbActiveGames: ActiveGameSummary[] = [];
+      // Gracefully handle database errors - don't fail entire request if DB is unavailable
+      let dbActiveGames: ActiveGameSummary[] = [];
+      try {
+        const dbGames = await getPlayerGames(playerName);
 
-      for (const dbGame of dbGames) {
-        // Skip if already in memory or finished
-        if (inMemoryActiveGames.some(g => g.gameId === dbGame.gameId) || dbGame.status === 'finished') {
-          continue;
-        }
+        for (const dbGame of dbGames) {
+          try {
+            // Skip if already in memory or finished
+            if (inMemoryActiveGames.some(g => g.gameId === dbGame.gameId) || dbGame.status === 'finished') {
+              continue;
+            }
 
-        // Load full game state to check phase
-        const fullGame = await getGame(dbGame.gameId);
-        if (fullGame && fullGame.phase !== 'team_selection') {
-          const myPlayer = fullGame.players.find((p: Player) => p.name === playerName);
-          dbActiveGames.push({
-            gameId: fullGame.id,
-            playerNames: fullGame.players.map((p) => p.name),
-            phase: fullGame.phase,
-            teamScores: fullGame.teamScores,
-            myTeamId: myPlayer?.teamId || null,
-            createdAt: dbGame.createdAt instanceof Date ? dbGame.createdAt.getTime() : dbGame.createdAt,
-          });
+            // Load full game state to check phase
+            const fullGame = await getGame(dbGame.gameId);
+            if (fullGame && fullGame.phase !== 'team_selection') {
+              const myPlayer = fullGame.players.find((p: Player) => p.name === playerName);
+              dbActiveGames.push({
+                gameId: fullGame.id,
+                playerNames: fullGame.players.map((p) => p.name),
+                phase: fullGame.phase,
+                teamScores: fullGame.teamScores,
+                myTeamId: myPlayer?.teamId || null,
+                createdAt: dbGame.createdAt instanceof Date ? dbGame.createdAt.getTime() : dbGame.createdAt,
+              });
+            }
+          } catch (gameError) {
+            console.warn(`Failed to load game ${dbGame.gameId} from database:`, gameError);
+            // Continue with other games
+          }
         }
+      } catch (dbError) {
+        console.warn('Failed to fetch player games from database, returning in-memory games only:', dbError);
+        // Don't fail the entire request - just return in-memory games
       }
 
       // Combine and sort by creation time (newest first)

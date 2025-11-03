@@ -111,6 +111,20 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
   }));
 
   // ============================================================================
+  // get_lobby_chat - Retrieve lobby chat history from database
+  // ============================================================================
+  socket.on('get_lobby_chat', errorBoundaries.gameAction('get_lobby_chat')(async (limit?: number) => {
+    try {
+      const messages = await getLobbyChat(limit || 100);
+      socket.emit('lobby_chat_history', { messages });
+      logger.debug('Sent lobby chat history', { socketId: socket.id, messageCount: messages.length });
+    } catch (err) {
+      logger.error('Failed to retrieve lobby chat history', { error: err, socketId: socket.id });
+      socket.emit('error', { message: 'Failed to load chat history' });
+    }
+  }));
+
+  // ============================================================================
   // send_team_selection_chat - Team selection phase chat
   // ============================================================================
   socket.on('send_team_selection_chat', errorBoundaries.gameAction('send_team_selection_chat')((payload: { gameId: string; message: string }) => {

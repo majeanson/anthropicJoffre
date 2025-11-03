@@ -30,6 +30,35 @@ export function LobbyChat({ socket, playerName, onSetPlayerName }: LobbyChatProp
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Request chat history on mount
+  useEffect(() => {
+    if (!socket) return;
+
+    // Request chat history from server
+    socket.emit('get_lobby_chat', 100);
+  }, [socket]);
+
+  // Listen for chat history response
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleChatHistory = (data: { messages: Array<{ playerName: string; message: string; createdAt: string }> }) => {
+      // Convert database messages to component format
+      const historicalMessages: LobbyChatMessage[] = data.messages.map(msg => ({
+        playerName: msg.playerName,
+        message: msg.message,
+        timestamp: new Date(msg.createdAt).getTime(),
+      }));
+      setMessages(historicalMessages);
+    };
+
+    socket.on('lobby_chat_history', handleChatHistory);
+
+    return () => {
+      socket.off('lobby_chat_history', handleChatHistory);
+    };
+  }, [socket]);
+
   // Listen for incoming lobby chat messages
   useEffect(() => {
     if (!socket) return;
