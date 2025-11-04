@@ -594,7 +594,8 @@ describe('applyTrickResolution', () => {
     const result = applyTrickResolution(game, 'p1', 1);
 
     expect(result.isRoundOver).toBe(true);
-    expect(game.phase).toBe('scoring');
+    // Phase should still be 'playing' - transition to 'scoring' happens after 2s delay in schedulePostTrickActions()
+    expect(game.phase).toBe('playing');
   });
 
   it('should not transition to scoring if hands remain', () => {
