@@ -567,7 +567,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <h3 className="text-xs md:text-sm font-semibold text-orange-600/70 uppercase tracking-wider mb-1 flex items-center justify-start gap-1">
                 <span>Team 1</span>
                 {gameState.highestBet && gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId === 1 && (
-                  <span className="text-base">🎲</span>
+                  <span className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                    <span className="text-base">🎲</span>
+                    <span className="font-bold text-sm">{gameState.highestBet.amount}</span>
+                  </span>
                 )}
               </h3>
               <p className="text-lg md:text-2xl font-bold text-orange-500 relative">
@@ -611,6 +614,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 betAmount={gameState.highestBet?.amount}
                 withoutTrump={gameState.highestBet?.withoutTrump}
                 trumpColor={gameState.trump as CardColor}
+                bettingTeamId={gameState.highestBet ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId : undefined}
               />
               {/* Keep timeout indicator for autoplay trigger (hidden) */}
               {gameState.currentTrick.length < 4 && isCurrentTurn && (
@@ -633,7 +637,10 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible">
               <h3 className="text-xs md:text-sm font-semibold text-purple-600/70 uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
                 {gameState.highestBet && gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId === 2 && (
-                  <span className="text-base">🎲</span>
+                  <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400">
+                    <span className="text-base">🎲</span>
+                    <span className="font-bold text-sm">{gameState.highestBet.amount}</span>
+                  </span>
                 )}
                 <span>Team 2</span>
               </h3>

@@ -572,16 +572,14 @@ function App() {
           onClose={() => setShowCatchUpModal(false)}
         />
       )}
-      {gameState && socket?.id && (
-        <BotManagementPanel
-          isOpen={botManagementOpen}
-          onClose={() => setBotManagementOpen(false)}
-          gameState={gameState}
-          currentPlayerId={socket.id}
-          onReplaceWithBot={handleReplaceWithBot}
-          onChangeBotDifficulty={handleChangeBotDifficulty}
-        />
-      )}
+      <BotManagementPanel
+        isOpen={botManagementOpen}
+        onClose={() => setBotManagementOpen(false)}
+        gameState={gameState}
+        currentPlayerId={socket?.id || ''}
+        onReplaceWithBot={handleReplaceWithBot}
+        onChangeBotDifficulty={handleChangeBotDifficulty}
+      />
       {botTakeoverModal && (
         <BotTakeoverModal
           isOpen={!!botTakeoverModal}

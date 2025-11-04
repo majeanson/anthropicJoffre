@@ -9,6 +9,7 @@ interface ContextualGameInfoProps {
   timeRemaining?: number;
   trickWinnerName?: string;
   trickPoints?: number;
+  bettingTeamId?: 1 | 2;
 }
 
 export function ContextualGameInfo({
@@ -19,7 +20,8 @@ export function ContextualGameInfo({
   trumpColor,
   timeRemaining,
   trickWinnerName,
-  trickPoints
+  trickPoints,
+  bettingTeamId
 }: ContextualGameInfoProps) {
   const colorNames: Record<CardColor, string> = {
     red: 'Red',
@@ -37,6 +39,12 @@ export function ContextualGameInfo({
 
   // Waiting or in progress - unified display with consistent height
   if ((state === 'waiting' || state === 'in_progress') && (betAmount || trumpColor)) {
+    const teamColorClass = bettingTeamId === 1
+      ? 'text-orange-600 dark:text-orange-400'
+      : bettingTeamId === 2
+      ? 'text-purple-600 dark:text-purple-400'
+      : 'text-umber-900 dark:text-gray-100';
+
     return (
       <div
         className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-700 dark:border-gray-600 rounded-lg px-4 py-2 text-center shadow-lg max-w-xs mx-auto"
@@ -45,7 +53,7 @@ export function ContextualGameInfo({
         <div className="flex items-center justify-center gap-3 text-sm">
           <div className="flex items-center gap-1">
             <span className="text-lg">🎲</span>
-            <span className="text-umber-900 dark:text-gray-100 font-bold">{betAmount}</span>
+            <span className={`font-bold ${teamColorClass}`}>{betAmount}</span>
             {withoutTrump && (
               <span className="text-umber-700 dark:text-gray-400 text-xs">(No Trump)</span>
             )}

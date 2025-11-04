@@ -3,7 +3,7 @@ import { GameState, BotDifficulty } from '../types/game';
 interface BotManagementPanelProps {
   isOpen: boolean;
   onClose: () => void;
-  gameState: GameState;
+  gameState: GameState | null;
   currentPlayerId: string;
   onReplaceWithBot: (playerName: string) => void;
   onChangeBotDifficulty: (botName: string, difficulty: BotDifficulty) => void;
@@ -17,24 +17,23 @@ export function BotManagementPanel({
   onReplaceWithBot,
   onChangeBotDifficulty,
 }: BotManagementPanelProps) {
-  // ✅ Follow PlayerStatsModal pattern: early return AFTER all potential hooks
-  // (This component has no hooks, but we follow the pattern for consistency)
-  if (!isOpen) return null;
+  // Early return BEFORE any logic to prevent flickering
+  if (!isOpen || !gameState) return null;
 
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
-  if (!currentPlayer) return null;
-
   const botCount = gameState.players.filter(p => p.isBot).length;
   const canAddMoreBots = botCount < 3;
 
   // Check if player is teammate (same team) for replace button
   const isTeammate = (player: typeof gameState.players[0]) => {
+    if (!currentPlayer) return false;
     return player.teamId === currentPlayer.teamId;
   };
 
   // Can only replace humans with bots, not yourself, and only teammates
   const canReplace = (player: typeof gameState.players[0]) => {
-    return !player.isBot &&
+    return currentPlayer &&
+           !player.isBot &&
            player.id !== currentPlayerId &&
            isTeammate(player) &&
            canAddMoreBots;
