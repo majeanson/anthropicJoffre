@@ -11,6 +11,8 @@ import { Socket, Server } from 'socket.io';
 import { GameState, PlayerSession, Player } from '../types/game';
 import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
+import { migratePlayerIdentity } from '../utils/playerMigrationHelpers';
+import { RoundStatsData } from '../game/roundStatistics';
 
 /**
  * Dependencies needed by the connection handlers
@@ -19,6 +21,7 @@ export interface ConnectionHandlersDependencies {
   // State Maps
   games: Map<string, GameState>;
   playerSessions: Map<string, PlayerSession>;
+  roundStats: Map<string, RoundStatsData>;
   activeTimeouts: Map<string, NodeJS.Timeout>;
   disconnectTimeouts: Map<string, NodeJS.Timeout>;
   gameDeletionTimeouts: Map<string, NodeJS.Timeout>;
@@ -66,6 +69,7 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
   const {
     games,
     playerSessions,
+    roundStats,
     activeTimeouts,
     disconnectTimeouts,
     gameDeletionTimeouts,
@@ -195,6 +199,17 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     if (game.highestBet && game.highestBet.playerId === oldSocketId) {
       game.highestBet.playerId = socket.id;
     }
+
+    // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
+    // Note: In reconnection, playerName usually doesn't change, but playerId always does
+    migratePlayerIdentity({
+      gameState: game,
+      roundStats: roundStats.get(session.gameId),
+      oldPlayerId: oldSocketId,
+      newPlayerId: socket.id,
+      oldPlayerName: session.playerName,
+      newPlayerName: player.name
+    });
 
     // Update session with new socket ID and timestamp in database
     try {

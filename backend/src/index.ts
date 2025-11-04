@@ -925,6 +925,7 @@ io.on('connection', (socket) => {
     games,
     playerSessions,
     onlinePlayers,
+    roundStats,
     io,
     deletePlayerSessions,
     createDBSession,
@@ -957,6 +958,7 @@ io.on('connection', (socket) => {
   registerConnectionHandlers(socket, {
     games,
     playerSessions,
+    roundStats,
     activeTimeouts,
     disconnectTimeouts,
     gameDeletionTimeouts,

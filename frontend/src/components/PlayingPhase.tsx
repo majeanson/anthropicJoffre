@@ -576,7 +576,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-orange-500 relative">
                 {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
                 {floatingTrickPoints.team1 !== null && (
-                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[60]">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team1 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -588,7 +588,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 )}
               </p>
               {floatingPoints.team1 !== null && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-50">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[60]">
                   <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
                     floatingPoints.team1 >= 0
                       ? 'bg-green-500 border-green-300'
@@ -647,7 +647,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-purple-500 relative">
                 {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
                 {floatingTrickPoints.team2 !== null && (
-                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-50">
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[60]">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team2 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -659,7 +659,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 )}
               </p>
               {floatingPoints.team2 !== null && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-50">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[60]">
                   <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
                     floatingPoints.team2 >= 0
                       ? 'bg-green-500 border-green-300'

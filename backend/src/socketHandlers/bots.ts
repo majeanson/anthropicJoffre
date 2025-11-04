@@ -12,6 +12,8 @@ import { Socket, Server } from 'socket.io';
 import { GameState, PlayerSession } from '../types/game';
 import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
+import { migratePlayerIdentity } from '../utils/playerMigrationHelpers';
+import { RoundStatsData } from '../game/roundStatistics';
 
 /**
  * Dependencies needed by the bot handlers
@@ -21,6 +23,7 @@ export interface BotHandlersDependencies {
   games: Map<string, GameState>;
   playerSessions: Map<string, PlayerSession>;
   onlinePlayers: Map<string, any>;
+  roundStats: Map<string, RoundStatsData>;
 
   // Socket.io
   io: Server;
@@ -54,6 +57,7 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
     games,
     playerSessions,
     onlinePlayers,
+    roundStats,
     io,
     deletePlayerSessions,
     createDBSession,
@@ -138,6 +142,16 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
     if (game.highestBet && game.highestBet.playerId === oldSocketId) {
       game.highestBet.playerId = newBotId;
     }
+
+    // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
+    migratePlayerIdentity({
+      gameState: game,
+      roundStats: roundStats.get(gameId),
+      oldPlayerId: oldSocketId,
+      newPlayerId: newBotId,
+      oldPlayerName: playerName,
+      newPlayerName: botName
+    });
 
     // Clean up player sessions
     await PersistenceManager.deletePlayerSessions(playerName, gameId, game.persistenceMode);
@@ -251,6 +265,16 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
     if (game.highestBet && game.highestBet.playerId === oldSocketId) {
       game.highestBet.playerId = newBotId;
     }
+
+    // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
+    migratePlayerIdentity({
+      gameState: game,
+      roundStats: roundStats.get(gameId),
+      oldPlayerId: oldSocketId,
+      newPlayerId: newBotId,
+      oldPlayerName: playerNameToReplace,
+      newPlayerName: botName
+    });
 
     // Clean up old player's sessions (conditional on persistence mode)
     await PersistenceManager.deletePlayerSessions(playerNameToReplace, gameId, game.persistenceMode);
@@ -397,6 +421,16 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
         round.statistics.playerBets[newPlayerName] = round.statistics.playerBets[botNameToReplace];
         delete round.statistics.playerBets[botNameToReplace];
       }
+    });
+
+    // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
+    migratePlayerIdentity({
+      gameState: game,
+      roundStats: roundStats.get(gameId),
+      oldPlayerId: oldBotId,
+      newPlayerId: socket.id,
+      oldPlayerName: botNameToReplace,
+      newPlayerName: newPlayerName
     });
 
     // Join the socket room
