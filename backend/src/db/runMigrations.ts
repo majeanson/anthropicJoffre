@@ -10,11 +10,20 @@
 
 import { runMigrations, getMigrationStatus } from './migrationSystem';
 import { closePool } from './index';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { config } from 'dotenv';
+import { existsSync } from 'fs';
 
-// Load environment variables
-config();
+// Load environment variables (match db/index.ts logic)
+// Prioritize .env.local for local development, fall back to .env
+const localEnvPath = resolve(__dirname, '../../.env.local');
+if (existsSync(localEnvPath)) {
+  config({ path: localEnvPath, override: true });
+} else {
+  // Load from backend/.env
+  const envPath = resolve(__dirname, '../../.env');
+  config({ path: envPath, override: true });
+}
 
 const migrationsDir = join(__dirname, 'migrations');
 

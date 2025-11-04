@@ -67,7 +67,7 @@ export const query = async (text: string, params?: any[]) => {
   if (process.env.NODE_ENV !== 'production' || duration > 100) {
     logDatabaseQuery(text, duration, {
       params: params?.length,
-      rows: result.rows.length,
+      rows: result.rows?.length || 0,
     });
   }
 
