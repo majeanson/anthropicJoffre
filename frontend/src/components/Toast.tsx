@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, memo } from 'react';
 
 export interface ToastProps {
   message: string;
@@ -7,7 +7,7 @@ export interface ToastProps {
   onClose: () => void;
 }
 
-export function Toast({ message, type, duration = 3000, onClose }: ToastProps) {
+export const Toast = memo(function Toast({ message, type, duration = 3000, onClose }: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -45,4 +45,4 @@ export function Toast({ message, type, duration = 3000, onClose }: ToastProps) {
       </div>
     </div>
   );
-}
+});

@@ -167,7 +167,27 @@ export function calculateRoundStatistics(
 
   // 3. Perfect Bet - player who made their exact bet
   if (game.highestBet && statsData.playerBets) {
-    const bidder = game.players.find(p => p.id === game.highestBet?.playerId);
+    // Try to find bidder by ID first
+    let bidder = game.players.find(p => p.id === game.highestBet?.playerId);
+
+    // Fallback: Find by matching bet in statsData.playerBets if ID lookup failed
+    // This handles player replacement/reconnection scenarios
+    if (!bidder) {
+      // Search through all players to find who has a matching bet
+      for (const player of game.players) {
+        const bet = statsData.playerBets.get(player.name);
+        if (bet && bet.amount === game.highestBet.amount && bet.withoutTrump === game.highestBet.withoutTrump) {
+          bidder = player;
+          console.log(`[calculateRoundStatistics] Perfect Bet: Found bidder by name fallback. Original playerId: ${game.highestBet.playerId}, Found: ${player.name} (${player.id})`);
+          break;
+        }
+      }
+
+      if (!bidder) {
+        console.warn(`[calculateRoundStatistics] Perfect Bet calculation: Bidder not found. Action: Looking up player for highest bet. HighestBet.playerId: ${game.highestBet.playerId}, HighestBet.amount: ${game.highestBet.amount}, Available players: ${game.players.map(p => `${p.name}(${p.id})`).join(', ')}`);
+      }
+    }
+
     if (bidder) {
       const bet = statsData.playerBets.get(bidder.name);
       if (bet && bidder.pointsWon === bet.amount) {
@@ -223,6 +243,8 @@ export function calculateRoundStatistics(
         playerName: player.name,
         trumpsPlayed: trumpMasterResult.count,
       };
+    } else {
+      console.warn(`[calculateRoundStatistics] Trump Master calculation: Player not found. Action: Looking up player for trump master stat. PlayerName from stats: '${trumpMasterResult.playerName}', Available players: ${game.players.map(p => `${p.name}(${p.id})`).join(', ')}, StatsData.trumpsPlayed keys: ${Array.from(statsData.trumpsPlayed.keys()).join(', ')}`);
     }
   }
 
@@ -246,6 +268,8 @@ export function calculateRoundStatistics(
           playerName: player.name,
           redZeros: maxRedZeros,
         };
+      } else {
+        console.warn(`[calculateRoundStatistics] Lucky Player calculation: Player not found. Action: Looking up player for lucky player stat. PlayerName from stats: '${luckyPlayerName}', Available players: ${game.players.map(p => `${p.name}(${p.id})`).join(', ')}, StatsData.redZerosCollected keys: ${Array.from(statsData.redZerosCollected.keys()).join(', ')}`);
       }
     }
   }
@@ -257,7 +281,10 @@ export function calculateRoundStatistics(
     // Find interesting hand patterns
     handAnalyses.forEach((analysis, playerName) => {
       const player = game.players.find(p => p.name === playerName);
-      if (!player) return;
+      if (!player) {
+        console.warn(`[calculateRoundStatistics] Starting hand stats: Player not found. Action: Looking up player for hand analysis stats. PlayerName from initialHands: '${playerName}', Available players: ${game.players.map(p => `${p.name}(${p.id})`).join(', ')}, InitialHands keys: ${Array.from(statsData.initialHands?.keys() || []).join(', ')}`);
+        return;
+      }
 
       // Monochrome (no red cards)
       if (analysis.noRed && !statistics.monochrome) {

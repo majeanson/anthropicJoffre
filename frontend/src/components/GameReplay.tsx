@@ -202,7 +202,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         // Defensive check: ensure player exists in hands before pushing
         // This handles cases where player names changed (e.g., bot replacement)
         if (!hands[trickCard.playerName]) {
-          console.warn('[GameReplay] Player not found in hands:', trickCard.playerName, 'Available:', Object.keys(hands));
+          console.warn('[GameReplay] Calculating starting hands: Player not found. Action: Building hand from trick history. PlayerName from trick:', trickCard.playerName, 'Available players:', Object.keys(hands), 'Round:', currentRoundIndex, 'Trick:', currentTrickIndex);
           hands[trickCard.playerName] = [];
         }
         hands[trickCard.playerName].push(trickCard.card);

@@ -83,6 +83,7 @@ function App() {
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
+  const [autoJoinGameId, setAutoJoinGameId] = useState<string>(''); // URL parameter for auto-join from shared links
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastAutoActionRef = useRef<{ message: string; timestamp: number } | null>(null);
 
@@ -233,6 +234,23 @@ function App() {
       availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
     }) => {
       const storedPlayerName = localStorage.getItem('playerName') || '';
+
+      // If user arrived via share link (autoJoinGameId is set), automatically take over first available bot
+      if (autoJoinGameId === gameId && storedPlayerName && availableBots.length > 0) {
+        console.log(`[Auto-Join] Automatically taking over bot for share link join. GameId: ${gameId}, PlayerName: ${storedPlayerName}, Bot: ${availableBots[0].name}`);
+
+        // Automatically take over the first available bot
+        if (socket) {
+          socket.emit('take_over_bot', {
+            gameId,
+            playerName: storedPlayerName,
+            botName: availableBots[0].name
+          });
+        }
+        return;
+      }
+
+      // Otherwise show the bot takeover modal
       setBotTakeoverModal({
         gameId,
         availableBots,
@@ -273,7 +291,7 @@ function App() {
       socket.off('replaced_by_bot', handleReplacedByBot);
       socket.off('game_full_with_bots', handleGameFullWithBots);
     };
-  }, [socket, gameState, showToast, setError, setGameState, setGameId, setIsSpectator, spawnBotsForGame, cleanupBotSocket]);
+  }, [socket, gameState, showToast, setError, setGameState, setGameId, setIsSpectator, spawnBotsForGame, cleanupBotSocket, autoJoinGameId]);
 
   // Sprint 5 Phase 2: Handle bot spawning on reconnection
   // This ensures bots continue playing after human player reconnects
@@ -287,8 +305,6 @@ function App() {
   }, [showCatchUpModal]); // Trigger when catch-up modal is shown (indicates reconnection)
 
   // URL parameter parsing for auto-join from shared links
-  const [autoJoinGameId, setAutoJoinGameId] = useState<string>('');
-
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const joinGameId = urlParams.get('join');

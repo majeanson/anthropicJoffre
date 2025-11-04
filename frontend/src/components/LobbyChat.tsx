@@ -115,8 +115,14 @@ export function LobbyChat({ socket, playerName, onSetPlayerName }: LobbyChatProp
     }
   };
 
-  const formatTime = (timestamp: number) => {
+  const formatTime = (timestamp: number | undefined) => {
+    if (!timestamp || isNaN(timestamp)) {
+      return 'now';
+    }
     const date = new Date(timestamp);
+    if (isNaN(date.getTime())) {
+      return 'now';
+    }
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
     return `${hours}:${minutes}`;

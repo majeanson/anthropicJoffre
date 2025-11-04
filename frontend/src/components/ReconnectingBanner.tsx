@@ -1,9 +1,11 @@
+import { memo } from 'react';
+
 interface ReconnectingBannerProps {
   attempt: number;
   maxAttempts: number;
 }
 
-export function ReconnectingBanner({ attempt, maxAttempts }: ReconnectingBannerProps) {
+export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, maxAttempts }: ReconnectingBannerProps) {
   const progress = (attempt / maxAttempts) * 100;
 
   return (
@@ -30,4 +32,4 @@ export function ReconnectingBanner({ attempt, maxAttempts }: ReconnectingBannerP
       </div>
     </div>
   );
-}
+});

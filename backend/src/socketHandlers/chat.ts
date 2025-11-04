@@ -115,7 +115,13 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
   // ============================================================================
   socket.on('get_lobby_chat', errorBoundaries.gameAction('get_lobby_chat')(async (limit?: number) => {
     try {
-      const messages = await getLobbyChat(limit || 100);
+      const dbMessages = await getLobbyChat(limit || 100);
+      // Map snake_case DB fields to camelCase for frontend
+      const messages = dbMessages.map((msg: any) => ({
+        playerName: msg.player_name,
+        message: msg.message,
+        createdAt: msg.created_at
+      }));
       socket.emit('lobby_chat_history', { messages });
       logger.debug('Sent lobby chat history', { socketId: socket.id, messageCount: messages.length });
     } catch (err) {

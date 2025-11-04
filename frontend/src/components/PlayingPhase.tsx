@@ -563,7 +563,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         <div className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600" data-testid="score-board">
           <div className="flex justify-between items-center gap-2 md:gap-8">
             {/* Team 1 */}
-            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible">
+            <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible z-20">
               <h3 className="text-xs md:text-sm font-semibold text-orange-600/70 uppercase tracking-wider mb-1 flex items-center justify-start gap-1">
                 <span>Team 1</span>
                 {gameState.highestBet && gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId === 1 && (
@@ -634,7 +634,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             </div>
 
             {/* Team 2 */}
-            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible">
+            <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible z-20">
               <h3 className="text-xs md:text-sm font-semibold text-purple-600/70 uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
                 {gameState.highestBet && gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId === 2 && (
                   <span className="flex items-center gap-1 text-purple-600 dark:text-purple-400">

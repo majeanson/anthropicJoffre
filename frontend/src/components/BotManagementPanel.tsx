@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { GameState, BotDifficulty } from '../types/game';
 
 interface BotManagementPanelProps {
@@ -9,7 +10,7 @@ interface BotManagementPanelProps {
   onChangeBotDifficulty: (botName: string, difficulty: BotDifficulty) => void;
 }
 
-export function BotManagementPanel({
+export const BotManagementPanel = memo(function BotManagementPanel({
   isOpen,
   onClose,
   gameState,
@@ -188,4 +189,4 @@ export function BotManagementPanel({
       </div>
     </div>
   );
-}
+});

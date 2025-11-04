@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { GameState } from '../types/game';
 
 interface CatchUpModalProps {
@@ -7,7 +8,7 @@ interface CatchUpModalProps {
   onClose: () => void;
 }
 
-export function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: CatchUpModalProps) {
+export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: CatchUpModalProps) {
   if (!isOpen) return null;
 
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
@@ -130,4 +131,4 @@ export function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: Ca
       </div>
     </div>
   );
-}
+});
