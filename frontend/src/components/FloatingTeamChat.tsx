@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { ChatMessage } from '../types/game';
+import { EmojiPicker } from './EmojiPicker';
 
 interface FloatingTeamChatProps {
   gameId: string;
@@ -20,6 +21,7 @@ export function FloatingTeamChat({
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -65,6 +67,11 @@ export function FloatingTeamChat({
     if (!isExpanded) {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    setInputMessage(prev => prev + emoji);
+    inputRef.current?.focus();
   };
 
   if (!isExpanded) {
@@ -148,8 +155,23 @@ export function FloatingTeamChat({
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className="p-3 border-t border-amber-700 dark:border-gray-600">
+      <form onSubmit={handleSendMessage} className="p-3 border-t border-amber-700 dark:border-gray-600 relative">
+        {showEmojiPicker && (
+          <EmojiPicker
+            onSelectEmoji={handleEmojiSelect}
+            onClose={() => setShowEmojiPicker(false)}
+          />
+        )}
         <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className="bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-500 dark:hover:bg-yellow-600 text-gray-900 px-3 py-2 rounded font-bold transition-all text-lg"
+            title="Add Emoji"
+            data-testid="emoji-picker-button"
+          >
+            😊
+          </button>
           <input
             ref={inputRef}
             type="text"

@@ -1,0 +1,169 @@
+/**
+ * Profile REST API Endpoints
+ * Sprint 3 Phase 3.2
+ */
+
+import { Router, Request, Response } from 'express';
+import {
+  getUserProfile,
+  updateUserProfile,
+  getUserPreferences,
+  updateUserPreferences,
+  getCompleteUserProfile,
+  ProfileUpdateData,
+  PreferencesUpdateData
+} from '../db/profiles';
+import { updateUserProfile as updateUserAvatar } from '../db/users';
+import { verifyAccessToken } from '../utils/authHelpers';
+
+const router = Router();
+
+/**
+ * Middleware to verify authentication
+ */
+function requireAuth(req: Request, res: Response, next: Function) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const token = authHeader.substring(7);
+  const payload = verifyAccessToken(token);
+
+  if (!payload) {
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+
+  // Attach user info to request
+  (req as any).user = payload;
+  next();
+}
+
+/**
+ * GET /api/profiles/me
+ * Get current user's profile and preferences
+ */
+router.get('/me', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.user_id;
+
+    const data = await getCompleteUserProfile(userId);
+
+    if (!data) {
+      return res.status(500).json({ error: 'Failed to fetch profile' });
+    }
+
+    return res.json(data);
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * PUT /api/profiles/me
+ * Update current user's profile
+ */
+router.put('/me', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.user_id;
+    const updates: ProfileUpdateData = req.body;
+
+    // Update profile
+    const profile = await updateUserProfile(userId, updates);
+
+    if (!profile) {
+      return res.status(500).json({ error: 'Failed to update profile' });
+    }
+
+    // If avatar_id is provided, update user's avatar_url
+    if ((req.body as any).avatar_id) {
+      const avatarId = (req.body as any).avatar_id;
+      await updateUserAvatar(userId, {
+        avatar_url: avatarId // Store avatar ID as avatar_url for now
+      });
+    }
+
+    return res.json({ profile });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/profiles/preferences
+ * Get current user's preferences
+ */
+router.get('/preferences', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.user_id;
+
+    const preferences = await getUserPreferences(userId);
+
+    if (!preferences) {
+      return res.status(404).json({ error: 'Preferences not found' });
+    }
+
+    return res.json({ preferences });
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * PUT /api/profiles/preferences
+ * Update current user's preferences
+ */
+router.put('/preferences', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.user_id;
+    const updates: PreferencesUpdateData = req.body;
+
+    const preferences = await updateUserPreferences(userId, updates);
+
+    if (!preferences) {
+      return res.status(500).json({ error: 'Failed to update preferences' });
+    }
+
+    return res.json({ preferences });
+  } catch (error) {
+    console.error('Error updating preferences:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * GET /api/profiles/:userId
+ * Get another user's public profile
+ */
+router.get('/:userId', async (req: Request, res: Response) => {
+  try {
+    const userId = parseInt(req.params.userId);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    const profile = await getUserProfile(userId);
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    // Check visibility
+    if (profile.visibility === 'private') {
+      return res.status(403).json({ error: 'Profile is private' });
+    }
+
+    // TODO: Check if requestor is friend if visibility is 'friends_only'
+
+    return res.json({ profile });
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+export default router;

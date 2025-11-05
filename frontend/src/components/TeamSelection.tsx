@@ -6,6 +6,7 @@ import { HowToPlay } from './HowToPlay';
 import { BotDifficulty } from '../utils/botPlayer';
 import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 import { FloatingTeamChat } from './FloatingTeamChat';
+import { sounds } from '../utils/sounds';
 
 interface TeamSelectionProps {
   players: Player[];
@@ -248,7 +249,10 @@ export function TeamSelection({
                           </div>
                         ) : currentPlayer?.teamId !== 1 ? (
                           <button
-                            onClick={() => onSelectTeam(1)}
+                            onClick={() => {
+                              sounds.teamSwitch(); // Sprint 1 Phase 6
+                              onSelectTeam(1);
+                            }}
                             className="text-orange-600 dark:text-orange-400 hover:text-orange-800 dark:hover:text-orange-300 font-medium"
                           >
                             Join Team 1
@@ -351,7 +355,10 @@ export function TeamSelection({
                           </div>
                         ) : currentPlayer?.teamId !== 2 ? (
                           <button
-                            onClick={() => onSelectTeam(2)}
+                            onClick={() => {
+                              sounds.teamSwitch(); // Sprint 1 Phase 6
+                              onSelectTeam(2);
+                            }}
                             className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-300 font-medium"
                           >
                             Join Team 2
@@ -427,7 +434,10 @@ export function TeamSelection({
             {canStartGame() ? (
               <button
                 data-testid="start-game-button"
-                onClick={onStartGame}
+                onClick={() => {
+                  sounds.gameStart(); // Sprint 1 Phase 6
+                  onStartGame();
+                }}
                 className="bg-forest-600 text-parchment-50 px-8 py-3 rounded-lg text-lg font-bold hover:bg-forest-700 shadow-lg transition-colors border-2 border-forest-700"
               >
                 Start Game

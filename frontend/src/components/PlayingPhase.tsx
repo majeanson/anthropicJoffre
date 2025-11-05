@@ -1,6 +1,10 @@
 import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { Socket } from 'socket.io-client';
 import { Card as CardComponent } from './Card';
+import { CardPreview } from './CardPreview'; // Sprint 1 Phase 1
+import { CardPlayEffect } from './CardPlayEffect'; // Sprint 1 Phase 2
+import { ConfettiEffect } from './ConfettiEffect'; // Sprint 1 Phase 3
+import { TrickWinnerBanner } from './TrickWinnerBanner'; // Sprint 1 Phase 3
 import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { ChatPanel, ChatMessage } from './ChatPanel';
@@ -22,6 +26,8 @@ interface PlayingPhaseProps {
   soundEnabled?: boolean;
   onSoundToggle?: () => void;
   onOpenBotManagement?: () => void;
+  onOpenAchievements?: () => void; // Sprint 2 Phase 1
+  onOpenFriends?: () => void; // Sprint 2 Phase 2
   socket?: Socket | null;
   gameId?: string;
   chatMessages?: ChatMessage[];
@@ -29,7 +35,7 @@ interface PlayingPhaseProps {
   connectionStats?: ConnectionStats;
 }
 
-function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, soundEnabled = true, onSoundToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
+function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, soundEnabled = true, onSoundToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
   // ✅ CRITICAL: Check player existence BEFORE any hooks to prevent "Rendered fewer hooks than expected" error
   // Rules of Hooks: All hooks must be called in the same order on every render
   // Early returns before hooks are safe, but early returns AFTER hooks will cause React to crash
@@ -77,6 +83,15 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
   // Sprint 6: Keyboard navigation state
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
 
+  // Sprint 1 Phase 1: Card preview state
+  const [cardPreview, setCardPreview] = useState<{ card: CardType; mouseX: number; mouseY: number } | null>(null);
+
+  // Sprint 1 Phase 2: Card play effect state
+  const [playEffect, setPlayEffect] = useState<{ card: CardType; position: { x: number; y: number } } | null>(null);
+
+  // Sprint 1 Phase 3: Trick winner celebration state
+  const [trickWinner, setTrickWinner] = useState<{ playerName: string; points: number; teamId: 1 | 2 } | null>(null);
+
   // Memoize expensive computations (now using the pre-validated playerLookup)
   const currentPlayer = useMemo(
     () => playerLookup,
@@ -108,6 +123,33 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       socket.off('game_chat_message', handleChatMessage);
     };
   }, [socket, chatOpen]);
+
+  // Sprint 1 Phase 3: Listen for trick winner to show celebration
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleTrickResolved = ({ winnerId, points, gameState: newGameState }: { winnerId: string; points: number; gameState: GameState }) => {
+      const winner = newGameState.players.find(p => p.id === winnerId);
+      if (winner) {
+        setTrickWinner({
+          playerName: winner.name,
+          points,
+          teamId: winner.teamId
+        });
+
+        // Clear celebration after 2 seconds
+        setTimeout(() => {
+          setTrickWinner(null);
+        }, 2000);
+      }
+    };
+
+    socket.on('trick_resolved', handleTrickResolved);
+
+    return () => {
+      socket.off('trick_resolved', handleTrickResolved);
+    };
+  }, [socket]);
 
   // Reset unread count when chat is opened
   useEffect(() => {
@@ -389,7 +431,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     return playableCards.some(c => c.color === card.color && c.value === card.value);
   }, [playableCards]);
 
-  const handleCardClick = useCallback((card: CardType) => {
+  const handleCardClick = useCallback((card: CardType, event?: React.MouseEvent) => {
     // Prevent multiple rapid clicks
     if (isPlayingCard) {
       return;
@@ -405,6 +447,21 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
 
     setIsPlayingCard(true);
     setCardInTransition(card); // Mark card as transitioning
+    setCardPreview(null); // Sprint 1 Phase 1: Hide preview when card is played
+
+    // Sprint 1 Phase 2: Play confirmation sound and effect
+    sounds.cardConfirm(card.value);
+    if (event) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setPlayEffect({
+        card,
+        position: {
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2
+        }
+      });
+    }
+
     sounds.cardPlay(); // Play card play sound
     onPlayCard(card);
 
@@ -413,6 +470,15 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       setCardInTransition(null);
     }, 450); // Slightly longer than the 400ms animation
   }, [isPlayingCard, isCurrentTurn, isCardPlayable, onPlayCard]);
+
+  // Sprint 1 Phase 1: Card preview handlers
+  const handleCardPreviewShow = useCallback((card: CardType, mouseX: number, mouseY: number) => {
+    setCardPreview({ card, mouseX, mouseY });
+  }, []);
+
+  const handleCardPreviewHide = useCallback(() => {
+    setCardPreview(null);
+  }, []);
 
   const cardPositions = getCardPositions(gameState.currentTrick);
   const previousCardPositions = gameState.previousTrick ? getCardPositions(gameState.previousTrick.trick) : null;
@@ -544,6 +610,8 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         onOpenLeaderboard={() => setShowLeaderboard(true)}
         onOpenChat={() => setChatOpen(true)}
         onOpenBotManagement={onOpenBotManagement}
+        onOpenAchievements={onOpenAchievements}
+        onOpenFriends={onOpenFriends}
         botCount={gameState.players.filter(p => p.isBot).length}
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
@@ -576,7 +644,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-orange-500 relative">
                 {team1RoundScore >= 0 ? '+' : ''}{team1RoundScore} pts
                 {floatingTrickPoints.team1 !== null && (
-                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[60]">
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[6000]">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team1 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -588,7 +656,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 )}
               </p>
               {floatingPoints.team1 !== null && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[60]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[6000]">
                   <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
                     floatingPoints.team1 >= 0
                       ? 'bg-green-500 border-green-300'
@@ -647,7 +715,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
               <p className="text-lg md:text-2xl font-bold text-purple-500 relative">
                 {team2RoundScore >= 0 ? '+' : ''}{team2RoundScore} pts
                 {floatingTrickPoints.team2 !== null && (
-                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[60]">
+                  <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[6000]">
                     <span className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team2 >= 0
                         ? 'bg-green-500 border-green-300'
@@ -659,7 +727,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 )}
               </p>
               {floatingPoints.team2 !== null && (
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[60]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[6000]">
                   <div className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
                     floatingPoints.team2 >= 0
                       ? 'bg-green-500 border-green-300'
@@ -871,8 +939,25 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-10">
         {gameState.currentTrick.length === 0 && !showLeaderboard && !showPreviousTrick && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
-                  <div className="bg-umber-800/90 rounded-2xl px-6 py-4 lg:px-8 lg:py-6 border-2 border-parchment-400 dark:border-gray-600 shadow-xl" data-testid="waiting-first-card">
-                    <p className="text-parchment-50 text-lg md:text-2xl lg:text-3xl font-semibold">{`Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}</p>
+                  {/* Spotlight effect for current player's turn */}
+                  {isCurrentTurn && (
+                    <div className="absolute inset-0 -m-12 rounded-full bg-gradient-radial from-blue-400/30 via-blue-400/10 to-transparent motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" />
+                  )}
+                  <div className={`relative bg-umber-800/90 rounded-2xl px-6 py-4 lg:px-8 lg:py-6 shadow-xl transition-all ${
+                    isCurrentTurn
+                      ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse'
+                      : 'border-2 border-parchment-400 dark:border-gray-600'
+                  }`} data-testid="waiting-first-card">
+                    {isCurrentTurn && (
+                      <div className="mb-2">
+                        <span className="text-4xl motion-safe:animate-arrow-bounce motion-reduce:inline">👇</span>
+                      </div>
+                    )}
+                    <p className="text-parchment-50 text-lg md:text-2xl lg:text-3xl font-semibold">
+                      {isCurrentTurn
+                        ? 'Your Turn - Play a card!'
+                        : `Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}
+                    </p>
                     <div className="mt-2 flex gap-1 justify-center">
                       <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce"></div>
                       <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
@@ -932,8 +1017,13 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                             <CardComponent
                               card={card}
                               size="small"
-                              onClick={() => handleCardClick(card)}
+                              onClick={(e) => handleCardClick(card, e)}
                               disabled={!isCurrentTurn || !playable || !!isTransitioning}
+                              isPlayable={playable && isCurrentTurn}
+                              showPreview={isCurrentTurn && !isTransitioning}
+                              onPreviewShow={handleCardPreviewShow}
+                              onPreviewHide={handleCardPreviewHide}
+                              isKeyboardSelected={isSelected}
                             />
                           </div>
                         );
@@ -964,6 +1054,41 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
           messages={chatMessages}
           onNewMessage={onNewChatMessage}
         />
+      )}
+
+      {/* Sprint 1 Phase 1: Card Preview */}
+      {cardPreview && (
+        <CardPreview
+          card={cardPreview.card}
+          mouseX={cardPreview.mouseX}
+          mouseY={cardPreview.mouseY}
+        />
+      )}
+
+      {/* Sprint 1 Phase 2: Card Play Effect */}
+      {playEffect && (
+        <CardPlayEffect
+          card={playEffect.card}
+          position={playEffect.position}
+          onComplete={() => setPlayEffect(null)}
+        />
+      )}
+
+      {/* Sprint 1 Phase 3: Trick Winner Celebration */}
+      {trickWinner && (
+        <>
+          <ConfettiEffect
+            teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
+            duration={2000}
+          />
+          <TrickWinnerBanner
+            playerName={trickWinner.playerName}
+            points={trickWinner.points}
+            teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
+          />
+          {/* Screen flash overlay */}
+          <div className="fixed inset-0 bg-white pointer-events-none z-[9997] motion-safe:animate-screen-flash motion-reduce:hidden" />
+        </>
       )}
       </div>
     </div>

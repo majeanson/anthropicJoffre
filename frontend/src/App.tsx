@@ -16,6 +16,19 @@ import { BotTakeoverModal } from './components/BotTakeoverModal';
 import { Toast } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
 import { GameReplay } from './components/GameReplay';
+import { AchievementUnlocked } from './components/AchievementUnlocked'; // Sprint 2 Phase 1
+import { AchievementsPanel } from './components/AchievementsPanel'; // Sprint 2 Phase 1
+import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
+import FriendsPanel from './components/FriendsPanel'; // Sprint 2 Phase 2
+import FriendRequestNotificationComponent from './components/FriendRequestNotification'; // Sprint 2 Phase 2
+import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
+import LoginModal from './components/LoginModal'; // Sprint 3 Phase 1
+import RegisterModal from './components/RegisterModal'; // Sprint 3 Phase 1
+import PasswordResetModal from './components/PasswordResetModal'; // Sprint 3 Phase 1
+import EmailVerificationBanner from './components/EmailVerificationBanner'; // Sprint 3 Phase 1
+import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
+import { NotificationCenter } from './components/NotificationCenter'; // Sprint 3 Phase 5
+import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
 // Use enhanced bot AI with advanced strategic concepts
 import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayerEnhanced';
 // Fallback to original bot player if needed:
@@ -87,6 +100,23 @@ function App() {
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastAutoActionRef = useRef<{ message: string; timestamp: number } | null>(null);
 
+  // Sprint 2 Phase 1: Achievement state
+  const [achievementNotification, setAchievementNotification] = useState<{ achievement: Achievement; playerName: string } | null>(null);
+  const [showAchievementsPanel, setShowAchievementsPanel] = useState<boolean>(false);
+
+  // Sprint 2 Phase 2: Friends state
+  const [showFriendsPanel, setShowFriendsPanel] = useState<boolean>(false);
+  const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
+
+  // Sprint 3 Phase 1: Authentication state
+  const auth = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
+  const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState<boolean>(false);
+
+  // Sprint 3 Phase 5: Notification state
+  useNotifications(socket, auth?.isAuthenticated || false);
+
   // Online players tracking
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
     socketId: string;
@@ -106,7 +136,46 @@ function App() {
         localStorage.removeItem(key);
       }
     });
-  }, [])
+  }, []);
+
+  // Sprint 1 Phase 6: Play game over sound when game ends
+  useEffect(() => {
+    if (gameState && gameState.phase === 'game_over') {
+      sounds.gameOver();
+    }
+  }, [gameState?.phase]);
+
+  // Sprint 2 Phase 1: Listen for achievement unlocks
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleAchievementUnlocked = ({ playerName, achievement }: { playerName: string; achievement: Achievement }) => {
+      // Show notification popup
+      setAchievementNotification({ playerName, achievement });
+    };
+
+    socket.on('achievement_unlocked', handleAchievementUnlocked);
+
+    return () => {
+      socket.off('achievement_unlocked', handleAchievementUnlocked);
+    };
+  }, [socket]);
+
+  // Sprint 2 Phase 2: Friend request notifications
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleFriendRequestReceived = (notification: FriendRequestNotification) => {
+      // Show toast notification
+      setFriendRequestNotification(notification);
+    };
+
+    socket.on('friend_request_received', handleFriendRequestReceived);
+
+    return () => {
+      socket.off('friend_request_received', handleFriendRequestReceived);
+    };
+  }, [socket])
 
   // Sprint 5 Phase 2: Additional socket event listeners not handled by hooks
   // These events have UI-specific side effects (toasts, bot management, spectator mode)
@@ -150,6 +219,7 @@ function App() {
 
     // Error events
     const handleError = ({ message }: { message: string }) => {
+      sounds.error(); // Sprint 1 Phase 6
       setError(message);
     };
 
@@ -606,6 +676,80 @@ function App() {
           }}
         />
       )}
+      {/* Sprint 2 Phase 1: Achievement system UI */}
+      {achievementNotification && (
+        <AchievementUnlocked
+          achievement={{
+            achievement_id: achievementNotification.achievement.achievement_key,
+            name: achievementNotification.achievement.achievement_name,
+            description: achievementNotification.achievement.description,
+            icon: achievementNotification.achievement.icon,
+            rarity: achievementNotification.achievement.tier === 'bronze' ? 'common' :
+                    achievementNotification.achievement.tier === 'silver' ? 'rare' :
+                    achievementNotification.achievement.tier === 'gold' ? 'epic' : 'legendary'
+          }}
+          onDismiss={() => setAchievementNotification(null)}
+        />
+      )}
+      {gameState && (
+        <AchievementsPanel
+          isOpen={showAchievementsPanel}
+          onClose={() => setShowAchievementsPanel(false)}
+          socket={socket}
+          playerName={gameState.players.find(p => p.id === socket?.id)?.name || ''}
+        />
+      )}
+      {/* Sprint 2 Phase 2: Friends system UI */}
+      {friendRequestNotification && (
+        <FriendRequestNotificationComponent
+          notification={friendRequestNotification}
+          onClose={() => setFriendRequestNotification(null)}
+          onView={() => setShowFriendsPanel(true)}
+        />
+      )}
+      {gameState && (
+        <FriendsPanel
+          isOpen={showFriendsPanel}
+          onClose={() => setShowFriendsPanel(false)}
+          socket={socket}
+          currentPlayer={gameState.players.find(p => p.id === socket?.id)?.name || ''}
+        />
+      )}
+      {/* Sprint 3 Phase 5: Notification Center */}
+      <NotificationCenter
+        socket={socket}
+        isAuthenticated={auth.isAuthenticated}
+      />
+      {/* Sprint 3 Phase 1: Authentication UI */}
+      <EmailVerificationBanner />
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+        onSwitchToRegister={() => {
+          setShowLoginModal(false);
+          setShowRegisterModal(true);
+        }}
+        onSwitchToPasswordReset={() => {
+          setShowLoginModal(false);
+          setShowPasswordResetModal(true);
+        }}
+      />
+      <RegisterModal
+        isOpen={showRegisterModal}
+        onClose={() => setShowRegisterModal(false)}
+        onSwitchToLogin={() => {
+          setShowRegisterModal(false);
+          setShowLoginModal(true);
+        }}
+      />
+      <PasswordResetModal
+        isOpen={showPasswordResetModal}
+        onClose={() => setShowPasswordResetModal(false)}
+        onSwitchToLogin={() => {
+          setShowPasswordResetModal(false);
+          setShowLoginModal(true);
+        }}
+      />
     </>
   );
 
@@ -625,6 +769,8 @@ function App() {
           onlinePlayers={onlinePlayers}
           socket={socket}
           botDifficulty={botDifficulty}
+          onShowLogin={() => setShowLoginModal(true)}
+          onShowRegister={() => setShowRegisterModal(true)}
           onBotDifficultyChange={setBotDifficulty}
         />
       </>
@@ -778,6 +924,8 @@ function App() {
             autoplayEnabled={autoplayEnabled}
             onAutoplayToggle={handleAutoplayToggle}
             onOpenBotManagement={() => setBotManagementOpen(true)}
+            onOpenAchievements={() => setShowAchievementsPanel(true)}
+            onOpenFriends={() => setShowFriendsPanel(true)}
             socket={socket}
             gameId={gameId}
             chatMessages={chatMessages}
@@ -813,6 +961,8 @@ function App() {
           soundEnabled={soundEnabled}
           onSoundToggle={toggleSound}
           onOpenBotManagement={() => setBotManagementOpen(true)}
+          onOpenAchievements={() => setShowAchievementsPanel(true)}
+          onOpenFriends={() => setShowFriendsPanel(true)}
           socket={socket}
           gameId={gameId}
           chatMessages={chatMessages}

@@ -145,6 +145,10 @@ export default {
           '0%': { transform: 'translateY(20px) scale(0.95)', opacity: '0' },
           '100%': { transform: 'translateY(0) scale(1)', opacity: '1' },
         },
+        'slide-in-right': {
+          '0%': { transform: 'translateX(100%)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
         'shimmer': {
           '0%': { backgroundPosition: '200% 0' },
           '100%': { backgroundPosition: '-200% 0' },
@@ -181,6 +185,103 @@ export default {
             transform: 'scale(1.02)'
           },
         },
+        // Sprint 1 Phase 1: Card hover effects
+        'card-glow-pulse': {
+          '0%, 100%': { boxShadow: '0 0 10px rgba(74, 222, 128, 0.4)' },
+          '50%': { boxShadow: '0 0 20px rgba(74, 222, 128, 0.7)' },
+        },
+        'card-preview-zoom': {
+          '0%': { transform: 'scale(0.8)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'selection-ring': {
+          '0%, 100%': { boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.5)' },
+          '50%': { boxShadow: '0 0 0 5px rgba(59, 130, 246, 0.8)' },
+        },
+        // Sprint 1 Phase 2: Play confirmation animations
+        'card-play-confirm': {
+          '0%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.15)', opacity: '0.9' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        'particle-burst': {
+          '0%': { transform: 'translate(0, 0) scale(1)', opacity: '1' },
+          '100%': { transform: 'var(--particle-x) var(--particle-y) scale(0)', opacity: '0' },
+        },
+        // Sprint 1 Phase 3: Trick winner celebrations
+        'confetti-fall': {
+          '0%': {
+            transform: 'translateY(-100vh) rotate(0deg)',
+            opacity: '1'
+          },
+          '100%': {
+            transform: 'translateY(100vh) rotate(720deg)',
+            opacity: '0.3'
+          }
+        },
+        'crown-bounce': {
+          '0%, 100%': { transform: 'translateY(0) scale(1)' },
+          '50%': { transform: 'translateY(-20px) scale(1.2)' }
+        },
+        'screen-flash': {
+          '0%, 100%': { opacity: '0' },
+          '50%': { opacity: '0.3' }
+        },
+        'trophy-rotate': {
+          '0%': { transform: 'rotateY(0deg) scale(1)' },
+          '50%': { transform: 'rotateY(180deg) scale(1.1)' },
+          '100%': { transform: 'rotateY(360deg) scale(1)' }
+        },
+        // Sprint 1 Phase 4: Score change animations
+        'score-flash-green': {
+          '0%, 100%': { backgroundColor: 'transparent' },
+          '50%': { backgroundColor: 'rgba(34, 197, 94, 0.3)' }
+        },
+        'score-flash-red': {
+          '0%, 100%': { backgroundColor: 'transparent' },
+          '50%': { backgroundColor: 'rgba(239, 68, 68, 0.3)' }
+        },
+        'plus-minus-float': {
+          '0%': { transform: 'translateY(0)', opacity: '0' },
+          '10%': { opacity: '1' },
+          '90%': { opacity: '1' },
+          '100%': { transform: 'translateY(-30px)', opacity: '0' }
+        },
+        // Sprint 1 Phase 5: Enhanced turn indicators
+        'turn-pulse': {
+          '0%, 100%': {
+            boxShadow: '0 0 0 0 rgba(59, 130, 246, 0.7)',
+            borderColor: 'rgba(59, 130, 246, 1)'
+          },
+          '50%': {
+            boxShadow: '0 0 0 8px rgba(59, 130, 246, 0)',
+            borderColor: 'rgba(59, 130, 246, 0.5)'
+          }
+        },
+        'spotlight': {
+          '0%, 100%': { opacity: '0.3' },
+          '50%': { opacity: '0.6' }
+        },
+        'arrow-bounce': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' }
+        },
+        // Sprint 3 Phase 3.5: Notification animations
+        'bounce-once': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '15%': { transform: 'translateY(-20px)' },
+          '30%': { transform: 'translateY(0)' },
+          '45%': { transform: 'translateY(-10px)' },
+          '60%': { transform: 'translateY(0)' },
+        },
+        'spin-slow': {
+          'from': { transform: 'rotate(0deg)' },
+          'to': { transform: 'rotate(360deg)' },
+        },
+        'progress-fill': {
+          '0%': { width: '100%' },
+          '100%': { width: '0%' },
+        },
       },
       animation: {
         'slide-from-bottom': 'slide-from-bottom 0.4s ease-out',
@@ -199,10 +300,35 @@ export default {
         'fadeInUp': 'fadeInUp 0.5s ease-out',
         'fadeInDown': 'fadeInDown 0.5s ease-out',
         'slide-in': 'slide-in 0.2s ease-out',
+        'slide-in-right': 'slide-in-right 0.3s ease-out',
         'card-play-arc': 'card-play-arc 0.6s ease-out forwards',
         'card-hover-lift': 'card-hover-lift 0.15s ease-out forwards',
         'ghost-fade': 'ghost-fade 0.4s ease-out forwards',
         'special-card-glow': 'special-card-glow 2s ease-in-out infinite',
+        // Sprint 1 Phase 1: Card hover effects
+        'card-glow-pulse': 'card-glow-pulse 1.5s ease-in-out infinite',
+        'card-preview-zoom': 'card-preview-zoom 0.2s ease-out',
+        'selection-ring': 'selection-ring 1s ease-in-out infinite',
+        // Sprint 1 Phase 2: Play confirmation animations
+        'card-play-confirm': 'card-play-confirm 0.3s ease-out',
+        'particle-burst': 'particle-burst 0.6s ease-out forwards',
+        // Sprint 1 Phase 3: Trick winner celebrations
+        'confetti-fall': 'confetti-fall 3s linear forwards',
+        'crown-bounce': 'crown-bounce 0.6s ease-in-out infinite',
+        'screen-flash': 'screen-flash 0.5s ease-out',
+        'trophy-rotate': 'trophy-rotate 1s ease-in-out',
+        // Sprint 1 Phase 4: Score change animations
+        'score-flash-green': 'score-flash-green 0.5s ease-out',
+        'score-flash-red': 'score-flash-red 0.5s ease-out',
+        'plus-minus-float': 'plus-minus-float 1.5s ease-out forwards',
+        // Sprint 1 Phase 5: Enhanced turn indicators
+        'turn-pulse': 'turn-pulse 2s ease-in-out infinite',
+        'spotlight': 'spotlight 2s ease-in-out infinite',
+        'arrow-bounce': 'arrow-bounce 1s ease-in-out infinite',
+        // Sprint 3 Phase 3.5: Notification animations
+        'bounce-once': 'bounce-once 0.5s ease-out',
+        'spin-slow': 'spin-slow 3s linear infinite',
+        'progress-fill': 'progress-fill 5s linear forwards',
       },
     },
   },

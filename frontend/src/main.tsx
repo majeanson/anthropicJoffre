@@ -6,6 +6,7 @@ import './index.css';
 import { SocketProvider } from './contexts/SocketContext';
 import { GameProvider } from './contexts/GameContext';
 import { SettingsProvider } from './contexts/SettingsContext';
+import { AuthProvider } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Initialize Sentry for error tracking
@@ -31,13 +32,15 @@ if (import.meta.env.VITE_SENTRY_DSN) {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <SocketProvider>
-        <GameProvider>
-          <SettingsProvider>
-            <App />
-          </SettingsProvider>
-        </GameProvider>
-      </SocketProvider>
+      <AuthProvider>
+        <SocketProvider>
+          <GameProvider>
+            <SettingsProvider>
+              <App />
+            </SettingsProvider>
+          </GameProvider>
+        </SocketProvider>
+      </AuthProvider>
     </ErrorBoundary>
   </React.StrictMode>,
 );

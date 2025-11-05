@@ -1,0 +1,265 @@
+/**
+ * Friends System Socket Handlers
+ * Sprint 2 Phase 2
+ */
+
+import { Server, Socket } from 'socket.io';
+import {
+  sendFriendRequest,
+  getPendingFriendRequests,
+  getSentFriendRequests,
+  acceptFriendRequest,
+  rejectFriendRequest,
+  removeFriendship,
+  getFriendsWithStatus,
+  areFriends
+} from '../db/friends';
+
+export function registerFriendHandlers(io: Server, socket: Socket) {
+  /**
+   * Send a friend request
+   */
+  socket.on('send_friend_request', async ({ toPlayer }: { toPlayer: string }) => {
+    try {
+      const fromPlayer = socket.data.playerName;
+
+      if (!fromPlayer) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      if (fromPlayer === toPlayer) {
+        socket.emit('error', { message: 'Cannot send friend request to yourself' });
+        return;
+      }
+
+      // Check if already friends
+      const alreadyFriends = await areFriends(fromPlayer, toPlayer);
+      if (alreadyFriends) {
+        socket.emit('error', { message: 'Already friends with this player' });
+        return;
+      }
+
+      const request = await sendFriendRequest(fromPlayer, toPlayer);
+
+      if (!request) {
+        socket.emit('error', { message: 'Failed to send friend request' });
+        return;
+      }
+
+      // Notify sender
+      socket.emit('friend_request_sent', { request });
+
+      // Notify recipient if they're online
+      const recipientSockets = await io.in(`player:${toPlayer}`).fetchSockets();
+      if (recipientSockets.length > 0) {
+        io.to(`player:${toPlayer}`).emit('friend_request_received', {
+          request_id: request.id,
+          from_player: fromPlayer,
+          created_at: request.created_at
+        });
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+      socket.emit('error', { message: 'Failed to send friend request' });
+    }
+  });
+
+  /**
+   * Get pending friend requests (received)
+   */
+  socket.on('get_friend_requests', async () => {
+    try {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      const requests = await getPendingFriendRequests(playerName);
+      socket.emit('friend_requests', { requests });
+    } catch (error) {
+      console.error('Error getting friend requests:', error);
+      socket.emit('error', { message: 'Failed to get friend requests' });
+    }
+  });
+
+  /**
+   * Get sent friend requests
+   */
+  socket.on('get_sent_friend_requests', async () => {
+    try {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      const requests = await getSentFriendRequests(playerName);
+      socket.emit('sent_friend_requests', { requests });
+    } catch (error) {
+      console.error('Error getting sent friend requests:', error);
+      socket.emit('error', { message: 'Failed to get sent friend requests' });
+    }
+  });
+
+  /**
+   * Accept a friend request
+   */
+  socket.on('accept_friend_request', async ({ requestId }: { requestId: number }) => {
+    try {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      const friendship = await acceptFriendRequest(requestId);
+
+      if (!friendship) {
+        socket.emit('error', { message: 'Failed to accept friend request' });
+        return;
+      }
+
+      // Notify both players
+      const player1 = friendship.player1_name;
+      const player2 = friendship.player2_name;
+
+      // Update friends list for both players
+      const player1Friends = await getFriendsWithStatus(player1);
+      const player2Friends = await getFriendsWithStatus(player2);
+
+      io.to(`player:${player1}`).emit('friends_list_updated', { friends: player1Friends });
+      io.to(`player:${player2}`).emit('friends_list_updated', { friends: player2Friends });
+
+      // Notify the sender that their request was accepted
+      const otherPlayer = player1 === playerName ? player2 : player1;
+      io.to(`player:${otherPlayer}`).emit('friend_request_accepted', {
+        playerName: playerName,
+        friendship
+      });
+
+      socket.emit('friend_request_accepted_confirm', { friendship });
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+      socket.emit('error', { message: 'Failed to accept friend request' });
+    }
+  });
+
+  /**
+   * Reject a friend request
+   */
+  socket.on('reject_friend_request', async ({ requestId }: { requestId: number }) => {
+    try {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      const success = await rejectFriendRequest(requestId);
+
+      if (!success) {
+        socket.emit('error', { message: 'Failed to reject friend request' });
+        return;
+      }
+
+      socket.emit('friend_request_rejected', { requestId });
+    } catch (error) {
+      console.error('Error rejecting friend request:', error);
+      socket.emit('error', { message: 'Failed to reject friend request' });
+    }
+  });
+
+  /**
+   * Remove a friend
+   */
+  socket.on('remove_friend', async ({ friendName }: { friendName: string }) => {
+    try {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      const success = await removeFriendship(playerName, friendName);
+
+      if (!success) {
+        socket.emit('error', { message: 'Failed to remove friend' });
+        return;
+      }
+
+      // Update friends list for both players
+      const player1Friends = await getFriendsWithStatus(playerName);
+      const player2Friends = await getFriendsWithStatus(friendName);
+
+      io.to(`player:${playerName}`).emit('friends_list_updated', { friends: player1Friends });
+      io.to(`player:${friendName}`).emit('friends_list_updated', { friends: player2Friends });
+
+      socket.emit('friend_removed', { friendName });
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      socket.emit('error', { message: 'Failed to remove friend' });
+    }
+  });
+
+  /**
+   * Get friends list with status
+   */
+  socket.on('get_friends_list', async () => {
+    try {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      const friends = await getFriendsWithStatus(playerName);
+      socket.emit('friends_list', { friends });
+    } catch (error) {
+      console.error('Error getting friends list:', error);
+      socket.emit('error', { message: 'Failed to get friends list' });
+    }
+  });
+
+  /**
+   * Search for players to add as friends
+   */
+  socket.on('search_players', async ({ searchQuery }: { searchQuery: string }) => {
+    try {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Not logged in' });
+        return;
+      }
+
+      if (!searchQuery || searchQuery.trim().length < 2) {
+        socket.emit('player_search_results', { players: [] });
+        return;
+      }
+
+      // Search in player_stats for matching names
+      const { query } = await import('../db/index');
+      const result = await query(
+        `SELECT player_name, games_played, games_won
+         FROM player_stats
+         WHERE player_name ILIKE $1 AND player_name != $2
+         ORDER BY games_played DESC
+         LIMIT 20`,
+        [`%${searchQuery}%`, playerName]
+      );
+
+      socket.emit('player_search_results', { players: result.rows });
+    } catch (error) {
+      console.error('Error searching players:', error);
+      socket.emit('error', { message: 'Failed to search players' });
+    }
+  });
+}

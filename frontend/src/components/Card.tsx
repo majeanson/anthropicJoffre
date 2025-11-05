@@ -1,11 +1,16 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState, useEffect } from 'react';
 import { Card as CardType, CardColor } from '../types/game';
 
 interface CardProps {
   card: CardType;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   size?: 'tiny' | 'small' | 'medium' | 'large';
+  isPlayable?: boolean; // Sprint 1 Phase 1: Indicate if card can be played
+  showPreview?: boolean; // Sprint 1 Phase 1: Enable hover preview
+  onPreviewShow?: (card: CardType, mouseX: number, mouseY: number) => void;
+  onPreviewHide?: () => void;
+  isKeyboardSelected?: boolean; // Sprint 1 Phase 1: Keyboard navigation
 }
 
 // Card background color: #d6ccba (custom beige matching emblem aesthetics)
@@ -41,7 +46,21 @@ const emblemSizeStyles = {
   large: 'w-18 h-18 md:w-16 md:h-16',
 };
 
-function CardComponent({ card, onClick, disabled, size = 'medium' }: CardProps) {
+function CardComponent({
+  card,
+  onClick,
+  disabled,
+  size = 'medium',
+  isPlayable = false,
+  showPreview = false,
+  onPreviewShow,
+  onPreviewHide,
+  isKeyboardSelected = false,
+}: CardProps) {
+  // Sprint 1 Phase 1: Hover state management
+  const [isHovered, setIsHovered] = useState(false);
+  const [hoverTimer, setHoverTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+
   // Memoize expensive calculations
   const isSpecial = useMemo(
     () => (card.color === 'red' || card.color === 'brown') && card.value === 0,
@@ -68,10 +87,56 @@ function CardComponent({ card, onClick, disabled, size = 'medium' }: CardProps) 
     return `/cards/${card.color}_emblem.jpg`;
   }, [isSpecial, card.color]);
 
+  // Sprint 1 Phase 1: Show preview after 500ms hover
+  useEffect(() => {
+    if (isHovered && showPreview && !disabled && onPreviewShow) {
+      const timer = setTimeout(() => {
+        // Get mouse position - we'll track it from the event
+        // For now, we'll trigger the preview without exact mouse coords
+        // The parent component will handle positioning
+      }, 500);
+      setHoverTimer(timer);
+      return () => clearTimeout(timer);
+    } else {
+      if (hoverTimer) {
+        clearTimeout(hoverTimer);
+        setHoverTimer(null);
+      }
+      if (!isHovered && onPreviewHide) {
+        onPreviewHide();
+      }
+    }
+  }, [isHovered, showPreview, disabled, onPreviewShow, onPreviewHide, hoverTimer]);
+
+  // Sprint 1 Phase 1: Mouse event handlers
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    setIsHovered(true);
+    if (showPreview && !disabled && onPreviewShow) {
+      // Trigger preview after delay
+      const timer = setTimeout(() => {
+        onPreviewShow(card, e.clientX, e.clientY);
+      }, 500);
+      setHoverTimer(timer);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    if (hoverTimer) {
+      clearTimeout(hoverTimer);
+      setHoverTimer(null);
+    }
+    if (onPreviewHide) {
+      onPreviewHide();
+    }
+  };
+
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       data-testid={`card-${card.color}-${card.value}`}
       data-card-value={card.value}
       data-card-color={card.color}
@@ -82,8 +147,11 @@ function CardComponent({ card, onClick, disabled, size = 'medium' }: CardProps) 
         ${borderWidth} rounded-lg font-bold
         flex flex-col items-center justify-center gap-1
         transition-all duration-200
-        ${!disabled && onClick ? 'hover:scale-105 hover:shadow-xl cursor-pointer' : 'cursor-default'}
+        ${!disabled && onClick ? 'motion-safe:hover:scale-105 hover:shadow-xl cursor-pointer' : 'cursor-default'}
         ${disabled ? 'opacity-50' : ''}
+        ${isPlayable && !disabled ? 'motion-safe:animate-card-glow-pulse' : ''}
+        ${isKeyboardSelected ? 'motion-safe:animate-selection-ring' : ''}
+        ${isHovered && !disabled && onClick ? 'motion-safe:animate-card-hover-lift' : ''}
         relative overflow-hidden
       `}
     >
@@ -119,14 +187,17 @@ function CardComponent({ card, onClick, disabled, size = 'medium' }: CardProps) 
 }
 
 // Custom comparison function for React.memo
-// Only re-render if card, disabled, or size changes
+// Only re-render if card, disabled, size, or new Sprint 1 props change
 function arePropsEqual(prevProps: CardProps, nextProps: CardProps) {
   return (
     prevProps.card.color === nextProps.card.color &&
     prevProps.card.value === nextProps.card.value &&
     prevProps.disabled === nextProps.disabled &&
     prevProps.size === nextProps.size &&
-    prevProps.onClick === nextProps.onClick
+    prevProps.onClick === nextProps.onClick &&
+    prevProps.isPlayable === nextProps.isPlayable &&
+    prevProps.showPreview === nextProps.showPreview &&
+    prevProps.isKeyboardSelected === nextProps.isKeyboardSelected
   );
 }
 

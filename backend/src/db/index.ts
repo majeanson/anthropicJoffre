@@ -18,7 +18,7 @@ if (existsSync(localEnvPath)) {
 
 let pool: Pool | null = null;
 
-const getPool = () => {
+export const getPool = () => {
   if (!pool && process.env.DATABASE_URL) {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,

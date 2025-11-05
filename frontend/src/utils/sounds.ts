@@ -89,6 +89,37 @@ class SoundManager {
     osc.stop(now + 0.05);
   }
 
+  // Sprint 1 Phase 2: Card play confirmation - pitch varies by card value
+  playCardConfirm(cardValue: number = 5) {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Base frequency varies by card value (0-7)
+    // Higher cards = higher pitch
+    const basePitch = 400 + (cardValue * 80); // 400-960 Hz range
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.frequency.setValueAtTime(basePitch, now);
+    osc.frequency.exponentialRampToValueAtTime(basePitch * 1.2, now + 0.05);
+
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(this.masterVolume * 0.25, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+
   // Trick won sound - triumphant chime
   playTrickWon() {
     if (!this.enabled) return;
@@ -210,7 +241,7 @@ class SoundManager {
     osc.stop(now + 0.03);
   }
 
-  // Your turn notification - attention-grabbing beep
+  // Your turn notification - attention-grabbing beep (Sprint 1 Phase 5: Enhanced)
   playYourTurn() {
     if (!this.enabled) return;
     this.ensureContext();
@@ -219,23 +250,25 @@ class SoundManager {
     const ctx = this.audioContext;
     const now = ctx.currentTime;
 
-    // Two quick beeps
-    [0, 0.15].forEach((delay) => {
+    // Three ascending beeps for better attention-grabbing effect
+    [0, 0.12, 0.24].forEach((delay, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
 
-      osc.frequency.setValueAtTime(880, now + delay); // A5 note
+      // Ascending pitch pattern (A5, C6, E6) - musical chord
+      const frequencies = [880, 1046, 1318];
+      osc.frequency.setValueAtTime(frequencies[index], now + delay);
 
       gain.gain.setValueAtTime(0, now + delay);
-      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.2, now + delay + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.08);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.25, now + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.1);
 
       osc.type = 'sine';
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(now + delay);
-      osc.stop(now + delay + 0.08);
+      osc.stop(now + delay + 0.1);
     });
   }
 
@@ -266,6 +299,182 @@ class SoundManager {
     osc.start(now);
     osc.stop(now + 0.15);
   }
+
+  // Sprint 1 Phase 6: Additional sound effects
+
+  // Bet placed - coin clink sound
+  playBetPlaced() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Metallic clink with overtones
+    [1, 1.5, 2, 2.5].forEach((multiplier, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.frequency.setValueAtTime(400 * multiplier, now);
+      osc.frequency.exponentialRampToValueAtTime(350 * multiplier, now + 0.1);
+
+      const volume = this.masterVolume * 0.15 * (1 / (index + 1));
+      gain.gain.setValueAtTime(volume, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.15);
+    });
+  }
+
+  // Bet skipped - whoosh sound
+  playBetSkipped() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // Descending whoosh
+    osc.frequency.setValueAtTime(800, now);
+    osc.frequency.exponentialRampToValueAtTime(200, now + 0.2);
+
+    gain.gain.setValueAtTime(this.masterVolume * 0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+
+    osc.type = 'sawtooth';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.2);
+  }
+
+  // Team switch - quick boop
+  playTeamSwitch() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.linearRampToValueAtTime(700, now + 0.05);
+
+    gain.gain.setValueAtTime(this.masterVolume * 0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.08);
+  }
+
+  // Game start - fanfare
+  playGameStart() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Ascending fanfare: C4, E4, G4, C5
+    const notes = [261.63, 329.63, 392.00, 523.25];
+    notes.forEach((freq, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const delay = index * 0.1;
+
+      osc.frequency.setValueAtTime(freq, now + delay);
+
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.25, now + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.15);
+
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.15);
+    });
+  }
+
+  // Game over - celebratory chord
+  playGameOver() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Major chord: C4, E4, G4
+    const chord = [261.63, 329.63, 392.00];
+    chord.forEach((freq) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.2, now + 0.05);
+      gain.gain.setValueAtTime(this.masterVolume * 0.2, now + 0.3);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+      osc.type = 'sine';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now);
+      osc.stop(now + 0.8);
+    });
+  }
+
+  // Error - descending error tone
+  playError() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Two descending beeps
+    [0, 0.15].forEach((delay) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.frequency.setValueAtTime(400, now + delay);
+      osc.frequency.exponentialRampToValueAtTime(200, now + delay + 0.1);
+
+      gain.gain.setValueAtTime(this.masterVolume * 0.25, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.1);
+
+      osc.type = 'square';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.1);
+    });
+  }
 }
 
 // Create singleton instance
@@ -275,12 +484,20 @@ export const soundManager = new SoundManager();
 export const sounds = {
   cardDeal: (index?: number) => soundManager.playCardDeal(index),
   cardPlay: () => soundManager.playCardPlay(),
+  cardConfirm: (cardValue?: number) => soundManager.playCardConfirm(cardValue), // Sprint 1 Phase 2
   trickWon: () => soundManager.playTrickWon(),
   trickCollect: () => soundManager.playTrickCollect(),
   roundStart: () => soundManager.playRoundStart(),
   buttonClick: () => soundManager.playButtonClick(),
   yourTurn: () => soundManager.playYourTurn(),
   chatNotification: () => soundManager.playChatNotification(),
+  // Sprint 1 Phase 6: Additional sounds
+  betPlaced: () => soundManager.playBetPlaced(),
+  betSkipped: () => soundManager.playBetSkipped(),
+  teamSwitch: () => soundManager.playTeamSwitch(),
+  gameStart: () => soundManager.playGameStart(),
+  gameOver: () => soundManager.playGameOver(),
+  error: () => soundManager.playError(),
   setEnabled: (enabled: boolean) => soundManager.setEnabled(enabled),
   setVolume: (volume: number) => soundManager.setVolume(volume),
   isEnabled: () => soundManager['enabled'],

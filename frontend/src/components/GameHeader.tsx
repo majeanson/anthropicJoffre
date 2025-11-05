@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { SettingsPanel } from './SettingsPanel';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { CardColor } from '../types/game';
+import { useCountUp } from '../hooks/useCountUp';
 
 interface GameHeaderProps {
   gameId: string;
@@ -13,6 +14,10 @@ interface GameHeaderProps {
   onOpenChat?: () => void;
   onOpenBotManagement?: () => void;
   onOpenRules?: () => void;
+  onOpenAchievements?: () => void; // Sprint 2 Phase 1
+  onOpenFriends?: () => void; // Sprint 2 Phase 2
+  onOpenNotifications?: () => void; // Sprint 3 Phase 5
+  unreadNotificationsCount?: number; // Sprint 3 Phase 5
   botCount?: number;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
@@ -36,6 +41,10 @@ export function GameHeader({
   onOpenChat,
   onOpenBotManagement,
   onOpenRules,
+  onOpenAchievements,
+  onOpenFriends,
+  onOpenNotifications,
+  unreadNotificationsCount = 0,
   botCount = 0,
   autoplayEnabled = false,
   onAutoplayToggle,
@@ -50,6 +59,46 @@ export function GameHeader({
 }: GameHeaderProps) {
   const [linkCopied, setLinkCopied] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Score change animation state
+  const prevTeam1ScoreRef = useRef(team1Score);
+  const prevTeam2ScoreRef = useRef(team2Score);
+  const [team1ScoreChange, setTeam1ScoreChange] = useState<number | null>(null);
+  const [team2ScoreChange, setTeam2ScoreChange] = useState<number | null>(null);
+  const [team1Flash, setTeam1Flash] = useState<'green' | 'red' | null>(null);
+  const [team2Flash, setTeam2Flash] = useState<'green' | 'red' | null>(null);
+
+  // Animated score values
+  const animatedTeam1Score = useCountUp(team1Score, 500);
+  const animatedTeam2Score = useCountUp(team2Score, 500);
+
+  // Detect score changes and trigger animations
+  useEffect(() => {
+    const team1Change = team1Score - prevTeam1ScoreRef.current;
+    const team2Change = team2Score - prevTeam2ScoreRef.current;
+
+    if (team1Change !== 0) {
+      setTeam1ScoreChange(team1Change);
+      setTeam1Flash(team1Change > 0 ? 'green' : 'red');
+
+      // Clear flash after 500ms
+      setTimeout(() => setTeam1Flash(null), 500);
+
+      // Clear floating indicator after 1500ms
+      setTimeout(() => setTeam1ScoreChange(null), 1500);
+    }
+
+    if (team2Change !== 0) {
+      setTeam2ScoreChange(team2Change);
+      setTeam2Flash(team2Change > 0 ? 'green' : 'red');
+
+      setTimeout(() => setTeam2Flash(null), 500);
+      setTimeout(() => setTeam2ScoreChange(null), 1500);
+    }
+
+    prevTeam1ScoreRef.current = team1Score;
+    prevTeam2ScoreRef.current = team2Score;
+  }, [team1Score, team2Score]);
 
   // Helper to get trump color display
   const getTrumpColorClass = (color: CardColor | null | undefined): string => {
@@ -121,14 +170,28 @@ export function GameHeader({
           {/* Team Scores */}
           <div className="flex items-center gap-1" data-testid="team-scores">
             <span className="sr-only">Team 1: {team1Score} Team 2: {team2Score}</span>
-            <div className={`bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''}`}>
+            <div className={`relative bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''} ${team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
               <p className="text-xs text-white/90 font-semibold">T1</p>
-              <p className="text-base text-white font-black">{team1Score}</p>
+              <p className="text-base text-white font-black">{animatedTeam1Score}</p>
+              {team1ScoreChange !== null && (
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                  <span className={team1ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                    {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
+                  </span>
+                </div>
+              )}
             </div>
             <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-            <div className={`bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''}`}>
+            <div className={`relative bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''} ${team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
               <p className="text-xs text-white/90 font-semibold">T2</p>
-              <p className="text-base text-white font-black">{team2Score}</p>
+              <p className="text-base text-white font-black">{animatedTeam2Score}</p>
+              {team2ScoreChange !== null && (
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                  <span className={team2ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                    {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -165,6 +228,50 @@ export function GameHeader({
               >
                 <span className="text-base md:text-lg">🏆</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Stats</span>
+              </button>
+            )}
+
+            {/* Achievements Button - Sprint 2 Phase 1 */}
+            {onOpenAchievements && (
+              <button
+                onClick={onOpenAchievements}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title="Achievements"
+                data-testid="header-achievements-button"
+              >
+                <span className="text-base md:text-lg">🏅</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Achievements</span>
+              </button>
+            )}
+
+            {/* Friends Button - Sprint 2 Phase 2 */}
+            {onOpenFriends && (
+              <button
+                onClick={onOpenFriends}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title="Friends"
+                data-testid="header-friends-button"
+              >
+                <span className="text-base md:text-lg">👥</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Friends</span>
+              </button>
+            )}
+
+            {/* Notifications Button - Sprint 3 Phase 5 */}
+            {onOpenNotifications && (
+              <button
+                onClick={onOpenNotifications}
+                className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title="Notifications"
+                data-testid="header-notifications-button"
+              >
+                <span className="text-base md:text-lg">🔔</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Notifications</span>
+                {unreadNotificationsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse">
+                    {unreadNotificationsCount}
+                  </span>
+                )}
               </button>
             )}
 
@@ -213,14 +320,28 @@ export function GameHeader({
             <div className="flex-1"></div>
 
             <div className="flex items-center gap-1">
-              <div className={`bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300' : ''}`}>
+              <div className={`relative bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300' : ''} ${team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
                 <p className="text-xs text-white/90 font-semibold">T1</p>
-                <p className="text-base text-white font-black">{team1Score}</p>
+                <p className="text-base text-white font-black">{animatedTeam1Score}</p>
+                {team1ScoreChange !== null && (
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                    <span className={team1ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                      {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-              <div className={`bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300' : ''}`}>
+              <div className={`relative bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300' : ''} ${team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
                 <p className="text-xs text-white/90 font-semibold">T2</p>
-                <p className="text-base text-white font-black">{team2Score}</p>
+                <p className="text-base text-white font-black">{animatedTeam2Score}</p>
+                {team2ScoreChange !== null && (
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                    <span className={team2ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                      {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
+                    </span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -251,6 +372,28 @@ export function GameHeader({
                 title="Leaderboard"
               >
                 <span className="text-base">🏆</span>
+              </button>
+            )}
+
+            {/* Achievements Button - Sprint 2 Phase 1 */}
+            {onOpenAchievements && (
+              <button
+                onClick={onOpenAchievements}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                title="Achievements"
+              >
+                <span className="text-base">🏅</span>
+              </button>
+            )}
+
+            {/* Friends Button - Sprint 2 Phase 2 */}
+            {onOpenFriends && (
+              <button
+                onClick={onOpenFriends}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                title="Friends"
+              >
+                <span className="text-base">👥</span>
               </button>
             )}
 

@@ -12,6 +12,7 @@ import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { OnlinePlayer } from '../types/game';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LobbyProps {
   onCreateGame: (playerName: string, persistenceMode?: 'elo' | 'casual') => void;
@@ -25,10 +26,13 @@ interface LobbyProps {
   socket: Socket | null;
   botDifficulty?: BotDifficulty;
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
+  onShowLogin?: () => void;
+  onShowRegister?: () => void;
 }
 
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister }: LobbyProps) {
+  const { user, logout } = useAuth();
   const [playerName, setPlayerName] = useState(() => localStorage.getItem('playerName') || '');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
@@ -154,6 +158,44 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   Joined as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
                 </p>
               )}
+
+              {/* Authentication Section */}
+              <div className="mt-4">
+                {user ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center gap-2 bg-parchment-200 dark:bg-gray-700 px-4 py-2 rounded-lg">
+                      {user.avatar_url && (
+                        <img src={user.avatar_url} alt={user.username} className="w-6 h-6 rounded-full" />
+                      )}
+                      <span className="text-sm font-semibold text-umber-800 dark:text-gray-200">
+                        {user.display_name || user.username}
+                      </span>
+                      {user.is_verified && <span className="text-blue-500" title="Verified">✓</span>}
+                    </div>
+                    <button
+                      onClick={() => logout()}
+                      className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={onShowLogin}
+                      className="text-sm px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
+                    >
+                      Login
+                    </button>
+                    <button
+                      onClick={onShowRegister}
+                      className="text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
+                    >
+                      Register
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Horizontal Tab Navigation */}

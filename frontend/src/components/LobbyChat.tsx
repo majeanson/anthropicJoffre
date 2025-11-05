@@ -3,10 +3,16 @@
  *
  * Global chat for all players in the lobby (social section)
  * Allows players to communicate before joining games
+ *
+ * Sprint 3 Phase 3.4 Enhancements:
+ * - @mention support with highlighting
+ * - Clickable URLs
+ * - Visual feedback for mentions of current player
  */
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
+import { parseMessage, renderParsedMessage, messageHasMention } from '../utils/chatParser';
 
 interface LobbyChatMessage {
   playerName: string;
@@ -133,7 +139,9 @@ export function LobbyChat({ socket, playerName, onSetPlayerName }: LobbyChatProp
       {/* Header */}
       <div className="px-4 py-3 bg-parchment-100 dark:bg-gray-700 border-b-2 border-parchment-400 dark:border-gray-600 rounded-t-lg">
         <h3 className="font-bold text-umber-900 dark:text-gray-100 text-lg">💬 Lobby Chat</h3>
-        <p className="text-xs text-umber-600 dark:text-gray-400">Chat with other players in the lobby</p>
+        <p className="text-xs text-umber-600 dark:text-gray-400">
+          Chat with other players • Use @username to mention someone
+        </p>
       </div>
 
       {/* Messages */}
@@ -147,6 +155,9 @@ export function LobbyChat({ socket, playerName, onSetPlayerName }: LobbyChatProp
         ) : (
           messages.map((msg, index) => {
             const isOwnMessage = msg.playerName === playerName;
+            const mentionsMe = messageHasMention(msg.message, playerName);
+            const parsedSegments = parseMessage(msg.message);
+
             return (
               <div
                 key={index}
@@ -156,6 +167,8 @@ export function LobbyChat({ socket, playerName, onSetPlayerName }: LobbyChatProp
                   className={`max-w-[80%] rounded-lg px-3 py-2 ${
                     isOwnMessage
                       ? 'bg-blue-500 text-white'
+                      : mentionsMe
+                      ? 'bg-yellow-100 dark:bg-yellow-900/40 text-umber-900 dark:text-gray-100 border-2 border-yellow-400 dark:border-yellow-600'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-900 dark:text-gray-100'
                   }`}
                 >
@@ -165,7 +178,9 @@ export function LobbyChat({ socket, playerName, onSetPlayerName }: LobbyChatProp
                       {formatTime(msg.timestamp)}
                     </span>
                   </div>
-                  <p className="text-sm break-words">{msg.message}</p>
+                  <p className="text-sm break-words">
+                    {renderParsedMessage(parsedSegments, playerName, isOwnMessage)}
+                  </p>
                 </div>
               </div>
             );

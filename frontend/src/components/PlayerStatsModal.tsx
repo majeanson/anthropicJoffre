@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
 import { GameHistoryEntry } from '../types/game';
+import Avatar from './Avatar'; // Sprint 3 Phase 2
+import { useAuth } from '../contexts/AuthContext'; // Sprint 3 Phase 2
+import { ProfileEditor, ProfileData } from './ProfileEditor'; // Sprint 3 Phase 3.2
+import { UserProfile } from '../types/auth'; // Sprint 3 Phase 3.2
+import { MatchCard } from './MatchCard'; // Sprint 3 Phase 3.3
+import { MatchStatsModal } from './MatchStatsModal'; // Sprint 3 Phase 3.3
 
 interface PlayerStats {
   player_name: string;
@@ -70,10 +76,28 @@ interface PlayerStatsModalProps {
 export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewReplay }: PlayerStatsModalProps) {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'round' | 'game' | 'history'>('round');
+  const [activeTab, setActiveTab] = useState<'round' | 'game' | 'history' | 'profile'>('round');
   const [historyTab, setHistoryTab] = useState<'finished' | 'unfinished'>('finished');
   const [gameHistory, setGameHistory] = useState<GameHistoryEntry[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+
+  // Sprint 3 Phase 3: History filtering and sorting
+  const [resultFilter, setResultFilter] = useState<'all' | 'won' | 'lost'>('all');
+  const [sortBy, setSortBy] = useState<'date' | 'score' | 'rounds'>('date');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+
+  // Sprint 3 Phase 2: Authentication integration
+  const { user, isAuthenticated, updateProfile, getUserProfile } = useAuth();
+  const isOwnProfile = isAuthenticated && user?.username === playerName;
+
+  // Sprint 3 Phase 3.2: Profile data
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  // const [preferences, setPreferences] = useState<UserPreferences | null>(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  // Sprint 3 Phase 3.3: Match details modal
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [showMatchStatsModal, setShowMatchStatsModal] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !playerName) return;
@@ -134,18 +158,51 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     };
   }, [isOpen, activeTab, playerName, socket, historyLoading]);
 
+  // Fetch profile data when profile tab is active and it's the user's own profile
+  useEffect(() => {
+    if (!isOpen || activeTab !== 'profile' || !isOwnProfile || profileLoading) return;
+
+    const loadProfile = async () => {
+      setProfileLoading(true);
+      try {
+        console.log('[PlayerStatsModal] Loading profile data');
+        const data = await getUserProfile();
+        if (data) {
+          setProfile(data.profile);
+          // setPreferences(data.preferences);
+          console.log('[PlayerStatsModal] Profile loaded:', data);
+        }
+      } catch (error) {
+        console.error('[PlayerStatsModal] Error loading profile:', error);
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [isOpen, activeTab, isOwnProfile, getUserProfile, profileLoading]);
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
       <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600">
-        {/* Header */}
+        {/* Header - Sprint 3 Phase 2: Enhanced with avatar */}
         <div className="sticky top-0 bg-gradient-to-r from-amber-700 to-amber-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-amber-950 dark:border-gray-900 z-10">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl">📊</span>
+          <div className="flex items-center gap-4">
+            <Avatar username={playerName} avatarUrl={user?.avatar_url} size="xl" />
             <div>
-              <h2 className="text-2xl font-bold text-parchment-50">Player Statistics</h2>
-              <p className="text-amber-200 dark:text-gray-300 font-semibold">{playerName}</p>
+              <h2 className="text-2xl font-bold text-parchment-50">{playerName}</h2>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-amber-200 dark:text-gray-300 text-sm">
+                  {stats ? `Joined ${new Date(stats.created_at).toLocaleDateString()}` : 'Loading...'}
+                </span>
+                {isOwnProfile && (
+                  <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                    You
+                  </span>
+                )}
+              </div>
             </div>
           </div>
           <button
@@ -230,6 +287,18 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                 >
                   📜 Game History
                 </button>
+                {isOwnProfile && (
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    className={`flex-1 py-3 px-4 font-bold transition-all duration-200 ${
+                      activeTab === 'profile'
+                        ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-t-lg'
+                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                  >
+                    👤 Profile
+                  </button>
+                )}
               </div>
 
               {/* Round Stats Tab */}
@@ -456,6 +525,83 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                     </button>
                   </div>
 
+                  {/* Result Filter - Only show for finished games */}
+                  {historyTab === 'finished' && (
+                    <div className="flex gap-2 items-center flex-wrap">
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Filter:</span>
+                      <button
+                        onClick={() => setResultFilter('all')}
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                          resultFilter === 'all'
+                            ? 'bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900'
+                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                        }`}
+                      >
+                        All Games
+                      </button>
+                      <button
+                        onClick={() => setResultFilter('won')}
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                          resultFilter === 'won'
+                            ? 'bg-green-600 text-white dark:bg-green-500'
+                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900'
+                        }`}
+                      >
+                        🏆 Wins
+                      </button>
+                      <button
+                        onClick={() => setResultFilter('lost')}
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                          resultFilter === 'lost'
+                            ? 'bg-red-600 text-white dark:bg-red-500'
+                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900'
+                        }`}
+                      >
+                        ❌ Losses
+                      </button>
+
+                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-4">Sort by:</span>
+                      <button
+                        onClick={() => setSortBy('date')}
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                          sortBy === 'date'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
+                        }`}
+                      >
+                        📅 Date
+                      </button>
+                      <button
+                        onClick={() => setSortBy('score')}
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                          sortBy === 'score'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
+                        }`}
+                      >
+                        ⚡ Score
+                      </button>
+                      <button
+                        onClick={() => setSortBy('rounds')}
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                          sortBy === 'rounds'
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
+                        }`}
+                      >
+                        🔄 Rounds
+                      </button>
+
+                      <button
+                        onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+                        className="px-3 py-1 rounded-lg text-sm font-bold transition-all bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                        title={sortOrder === 'desc' ? 'Sort descending' : 'Sort ascending'}
+                      >
+                        {sortOrder === 'desc' ? '↓' : '↑'}
+                      </button>
+                    </div>
+                  )}
+
                   {historyLoading && (
                     <div className="text-center py-12">
                       <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-green-700"></div>
@@ -476,16 +622,49 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   )}
 
                   {!historyLoading && gameHistory.length > 0 && (() => {
-                    const filteredGames = gameHistory.filter(game =>
+                    let filteredGames = gameHistory.filter(game =>
                       historyTab === 'finished' ? game.is_finished : !game.is_finished
                     );
 
+                    // Apply result filter for finished games
+                    if (historyTab === 'finished' && resultFilter !== 'all') {
+                      filteredGames = filteredGames.filter(game => {
+                        const playerTeamId = game.team_id;
+                        const didWin = game.winning_team === playerTeamId;
+                        return resultFilter === 'won' ? didWin : !didWin;
+                      });
+                    }
+
+                    // Apply sorting
+                    filteredGames = [...filteredGames].sort((a, b) => {
+                      let comparison = 0;
+
+                      switch (sortBy) {
+                        case 'date':
+                          const dateA = new Date(a.finished_at || a.created_at).getTime();
+                          const dateB = new Date(b.finished_at || b.created_at).getTime();
+                          comparison = dateB - dateA; // Newest first by default
+                          break;
+                        case 'score':
+                          const scoreA = Math.abs(a.team1_score - a.team2_score);
+                          const scoreB = Math.abs(b.team1_score - b.team2_score);
+                          comparison = scoreB - scoreA; // Bigger score difference first
+                          break;
+                        case 'rounds':
+                          comparison = b.rounds - a.rounds; // More rounds first
+                          break;
+                      }
+
+                      return sortOrder === 'desc' ? comparison : -comparison;
+                    });
+
                     if (filteredGames.length === 0) {
+                      const filterText = resultFilter === 'won' ? 'wins' : resultFilter === 'lost' ? 'losses' : historyTab + ' games';
                       return (
                         <div className="text-center py-12">
                           <span className="text-4xl">🔍</span>
                           <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold">
-                            No {historyTab} games found
+                            No {filterText} found
                           </p>
                         </div>
                       );
@@ -495,92 +674,70 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                       <>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           Showing {filteredGames.length} {historyTab} game{filteredGames.length !== 1 ? 's' : ''}
+                          {historyTab === 'finished' && resultFilter !== 'all' && (
+                            <span className="font-semibold"> ({resultFilter === 'won' ? 'wins only' : 'losses only'})</span>
+                          )}
                         </p>
                         <div className="space-y-3">
                           {filteredGames.map((game) => (
-                          <div
-                            key={game.game_id}
-                            className={`rounded-lg p-4 border-2 ${
-                              game.won_game
-                                ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-600'
-                                : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-600'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-4 mb-3">
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <span className={`text-lg font-bold ${
-                                    game.won_game
-                                      ? 'text-green-700 dark:text-green-300'
-                                      : 'text-red-700 dark:text-red-300'
-                                  }`}>
-                                    {game.won_game ? '✓ Victory' : '✗ Defeat'}
-                                  </span>
-                                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                                    game.team_id === 1
-                                      ? 'bg-orange-500 text-white'
-                                      : 'bg-purple-500 text-white'
-                                  }`}>
-                                    Team {game.team_id}
-                                  </span>
-                                </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
-                                  {game.finished_at ? new Date(game.finished_at).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'short',
-                                    day: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                  }) : 'In Progress'}
-                                </div>
-                              </div>
-
-                              <div className="text-right">
-                                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                  {game.team1_score} - {game.team2_score}
-                                </div>
-                                <div className="text-xs text-gray-600 dark:text-gray-400">
-                                  {game.rounds} rounds
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-3 text-sm mb-3 pt-3 border-t border-gray-300 dark:border-gray-600">
-                              <div>
-                                <p className="text-gray-600 dark:text-gray-400">Tricks Won</p>
-                                <p className="font-bold text-gray-900 dark:text-gray-100">{game.tricks_won}</p>
-                              </div>
-                              <div>
-                                <p className="text-gray-600 dark:text-gray-400">Points Earned</p>
-                                <p className="font-bold text-gray-900 dark:text-gray-100">{game.points_earned}</p>
-                              </div>
-                              {game.bet_amount !== null && (
-                                <div>
-                                  <p className="text-gray-600 dark:text-gray-400">Bet</p>
-                                  <p className="font-bold text-gray-900 dark:text-gray-100">
-                                    {game.bet_amount} {game.bet_won === true ? '✓' : game.bet_won === false ? '✗' : ''}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-
-                            {onViewReplay && game.is_finished && (
-                              <button
-                                onClick={() => {
-                                  onViewReplay(game.game_id);
-                                  onClose();
-                                }}
-                                className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-2 px-4 rounded-lg font-bold transition-all"
-                              >
-                                📺 View Replay
-                              </button>
-                            )}
-                          </div>
+                            <MatchCard
+                              key={game.game_id}
+                              game={game}
+                              onViewReplay={onViewReplay ? (gameId) => {
+                                onViewReplay(gameId);
+                                onClose();
+                              } : undefined}
+                              onViewDetails={(gameId) => {
+                                setSelectedMatchId(gameId);
+                                setShowMatchStatsModal(true);
+                              }}
+                            />
                           ))}
                         </div>
                       </>
                     );
                   })()}
+                </div>
+              )}
+
+              {/* Profile Tab - Sprint 3 Phase 3.2 */}
+              {activeTab === 'profile' && isOwnProfile && (
+                <div className="space-y-4 animate-fadeIn">
+                  {profileLoading && (
+                    <div className="text-center py-12">
+                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-amber-700"></div>
+                      <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading profile...</p>
+                    </div>
+                  )}
+
+                  {!profileLoading && (
+                    <ProfileEditor
+                      initialData={{
+                        avatar_id: user?.avatar_url || 'dog',
+                        bio: profile?.bio || undefined,
+                        country: profile?.country || undefined,
+                        favorite_team: profile?.favorite_team || null,
+                        visibility: profile?.visibility || 'public',
+                        show_online_status: profile?.show_online_status !== undefined ? profile.show_online_status : true,
+                        allow_friend_requests: profile?.allow_friend_requests !== undefined ? profile.allow_friend_requests : true,
+                      }}
+                      onSave={async (data: ProfileData) => {
+                        try {
+                          await updateProfile(data);
+                          console.log('[PlayerStatsModal] Profile saved successfully');
+                          // Optionally show success message
+                          // Could close modal or switch to another tab
+                        } catch (error) {
+                          console.error('[PlayerStatsModal] Error saving profile:', error);
+                          // Optionally show error message to user
+                        }
+                      }}
+                      onCancel={() => {
+                        // Switch back to round stats tab
+                        setActiveTab('round');
+                      }}
+                    />
+                  )}
                 </div>
               )}
 
@@ -593,6 +750,20 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
           )}
         </div>
       </div>
+
+      {/* Match Stats Modal - Sprint 3 Phase 3.3 */}
+      {selectedMatchId && (
+        <MatchStatsModal
+          gameId={selectedMatchId}
+          socket={socket}
+          isOpen={showMatchStatsModal}
+          onClose={() => {
+            setShowMatchStatsModal(false);
+            setSelectedMatchId(null);
+          }}
+          onViewReplay={onViewReplay}
+        />
+      )}
     </div>
   );
 }

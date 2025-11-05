@@ -22,13 +22,15 @@ interface BettingPhaseProps {
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
   onOpenBotManagement?: () => void;
+  onOpenAchievements?: () => void; // Sprint 2 Phase 1
+  onOpenFriends?: () => void; // Sprint 2 Phase 2
   socket?: Socket | null;
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
   // Memoize expensive computations
   const hasPlacedBet = useMemo(
     () => currentBets.some(b => b.playerId === currentPlayerId),
@@ -112,10 +114,12 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   };
 
   const handlePlaceBet = () => {
+    sounds.betPlaced(); // Sprint 1 Phase 6: Bet placed sound
     onPlaceBet(selectedAmount, withoutTrump, false);
   };
 
   const handleSkip = () => {
+    sounds.betSkipped(); // Sprint 1 Phase 6: Skip sound
     onPlaceBet(-1, false, true);
   };
 
@@ -158,6 +162,8 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
         onOpenLeaderboard={() => setShowLeaderboard(true)}
         onOpenChat={() => setChatOpen(!chatOpen)}
         onOpenBotManagement={onOpenBotManagement}
+        onOpenAchievements={onOpenAchievements}
+        onOpenFriends={onOpenFriends}
         botCount={gameState.players.filter(p => p.isBot).length}
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
@@ -170,23 +176,32 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
 
       {/* Current Turn Indicator with Timeout */}
       {!hasPlacedBet && (
-        <div className={`mb-6 px-3 md:px-4 py-2 md:py-3 rounded-xl text-sm md:text-base font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap ${
-          players[currentPlayerIndex]?.teamId === 1
-            ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-            : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
-        }`}>
-          <span>Waiting for: {players[currentPlayerIndex]?.name}</span>
-          <TimeoutIndicator
-            duration={60000}
-            isActive={!hasPlacedBet && isMyTurn}
-            resetKey={currentPlayerIndex}
-            onTimeout={() => {
-              // Auto-enable autoplay when timeout expires (only for current player)
-              if (isMyTurn && onAutoplayToggle && !autoplayEnabled) {
-                onAutoplayToggle();
-              }
-            }}
-          />
+        <div className="relative mb-6">
+          {/* Spotlight effect for current player */}
+          {isMyTurn && (
+            <div className="absolute inset-0 -m-4 rounded-full bg-gradient-radial from-blue-400/30 via-blue-400/10 to-transparent motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" />
+          )}
+          <div className={`relative px-3 md:px-4 py-2 md:py-3 rounded-xl text-sm md:text-base font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap transition-all ${
+            players[currentPlayerIndex]?.teamId === 1
+              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
+              : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
+          } ${isMyTurn ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse' : ''}`}>
+            {isMyTurn && (
+              <span className="motion-safe:animate-arrow-bounce motion-reduce:inline">👇</span>
+            )}
+            <span>Waiting for: {players[currentPlayerIndex]?.name}{isMyTurn ? ' (Your Turn)' : ''}</span>
+            <TimeoutIndicator
+              duration={60000}
+              isActive={!hasPlacedBet && isMyTurn}
+              resetKey={currentPlayerIndex}
+              onTimeout={() => {
+                // Auto-enable autoplay when timeout expires (only for current player)
+                if (isMyTurn && onAutoplayToggle && !autoplayEnabled) {
+                  onAutoplayToggle();
+                }
+              }}
+            />
+          </div>
         </div>
       )}
 

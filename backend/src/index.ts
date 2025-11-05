@@ -179,6 +179,8 @@ import {
   leaveSpectatePayloadSchema,
 } from './validation/schemas';
 import { registerRoutes } from './api/routes';
+import authRoutes from './api/auth'; // Sprint 3 Phase 1
+import profileRoutes from './api/profiles'; // Sprint 3 Phase 3.2
 import { registerLobbyHandlers } from './socketHandlers/lobby';
 import { registerGameplayHandlers } from './socketHandlers/gameplay';
 import { registerChatHandlers } from './socketHandlers/chat';
@@ -187,6 +189,9 @@ import { registerBotHandlers } from './socketHandlers/bots';
 import { registerStatsHandlers } from './socketHandlers/stats';
 import { registerConnectionHandlers } from './socketHandlers/connection';
 import { registerAdminHandlers } from './socketHandlers/admin';
+import { registerAchievementHandlers } from './socketHandlers/achievements'; // Sprint 2 Phase 1
+import { registerFriendHandlers } from './socketHandlers/friends'; // Sprint 2 Phase 2
+import { registerNotificationHandlers } from './socketHandlers/notifications'; // Sprint 3 Phase 5
 import {
   generateSessionToken as generateSessionTokenUtil,
   createPlayerSession as createPlayerSessionUtil,
@@ -822,6 +827,12 @@ registerRoutes(app, {
   formatBytes,
 });
 
+// Sprint 3 Phase 1: Authentication routes
+app.use('/api/auth', authRoutes);
+
+// Sprint 3 Phase 3.2: Profile routes
+app.use('/api/profiles', profileRoutes);
+
 // ============================================================================
 
 // Socket.io event handlers
@@ -948,6 +959,21 @@ io.on('connection', (socket) => {
     getPlayerGameHistory,
     getGameReplayData,
     getAllFinishedGames,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Achievement Handlers - Sprint 2 Phase 1
+  // ============================================================================
+  registerAchievementHandlers(io, socket);
+  registerFriendHandlers(io, socket);
+
+  // ============================================================================
+  // Notification Handlers - Sprint 3 Phase 5
+  // ============================================================================
+  registerNotificationHandlers(socket, {
+    io,
     logger,
     errorBoundaries,
   });
