@@ -72,7 +72,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       // Success
       setSuccessMessage('Account created successfully! Please check your email to verify your account.');
 
-      // Clear form
+      // Clear form only on success
       setUsername('');
       setEmail('');
       setPassword('');
@@ -91,13 +91,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   };
 
   const handleClose = () => {
+    // Don't clear form fields on close - user might want to continue
     clearError();
     setSuccessMessage('');
-    setUsername('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-    setDisplayName('');
     onClose();
   };
 

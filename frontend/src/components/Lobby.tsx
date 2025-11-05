@@ -33,7 +33,13 @@ interface LobbyProps {
 
 export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister }: LobbyProps) {
   const { user, logout } = useAuth();
-  const [playerName, setPlayerName] = useState(() => localStorage.getItem('playerName') || '');
+  // Use authenticated username if available, otherwise use stored playerName for guests
+  const [playerName, setPlayerName] = useState(() => {
+    if (user?.username) {
+      return user.username;
+    }
+    return localStorage.getItem('playerName') || '';
+  });
   const [gameId, setGameId] = useState(autoJoinGameId || '');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
@@ -57,12 +63,18 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     setRecentPlayers(getRecentPlayers());
   }, []);
 
-  // Save playerName to localStorage whenever it changes
+  // Sync playerName with auth and localStorage
   useEffect(() => {
-    if (playerName.trim()) {
+    // If user is authenticated, use their username
+    if (user?.username) {
+      setPlayerName(user.username);
+      localStorage.setItem('playerName', user.username);
+    }
+    // For guests, save to localStorage
+    else if (playerName.trim()) {
       localStorage.setItem('playerName', playerName.trim());
     }
-  }, [playerName]);
+  }, [playerName, user]);
 
   // React to autoJoinGameId prop changes
   useEffect(() => {
@@ -749,7 +761,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
-                placeholder="Enter your name"
+                placeholder={user ? "Using authenticated username" : "Enter your name"}
+                disabled={!!user}
                 required
               />
             </div>
@@ -896,12 +909,15 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               type="text"
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
+              disabled={!!user}
+              placeholder={user ? "Using authenticated username" : "Enter your name"}
               className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 ${
+                user ? 'opacity-60 cursor-not-allowed' : ''
+              } ${
                 autoJoinGameId
                   ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-300 dark:ring-blue-700'
                   : 'border-parchment-400 dark:border-gray-500'
               }`}
-              placeholder={autoJoinGameId ? "👤 Type your name here..." : "Enter your name"}
               required={joinType === 'player'}
             />
           </div>

@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.6.1",
   "releaseDate": "2025-11-05",
   "sprint": "Sprint 3 - Major Features",
   "phases": {
@@ -125,7 +125,12 @@
     "Added notification system with visual feedback",
     "Improved settings with tabbed interface",
     "Fixed all TypeScript compilation errors",
-    "Enhanced UX with animations and transitions"
+    "Enhanced UX with animations and transitions",
+    "Fixed registration form auto-clearing issue",
+    "Integrated authentication with playerName localStorage",
+    "Hide friends button for non-authenticated users",
+    "Implemented guest mode vs ranked mode distinction",
+    "Created comprehensive user documentation"
   ],
   "upcomingFeatures": [
     "Private game invitations",

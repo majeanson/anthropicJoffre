@@ -925,7 +925,7 @@ function App() {
             onAutoplayToggle={handleAutoplayToggle}
             onOpenBotManagement={() => setBotManagementOpen(true)}
             onOpenAchievements={() => setShowAchievementsPanel(true)}
-            onOpenFriends={() => setShowFriendsPanel(true)}
+            onOpenFriends={auth?.isAuthenticated ? () => setShowFriendsPanel(true) : undefined}
             socket={socket}
             gameId={gameId}
             chatMessages={chatMessages}
@@ -962,7 +962,7 @@ function App() {
           onSoundToggle={toggleSound}
           onOpenBotManagement={() => setBotManagementOpen(true)}
           onOpenAchievements={() => setShowAchievementsPanel(true)}
-          onOpenFriends={() => setShowFriendsPanel(true)}
+          onOpenFriends={auth?.isAuthenticated ? () => setShowFriendsPanel(true) : undefined}
           socket={socket}
           gameId={gameId}
           chatMessages={chatMessages}
