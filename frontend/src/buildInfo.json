@@ -1,336 +1,161 @@
 {
-  "buildDate": "2025-11-04T12:52:46.000Z",
-  "version": "1.5.1",
-  "git": {
-    "commitMessage": "fix: 7 critical UX improvements - timestamps, z-index, errors, share links, flickering",
-    "commitHash": "e80043ce2850a433ee731b9331fb97fe91bc82e8",
-    "commitDate": "2025-11-04T07:50:37-05:00",
-    "branch": "main"
-  },
-  "latestDoneFeatures": [
-    {
-      "date": "2025-11-04",
-      "title": "7 Critical UX Improvements - Polish & Stability",
+  "version": "1.6.3",
+  "releaseDate": "2025-11-05",
+  "sprint": "Sprint 3 - Major Features",
+  "phases": {
+    "phase1": {
+      "name": "User Authentication System",
+      "status": "✅ Completed",
+      "duration": "8-10 hours",
       "features": [
-        "✅ Fixed chat timestamp NaN:NaN display",
-        "  - Backend: Map DB snake_case (created_at, player_name) to frontend camelCase",
-        "  - Frontend: Added NaN checks in formatTime() with 'now' fallback",
-        "✅ Refined z-index hierarchy for proper layering",
-        "  - Team score boxes: z-20 (above header at z-10)",
-        "  - Floating points badges: z-[60] (above everything)",
-        "  - Player hand cards: z-10 (below Settings menu at z-50)",
-        "✅ Enhanced 'Player data not found' error messages with action context",
-        "  - roundStatistics.ts: Added comprehensive logging for Perfect Bet, Trump Master, Lucky Player",
-        "  - Perfect Bet: Added fallback lookup by matching bet amount (handles player replacement)",
-        "  - GameReplay: Enhanced warning with round/trick context",
-        "✅ Fixed share link auto-join with 3 bots",
-        "  - Automatically takes over first available bot instead of showing modal",
-        "  - Moved autoJoinGameId state declaration before useEffect",
-        "  - Added autoJoinGameId to socket event handler dependencies",
-        "✅ Fixed modal/popup flickering with React.memo optimization",
-        "  - BotManagementPanel: Memoized to prevent re-renders on gameState changes",
-        "  - Toast: Memoized to prevent re-renders",
-        "  - ReconnectingBanner: Memoized to prevent re-renders during reconnection",
-        "  - CatchUpModal: Memoized to prevent re-renders on gameState changes",
-        "Frontend: 6 components updated (App, PlayingPhase, LobbyChat, BotManagementPanel, Toast, ReconnectingBanner, CatchUpModal, GameReplay)",
-        "Backend: 2 files modified (roundStatistics.ts, chat.ts)",
-        "Build successful: 758KB bundle, 3.30s build time"
+        "JWT-based authentication",
+        "User registration and login",
+        "Email verification",
+        "Password reset functionality",
+        "Session management",
+        "Protected routes"
       ]
     },
-    {
-      "date": "2025-11-04",
-      "title": "Critical Data Migration & Database Fixes",
+    "phase2": {
+      "name": "Enhanced Player Profiles",
+      "status": "✅ Completed",
+      "duration": "5-6 hours",
       "features": [
-        "✅ Fixed z-index stacking - Floating points badges now appear above header (z-60 vs z-10)",
-        "✅ CRITICAL: Comprehensive player identity migration system",
-        "  - Fixed 'Player data not found' errors at round end during reconnection/replacement",
-        "  - Created migratePlayerIdentity() utility migrating ALL data structures:",
-        "    • roundStats Maps (6 Maps: cardPlayTimes, trumpsPlayed, redZeros, brownZeros, initialHands, playerBets)",
-        "    • currentTrick.playerName (was only updating playerId)",
-        "    • currentRoundTricks (TrickResult[] - not migrated before)",
-        "    • afkWarnings Map (playerId keys)",
-        "  - Applied to ALL 4 handlers: take_over_bot, replace_with_bot, replace_me_with_bot, reconnect_to_game",
-        "  - Covers: empty seat fills, bot takeover, human replacement, reconnection",
-        "✅ Database migration system now working correctly",
-        "  - Fixed runMigrations.ts environment loading (matches db/index.ts logic)",
-        "  - Fixed query logging for DDL statements (CREATE TABLE, CREATE INDEX)",
-        "  - All 4 migrations applied successfully: game_persistence, performance_indexes, persistence_mode, chat_persistence",
-        "✅ Chat persistence fully functional - 'Can't load chat history' error resolved",
-        "  - Database connection established to Neon PostgreSQL",
-        "  - chat_messages table created with 24hr lobby retention, 7-day game retention",
-        "Frontend: 2 components updated (PlayingPhase, GameHeader)",
-        "Backend: 4 files modified + 1 new utility (playerMigrationHelpers.ts, 140 lines)",
-        "Build successful: All migrations applied, TypeScript compilation clean"
+        "Avatar system with 20+ options",
+        "Profile customization (bio, country)",
+        "Privacy settings",
+        "Profile editor modal",
+        "Avatar display across UI"
       ]
     },
-    {
-      "date": "2025-01-02",
-      "title": "Critical Bug Fixes - 5 Issues Resolved",
+    "phase3": {
+      "name": "Enhanced Match History UI",
+      "status": "✅ Completed",
+      "duration": "3-4 hours",
       "features": [
-        "✅ Fixed bot difficulty badges visibility - Removed text truncation that was hiding badges",
-        "✅ Show ready/not-ready players in round summary - Added visual ready status display with checkmarks",
-        "✅ Lobby chat persistence - Chat history now loads from database on mount (last 100 messages)",
-        "✅ Fixed 'Failed to load active games' error - Added graceful database error handling",
-        "✅ Fixed 'Player not found' error on takeover - Improved bet player lookup with multiple fallbacks",
-        "Frontend: Updated 3 components (PlayingPhase, RoundSummary, LobbyChat)",
-        "Backend: Updated 3 files (chat handlers, API routes, game state logic)",
-        "All changes tested with TypeScript compilation - no errors",
-        "Build successful: 755KB bundle, 3.11s build time"
+        "Detailed match cards",
+        "Match statistics modal",
+        "Game replay integration",
+        "Win/loss filtering",
+        "Sorting options"
       ]
     },
-    {
-      "date": "2025-01-02",
-      "title": "UX Improvements - 9 Fixes",
+    "phase4": {
+      "name": "Enhanced Lobby Chat",
+      "status": "✅ Completed",
+      "duration": "4-5 hours",
       "features": [
-        "✅ Fixed ghost card animation - Cards now fade in place instead of flying upward",
-        "✅ Centered remaining cards in hand after playing",
-        "✅ Fixed floating points badge positioning - Team 1 left, Team 2 right",
-        "✅ Fixed Lucky Player stat - Now requires BOTH red 0 AND brown 0 to win",
-        "✅ Removed redundant star badges from special cards (already have +5 indicator)",
-        "✅ Player name persistence - Moved to localStorage from sessionStorage (persists across refreshes)",
-        "✅ Connection quality moved to Settings Panel (cleaner in-game UI)",
-        "✅ Fixed header height consistency - Added min-height to prevent jumping",
-        "✅ Bet/Trump display in header - Always visible with betting team highlighted (yellow ring)",
-        "Build successful: 753KB bundle, 3.48s build time"
+        "@mention support with highlighting",
+        "Clickable URLs",
+        "Visual feedback for mentions",
+        "Chat persistence"
       ]
     },
-    {
-      "date": "2025-01-02",
-      "title": "UI Decluttering - Sprints 4-5",
+    "phase5": {
+      "name": "Notification System",
+      "status": "✅ Completed",
+      "duration": "5-6 hours",
       "features": [
-        "✅ Sprint 4: UnifiedModal - Reusable modal system with 5 size variants (sm/md/lg/xl/full)",
-        "✅ Sprint 4: UnifiedModal - ESC key, backdrop click handling, body scroll prevention",
-        "✅ Sprint 4: Skeleton - Loading state components with shimmer animation",
-        "✅ Sprint 4: SkeletonCard, SkeletonList, SkeletonGameCard - Compound skeleton components",
-        "✅ Sprint 5: Enhanced card animations - card-play-arc (arc trajectory for played cards)",
-        "✅ Sprint 5: Card hover animation - card-hover-lift (smooth lift on hover)",
-        "✅ Sprint 5: Tablet optimization - Added lg breakpoints (1024px+) throughout PlayingPhase",
-        "✅ Sprint 5: Responsive spacing - Improved padding/margins for tablet screens",
-        "Motion-safe variants for accessibility (respects prefers-reduced-motion)",
-        "All animations tested and optimized for performance"
+        "Notification center with bell icon",
+        "Achievement unlock animations",
+        "Friend request notifications",
+        "Mention notifications",
+        "Database persistence",
+        "Mark as read functionality",
+        "Notification preferences"
       ]
     },
-    {
-      "date": "2025-01-02",
-      "title": "UI Decluttering - Sprints 1-3",
+    "phase6": {
+      "name": "Enhanced Settings System",
+      "status": "✅ Completed",
+      "duration": "3-4 hours",
       "features": [
-        "✅ Sprint 1: SettingsPanel - Unified settings consolidating 6 scattered controls (62% reduction in header buttons: 8→3)",
-        "✅ Sprint 1: Removed excessive decorations from TeamSelection (40% faster rendering)",
-        "✅ Sprint 2: ContextualGameInfo - Smart center panel showing only relevant information (60% height reduction: 150px→60px)",
-        "✅ Sprint 3: InlineBetStatus - Horizontal bet status strip (75% height reduction: 120px→30px)",
-        "✅ Sprint 3: SmartValidationMessage - Single priority-based message panel with fixed height (prevents UI jumping)",
-        "✅ Sprint 3: FloatingTeamChat - Collapsible chat bubble (saves 180px when collapsed, 78% reduction)",
-        "Created 6 new reusable components with proper test identifiers (data-testid)",
-        "All components mobile-optimized and dark mode compatible",
-        "Overall impact: 50-75% reduction in visual clutter, 25-27% reduction in view heights",
-        "Documentation: Created UI_IMPROVEMENTS_SUMMARY.md and UI_IMPROVEMENTS_INTEGRATION_GUIDE.md"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Lobby & UX Improvements",
-      "features": [
-        "Changed 'Save Stats & ELO' checkbox to simpler 'Ranked Mode' toggle",
-        "Removed duplicate 'Join Game' button - now integrated into 'Browse & Join Games'",
-        "Added 'Joined as [playername]' display below Joffre logo on homepage",
-        "Social tab now filters out bot players from Recent players list",
-        "Fixed duplicate leave game confirmation prompts (removed from GameHeader)",
-        "Fixed: Leaving game with 3 bots no longer shows 'max bots' error",
-        "Database: Added chat_messages table for persistent chat across server restarts"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "UI Polish Fixes",
-      "features": [
-        "Fixed: Round Complete now shows negative points correctly (-7, not +-7)",
-        "Fixed: Trick History card display now matches Stats panel format (suit symbols + value)",
-        "Cards now display consistently across all panels with suit symbols (♥7, ♠3, etc.)"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Bot Toast Fix",
-      "features": [
-        "Fixed: Bots no longer show 'autoplay on' toast after timeout (they're always in autoplay)"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Final Bug Fixes - Persistence & Empty Seats",
-      "features": [
-        "Leaderboard now only shows stats from persistent (ELO) games - casual games don't count",
-        "Added persistence_mode column to database with migration",
-        "Empty seats now joinable directly - no separate 'Fill Seat' button needed",
-        "Join flow automatically detects and fills empty seats before checking for bots"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Bug Fixes from User Testing (Round 1)",
-      "features": [
-        "Lobby chat now requires name - prompts users instead of allowing anonymous messages",
-        "Consolidated 'Leave Game' button - automatically replaces player with bot (removed separate button)",
-        "Fixed auto-play toast flickering - added 2s deduplication to prevent rapid duplicate notifications",
-        "Fixed mobile button overflow - Join/Spectate buttons now wrap and scale responsively",
-        "Corrected dealer skip rules - dealer can skip ONLY when no one has bet (not vice versa)"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Sprint 6: UX Enhancements",
-      "features": [
-        "Connection quality indicator with real-time ping (5s interval)",
-        "Keyboard navigation for playing phase (arrows, Tab, Enter, numbers)",
-        "Lobby browser filters (With Bots, Needs Players, In Progress)",
-        "Lobby sorting (Newest, Most Players, Highest Score)",
-        "Bot difficulty badges (Easy/Medium/Hard) with thinking animations",
-        "Graceful player exit - Replace yourself with bot mid-game",
-        "Visual retry counter on reconnection banner (progress bar)",
-        "Better error messages (specific game join failures)",
-        "Skeleton loaders for lobby browser",
-        "Improved validation error messages with actionable details"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Connection Stability & Bot Autonomy Fixes",
-      "features": [
-        "Fixed bot freezing - Added server-side bot action scheduling",
-        "Bots now independent of frontend sockets (schedule actions automatically)",
-        "Disabled duplicate ConnectionManager heartbeat causing mass disconnections",
-        "Socket.IO built-in ping/pong now sole heartbeat mechanism (60s timeout)",
-        "Removed duplicate emitGameUpdate on disconnect (prevented update cascades)",
-        "Bot actions scheduled at all turn transitions (betting, playing, post-trick)",
-        "Games with bots now visible in lobby browser (isJoinable includes bot replacement)",
-        "In-progress games now shown in lobby for spectating",
-        "Fixed ActiveGames CORS error (VITE_API_URL → VITE_SOCKET_URL)"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Empty Seat System",
-      "features": [
-        "Players leaving games create empty seats instead of being removed",
-        "Empty seats preserve team assignments and positions",
-        "New players can fill empty seats via TeamSelection 'Fill Seat' button",
-        "Backend: fill_empty_seat socket handler with session management",
-        "Frontend: Consistent empty seat UI across all phases (💺, gray, dashed borders)",
-        "LobbyBrowser shows empty seat count for each game",
-        "Reconnection compatibility: Empty seats cannot reconnect (must fill seat)",
-        "15-min disconnect timeout creates empty seats instead of removing players"
-      ]
-    },
-    {
-      "date": "2025-11-02",
-      "title": "Round Summary Enhancements",
-      "features": [
-        "Fixed last trick visibility - shows for 2 seconds before round summary",
-        "Added TrickHistory component to round summary",
-        "Fixed Team MVP calculation bug (was showing >100%)",
-        "Made round points delta prominent with large +X display"
+        "Tabbed settings interface",
+        "General settings tab",
+        "Game settings tab",
+        "Notification preferences tab",
+        "Advanced settings tab",
+        "Animation toggles",
+        "Performance mode",
+        "Cache clearing"
       ]
     }
+  },
+  "totalDuration": "28-35 hours",
+  "newFeatures": [
+    "Complete user authentication system with JWT",
+    "Player profiles with avatar customization",
+    "Enhanced match history with detailed stats",
+    "Advanced chat with @mentions and URLs",
+    "Full notification system with animations",
+    "Tabbed settings panel with preferences"
   ],
-  "lastSession": {
-    "date": "2025-11-04",
-    "summary": "7 Critical UX Improvements - Polish & Stability",
-    "achievements": [
-      "🔧 Chat Timestamp Fix:",
-      "  - Problem: Global chat showing 'NaN:NaN:' before messages",
-      "  - Root cause: Database returns snake_case (created_at, player_name), frontend expects camelCase",
-      "  - Backend fix: Added field mapping in chat.ts socket handler (lines 116-131)",
-      "  - Frontend fix: Added NaN checks in LobbyChat formatTime() with 'now' fallback",
-      "  - Result: Timestamps now display correctly as 'HH:MM' format",
-      "",
-      "🎨 Z-Index Hierarchy Refinement:",
-      "  - Established proper layering for all game elements",
-      "  - Team score boxes: z-20 (establishes stacking context)",
-      "  - Floating points badges: z-[60] (above all game elements)",
-      "  - Game header: z-10 (below badges, above game board)",
-      "  - Player hand cards: z-10 (below Settings menu at z-50)",
-      "  - Settings menu: z-40 (backdrop) + z-50 (panel)",
-      "  - Result: All elements layer correctly, no overlapping issues",
-      "",
-      "🔍 Enhanced Error Messages with Action Context:",
-      "  - Added comprehensive logging to roundStatistics.ts for debugging",
-      "  - Perfect Bet calculation: Added fallback lookup by matching bet amount",
-      "    • Handles player replacement scenarios where playerId doesn't match",
-      "    • Searches through all players to find matching bet",
-      "  - Trump Master: Added detailed logging with available playerNames",
-      "  - Lucky Player: Added detailed logging with redZerosCollected keys",
-      "  - Starting Hand stats: Added logging with initialHands keys",
-      "  - GameReplay: Enhanced 'Player not found' warning with round/trick context",
-      "  - Result: All 'Player data not found' errors now include action context",
-      "",
-      "🔗 Share Link Auto-Join with Bots:",
-      "  - Problem: Share links with 3 bots + 1 human just redirect to homepage",
-      "  - Root cause: autoJoinGameId declared after socket event handler useEffect",
-      "  - Fix 1: Moved autoJoinGameId state to UI state section (line 86)",
-      "  - Fix 2: Added autoJoinGameId to socket event handler dependencies",
-      "  - Fix 3: Added auto-takeover logic in handleGameFullWithBots",
-      "    • If user came via share link, automatically take over first available bot",
-      "    • Otherwise, show bot takeover modal as before",
-      "  - Result: Share links now work seamlessly with games containing bots",
-      "",
-      "✨ Flickering Fixes (React.memo optimization):",
-      "  - Problem: Modals and popups flickering on every gameState change",
-      "  - Root cause: Components re-rendering unnecessarily",
-      "  - Solution: Wrapped all UI components with React.memo",
-      "  - BotManagementPanel: Memoized to prevent re-renders (lines 1, 13, 192)",
-      "  - Toast: Memoized to prevent re-renders (lines 1, 10, 48)",
-      "  - ReconnectingBanner: Memoized to prevent re-renders (lines 1, 8, 35)",
-      "  - CatchUpModal: Memoized to prevent re-renders (lines 1, 11, 134)",
-      "  - Result: Smooth UI with no flickering during gameplay",
-      "",
-      "🔧 Technical Details:",
-      "  - 1 commit pushed to main (e80043c)",
-      "  - Frontend: 8 files modified",
-      "    • App.tsx (autoJoinGameId fixes + dependencies)",
-      "    • PlayingPhase.tsx (z-index refinement)",
-      "    • LobbyChat.tsx (timestamp NaN checks)",
-      "    • BotManagementPanel.tsx (React.memo)",
-      "    • Toast.tsx (React.memo)",
-      "    • ReconnectingBanner.tsx (React.memo)",
-      "    • CatchUpModal.tsx (React.memo)",
-      "    • GameReplay.tsx (enhanced error logging)",
-      "  - Backend: 2 files modified",
-      "    • roundStatistics.ts (enhanced error logging + Perfect Bet fallback)",
-      "    • chat.ts (field mapping for timestamps)",
-      "  - Build successful: 758KB bundle, 3.30s build time",
-      "  - TypeScript compilation clean (frontend + backend)"
+  "databaseTables": [
+    "users",
+    "user_sessions",
+    "user_profiles",
+    "password_reset_tokens",
+    "email_verification_tokens",
+    "achievements",
+    "user_achievements",
+    "friends",
+    "notifications"
+  ],
+  "techStack": {
+    "frontend": [
+      "React 18.3",
+      "TypeScript 5.6",
+      "Tailwind CSS 3.4",
+      "Socket.io Client 4.8",
+      "Vite 5.4"
     ],
-    "commits": 1,
-    "linesChanged": "~78 added, ~19 modified",
-    "filesModified": [
-      "backend/src/game/roundStatistics.ts (error logging + Perfect Bet fallback)",
-      "backend/src/socketHandlers/chat.ts (field mapping)",
-      "frontend/src/App.tsx (autoJoinGameId fixes + dependencies)",
-      "frontend/src/components/BotManagementPanel.tsx (React.memo)",
-      "frontend/src/components/CatchUpModal.tsx (React.memo)",
-      "frontend/src/components/GameReplay.tsx (enhanced error logging)",
-      "frontend/src/components/LobbyChat.tsx (timestamp NaN checks)",
-      "frontend/src/components/PlayingPhase.tsx (z-index refinement)",
-      "frontend/src/components/ReconnectingBanner.tsx (React.memo)",
-      "frontend/src/components/Toast.tsx (React.memo)"
-    ],
-    "technicalDetails": {
-      "performance": "React.memo on 4 components eliminates unnecessary re-renders during gameplay",
-      "reliability": "Enhanced error logging with action context enables faster debugging",
-      "userExperience": "Share links work seamlessly, timestamps display correctly, no UI flickering",
-      "codeQuality": "Proper state management and dependency tracking for React hooks"
-    }
+    "backend": [
+      "Node.js",
+      "Express 4.21",
+      "Socket.io 4.8",
+      "PostgreSQL (Neon)",
+      "bcryptjs",
+      "jsonwebtoken"
+    ]
   },
-  "futureTodos": [
-    "Accessibility - ARIA labels and screen reader support",
-    "Redis Caching Layer - Further optimize database usage",
-    "WebSocket Integration Tests - Backend multi-player test suite",
-    "CI/CD Pipeline - Automated deployment and testing",
-    "Improve Bot AI - Advanced strategy and card tracking",
-    "Enhanced Leaderboard - Charts, statistics, and CSV export",
-    "Performance optimization - Bundle splitting and code optimization",
-    "Mobile UX improvements - Touch gestures and responsive tweaks",
-    "Tournament mode - Bracket system for competitive play",
-    "Replay system enhancements - Download/share replays"
+  "improvements": [
+    "Added comprehensive authentication system",
+    "Implemented user profiles and avatars",
+    "Enhanced social features (friends, mentions)",
+    "Added notification system with visual feedback",
+    "Improved settings with tabbed interface",
+    "Fixed all TypeScript compilation errors",
+    "Enhanced UX with animations and transitions",
+    "Fixed registration form auto-clearing issue",
+    "Integrated authentication with playerName localStorage",
+    "Hide friends button for non-authenticated users",
+    "Implemented guest mode vs ranked mode distinction",
+    "Created comprehensive user documentation",
+    "Fixed modal backdrop click closing forms",
+    "Removed form clearing on focus out for all auth modals",
+    "Fixed Rules of Hooks violation causing state loss",
+    "Moved early returns after all hooks in modals",
+    "Ensured modal state preservation across renders"
+  ],
+  "upcomingFeatures": [
+    "Private game invitations",
+    "Tournament mode",
+    "Seasonal rankings",
+    "Custom card designs",
+    "Voice chat integration",
+    "Mobile app version"
+  ],
+  "buildStatus": "✅ Production Ready",
+  "testsStatus": {
+    "backend": "✅ 150 tests passing",
+    "frontend": "✅ TypeScript compilation passing",
+    "e2e": "⚠️ Some tests need refactoring"
+  },
+  "notes": [
+    "Sprint 3 successfully completed all 6 phases",
+    "Authentication system fully integrated",
+    "Social features significantly enhanced",
+    "UI/UX improvements throughout the application",
+    "Ready for production deployment"
   ]
 }

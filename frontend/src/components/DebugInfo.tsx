@@ -166,34 +166,36 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             <div className="flex-1">
               <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Build Date</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
-                {formatDate(buildInfo.buildDate)}
+                {formatDate((buildInfo as any).buildDate || buildInfo.releaseDate || new Date().toISOString())}
               </p>
             </div>
           </div>
 
           {/* Latest Commit */}
-          <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">💾</span>
-            <div className="flex-1">
-              <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Latest Commit</h3>
-              <div className="bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">
-                    {buildInfo.git.commitHash}
-                  </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    on {buildInfo.git.branch}
-                  </span>
+          {(buildInfo as any).git && (
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">💾</span>
+              <div className="flex-1">
+                <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Latest Commit</h3>
+                <div className="bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">
+                      {(buildInfo as any).git.commitHash}
+                    </span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      on {(buildInfo as any).git.branch}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
+                    {getCommitTitle((buildInfo as any).git.commitMessage)}
+                  </p>
                 </div>
-                <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
-                  {getCommitTitle(buildInfo.git.commitMessage)}
-                </p>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Latest Done Features (Collapsible) */}
-          {buildInfo.latestDoneFeatures && buildInfo.latestDoneFeatures.length > 0 && (
+          {(buildInfo as any).latestDoneFeatures && (buildInfo as any).latestDoneFeatures.length > 0 && (
             <div className="flex items-start gap-3">
               <span className="text-2xl flex-shrink-0">✨</span>
               <div className="flex-1">
@@ -209,7 +211,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
                 {showLatestFeatures && (
                   <div className="space-y-3">
-                    {buildInfo.latestDoneFeatures.map((featureGroup: any, index: number) => (
+                    {(buildInfo as any).latestDoneFeatures.map((featureGroup: any, index: number) => (
                       <div
                         key={index}
                         className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700"
@@ -242,22 +244,23 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
           )}
 
           {/* Future Features (Collapsible) */}
-          <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">🚀</span>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
-                <button
-                  onClick={() => setShowFutureFeatures(!showFutureFeatures)}
-                  className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
-                >
-                  {showFutureFeatures ? 'Hide' : 'Show'}
-                </button>
-              </div>
+          {(buildInfo as any).futureTodos && (buildInfo as any).futureTodos.length > 0 && (
+            <div className="flex items-start gap-3">
+              <span className="text-2xl flex-shrink-0">🚀</span>
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
+                  <button
+                    onClick={() => setShowFutureFeatures(!showFutureFeatures)}
+                    className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                  >
+                    {showFutureFeatures ? 'Hide' : 'Show'}
+                  </button>
+                </div>
 
-              {showFutureFeatures && (
-                <ul className="space-y-2">
-                  {buildInfo.futureTodos.map((todo: string, index: number) => (
+                {showFutureFeatures && (
+                  <ul className="space-y-2">
+                    {(buildInfo as any).futureTodos.map((todo: string, index: number) => (
                     <li
                       key={index}
                       className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700"
@@ -266,10 +269,11 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                       <span>{todo}</span>
                     </li>
                   ))}
-                </ul>
-              )}
+                  </ul>
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Server Health Monitoring */}
           <div className="flex items-start gap-3">
