@@ -1008,9 +1008,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                         return (
                           <div
                             key={`${card.color}-${card.value}-${index}`}
-                            className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
-                              playable && isCurrentTurn ? 'motion-safe:hover:animate-card-hover-lift' : ''
-                            } ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0 motion-safe:animate-card-play-arc' : 'opacity-100 scale-100'}
+                            className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${showDealingAnimation && !isCardDealt ? 'opacity-0 scale-50' : isTransitioning ? 'opacity-0 motion-safe:animate-card-play-arc' : 'opacity-100 scale-100'}
                             ${isSelected ? '-translate-y-4 scale-110' : ''}`}
                             style={{
                               transition: isTransitioning

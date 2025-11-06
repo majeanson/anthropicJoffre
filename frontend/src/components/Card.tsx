@@ -147,7 +147,7 @@ function CardComponent({
         ${borderWidth} rounded-lg font-bold
         flex flex-col items-center justify-center gap-1
         transition-all duration-200
-        ${!disabled && onClick ? 'hover:shadow-xl cursor-pointer' : 'cursor-default'}
+        ${!disabled && onClick ? 'cursor-pointer' : 'cursor-default'}
         ${disabled ? 'opacity-50' : ''}
         ${isPlayable && !disabled ? 'motion-safe:animate-card-glow-pulse' : ''}
         ${isKeyboardSelected ? 'motion-safe:animate-selection-ring' : ''}

@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useSettings } from '../contexts/SettingsContext';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
@@ -23,7 +24,7 @@ interface SettingsPanelProps {
   connectionStats?: ConnectionStats;
 }
 
-type SettingsTab = 'general' | 'game' | 'notifications' | 'advanced';
+type SettingsTab = 'settings' | 'advanced';
 
 export function SettingsPanel({
   isOpen,
@@ -39,17 +40,8 @@ export function SettingsPanel({
   isSpectator = false,
   connectionStats
 }: SettingsPanelProps) {
-  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled } = useSettings();
-  const [activeTab, setActiveTab] = useState<SettingsTab>('general');
-
-  // Local settings state (would normally come from context/localStorage)
-  const [cardDesign, setCardDesign] = useState<'classic' | 'modern'>('classic');
-  const [notifyAchievements, setNotifyAchievements] = useState(true);
-  const [notifyFriendRequests, setNotifyFriendRequests] = useState(true);
-  const [notifyMentions, setNotifyMentions] = useState(true);
-  const [notifyGameInvites, setNotifyGameInvites] = useState(true);
-  const [debugMode, setDebugMode] = useState(false);
-  const [performanceMode, setPerformanceMode] = useState(false);
+  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled, debugMode, setDebugMode } = useSettings();
+  const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
   if (!isOpen) return null;
 
@@ -69,9 +61,7 @@ export function SettingsPanel({
   };
 
   const tabs: { key: SettingsTab; label: string; icon: string }[] = [
-    { key: 'general', label: 'General', icon: '⚙️' },
-    { key: 'game', label: 'Game', icon: '🎮' },
-    { key: 'notifications', label: 'Notifications', icon: '🔔' },
+    { key: 'settings', label: 'Settings', icon: '⚙️' },
     { key: 'advanced', label: 'Advanced', icon: '🔧' },
   ];
 
@@ -93,7 +83,7 @@ export function SettingsPanel({
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'general':
+      case 'settings':
         return (
           <div className="space-y-3">
             {/* Dark Mode Toggle */}
@@ -125,6 +115,17 @@ export function SettingsPanel({
               <ToggleSwitch enabled={animationsEnabled} onChange={() => setAnimationsEnabled(!animationsEnabled)} label="Animations" />
             </div>
 
+            {/* Autoplay Toggle */}
+            {!isSpectator && onAutoplayToggle && (
+              <div className="flex items-center justify-between" data-testid="settings-autoplay">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{autoplayEnabled ? '⚡' : '🎮'}</span>
+                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Autoplay</span>
+                </div>
+                <ToggleSwitch enabled={autoplayEnabled} onChange={onAutoplayToggle} label="Autoplay" />
+              </div>
+            )}
+
             {/* Connection Quality */}
             {connectionStats && (
               <div className="flex items-center justify-between" data-testid="settings-connection">
@@ -150,55 +151,20 @@ export function SettingsPanel({
                 <span className="text-umber-900 dark:text-gray-100 font-semibold">How to Play</span>
               </button>
             )}
-          </div>
-        );
-
-      case 'game':
-        return (
-          <div className="space-y-3">
-            {/* Autoplay Toggle */}
-            {!isSpectator && onAutoplayToggle && (
-              <div className="flex items-center justify-between" data-testid="settings-autoplay">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{autoplayEnabled ? '⚡' : '🎮'}</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Autoplay</span>
-                </div>
-                <ToggleSwitch enabled={autoplayEnabled} onChange={onAutoplayToggle} label="Autoplay" />
-              </div>
-            )}
-
-            {/* Card Design Selection */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🎴</span>
-                <span className="text-umber-900 dark:text-gray-100 font-semibold">Card Design</span>
-              </div>
-              <select
-                value={cardDesign}
-                onChange={(e) => setCardDesign(e.target.value as 'classic' | 'modern')}
-                className="px-3 py-1 bg-parchment-200 dark:bg-gray-700 border border-amber-700 dark:border-gray-600 rounded text-umber-900 dark:text-gray-100"
-              >
-                <option value="classic">Classic</option>
-                <option value="modern">Modern</option>
-              </select>
-            </div>
 
             {/* Bot Management Button */}
             {!isSpectator && onOpenBotManagement && (
-              <>
-                <div className="border-t border-amber-700/30 dark:border-gray-600"></div>
-                <button
-                  onClick={handleBotManagement}
-                  className="w-full bg-parchment-200 dark:bg-gray-700 hover:bg-parchment-300 dark:hover:bg-gray-600 border border-amber-700 dark:border-gray-600 rounded px-3 py-2 transition-colors flex items-center justify-between"
-                  data-testid="settings-bot-management"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🤖</span>
-                    <span className="text-umber-900 dark:text-gray-100 font-semibold">Bot Management</span>
-                  </div>
-                  <span className="text-umber-700 dark:text-gray-300 text-sm">({botCount}/3)</span>
-                </button>
-              </>
+              <button
+                onClick={handleBotManagement}
+                className="w-full bg-parchment-200 dark:bg-gray-700 hover:bg-parchment-300 dark:hover:bg-gray-600 border border-amber-700 dark:border-gray-600 rounded px-3 py-2 transition-colors flex items-center justify-between"
+                data-testid="settings-bot-management"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🤖</span>
+                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Bot Management</span>
+                </div>
+                <span className="text-umber-700 dark:text-gray-300 text-sm">({botCount}/3)</span>
+              </button>
             )}
 
             {/* Leave Game Button */}
@@ -218,51 +184,6 @@ export function SettingsPanel({
           </div>
         );
 
-      case 'notifications':
-        return (
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              Choose which notifications you want to receive
-            </p>
-
-            {/* Achievement Notifications */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🏆</span>
-                <span className="text-umber-900 dark:text-gray-100 text-sm">Achievements</span>
-              </div>
-              <ToggleSwitch enabled={notifyAchievements} onChange={() => setNotifyAchievements(!notifyAchievements)} label="Achievement Notifications" />
-            </div>
-
-            {/* Friend Request Notifications */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">👥</span>
-                <span className="text-umber-900 dark:text-gray-100 text-sm">Friend Requests</span>
-              </div>
-              <ToggleSwitch enabled={notifyFriendRequests} onChange={() => setNotifyFriendRequests(!notifyFriendRequests)} label="Friend Request Notifications" />
-            </div>
-
-            {/* Mention Notifications */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">💬</span>
-                <span className="text-umber-900 dark:text-gray-100 text-sm">@Mentions</span>
-              </div>
-              <ToggleSwitch enabled={notifyMentions} onChange={() => setNotifyMentions(!notifyMentions)} label="Mention Notifications" />
-            </div>
-
-            {/* Game Invite Notifications */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🎮</span>
-                <span className="text-umber-900 dark:text-gray-100 text-sm">Game Invites</span>
-              </div>
-              <ToggleSwitch enabled={notifyGameInvites} onChange={() => setNotifyGameInvites(!notifyGameInvites)} label="Game Invite Notifications" />
-            </div>
-          </div>
-        );
-
       case 'advanced':
         return (
           <div className="space-y-3">
@@ -271,21 +192,17 @@ export function SettingsPanel({
             </p>
 
             {/* Debug Mode */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">🐛</span>
-                <span className="text-umber-900 dark:text-gray-100 text-sm">Debug Mode</span>
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🐛</span>
+                  <span className="text-umber-900 dark:text-gray-100 text-sm font-semibold">Debug Mode</span>
+                </div>
+                <ToggleSwitch enabled={debugMode} onChange={() => setDebugMode(!debugMode)} label="Debug Mode" />
               </div>
-              <ToggleSwitch enabled={debugMode} onChange={() => setDebugMode(!debugMode)} label="Debug Mode" />
-            </div>
-
-            {/* Performance Mode */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">⚡</span>
-                <span className="text-umber-900 dark:text-gray-100 text-sm">Performance Mode</span>
-              </div>
-              <ToggleSwitch enabled={performanceMode} onChange={() => setPerformanceMode(!performanceMode)} label="Performance Mode" />
+              <p className="text-xs text-gray-500 dark:text-gray-400 ml-7">
+                Shows game state inspector and enables multi-player view for testing
+              </p>
             </div>
 
             {/* Clear Cache Button */}
@@ -309,7 +226,7 @@ export function SettingsPanel({
     }
   };
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
@@ -369,6 +286,7 @@ export function SettingsPanel({
           {renderTabContent()}
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }

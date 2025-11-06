@@ -55,7 +55,6 @@ function AppContent() {
   const {
     botDifficulty,
     setBotDifficulty,
-    setBotManagementOpen,
     botTakeoverModal,
     setBotTakeoverModal,
     botSocketsRef,
@@ -794,9 +793,9 @@ function AppContent() {
             gameState={gameState}
             autoplayEnabled={autoplayEnabled}
             onAutoplayToggle={handleAutoplayToggle}
-            onOpenBotManagement={() => setBotManagementOpen(true)}
+            onOpenBotManagement={() => setShowBotManagement(true)}
             onOpenAchievements={() => setShowAchievementsPanel(true)}
-            onOpenFriends={auth?.isAuthenticated ? () => setShowFriendsPanel(true) : undefined}
+            onOpenFriends={() => setShowFriendsPanel(true)}
             socket={socket}
             gameId={gameId}
             chatMessages={chatMessages}
@@ -844,9 +843,9 @@ function AppContent() {
           onAutoplayToggle={handleAutoplayToggle}
           soundEnabled={soundEnabled}
           onSoundToggle={toggleSound}
-          onOpenBotManagement={() => setBotManagementOpen(true)}
+          onOpenBotManagement={() => setShowBotManagement(true)}
           onOpenAchievements={() => setShowAchievementsPanel(true)}
-          onOpenFriends={auth?.isAuthenticated ? () => setShowFriendsPanel(true) : undefined}
+          onOpenFriends={() => setShowFriendsPanel(true)}
           socket={socket}
           gameId={gameId}
           chatMessages={chatMessages}

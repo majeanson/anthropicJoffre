@@ -38,18 +38,20 @@ export function ConfettiEffect({ teamColor, duration = 2000 }: ConfettiEffectPro
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size to fullscreen
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Set canvas size to a smaller area (centered)
+    const canvasWidth = Math.min(600, window.innerWidth * 0.8);
+    const canvasHeight = Math.min(400, window.innerHeight * 0.6);
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
 
     // Team colors
     const colors = teamColor === 'orange'
       ? ['#ea580c', '#fb923c', '#fdba74', '#fed7aa', '#ffedd5']
       : ['#9333ea', '#c084fc', '#d8b4fe', '#e9d5ff', '#f3e8ff'];
 
-    // Create confetti particles
+    // Create confetti particles (reduced count for smaller area)
     const particles: ConfettiParticle[] = [];
-    const particleCount = 100;
+    const particleCount = 50;
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -115,7 +117,7 @@ export function ConfettiEffect({ teamColor, duration = 2000 }: ConfettiEffectPro
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-[9998] motion-reduce:hidden"
+      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[9998] motion-reduce:hidden max-w-[600px] max-h-[400px]"
       style={{ mixBlendMode: 'multiply' }}
     />
   );
