@@ -27,6 +27,7 @@ import RegisterModal from './components/RegisterModal'; // Sprint 3 Phase 1
 import PasswordResetModal from './components/PasswordResetModal'; // Sprint 3 Phase 1
 import EmailVerificationBanner from './components/EmailVerificationBanner'; // Sprint 3 Phase 1
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
+import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal state management
 import { NotificationCenter } from './components/NotificationCenter'; // Sprint 3 Phase 5
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
 // Use enhanced bot AI with advanced strategic concepts
@@ -46,7 +47,7 @@ import { useBotManagement } from './hooks/useBotManagement';
 // Sprint 6: Connection quality monitoring
 import { useConnectionQuality } from './hooks/useConnectionQuality';
 
-function App() {
+function AppContent() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
   const { socket, reconnecting, reconnectAttempt, error, setError } = useSocketConnection();
   const {
@@ -110,9 +111,7 @@ function App() {
 
   // Sprint 3 Phase 1: Authentication state
   const auth = useAuth();
-  const [showLoginModal, setShowLoginModal] = useState<boolean>(false);
-  const [showRegisterModal, setShowRegisterModal] = useState<boolean>(false);
-  const [showPasswordResetModal, setShowPasswordResetModal] = useState<boolean>(false);
+  const modals = useModals();
 
   // Sprint 3 Phase 5: Notification state
   useNotifications(socket, auth?.isAuthenticated || false);
@@ -722,33 +721,22 @@ function App() {
       />
       {/* Sprint 3 Phase 1: Authentication UI */}
       <EmailVerificationBanner />
+      {/* Render all modals - they stay mounted but hidden when not in use */}
       <LoginModal
-        isOpen={showLoginModal}
-        onClose={() => setShowLoginModal(false)}
-        onSwitchToRegister={() => {
-          setShowLoginModal(false);
-          setShowRegisterModal(true);
-        }}
-        onSwitchToPasswordReset={() => {
-          setShowLoginModal(false);
-          setShowPasswordResetModal(true);
-        }}
+        isOpen={modals.showLoginModal}
+        onClose={modals.closeLoginModal}
+        onSwitchToRegister={modals.switchToRegister}
+        onSwitchToPasswordReset={modals.switchToPasswordReset}
       />
       <RegisterModal
-        isOpen={showRegisterModal}
-        onClose={() => setShowRegisterModal(false)}
-        onSwitchToLogin={() => {
-          setShowRegisterModal(false);
-          setShowLoginModal(true);
-        }}
+        isOpen={modals.showRegisterModal}
+        onClose={modals.closeRegisterModal}
+        onSwitchToLogin={modals.switchToLogin}
       />
       <PasswordResetModal
-        isOpen={showPasswordResetModal}
-        onClose={() => setShowPasswordResetModal(false)}
-        onSwitchToLogin={() => {
-          setShowPasswordResetModal(false);
-          setShowLoginModal(true);
-        }}
+        isOpen={modals.showPasswordResetModal}
+        onClose={modals.closePasswordResetModal}
+        onSwitchToLogin={modals.switchToLogin}
       />
     </>
   );
@@ -769,8 +757,8 @@ function App() {
           onlinePlayers={onlinePlayers}
           socket={socket}
           botDifficulty={botDifficulty}
-          onShowLogin={() => setShowLoginModal(true)}
-          onShowRegister={() => setShowRegisterModal(true)}
+          onShowLogin={modals.openLoginModal}
+          onShowRegister={modals.openRegisterModal}
           onBotDifficultyChange={setBotDifficulty}
         />
       </>
@@ -1202,6 +1190,15 @@ function App() {
   }
 
   return null;
+}
+
+// Wrapper component to provide modal context
+function App() {
+  return (
+    <ModalProvider>
+      <AppContent />
+    </ModalProvider>
+  );
 }
 
 export default App;
