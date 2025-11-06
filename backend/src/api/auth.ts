@@ -104,8 +104,14 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
     // Return user info (without sensitive data)
     // In development, include verification token for testing
     const isDevelopment = process.env.NODE_ENV !== 'production';
+    const emailServiceConfigured = !!process.env.RESEND_API_KEY;
+
+    const message = user.is_verified
+      ? 'Account created successfully. You can now log in.'
+      : 'Account created successfully. Please check your email to verify your account.';
+
     return res.status(201).json({
-      message: 'Account created successfully. Please check your email to verify your account.',
+      message,
       user: {
         user_id: user.user_id,
         username: user.username,
@@ -114,7 +120,7 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
         is_verified: user.is_verified
       },
       // Only include token in development for manual testing
-      ...(isDevelopment && { verificationToken })
+      ...(isDevelopment && !emailServiceConfigured && { verificationToken })
     });
   } catch (error) {
     console.error('Register error:', error);

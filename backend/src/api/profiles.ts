@@ -13,8 +13,9 @@ import {
   ProfileUpdateData,
   PreferencesUpdateData
 } from '../db/profiles';
-import { updateUserProfile as updateUserAvatar } from '../db/users';
+import { updateUserProfile as updateUserAvatar, getUserById } from '../db/users';
 import { verifyAccessToken } from '../utils/authHelpers';
+import { areFriends } from '../db/friends';
 
 const router = Router();
 
@@ -157,7 +158,49 @@ router.get('/:userId', async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'Profile is private' });
     }
 
-    // TODO: Check if requestor is friend if visibility is 'friends_only'
+    // Check friend-only visibility
+    if (profile.visibility === 'friends_only') {
+      // Extract requestor info from auth header (optional)
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(403).json({ error: 'Profile is only visible to friends' });
+      }
+
+      const token = authHeader.substring(7);
+      const payload = verifyAccessToken(token);
+
+      if (!payload) {
+        return res.status(403).json({ error: 'Profile is only visible to friends' });
+      }
+
+      const requestorId = payload.user_id;
+
+      // Don't block if viewing own profile
+      if (requestorId === userId) {
+        return res.json({ profile });
+      }
+
+      // Check friendship status
+      try {
+        // Get usernames for both users
+        const requestorUser = await getUserById(requestorId);
+        const targetUser = await getUserById(userId);
+
+        if (!requestorUser || !targetUser) {
+          return res.status(403).json({ error: 'Profile is only visible to friends' });
+        }
+
+        const isFriend = await areFriends(requestorUser.username, targetUser.username);
+
+        if (!isFriend) {
+          return res.status(403).json({ error: 'Profile is only visible to friends' });
+        }
+      } catch (error) {
+        console.error('Error checking friendship status:', error);
+        return res.status(403).json({ error: 'Profile is only visible to friends' });
+      }
+    }
 
     return res.json({ profile });
   } catch (error) {

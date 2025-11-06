@@ -580,6 +580,338 @@ frontend/src/
 - ✅ Created stable marathon test architecture
 - 🔲 4 test suites remaining for future refactoring (spectator, timeout, chat)
 
+## 📧 Email Service Architecture (Sprint 3)
+
+### Why Resend Instead of SMTP?
+
+**Problem**: Railway (and most hosting platforms) block outbound SMTP ports (587, 465) to prevent spam.
+
+**Solution**: HTTP-based transactional email API (Resend)
+
+### Implementation Pattern
+
+**Location**: `backend/src/utils/emailService.ts`
+
+```typescript
+import { Resend } from 'resend';
+
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Jaffre <onboarding@resend.dev>';
+
+// Singleton pattern
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend | null {
+  if (!RESEND_API_KEY) {
+    console.warn('⚠️  Email service not configured');
+    return null;
+  }
+
+  if (!resendClient) {
+    resendClient = new Resend(RESEND_API_KEY);
+  }
+
+  return resendClient;
+}
+
+export async function sendVerificationEmail(...): Promise<boolean> {
+  const resend = getResendClient();
+
+  if (!resend) {
+    // Dev mode: Log to console instead
+    console.log(`[DEV MODE] Email would be sent to ${email}`);
+    return false;
+  }
+
+  const { data, error } = await resend.emails.send({
+    from: EMAIL_FROM,
+    to: email,
+    subject: '...',
+    html: '...' // Full HTML template
+  });
+
+  // Never block user flow if email fails
+  return !error;
+}
+```
+
+### Production Considerations
+
+**Free Tier Limitation**: Can only send to email address used for Resend signup
+
+**Solutions**:
+1. **Development**: Use `onboarding@resend.dev` + send to your own email for testing
+2. **Production**: Verify a custom domain ($10-15/year) to send to any user
+
+**See**: `docs/deployment/EMAIL_SETUP.md` for domain verification guide
+
+---
+
+## 🔐 Authentication Architecture (Sprint 3)
+
+### System Overview
+
+**Components**:
+- `backend/src/db/users.ts` - User CRUD operations
+- `backend/src/api/auth.ts` - REST endpoints (register, login, verify, reset)
+- `frontend/src/contexts/AuthContext.tsx` - Global auth state
+- `frontend/src/components/*Modal.tsx` - Login, Register, Password Reset UIs
+
+### Authentication Flow
+
+```
+1. User Registration
+   └─> POST /api/auth/register
+       ├─> Create user in DB (password hashed with bcrypt)
+       ├─> Create email_verification_tokens entry
+       ├─> Send verification email (Resend API)
+       └─> Return { success, message }
+
+2. Email Verification
+   └─> GET /api/auth/verify-email?token=...
+       ├─> Validate token + expiration (24 hours)
+       ├─> Update users.email_verified = true
+       ├─> Delete token
+       └─> Redirect to login
+
+3. User Login
+   └─> POST /api/auth/login
+       ├─> Find user by email
+       ├─> Compare password (bcrypt)
+       ├─> Generate JWT token (7 days)
+       └─> Return { user, token }
+
+4. Password Reset
+   └─> POST /api/auth/forgot-password
+       ├─> Create password_reset_tokens entry
+       ├─> Send reset email (1 hour expiration)
+       └─> POST /api/auth/reset-password?token=...
+           ├─> Validate token
+           ├─> Hash new password
+           ├─> Update user
+           └─> Delete token
+```
+
+### Integration with Game
+
+**Pattern**: Guest mode vs. Authenticated mode
+
+```typescript
+// In App.tsx or Lobby.tsx
+const { user, isAuthenticated } = useAuth();
+
+const playerName = isAuthenticated
+  ? user.username
+  : localStorage.getItem('playerName') || 'Guest';
+
+// Ranked games require authentication
+if (gameMode === 'ranked' && !isAuthenticated) {
+  showAuthModal();
+  return;
+}
+```
+
+**Key Principle**: Never block gameplay with authentication. Guest players can play, but miss features like:
+- Profile customization
+- Friends list
+- Achievements tracking
+- Match history persistence
+
+---
+
+## 🪟 Modal State Management (Sprint 3)
+
+### Problem: Forms Clearing Unexpectedly
+
+**Root Cause**: React re-renders caused modals to remount, losing form state
+
+### Solution: ModalContext Pattern
+
+**Location**: `frontend/src/contexts/ModalContext.tsx`
+
+```typescript
+interface ModalContextType {
+  activeModal: string | null;
+  openModal: (modalName: string) => void;
+  closeModal: () => void;
+}
+
+export function ModalProvider({ children }) {
+  const [activeModal, setActiveModal] = useState<string | null>(null);
+
+  return (
+    <ModalContext.Provider value={{ activeModal, openModal, closeModal }}>
+      {children}
+    </ModalContext.Provider>
+  );
+}
+```
+
+### Usage Pattern
+
+```typescript
+// In App.tsx
+<ModalProvider>
+  <LoginModal />
+  <RegisterModal />
+  <PasswordResetModal />
+  {/* Modals stay mounted but hidden when not active */}
+</ModalProvider>
+
+// In any component
+function SomeComponent() {
+  const { openModal } = useModal();
+
+  return <button onClick={() => openModal('login')}>Sign In</button>;
+}
+
+// In modal component
+function LoginModal() {
+  const { activeModal, closeModal } = useModal();
+  const [email, setEmail] = useState('');
+
+  // Modal stays mounted, so form state persists
+  if (activeModal !== 'login') return null;
+
+  return (
+    <div onClick={closeModal}> {/* Backdrop */}
+      <div onClick={(e) => e.stopPropagation()}> {/* Content */}
+        {/* Form keeps state when reopened */}
+      </div>
+    </div>
+  );
+}
+```
+
+**Key Benefits**:
+- Form state persists when modal is closed/reopened
+- No Rules of Hooks violations
+- Backdrop click closes modal safely
+- Single source of truth for modal visibility
+
+---
+
+## 🏗️ Sprint 3 Refactoring Patterns
+
+### Socket Handler Extraction
+
+**Before (Sprint 2)**: `backend/src/index.ts` was 2,500+ lines
+
+**After (Sprint 3)**: Modular socket handlers (~200-300 lines each)
+
+```
+backend/src/socketHandlers/
+├── lobby.ts          - Game creation, joining, team selection
+├── gameplay.ts       - Betting, card playing, ready states
+├── chat.ts           - Team and lobby chat
+├── spectator.ts      - Spectator mode
+├── bots.ts           - Bot management
+├── connection.ts     - Reconnection and disconnection
+├── stats.ts          - Stats, leaderboard, history
+├── admin.ts          - Kick, rematch, test utils
+├── achievements.ts   - Achievement unlocking
+├── friends.ts        - Friend requests
+└── notifications.ts  - Notification center
+```
+
+**Pattern**:
+```typescript
+// Each handler exports register function
+export function registerLobbyHandlers(
+  io: Server,
+  socket: Socket,
+  games: Map<string, GameState>
+) {
+  socket.on('create_game', async (playerName: string) => {
+    // Handler logic
+  });
+
+  socket.on('join_game', async (data: { gameId: string; playerName: string }) => {
+    // Handler logic
+  });
+}
+
+// In index.ts
+io.on('connection', (socket) => {
+  registerLobbyHandlers(io, socket, games);
+  registerGameplayHandlers(io, socket, games);
+  registerChatHandlers(io, socket, games);
+  // ...
+});
+```
+
+### Database Migration System
+
+**Pattern**: Sequential numbered migrations with automatic tracking
+
+```sql
+-- backend/src/db/migrations/012_user_authentication.sql
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  email_verified BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  token VARCHAR(255) UNIQUE NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Execution**:
+```typescript
+// backend/src/db/runMigrations.ts
+export async function runMigrations() {
+  const migrations = await fs.readdir('./migrations');
+
+  for (const file of migrations.sort()) {
+    const sql = await fs.readFile(`./migrations/${file}`, 'utf-8');
+    await query(sql);
+    console.log(`✅ Ran migration: ${file}`);
+  }
+}
+```
+
+### Component Composition Pattern
+
+**Sprint 3 Example**: Settings Panel consolidation
+
+**Before**: 4 separate tabs, 800+ lines total
+**After**: 2 tabs, 291 lines, using composition
+
+```typescript
+// SettingsPanel.tsx
+function SettingsPanel() {
+  const [activeTab, setActiveTab] = useState('settings');
+
+  return (
+    <Modal>
+      <Tabs>
+        <Tab active={activeTab === 'settings'} onClick={() => setActiveTab('settings')}>
+          Settings
+        </Tab>
+        <Tab active={activeTab === 'advanced'} onClick={() => setActiveTab('advanced')}>
+          Advanced
+        </Tab>
+      </Tabs>
+
+      {activeTab === 'settings' && <SettingsContent />}
+      {activeTab === 'advanced' && <AdvancedContent />}
+    </Modal>
+  );
+}
+```
+
+**Principle**: Consolidate related functionality, extract unrelated concerns
+
+---
+
 ## 🚨 Common Pitfalls
 
 ### ❌ DON'T

@@ -27,12 +27,15 @@ export async function createUser(
     // Hash password
     const passwordHash = await hashPassword(password);
 
+    // Auto-verify users when email service is not configured (development mode)
+    const autoVerify = !process.env.RESEND_API_KEY;
+
     // Create user
     const userResult = await client.query(
-      `INSERT INTO users (username, email, password_hash, display_name)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO users (username, email, password_hash, display_name, is_verified)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING user_id, username, email, display_name, avatar_url, is_verified, is_banned, created_at, last_login_at`,
-      [username, email.toLowerCase(), passwordHash, displayName || username]
+      [username, email.toLowerCase(), passwordHash, displayName || username, autoVerify]
     );
 
     const user = userResult.rows[0];
@@ -60,8 +63,12 @@ export async function createUser(
 
     await client.query('COMMIT');
 
-    // Send verification email
-    await sendVerificationEmail(email, username, verificationToken);
+    // Send verification email only if email service is configured
+    if (!autoVerify) {
+      await sendVerificationEmail(email, username, verificationToken);
+    } else {
+      console.log(`[DEV MODE] User ${username} auto-verified (email service not configured)`);
+    }
 
     return { user, verificationToken };
   } catch (error) {

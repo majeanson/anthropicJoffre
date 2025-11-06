@@ -23,7 +23,6 @@ import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayer
 // import { BotPlayer, BotDifficulty } from './utils/botPlayer';
 import { preloadCardImages } from './utils/imagePreloader';
 import { ErrorBoundary } from './components/ErrorBoundary';
-import { sounds } from './utils/sounds';
 // Sprint 5 Phase 2: Custom hooks for state management
 import { useSocketConnection, checkValidSession } from './hooks/useSocketConnection';
 import { useGameState } from './hooks/useGameState';
@@ -33,6 +32,8 @@ import { useToast } from './hooks/useToast';
 import { useBotManagement } from './hooks/useBotManagement';
 // Sprint 6: Connection quality monitoring
 import { useConnectionQuality } from './hooks/useConnectionQuality';
+// Sprint 3 Refactoring: Audio management
+import { useAudioManager } from './hooks/useAudioManager';
 
 function AppContent() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
@@ -69,6 +70,9 @@ function AppContent() {
   // Sprint 6: Connection quality monitoring
   const connectionStats = useConnectionQuality(socket);
 
+  // Sprint 3 Refactoring: Audio management hook
+  const { soundEnabled, toggleSound, playErrorSound } = useAudioManager({ gameState });
+
   // Debug mode state
   const [debugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
@@ -78,7 +82,6 @@ function AppContent() {
   // UI state
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
   const [autoJoinGameId, setAutoJoinGameId] = useState<string>(''); // URL parameter for auto-join from shared links
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -125,12 +128,7 @@ function AppContent() {
     });
   }, []);
 
-  // Sprint 1 Phase 6: Play game over sound when game ends
-  useEffect(() => {
-    if (gameState && gameState.phase === 'game_over') {
-      sounds.gameOver();
-    }
-  }, [gameState?.phase]);
+  // Sprint 1 Phase 6: Game over sound now handled by useAudioManager hook
 
   // Sprint 2 Phase 1: Listen for achievement unlocks
   useEffect(() => {
@@ -206,7 +204,7 @@ function AppContent() {
 
     // Error events
     const handleError = ({ message }: { message: string }) => {
-      sounds.error(); // Sprint 1 Phase 6
+      playErrorSound(); // Sprint 1 Phase 6 - now using useAudioManager hook
       setError(message);
     };
 
@@ -508,15 +506,7 @@ function AppContent() {
     setAutoplayEnabled(prev => !prev);
   }, []);
 
-  // Sound toggle handler
-  const toggleSound = useCallback(() => {
-    const newState = !soundEnabled;
-    setSoundEnabled(newState);
-    sounds.setEnabled(newState);
-    if (newState) {
-      sounds.buttonClick(); // Play test sound when enabling
-    }
-  }, [soundEnabled]);
+  // Sound toggle handler - now provided by useAudioManager hook
 
   const handleNewChatMessage = (message: ChatMessage) => {
     setChatMessages(prev => [...prev, message]);
