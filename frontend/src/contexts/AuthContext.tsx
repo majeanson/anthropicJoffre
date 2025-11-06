@@ -199,9 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Update user profile
   const updateProfile = useCallback(async (data: ProfileUpdateData) => {
     const token = getAccessToken();
-    if (!token) {
-      throw new Error('Not authenticated');
-    }
+    if (!token) return null;
 
     setError(null);
     try {
