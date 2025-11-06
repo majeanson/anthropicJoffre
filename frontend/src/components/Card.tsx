@@ -1,4 +1,4 @@
-import { memo, useMemo, useState, useEffect } from 'react';
+import { memo, useMemo } from 'react';
 import { Card as CardType, CardColor } from '../types/game';
 
 interface CardProps {
@@ -7,9 +7,6 @@ interface CardProps {
   disabled?: boolean;
   size?: 'tiny' | 'small' | 'medium' | 'large';
   isPlayable?: boolean; // Sprint 1 Phase 1: Indicate if card can be played
-  showPreview?: boolean; // Sprint 1 Phase 1: Enable hover preview
-  onPreviewShow?: (card: CardType, mouseX: number, mouseY: number) => void;
-  onPreviewHide?: () => void;
   isKeyboardSelected?: boolean; // Sprint 1 Phase 1: Keyboard navigation
 }
 
@@ -52,15 +49,8 @@ function CardComponent({
   disabled,
   size = 'medium',
   isPlayable = false,
-  showPreview = false,
-  onPreviewShow,
-  onPreviewHide,
   isKeyboardSelected = false,
 }: CardProps) {
-  // Sprint 1 Phase 1: Hover state management
-  const [isHovered, setIsHovered] = useState(false);
-  const [hoverTimer, setHoverTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
-
   // Memoize expensive calculations
   const isSpecial = useMemo(
     () => (card.color === 'red' || card.color === 'brown') && card.value === 0,
@@ -87,56 +77,11 @@ function CardComponent({
     return `/cards/${card.color}_emblem.jpg`;
   }, [isSpecial, card.color]);
 
-  // Sprint 1 Phase 1: Show preview after 500ms hover
-  useEffect(() => {
-    if (isHovered && showPreview && !disabled && onPreviewShow) {
-      const timer = setTimeout(() => {
-        // Get mouse position - we'll track it from the event
-        // For now, we'll trigger the preview without exact mouse coords
-        // The parent component will handle positioning
-      }, 500);
-      setHoverTimer(timer);
-      return () => clearTimeout(timer);
-    } else {
-      if (hoverTimer) {
-        clearTimeout(hoverTimer);
-        setHoverTimer(null);
-      }
-      if (!isHovered && onPreviewHide) {
-        onPreviewHide();
-      }
-    }
-  }, [isHovered, showPreview, disabled, onPreviewShow, onPreviewHide, hoverTimer]);
-
-  // Sprint 1 Phase 1: Mouse event handlers
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    setIsHovered(true);
-    if (showPreview && !disabled && onPreviewShow) {
-      // Trigger preview after delay
-      const timer = setTimeout(() => {
-        onPreviewShow(card, e.clientX, e.clientY);
-      }, 500);
-      setHoverTimer(timer);
-    }
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    if (hoverTimer) {
-      clearTimeout(hoverTimer);
-      setHoverTimer(null);
-    }
-    if (onPreviewHide) {
-      onPreviewHide();
-    }
-  };
 
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       data-testid={`card-${card.color}-${card.value}`}
       data-card-value={card.value}
       data-card-color={card.color}
@@ -195,7 +140,6 @@ function arePropsEqual(prevProps: CardProps, nextProps: CardProps) {
     prevProps.size === nextProps.size &&
     prevProps.onClick === nextProps.onClick &&
     prevProps.isPlayable === nextProps.isPlayable &&
-    prevProps.showPreview === nextProps.showPreview &&
     prevProps.isKeyboardSelected === nextProps.isKeyboardSelected
   );
 }

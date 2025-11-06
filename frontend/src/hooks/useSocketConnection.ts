@@ -12,6 +12,7 @@
 import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { PlayerSession } from '../types/game';
+import { useAuth } from '../contexts/AuthContext';
 
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 const SESSION_TIMEOUT = 900000; // 15 minutes
@@ -52,12 +53,15 @@ export function checkValidSession(): boolean {
  * @returns Socket instance, reconnecting state, and error state
  */
 export function useSocketConnection() {
+  const { getAccessToken, isAuthenticated } = useAuth();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [reconnecting, setReconnecting] = useState<boolean>(false);
   const [reconnectAttempt, setReconnectAttempt] = useState<number>(0);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    const token = getAccessToken();
+
     const newSocket = io(SOCKET_URL, {
       // Enable automatic reconnection with exponential backoff
       reconnection: true,
@@ -66,6 +70,10 @@ export function useSocketConnection() {
       reconnectionDelayMax: 5000,
       // Connection timeout
       timeout: 10000,
+      // Send JWT token for authentication
+      auth: {
+        token: token || undefined,
+      },
     });
 
     setSocket(newSocket);
@@ -126,7 +134,7 @@ export function useSocketConnection() {
     return () => {
       newSocket.close();
     };
-  }, []);
+  }, [isAuthenticated, getAccessToken]); // Reconnect when authentication changes
 
   return { socket, reconnecting, reconnectAttempt, error, setError };
 }

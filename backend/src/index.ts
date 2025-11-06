@@ -181,6 +181,7 @@ import {
 import { registerRoutes } from './api/routes';
 import authRoutes from './api/auth'; // Sprint 3 Phase 1
 import profileRoutes from './api/profiles'; // Sprint 3 Phase 3.2
+import { verifyAccessToken } from './utils/authHelpers'; // Sprint 3: JWT verification
 import { registerLobbyHandlers } from './socketHandlers/lobby';
 import { registerGameplayHandlers } from './socketHandlers/gameplay';
 import { registerChatHandlers } from './socketHandlers/chat';
@@ -836,9 +837,33 @@ app.use('/api/profiles', profileRoutes);
 
 // ============================================================================
 
+// Socket.IO authentication middleware - set playerName from JWT token if available
+io.use((socket, next) => {
+  try {
+    const token = socket.handshake.auth.token;
+
+    if (token) {
+      const payload = verifyAccessToken(token);
+
+      if (payload && payload.username) {
+        // Set playerName from authenticated user
+        socket.data.playerName = payload.username;
+        console.log(`Socket ${socket.id} authenticated as ${payload.username}`);
+      }
+    }
+
+    // Continue even if not authenticated (guest users can still play)
+    next();
+  } catch (error) {
+    // Don't block connection on auth error, just log it
+    console.error('Socket auth error:', error);
+    next();
+  }
+});
+
 // Socket.io event handlers
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id);
+  console.log('Client connected:', socket.id, socket.data.playerName ? `(authenticated as ${socket.data.playerName})` : '(guest)');
 
   // Register connection with ConnectionManager
   connectionManager.registerConnection(socket);

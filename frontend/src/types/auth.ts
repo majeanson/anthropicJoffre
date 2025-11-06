@@ -80,4 +80,5 @@ export interface AuthContextType {
   clearError: () => void;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;
   getUserProfile: () => Promise<{ profile: UserProfile | null; preferences: UserPreferences | null } | null>;
+  getAccessToken: () => string | null;
 }

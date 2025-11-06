@@ -148,6 +148,7 @@ export const joinGamePayloadSchema = z.object({
   gameId: gameIdSchema,
   playerName: playerNameSchema,
   isBot: booleanSchema.optional(),
+  botDifficulty: botDifficultySchema.optional(),
 }).strict();
 
 /**

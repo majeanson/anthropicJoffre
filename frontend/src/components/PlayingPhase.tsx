@@ -1,7 +1,6 @@
-import { useState, useEffect, useMemo, useCallback, memo } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { Card as CardComponent } from './Card';
-import { CardPreview } from './CardPreview'; // Sprint 1 Phase 1
 import { CardPlayEffect } from './CardPlayEffect'; // Sprint 1 Phase 2
 import { ConfettiEffect } from './ConfettiEffect'; // Sprint 1 Phase 3
 import { TrickWinnerBanner } from './TrickWinnerBanner'; // Sprint 1 Phase 3
@@ -84,15 +83,17 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
 
   // Sprint 6: Keyboard navigation state
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
-
-  // Sprint 1 Phase 1: Card preview state
-  const [cardPreview, setCardPreview] = useState<{ card: CardType; mouseX: number; mouseY: number } | null>(null);
-
   // Sprint 1 Phase 2: Card play effect state
   const [playEffect, setPlayEffect] = useState<{ card: CardType; position: { x: number; y: number } } | null>(null);
 
   // Sprint 1 Phase 3: Trick winner celebration state
-  const [trickWinner, setTrickWinner] = useState<{ playerName: string; points: number; teamId: 1 | 2 } | null>(null);
+  const [trickWinner, setTrickWinner] = useState<{ playerName: string; points: number; teamId: 1 | 2; position: 'bottom' | 'left' | 'top' | 'right' } | null>(null);
+
+  // Track autoplayEnabled with ref to avoid stale closure in timeout callback
+  const autoplayEnabledRef = useRef(autoplayEnabled);
+  useEffect(() => {
+    autoplayEnabledRef.current = autoplayEnabled;
+  }, [autoplayEnabled]);
 
   // Memoize expensive computations (now using the pre-validated playerLookup)
   const currentPlayer = useMemo(
@@ -104,6 +105,13 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     () => !isSpectator && gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId,
     [isSpectator, gameState.players, gameState.currentPlayerIndex, currentPlayerId]
   );
+
+  // Handle autoplay timeout - enable autoplay if not already enabled
+  const handleAutoplayTimeout = useCallback(() => {
+    if (isCurrentTurn && onAutoplayToggle && !autoplayEnabledRef.current) {
+      onAutoplayToggle();
+    }
+  }, [isCurrentTurn, onAutoplayToggle]);
 
   // Listen for chat messages to update unread count
   useEffect(() => {
@@ -133,10 +141,24 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     const handleTrickResolved = ({ winnerId, points, gameState: newGameState }: { winnerId: string; points: number; gameState: GameState }) => {
       const winner = newGameState.players.find(p => p.id === winnerId);
       if (winner) {
+        // Calculate winner's position relative to current player view
+        const winnerIndex = newGameState.players.findIndex(p => p.id === winnerId);
+        const currentIndex = newGameState.currentPlayerIndex;
+        const relativePosition = (winnerIndex - currentIndex + 4) % 4;
+
+        // Map position index to layout position
+        const positionMap: { [key: number]: 'bottom' | 'left' | 'top' | 'right' } = {
+          0: 'bottom', // Current player (bottom)
+          1: 'left',   // Next player counter-clockwise
+          2: 'top',    // Opposite player
+          3: 'right'   // Previous player counter-clockwise
+        };
+
         setTrickWinner({
           playerName: winner.name,
           points,
-          teamId: winner.teamId
+          teamId: winner.teamId,
+          position: positionMap[relativePosition]
         });
 
         // Clear celebration after 2 seconds
@@ -239,11 +261,17 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     }
   }, [gameState.previousTrick?.winnerId]);
 
-  // Your turn notification sound
+  // Your turn notification sound - only after 10 seconds of inactivity
   useEffect(() => {
-    if (isCurrentTurn && gameState.currentTrick.length > 0) {
+    if (!isCurrentTurn) return;
+
+    // Set a 10-second timeout to play the reminder sound
+    const timeoutId = setTimeout(() => {
       sounds.yourTurn();
-    }
+    }, 10000); // 10 seconds
+
+    // Cleanup: cancel the timeout if turn changes or component unmounts
+    return () => clearTimeout(timeoutId);
   }, [isCurrentTurn, gameState.currentPlayerIndex]);
 
   // Score change animation (for cumulative scores at round end)
@@ -455,8 +483,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
 
     setIsPlayingCard(true);
     setCardInTransition(card); // Mark card as transitioning
-    setCardPreview(null); // Sprint 1 Phase 1: Hide preview when card is played
-
+   
     // Sprint 1 Phase 2: Play confirmation sound and effect
     sounds.cardConfirm(card.value);
     if (event) {
@@ -478,15 +505,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       setCardInTransition(null);
     }, 450); // Slightly longer than the 400ms animation
   }, [isPlayingCard, isCurrentTurn, isCardPlayable, onPlayCard]);
-
-  // Sprint 1 Phase 1: Card preview handlers
-  const handleCardPreviewShow = useCallback((card: CardType, mouseX: number, mouseY: number) => {
-    setCardPreview({ card, mouseX, mouseY });
-  }, []);
-
-  const handleCardPreviewHide = useCallback(() => {
-    setCardPreview(null);
-  }, []);
 
   const cardPositions = getCardPositions(gameState.currentTrick);
   const previousCardPositions = gameState.previousTrick ? getCardPositions(gameState.previousTrick.trick) : null;
@@ -699,11 +717,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                     duration={60000}
                     isActive={true}
                     resetKey={gameState.currentPlayerIndex}
-                    onTimeout={() => {
-                      if (isCurrentTurn && onAutoplayToggle && !autoplayEnabled) {
-                        onAutoplayToggle();
-                      }
-                    }}
+                    onTimeout={handleAutoplayTimeout}
                   />
                 </div>
               )}
@@ -1026,9 +1040,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                               onClick={(e) => handleCardClick(card, e)}
                               disabled={!isCurrentTurn || !playable || !!isTransitioning}
                               isPlayable={playable && isCurrentTurn}
-                              showPreview={isCurrentTurn && !isTransitioning}
-                              onPreviewShow={handleCardPreviewShow}
-                              onPreviewHide={handleCardPreviewHide}
                               isKeyboardSelected={isSelected}
                             />
                           </div>
@@ -1062,14 +1073,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
         />
       )}
 
-      {/* Sprint 1 Phase 1: Card Preview */}
-      {cardPreview && (
-        <CardPreview
-          card={cardPreview.card}
-          mouseX={cardPreview.mouseX}
-          mouseY={cardPreview.mouseY}
-        />
-      )}
 
       {/* Sprint 1 Phase 2: Card Play Effect */}
       {playEffect && (
@@ -1086,6 +1089,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
           <ConfettiEffect
             teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
             duration={2000}
+            position={trickWinner.position}
           />
           <TrickWinnerBanner
             playerName={trickWinner.playerName}

@@ -255,7 +255,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     error,
     clearError,
     updateProfile,
-    getUserProfile
+    getUserProfile,
+    getAccessToken
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

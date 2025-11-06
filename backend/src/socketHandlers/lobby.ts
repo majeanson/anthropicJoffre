@@ -12,7 +12,7 @@
  */
 
 import { Socket, Server } from 'socket.io';
-import { GameState, Player, PlayerSession } from '../types/game';
+import { GameState, Player, PlayerSession, BotDifficulty } from '../types/game';
 import { Logger } from 'winston';
 
 // Import validation schemas and functions
@@ -211,7 +211,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   // ============================================================================
   // join_game - Join existing game
   // ============================================================================
-  socket.on('join_game', errorBoundaries.gameAction('join_game')(async (payload: { gameId: string; playerName: string; isBot?: boolean }) => {
+  socket.on('join_game', errorBoundaries.gameAction('join_game')(async (payload: { gameId: string; playerName: string; isBot?: boolean; botDifficulty?: BotDifficulty }) => {
     // Sprint 2: Validate input with Zod schema
     const validation = validateInput(joinGamePayloadSchema, payload);
     if (!validation.success) {
@@ -225,7 +225,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       return;
     }
 
-    const { gameId, playerName: validatedPlayerName, isBot } = validation.data;
+    const { gameId, playerName: validatedPlayerName, isBot, botDifficulty } = validation.data;
 
     // Player name is already validated and sanitized by Zod schema
     const sanitizedName = validatedPlayerName;
@@ -387,6 +387,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       tricksWon: 0,
       pointsWon: 0,
       isBot: isBot || false,
+      botDifficulty: isBot ? (botDifficulty || 'medium') : undefined,
       connectionStatus: 'connected',
     };
 

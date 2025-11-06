@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { GameState, BotDifficulty } from '../types/game';
 
 interface BotManagementPanelProps {
@@ -8,6 +8,9 @@ interface BotManagementPanelProps {
   currentPlayerId: string;
   onReplaceWithBot: (playerName: string) => void;
   onChangeBotDifficulty: (botName: string, difficulty: BotDifficulty) => void;
+  onKickPlayer?: (playerId: string) => void;
+  onSwapPosition?: (targetPlayerId: string) => void;
+  creatorId?: string;
 }
 
 export const BotManagementPanel = memo(function BotManagementPanel({
@@ -17,27 +20,64 @@ export const BotManagementPanel = memo(function BotManagementPanel({
   currentPlayerId,
   onReplaceWithBot,
   onChangeBotDifficulty,
+  onKickPlayer,
+  onSwapPosition,
+  creatorId,
 }: BotManagementPanelProps) {
   // Early return BEFORE any logic to prevent flickering
   if (!isOpen || !gameState) return null;
 
+  const [swapMode, setSwapMode] = useState(false);
+  const [selectedPlayerToSwap, setSelectedPlayerToSwap] = useState<string | null>(null);
+
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
   const botCount = gameState.players.filter(p => p.isBot).length;
   const canAddMoreBots = botCount < 3;
+  const isCreator = creatorId && currentPlayerId === creatorId;
 
-  // Check if player is teammate (same team) for replace button
-  const isTeammate = (player: typeof gameState.players[0]) => {
-    if (!currentPlayer) return false;
-    return player.teamId === currentPlayer.teamId;
-  };
-
-  // Can only replace humans with bots, not yourself, and only teammates
+  // Can only replace humans with bots, not yourself (creator only)
   const canReplace = (player: typeof gameState.players[0]) => {
     return currentPlayer &&
            !player.isBot &&
+           !player.isEmpty &&
            player.id !== currentPlayerId &&
-           isTeammate(player) &&
+           isCreator &&
            canAddMoreBots;
+  };
+
+  // Can kick any non-empty player except yourself (creator only)
+  const canKick = (player: typeof gameState.players[0]) => {
+    return isCreator &&
+           !player.isEmpty &&
+           player.id !== currentPlayerId &&
+           onKickPlayer;
+  };
+
+  // Handle swap initiation
+  const handleSwapClick = (playerId: string) => {
+    if (swapMode && selectedPlayerToSwap === playerId) {
+      // Cancel swap if clicking the same player
+      setSwapMode(false);
+      setSelectedPlayerToSwap(null);
+    } else if (swapMode && selectedPlayerToSwap && selectedPlayerToSwap !== playerId) {
+      // Complete the swap
+      if (onSwapPosition) {
+        onSwapPosition(playerId);
+      }
+      setSwapMode(false);
+      setSelectedPlayerToSwap(null);
+    } else {
+      // Start swap mode
+      setSwapMode(true);
+      setSelectedPlayerToSwap(playerId);
+    }
+  };
+
+  // Can swap with any other non-empty player
+  const canSwap = (player: typeof gameState.players[0]) => {
+    return !player.isEmpty &&
+           player.id !== currentPlayerId &&
+           onSwapPosition;
   };
 
   return (
@@ -52,16 +92,20 @@ export const BotManagementPanel = memo(function BotManagementPanel({
         {/* Header - Match PlayerStatsModal pattern */}
         <div className="sticky top-0 bg-gradient-to-r from-blue-700 to-blue-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-blue-950 dark:border-gray-900 z-10">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">🤖</span>
+            <span className="text-4xl">⚙️</span>
             <div>
-              <h2 className="text-2xl font-bold text-white">Bot Management</h2>
+              <h2 className="text-2xl font-bold text-white">Team Management</h2>
               <p className="text-blue-200 dark:text-gray-300 font-semibold">
-                Bots: {botCount}/3 • {canAddMoreBots ? 'Can add more' : 'Max reached'}
+                {isCreator ? 'Manage teams, positions & bots' : 'View teams & bots'} • Bots: {botCount}/3
               </p>
             </div>
           </div>
           <button
-            onClick={onClose}
+            onClick={() => {
+              setSwapMode(false);
+              setSelectedPlayerToSwap(null);
+              onClose();
+            }}
             className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
           >
             ✕
@@ -130,9 +174,9 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                       </div>
                     </div>
                   ) : player.isBot ? (
-                    <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2 bg-gray-200 px-3 py-1.5 rounded-full">
-                        <span className="text-sm font-bold text-gray-700">🤖 Bot</span>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 px-3 py-1.5 rounded-full">
+                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">🤖 Bot</span>
                       </div>
 
                       {/* Difficulty Selector - Dark mode support */}
@@ -149,42 +193,137 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                         <option value="medium">🙂 Medium</option>
                         <option value="hard">😎 Hard</option>
                       </select>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 bg-green-100 px-3 py-1.5 rounded-full">
-                        <span className="text-sm font-bold text-green-700">👤 Human</span>
-                      </div>
 
-                      {/* Replace Button */}
-                      {canReplace(player) ? (
+                      {/* Swap Button for Bots */}
+                      {canSwap(player) && (
                         <button
                           onClick={(e) => {
-                            e.stopPropagation(); // Prevent modal closing on click
-                            onReplaceWithBot(player.name);
+                            e.stopPropagation();
+                            handleSwapClick(player.id);
                           }}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-lg text-sm font-bold transition-colors"
-                          title="Replace with bot"
+                          className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                            swapMode && selectedPlayerToSwap === player.id
+                              ? 'bg-yellow-600 hover:bg-yellow-700 text-white ring-2 ring-yellow-400'
+                              : swapMode
+                              ? 'bg-green-600 hover:bg-green-700 text-white'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          }`}
+                          title={swapMode && selectedPlayerToSwap === player.id ? 'Cancel swap' : swapMode ? 'Swap with this bot' : 'Swap positions'}
                         >
-                          Replace
+                          {swapMode && selectedPlayerToSwap === player.id ? 'Cancel' : swapMode ? '↔️ Swap' : '↔️'}
                         </button>
-                      ) : (
-                        <div className="w-[88px]" /> // Placeholder for alignment
                       )}
+
+                      {/* Kick Bot Button */}
+                      {canKick(player) && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm(`Remove bot ${player.name}?`)) {
+                              onKickPlayer!(player.id);
+                            }
+                          }}
+                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                          title="Remove bot from game"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                      <div className="flex items-center gap-2 bg-green-100 dark:bg-green-900/30 px-3 py-1.5 rounded-full">
+                        <span className="text-sm font-bold text-green-700 dark:text-green-300">👤 Human</span>
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-2">
+                        {/* Swap Button */}
+                        {canSwap(player) && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSwapClick(player.id);
+                            }}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${
+                              swapMode && selectedPlayerToSwap === player.id
+                                ? 'bg-yellow-600 hover:bg-yellow-700 text-white ring-2 ring-yellow-400'
+                                : swapMode
+                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                            }`}
+                            title={swapMode && selectedPlayerToSwap === player.id ? 'Cancel swap' : swapMode ? 'Swap with this player' : 'Swap positions'}
+                          >
+                            {swapMode && selectedPlayerToSwap === player.id ? 'Cancel' : swapMode ? '↔️ Swap' : '↔️'}
+                          </button>
+                        )}
+
+                        {/* Replace with Bot Button */}
+                        {canReplace(player) && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onReplaceWithBot(player.name);
+                            }}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            title="Replace with bot"
+                          >
+                            🤖 Bot
+                          </button>
+                        )}
+
+                        {/* Kick Button */}
+                        {canKick(player) && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm(`Remove ${player.name} from the game?`)) {
+                                onKickPlayer!(player.id);
+                              }
+                            }}
+                            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            title="Remove player from game"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
 
-                {/* Replacement Restrictions Tooltip */}
-                {!player.isBot && !isEmptySeat && !canReplace(player) && player.id !== currentPlayerId && (
-                  <div className="mt-2 text-xs text-gray-600 dark:text-gray-400 italic">
-                    {!isTeammate(player) && "⛔ Not your teammate"}
-                    {isTeammate(player) && !canAddMoreBots && "⛔ Max 3 bots reached"}
+                {/* Swap Mode Indicator */}
+                {swapMode && selectedPlayerToSwap === player.id && (
+                  <div className="mt-2 text-sm bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-3 py-2 rounded-lg border-2 border-yellow-300 dark:border-yellow-600 font-semibold animate-pulse">
+                    👆 Click another player to swap positions
                   </div>
                 )}
               </div>
             );
           })}
+
+          {/* Swap Mode Global Indicator */}
+          {swapMode && (
+            <div className="mt-4 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 border-2 border-blue-500 dark:border-blue-600 rounded-lg p-4 text-center">
+              <p className="text-blue-900 dark:text-blue-200 font-bold text-lg mb-2">
+                🔄 Swap Mode Active
+              </p>
+              <p className="text-blue-700 dark:text-blue-300 text-sm">
+                {selectedPlayerToSwap
+                  ? 'Click another player to complete the swap, or click the yellow "Cancel" button'
+                  : 'Select a player to swap with'}
+              </p>
+            </div>
+          )}
+
+          {/* Help Text for Non-Creators */}
+          {!isCreator && (
+            <div className="mt-4 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
+              <p className="text-gray-700 dark:text-gray-300 text-sm">
+                ℹ️ Only the game creator can manage teams and swap positions
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

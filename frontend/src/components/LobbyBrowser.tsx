@@ -253,7 +253,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                 : 'text-umber-600 dark:text-gray-400 hover:bg-parchment-200 dark:hover:bg-gray-600'
             }`}
           >
-            📜 Recent Games
+            📜 Recent Finished Games
           </button>
         </div>
 

@@ -74,6 +74,18 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
     handleChangeBotDifficulty,
   } = useBotManagement(socket, gameId, gameState);
 
+  // Handler for kicking players
+  const handleKickPlayer = (playerId: string) => {
+    if (!socket || !gameId) return;
+    socket.emit('kick_player', { gameId, playerIdToKick: playerId });
+  };
+
+  // Handler for swapping positions
+  const handleSwapPosition = (targetPlayerId: string) => {
+    if (!socket || !gameId) return;
+    socket.emit('swap_position', { gameId, targetPlayerId });
+  };
+
   return (
     <>
       {/* Connection & Toast UI */}
@@ -99,6 +111,9 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
             currentPlayerId={socket?.id || ''}
             onChangeBotDifficulty={handleChangeBotDifficulty}
             onReplaceWithBot={handleReplaceWithBot}
+            onKickPlayer={handleKickPlayer}
+            onSwapPosition={handleSwapPosition}
+            creatorId={gameState.creatorId}
           />
           <FriendsPanel
             isOpen={showFriendsPanel}

@@ -65,6 +65,21 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     }
   }, [gameState.roundHistory, gameState.roundNumber]);
 
+  // Keyboard accessibility - Enter to mark ready
+  useEffect(() => {
+    if (!dataReady) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onReady();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [dataReady, onReady]);
+
   if (!lastRound) {
     return null;
   }
@@ -238,6 +253,16 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
         <h2 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 mb-2">
           Round {gameState.roundNumber} Complete
         </h2>
+      </div>
+      
+      {/* Ready Button */}
+      <div className="flex justify-center pt-4 animate-fadeInUp" style={{ animationDelay: '600ms' }}>
+        <button
+          onClick={onReady}
+          className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 dark:from-blue-500 dark:to-purple-600 text-white font-bold text-lg rounded-xl hover:from-amber-600 hover:to-orange-700 dark:hover:from-blue-600 dark:hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl hover:shadow-2xl"
+        >
+          Ready for Next Round
+        </button>
       </div>
 
       {/* Team Scores */}
@@ -446,15 +471,6 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
         </div>
       </div>
 
-      {/* Ready Button */}
-      <div className="flex justify-center pt-4 animate-fadeInUp" style={{ animationDelay: '600ms' }}>
-        <button
-          onClick={onReady}
-          className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 dark:from-blue-500 dark:to-purple-600 text-white font-bold text-lg rounded-xl hover:from-amber-600 hover:to-orange-700 dark:hover:from-blue-600 dark:hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl hover:shadow-2xl"
-        >
-          Ready for Next Round
-        </button>
-      </div>
     </div>
   );
 };

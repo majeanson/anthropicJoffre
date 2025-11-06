@@ -226,7 +226,8 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
       botSocket.on('connect', () => {
         // Join as a fresh bot connection (server will handle reconnection internally)
-        botSocket.emit('join_game', { gameId: gameState.id, playerName: botName, isBot: true });
+        const difficulty = botDifficultiesRef.current.get(botName) || botPlayer.botDifficulty || 'medium';
+        botSocket.emit('join_game', { gameId: gameState.id, playerName: botName, isBot: true, botDifficulty: difficulty });
       });
 
       botSocket.on('player_joined', ({ player, gameState: newState }: { player?: any; gameState: GameState; session?: PlayerSession }) => {
@@ -312,7 +313,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
 
     botSocket.on('connect', () => {
-      botSocket.emit('join_game', { gameId, playerName: botName, isBot: true });
+      botSocket.emit('join_game', { gameId, playerName: botName, isBot: true, botDifficulty });
     });
 
     botSocket.on('player_joined', ({ gameState: state }: { gameState: GameState }) => {
@@ -372,7 +373,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
         handleBotAction(botSocket, state, botPlayerId);
       }
     });
-  }, [socket, gameId, gameState, handleBotAction]);
+  }, [socket, gameId, gameState, handleBotAction, botDifficulty]);
 
   /**
    * Quick Play: Create game with 3 bots
@@ -396,7 +397,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
           botSocket.on('connect', () => {
             console.log(`[Quick Play] ${botName} connected, joining game ${createdGameId}`);
-            botSocket.emit('join_game', { gameId: createdGameId, playerName: botName, isBot: true });
+            botSocket.emit('join_game', { gameId: createdGameId, playerName: botName, isBot: true, botDifficulty: difficulty });
           });
 
           botSocket.on('error', (error: any) => {

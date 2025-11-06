@@ -109,27 +109,26 @@ export function NotificationCenter({ socket, isAuthenticated }: NotificationCent
     }
   };
 
-  if (!isAuthenticated) return null;
+  // Only show if authenticated AND has unread notifications
+  if (!isAuthenticated || unreadCount === 0) return null;
 
   return (
-    <div className="relative" ref={dropdownRef}>
-      {/* Bell Icon with Badge */}
+    <div className="fixed bottom-4 right-4 z-40" ref={dropdownRef}>
+      {/* Floating Bell Button with Badge */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+        className="relative p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl transition-all duration-200 hover:scale-110 active:scale-95"
         title="Notifications"
       >
         <span className="text-2xl">🔔</span>
-        {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
+        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
+          {unreadCount > 9 ? '9+' : unreadCount}
+        </span>
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown - Positioned above the floating button */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-gray-200 dark:border-gray-600 z-50 max-h-[600px] flex flex-col">
+        <div className="absolute right-0 bottom-full mb-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-gray-200 dark:border-gray-600 z-50 max-h-[600px] flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b-2 border-gray-200 dark:border-gray-600">
             <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">

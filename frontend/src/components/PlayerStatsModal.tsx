@@ -130,7 +130,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
 
   // Fetch game history when history tab is active
   useEffect(() => {
-    if (!isOpen || activeTab !== 'history' || !playerName || historyLoading) return;
+    if (!isOpen || activeTab !== 'history' || !playerName) return;
 
     setHistoryLoading(true);
     console.log('[PlayerStatsModal] Requesting history for:', playerName);
@@ -156,11 +156,11 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       socket.off('player_history_response', handleHistoryResponse);
       socket.off('error', handleError);
     };
-  }, [isOpen, activeTab, playerName, socket, historyLoading]);
+  }, [isOpen, activeTab, playerName, socket]);
 
   // Fetch profile data when profile tab is active and it's the user's own profile
   useEffect(() => {
-    if (!isOpen || activeTab !== 'profile' || !isOwnProfile || profileLoading) return;
+    if (!isOpen || activeTab !== 'profile' || !isOwnProfile) return;
 
     const loadProfile = async () => {
       setProfileLoading(true);
@@ -180,7 +180,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     };
 
     loadProfile();
-  }, [isOpen, activeTab, isOwnProfile, getUserProfile, profileLoading]);
+  }, [isOpen, activeTab, isOwnProfile, getUserProfile]);
 
   if (!isOpen) return null;
 

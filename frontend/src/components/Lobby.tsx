@@ -56,6 +56,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
   const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual'); // Default to casual for Quick Play
   const [createGamePersistence, setCreateGamePersistence] = useState<'elo' | 'casual'>('elo'); // Default to ELO for manual creation
+  const [focusedTabIndex, setFocusedTabIndex] = useState<number | null>(null); // 0=PLAY, 1=SOCIAL, 2=STATS, 3=SETTINGS
+  const [focusedButtonIndex, setFocusedButtonIndex] = useState<number>(0); // Index within active tab
 
 
   // Load recent players on mount
@@ -93,6 +95,133 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
       }
     }
   }, [autoJoinGameId, mode]);
+
+  // Keyboard navigation for lobby menu
+  useEffect(() => {
+    if (mode !== 'menu') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Tab navigation with Arrow Left/Right
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        e.preventDefault();
+        const tabs = ['play', 'social', 'stats', 'settings'];
+        const currentIndex = tabs.indexOf(mainTab);
+
+        if (e.key === 'ArrowRight') {
+          const nextIndex = (currentIndex + 1) % tabs.length;
+          setMainTab(tabs[nextIndex] as typeof mainTab);
+          setFocusedTabIndex(nextIndex);
+          setFocusedButtonIndex(0);
+        } else {
+          const prevIndex = currentIndex === 0 ? tabs.length - 1 : currentIndex - 1;
+          setMainTab(tabs[prevIndex] as typeof mainTab);
+          setFocusedTabIndex(prevIndex);
+          setFocusedButtonIndex(0);
+        }
+        sounds.buttonClick();
+      }
+
+      // Button navigation within tab with Arrow Up/Down
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+        e.preventDefault();
+
+        // Get all interactive buttons in current tab
+        const buttons = getActiveTabButtons();
+
+        if (buttons.length === 0) return;
+
+        // Initialize focus if not set
+        if (focusedTabIndex === null) {
+          const tabs = ['play', 'social', 'stats', 'settings'];
+          setFocusedTabIndex(tabs.indexOf(mainTab));
+          setFocusedButtonIndex(0);
+          sounds.buttonClick();
+          return;
+        }
+
+        if (e.key === 'ArrowDown') {
+          setFocusedButtonIndex((prev) => (prev + 1) % buttons.length);
+        } else {
+          setFocusedButtonIndex((prev) => prev === 0 ? buttons.length - 1 : prev - 1);
+        }
+        sounds.buttonClick();
+      }
+
+      // Activate focused button with Enter
+      else if (e.key === 'Enter') {
+        if (focusedTabIndex !== null) {
+          e.preventDefault();
+          const buttons = getActiveTabButtons();
+          const button = buttons[focusedButtonIndex];
+          if (button) {
+            button.click();
+          }
+        }
+      }
+
+      // Clear focus with Escape
+      else if (e.key === 'Escape') {
+        setFocusedTabIndex(null);
+        setFocusedButtonIndex(0);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mode, mainTab, socialTab, focusedTabIndex, focusedButtonIndex, playerName, socket, hasValidSession, onlinePlayers]);
+
+  // Helper function to get all interactive buttons in the current tab
+  const getActiveTabButtons = (): HTMLButtonElement[] => {
+    const buttons: HTMLButtonElement[] = [];
+
+    if (mainTab === 'play') {
+      // Rejoin button (if available)
+      if (hasValidSession && onRejoinGame) {
+        const rejoinBtn = document.querySelector('[data-testid="rejoin-game-button"]') as HTMLButtonElement;
+        if (rejoinBtn) buttons.push(rejoinBtn);
+      }
+
+      // Create Game, Browse Games, Quick Play buttons
+      const createBtn = document.querySelector('[data-testid="create-game-button"]') as HTMLButtonElement;
+      const browseBtn = document.querySelector('[data-keyboard-nav="browse-games"]') as HTMLButtonElement;
+      const quickPlayBtn = document.querySelector('[data-testid="quick-play-button"]') as HTMLButtonElement;
+
+      if (createBtn) buttons.push(createBtn);
+      if (browseBtn) buttons.push(browseBtn);
+      if (quickPlayBtn) buttons.push(quickPlayBtn);
+    } else if (mainTab === 'social') {
+      // Social sub-tabs
+      const onlineTabBtn = document.querySelector('[data-keyboard-nav="social-online"]') as HTMLButtonElement;
+      const chatTabBtn = document.querySelector('[data-keyboard-nav="social-chat"]') as HTMLButtonElement;
+      const recentTabBtn = document.querySelector('[data-keyboard-nav="social-recent"]') as HTMLButtonElement;
+
+      if (onlineTabBtn) buttons.push(onlineTabBtn);
+      if (chatTabBtn) buttons.push(chatTabBtn);
+      if (recentTabBtn) buttons.push(recentTabBtn);
+
+      // Join buttons for online players
+      if (socialTab === 'online') {
+        const joinButtons = Array.from(document.querySelectorAll('[data-keyboard-nav^="join-player-"]')) as HTMLButtonElement[];
+        buttons.push(...joinButtons);
+      }
+    } else if (mainTab === 'stats') {
+      const myStatsBtn = document.querySelector('[data-keyboard-nav="my-stats"]') as HTMLButtonElement;
+      const leaderboardBtn = document.querySelector('[data-keyboard-nav="leaderboard"]') as HTMLButtonElement;
+      const recentGamesBtn = document.querySelector('[data-keyboard-nav="recent-games"]') as HTMLButtonElement;
+
+      if (myStatsBtn) buttons.push(myStatsBtn);
+      if (leaderboardBtn) buttons.push(leaderboardBtn);
+      if (recentGamesBtn) buttons.push(recentGamesBtn);
+    } else if (mainTab === 'settings') {
+      const rulesBtn = document.querySelector('[data-keyboard-nav="how-to-play"]') as HTMLButtonElement;
+      const debugBtn = document.querySelector('[data-keyboard-nav="debug-fun"]') as HTMLButtonElement;
+
+      if (rulesBtn) buttons.push(rulesBtn);
+      if (debugBtn) buttons.push(debugBtn);
+    }
+
+    return buttons;
+  };
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -165,7 +294,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 dark:from-blue-400 dark:via-purple-500 dark:to-pink-500 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
                 J⋀ffre
               </h1>
-              {playerName.trim() && (
+              {playerName.trim() && !user && (
                 <p className="text-sm text-umber-600 dark:text-gray-400 mt-2 font-medium">
                   Joined as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
                 </p>
@@ -302,6 +431,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </button>
 
                         <button
+                          data-keyboard-nav="browse-games"
                           onClick={() => { sounds.buttonClick(); setShowBrowser(true); }}
                           className="w-full bg-gradient-to-r from-amber-600 to-orange-600 dark:from-indigo-700 dark:to-indigo-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-orange-700 dark:hover:from-indigo-600 dark:hover:to-indigo-700 transition-all duration-200 border border-amber-800 dark:border-indigo-600 shadow flex items-center justify-center gap-2"
                         >
@@ -408,6 +538,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     {/* Sub-tabs for Social */}
                     <div className="flex gap-2">
                       <button
+                        data-keyboard-nav="social-online"
                         onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'online'
@@ -418,6 +549,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         🟢 Online ({onlinePlayers.length})
                       </button>
                       <button
+                        data-keyboard-nav="social-chat"
                         onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'chat'
@@ -428,6 +560,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         💬 Chat
                       </button>
                       <button
+                        data-keyboard-nav="social-recent"
                         onClick={() => { sounds.buttonClick(); setSocialTab('recent'); }}
                         className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
                           socialTab === 'recent'
@@ -474,6 +607,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                                   </div>
                                   {player.gameId && player.status !== 'in_lobby' && (
                                     <button
+                                      data-keyboard-nav={`join-player-${player.socketId}`}
                                       onClick={() => {
                                         sounds.buttonClick();
                                         const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
@@ -545,6 +679,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
                       <div className="space-y-3">
                         <button
+                          data-keyboard-nav="my-stats"
                           onClick={() => {
                             if (!socket) return;
                             sounds.buttonClick();
@@ -568,6 +703,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </button>
 
                         <button
+                          data-keyboard-nav="leaderboard"
                           onClick={() => {
                             if (socket) {
                               sounds.buttonClick();
@@ -582,6 +718,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         </button>
 
                         <button
+                          data-keyboard-nav="recent-games"
                           onClick={() => {
                             sounds.buttonClick();
                             setShowBrowser(true);
@@ -671,6 +808,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         {/* How to Play */}
                         <div className="pt-4 border-t-2 border-parchment-300 dark:border-gray-600">
                           <button
+                            data-keyboard-nav="how-to-play"
                             onClick={() => { sounds.buttonClick(); setShowRules(true); }}
                             className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-teal-700 dark:to-teal-800 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-teal-600 dark:hover:to-teal-700 transition-all duration-200 border border-amber-900 dark:border-teal-600 shadow flex items-center justify-center gap-2"
                           >
@@ -691,6 +829,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         {/* Debug Fun */}
                         <div className="pt-4 border-t-2 border-parchment-300 dark:border-gray-600">
                           <button
+                            data-keyboard-nav="debug-fun"
                             onClick={() => { sounds.buttonClick(); setShowDebugInfo(true); }}
                             className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 text-white py-3 rounded-lg font-bold hover:from-indigo-700 hover:to-purple-700 dark:hover:from-indigo-600 dark:hover:to-purple-600 transition-all duration-200 border border-indigo-800 dark:border-indigo-600 shadow flex items-center justify-center gap-2"
                           >

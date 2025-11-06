@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-06T06:00:00.000Z",
-  "version": "1.8.0",
+  "buildDate": "2025-11-06T19:41:22.340Z",
+  "version": "1.6.3",
   "git": {
-    "commitMessage": "fix: Railway deployment errors - trust proxy and database query",
-    "commitHash": "19603ff",
-    "commitDate": "2025-11-06 00:43:00 -0500",
+    "commitMessage": "docs: Update REFACTOR_PROGRESS.md with Session 2 completion summary",
+    "commitHash": "a897112",
+    "commitDate": "2025-11-06 08:31:37 -0500",
     "branch": "main"
   },
   "futureTodos": [
@@ -108,11 +108,7 @@
     "Enhanced match history with detailed stats",
     "Advanced chat with @mentions and URLs",
     "Full notification system with animations",
-    "Tabbed settings panel with preferences",
-    "Email verification and password reset with HTML templates",
-    "Streamlined settings UI (2 tabs instead of 4)",
-    "Improved animations and visual effects",
-    "Enhanced reconnection stability and bug fixes"
+    "Tabbed settings panel with preferences"
   ],
   "databaseTables": [
     "users",
@@ -139,8 +135,7 @@
       "Socket.io 4.8",
       "PostgreSQL (Neon)",
       "bcryptjs",
-      "jsonwebtoken",
-      "nodemailer"
+      "jsonwebtoken"
     ]
   },
   "improvements": [
@@ -160,24 +155,7 @@
     "Removed form clearing on focus out for all auth modals",
     "Fixed Rules of Hooks violation causing state loss",
     "Moved early returns after all hooks in modals",
-    "Ensured modal state preservation across renders",
-    "Implemented email service for verification and password reset",
-    "Added HTML email templates with branding",
-    "Consolidated settings panel from 4 tabs to 2 tabs",
-    "Fixed z-index stacking issues with React Portal",
-    "Reduced confetti animation from fullscreen to centered 600x400px",
-    "Removed card hover effects during gameplay",
-    "Fixed Friends button authentication requirement",
-    "Moved toast notifications below game header",
-    "Fixed Bot management modal not opening in gaming phase",
-    "Documented Debug mode functionality",
-    "Fixed reconnection player ID mismatch causing crashes",
-    "Refactored reconnection data migration logic for clarity",
-    "Fixed Railway trust proxy validation error",
-    "Fixed PostgreSQL parameter type casting in gameState query",
-    "Migrated email service from SMTP to Resend API (Railway blocks SMTP ports)",
-    "Implemented Resend integration for reliable email delivery",
-    "Removed nodemailer dependency in favor of Resend client"
+    "Ensured modal state preservation across renders"
   ],
   "upcomingFeatures": [
     "Private game invitations",

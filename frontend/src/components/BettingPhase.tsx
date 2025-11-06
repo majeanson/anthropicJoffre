@@ -123,6 +123,47 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
     onPlaceBet(-1, false, true);
   };
 
+  // Keyboard accessibility for betting
+  useEffect(() => {
+    if (!isMyTurn || hasPlacedBet) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Arrow Up - Increase bet
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedAmount(prev => Math.min(12, prev + 1));
+        sounds.buttonClick();
+      }
+      // Arrow Down - Decrease bet
+      else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedAmount(prev => Math.max(7, prev - 1));
+        sounds.buttonClick();
+      }
+      // Arrow Right/Left - Toggle without trump
+      else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setWithoutTrump(prev => !prev);
+        sounds.buttonClick();
+      }
+      // Enter - Place bet (if valid)
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!hasPlacedBet && isCurrentBetValid()) {
+          handlePlaceBet();
+        }
+      }
+      // S or Escape - Skip (if allowed)
+      else if ((e.key === 's' || e.key === 'S' || e.key === 'Escape') && canSkip()) {
+        e.preventDefault();
+        handleSkip();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isMyTurn, hasPlacedBet, selectedAmount, withoutTrump]);
+
   // Check if a specific bet amount is valid (for button disabling)
   const isBetAmountValid = (amount: number): boolean => {
     if (!highestBet) return true; // No bets yet, all amounts valid
