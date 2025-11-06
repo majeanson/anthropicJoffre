@@ -13,9 +13,7 @@ interface RegisterModalProps {
 }
 
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModalProps) {
-  // Early return BEFORE hooks
-  if (!isOpen) return null;
-
+  // All hooks MUST be called before any conditional returns (Rules of Hooks)
   const { register, error, clearError } = useAuth();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -102,6 +100,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     email.trim().includes('@') &&
     password.length >= 8 &&
     password === confirmPassword;
+
+  // Early return AFTER all hooks (Rules of Hooks)
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4">

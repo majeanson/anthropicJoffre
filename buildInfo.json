@@ -1,5 +1,5 @@
 {
-  "version": "1.6.2",
+  "version": "1.6.3",
   "releaseDate": "2025-11-05",
   "sprint": "Sprint 3 - Major Features",
   "phases": {
@@ -132,7 +132,10 @@
     "Implemented guest mode vs ranked mode distinction",
     "Created comprehensive user documentation",
     "Fixed modal backdrop click closing forms",
-    "Removed form clearing on focus out for all auth modals"
+    "Removed form clearing on focus out for all auth modals",
+    "Fixed Rules of Hooks violation causing state loss",
+    "Moved early returns after all hooks in modals",
+    "Ensured modal state preservation across renders"
   ],
   "upcomingFeatures": [
     "Private game invitations",

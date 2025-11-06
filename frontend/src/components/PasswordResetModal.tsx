@@ -14,9 +14,7 @@ interface PasswordResetModalProps {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }: PasswordResetModalProps) {
-  // Early return BEFORE hooks
-  if (!isOpen) return null;
-
+  // All hooks MUST be called before any conditional returns (Rules of Hooks)
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
@@ -67,6 +65,9 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
     setErrorMessage('');
     onClose();
   };
+
+  // Early return AFTER all hooks (Rules of Hooks)
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">

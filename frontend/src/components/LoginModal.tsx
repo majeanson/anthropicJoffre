@@ -14,9 +14,7 @@ interface LoginModalProps {
 }
 
 export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwitchToPasswordReset }: LoginModalProps) {
-  // Early return BEFORE hooks
-  if (!isOpen) return null;
-
+  // All hooks MUST be called before any conditional returns (Rules of Hooks)
   const { login, error, clearError } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -49,6 +47,9 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
     setPassword('');
     onClose();
   };
+
+  // Early return AFTER all hooks (Rules of Hooks)
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
