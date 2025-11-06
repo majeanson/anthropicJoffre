@@ -213,7 +213,7 @@ export async function getPlayerGames(playerName: string): Promise<GameListItem[]
       game_state
     FROM active_games
     WHERE game_state @> jsonb_build_object('players',
-      jsonb_build_array(jsonb_build_object('name', $1))
+      jsonb_build_array(jsonb_build_object('name', $1::text))
     )
     ORDER BY created_at DESC
   `;

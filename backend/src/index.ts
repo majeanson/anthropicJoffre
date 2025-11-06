@@ -211,7 +211,8 @@ const app = express();
 const httpServer = createServer(app);
 
 // Trust proxy for Railway deployment (enables X-Forwarded-For header)
-app.set('trust proxy', true);
+// Railway is behind 1 proxy hop
+app.set('trust proxy', 1);
 
 // Configure CORS for Socket.io
 const clientUrl = process.env.CLIENT_URL?.replace(/\/$/, ''); // Remove trailing slash
