@@ -1,5 +1,5 @@
 {
-  "version": "1.6.1",
+  "version": "1.6.2",
   "releaseDate": "2025-11-05",
   "sprint": "Sprint 3 - Major Features",
   "phases": {
@@ -130,7 +130,9 @@
     "Integrated authentication with playerName localStorage",
     "Hide friends button for non-authenticated users",
     "Implemented guest mode vs ranked mode distinction",
-    "Created comprehensive user documentation"
+    "Created comprehensive user documentation",
+    "Fixed modal backdrop click closing forms",
+    "Removed form clearing on focus out for all auth modals"
   ],
   "upcomingFeatures": [
     "Private game invitations",

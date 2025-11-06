@@ -51,8 +51,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onClick={handleClose}>
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-blue-500/30 w-full max-w-md animate-scale-in" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-blue-500/30 w-full max-w-md animate-scale-in">
 
         {/* Header */}
         <div className="p-6 border-b border-gray-700 flex justify-between items-center">
