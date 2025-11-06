@@ -1,6 +1,6 @@
 {
-  "buildDate": "2025-11-06T05:15:00.000Z",
-  "version": "1.7.2",
+  "buildDate": "2025-11-06T05:30:00.000Z",
+  "version": "1.7.3",
   "git": {
     "commitMessage": "fix: Railway deployment errors - trust proxy and database query",
     "commitHash": "19603ff",
@@ -175,7 +175,9 @@
     "Refactored reconnection data migration logic for clarity",
     "Fixed Railway trust proxy validation error",
     "Fixed PostgreSQL parameter type casting in gameState query",
-    "Added 30-second timeout to email sending to prevent request hangs"
+    "Added 30-second timeout to email sending to prevent request hangs",
+    "Switched email to port 465 (SSL) to work around Railway port 587 blocking",
+    "Added comprehensive email debug logging for troubleshooting"
   ],
   "upcomingFeatures": [
     "Private game invitations",
