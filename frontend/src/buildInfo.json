@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-06T04:25:00.000Z",
-  "version": "1.7.0",
+  "buildDate": "2025-11-06T04:45:00.000Z",
+  "version": "1.7.1",
   "git": {
-    "commitMessage": "docs: Update .env.example with Gmail email configuration",
-    "commitHash": "2a521cf",
-    "commitDate": "2025-11-05 23:24:00 -0500",
+    "commitMessage": "fix: Railway deployment errors - trust proxy and database query",
+    "commitHash": "19603ff",
+    "commitDate": "2025-11-06 00:43:00 -0500",
     "branch": "main"
   },
   "futureTodos": [
