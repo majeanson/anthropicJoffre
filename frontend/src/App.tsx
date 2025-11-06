@@ -17,10 +17,8 @@ import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal state management
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
-// Use enhanced bot AI with advanced strategic concepts
-import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayerEnhanced';
-// Fallback to original bot player if needed:
-// import { BotPlayer, BotDifficulty } from './utils/botPlayer';
+// Bot AI types
+import { BotDifficulty } from './utils/botPlayerEnhanced';
 import { preloadCardImages } from './utils/imagePreloader';
 import { ErrorBoundary } from './components/ErrorBoundary';
 // Sprint 5 Phase 2: Custom hooks for state management
@@ -34,6 +32,12 @@ import { useBotManagement } from './hooks/useBotManagement';
 import { useConnectionQuality } from './hooks/useConnectionQuality';
 // Sprint 3 Refactoring: Audio management
 import { useAudioManager } from './hooks/useAudioManager';
+// Sprint 3 Refactoring: Debug mode management
+import { useDebugMode } from './hooks/useDebugMode';
+// Sprint 3 Refactoring: UI state management
+import { useUIState } from './hooks/useUIState';
+// Sprint 3 Refactoring: Autoplay management
+import { useAutoplay } from './hooks/useAutoplay';
 
 function AppContent() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
@@ -73,18 +77,32 @@ function AppContent() {
   // Sprint 3 Refactoring: Audio management hook
   const { soundEnabled, toggleSound, playErrorSound } = useAudioManager({ gameState });
 
-  // Debug mode state
-  const [debugMode] = useState<boolean>(false);
-  const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
-  const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
-  const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
+  // Sprint 3 Refactoring: Debug mode management hook
+  const {
+    debugMode,
+    debugPanelOpen,
+    testPanelOpen,
+    debugMenuOpen,
+    debugInfoOpen,
+    setDebugPanelOpen,
+    setTestPanelOpen,
+    setDebugMenuOpen,
+    setDebugInfoOpen,
+  } = useDebugMode();
+
+  // Sprint 3 Refactoring: UI state management hook
+  const {
+    showBotManagement,
+    showFriendsPanel,
+    showReplayModal,
+    setShowBotManagement,
+    setShowFriendsPanel,
+    setShowReplayModal,
+  } = useUIState();
 
   // UI state
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
-  const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
-  const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
   const [autoJoinGameId, setAutoJoinGameId] = useState<string>(''); // URL parameter for auto-join from shared links
-  const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastAutoActionRef = useRef<{ message: string; timestamp: number } | null>(null);
 
   // Sprint 2 Phase 1: Achievement state
@@ -92,13 +110,10 @@ function AppContent() {
   const [, setShowAchievementsPanel] = useState<boolean>(false);
 
   // Sprint 2 Phase 2: Friends state
-  const [showFriendsPanel, setShowFriendsPanel] = useState<boolean>(false);
   const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
 
   // Missing state variables for GlobalUI and DebugControls
   const [missedActions, setMissedActions] = useState<any[]>([]);
-  const [showBotManagement, setShowBotManagement] = useState<boolean>(false);
-  const [debugInfoOpen, setDebugInfoOpen] = useState<boolean>(false);
 
   // Sprint 3 Phase 1: Authentication state
   const auth = useAuth();
@@ -408,6 +423,14 @@ function AppContent() {
     }
   }, [socket, gameId]);
 
+  // Sprint 3 Refactoring: Autoplay management hook (must be after handlePlaceBet and handlePlayCard)
+  const { autoplayEnabled, toggleAutoplay } = useAutoplay({
+    gameState,
+    socket,
+    onPlaceBet: handlePlaceBet,
+    onPlayCard: handlePlayCard,
+  });
+
   const handleSelectTeam = (teamId: 1 | 2) => {
     if (socket && gameId) {
       socket.emit('select_team', { gameId, teamId });
@@ -501,10 +524,7 @@ function AppContent() {
   // Sprint 5 Phase 3: Bot management handlers now in useBotManagement hook
   // (handleReplaceWithBot, handleChangeBotDifficulty, handleTakeOverBot)
 
-  // Autoplay toggle handler (stable reference to prevent infinite re-renders)
-  const handleAutoplayToggle = useCallback(() => {
-    setAutoplayEnabled(prev => !prev);
-  }, []);
+  // Autoplay toggle handler - now provided by useAutoplay hook
 
   // Sound toggle handler - now provided by useAudioManager hook
 
@@ -536,70 +556,7 @@ function AppContent() {
   // Sprint 5 Phase 3: Bot socket management functions now in useBotManagement hook
   // (spawnBotsForGame, handleAddBot, handleQuickPlay, handleBotAction)
 
-  // Autoplay effect: when enabled and it's the player's turn, act as a bot
-  // Extract specific values from gameState to prevent infinite re-renders
-  const phase = gameState?.phase;
-  const currentPlayerIndex = gameState?.currentPlayerIndex;
-  const currentPlayerId = gameState?.players[currentPlayerIndex || 0]?.id;
-  const playersReadyList = gameState?.playersReady;
-
-  useEffect(() => {
-    if (!autoplayEnabled || !gameState || !socket) return;
-    if (phase !== 'betting' && phase !== 'playing' && phase !== 'scoring') return;
-
-    const myPlayerId = socket.id || '';
-
-    // For scoring phase, auto-ready
-    if (phase === 'scoring') {
-      // playersReady now stores names, not IDs
-      const me = gameState.players.find(p => p.id === myPlayerId);
-      const isAlreadyReady = me ? (playersReadyList?.includes(me.name) || false) : false;
-      if (!isAlreadyReady) {
-        // Clear any existing autoplay timeout
-        if (autoplayTimeoutRef.current) {
-          clearTimeout(autoplayTimeoutRef.current);
-          autoplayTimeoutRef.current = null;
-        }
-
-        // Schedule ready action with bot delay
-        autoplayTimeoutRef.current = setTimeout(() => {
-          socket.emit('player_ready', { gameId: gameState.id });
-          autoplayTimeoutRef.current = null;
-        }, BotPlayer.getActionDelay());
-      }
-      return;
-    }
-
-    // Only act if it's my turn (use extracted currentPlayerId to prevent stale closure)
-    if (!currentPlayerId || currentPlayerId !== myPlayerId) return;
-
-    // Clear any existing autoplay timeout
-    if (autoplayTimeoutRef.current) {
-      clearTimeout(autoplayTimeoutRef.current);
-      autoplayTimeoutRef.current = null;
-    }
-
-    // Schedule autoplay action with bot delay
-    autoplayTimeoutRef.current = setTimeout(() => {
-      if (phase === 'betting') {
-        const bet = BotPlayer.makeBet(gameState, myPlayerId);
-        handlePlaceBet(bet.amount, bet.withoutTrump, bet.skipped);
-      } else if (phase === 'playing') {
-        const card = BotPlayer.playCard(gameState, myPlayerId);
-        if (card) {
-          handlePlayCard(card);
-        }
-      }
-      autoplayTimeoutRef.current = null;
-    }, BotPlayer.getActionDelay());
-
-    return () => {
-      if (autoplayTimeoutRef.current) {
-        clearTimeout(autoplayTimeoutRef.current);
-        autoplayTimeoutRef.current = null;
-      }
-    };
-  }, [autoplayEnabled, phase, currentPlayerId, playersReadyList, socket, gameState, handlePlaceBet, handlePlayCard]);
+  // Autoplay effect: now handled by useAutoplay hook
 
   if (error) {
     return (
@@ -782,7 +739,7 @@ function AppContent() {
             onLeaveGame={handleLeaveGame}
             gameState={gameState}
             autoplayEnabled={autoplayEnabled}
-            onAutoplayToggle={handleAutoplayToggle}
+            onAutoplayToggle={toggleAutoplay}
             onOpenBotManagement={() => setShowBotManagement(true)}
             onOpenAchievements={() => setShowAchievementsPanel(true)}
             onOpenFriends={() => setShowFriendsPanel(true)}
@@ -830,7 +787,7 @@ function AppContent() {
           currentTrickWinnerId={currentTrickWinnerId}
           onLeaveGame={handleLeaveGame}
           autoplayEnabled={autoplayEnabled}
-          onAutoplayToggle={handleAutoplayToggle}
+          onAutoplayToggle={toggleAutoplay}
           soundEnabled={soundEnabled}
           onSoundToggle={toggleSound}
           onOpenBotManagement={() => setShowBotManagement(true)}
