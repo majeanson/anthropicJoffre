@@ -96,15 +96,6 @@ class BotPlayer {
 
 1. **🧪 Test** - Opens Test Panel for state manipulation
 2. **🔍 State** - Opens Debug Panel to inspect full game state JSON
-3. **🐛 4-Player** - Toggles 4-player debug view (shows all perspectives)
-
-**4-Player Debug View**:
-- Shows all 4 players' hands and perspectives simultaneously
-- Each player's section includes their hand, bet controls, and card play
-- Perfect for testing with bot players on single screen
-- Compatible with bot system (bots appear as regular players)
-
-**Implementation**: `frontend/src/components/DebugMultiPlayerView.tsx`
 
 ### Development Testing Workflow
 

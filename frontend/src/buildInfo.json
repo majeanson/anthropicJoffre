@@ -1,13 +1,26 @@
 {
-  "buildDate": "2025-11-05T00:00:00.000Z",
+  "buildDate": "2025-11-06T01:55:02.287Z",
   "version": "1.6.3",
   "git": {
-    "commitMessage": "fix: Sprint 3 complete - authentication, profiles, notifications, settings, and Rules of Hooks fixes",
-    "commitHash": "c13f1d1",
-    "commitDate": "2025-11-05T00:00:00-05:00",
+    "commitMessage": "Testy test",
+    "commitHash": "08eeedc",
+    "commitDate": "2025-11-05 20:49:49 -0500",
     "branch": "main"
   },
+  "futureTodos": [
+    "Game Replay Feature",
+    "Improve Bot AI",
+    "Enhanced Leaderboard",
+    "Achievements & Badges",
+    "Friend System"
+  ],
   "releaseDate": "2025-11-05",
+  "buildStatus": "✅ Production Ready",
+  "testsStatus": {
+    "backend": "✅ 150 tests passing",
+    "frontend": "✅ TypeScript compilation passing",
+    "e2e": "⚠️ Some tests need refactoring"
+  },
   "sprint": "Sprint 3 - Major Features",
   "phases": {
     "phase1": {
@@ -152,158 +165,11 @@
     "Voice chat integration",
     "Mobile app version"
   ],
-  "buildStatus": "✅ Production Ready",
-  "testsStatus": {
-    "backend": "✅ 150 tests passing",
-    "frontend": "✅ TypeScript compilation passing",
-    "e2e": "⚠️ Some tests need refactoring"
-  },
   "notes": [
     "Sprint 3 successfully completed all 6 phases",
     "Authentication system fully integrated",
     "Social features significantly enhanced",
     "UI/UX improvements throughout the application",
     "Ready for production deployment"
-  ],
-  "latestDoneFeatures": [
-    {
-      "date": "2025-11-05",
-      "title": "Sprint 3 Complete - Major Features & Critical Fixes",
-      "features": [
-        "✅ Phase 1: User Authentication System",
-        "  - JWT-based authentication with secure tokens",
-        "  - User registration with email verification",
-        "  - Login system with username or email",
-        "  - Password reset functionality",
-        "  - Session management and protected routes",
-        "✅ Phase 2: Enhanced Player Profiles",
-        "  - Avatar system with 20+ options",
-        "  - Profile customization (bio, country, favorite team)",
-        "  - Privacy settings (public/friends/private)",
-        "  - Profile editor modal with live preview",
-        "  - Avatar display integrated across UI",
-        "✅ Phase 3: Enhanced Match History UI",
-        "  - Detailed match cards with team results",
-        "  - Match statistics modal with comprehensive data",
-        "  - Game replay integration",
-        "  - Win/loss filtering and sorting",
-        "  - Visual team indicators",
-        "✅ Phase 4: Enhanced Lobby Chat",
-        "  - @mention support with highlighting",
-        "  - Clickable URLs with auto-detection",
-        "  - Visual feedback for mentions (yellow for self, blue for others)",
-        "  - Chat persistence across sessions",
-        "✅ Phase 5: Notification System",
-        "  - Notification center with bell icon and unread count",
-        "  - Achievement unlock animations (rarity-based)",
-        "  - Friend request notifications",
-        "  - Mention notifications in chat",
-        "  - Database persistence for notifications",
-        "  - Mark as read functionality",
-        "✅ Phase 6: Enhanced Settings System",
-        "  - Tabbed interface (General, Game, Notifications, Advanced)",
-        "  - Notification preferences per type",
-        "  - Performance mode toggle",
-        "  - Cache clearing functionality",
-        "  - Debug mode and advanced options",
-        "✅ CRITICAL FIX: React Rules of Hooks",
-        "  - Fixed modal state loss on re-render",
-        "  - Moved early returns AFTER all hooks in RegisterModal, LoginModal, PasswordResetModal",
-        "  - Prevents 'Rendered fewer hooks than expected' errors",
-        "  - Ensures modal forms preserve state correctly",
-        "✅ Authentication Integration Improvements",
-        "  - Integrated localStorage playerName with auth system",
-        "  - Distinguished guest mode (casual) from ranked mode (authenticated)",
-        "  - Hide friends button for non-authenticated users",
-        "  - Disabled player name input when authenticated",
-        "✅ Documentation",
-        "  - Created comprehensive USER_GUIDE.md",
-        "  - Step-by-step instructions for all features",
-        "  - FAQ section with common questions",
-        "  - Clear distinction between guest and ranked modes",
-        "Frontend: 50+ new components and enhancements",
-        "Backend: 15+ new API endpoints and socket handlers",
-        "Database: 9 new tables for user system",
-        "Build successful: All TypeScript errors resolved"
-      ]
-    },
-    {
-      "date": "2025-11-04",
-      "title": "7 Critical UX Improvements - Polish & Stability",
-      "features": [
-        "✅ Fixed chat timestamp NaN:NaN display",
-        "  - Backend: Map DB snake_case (created_at, player_name) to frontend camelCase",
-        "  - Frontend: Added NaN checks in formatTime() with 'now' fallback",
-        "✅ Refined z-index hierarchy for proper layering",
-        "  - Team score boxes: z-20 (above header at z-10)",
-        "  - Floating points badges: z-[60] (above everything)",
-        "  - Player hand cards: z-10 (below Settings menu at z-50)",
-        "✅ Enhanced 'Player data not found' error messages with action context",
-        "  - roundStatistics.ts: Added comprehensive logging for Perfect Bet, Trump Master, Lucky Player",
-        "  - Perfect Bet: Added fallback lookup by matching bet amount (handles player replacement)",
-        "  - GameReplay: Enhanced warning with round/trick context",
-        "✅ Fixed share link auto-join with 3 bots",
-        "  - Automatically takes over first available bot instead of showing modal",
-        "  - Moved autoJoinGameId state declaration before useEffect",
-        "  - Added autoJoinGameId to socket event handler dependencies",
-        "✅ Fixed modal/popup flickering with React.memo optimization"
-      ]
-    }
-  ],
-  "lastSession": {
-    "date": "2025-11-05",
-    "summary": "Sprint 3 Complete - Authentication, Profiles, Notifications, Settings & Critical Fixes",
-    "achievements": [
-      "🔐 User Authentication System:",
-      "  - JWT-based authentication with secure session management",
-      "  - Complete registration flow with email verification",
-      "  - Password reset functionality with email tokens",
-      "  - Protected routes and middleware",
-      "  - Integration with existing playerName localStorage",
-      "",
-      "👤 Player Profiles:",
-      "  - 20+ avatar options with visual categories",
-      "  - Profile editor with bio, country, favorite team",
-      "  - Privacy settings (public/friends only/private)",
-      "  - Avatar display throughout the UI",
-      "  - Profile viewing modal with stats",
-      "",
-      "📊 Match History Enhancement:",
-      "  - Detailed match cards with team composition",
-      "  - Comprehensive statistics modal",
-      "  - Game replay integration",
-      "  - Filtering and sorting options",
-      "  - Visual win/loss indicators"
-    ],
-    "commits": 1,
-    "linesChanged": "~3000+ added across Sprint 3",
-    "filesModified": [
-      "backend/src/db/users.ts (user management)",
-      "backend/src/db/profiles.ts (profile storage)",
-      "backend/src/db/achievements.ts (achievement system)",
-      "backend/src/db/friends.ts (friend system)",
-      "backend/src/db/notifications.ts (notification persistence)",
-      "frontend/src/components/RegisterModal.tsx",
-      "frontend/src/components/LoginModal.tsx",
-      "frontend/src/components/PasswordResetModal.tsx"
-    ],
-    "technicalDetails": {
-      "performance": "Optimized database queries with proper indexing",
-      "reliability": "Session management with automatic token refresh",
-      "userExperience": "Seamless authentication flow with clear feedback",
-      "codeQuality": "Proper React hooks usage preventing state loss"
-    }
-  },
-  "futureTodos": [
-    "Private game invitations system",
-    "Tournament mode with bracket system",
-    "Seasonal rankings and leaderboards",
-    "Custom card designs and themes",
-    "Voice chat integration",
-    "Mobile app version",
-    "Redis caching layer for performance",
-    "WebSocket integration tests",
-    "CI/CD pipeline automation",
-    "Enhanced bot AI strategies"
   ]
 }

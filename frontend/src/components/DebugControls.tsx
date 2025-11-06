@@ -9,11 +9,11 @@ import { GameState } from '../types/game';
 import { TestPanel } from './TestPanel';
 import { DebugPanel } from './DebugPanel';
 import { DebugInfo } from './DebugInfo';
-import { DebugMultiPlayerView } from './DebugMultiPlayerView';
 
 interface DebugControlsProps {
   gameState: GameState | null;
   socket: any;
+  gameId: string;
   debugMenuOpen: boolean;
   setDebugMenuOpen: (open: boolean) => void;
   testPanelOpen: boolean;
@@ -24,12 +24,11 @@ interface DebugControlsProps {
   setDebugInfoOpen: (open: boolean) => void;
   showBotManagement: boolean;
   setShowBotManagement: (open: boolean) => void;
-  showMultiPlayerDebug: boolean;
-  setShowMultiPlayerDebug: (open: boolean) => void;
 }
 
 const DebugControls: React.FC<DebugControlsProps> = ({
   gameState,
+  gameId,
   socket,
   debugMenuOpen,
   setDebugMenuOpen,
@@ -39,10 +38,7 @@ const DebugControls: React.FC<DebugControlsProps> = ({
   setDebugPanelOpen,
   debugInfoOpen,
   setDebugInfoOpen,
-  showBotManagement,
   setShowBotManagement,
-  showMultiPlayerDebug,
-  setShowMultiPlayerDebug,
 }) => {
   // Debug controls - can be controlled via environment variable
   const DEBUG_ENABLED = import.meta.env.VITE_DEBUG_ENABLED !== 'false';
@@ -106,7 +102,6 @@ const DebugControls: React.FC<DebugControlsProps> = ({
                 </button>
                 <button
                   onClick={() => {
-                    setShowMultiPlayerDebug(true);
                     setDebugMenuOpen(false);
                   }}
                   className="w-full text-left px-3 py-2 rounded hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
@@ -132,6 +127,7 @@ const DebugControls: React.FC<DebugControlsProps> = ({
         <DebugPanel
           gameState={gameState}
           isOpen={debugPanelOpen}
+          gameId={gameId}
           onClose={() => setDebugPanelOpen(false)}
         />
       )}
@@ -139,14 +135,6 @@ const DebugControls: React.FC<DebugControlsProps> = ({
         <DebugInfo
           isOpen={debugInfoOpen}
           onClose={() => setDebugInfoOpen(false)}
-        />
-      )}
-      {showMultiPlayerDebug && gameState && (
-        <DebugMultiPlayerView
-          gameState={gameState}
-          socket={socket}
-          isOpen={showMultiPlayerDebug}
-          onClose={() => setShowMultiPlayerDebug(false)}
         />
       )}
     </>

@@ -1,14 +1,14 @@
 import { GameState } from '../types/game';
 
 interface DebugPanelProps {
-  gameState: GameState;
+  gameState: GameState | null;
   gameId: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
 export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelProps) {
-  if (!isOpen) return null;
+  if (!isOpen || !gameState) return null;
 
   const highestBidder = gameState.highestBet
     ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)

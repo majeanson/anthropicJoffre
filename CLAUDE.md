@@ -506,7 +506,6 @@ frontend/src/
 │   ├── GlobalLeaderboard.tsx # Top 100 players
 │   ├── BotManagementPanel.tsx # Bot settings and replacement
 │   ├── DebugPanel.tsx     # Game state inspector (JSON viewer)
-│   ├── DebugMultiPlayerView.tsx  # 4-player simultaneous view
 │   └── TestPanel.tsx      # State manipulation for testing
 ├── utils/            # Utility functions and helpers
 │   ├── botPlayer.ts  # AI bot decision-making system

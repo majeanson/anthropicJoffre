@@ -94,7 +94,6 @@ function AppContent() {
   const [missedActions, setMissedActions] = useState<any[]>([]);
   const [showBotManagement, setShowBotManagement] = useState<boolean>(false);
   const [debugInfoOpen, setDebugInfoOpen] = useState<boolean>(false);
-  const [showMultiPlayerDebug, setShowMultiPlayerDebug] = useState<boolean>(false);
 
   // Sprint 3 Phase 1: Authentication state
   const auth = useAuth();
@@ -693,6 +692,7 @@ function AppContent() {
       <>
         <GlobalUI {...globalUIProps} />
         <DebugControls
+          gameId={gameId}
           gameState={gameState}
           socket={socket}
           debugMenuOpen={debugMenuOpen}
@@ -705,8 +705,6 @@ function AppContent() {
           setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
-          showMultiPlayerDebug={showMultiPlayerDebug}
-          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
         />
       </>
     );
@@ -718,6 +716,7 @@ function AppContent() {
         <GlobalUI {...globalUIProps} />
         <DebugControls
           gameState={gameState}
+          gameId={gameId}
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
@@ -729,8 +728,6 @@ function AppContent() {
           setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
-          showMultiPlayerDebug={showMultiPlayerDebug}
-          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
         />
         <DebugPanel
           gameState={gameState}
@@ -763,6 +760,7 @@ function AppContent() {
         <GlobalUI {...globalUIProps} />
         <DebugControls
           gameState={gameState}
+          gameId={gameId}
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
@@ -774,8 +772,6 @@ function AppContent() {
           setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
-          showMultiPlayerDebug={showMultiPlayerDebug}
-          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
         />
         <DebugPanel
           gameState={gameState}
@@ -814,6 +810,7 @@ function AppContent() {
         <GlobalUI {...globalUIProps} />
         <DebugControls
           gameState={gameState}
+          gameId={gameId}
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
@@ -825,8 +822,6 @@ function AppContent() {
           setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
-          showMultiPlayerDebug={showMultiPlayerDebug}
-          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
         />
         <DebugPanel
           gameState={gameState}
@@ -871,6 +866,7 @@ function AppContent() {
         <GlobalUI {...globalUIProps} />
         <DebugControls
           gameState={gameState}
+          gameId={gameId}
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
@@ -882,8 +878,6 @@ function AppContent() {
           setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
-          showMultiPlayerDebug={showMultiPlayerDebug}
-          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
         />
         <DebugPanel
           gameState={gameState}
@@ -915,6 +909,7 @@ function AppContent() {
         <GlobalUI {...globalUIProps} />
         <DebugControls
           gameState={gameState}
+          gameId={gameId}
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
@@ -926,8 +921,6 @@ function AppContent() {
           setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
-          showMultiPlayerDebug={showMultiPlayerDebug}
-          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
         />
         <DebugPanel
           gameState={gameState}
