@@ -530,10 +530,11 @@ export function calculateRoundScoring(game: GameState): RoundScoringResult {
   let offensivePlayer = game.players.find(p => p.id === game.highestBet?.playerId);
 
   // If not found by ID, try finding by matching the highest bet
-  // This handles cases where player took over a bot/empty seat mid-game
+  // This handles cases where player took over a bot/empty seat mid-game, or reconnection issues
   if (!offensivePlayer && game.highestBet) {
     const highestBetData = game.highestBet;
-    // Find the bet that matches the highest bet amount and withoutTrump flag
+
+    // Strategy 1: Find by matching bet data in currentBets
     const matchingBet = game.currentBets.find(b =>
       b.amount === highestBetData.amount &&
       b.withoutTrump === highestBetData.withoutTrump &&
@@ -541,20 +542,35 @@ export function calculateRoundScoring(game: GameState): RoundScoringResult {
     );
 
     if (matchingBet) {
-      // Find current player with this playerId (they might have taken over)
+      // Try to find current player with this playerId
       offensivePlayer = game.players.find(p => p.id === matchingBet.playerId);
+
+      // Strategy 2: If still not found (stale socket ID from disconnect), find by position
+      // Use currentBets array index to map to players array
+      if (!offensivePlayer) {
+        const betIndex = game.currentBets.indexOf(matchingBet);
+        if (betIndex >= 0 && betIndex < game.players.length) {
+          // currentBets are in same order as players during betting phase
+          offensivePlayer = game.players[betIndex];
+          console.log(`⚠️  Found betting player by position fallback: ${offensivePlayer.name} (index ${betIndex})`);
+        }
+      }
     }
 
-    // Last resort: find by position if bet amount is unique
+    // Strategy 3: Find by unique bet amount (last resort)
     if (!offensivePlayer) {
       const betsWithSameAmount = game.currentBets.filter(b =>
         b.amount === highestBetData.amount &&
         b.withoutTrump === highestBetData.withoutTrump &&
         !b.skipped
       );
-      // Only use this fallback if there's exactly one matching bet (unambiguous)
+
       if (betsWithSameAmount.length === 1) {
-        offensivePlayer = game.players.find(p => p.id === betsWithSameAmount[0].playerId);
+        const betIndex = game.currentBets.indexOf(betsWithSameAmount[0]);
+        if (betIndex >= 0 && betIndex < game.players.length) {
+          offensivePlayer = game.players[betIndex];
+          console.log(`⚠️  Found betting player by unique bet fallback: ${offensivePlayer.name}`);
+        }
       }
     }
   }

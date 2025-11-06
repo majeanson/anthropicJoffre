@@ -6,6 +6,7 @@
 import { query, getPool } from './index';
 import { User, UserWithPassword, PasswordReset, EmailVerification } from '../types/auth';
 import { hashPassword, generateSecureToken } from '../utils/authHelpers';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/emailService';
 
 /**
  * Create a new user account
@@ -59,10 +60,8 @@ export async function createUser(
 
     await client.query('COMMIT');
 
-    // TODO: Send verification email (implement email service later)
-    // For now, log token to console (in development, token is also returned in API response)
-    console.log(`✉️  Verification token for ${username}: ${verificationToken}`);
-    console.log(`   Verify at: /api/auth/verify-email with token: ${verificationToken}`);
+    // Send verification email
+    await sendVerificationEmail(email, username, verificationToken);
 
     return { user, verificationToken };
   } catch (error) {
@@ -233,8 +232,8 @@ export async function createPasswordReset(email: string): Promise<string | null>
       [user.user_id, resetToken, expiresAt]
     );
 
-    // TODO: Send password reset email
-    console.log(`Password reset token for ${email}: ${resetToken}`);
+    // Send password reset email
+    await sendPasswordResetEmail(email, user.username, resetToken);
 
     return resetToken;
   } catch (error) {
