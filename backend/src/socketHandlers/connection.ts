@@ -155,7 +155,9 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       return;
     }
 
-    // Update player's socket ID
+    // ========================================================================
+    // RECONNECTION DATA MIGRATION
+    // ========================================================================
     const oldSocketId = player.id;
     player.id = socket.id;
 
@@ -171,14 +173,7 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       countdownIntervals.delete(oldSocketId);
     }
 
-    // IMPORTANT: Update player ID in currentTrick to fix card display after reconnection
-    game.currentTrick.forEach(tc => {
-      if (tc.playerId === oldSocketId) {
-        tc.playerId = socket.id;
-      }
-    });
-
-    // CRITICAL: Update player ID in previousTrick to prevent display issues
+    // 1. Migrate previousTrick (NOT handled by migratePlayerIdentity)
     if (game.previousTrick) {
       game.previousTrick.trick.forEach(tc => {
         if (tc.playerId === oldSocketId) {
@@ -190,7 +185,7 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       }
     }
 
-    // CRITICAL: Update player ID in bets to ensure correct round scoring
+    // 2. Migrate bets (NOT handled by migratePlayerIdentity)
     game.currentBets.forEach(bet => {
       if (bet.playerId === oldSocketId) {
         bet.playerId = socket.id;
@@ -200,8 +195,8 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       game.highestBet.playerId = socket.id;
     }
 
-    // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
-    // Note: In reconnection, playerName usually doesn't change, but playerId always does
+    // 3. Migrate ALL other player identity data
+    // This handles: roundStats, currentTrick, currentRoundTricks, afkWarnings
     migratePlayerIdentity({
       gameState: game,
       roundStats: roundStats.get(session.gameId),
@@ -249,39 +244,19 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       }
     }
 
-    // Migrate rematch votes from old socket ID to player name (for backward compatibility)
+    // 4. Migrate rematch votes to use player names (for backward compatibility)
     if (game.rematchVotes && game.rematchVotes.includes(oldSocketId)) {
       const index = game.rematchVotes.indexOf(oldSocketId);
       game.rematchVotes[index] = player.name;
       console.log(`Migrated rematch vote from socket ID to player name: ${player.name}`);
     }
 
-    // Migrate playersReady from old socket ID to player name (for backward compatibility)
+    // 5. Migrate playersReady to use player names (for backward compatibility)
     if (game.playersReady && game.playersReady.includes(oldSocketId)) {
       const index = game.playersReady.indexOf(oldSocketId);
       game.playersReady[index] = player.name;
       console.log(`Migrated player ready status from socket ID to player name: ${player.name}`);
     }
-
-    // Update bets with old socket ID to new socket ID
-    game.currentBets.forEach(bet => {
-      if (bet.playerId === oldSocketId) {
-        bet.playerId = socket.id;
-        console.log(`Updated bet playerId from ${oldSocketId} to ${socket.id}`);
-      }
-    });
-    if (game.highestBet && game.highestBet.playerId === oldSocketId) {
-      game.highestBet.playerId = socket.id;
-      console.log(`Updated highestBet playerId from ${oldSocketId} to ${socket.id}`);
-    }
-
-    // Update current trick with old socket ID to new socket ID
-    game.currentTrick.forEach(trickCard => {
-      if (trickCard.playerId === oldSocketId) {
-        trickCard.playerId = socket.id;
-        console.log(`Updated trick card playerId from ${oldSocketId} to ${socket.id}`);
-      }
-    });
 
     console.log(`Player ${session.playerName} reconnected to game ${session.gameId}`);
 
