@@ -231,6 +231,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Load user on mount
   useEffect(() => {
+    console.log('[AuthContext] Initial load - fetching current user');
     fetchCurrentUser();
   }, [fetchCurrentUser]);
 

@@ -13,6 +13,8 @@ interface RegisterModalProps {
 }
 
 export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: RegisterModalProps) {
+  console.log('[RegisterModal] Render called, isOpen:', isOpen);
+
   // All hooks MUST be called before any conditional returns (Rules of Hooks)
   const { register, error, clearError } = useAuth();
   const [username, setUsername] = useState('');
@@ -23,6 +25,64 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Debug: Log when component mounts/unmounts
+  React.useEffect(() => {
+    console.log('[RegisterModal] Component mounted');
+    return () => {
+      console.log('[RegisterModal] Component unmounting!!! This should NOT happen while modal is open');
+    };
+  }, []);
+
+  // Debug: Log when isOpen changes
+  React.useEffect(() => {
+    console.log('[RegisterModal] isOpen changed to:', isOpen);
+  }, [isOpen]);
+
+  // Debug: Log state changes with stack trace
+  React.useEffect(() => {
+    if (username || email || password) {
+      console.log('[RegisterModal] State values:', {
+        username,
+        email,
+        passwordLength: password.length,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }, [username, email, password]);
+
+  // Debug: Track if state is being reset
+  const prevUsernameRef = React.useRef(username);
+  const prevEmailRef = React.useRef(email);
+  const prevPasswordRef = React.useRef(password);
+
+  React.useEffect(() => {
+    if (prevUsernameRef.current && !username) {
+      console.error('[RegisterModal] USERNAME WAS CLEARED!', {
+        prev: prevUsernameRef.current,
+        current: username,
+        stack: new Error().stack
+      });
+    }
+    if (prevEmailRef.current && !email) {
+      console.error('[RegisterModal] EMAIL WAS CLEARED!', {
+        prev: prevEmailRef.current,
+        current: email,
+        stack: new Error().stack
+      });
+    }
+    if (prevPasswordRef.current && !password) {
+      console.error('[RegisterModal] PASSWORD WAS CLEARED!', {
+        prev: prevPasswordRef.current.length + ' chars',
+        current: password.length + ' chars',
+        stack: new Error().stack
+      });
+    }
+
+    prevUsernameRef.current = username;
+    prevEmailRef.current = email;
+    prevPasswordRef.current = password;
+  });
 
   // Password strength indicator
   const getPasswordStrength = (pwd: string): { strength: string; color: string; percentage: number } => {
@@ -89,6 +149,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   };
 
   const handleClose = () => {
+    console.log('[RegisterModal] handleClose called');
     // Don't clear form fields on close - user might want to continue
     clearError();
     setSuccessMessage('');
@@ -147,7 +208,10 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
               id="username"
               type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                console.log('[RegisterModal] Username onChange:', e.target.value);
+                setUsername(e.target.value);
+              }}
               className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
               placeholder="3-50 characters, letters, numbers, _, -"
               disabled={isLoading || !!successMessage}

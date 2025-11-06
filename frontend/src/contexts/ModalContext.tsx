@@ -37,6 +37,9 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
 
+  // Debug: Log when ModalProvider re-renders
+  console.log('[ModalProvider] Render, states:', { showLoginModal, showRegisterModal, showPasswordResetModal });
+
   // Modal control functions
   const openLoginModal = () => {
     console.log('[ModalContext] Opening login modal');

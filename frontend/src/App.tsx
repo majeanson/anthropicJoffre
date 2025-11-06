@@ -1194,6 +1194,13 @@ function AppContent() {
 
 // Wrapper component to provide modal context
 function App() {
+  React.useEffect(() => {
+    console.log('[App] Main App component mounted');
+    return () => {
+      console.log('[App] Main App component unmounting - THIS SHOULD NOT HAPPEN!');
+    };
+  }, []);
+
   return (
     <ModalProvider>
       <AppContent />
