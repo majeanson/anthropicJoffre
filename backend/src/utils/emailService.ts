@@ -1,54 +1,38 @@
 /**
  * Email Service
  * Handles sending emails for verification and password reset
+ * Uses Resend API (Railway blocks SMTP ports)
  */
 
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 // Email configuration from environment variables
-const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
-const EMAIL_PORT = parseInt(process.env.EMAIL_PORT || '587');
-const EMAIL_SECURE = process.env.EMAIL_SECURE === 'true'; // true for 465, false for other ports
-const EMAIL_USER = process.env.EMAIL_USER;
-const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
-const EMAIL_FROM = process.env.EMAIL_FROM || EMAIL_USER;
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Jaffre <onboarding@resend.dev>';
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-// Create reusable transporter
-let transporter: nodemailer.Transporter | null = null;
+// Create Resend client
+let resendClient: Resend | null = null;
 
-function getTransporter(): nodemailer.Transporter | null {
-  // If email is not configured, return null
-  if (!EMAIL_USER || !EMAIL_PASSWORD) {
-    console.warn('⚠️  Email service not configured. Set EMAIL_USER and EMAIL_PASSWORD in .env');
+function getResendClient(): Resend | null {
+  // If Resend is not configured, return null
+  if (!RESEND_API_KEY) {
+    console.warn('⚠️  Email service not configured. Set RESEND_API_KEY in .env');
     return null;
   }
 
-  // Create transporter if it doesn't exist
-  if (!transporter) {
-    console.log(`🔧 Creating email transporter...`);
-    console.log(`   Host: ${EMAIL_HOST}`);
-    console.log(`   Port: ${EMAIL_PORT}`);
-    console.log(`   Secure: ${EMAIL_SECURE}`);
-    console.log(`   User: ${EMAIL_USER}`);
-    console.log(`   Password length: ${EMAIL_PASSWORD?.length || 0} chars`);
+  // Create client if it doesn't exist
+  if (!resendClient) {
+    console.log(`🔧 Initializing Resend email service...`);
+    console.log(`   API Key length: ${RESEND_API_KEY.length} chars`);
+    console.log(`   From address: ${EMAIL_FROM}`);
 
-    transporter = nodemailer.createTransport({
-      host: EMAIL_HOST,
-      port: EMAIL_PORT,
-      secure: EMAIL_SECURE,
-      auth: {
-        user: EMAIL_USER,
-        pass: EMAIL_PASSWORD,
-      },
-      debug: true, // Enable SMTP protocol logging
-      logger: true, // Log information to console
-    });
+    resendClient = new Resend(RESEND_API_KEY);
 
-    console.log(`✉️  Email service configured: ${EMAIL_USER} via ${EMAIL_HOST}:${EMAIL_PORT}`);
+    console.log(`✉️  Email service configured with Resend API`);
   }
 
-  return transporter;
+  return resendClient;
 }
 
 /**
@@ -59,9 +43,9 @@ export async function sendVerificationEmail(
   username: string,
   verificationToken: string
 ): Promise<boolean> {
-  const transport = getTransporter();
+  const resend = getResendClient();
 
-  if (!transport) {
+  if (!resend) {
     console.log(`✉️  [DEV MODE] Verification email would be sent to ${email}`);
     console.log(`   Token: ${verificationToken}`);
     console.log(`   Verify at: ${FRONTEND_URL}/verify-email?token=${verificationToken}`);
@@ -75,8 +59,7 @@ export async function sendVerificationEmail(
   console.log(`   From: ${EMAIL_FROM}`);
 
   try {
-    // Add 30 second timeout to prevent hanging
-    const sendMailPromise = transport.sendMail({
+    const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: email,
       subject: 'Verify Your Email - Joffre Card Game',
@@ -119,33 +102,15 @@ export async function sendVerificationEmail(
         </body>
         </html>
       `,
-      text: `
-Welcome to Joffre Card Game!
-
-Hi ${username}!
-
-Thank you for registering. Please verify your email address to activate your account.
-
-Verify your email by visiting this link:
-${verificationLink}
-
-This link will expire in 24 hours.
-
-If you didn't create an account, you can safely ignore this email.
-
----
-Joffre Card Game - Multiplayer Trick Card Game
-      `.trim(),
     });
 
-    // Race against timeout to prevent 2-minute hangs
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
-    );
-
-    await Promise.race([sendMailPromise, timeoutPromise]);
+    if (error) {
+      console.error('❌ Resend API error:', error);
+      return false;
+    }
 
     console.log(`✅ Verification email sent successfully to ${email}`);
+    console.log(`   Email ID: ${data?.id}`);
     return true;
   } catch (error) {
     console.error('❌ Error sending verification email:');
@@ -154,8 +119,6 @@ Joffre Card Game - Multiplayer Trick Card Game
     if (error instanceof Error && error.stack) {
       console.error('   Stack trace:', error.stack);
     }
-    // Log full error object for debugging
-    console.error('   Full error:', error);
     // Don't block user registration if email fails
     return false;
   }
@@ -169,9 +132,9 @@ export async function sendPasswordResetEmail(
   username: string,
   resetToken: string
 ): Promise<boolean> {
-  const transport = getTransporter();
+  const resend = getResendClient();
 
-  if (!transport) {
+  if (!resend) {
     console.log(`✉️  [DEV MODE] Password reset email would be sent to ${email}`);
     console.log(`   Token: ${resetToken}`);
     console.log(`   Reset at: ${FRONTEND_URL}/reset-password?token=${resetToken}`);
@@ -185,8 +148,7 @@ export async function sendPasswordResetEmail(
   console.log(`   From: ${EMAIL_FROM}`);
 
   try {
-    // Add 30 second timeout to prevent hanging
-    const sendMailPromise = transport.sendMail({
+    const { data, error } = await resend.emails.send({
       from: EMAIL_FROM,
       to: email,
       subject: 'Reset Your Password - Joffre Card Game',
@@ -232,33 +194,15 @@ export async function sendPasswordResetEmail(
         </body>
         </html>
       `,
-      text: `
-Password Reset Request
-
-Hi ${username}!
-
-We received a request to reset your password for your Joffre Card Game account.
-
-Reset your password by visiting this link:
-${resetLink}
-
-This link will expire in 1 hour.
-
-⚠️ Security Notice: If you didn't request a password reset, please ignore this email and ensure your account is secure.
-
----
-Joffre Card Game - Multiplayer Trick Card Game
-      `.trim(),
     });
 
-    // Race against timeout to prevent 2-minute hangs
-    const timeoutPromise = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
-    );
-
-    await Promise.race([sendMailPromise, timeoutPromise]);
+    if (error) {
+      console.error('❌ Resend API error:', error);
+      return false;
+    }
 
     console.log(`✅ Password reset email sent successfully to ${email}`);
+    console.log(`   Email ID: ${data?.id}`);
     return true;
   } catch (error) {
     console.error('❌ Error sending password reset email:');
@@ -267,8 +211,6 @@ Joffre Card Game - Multiplayer Trick Card Game
     if (error instanceof Error && error.stack) {
       console.error('   Stack trace:', error.stack);
     }
-    // Log full error object for debugging
-    console.error('   Full error:', error);
     // Don't block password reset flow if email fails
     return false;
   }
@@ -278,18 +220,13 @@ Joffre Card Game - Multiplayer Trick Card Game
  * Verify email configuration
  */
 export async function verifyEmailConfig(): Promise<boolean> {
-  const transport = getTransporter();
+  const resend = getResendClient();
 
-  if (!transport) {
+  if (!resend) {
     return false;
   }
 
-  try {
-    await transport.verify();
-    console.log('✅ Email service is ready');
-    return true;
-  } catch (error) {
-    console.error('❌ Email service configuration error:', error);
-    return false;
-  }
+  // Resend doesn't have a verify method, but we can check if client was created
+  console.log('✅ Resend email service is ready');
+  return true;
 }

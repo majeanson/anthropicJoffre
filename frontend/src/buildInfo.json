@@ -1,6 +1,6 @@
 {
-  "buildDate": "2025-11-06T05:30:00.000Z",
-  "version": "1.7.3",
+  "buildDate": "2025-11-06T06:00:00.000Z",
+  "version": "1.8.0",
   "git": {
     "commitMessage": "fix: Railway deployment errors - trust proxy and database query",
     "commitHash": "19603ff",
@@ -175,9 +175,9 @@
     "Refactored reconnection data migration logic for clarity",
     "Fixed Railway trust proxy validation error",
     "Fixed PostgreSQL parameter type casting in gameState query",
-    "Added 30-second timeout to email sending to prevent request hangs",
-    "Switched email to port 465 (SSL) to work around Railway port 587 blocking",
-    "Added comprehensive email debug logging for troubleshooting"
+    "Migrated email service from SMTP to Resend API (Railway blocks SMTP ports)",
+    "Implemented Resend integration for reliable email delivery",
+    "Removed nodemailer dependency in favor of Resend client"
   ],
   "upcomingFeatures": [
     "Private game invitations",
