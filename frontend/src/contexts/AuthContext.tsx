@@ -199,7 +199,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Update user profile
   const updateProfile = useCallback(async (data: ProfileUpdateData) => {
     const token = getAccessToken();
-    if (!token) return null;
+    if (!token) return;
 
     setError(null);
     try {
