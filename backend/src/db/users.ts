@@ -15,7 +15,7 @@ export async function createUser(
   email: string,
   password: string,
   displayName?: string
-): Promise<User | null> {
+): Promise<{ user: User; verificationToken: string } | null> {
   const pool = getPool();
   if (!pool) return null;
 
@@ -60,9 +60,11 @@ export async function createUser(
     await client.query('COMMIT');
 
     // TODO: Send verification email (implement email service later)
-    console.log(`Verification token for ${username}: ${verificationToken}`);
+    // For now, log token to console (in development, token is also returned in API response)
+    console.log(`✉️  Verification token for ${username}: ${verificationToken}`);
+    console.log(`   Verify at: /api/auth/verify-email with token: ${verificationToken}`);
 
-    return user;
+    return { user, verificationToken };
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('Error creating user:', error);

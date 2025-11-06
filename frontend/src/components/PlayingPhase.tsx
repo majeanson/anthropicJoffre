@@ -13,6 +13,7 @@ import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game
 import { sounds } from '../utils/sounds';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { ContextualGameInfo } from './ContextualGameInfo';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface PlayingPhaseProps {
   gameState: GameState;
@@ -66,6 +67,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
   }
 
   // ✅ NOW it's safe to call hooks - all conditional returns are done
+  const { animationsEnabled } = useSettings();
   const [showPreviousTrick, setShowPreviousTrick] = useState<boolean>(false);
   const [isPlayingCard, setIsPlayingCard] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
@@ -180,25 +182,31 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
   // Card dealing animation when round starts or hand changes
   useEffect(() => {
     if (currentPlayer && currentPlayer.hand.length > 0 && gameState.currentTrick.length === 0) {
-      setShowDealingAnimation(true);
-      setDealingCardIndex(0);
-      sounds.roundStart(); // Play round start sound
+      // Only show animation if animations are enabled
+      if (animationsEnabled) {
+        setShowDealingAnimation(true);
+        setDealingCardIndex(0);
+        sounds.roundStart(); // Play round start sound
 
-      const dealInterval = setInterval(() => {
-        setDealingCardIndex(prev => {
-          if (prev >= currentPlayer.hand.length - 1) {
-            clearInterval(dealInterval);
-            setTimeout(() => setShowDealingAnimation(false), 300);
-            return prev;
-          }
-          sounds.cardDeal(prev + 1); // Play card deal sound for each card
-          return prev + 1;
-        });
-      }, 80); // 80ms between each card
+        const dealInterval = setInterval(() => {
+          setDealingCardIndex(prev => {
+            if (prev >= currentPlayer.hand.length - 1) {
+              clearInterval(dealInterval);
+              setTimeout(() => setShowDealingAnimation(false), 500);
+              return prev;
+            }
+            sounds.cardDeal(prev + 1); // Play card deal sound for each card
+            return prev + 1;
+          });
+        }, 120); // 120ms between each card (was 80ms - made slower for visibility)
 
-      return () => clearInterval(dealInterval);
+        return () => clearInterval(dealInterval);
+      } else {
+        // If animations disabled, just play the sound
+        sounds.roundStart();
+      }
     }
-  }, [gameState.roundNumber]);
+  }, [gameState.roundNumber, animationsEnabled]);
 
   // Trick collection animation when trick is completed
   useEffect(() => {
@@ -993,7 +1001,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                       return displayHand.map((card, index) => {
                         const playable = isCardPlayable(card);
                         const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
-                        const dealDelay = index * 80; // Stagger animation for each card
+                        const dealDelay = index * 120; // Stagger animation for each card (was 80ms - made slower)
                         const isTransitioning = cardInTransition && card.color === cardInTransition.color && card.value === cardInTransition.value;
                         const isSelected = selectedCardIndex === index; // Sprint 6: Keyboard selection
 
@@ -1007,7 +1015,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                             style={{
                               transition: isTransitioning
                                 ? 'opacity 400ms ease-out, transform 400ms ease-out'
-                                : `opacity 200ms ease-out ${dealDelay}ms, transform 200ms ease-out ${dealDelay}ms`
+                                : `opacity 300ms ease-out ${dealDelay}ms, transform 300ms ease-out ${dealDelay}ms`
                             }}
                           >
                             {/* Sprint 6: Selection indicator ring */}

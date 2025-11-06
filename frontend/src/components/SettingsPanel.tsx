@@ -39,11 +39,10 @@ export function SettingsPanel({
   isSpectator = false,
   connectionStats
 }: SettingsPanelProps) {
-  const { darkMode, setDarkMode } = useSettings();
+  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled } = useSettings();
   const [activeTab, setActiveTab] = useState<SettingsTab>('general');
 
   // Local settings state (would normally come from context/localStorage)
-  const [showAnimations, setShowAnimations] = useState(true);
   const [cardDesign, setCardDesign] = useState<'classic' | 'modern'>('classic');
   const [notifyAchievements, setNotifyAchievements] = useState(true);
   const [notifyFriendRequests, setNotifyFriendRequests] = useState(true);
@@ -118,12 +117,12 @@ export function SettingsPanel({
             )}
 
             {/* Animations Toggle */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between" data-testid="settings-animations">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">✨</span>
                 <span className="text-umber-900 dark:text-gray-100 font-semibold">Animations</span>
               </div>
-              <ToggleSwitch enabled={showAnimations} onChange={() => setShowAnimations(!showAnimations)} label="Animations" />
+              <ToggleSwitch enabled={animationsEnabled} onChange={() => setAnimationsEnabled(!animationsEnabled)} label="Animations" />
             </div>
 
             {/* Connection Quality */}
@@ -314,14 +313,14 @@ export function SettingsPanel({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-4000 transition-opacity"
+        className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-[9998] transition-opacity"
         onClick={onClose}
         data-testid="settings-backdrop"
       />
 
       {/* Settings Panel - Increased width for tabs */}
       <div
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-parchment-100 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg shadow-2xl z-50 w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-parchment-100 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg shadow-2xl z-[9999] w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
         onClick={(e) => e.stopPropagation()}
         data-testid="settings-panel"
       >

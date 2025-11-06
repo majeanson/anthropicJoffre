@@ -42,7 +42,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
 
   return (
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
+      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[10000] animate-fadeIn"
       onClick={onClose}
     >
       <div

@@ -11,6 +11,7 @@ import DebugControls from './components/DebugControls';
 import { DebugPanel } from './components/DebugPanel';
 import { ChatMessage } from './components/ChatPanel';
 import { GameReplay } from './components/GameReplay';
+import { BotTakeoverModal } from './components/BotTakeoverModal';
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
@@ -55,12 +56,14 @@ function AppContent() {
     botDifficulty,
     setBotDifficulty,
     setBotManagementOpen,
+    botTakeoverModal,
     setBotTakeoverModal,
     botSocketsRef,
     botTimeoutsRef,
     spawnBotsForGame,
     handleAddBot,
     handleQuickPlay,
+    handleTakeOverBot,
     cleanupBotSocket,
   } = useBotManagement(socket, gameId, gameState);
 
@@ -1102,6 +1105,16 @@ function AppContent() {
             gameId={gameId}
             socket={socket}
             onClose={() => setShowReplayModal(false)}
+          />
+        )}
+
+        {/* Bot Takeover Modal */}
+        {botTakeoverModal && (
+          <BotTakeoverModal
+            isOpen={!!botTakeoverModal}
+            availableBots={botTakeoverModal.availableBots}
+            onTakeOver={handleTakeOverBot}
+            onCancel={() => setBotTakeoverModal(null)}
           />
         )}
       </>

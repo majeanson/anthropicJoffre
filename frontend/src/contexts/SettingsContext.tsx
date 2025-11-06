@@ -8,6 +8,8 @@ interface SettingsContextType {
   setDarkMode: (enabled: boolean) => void;
   autoplayEnabled: boolean;
   setAutoplayEnabled: (enabled: boolean) => void;
+  animationsEnabled: boolean;
+  setAnimationsEnabled: (enabled: boolean) => void;
   debugMode: boolean;
   setDebugMode: (enabled: boolean) => void;
   debugPanelOpen: boolean;
@@ -28,6 +30,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [darkMode, setDarkModeState] = useState<boolean>(() => {
     const saved = localStorage.getItem('darkMode');
     return saved !== null ? JSON.parse(saved) : false;
+  });
+
+  const [animationsEnabled, setAnimationsEnabledState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('animationsEnabled');
+    return saved !== null ? JSON.parse(saved) : true;
   });
 
   const [autoplayEnabled, setAutoplayEnabled] = useState<boolean>(false);
@@ -51,6 +58,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
   }, [darkMode]);
 
+  // Sync animations settings
+  useEffect(() => {
+    localStorage.setItem('animationsEnabled', JSON.stringify(animationsEnabled));
+  }, [animationsEnabled]);
+
   const setSoundEnabled = (enabled: boolean) => {
     setSoundEnabledState(enabled);
     sounds.setEnabled(enabled);
@@ -63,6 +75,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     setDarkModeState(enabled);
   };
 
+  const setAnimationsEnabled = (enabled: boolean) => {
+    setAnimationsEnabledState(enabled);
+  };
+
   return (
     <SettingsContext.Provider
       value={{
@@ -72,6 +88,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         setDarkMode,
         autoplayEnabled,
         setAutoplayEnabled,
+        animationsEnabled,
+        setAnimationsEnabled,
         debugMode,
         setDebugMode,
         debugPanelOpen,

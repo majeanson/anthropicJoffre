@@ -45,7 +45,8 @@ export function registerNotificationHandlers(socket: Socket, deps: NotificationH
   socket.on('get_notifications', errorBoundaries.gameAction('get_notifications')(async (limit?: number) => {
     const userId = getUserId();
     if (!userId) {
-      socket.emit('error', { message: 'Not authenticated' });
+      // Silently skip if not authenticated - user may not be logged in
+      logger.debug('get_notifications called without authentication', { socketId: socket.id });
       return;
     }
 
@@ -69,7 +70,8 @@ export function registerNotificationHandlers(socket: Socket, deps: NotificationH
   socket.on('mark_notification_read', errorBoundaries.gameAction('mark_notification_read')(async (notificationId: number) => {
     const userId = getUserId();
     if (!userId) {
-      socket.emit('error', { message: 'Not authenticated' });
+      // Silently skip if not authenticated
+      logger.debug('mark_notification_read called without authentication', { socketId: socket.id });
       return;
     }
 
@@ -91,7 +93,8 @@ export function registerNotificationHandlers(socket: Socket, deps: NotificationH
   socket.on('mark_all_notifications_read', errorBoundaries.gameAction('mark_all_notifications_read')(async () => {
     const userId = getUserId();
     if (!userId) {
-      socket.emit('error', { message: 'Not authenticated' });
+      // Silently skip if not authenticated
+      logger.debug('mark_all_notifications_read called without authentication', { socketId: socket.id });
       return;
     }
 
@@ -110,7 +113,8 @@ export function registerNotificationHandlers(socket: Socket, deps: NotificationH
   socket.on('delete_notification', errorBoundaries.gameAction('delete_notification')(async (notificationId: number) => {
     const userId = getUserId();
     if (!userId) {
-      socket.emit('error', { message: 'Not authenticated' });
+      // Silently skip if not authenticated
+      logger.debug('delete_notification called without authentication', { socketId: socket.id });
       return;
     }
 
@@ -132,7 +136,8 @@ export function registerNotificationHandlers(socket: Socket, deps: NotificationH
   socket.on('clear_all_notifications', errorBoundaries.gameAction('clear_all_notifications')(async () => {
     const userId = getUserId();
     if (!userId) {
-      socket.emit('error', { message: 'Not authenticated' });
+      // Silently skip if not authenticated
+      logger.debug('clear_all_notifications called without authentication', { socketId: socket.id });
       return;
     }
 

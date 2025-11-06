@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 import { Card as CardType } from '../types/game';
 
 interface CardPlayEffectProps {
@@ -24,7 +25,17 @@ interface Particle {
 const PARTICLE_COUNT = 12;
 
 export function CardPlayEffect({ card, position, onComplete }: CardPlayEffectProps) {
+  const { animationsEnabled } = useSettings();
   const [particles, setParticles] = useState<Particle[]>([]);
+
+  // Don't render if animations are disabled
+  if (!animationsEnabled) {
+    // Still call onComplete to avoid breaking parent logic
+    useEffect(() => {
+      onComplete();
+    }, [onComplete]);
+    return null;
+  }
 
   useEffect(() => {
     // Generate particles in a radial pattern

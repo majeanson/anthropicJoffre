@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useRef } from 'react';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface ConfettiEffectProps {
   teamColor: 'orange' | 'purple';
@@ -24,7 +25,11 @@ interface ConfettiParticle {
 }
 
 export function ConfettiEffect({ teamColor, duration = 2000 }: ConfettiEffectProps) {
+  const { animationsEnabled } = useSettings();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Don't render if animations are disabled
+  if (!animationsEnabled) return null;
 
   useEffect(() => {
     const canvas = canvasRef.current;

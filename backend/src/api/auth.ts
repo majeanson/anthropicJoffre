@@ -92,14 +92,18 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
     // Sanitize display name
     const displayName = display_name ? sanitizeDisplayName(display_name) : username;
 
-    // Create user
-    const user = await createUser(username, email, password, displayName);
+    // Create user and get verification token
+    const result = await createUser(username, email, password, displayName);
 
-    if (!user) {
+    if (!result || !result.user) {
       return res.status(500).json({ error: 'Failed to create user account' });
     }
 
+    const { user, verificationToken } = result;
+
     // Return user info (without sensitive data)
+    // In development, include verification token for testing
+    const isDevelopment = process.env.NODE_ENV !== 'production';
     return res.status(201).json({
       message: 'Account created successfully. Please check your email to verify your account.',
       user: {
@@ -108,7 +112,9 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
         email: user.email,
         display_name: user.display_name,
         is_verified: user.is_verified
-      }
+      },
+      // Only include token in development for manual testing
+      ...(isDevelopment && { verificationToken })
     });
   } catch (error) {
     console.error('Register error:', error);
