@@ -26,6 +26,13 @@ function getTransporter(): nodemailer.Transporter | null {
 
   // Create transporter if it doesn't exist
   if (!transporter) {
+    console.log(`🔧 Creating email transporter...`);
+    console.log(`   Host: ${EMAIL_HOST}`);
+    console.log(`   Port: ${EMAIL_PORT}`);
+    console.log(`   Secure: ${EMAIL_SECURE}`);
+    console.log(`   User: ${EMAIL_USER}`);
+    console.log(`   Password length: ${EMAIL_PASSWORD?.length || 0} chars`);
+
     transporter = nodemailer.createTransport({
       host: EMAIL_HOST,
       port: EMAIL_PORT,
@@ -34,6 +41,8 @@ function getTransporter(): nodemailer.Transporter | null {
         user: EMAIL_USER,
         pass: EMAIL_PASSWORD,
       },
+      debug: true, // Enable SMTP protocol logging
+      logger: true, // Log information to console
     });
 
     console.log(`✉️  Email service configured: ${EMAIL_USER} via ${EMAIL_HOST}:${EMAIL_PORT}`);
@@ -61,8 +70,13 @@ export async function sendVerificationEmail(
 
   const verificationLink = `${FRONTEND_URL}/verify-email?token=${verificationToken}`;
 
+  console.log(`📧 Attempting to send verification email to ${email}...`);
+  console.log(`   Link: ${verificationLink}`);
+  console.log(`   From: ${EMAIL_FROM}`);
+
   try {
-    await transport.sendMail({
+    // Add 30 second timeout to prevent hanging
+    const sendMailPromise = transport.sendMail({
       from: EMAIL_FROM,
       to: email,
       subject: 'Verify Your Email - Joffre Card Game',
@@ -124,10 +138,25 @@ Joffre Card Game - Multiplayer Trick Card Game
       `.trim(),
     });
 
-    console.log(`✉️  Verification email sent to ${email}`);
+    // Race against timeout to prevent 2-minute hangs
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
+    );
+
+    await Promise.race([sendMailPromise, timeoutPromise]);
+
+    console.log(`✅ Verification email sent successfully to ${email}`);
     return true;
   } catch (error) {
-    console.error('❌ Error sending verification email:', error);
+    console.error('❌ Error sending verification email:');
+    console.error('   Error type:', error instanceof Error ? error.constructor.name : typeof error);
+    console.error('   Error message:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error && error.stack) {
+      console.error('   Stack trace:', error.stack);
+    }
+    // Log full error object for debugging
+    console.error('   Full error:', error);
+    // Don't block user registration if email fails
     return false;
   }
 }
@@ -151,8 +180,13 @@ export async function sendPasswordResetEmail(
 
   const resetLink = `${FRONTEND_URL}/reset-password?token=${resetToken}`;
 
+  console.log(`📧 Attempting to send password reset email to ${email}...`);
+  console.log(`   Link: ${resetLink}`);
+  console.log(`   From: ${EMAIL_FROM}`);
+
   try {
-    await transport.sendMail({
+    // Add 30 second timeout to prevent hanging
+    const sendMailPromise = transport.sendMail({
       from: EMAIL_FROM,
       to: email,
       subject: 'Reset Your Password - Joffre Card Game',
@@ -217,10 +251,25 @@ Joffre Card Game - Multiplayer Trick Card Game
       `.trim(),
     });
 
-    console.log(`✉️  Password reset email sent to ${email}`);
+    // Race against timeout to prevent 2-minute hangs
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Email sending timeout after 30 seconds')), 30000)
+    );
+
+    await Promise.race([sendMailPromise, timeoutPromise]);
+
+    console.log(`✅ Password reset email sent successfully to ${email}`);
     return true;
   } catch (error) {
-    console.error('❌ Error sending password reset email:', error);
+    console.error('❌ Error sending password reset email:');
+    console.error('   Error type:', error instanceof Error ? error.constructor.name : typeof error);
+    console.error('   Error message:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error && error.stack) {
+      console.error('   Stack trace:', error.stack);
+    }
+    // Log full error object for debugging
+    console.error('   Full error:', error);
+    // Don't block password reset flow if email fails
     return false;
   }
 }
