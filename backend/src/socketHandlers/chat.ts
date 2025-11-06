@@ -14,7 +14,6 @@ import { Logger } from 'winston';
 
 // Import validation schemas
 import {
-  validateInput,
   lobbyChatPayloadSchema,
   teamChatPayloadSchema,
   gameChatPayloadSchema,
@@ -22,6 +21,13 @@ import {
 
 // Import chat persistence functions
 import { saveChatMessage, getLobbyChat, getGameChat } from '../db/index';
+
+// Import chat helper functions (Sprint 4 Phase 4.3)
+import {
+  validateChatMessage,
+  rateLimitChatMessage,
+  sanitizeChatMessage,
+} from './chatHelpers';
 
 /**
  * Dependencies needed by the chat handlers
@@ -66,36 +72,27 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
   // send_lobby_chat - Global lobby chat (accessible to all connected clients)
   // ============================================================================
   socket.on('send_lobby_chat', errorBoundaries.gameAction('send_lobby_chat')((payload: { playerName: string; message: string }) => {
-    // Validate input
-    const validation = validateInput(lobbyChatPayloadSchema, payload);
-    if (!validation.success) {
-      socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid send_lobby_chat payload', { payload, error: validation.error });
-      return;
-    }
+    // Validate input using helper
+    const validation = validateChatMessage(lobbyChatPayloadSchema, payload, socket, logger, 'send_lobby_chat');
+    if (!validation.success) return;
 
     const { playerName, message: validatedMessage } = validation.data;
 
-    // Rate limiting: Check per-player rate limit
+    // Rate limiting using helper
     const ipAddress = getSocketIP(socket);
-    const rateLimit = rateLimiters.chat.checkLimit(playerName, ipAddress);
-    if (!rateLimit.allowed) {
-      socket.emit('error', {
-        message: 'You are sending messages too fast. Please slow down.',
-      });
-      logger.warn('Rate limit exceeded for send_lobby_chat', {
-        playerName,
-        ipAddress,
-      });
-      return;
-    }
-    rateLimiters.chat.recordRequest(playerName, ipAddress);
+    const rateCheck = rateLimitChatMessage(
+      playerName,
+      ipAddress,
+      rateLimiters.chat,
+      socket,
+      logger,
+      'send_lobby_chat'
+    );
+    if (!rateCheck.allowed) return;
 
-    // Message is already validated and sanitized by Zod schema
-    const sanitizedMessage = validatedMessage;
-    if (!sanitizedMessage) {
-      return;
-    }
+    // Sanitize message using helper
+    const sanitizedMessage = sanitizeChatMessage(validatedMessage);
+    if (!sanitizedMessage) return;
 
     // Broadcast message to all connected clients
     const timestamp = Date.now();
@@ -134,13 +131,9 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
   // send_team_selection_chat - Team selection phase chat
   // ============================================================================
   socket.on('send_team_selection_chat', errorBoundaries.gameAction('send_team_selection_chat')((payload: { gameId: string; message: string }) => {
-    // Sprint 2: Validate input with Zod schema
-    const validation = validateInput(teamChatPayloadSchema, payload);
-    if (!validation.success) {
-      socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid send_team_selection_chat payload', { payload, error: validation.error });
-      return;
-    }
+    // Validate input using helper
+    const validation = validateChatMessage(teamChatPayloadSchema, payload, socket, logger, 'send_team_selection_chat');
+    if (!validation.success) return;
 
     const { gameId, message: validatedMessage } = validation.data;
 
@@ -149,23 +142,6 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
       socket.emit('error', { message: 'Game not found' });
       return;
     }
-
-    // Rate limiting: Check per-player rate limit (Sprint 2)
-    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
-    const ipAddress = getSocketIP(socket);
-    const rateLimit = rateLimiters.chat.checkLimit(playerName, ipAddress);
-    if (!rateLimit.allowed) {
-      socket.emit('error', {
-        message: 'You are sending messages too fast. Please slow down.',
-      });
-      logger.warn('Rate limit exceeded for send_team_selection_chat', {
-        playerName,
-        ipAddress,
-        gameId,
-      });
-      return;
-    }
-    rateLimiters.chat.recordRequest(playerName, ipAddress);
 
     const player = game.players.find(p => p.id === socket.id);
     if (!player) {
@@ -178,11 +154,22 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
       return;
     }
 
-    // Message is already validated and sanitized by Zod schema
-    const sanitizedMessage = validatedMessage;
-    if (!sanitizedMessage) {
-      return;
-    }
+    // Rate limiting using helper
+    const ipAddress = getSocketIP(socket);
+    const rateCheck = rateLimitChatMessage(
+      player.name,
+      ipAddress,
+      rateLimiters.chat,
+      socket,
+      logger,
+      'send_team_selection_chat',
+      gameId
+    );
+    if (!rateCheck.allowed) return;
+
+    // Sanitize message using helper
+    const sanitizedMessage = sanitizeChatMessage(validatedMessage);
+    if (!sanitizedMessage) return;
 
     // Broadcast message to all players in the game
     const timestamp = Date.now();
@@ -203,13 +190,9 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
   // send_game_chat - In-game chat (betting, playing, scoring phases)
   // ============================================================================
   socket.on('send_game_chat', errorBoundaries.gameAction('send_game_chat')((payload: { gameId: string; message: string }) => {
-    // Sprint 2: Validate input with Zod schema
-    const validation = validateInput(gameChatPayloadSchema, payload);
-    if (!validation.success) {
-      socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid send_game_chat payload', { payload, error: validation.error });
-      return;
-    }
+    // Validate input using helper
+    const validation = validateChatMessage(gameChatPayloadSchema, payload, socket, logger, 'send_game_chat');
+    if (!validation.success) return;
 
     const { gameId, message: validatedMessage } = validation.data;
 
@@ -218,23 +201,6 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
       socket.emit('error', { message: 'Game not found' });
       return;
     }
-
-    // Rate limiting: Check per-player rate limit (Sprint 2)
-    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
-    const ipAddress = getSocketIP(socket);
-    const rateLimit = rateLimiters.chat.checkLimit(playerName, ipAddress);
-    if (!rateLimit.allowed) {
-      socket.emit('error', {
-        message: 'You are sending messages too fast. Please slow down.',
-      });
-      logger.warn('Rate limit exceeded for send_game_chat', {
-        playerName,
-        ipAddress,
-        gameId,
-      });
-      return;
-    }
-    rateLimiters.chat.recordRequest(playerName, ipAddress);
 
     const player = game.players.find(p => p.id === socket.id);
     if (!player) {
@@ -247,11 +213,22 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
       return;
     }
 
-    // Message is already validated and sanitized by Zod schema
-    const sanitizedMessage = validatedMessage;
-    if (!sanitizedMessage) {
-      return;
-    }
+    // Rate limiting using helper
+    const ipAddress = getSocketIP(socket);
+    const rateCheck = rateLimitChatMessage(
+      player.name,
+      ipAddress,
+      rateLimiters.chat,
+      socket,
+      logger,
+      'send_game_chat',
+      gameId
+    );
+    if (!rateCheck.allowed) return;
+
+    // Sanitize message using helper
+    const sanitizedMessage = sanitizeChatMessage(validatedMessage);
+    if (!sanitizedMessage) return;
 
     // Broadcast message to all players in the game
     const timestamp = Date.now();

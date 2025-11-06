@@ -1,9 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, lazy } from 'react';
 import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
 import { DarkModeToggle } from './DarkModeToggle';
 import { LobbyBrowser } from './LobbyBrowser';
-import { PlayerStatsModal } from './PlayerStatsModal';
-import { GlobalLeaderboard } from './GlobalLeaderboard';
 import { HowToPlay } from './HowToPlay';
 import { DebugInfo } from './DebugInfo';
 import { LobbyChat } from './LobbyChat';
@@ -13,6 +11,10 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { OnlinePlayer } from '../types/game';
 import { useAuth } from '../contexts/AuthContext';
+
+// Lazy load heavy modals
+const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
+const GlobalLeaderboard = lazy(() => import('./GlobalLeaderboard').then(m => ({ default: m.GlobalLeaderboard })));
 
 interface LobbyProps {
   onCreateGame: (playerName: string, persistenceMode?: 'elo' | 'casual') => void;
@@ -847,7 +849,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
         {/* Stats & Leaderboard Modals */}
         {socket && (
-          <>
+          <Suspense fallback={<div />}>
             <PlayerStatsModal
               playerName={selectedPlayerName}
               socket={socket}
@@ -864,7 +866,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 setShowPlayerStats(true);
               }}
             />
-          </>
+          </Suspense>
         )}
       </>
     );
@@ -1112,7 +1114,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
       {/* Stats & Leaderboard Modals */}
       {socket && (
-        <>
+        <Suspense fallback={<div />}>
           <PlayerStatsModal
             playerName={selectedPlayerName}
             socket={socket}
@@ -1129,7 +1131,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               setShowPlayerStats(true);
             }}
           />
-        </>
+        </Suspense>
       )}
     </div>
   );

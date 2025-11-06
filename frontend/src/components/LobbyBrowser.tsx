@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
-import { GameReplay } from './GameReplay';
+
+// Lazy load GameReplay component
+const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
 
 interface LobbyGame {
   gameId: string;
@@ -200,11 +202,13 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {
     return (
-      <GameReplay
-        gameId={replayGameId}
-        socket={socket}
-        onClose={() => setReplayGameId(null)}
-      />
+      <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white">Loading replay...</div></div>}>
+        <GameReplay
+          gameId={replayGameId}
+          socket={socket}
+          onClose={() => setReplayGameId(null)}
+        />
+      </Suspense>
     );
   }
 

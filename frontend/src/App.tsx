@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, Suspense, lazy } from 'react';
 import { GameState, Card, PlayerSession } from './types/game';
 import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
@@ -10,8 +10,10 @@ import GlobalUI from './components/GlobalUI';
 import DebugControls from './components/DebugControls';
 import { DebugPanel } from './components/DebugPanel';
 import { ChatMessage } from './components/ChatPanel';
-import { GameReplay } from './components/GameReplay';
 import { BotTakeoverModal } from './components/BotTakeoverModal';
+
+// Lazy load heavy components for better initial load performance
+const GameReplay = lazy(() => import('./components/GameReplay').then(m => ({ default: m.GameReplay })));
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
@@ -1047,11 +1049,13 @@ function AppContent() {
 
         {/* Game Replay Modal */}
         {showReplayModal && socket && (
-          <GameReplay
-            gameId={gameId}
-            socket={socket}
-            onClose={() => setShowReplayModal(false)}
-          />
+          <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading replay...</div></div>}>
+            <GameReplay
+              gameId={gameId}
+              socket={socket}
+              onClose={() => setShowReplayModal(false)}
+            />
+          </Suspense>
         )}
 
         {/* Bot Takeover Modal */}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
 import { GameHistoryEntry } from '../types/game';
@@ -7,7 +7,9 @@ import { useAuth } from '../contexts/AuthContext'; // Sprint 3 Phase 2
 import { ProfileEditor, ProfileData } from './ProfileEditor'; // Sprint 3 Phase 3.2
 import { UserProfile } from '../types/auth'; // Sprint 3 Phase 3.2
 import { MatchCard } from './MatchCard'; // Sprint 3 Phase 3.3
-import { MatchStatsModal } from './MatchStatsModal'; // Sprint 3 Phase 3.3
+
+// Lazy load heavy modal
+const MatchStatsModal = lazy(() => import('./MatchStatsModal').then(m => ({ default: m.MatchStatsModal })));
 
 interface PlayerStats {
   player_name: string;
@@ -753,16 +755,18 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
 
       {/* Match Stats Modal - Sprint 3 Phase 3.3 */}
       {selectedMatchId && (
-        <MatchStatsModal
-          gameId={selectedMatchId}
-          socket={socket}
-          isOpen={showMatchStatsModal}
-          onClose={() => {
-            setShowMatchStatsModal(false);
-            setSelectedMatchId(null);
-          }}
-          onViewReplay={onViewReplay}
-        />
+        <Suspense fallback={<div />}>
+          <MatchStatsModal
+            gameId={selectedMatchId}
+            socket={socket}
+            isOpen={showMatchStatsModal}
+            onClose={() => {
+              setShowMatchStatsModal(false);
+              setSelectedMatchId(null);
+            }}
+            onViewReplay={onViewReplay}
+          />
+        </Suspense>
       )}
     </div>
   );

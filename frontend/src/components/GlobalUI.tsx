@@ -4,25 +4,27 @@
  * Extracted from App.tsx to prevent remounting issues
  */
 
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { GameState } from '../types/game';
 import { useModals } from '../contexts/ModalContext';
 import { useAuth } from '../contexts/AuthContext';
 import { ReconnectingBanner } from './ReconnectingBanner';
 import { Toast, ToastProps } from './Toast';
-import { CatchUpModal } from './CatchUpModal';
-import { BotManagementPanel } from './BotManagementPanel';
 import { AchievementUnlocked } from './AchievementUnlocked';
 import FriendRequestNotification from './FriendRequestNotification';
-import FriendsPanel from './FriendsPanel';
 import { NotificationCenter } from './NotificationCenter';
 import EmailVerificationBanner from './EmailVerificationBanner';
-import LoginModal from './LoginModal';
-import RegisterModal from './RegisterModal';
-import PasswordResetModal from './PasswordResetModal';
 import { Achievement } from '../types/achievements';
 import { FriendRequestNotification as FriendRequestNotificationType } from '../types/friends';
 import { useBotManagement } from '../hooks/useBotManagement';
+
+// Lazy load heavy modals for better initial load performance
+const BotManagementPanel = lazy(() => import('./BotManagementPanel').then(m => ({ default: m.BotManagementPanel })));
+const FriendsPanel = lazy(() => import('./FriendsPanel'));
+const CatchUpModal = lazy(() => import('./CatchUpModal').then(m => ({ default: m.CatchUpModal })));
+const LoginModal = lazy(() => import('./LoginModal'));
+const RegisterModal = lazy(() => import('./RegisterModal'));
+const PasswordResetModal = lazy(() => import('./PasswordResetModal'));
 
 interface GlobalUIProps {
   reconnecting: boolean;
@@ -94,7 +96,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
 
       {/* Game-specific UI */}
       {gameState && (
-        <>
+        <Suspense fallback={<div />}>
           <CatchUpModal
             isOpen={showCatchUpModal}
             onClose={() => {
@@ -121,7 +123,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
             socket={socket}
             currentPlayer={gameState.players.find(p => p.id === socket?.id)?.name || ''}
           />
-        </>
+        </Suspense>
       )}
 
       {/* Achievement & Social UI */}
@@ -146,23 +148,25 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
       />
       <EmailVerificationBanner />
 
-      {/* Authentication Modals - Always rendered, visibility controlled by isOpen */}
-      <LoginModal
-        isOpen={modals.showLoginModal}
-        onClose={modals.closeLoginModal}
-        onSwitchToRegister={modals.switchToRegister}
-        onSwitchToPasswordReset={modals.switchToPasswordReset}
-      />
-      <RegisterModal
-        isOpen={modals.showRegisterModal}
-        onClose={modals.closeRegisterModal}
-        onSwitchToLogin={modals.switchToLogin}
-      />
-      <PasswordResetModal
-        isOpen={modals.showPasswordResetModal}
-        onClose={modals.closePasswordResetModal}
-        onSwitchToLogin={modals.switchToLogin}
-      />
+      {/* Authentication Modals - Lazy loaded */}
+      <Suspense fallback={<div />}>
+        <LoginModal
+          isOpen={modals.showLoginModal}
+          onClose={modals.closeLoginModal}
+          onSwitchToRegister={modals.switchToRegister}
+          onSwitchToPasswordReset={modals.switchToPasswordReset}
+        />
+        <RegisterModal
+          isOpen={modals.showRegisterModal}
+          onClose={modals.closeRegisterModal}
+          onSwitchToLogin={modals.switchToLogin}
+        />
+        <PasswordResetModal
+          isOpen={modals.showPasswordResetModal}
+          onClose={modals.closePasswordResetModal}
+          onSwitchToLogin={modals.switchToLogin}
+        />
+      </Suspense>
     </>
   );
 };
