@@ -10,7 +10,9 @@ export interface Achievement {
   achievement_id: number;
   achievement_key: string;
   achievement_name: string;
+  name: string;
   description: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
   icon: string; // Emoji
   tier: AchievementTier;
   points: number;

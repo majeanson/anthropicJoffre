@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { GameState, Card, PlayerSession } from './types/game';
 import { Lobby } from './components/Lobby';
 import { BettingPhase } from './components/BettingPhase';
@@ -6,29 +6,15 @@ import { PlayingPhase } from './components/PlayingPhase';
 import { TeamSelection } from './components/TeamSelection';
 import RoundSummary from './components/RoundSummary';
 import { RematchVoting } from './components/RematchVoting';
-import { DebugMultiPlayerView } from './components/DebugMultiPlayerView';
+import GlobalUI from './components/GlobalUI';
+import DebugControls from './components/DebugControls';
 import { DebugPanel } from './components/DebugPanel';
-import { TestPanel } from './components/TestPanel';
-import { ReconnectingBanner } from './components/ReconnectingBanner';
-import { CatchUpModal } from './components/CatchUpModal';
-import { BotManagementPanel } from './components/BotManagementPanel';
-import { BotTakeoverModal } from './components/BotTakeoverModal';
-import { Toast } from './components/Toast';
 import { ChatMessage } from './components/ChatPanel';
 import { GameReplay } from './components/GameReplay';
-import { AchievementUnlocked } from './components/AchievementUnlocked'; // Sprint 2 Phase 1
-import { AchievementsPanel } from './components/AchievementsPanel'; // Sprint 2 Phase 1
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
-import FriendsPanel from './components/FriendsPanel'; // Sprint 2 Phase 2
-import FriendRequestNotificationComponent from './components/FriendRequestNotification'; // Sprint 2 Phase 2
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
-import LoginModal from './components/LoginModal'; // Sprint 3 Phase 1
-import RegisterModal from './components/RegisterModal'; // Sprint 3 Phase 1
-import PasswordResetModal from './components/PasswordResetModal'; // Sprint 3 Phase 1
-import EmailVerificationBanner from './components/EmailVerificationBanner'; // Sprint 3 Phase 1
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal state management
-import { NotificationCenter } from './components/NotificationCenter'; // Sprint 3 Phase 5
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
 // Use enhanced bot AI with advanced strategic concepts
 import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from './utils/botPlayerEnhanced';
@@ -68,18 +54,13 @@ function AppContent() {
   const {
     botDifficulty,
     setBotDifficulty,
-    botManagementOpen,
     setBotManagementOpen,
-    botTakeoverModal,
     setBotTakeoverModal,
     botSocketsRef,
     botTimeoutsRef,
     spawnBotsForGame,
     handleAddBot,
     handleQuickPlay,
-    handleReplaceWithBot,
-    handleChangeBotDifficulty,
-    handleTakeOverBot,
     cleanupBotSocket,
   } = useBotManagement(socket, gameId, gameState);
 
@@ -87,7 +68,7 @@ function AppContent() {
   const connectionStats = useConnectionQuality(socket);
 
   // Debug mode state
-  const [debugMode, setDebugMode] = useState<boolean>(false);
+  const [debugMode] = useState<boolean>(false);
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
@@ -103,11 +84,17 @@ function AppContent() {
 
   // Sprint 2 Phase 1: Achievement state
   const [achievementNotification, setAchievementNotification] = useState<{ achievement: Achievement; playerName: string } | null>(null);
-  const [showAchievementsPanel, setShowAchievementsPanel] = useState<boolean>(false);
+  const [, setShowAchievementsPanel] = useState<boolean>(false);
 
   // Sprint 2 Phase 2: Friends state
   const [showFriendsPanel, setShowFriendsPanel] = useState<boolean>(false);
   const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
+
+  // Missing state variables for GlobalUI and DebugControls
+  const [missedActions, setMissedActions] = useState<any[]>([]);
+  const [showBotManagement, setShowBotManagement] = useState<boolean>(false);
+  const [debugInfoOpen, setDebugInfoOpen] = useState<boolean>(false);
+  const [showMultiPlayerDebug, setShowMultiPlayerDebug] = useState<boolean>(false);
 
   // Sprint 3 Phase 1: Authentication state
   const auth = useAuth();
@@ -644,107 +631,41 @@ function AppContent() {
     );
   }
 
-  // Global UI components (shown across all phases)
-  const GlobalUI = () => (
-    <>
-      {reconnecting && <ReconnectingBanner attempt={reconnectAttempt} maxAttempts={10} />}
-      {toast && <Toast {...toast} onClose={() => setToast(null)} />}
-      {gameState && (
-        <CatchUpModal
-          gameState={gameState}
-          currentPlayerId={socket?.id || ''}
-          isOpen={showCatchUpModal}
-          onClose={() => setShowCatchUpModal(false)}
-        />
-      )}
-      <BotManagementPanel
-        isOpen={botManagementOpen}
-        onClose={() => setBotManagementOpen(false)}
-        gameState={gameState}
-        currentPlayerId={socket?.id || ''}
-        onReplaceWithBot={handleReplaceWithBot}
-        onChangeBotDifficulty={handleChangeBotDifficulty}
-      />
-      {botTakeoverModal && (
-        <BotTakeoverModal
-          isOpen={!!botTakeoverModal}
-          availableBots={botTakeoverModal.availableBots}
-          onTakeOver={handleTakeOverBot}
-          onCancel={() => {
-            setBotTakeoverModal(null);
-          }}
-        />
-      )}
-      {/* Sprint 2 Phase 1: Achievement system UI */}
-      {achievementNotification && (
-        <AchievementUnlocked
-          achievement={{
-            achievement_id: achievementNotification.achievement.achievement_key,
-            name: achievementNotification.achievement.achievement_name,
-            description: achievementNotification.achievement.description,
-            icon: achievementNotification.achievement.icon,
-            rarity: achievementNotification.achievement.tier === 'bronze' ? 'common' :
-                    achievementNotification.achievement.tier === 'silver' ? 'rare' :
-                    achievementNotification.achievement.tier === 'gold' ? 'epic' : 'legendary'
-          }}
-          onDismiss={() => setAchievementNotification(null)}
-        />
-      )}
-      {gameState && (
-        <AchievementsPanel
-          isOpen={showAchievementsPanel}
-          onClose={() => setShowAchievementsPanel(false)}
-          socket={socket}
-          playerName={gameState.players.find(p => p.id === socket?.id)?.name || ''}
-        />
-      )}
-      {/* Sprint 2 Phase 2: Friends system UI */}
-      {friendRequestNotification && (
-        <FriendRequestNotificationComponent
-          notification={friendRequestNotification}
-          onClose={() => setFriendRequestNotification(null)}
-          onView={() => setShowFriendsPanel(true)}
-        />
-      )}
-      {gameState && (
-        <FriendsPanel
-          isOpen={showFriendsPanel}
-          onClose={() => setShowFriendsPanel(false)}
-          socket={socket}
-          currentPlayer={gameState.players.find(p => p.id === socket?.id)?.name || ''}
-        />
-      )}
-      {/* Sprint 3 Phase 5: Notification Center */}
-      <NotificationCenter
-        socket={socket}
-        isAuthenticated={auth.isAuthenticated}
-      />
-      {/* Sprint 3 Phase 1: Authentication UI */}
-      <EmailVerificationBanner />
-      {/* Render all modals - they stay mounted but hidden when not in use */}
-      <LoginModal
-        isOpen={modals.showLoginModal}
-        onClose={modals.closeLoginModal}
-        onSwitchToRegister={modals.switchToRegister}
-        onSwitchToPasswordReset={modals.switchToPasswordReset}
-      />
-      <RegisterModal
-        isOpen={modals.showRegisterModal}
-        onClose={modals.closeRegisterModal}
-        onSwitchToLogin={modals.switchToLogin}
-      />
-      <PasswordResetModal
-        isOpen={modals.showPasswordResetModal}
-        onClose={modals.closePasswordResetModal}
-        onSwitchToLogin={modals.switchToLogin}
-      />
-    </>
-  );
+  // GlobalUI props to avoid repetition
+  const globalUIProps = {
+    reconnecting,
+    reconnectAttempt,
+    toast: toast ? { ...toast, onClose: () => {} } : null,
+    setToast,
+    gameState,
+    showCatchUpModal,
+    setShowCatchUpModal,
+    missedActions,
+    setMissedActions,
+    showBotManagement,
+    setShowBotManagement,
+    botDifficulty,
+    setBotDifficulty,
+    achievementNotification: achievementNotification ? achievementNotification.achievement : null,
+    setAchievementNotification: (achievement: Achievement | null) => {
+      if (achievement) {
+        setAchievementNotification({ achievement, playerName: gameState?.players.find(p => p.id === socket?.id)?.name || '' });
+      } else {
+        setAchievementNotification(null);
+      }
+    },
+    friendRequestNotification,
+    setFriendRequestNotification,
+    showFriendsPanel,
+    setShowFriendsPanel,
+    gameId,
+    socket
+  };
 
   if (!gameState) {
     return (
       <>
-        <GlobalUI />
+        <GlobalUI {...globalUIProps} />
     
         <Lobby
           onCreateGame={handleCreateGame}
@@ -765,92 +686,27 @@ function AppContent() {
     );
   }
 
-  // Debug controls - can be controlled via environment variable
-  // Currently enabled for all environments (set to false to hide)
-  // To disable: set VITE_DEBUG_ENABLED=false in .env
-  const DEBUG_ENABLED = import.meta.env.VITE_DEBUG_ENABLED !== 'false';
-
-  const DebugControls = () => (
-    <div className="fixed top-4 right-4 z-50">
-      {/* Debug Menu Button */}
-      {DEBUG_ENABLED && (
-        <button
-          onClick={() => setDebugMenuOpen(!debugMenuOpen)}
-          className="bg-gray-800 bg-opacity-80 hover:bg-opacity-90 text-white px-3 py-2 rounded-lg shadow-lg font-bold transition-all flex items-center gap-2 backdrop-blur-sm"
-          title="Debug Menu"
-          aria-label="Open debug menu"
-        >
-          ⚙️ Debug
-        </button>
-      )}
-
-      {/* Dropdown Menu */}
-      {debugMenuOpen && (
-        <div className="absolute top-12 right-0 bg-white dark:bg-gray-800 bg-opacity-95 dark:bg-opacity-95 rounded-lg shadow-2xl p-2 min-w-[160px] backdrop-blur-sm">
-          <button
-            onClick={() => {
-              setTestPanelOpen(true);
-              setDebugMenuOpen(false);
-            }}
-            className="w-full text-left px-3 py-2 rounded hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
-          >
-            🧪 Test Panel
-          </button>
-          <button
-            onClick={() => {
-              setDebugPanelOpen(true);
-              setDebugMenuOpen(false);
-            }}
-            className="w-full text-left px-3 py-2 rounded hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
-          >
-            🔍 Game State
-          </button>
-          {gameState && gameState.players.length === 4 && (
-            <button
-              onClick={() => {
-                setDebugMode(!debugMode);
-                setDebugMenuOpen(false);
-              }}
-              className="w-full text-left px-3 py-2 rounded hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-colors flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
-            >
-              {debugMode ? '👤 Single View' : '🐛 4-Player View'}
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
-  // Render TestPanel alongside other components
-  const renderTestPanel = () => (
-    <TestPanel
-      gameState={gameState}
-      socket={socket}
-      isOpen={testPanelOpen}
-      onClose={() => setTestPanelOpen(false)}
-    />
-  );
 
   // If debug mode is enabled, use the multi-player view
   if (debugMode && gameState.players.length === 4) {
     return (
       <>
-        <DebugControls />
-        {renderTestPanel()}
-        <DebugPanel
+        <GlobalUI {...globalUIProps} />
+        <DebugControls
           gameState={gameState}
-          gameId={gameId}
-          isOpen={debugPanelOpen}
-          onClose={() => setDebugPanelOpen(false)}
-        />
-        <DebugMultiPlayerView
-          gameState={gameState}
-          gameId={gameId}
-          onPlaceBet={handlePlaceBet}
-          onPlayCard={handlePlayCard}
-          onSelectTeam={handleSelectTeam}
-          onSwapPosition={handleSwapPosition}
-          onStartGame={handleStartGame}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+          showMultiPlayerDebug={showMultiPlayerDebug}
+          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
         />
       </>
     );
@@ -859,9 +715,23 @@ function AppContent() {
   if (gameState.phase === 'team_selection') {
     return (
       <>
-        <GlobalUI />
-        <DebugControls />
-        {renderTestPanel()}
+        <GlobalUI {...globalUIProps} />
+        <DebugControls
+          gameState={gameState}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+          showMultiPlayerDebug={showMultiPlayerDebug}
+          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
+        />
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -890,9 +760,23 @@ function AppContent() {
   if (gameState.phase === 'betting') {
     return (
       <>
-        <GlobalUI />
-        <DebugControls />
-        {renderTestPanel()}
+        <GlobalUI {...globalUIProps} />
+        <DebugControls
+          gameState={gameState}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+          showMultiPlayerDebug={showMultiPlayerDebug}
+          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
+        />
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -927,9 +811,23 @@ function AppContent() {
   if (gameState.phase === 'playing') {
     return (
       <>
-        <GlobalUI />
-        <DebugControls />
-        {renderTestPanel()}
+        <GlobalUI {...globalUIProps} />
+        <DebugControls
+          gameState={gameState}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+          showMultiPlayerDebug={showMultiPlayerDebug}
+          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
+        />
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -970,9 +868,23 @@ function AppContent() {
 
     return (
       <>
-        <GlobalUI />
-        <DebugControls />
-        {renderTestPanel()}
+        <GlobalUI {...globalUIProps} />
+        <DebugControls
+          gameState={gameState}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+          showMultiPlayerDebug={showMultiPlayerDebug}
+          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
+        />
         <DebugPanel
           gameState={gameState}
           gameId={gameId}
@@ -1000,9 +912,23 @@ function AppContent() {
 
     return (
       <>
-        <GlobalUI />
-        <DebugControls />
-        {renderTestPanel()}
+        <GlobalUI {...globalUIProps} />
+        <DebugControls
+          gameState={gameState}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+          showMultiPlayerDebug={showMultiPlayerDebug}
+          setShowMultiPlayerDebug={setShowMultiPlayerDebug}
+        />
         <DebugPanel
           gameState={gameState}
           gameId={gameId}

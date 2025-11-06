@@ -6,15 +6,7 @@
  */
 
 import { useEffect, useState } from 'react';
-
-interface Achievement {
-  achievement_id: string;
-  name: string;
-  description: string;
-  icon: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-}
-
+import { Achievement } from '../types/achievements';
 interface AchievementUnlockedProps {
   achievement: Achievement | null;
   onDismiss: () => void;
