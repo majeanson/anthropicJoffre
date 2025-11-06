@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-06T02:28:00.796Z",
-  "version": "1.6.3",
+  "buildDate": "2025-11-06T04:25:00.000Z",
+  "version": "1.7.0",
   "git": {
-    "commitMessage": "Register fix try",
-    "commitHash": "5494a5d",
-    "commitDate": "2025-11-05 21:26:51 -0500",
+    "commitMessage": "docs: Update .env.example with Gmail email configuration",
+    "commitHash": "2a521cf",
+    "commitDate": "2025-11-05 23:24:00 -0500",
     "branch": "main"
   },
   "futureTodos": [
@@ -108,7 +108,11 @@
     "Enhanced match history with detailed stats",
     "Advanced chat with @mentions and URLs",
     "Full notification system with animations",
-    "Tabbed settings panel with preferences"
+    "Tabbed settings panel with preferences",
+    "Email verification and password reset with HTML templates",
+    "Streamlined settings UI (2 tabs instead of 4)",
+    "Improved animations and visual effects",
+    "Enhanced reconnection stability and bug fixes"
   ],
   "databaseTables": [
     "users",
@@ -135,7 +139,8 @@
       "Socket.io 4.8",
       "PostgreSQL (Neon)",
       "bcryptjs",
-      "jsonwebtoken"
+      "jsonwebtoken",
+      "nodemailer"
     ]
   },
   "improvements": [
@@ -155,7 +160,19 @@
     "Removed form clearing on focus out for all auth modals",
     "Fixed Rules of Hooks violation causing state loss",
     "Moved early returns after all hooks in modals",
-    "Ensured modal state preservation across renders"
+    "Ensured modal state preservation across renders",
+    "Implemented email service for verification and password reset",
+    "Added HTML email templates with branding",
+    "Consolidated settings panel from 4 tabs to 2 tabs",
+    "Fixed z-index stacking issues with React Portal",
+    "Reduced confetti animation from fullscreen to centered 600x400px",
+    "Removed card hover effects during gameplay",
+    "Fixed Friends button authentication requirement",
+    "Moved toast notifications below game header",
+    "Fixed Bot management modal not opening in gaming phase",
+    "Documented Debug mode functionality",
+    "Fixed reconnection player ID mismatch causing crashes",
+    "Refactored reconnection data migration logic for clarity"
   ],
   "upcomingFeatures": [
     "Private game invitations",
