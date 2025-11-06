@@ -217,10 +217,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(result.error || 'Failed to update profile');
       }
 
-      // If avatar was updated, refresh current user
-      if (data.avatar_id) {
-        await fetchCurrentUser();
-      }
+      // Always refresh current user after profile update to show latest data
+      await fetchCurrentUser();
     } catch (err: any) {
       setError(err.message || 'Failed to update profile');
       throw err;

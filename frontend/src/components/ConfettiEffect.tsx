@@ -130,7 +130,7 @@ export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom'
     <canvas
       ref={canvasRef}
       className={`fixed ${positionClasses[position]} pointer-events-none z-[9998] motion-reduce:hidden w-[200px] h-[150px]`}
-      style={{ opacity: 0.9 }}
+      style={{ opacity: 0.9, backgroundColor: 'transparent' }}
     />
   );
 }

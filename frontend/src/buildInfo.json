@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-06T19:41:22.340Z",
-  "version": "1.6.3",
+  "buildDate": "2025-11-06T19:53:53.077Z",
+  "version": "1.7.2",
   "git": {
-    "commitMessage": "docs: Update REFACTOR_PROGRESS.md with Session 2 completion summary",
-    "commitHash": "a897112",
-    "commitDate": "2025-11-06 08:31:37 -0500",
+    "commitMessage": "feat: Add comprehensive keyboard accessibility and Team Management modal\n\nKeyboard Accessibility:\n- Betting Phase: Arrow keys to adjust bet, Enter to place, S/Escape to skip\n- Round Summary: Enter key to mark ready for next round\n- Lobby: Arrow keys for tab/button navigation, Enter to activate\n\nTeam Management (formerly Bot Management):\n- Swap positions: Support for human↔human, bot↔bot, and cross-swaps\n- Kick player: Remove any player (creates empty seat)\n- Visual swap mode with clear feedback\n- Permission-based actions (creator only)\n- Preserved bot difficulty settings\n\nUX Improvements:\n- Notification center now floating button (only visible when unread)\n- Fixed confetti animation positioning (minimal above player)\n- Fixed autoplay timeout with useRef to prevent stale closures\n- Fixed loading states in PlayerStatsModal\n- Settings debug toggle now opens debug panel modal\n- Socket authentication with JWT token\n- Bot difficulty badges now properly displayed\n\nBackend:\n- Socket.IO authentication middleware\n- Added botDifficulty parameter to join_game handler\n- Updated validation schemas for bot difficulty\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "877fd83",
+    "commitDate": "2025-11-06 14:42:29 -0500",
     "branch": "main"
   },
   "futureTodos": [
@@ -14,14 +14,14 @@
     "Achievements & Badges",
     "Friend System"
   ],
-  "releaseDate": "2025-11-05",
+  "releaseDate": "2025-11-06",
   "buildStatus": "✅ Production Ready",
   "testsStatus": {
     "backend": "✅ 150 tests passing",
     "frontend": "✅ TypeScript compilation passing",
     "e2e": "⚠️ Some tests need refactoring"
   },
-  "sprint": "Sprint 3 - Major Features",
+  "sprint": "Sprint 3 - Accessibility & UX Polish",
   "phases": {
     "phase1": {
       "name": "User Authentication System",
@@ -155,7 +155,16 @@
     "Removed form clearing on focus out for all auth modals",
     "Fixed Rules of Hooks violation causing state loss",
     "Moved early returns after all hooks in modals",
-    "Ensured modal state preservation across renders"
+    "Ensured modal state preservation across renders",
+    "Added full keyboard accessibility to betting phase (arrows + Enter)",
+    "Added keyboard accessibility to round summary (Enter for ready)",
+    "Implemented complete lobby keyboard navigation (arrow keys + Enter)",
+    "Converted Bot Management to comprehensive Team Management modal",
+    "Added swap positions feature for all players (human-to-human, bot-to-bot, cross-swap)",
+    "Implemented kick player functionality for game creators",
+    "Added visual swap mode with clear feedback and instructions",
+    "Enhanced team management with permission-based actions",
+    "Improved notification center to floating button (only visible when unread)"
   ],
   "upcomingFeatures": [
     "Private game invitations",
@@ -170,6 +179,10 @@
     "Authentication system fully integrated",
     "Social features significantly enhanced",
     "UI/UX improvements throughout the application",
+    "Added comprehensive keyboard accessibility across all game phases",
+    "Team Management modal now supports full player/bot management",
+    "Notification center improved with floating button design",
+    "Enhanced accessibility for keyboard-only users",
     "Ready for production deployment"
   ]
 }

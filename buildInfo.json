@@ -1,7 +1,7 @@
 {
-  "version": "1.7.2",
+  "version": "1.7.3",
   "releaseDate": "2025-11-06",
-  "sprint": "Sprint 3 - Accessibility & UX Polish",
+  "sprint": "Sprint 3 - Match Details & Profile Fixes",
   "phases": {
     "phase1": {
       "name": "User Authentication System",
@@ -144,7 +144,12 @@
     "Implemented kick player functionality for game creators",
     "Added visual swap mode with clear feedback and instructions",
     "Enhanced team management with permission-based actions",
-    "Improved notification center to floating button (only visible when unread)"
+    "Improved notification center to floating button (only visible when unread)",
+    "Fixed profile update to refresh all fields (bio, country, favorite team, visibility)",
+    "Implemented comprehensive Match Details modal with 3 tabs (Overview, Round-by-Round, Player Stats)",
+    "Added detailed match statistics including bets, results, tricks won, and individual player performance",
+    "Integrated Match Details with Game Replay viewer for seamless navigation",
+    "Fixed confetti effect transparent background to prevent fullscreen white overlay"
   ],
   "upcomingFeatures": [
     "Private game invitations",
