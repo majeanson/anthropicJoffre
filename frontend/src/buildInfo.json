@@ -1,19 +1,12 @@
 {
-  "buildDate": "2025-11-06T19:53:53.077Z",
-  "version": "1.7.2",
+  "buildDate": "2025-11-07T04:59:01.122Z",
+  "version": "1.9.0",
   "git": {
-    "commitMessage": "feat: Add comprehensive keyboard accessibility and Team Management modal\n\nKeyboard Accessibility:\n- Betting Phase: Arrow keys to adjust bet, Enter to place, S/Escape to skip\n- Round Summary: Enter key to mark ready for next round\n- Lobby: Arrow keys for tab/button navigation, Enter to activate\n\nTeam Management (formerly Bot Management):\n- Swap positions: Support for human↔human, bot↔bot, and cross-swaps\n- Kick player: Remove any player (creates empty seat)\n- Visual swap mode with clear feedback\n- Permission-based actions (creator only)\n- Preserved bot difficulty settings\n\nUX Improvements:\n- Notification center now floating button (only visible when unread)\n- Fixed confetti animation positioning (minimal above player)\n- Fixed autoplay timeout with useRef to prevent stale closures\n- Fixed loading states in PlayerStatsModal\n- Settings debug toggle now opens debug panel modal\n- Socket authentication with JWT token\n- Bot difficulty badges now properly displayed\n\nBackend:\n- Socket.IO authentication middleware\n- Added botDifficulty parameter to join_game handler\n- Updated validation schemas for bot difficulty\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "877fd83",
-    "commitDate": "2025-11-06 14:42:29 -0500",
+    "commitMessage": "feat: Enable team swap and kick player in all game phases",
+    "commitHash": "6b5ff73",
+    "commitDate": "2025-11-06 23:22:59 -0500",
     "branch": "main"
   },
-  "futureTodos": [
-    "Game Replay Feature",
-    "Improve Bot AI",
-    "Enhanced Leaderboard",
-    "Achievements & Badges",
-    "Friend System"
-  ],
   "releaseDate": "2025-11-06",
   "buildStatus": "✅ Production Ready",
   "testsStatus": {
@@ -21,105 +14,36 @@
     "frontend": "✅ TypeScript compilation passing",
     "e2e": "⚠️ Some tests need refactoring"
   },
-  "sprint": "Sprint 3 - Accessibility & UX Polish",
-  "phases": {
-    "phase1": {
-      "name": "User Authentication System",
-      "status": "✅ Completed",
-      "duration": "8-10 hours",
-      "features": [
-        "JWT-based authentication",
-        "User registration and login",
-        "Email verification",
-        "Password reset functionality",
-        "Session management",
-        "Protected routes"
-      ]
-    },
-    "phase2": {
-      "name": "Enhanced Player Profiles",
-      "status": "✅ Completed",
-      "duration": "5-6 hours",
-      "features": [
-        "Avatar system with 20+ options",
-        "Profile customization (bio, country)",
-        "Privacy settings",
-        "Profile editor modal",
-        "Avatar display across UI"
-      ]
-    },
-    "phase3": {
-      "name": "Enhanced Match History UI",
-      "status": "✅ Completed",
-      "duration": "3-4 hours",
-      "features": [
-        "Detailed match cards",
-        "Match statistics modal",
-        "Game replay integration",
-        "Win/loss filtering",
-        "Sorting options"
-      ]
-    },
-    "phase4": {
-      "name": "Enhanced Lobby Chat",
-      "status": "✅ Completed",
-      "duration": "4-5 hours",
-      "features": [
-        "@mention support with highlighting",
-        "Clickable URLs",
-        "Visual feedback for mentions",
-        "Chat persistence"
-      ]
-    },
-    "phase5": {
-      "name": "Notification System",
-      "status": "✅ Completed",
-      "duration": "5-6 hours",
-      "features": [
-        "Notification center with bell icon",
-        "Achievement unlock animations",
-        "Friend request notifications",
-        "Mention notifications",
-        "Database persistence",
-        "Mark as read functionality",
-        "Notification preferences"
-      ]
-    },
-    "phase6": {
-      "name": "Enhanced Settings System",
-      "status": "✅ Completed",
-      "duration": "3-4 hours",
-      "features": [
-        "Tabbed settings interface",
-        "General settings tab",
-        "Game settings tab",
-        "Notification preferences tab",
-        "Advanced settings tab",
-        "Animation toggles",
-        "Performance mode",
-        "Cache clearing"
-      ]
-    }
-  },
-  "totalDuration": "28-35 hours",
-  "newFeatures": [
-    "Complete user authentication system with JWT",
-    "Player profiles with avatar customization",
-    "Enhanced match history with detailed stats",
-    "Advanced chat with @mentions and URLs",
-    "Full notification system with animations",
-    "Tabbed settings panel with preferences"
+  "sprint": "Sprint 4 - Code Optimization, UX Improvements & Social Features",
+  "currentPhases": [
+    "phase4.7 - Cold Start Optimizations & Railway Free Tier ✅",
+    "phase4.8 - Profile & Social Features Bug Fixes ✅",
+    "phase4.9 - Trick Winner Positioning & Team Management ✅"
   ],
-  "databaseTables": [
-    "users",
-    "user_sessions",
-    "user_profiles",
-    "password_reset_tokens",
-    "email_verification_tokens",
-    "achievements",
-    "user_achievements",
-    "friends",
-    "notifications"
+  "recentChanges": [
+    "Cold start optimizations for Railway free tier (512 MB RAM)",
+    "Server pre-warming with /api/ping endpoint (5s timeout)",
+    "RAM monitoring every 30 seconds with console warnings",
+    "Server health metrics in Debug Panel (heap, RSS, uptime, active games)",
+    "Fixed profile display not updating after save",
+    "Fixed unfinished game stats errors with optional chaining",
+    "Fixed duplicate name display on homepage",
+    "Fixed avatar 404 errors with ID/emoji/URL detection",
+    "Added Friends tab to Social section with online/offline status",
+    "Fixed Login/Register buttons always visible for guests",
+    "Trick winner banner positioned at winning card location",
+    "Confetti spreads radially from winning card center (20 particles)",
+    "Team swap enabled in all game phases",
+    "Kick player enabled in all game phases",
+    "Team order (1-2-1-2) automatically enforced after position swap"
+  ],
+  "keyFeatures": [
+    "Component extraction and bundle optimization (78% reduction)",
+    "Railway free tier optimizations with cold start handling",
+    "Enhanced social features with Friends integration",
+    "Position-aware trick winner celebrations",
+    "Flexible team management in all game phases",
+    "Comprehensive bug fixes for profiles and avatars"
   ],
   "techStack": {
     "frontend": [
@@ -138,51 +62,12 @@
       "jsonwebtoken"
     ]
   },
-  "improvements": [
-    "Added comprehensive authentication system",
-    "Implemented user profiles and avatars",
-    "Enhanced social features (friends, mentions)",
-    "Added notification system with visual feedback",
-    "Improved settings with tabbed interface",
-    "Fixed all TypeScript compilation errors",
-    "Enhanced UX with animations and transitions",
-    "Fixed registration form auto-clearing issue",
-    "Integrated authentication with playerName localStorage",
-    "Hide friends button for non-authenticated users",
-    "Implemented guest mode vs ranked mode distinction",
-    "Created comprehensive user documentation",
-    "Fixed modal backdrop click closing forms",
-    "Removed form clearing on focus out for all auth modals",
-    "Fixed Rules of Hooks violation causing state loss",
-    "Moved early returns after all hooks in modals",
-    "Ensured modal state preservation across renders",
-    "Added full keyboard accessibility to betting phase (arrows + Enter)",
-    "Added keyboard accessibility to round summary (Enter for ready)",
-    "Implemented complete lobby keyboard navigation (arrow keys + Enter)",
-    "Converted Bot Management to comprehensive Team Management modal",
-    "Added swap positions feature for all players (human-to-human, bot-to-bot, cross-swap)",
-    "Implemented kick player functionality for game creators",
-    "Added visual swap mode with clear feedback and instructions",
-    "Enhanced team management with permission-based actions",
-    "Improved notification center to floating button (only visible when unread)"
-  ],
-  "upcomingFeatures": [
-    "Private game invitations",
-    "Tournament mode",
-    "Seasonal rankings",
-    "Custom card designs",
-    "Voice chat integration",
-    "Mobile app version"
-  ],
   "notes": [
-    "Sprint 3 successfully completed all 6 phases",
-    "Authentication system fully integrated",
-    "Social features significantly enhanced",
-    "UI/UX improvements throughout the application",
-    "Added comprehensive keyboard accessibility across all game phases",
-    "Team Management modal now supports full player/bot management",
-    "Notification center improved with floating button design",
-    "Enhanced accessibility for keyboard-only users",
-    "Ready for production deployment"
+    "Sprint 4 phases 4.3-4.9 completed successfully",
+    "Major optimizations for Railway free tier deployment",
+    "Enhanced UX with position-aware celebrations",
+    "Improved social integration with Friends tab",
+    "Flexible team management across all game phases",
+    "All builds passing, ready for production deployment"
   ]
 }

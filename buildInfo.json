@@ -1,7 +1,7 @@
 {
-  "version": "1.8.1",
+  "version": "1.9.0",
   "releaseDate": "2025-11-06",
-  "sprint": "Sprint 4 - Code Optimization & Bug Fixes",
+  "sprint": "Sprint 4 - Code Optimization, UX Improvements & Social Features",
   "phases": {
     "phase4.3": {
       "name": "Lobby Component Extraction",
@@ -137,9 +137,54 @@
         "Disabled ranked features for non-registered users",
         "Added authentication gate with toast notifications"
       ]
+    },
+    "phase4.7": {
+      "name": "Cold Start Optimizations & Railway Free Tier",
+      "status": "✅ Completed",
+      "duration": "1-2 hours",
+      "features": [
+        "Added /api/ping endpoint for server wake-up (5s timeout)",
+        "Server pre-warming before WebSocket connection",
+        "RAM monitoring: process.memoryUsage() logged every 30s",
+        "Added server health to Debug Panel (heap, RSS, uptime, active games)",
+        "Cold start hint in ReconnectingBanner (first 2 attempts)",
+        "Optimized for Railway free tier (512 MB RAM, cold starts)",
+        "Console warnings for 80% RAM, critical alerts for 90%",
+        "Health data refreshed every 5 seconds in debug panel"
+      ]
+    },
+    "phase4.8": {
+      "name": "Profile & Social Features Bug Fixes",
+      "status": "✅ Completed",
+      "duration": "2-3 hours",
+      "features": [
+        "Fixed profile display not updating after save (loadProfile callback)",
+        "Fixed unfinished game stats errors (optional chaining for pointsWon)",
+        "Fixed duplicate name display on homepage (consolidated user display)",
+        "Fixed avatar 404 errors (avatar ID to emoji conversion)",
+        "Removed non-existent /vite.svg reference from index.html",
+        "Added Friends tab to Social section in Lobby",
+        "Friends list with online/offline status and join buttons",
+        "Fixed Login/Register buttons always visible for guests",
+        "Avatar component now handles IDs, emojis, and URLs properly"
+      ]
+    },
+    "phase4.9": {
+      "name": "Trick Winner Positioning & Team Management",
+      "status": "✅ Completed",
+      "duration": "1-2 hours",
+      "features": [
+        "Trick winner banner positioned at winning card location (not center)",
+        "Confetti spreads radially from winning card center (20 particles)",
+        "Position-aware celebration: bottom, left, top, right cards",
+        "Team swap enabled in all game phases (not just team selection)",
+        "Kick player enabled in all game phases",
+        "Team order (1-2-1-2) automatically enforced after position swap",
+        "Enhanced team management flexibility during gameplay"
+      ]
     }
   },
-  "totalDuration": "5-8 hours (Sprint 4 only)",
+  "totalDuration": "10-16 hours (Sprint 4 only)",
   "newFeatures": [
     "Component extraction: GameCreationForm, JoinGameForm, PlayContent, SettingsContent",
     "Custom hook: useGameEventListeners for socket event management",
@@ -147,7 +192,13 @@
     "Lazy loading for all game phase components",
     "78% reduction in main bundle size (734 kB → 161 kB)",
     "Terser minification with production optimizations",
-    "Bundle visualization tool integration"
+    "Bundle visualization tool integration",
+    "Cold start optimizations for Railway free tier (512 MB RAM)",
+    "Server pre-warming and RAM monitoring with /api/ping endpoint",
+    "Friends tab in Social section with online/offline status",
+    "Position-aware trick winner celebration (banner + confetti)",
+    "Team swap and kick player enabled in all game phases",
+    "Avatar system with ID/emoji/URL support"
   ],
   "databaseTables": [
     "users",
@@ -198,7 +249,26 @@
     "Fixed 10 UX bugs: confetti positioning, z-index, achievements, dealer logic, toasts, chat dates, stats viewing, ranked features",
     "Added authentication gates with informative toast messages",
     "Improved mobile UI with proper z-index layering",
-    "Enhanced chat with date display for historical messages"
+    "Enhanced chat with date display for historical messages",
+    "Added /api/ping endpoint for server wake-up (5s timeout)",
+    "Server pre-warming before WebSocket establishment",
+    "RAM monitoring every 30 seconds with warnings at 80%/90%",
+    "Server health metrics in Debug Panel (heap, RSS, uptime, games)",
+    "Cold start UX with ReconnectingBanner hint (10-30 seconds expected)",
+    "Fixed profile display refresh after save with loadProfile callback",
+    "Fixed unfinished game stats with optional chaining for pointsWon",
+    "Fixed duplicate name on homepage by consolidating user display",
+    "Fixed avatar 404 errors with ID/emoji/URL detection in Avatar component",
+    "Added Friends tab to Social section with online/offline status",
+    "Friends list shows current game and join buttons for active games",
+    "Fixed Login/Register buttons always visible for non-logged-in users",
+    "Trick winner banner now positioned at winning card location (not center)",
+    "Confetti spreads radially from winning card (20 particles, 360° spread)",
+    "Position-aware celebrations for all 4 player positions (bottom/left/top/right)",
+    "Team swap enabled in all phases (removed phase restriction from validation)",
+    "Kick player enabled in all phases (removed team_selection restriction)",
+    "Team order (1-2-1-2) automatically enforced after position swap",
+    "Enhanced flexibility for mid-game team management"
   ],
   "upcomingFeatures": [
     "Private game invitations",
@@ -215,17 +285,23 @@
     "e2e": "⚠️ Some tests need refactoring"
   },
   "notes": [
-    "Sprint 4 successfully completed phases 4.3, 4.4, 4.5, and 4.6",
-    "Major code refactoring and optimization sprint + UX bug fixes",
+    "Sprint 4 successfully completed phases 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, and 4.9",
+    "Major code refactoring, optimization, and feature enhancement sprint",
     "Reduced total codebase complexity by extracting 6 components and 1 hook",
     "Achieved 78% reduction in main bundle size",
     "Improved initial load performance by 13% (gzipped)",
     "Better browser caching with vendor chunk splitting",
-    "Fixed 10 critical UX bugs (v1.8.1)",
+    "Fixed 10+ critical UX bugs across phases 4.6-4.8",
+    "Added Railway free tier optimizations (cold start, RAM monitoring)",
+    "Enhanced social features with Friends tab in Lobby",
+    "Improved trick winner celebration with position-aware animations",
+    "Enabled team management in all game phases (not just team selection)",
+    "Fixed profile, avatar, and authentication UI issues",
     "All 150 backend tests passing",
     "TypeScript compilation successful with no errors",
     "Bundle visualization available at dist/stats.html",
     "Production build optimized with Terser minification",
-    "Ready for production deployment with improved performance and UX"
+    "Ready for production deployment with Railway free tier optimizations",
+    "Enhanced UX with position-aware celebrations and better social integration"
   ]
 }
