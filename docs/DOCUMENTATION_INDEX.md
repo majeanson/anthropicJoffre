@@ -1,140 +1,229 @@
 # Documentation Index
 
-**Last Updated**: 2025-10-30
+**Last Updated**: 2025-11-07
 
-This index provides a comprehensive overview of all documentation in the project.
-
----
-
-## 📚 Core Documentation (Root)
-
-### Main Guides
-- **[README.md](../README.md)** - Project overview, setup instructions, features
-- **[CLAUDE.md](../CLAUDE.md)** - AI development guide, core principles, patterns
-- **[ROADMAP.md](../ROADMAP.md)** - Project status, feature completion tracking
-- **[QUICKSTART.md](../QUICKSTART.md)** - Quick setup guide for new developers
-- **[CONTRIBUTING.md](../CONTRIBUTING.md)** - Contribution guidelines
+Complete index of all project documentation, organized by category.
 
 ---
 
-## 🔧 Technical Documentation
+## 📚 Getting Started
 
-### Testing & Quality
-- **[technical/TESTING_ARCHITECTURE.md](./technical/TESTING_ARCHITECTURE.md)** - Complete testing strategy overview
-- **[technical/BACKEND_TESTING.md](./technical/BACKEND_TESTING.md)** - Backend test suite (113 tests)
-- **[technical/TDD_WORKFLOW.md](./technical/TDD_WORKFLOW.md)** - Test-driven development workflow
-- **[technical/TEST_IDS.md](./technical/TEST_IDS.md)** - Test identifier reference
-- **[technical/VALIDATION_SYSTEM.md](./technical/VALIDATION_SYSTEM.md)** - 4-layer validation architecture
-
-### Features & Systems
-- **[technical/FEATURES.md](./technical/FEATURES.md)** - Complete feature documentation
-- **[technical/BOT_PLAYER_SYSTEM.md](./technical/BOT_PLAYER_SYSTEM.md)** - AI bot decision-making
-- **[technical/ACCESSIBILITY.md](./technical/ACCESSIBILITY.md)** - WCAG compliance guide
-- **[technical/IMPROVEMENTS_2025_10.md](./technical/IMPROVEMENTS_2025_10.md)** - Recent improvements log
-- **[technical/IMPROVEMENT_PLAN.md](./technical/IMPROVEMENT_PLAN.md)** - Future improvement roadmap
-
-### Configuration
-- **[PORT_CONFIGURATION.md](./PORT_CONFIGURATION.md)** - All port configurations centralized
+| Document | Description | Location |
+|----------|-------------|----------|
+| **README** | Project overview, setup instructions | `/README.md` |
+| **QUICKSTART** | Quick setup guide for developers | `/QUICKSTART.md` |
+| **CLAUDE.md** | Development guide for Claude Code | `/CLAUDE.md` |
+| **Contributing Guide** | How to contribute to the project | `/CONTRIBUTING.md` |
+| **User Guide** | Guide for end users | `/docs/USER_GUIDE.md` |
 
 ---
 
-## 🎨 Design Documentation
+## 🚀 Deployment
 
-- **[design/DARK_MODE_COLORS.md](./design/DARK_MODE_COLORS.md)** - Dark theme color palette
-- **[design/LIGHT_MODE_COLORS.md](./design/LIGHT_MODE_COLORS.md)** - Light theme color palette
-
----
-
-## 🚀 Deployment Documentation
-
-- **[deployment/RAILWAY_DEPLOY.md](./deployment/RAILWAY_DEPLOY.md)** - Production deployment guide
-- **[deployment/LOCAL_DEVELOPMENT.md](./deployment/LOCAL_DEVELOPMENT.md)** - Local development without Neon
-- **[deployment/TESTING_LOCAL.md](./deployment/TESTING_LOCAL.md)** - Testing with local database
+| Document | Description | Location |
+|----------|-------------|----------|
+| **Railway Deploy** | Production deployment to Railway | `/docs/deployment/RAILWAY_DEPLOY.md` |
+| **Email Setup** | Resend API email configuration | `/docs/deployment/EMAIL_SETUP.md` |
+| **Local Development** | Setting up local environment | `/docs/deployment/LOCAL_DEVELOPMENT.md` |
+| **Testing Locally** | Running tests locally | `/docs/deployment/TESTING_LOCAL.md` |
 
 ---
 
-## 🧪 E2E Test Documentation
+## 🏗️ Architecture & Technical
 
-### Test Guides
-- **[e2e/README.md](../e2e/README.md)** - E2E test suite overview
-- **[e2e/TEST_RESULTS_GUIDE.md](../e2e/TEST_RESULTS_GUIDE.md)** - Running and tracking test results
-
-### Test History
-- **[e2e/E2E_TEST_FIX_HISTORY.md](../e2e/E2E_TEST_FIX_HISTORY.md)** - Complete test fix session history
-  - Sessions 1-7 breakdown
-  - 124 tests fixed (3.9% → 83.9% pass rate)
-  - CI optimization (65% reduction in runtime)
+| Document | Description | Location |
+|----------|-------------|----------|
+| **Backend Architecture** | Backend system design | `/docs/technical/BACKEND_ARCHITECTURE.md` |
+| **Testing Architecture** | Complete testing strategy | `/docs/technical/TESTING_ARCHITECTURE.md` |
+| **Backend Testing** | Backend test suite (357 tests) | `/docs/technical/BACKEND_TESTING.md` |
+| **Validation System** | Multi-layer validation | `/docs/technical/VALIDATION_SYSTEM.md` |
+| **Bot Player System** | AI decision-making | `/docs/technical/BOT_PLAYER_SYSTEM.md` |
+| **Reconnection Flow** | Session-based reconnection | `/docs/technical/RECONNECTION_FLOW.md` |
+| **Features Documentation** | Complete feature list | `/docs/technical/FEATURES.md` |
 
 ---
 
-## 📁 Documentation Organization
+## 🧪 Testing
+
+| Document | Description | Location |
+|----------|-------------|----------|
+| **TDD Workflow** | Test-driven development guide | `/docs/technical/TDD_WORKFLOW.md` |
+| **Test IDs** | Test identifier reference | `/docs/technical/TEST_IDS.md` |
+| **E2E README** | E2E testing overview | `/e2e/README.md` |
+
+---
+
+## 🎨 Design
+
+| Document | Description | Location |
+|----------|-------------|----------|
+| **Dark Mode Colors** | Dark theme palette | `/docs/design/DARK_MODE_COLORS.md` |
+| **Light Mode Colors** | Light theme palette | `/docs/design/LIGHT_MODE_COLORS.md` |
+| **Accessibility** | WCAG compliance | `/docs/technical/ACCESSIBILITY.md` |
+
+---
+
+## 📋 Sprint Planning
+
+| Document | Description | Location |
+|----------|-------------|----------|
+| **Sprint History** | Sprints 1-5 archive | `/docs/sprints/SPRINT_HISTORY.md` |
+| **Sprint 6-11 Plan** | Current improvement plan | `/docs/sprints/SPRINT_6_11_IMPROVEMENT_PLAN.md` |
+| **Future Work** | Post-production roadmap | `/FUTURE_WORK.md` |
+| **Roadmap** | Project roadmap | `/ROADMAP.md` |
+
+---
+
+## 🔧 Configuration
+
+| Document | Description | Location |
+|----------|-------------|----------|
+| **Port Configuration** | Server port settings | `/docs/PORT_CONFIGURATION.md` |
+| **CORS Policy** | CORS configuration | `/docs/security/CORS_POLICY.md` |
+
+---
+
+## 📊 Current Status (November 2025)
+
+### Completion Status
+- ✅ **Core Features**: 100% complete
+- ✅ **Sprint 6**: Complete (Performance & Error Handling)
+- ✅ **Sprint 7**: Complete (Backend Tests - 176 tests)
+- ✅ **Sprint 8**: Complete (Frontend Tests - 116 tests)
+- ✅ **Sprint 9**: Tasks 1 & 4 complete (TypeScript cleanup)
+- 🔲 **Sprint 10**: Not started (Code Quality)
+- 🔲 **Sprint 11**: Not started (Security & Production)
+
+### Test Coverage
+- **Backend**: 357 passing tests (85% coverage)
+- **Frontend**: 116 tests (84 passing, 72% pass rate)
+- **E2E**: 22 test files
+
+### Production Readiness
+- 🔲 Security audit pending
+- 🔲 Performance profiling pending
+- 🔲 Production deployment pending
+- 🔲 Monitoring setup pending
+
+---
+
+## 🗂️ Document Organization
+
+### Active Documents
+Documents actively used and maintained:
+- All "Getting Started" docs
+- All "Deployment" docs
+- All "Architecture & Technical" docs
+- Sprint 6-11 Plan
+- Future Work
+
+### Archived Documents
+Historical reference only:
+- Sprint History (Sprints 1-5)
+
+### Deprecated Documents
+Removed during November 2025 cleanup:
+- Old sprint progress files (consolidated into SPRINT_HISTORY.md)
+- Session summaries and ephemeral notes
+- Redundant refactoring plans
+- Test result artifacts
+- Outdated roadmaps
+
+---
+
+## 📝 Documentation Standards
+
+### When to Create New Documentation
+- **Technical Architecture**: Major system design decisions
+- **Features**: New user-facing features
+- **Testing**: New testing patterns or frameworks
+- **Deployment**: Production configuration changes
+
+### When to Update Existing Documentation
+- **Feature Changes**: Modifications to existing features
+- **Bug Fixes**: Significant fixes that affect documented behavior
+- **Configuration**: Environment or setup changes
+- **Sprint Progress**: Regular updates to sprint plans
+
+### What NOT to Document
+- ❌ Daily work summaries (use git commits)
+- ❌ Debugging sessions (use inline comments)
+- ❌ Temporary workarounds (fix properly or create issue)
+- ❌ Personal notes (use local files)
+
+---
+
+## 🔍 Quick Find
+
+**Need to...**
+- Set up the project? → `README.md` or `QUICKSTART.md`
+- Deploy to production? → `docs/deployment/RAILWAY_DEPLOY.md`
+- Write tests? → `docs/technical/TDD_WORKFLOW.md`
+- Understand architecture? → `docs/technical/BACKEND_ARCHITECTURE.md`
+- See what's next? → `FUTURE_WORK.md`
+- Review history? → `docs/sprints/SPRINT_HISTORY.md`
+
+---
+
+## 📁 File Structure
 
 ```
 docs/
-├── DOCUMENTATION_INDEX.md      # This file
-├── PORT_CONFIGURATION.md       # Port config
-├── technical/                  # Technical documentation
-│   ├── TESTING_ARCHITECTURE.md
+├── DOCUMENTATION_INDEX.md         # This file
+├── PORT_CONFIGURATION.md          # Port config
+├── USER_GUIDE.md                  # User guide
+├── technical/                     # Technical docs (10 files)
+│   ├── BACKEND_ARCHITECTURE.md
 │   ├── BACKEND_TESTING.md
+│   ├── TESTING_ARCHITECTURE.md
 │   ├── TDD_WORKFLOW.md
 │   ├── TEST_IDS.md
 │   ├── VALIDATION_SYSTEM.md
-│   ├── FEATURES.md
 │   ├── BOT_PLAYER_SYSTEM.md
-│   ├── ACCESSIBILITY.md
-│   ├── IMPROVEMENTS_2025_10.md
-│   └── IMPROVEMENT_PLAN.md
-├── design/                     # Design documentation
+│   ├── RECONNECTION_FLOW.md
+│   ├── FEATURES.md
+│   └── ACCESSIBILITY.md
+├── design/                        # Design docs (2 files)
 │   ├── DARK_MODE_COLORS.md
 │   └── LIGHT_MODE_COLORS.md
-└── deployment/                 # Deployment guides
-    ├── RAILWAY_DEPLOY.md
-    ├── LOCAL_DEVELOPMENT.md
-    └── TESTING_LOCAL.md
+├── deployment/                    # Deployment docs (4 files)
+│   ├── RAILWAY_DEPLOY.md
+│   ├── EMAIL_SETUP.md
+│   ├── LOCAL_DEVELOPMENT.md
+│   └── TESTING_LOCAL.md
+├── security/                      # Security docs (1 file)
+│   └── CORS_POLICY.md
+└── sprints/                       # Sprint planning (2 files)
+    ├── SPRINT_HISTORY.md          # Sprints 1-5 archive
+    └── SPRINT_6_11_IMPROVEMENT_PLAN.md  # Current plan
 
 e2e/
-├── README.md                   # E2E overview
-├── TEST_RESULTS_GUIDE.md       # Test running guide
-└── E2E_TEST_FIX_HISTORY.md     # Historical test fixes
+└── README.md                      # E2E test overview
 ```
 
 ---
 
-## 🔍 Quick Reference
+## 📝 Recent Changes (2025-11-07)
 
-### For New Developers
-1. Start with [README.md](../README.md)
-2. Follow [QUICKSTART.md](../QUICKSTART.md)
-3. Read [CLAUDE.md](../CLAUDE.md) for development patterns
+### Major Documentation Cleanup
+**Deleted**:
+- 6 ephemeral root-level files
+- 13 redundant sprint progress/summary files
+- 14 redundant technical docs
+- 5 E2E session notes
+- Hundreds of test result artifacts
+- 5 outdated docs root files
 
-### For Testing
-1. **Unit Tests**: See [technical/BACKEND_TESTING.md](./technical/BACKEND_TESTING.md)
-2. **E2E Tests**: See [e2e/TEST_RESULTS_GUIDE.md](../e2e/TEST_RESULTS_GUIDE.md)
-3. **TDD Workflow**: See [technical/TDD_WORKFLOW.md](./technical/TDD_WORKFLOW.md)
+**Consolidated**:
+- Sprints 1-5 → SPRINT_HISTORY.md
+- Sprint documentation reduced from 14 files to 2
 
-### For Deployment
-1. **Production**: See [deployment/RAILWAY_DEPLOY.md](./deployment/RAILWAY_DEPLOY.md)
-2. **Local**: See [deployment/LOCAL_DEVELOPMENT.md](./deployment/LOCAL_DEVELOPMENT.md)
+**Created**:
+- FUTURE_WORK.md (completion-focused roadmap)
+- SPRINT_HISTORY.md (consolidated archive)
 
-### For Features
-1. **Complete List**: See [technical/FEATURES.md](./technical/FEATURES.md)
-2. **Roadmap**: See [ROADMAP.md](../ROADMAP.md)
-
----
-
-## 📝 Recent Changes (2025-10-30)
-
-### Consolidated Documentation
-- Removed 10 obsolete session tracking files from e2e/
-- Consolidated test fix history into `e2e/E2E_TEST_FIX_HISTORY.md`
-- Moved `IMPROVEMENT_PLAN.md` to `docs/technical/`
-- Moved `LOCAL_DEVELOPMENT.md` and `TESTING_LOCAL.md` to `docs/deployment/`
-- Created this index for easy navigation
-
-### New Documentation
-- Added REST API endpoints to CLAUDE.md (`/api/stats/:playerName`, `/api/leaderboard`)
-- Updated `e2e/TEST_RESULTS_GUIDE.md` with npm script references
+**Result**: Reduced from ~200 .md files to ~30 essential documents
 
 ---
 
-**Navigation Tip**: Use Ctrl+F / Cmd+F to search this index for specific topics.
+*This index is maintained as documentation evolves. Last major cleanup: November 2025*
