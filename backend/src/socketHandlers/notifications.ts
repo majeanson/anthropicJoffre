@@ -170,9 +170,10 @@ export async function sendNotificationToUser(
   try {
     // Find sockets for this user
     const sockets = await io.fetchSockets();
-    const userSockets = sockets.filter((s): s is SocketWithAuth & { emit: typeof s.emit } =>
-      'userId' in s && (s as SocketWithAuth).userId === userId
-    );
+    const userSockets = sockets.filter((s) => {
+      // Check if socket has userId property matching the target
+      return 'userId' in s && typeof s.userId === 'number' && s.userId === userId;
+    });
 
     // Emit to all user's sockets
     for (const userSocket of userSockets) {

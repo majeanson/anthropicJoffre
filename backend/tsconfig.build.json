@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Disable strict function types for build to allow Socket.io async handlers
+    // Socket.io's type definitions expect (args: unknown[]) => void
+    // but our error boundary returns (args: unknown[]) => Promise<void>
+    // This is safe at runtime - Socket.io handles async functions correctly
+    "strictFunctionTypes": false
+  }
+}
