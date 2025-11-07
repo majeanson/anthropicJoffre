@@ -9,6 +9,8 @@ import { ActiveGames } from './ActiveGames';
 import { QuickPlayPanel } from './QuickPlayPanel';
 import { SocialPanel } from './SocialPanel';
 import { StatsPanel } from './StatsPanel';
+import { GameCreationForm } from './GameCreationForm';
+import { JoinGameForm } from './JoinGameForm';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
@@ -60,7 +62,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
   const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual'); // Default to casual for Quick Play
-  const [createGamePersistence, setCreateGamePersistence] = useState<'elo' | 'casual'>('elo'); // Default to ELO for manual creation
   const [focusedTabIndex, setFocusedTabIndex] = useState<number | null>(null); // 0=PLAY, 1=SOCIAL, 2=STATS, 3=SETTINGS
   const [focusedButtonIndex, setFocusedButtonIndex] = useState<number>(0); // Index within active tab
 
@@ -228,26 +229,47 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     return buttons;
   };
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (playerName.trim()) {
-      onCreateGame(playerName, createGamePersistence);
-    }
-  };
+  if (mode === 'create') {
+    return (
+      <GameCreationForm
+        playerName={playerName}
+        setPlayerName={setPlayerName}
+        onCreateGame={onCreateGame}
+        onBack={() => setMode('menu')}
+        user={user}
+      />
+    );
+  }
 
-  const handleJoin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (joinType === 'player') {
-      if (playerName.trim() && gameId.trim()) {
-        onJoinGame(gameId, playerName);
-      }
-    } else {
-      // Spectator mode
-      if (gameId.trim()) {
-        onSpectateGame(gameId, playerName.trim() || undefined);
-      }
-    }
-  };
+  if (mode === 'join') {
+    return (
+      <JoinGameForm
+        gameId={gameId}
+        setGameId={setGameId}
+        playerName={playerName}
+        setPlayerName={setPlayerName}
+        joinType={joinType}
+        setJoinType={setJoinType}
+        autoJoinGameId={autoJoinGameId}
+        onJoinGame={onJoinGame}
+        onSpectateGame={onSpectateGame}
+        onBack={() => setMode('menu')}
+        onBackToHomepage={() => {
+          setMode('menu');
+          setGameId('');
+          setPlayerName('');
+        }}
+        user={user}
+        socket={socket}
+        showPlayerStats={showPlayerStats}
+        setShowPlayerStats={setShowPlayerStats}
+        showLeaderboard={showLeaderboard}
+        setShowLeaderboard={setShowLeaderboard}
+        selectedPlayerName={selectedPlayerName}
+        setSelectedPlayerName={setSelectedPlayerName}
+      />
+    );
+  }
 
   if (mode === 'menu') {
     return (
@@ -641,267 +663,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     );
   }
 
-  if (mode === 'create') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Animated background cards */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
-          <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
-          <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
-          <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
-        </div>
-
-        <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
-          {/* Decorative corners */}
-          <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl"></div>
-          <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl"></div>
-          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
-          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
-
-          <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Create Game</h2>
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
-                Your Name
-              </label>
-              <input
-                data-testid="player-name-input"
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
-                placeholder={user ? "Using authenticated username" : "Enter your name"}
-                disabled={!!user}
-                required
-              />
-            </div>
-
-            {/* Persistence Mode Selector */}
-            <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3">
-              <div className="flex items-center justify-between gap-3">
-                <label className="flex items-center gap-2 cursor-pointer flex-1">
-                  <input
-                    data-testid="persistence-mode-checkbox"
-                    type="checkbox"
-                    checked={createGamePersistence === 'elo'}
-                    onChange={(e) => setCreateGamePersistence(e.target.checked ? 'elo' : 'casual')}
-                    className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2"
-                  />
-                  <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
-                    Ranked Mode
-                  </span>
-                </label>
-                <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                  createGamePersistence === 'elo'
-                    ? 'bg-amber-200 dark:bg-purple-900 text-amber-900 dark:text-purple-200'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}>
-                  {createGamePersistence === 'elo' ? '🏆 Ranked' : '🎮 Casual'}
-                </span>
-              </div>
-              <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
-                {createGamePersistence === 'elo'
-                  ? 'Game will be saved to your profile and affect your ranking'
-                  : 'No stats saved - play without affecting your ELO rating'}
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                data-testid="back-button"
-                type="button"
-                onClick={() => { sounds.buttonClick(); setMode('menu'); }}
-                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
-              >
-                Back
-              </button>
-              <button
-                data-testid="submit-create-button"
-                type="submit"
-                className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105"
-              >
-                Create
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Animated background cards */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
-        <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
-        <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
-        <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
-      </div>
-
-      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
-        {/* Decorative corners */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl"></div>
-        <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl"></div>
-        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
-
-        <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Join Game</h2>
-
-        {/* Show message when joining from URL */}
-        {autoJoinGameId && (
-          <div className="mb-6 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 border-2 border-blue-500 dark:border-blue-600 rounded-lg p-5 animate-pulse shadow-lg">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <span className="text-2xl">🎮</span>
-              <p className="text-blue-900 dark:text-blue-200 font-bold text-lg text-center">
-                Joining game: <span className="font-mono bg-white dark:bg-gray-800 px-2 py-1 rounded border border-blue-400 dark:border-blue-500">{gameId}</span>
-              </p>
-            </div>
-            <p className="text-blue-700 dark:text-blue-300 font-medium text-center">
-              👇 Enter your name below to join!
-            </p>
-          </div>
-        )}
-
-        <form onSubmit={handleJoin} className="space-y-4">
-          {/* Join Type Selection */}
-          <div className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600">
-            <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3">
-              Join as:
-            </label>
-            <div className="space-y-2">
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="joinType"
-                  value="player"
-                  checked={joinType === 'player'}
-                  onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
-                  className="w-4 h-4 text-umber-600 focus:ring-umber-500"
-                />
-                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Player</span>
-              </label>
-              <label className="flex items-center cursor-pointer">
-                <input
-                  type="radio"
-                  name="joinType"
-                  value="spectator"
-                  checked={joinType === 'spectator'}
-                  onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
-                  className="w-4 h-4 text-umber-600 focus:ring-umber-500"
-                />
-                <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Guest (Spectator)</span>
-              </label>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
-              Game ID
-            </label>
-            <input
-              data-testid="game-id-input"
-              type="text"
-              value={gameId}
-              onChange={(e) => setGameId(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
-              placeholder="Enter game ID"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
-              Your Name {joinType === 'spectator' && '(Optional)'}
-            </label>
-            <input
-              data-testid="player-name-input"
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              disabled={!!user}
-              placeholder={user ? "Using authenticated username" : "Enter your name"}
-              className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 ${
-                user ? 'opacity-60 cursor-not-allowed' : ''
-              } ${
-                autoJoinGameId
-                  ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-300 dark:ring-blue-700'
-                  : 'border-parchment-400 dark:border-gray-500'
-              }`}
-              required={joinType === 'player'}
-            />
-          </div>
-
-          {/* Info message for spectator mode */}
-          {joinType === 'spectator' && (
-            <div className="bg-parchment-200 border-2 border-umber-400 rounded-lg p-3">
-              <p className="text-sm text-umber-800">
-                As a spectator, you can watch the game but cannot play cards. Player hands will be hidden.
-              </p>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            {/* Show appropriate back button based on context */}
-            {autoJoinGameId ? (
-              <button
-                data-testid="back-to-homepage-button"
-                type="button"
-                onClick={() => {
-                  setMode('menu');
-                  setGameId('');
-                  setPlayerName('');
-                }}
-                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
-              >
-                🏠 Back to Homepage
-              </button>
-            ) : (
-              <button
-                data-testid="back-button"
-                type="button"
-                onClick={() => { sounds.buttonClick(); setMode('menu'); }}
-                className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
-              >
-                Back
-              </button>
-            )}
-            <button
-              data-testid="submit-join-button"
-              type="submit"
-              className={`flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
-                joinType === 'player'
-                  ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-purple-800'
-                  : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-blue-800'
-              }`}
-            >
-              {joinType === 'player' ? 'Join as Player' : 'Join as Guest'}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      {/* Stats & Leaderboard Modals */}
-      {socket && (
-        <Suspense fallback={<div />}>
-          <PlayerStatsModal
-            playerName={selectedPlayerName}
-            socket={socket}
-            isOpen={showPlayerStats}
-            onClose={() => setShowPlayerStats(false)}
-          />
-          <GlobalLeaderboard
-            socket={socket}
-            isOpen={showLeaderboard}
-            onClose={() => setShowLeaderboard(false)}
-            onViewPlayerStats={(playerName) => {
-              setSelectedPlayerName(playerName);
-              setShowLeaderboard(false);
-              setShowPlayerStats(true);
-            }}
-          />
-        </Suspense>
-      )}
-    </div>
-  );
+  // Should never reach here - modes are handled above
+  return null;
 }
