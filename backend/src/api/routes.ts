@@ -10,6 +10,7 @@
  * - GET  /api/health/detailed        - Detailed health metrics
  * - GET  /api/metrics/error-boundaries - Error boundary statistics
  * - GET  /api/metrics/response-times - Response time analytics
+ * - POST /api/errors                 - Frontend error reporting (Sprint 6)
  * - POST /api/__test/set-game-state  - Test-only state manipulation
  * - GET  /api/games/lobby            - List active/joinable games
  * - GET  /api/games/recent           - List recent finished games
@@ -430,6 +431,40 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
       });
     } catch (error) {
       res.status(500).json({ error: 'Failed to retrieve response time metrics' });
+    }
+  });
+
+  // ============================================================================
+  // Error Reporting Endpoints (Sprint 6)
+  // ============================================================================
+
+  /**
+   * POST /api/errors - Frontend error reporting
+   * Receives error reports from frontend and logs them with full context
+   */
+  app.post('/api/errors', express.json(), (req: Request, res: Response) => {
+    try {
+      const { message, error, stack, url, userAgent, correlationId, metadata } = req.body;
+
+      // Log frontend error with context
+      logger.error('Frontend error reported', {
+        message,
+        error,
+        stack,
+        url,
+        userAgent,
+        correlationId,
+        metadata,
+        ip: req.ip,
+        timestamp: Date.now(),
+      });
+
+      // Respond immediately without blocking
+      res.status(200).json({ success: true, correlationId });
+    } catch (error) {
+      // Never let error reporting crash
+      logger.error('Failed to process frontend error report', { error });
+      res.status(500).json({ success: false, error: 'Failed to process error report' });
     }
   });
 

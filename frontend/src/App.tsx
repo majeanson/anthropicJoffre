@@ -26,6 +26,7 @@ import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal sta
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
 import { preloadCardImages } from './utils/imagePreloader';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ReplayErrorFallback } from './components/fallbacks/ReplayErrorFallback';
 // Sprint 5 Phase 2: Custom hooks for state management
 import { useSocketConnection, checkValidSession } from './hooks/useSocketConnection';
 import { useGameState } from './hooks/useGameState';
@@ -927,13 +928,15 @@ function AppContent() {
 
         {/* Game Replay Modal */}
         {showReplayModal && socket && (
-          <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading replay...</div></div>}>
-            <GameReplay
-              gameId={gameId}
-              socket={socket}
-              onClose={() => setShowReplayModal(false)}
-            />
-          </Suspense>
+          <ErrorBoundary fallback={<ReplayErrorFallback onClose={() => setShowReplayModal(false)} />}>
+            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading replay...</div></div>}>
+              <GameReplay
+                gameId={gameId}
+                socket={socket}
+                onClose={() => setShowReplayModal(false)}
+              />
+            </Suspense>
+          </ErrorBoundary>
         )}
 
         {/* Bot Takeover Modal */}

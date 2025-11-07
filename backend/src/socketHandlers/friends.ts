@@ -1,6 +1,7 @@
 /**
  * Friends System Socket Handlers
  * Sprint 2 Phase 2
+ * Sprint 6: Enhanced with error boundary integration
  */
 
 import { Server, Socket } from 'socket.io';
@@ -14,13 +15,25 @@ import {
   getFriendsWithStatus,
   areFriends
 } from '../db/friends';
+import { errorBoundaries } from '../middleware/errorBoundary.js';
 
-export function registerFriendHandlers(io: Server, socket: Socket) {
+interface FriendHandlerDependencies {
+  errorBoundaries: typeof errorBoundaries;
+}
+
+export function registerFriendHandlers(
+  io: Server,
+  socket: Socket,
+  deps: FriendHandlerDependencies
+) {
+  const { errorBoundaries } = deps;
+
   /**
    * Send a friend request
    */
-  socket.on('send_friend_request', async ({ toPlayer }: { toPlayer: string }) => {
-    try {
+  socket.on(
+    'send_friend_request',
+    errorBoundaries.gameAction('send_friend_request')(async ({ toPlayer }: { toPlayer: string }) => {
       const fromPlayer = socket.data.playerName;
 
       if (!fromPlayer) {
@@ -59,17 +72,15 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
           created_at: request.created_at
         });
       }
-    } catch (error) {
-      console.error('Error sending friend request:', error);
-      socket.emit('error', { message: 'Failed to send friend request' });
-    }
-  });
+    })
+  );
 
   /**
    * Get pending friend requests (received)
    */
-  socket.on('get_friend_requests', async () => {
-    try {
+  socket.on(
+    'get_friend_requests',
+    errorBoundaries.readOnly('get_friend_requests')(async () => {
       const playerName = socket.data.playerName;
 
       if (!playerName) {
@@ -79,17 +90,15 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
 
       const requests = await getPendingFriendRequests(playerName);
       socket.emit('friend_requests', { requests });
-    } catch (error) {
-      console.error('Error getting friend requests:', error);
-      socket.emit('error', { message: 'Failed to get friend requests' });
-    }
-  });
+    })
+  );
 
   /**
    * Get sent friend requests
    */
-  socket.on('get_sent_friend_requests', async () => {
-    try {
+  socket.on(
+    'get_sent_friend_requests',
+    errorBoundaries.readOnly('get_sent_friend_requests')(async () => {
       const playerName = socket.data.playerName;
 
       if (!playerName) {
@@ -99,17 +108,15 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
 
       const requests = await getSentFriendRequests(playerName);
       socket.emit('sent_friend_requests', { requests });
-    } catch (error) {
-      console.error('Error getting sent friend requests:', error);
-      socket.emit('error', { message: 'Failed to get sent friend requests' });
-    }
-  });
+    })
+  );
 
   /**
    * Accept a friend request
    */
-  socket.on('accept_friend_request', async ({ requestId }: { requestId: number }) => {
-    try {
+  socket.on(
+    'accept_friend_request',
+    errorBoundaries.gameAction('accept_friend_request')(async ({ requestId }: { requestId: number }) => {
       const playerName = socket.data.playerName;
 
       if (!playerName) {
@@ -143,17 +150,15 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
       });
 
       socket.emit('friend_request_accepted_confirm', { friendship });
-    } catch (error) {
-      console.error('Error accepting friend request:', error);
-      socket.emit('error', { message: 'Failed to accept friend request' });
-    }
-  });
+    })
+  );
 
   /**
    * Reject a friend request
    */
-  socket.on('reject_friend_request', async ({ requestId }: { requestId: number }) => {
-    try {
+  socket.on(
+    'reject_friend_request',
+    errorBoundaries.gameAction('reject_friend_request')(async ({ requestId }: { requestId: number }) => {
       const playerName = socket.data.playerName;
 
       if (!playerName) {
@@ -169,17 +174,15 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
       }
 
       socket.emit('friend_request_rejected', { requestId });
-    } catch (error) {
-      console.error('Error rejecting friend request:', error);
-      socket.emit('error', { message: 'Failed to reject friend request' });
-    }
-  });
+    })
+  );
 
   /**
    * Remove a friend
    */
-  socket.on('remove_friend', async ({ friendName }: { friendName: string }) => {
-    try {
+  socket.on(
+    'remove_friend',
+    errorBoundaries.gameAction('remove_friend')(async ({ friendName }: { friendName: string }) => {
       const playerName = socket.data.playerName;
 
       if (!playerName) {
@@ -202,17 +205,15 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
       io.to(`player:${friendName}`).emit('friends_list_updated', { friends: player2Friends });
 
       socket.emit('friend_removed', { friendName });
-    } catch (error) {
-      console.error('Error removing friend:', error);
-      socket.emit('error', { message: 'Failed to remove friend' });
-    }
-  });
+    })
+  );
 
   /**
    * Get friends list with status
    */
-  socket.on('get_friends_list', async () => {
-    try {
+  socket.on(
+    'get_friends_list',
+    errorBoundaries.readOnly('get_friends_list')(async () => {
       const playerName = socket.data.playerName;
 
       if (!playerName) {
@@ -222,17 +223,15 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
 
       const friends = await getFriendsWithStatus(playerName);
       socket.emit('friends_list', { friends });
-    } catch (error) {
-      console.error('Error getting friends list:', error);
-      socket.emit('error', { message: 'Failed to get friends list' });
-    }
-  });
+    })
+  );
 
   /**
    * Search for players to add as friends
    */
-  socket.on('search_players', async ({ searchQuery }: { searchQuery: string }) => {
-    try {
+  socket.on(
+    'search_players',
+    errorBoundaries.readOnly('search_players')(async ({ searchQuery }: { searchQuery: string }) => {
       const playerName = socket.data.playerName;
 
       if (!playerName) {
@@ -257,9 +256,6 @@ export function registerFriendHandlers(io: Server, socket: Socket) {
       );
 
       socket.emit('player_search_results', { players: result.rows });
-    } catch (error) {
-      console.error('Error searching players:', error);
-      socket.emit('error', { message: 'Failed to search players' });
-    }
-  });
+    })
+  );
 }

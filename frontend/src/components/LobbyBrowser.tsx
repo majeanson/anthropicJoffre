@@ -54,6 +54,8 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   const [recentGames, setRecentGames] = useState<RecentGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [correlationId, setCorrelationId] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [gameId, setGameId] = useState('');
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [replayGameId, setReplayGameId] = useState<string | null>(null);
@@ -68,65 +70,149 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   const hasLoadedActiveGames = useRef(false);
   const hasLoadedRecentGames = useRef(false);
 
-  const fetchGames = async (isInitialLoad = false) => {
+  const fetchGames = async (isInitialLoad = false, retryCount = 0) => {
     try {
       // Only show loading spinner on first ever load
       if (isInitialLoad && !hasLoadedActiveGames.current) {
         setLoading(true);
       }
+      if (retryCount > 0) {
+        setIsRetrying(true);
+      }
+
       console.log('[LobbyBrowser] Fetching games from:', `${SOCKET_URL}/api/games/lobby`);
-      const response = await fetch(`${SOCKET_URL}/api/games/lobby`);
+      const response = await fetch(`${SOCKET_URL}/api/games/lobby`, {
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
       console.log('[LobbyBrowser] Response status:', response.status, response.statusText);
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[LobbyBrowser] Server error:', errorText);
-        throw new Error(`Server returned ${response.status}: ${errorText}`);
+        // Try to parse error as JSON to extract correlation ID
+        let errorData: any;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: await response.text() };
+        }
+
+        console.error('[LobbyBrowser] Server error:', errorData);
+
+        // Extract correlation ID if available
+        const corrId = errorData.correlationId || errorData.correlation_id || null;
+        if (corrId) {
+          setCorrelationId(corrId);
+        }
+
+        // Retry on 5xx errors (server errors) or network issues
+        if (response.status >= 500 && retryCount < 2) {
+          console.log(`[LobbyBrowser] Retrying after server error (attempt ${retryCount + 1}/2)`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
+          return fetchGames(isInitialLoad, retryCount + 1);
+        }
+
+        throw new Error(errorData.message || `Server error: ${response.status}`);
       }
 
       const data = await response.json();
       console.log('[LobbyBrowser] Received games:', data.games?.length || 0);
       setGames(data.games);
       setError(null);
+      setCorrelationId(null);
       hasLoadedActiveGames.current = true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[LobbyBrowser] Failed to load games:', errorMessage, err);
-      setError(`Failed to load games: ${errorMessage}`);
+      // Network errors (fetch failed)
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        const errorMessage = 'Network error. Please check your connection.';
+        console.error('[LobbyBrowser] Network error:', err);
+        setError(errorMessage);
+
+        // Retry on network errors
+        if (retryCount < 2) {
+          console.log(`[LobbyBrowser] Retrying after network error (attempt ${retryCount + 1}/2)`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return fetchGames(isInitialLoad, retryCount + 1);
+        }
+      } else {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error('[LobbyBrowser] Failed to load games:', errorMessage, err);
+        setError(`Failed to load games: ${errorMessage}`);
+      }
     } finally {
-      // Always clear loading state if it was set
       setLoading(false);
+      setIsRetrying(false);
     }
   };
 
-  const fetchRecentGames = async (isInitialLoad = false) => {
+  const fetchRecentGames = async (isInitialLoad = false, retryCount = 0) => {
     try {
       // Only show loading spinner on first ever load
       if (isInitialLoad && !hasLoadedRecentGames.current) {
         setLoading(true);
       }
+      if (retryCount > 0) {
+        setIsRetrying(true);
+      }
+
       console.log('[LobbyBrowser] Fetching recent games from:', `${SOCKET_URL}/api/games/recent?limit=20`);
-      const response = await fetch(`${SOCKET_URL}/api/games/recent?limit=20`);
+      const response = await fetch(`${SOCKET_URL}/api/games/recent?limit=20`, {
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
       console.log('[LobbyBrowser] Response status:', response.status, response.statusText);
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('[LobbyBrowser] Server error:', errorText);
-        throw new Error(`Server returned ${response.status}: ${errorText}`);
+        // Try to parse error as JSON to extract correlation ID
+        let errorData: any;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: await response.text() };
+        }
+
+        console.error('[LobbyBrowser] Server error:', errorData);
+
+        // Extract correlation ID if available
+        const corrId = errorData.correlationId || errorData.correlation_id || null;
+        if (corrId) {
+          setCorrelationId(corrId);
+        }
+
+        // Retry on 5xx errors (server errors)
+        if (response.status >= 500 && retryCount < 2) {
+          console.log(`[LobbyBrowser] Retrying after server error (attempt ${retryCount + 1}/2)`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return fetchRecentGames(isInitialLoad, retryCount + 1);
+        }
+
+        throw new Error(errorData.message || `Server error: ${response.status}`);
       }
 
       const data = await response.json();
       console.log('[LobbyBrowser] Received recent games:', data.games?.length || 0);
       setRecentGames(data.games);
       setError(null);
+      setCorrelationId(null);
       hasLoadedRecentGames.current = true;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      console.error('[LobbyBrowser] Failed to load recent games:', errorMessage, err);
-      setError(`Failed to load recent games: ${errorMessage}`);
+      // Network errors (fetch failed)
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        const errorMessage = 'Network error. Please check your connection.';
+        console.error('[LobbyBrowser] Network error:', err);
+        setError(errorMessage);
+
+        // Retry on network errors
+        if (retryCount < 2) {
+          console.log(`[LobbyBrowser] Retrying after network error (attempt ${retryCount + 1}/2)`);
+          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          return fetchRecentGames(isInitialLoad, retryCount + 1);
+        }
+      } else {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        console.error('[LobbyBrowser] Failed to load recent games:', errorMessage, err);
+        setError(`Failed to load recent games: ${errorMessage}`);
+      }
     } finally {
-      // Always clear loading state if it was set
       setLoading(false);
+      setIsRetrying(false);
     }
   };
 
@@ -405,10 +491,41 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
             </div>
           )}
 
-          {/* Error State */}
+          {/* Error State - Sprint 6: Enhanced with correlation ID and retry */}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg text-center">
-              {error}
+            <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">⚠️</span>
+                <div className="flex-1">
+                  <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                    {error}
+                  </p>
+                  {correlationId && (
+                    <p className="text-xs text-red-700 dark:text-red-300 font-mono mt-2">
+                      Error ID: {correlationId}
+                      <br />
+                      <span className="text-xs opacity-75">
+                        Please include this ID when reporting the issue
+                      </span>
+                    </p>
+                  )}
+                  <button
+                    onClick={() => {
+                      setError(null);
+                      setCorrelationId(null);
+                      if (activeTab === 'active') {
+                        fetchGames(true);
+                      } else {
+                        fetchRecentGames(true);
+                      }
+                    }}
+                    disabled={isRetrying}
+                    className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isRetrying ? '🔄 Retrying...' : '🔄 Try Again'}
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 

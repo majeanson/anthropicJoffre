@@ -3,10 +3,15 @@
  *
  * Wraps socket event handlers with error catching and reporting.
  * Prevents uncaught exceptions from crashing the server.
+ *
+ * Sprint 6: Enhanced with correlation IDs and advanced error context
  */
 
 import * as Sentry from '@sentry/node';
 import { Socket } from 'socket.io';
+import { generateCorrelationId, logError } from '../utils/errorHandler.js';
+import logger from '../utils/logger.js';
+import { GameError } from '../types/errors.js';
 
 /**
  * Metrics tracking for error boundaries
@@ -110,11 +115,14 @@ interface ErrorBoundaryConfig {
 /**
  * Wrap a socket event handler with error boundary
  *
- * Features:
+ * Features (Sprint 6 Enhanced):
  * - Catches all synchronous and asynchronous errors
+ * - Generates correlation IDs for request tracking
  * - Reports to Sentry with context
- * - Optionally notifies client
+ * - Uses enhanced error logging with ErrorContext
+ * - Optionally notifies client with correlation ID
  * - Prevents server crashes
+ * - Tracks execution metrics
  *
  * @example
  * ```typescript
@@ -134,8 +142,22 @@ export function withErrorBoundary<TArgs extends any[], TReturn = void>(
 ): (this: Socket, ...args: TArgs) => Promise<void> {
   return async function (this: Socket, ...args: TArgs): Promise<void> {
     const startTime = Date.now();
+    const correlationId = generateCorrelationId();
     let success = true;
     let caughtError: Error | undefined;
+
+    // Extract context from socket and arguments
+    const userId = this.data?.userId;
+    const gameId = args.length > 0 && typeof args[0] === 'object' ? (args[0] as any)?.gameId : undefined;
+
+    // Log request start (debug level)
+    logger.debug('Socket handler started', {
+      correlationId,
+      handler: config.handlerName,
+      socketId: this.id,
+      userId,
+      gameId,
+    });
 
     try {
       const result = handler.apply(this, args);
@@ -144,18 +166,44 @@ export function withErrorBoundary<TArgs extends any[], TReturn = void>(
       if (result instanceof Promise) {
         await result;
       }
+
+      // Log success (debug level)
+      const duration = Date.now() - startTime;
+      logger.debug('Socket handler completed', {
+        correlationId,
+        handler: config.handlerName,
+        duration,
+        success: true,
+      });
     } catch (error) {
       success = false;
       caughtError = error instanceof Error ? error : new Error(String(error));
+      const duration = Date.now() - startTime;
 
-      // Log error
-      console.error(`[Error Boundary] ${config.handlerName} failed:`, error);
+      // Use enhanced error logging with full context
+      logError(caughtError, {
+        correlationId,
+        action: config.handlerName,
+        requestDuration: duration,
+        userId,
+        gameId,
+        metadata: {
+          socketId: this.id,
+          rooms: Array.from(this.rooms),
+          handshake: {
+            address: this.handshake.address,
+            time: this.handshake.time,
+          },
+          arguments: args.length > 0 && typeof args[0] === 'object' ? Object.keys(args[0]) : args,
+        },
+      });
 
-      // Report to Sentry with context
+      // Report to Sentry with enhanced context
       Sentry.captureException(error, {
         tags: {
           handler: config.handlerName,
           socketId: this.id,
+          correlationId,
         },
         contexts: {
           socket: {
@@ -168,14 +216,27 @@ export function withErrorBoundary<TArgs extends any[], TReturn = void>(
           },
         },
         extra: {
+          correlationId,
           arguments: args,
+          userId,
+          gameId,
+          duration,
         },
       });
 
-      // Optionally send error to client
+      // Send error to client with correlation ID
       if (config.sendToClient) {
-        const message = config.clientMessage || 'An error occurred. Please try again.';
-        this.emit('error', { message });
+        const message = caughtError instanceof GameError
+          ? caughtError.message
+          : config.clientMessage || 'An error occurred. Please try again.';
+
+        const code = caughtError instanceof GameError ? caughtError.code : 'INTERNAL_ERROR';
+
+        this.emit('error', {
+          message,
+          code,
+          correlationId, // Client can report this for support
+        });
       }
     } finally {
       // Update metrics

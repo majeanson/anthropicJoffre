@@ -1,50 +1,56 @@
 /**
  * Achievement Socket Handlers
  * Sprint 2 Phase 1
+ * Sprint 6: Enhanced with error boundary integration
  */
 
 import { Server, Socket } from 'socket.io';
 import * as achievementDb from '../db/achievements.js';
 import { checkAchievements, checkSecretAchievements } from '../utils/achievementChecker.js';
 import { AchievementCheckContext } from '../types/achievements.js';
+import { errorBoundaries } from '../middleware/errorBoundary.js';
+
+interface AchievementHandlerDependencies {
+  errorBoundaries: typeof errorBoundaries;
+}
 
 /**
  * Register achievement-related socket event handlers
  */
-export function registerAchievementHandlers(io: Server, socket: Socket) {
+export function registerAchievementHandlers(
+  io: Server,
+  socket: Socket,
+  deps: AchievementHandlerDependencies
+) {
+  const { errorBoundaries } = deps;
+
   // Get all achievements
-  socket.on('get_all_achievements', async (callback) => {
-    try {
+  socket.on(
+    'get_all_achievements',
+    errorBoundaries.readOnly('get_all_achievements')(async (callback) => {
       const achievements = await achievementDb.getAllAchievements();
       callback({ success: true, achievements });
-    } catch (error) {
-      console.error('Error getting achievements:', error);
-      callback({ success: false, error: 'Failed to get achievements' });
-    }
-  });
+    })
+  );
 
   // Get player's achievements with progress
-  socket.on('get_player_achievements', async ({ playerName }, callback) => {
-    try {
+  socket.on(
+    'get_player_achievements',
+    errorBoundaries.readOnly('get_player_achievements')(async ({ playerName }, callback) => {
       const achievements = await achievementDb.getPlayerAchievements(playerName);
       const points = await achievementDb.getPlayerAchievementPoints(playerName);
       callback({ success: true, achievements, points });
-    } catch (error) {
-      console.error('Error getting player achievements:', error);
-      callback({ success: false, error: 'Failed to get player achievements' });
-    }
-  });
+    })
+  );
 
   // Get achievement leaderboard
-  socket.on('get_achievement_leaderboard', async ({ limit = 10 }, callback) => {
-    try {
+  socket.on(
+    'get_achievement_leaderboard',
+    errorBoundaries.readOnly('get_achievement_leaderboard')(async ({ limit = 10 }, callback) => {
       const leaderboard = await achievementDb.getAchievementLeaderboard(limit);
       callback({ success: true, leaderboard });
-    } catch (error) {
-      console.error('Error getting achievement leaderboard:', error);
-      callback({ success: false, error: 'Failed to get leaderboard' });
-    }
-  });
+    })
+  );
 }
 
 /**

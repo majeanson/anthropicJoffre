@@ -34,6 +34,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   const [playSpeed, setPlaySpeed] = useState<0.5 | 1 | 2>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [correlationId, setCorrelationId] = useState<string | null>(null);
 
   // Fetch replay data on mount
   useEffect(() => {
@@ -69,12 +70,23 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
       console.log('[GameReplay] Replay data validated successfully. Rounds:', replayData.round_history.length);
       setReplayData(replayData);
+      setError(null);
+      setCorrelationId(null);
       setLoading(false);
     };
 
-    const handleError = ({ message }: { message: string }) => {
-      console.error('[GameReplay] Error loading replay:', message, 'for game:', gameId);
-      setError(message);
+    const handleError = (errorData: any) => {
+      console.error('[GameReplay] Error loading replay:', errorData, 'for game:', gameId);
+
+      // Extract correlation ID if available
+      const corrId = errorData?.correlationId || errorData?.correlation_id || null;
+      if (corrId) {
+        setCorrelationId(corrId);
+      }
+
+      // Set user-friendly error message
+      const errorMessage = errorData?.message || 'Failed to load game replay';
+      setError(errorMessage);
       setLoading(false);
     };
 
@@ -133,21 +145,46 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
   if (error || !replayData) {
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
         <div
-          className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md"
+          className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md w-full"
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Sprint 6: Enhanced error display */}
           <div className="text-center">
-            <div className="text-4xl mb-4">❌</div>
-            <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-4">
+            <div className="text-4xl mb-4">⚠️</div>
+            <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
               {error || 'Failed to load replay'}
             </p>
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all"
-            >
-              Close
+            {correlationId && (
+              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-700">
+                <p className="text-xs text-red-700 dark:text-red-300 font-mono">
+                  Error ID: {correlationId}
+                </p>
+                <p className="text-xs text-red-600 dark:text-red-400 mt-1 opacity-75">
+                  Please include this ID when reporting the issue
+                </p>
+              </div>
+            )}
+            <div className="flex gap-3 mt-6 justify-center">
+              <button
+                onClick={() => {
+                  setError(null);
+                  setCorrelationId(null);
+                  setLoading(true);
+                  if (socket) {
+                    socket.emit('get_game_replay', { gameId });
+                  }
+                }}
+                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-all"
+              >
+                🔄 Try Again
+              </button>
+              <button
+                onClick={onClose}
+                className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-bold transition-all"
+              >
+                Close
             </button>
           </div>
         </div>

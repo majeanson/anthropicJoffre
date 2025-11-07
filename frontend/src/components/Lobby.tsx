@@ -9,6 +9,8 @@ import { StatsPanel } from './StatsPanel';
 import { GameCreationForm } from './GameCreationForm';
 import { JoinGameForm } from './JoinGameForm';
 import { ErrorBoundary } from './ErrorBoundary';
+import { LobbyErrorFallback } from './fallbacks/LobbyErrorFallback';
+import { StatsErrorFallback } from './fallbacks/StatsErrorFallback';
 import { PlayContent } from './PlayContent';
 import { SettingsContent } from './SettingsContent';
 import { Socket } from 'socket.io-client';
@@ -276,19 +278,21 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
         <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
         <DebugInfo isOpen={showDebugInfo} onClose={() => setShowDebugInfo(false)} />
         {showBrowser && (
-          <LobbyBrowser
-            socket={socket}
-            onJoinGame={(gameId) => {
-              setGameId(gameId);
-              setMode('join');
-            }}
-            onSpectateGame={(gameId) => {
-              setGameId(gameId);
-              setMode('join');
-              setJoinType('spectator');
-            }}
-            onClose={() => setShowBrowser(false)}
-          />
+          <ErrorBoundary fallback={<LobbyErrorFallback onClose={() => setShowBrowser(false)} />}>
+            <LobbyBrowser
+              socket={socket}
+              onJoinGame={(gameId) => {
+                setGameId(gameId);
+                setMode('join');
+              }}
+              onSpectateGame={(gameId) => {
+                setGameId(gameId);
+                setMode('join');
+                setJoinType('spectator');
+              }}
+              onClose={() => setShowBrowser(false)}
+            />
+          </ErrorBoundary>
         )}
         <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
           {/* Animated background cards */}
@@ -507,24 +511,26 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
         {/* Stats & Leaderboard Modals */}
         {socket && (
-          <Suspense fallback={<div />}>
-            <PlayerStatsModal
-              playerName={selectedPlayerName}
-              socket={socket}
-              isOpen={showPlayerStats}
-              onClose={() => setShowPlayerStats(false)}
-            />
-            <GlobalLeaderboard
-              socket={socket}
-              isOpen={showLeaderboard}
-              onClose={() => setShowLeaderboard(false)}
-              onViewPlayerStats={(playerName) => {
-                setSelectedPlayerName(playerName);
-                setShowLeaderboard(false);
-                setShowPlayerStats(true);
-              }}
-            />
-          </Suspense>
+          <ErrorBoundary fallback={<StatsErrorFallback onClose={() => { setShowPlayerStats(false); setShowLeaderboard(false); }} />}>
+            <Suspense fallback={<div />}>
+              <PlayerStatsModal
+                playerName={selectedPlayerName}
+                socket={socket}
+                isOpen={showPlayerStats}
+                onClose={() => setShowPlayerStats(false)}
+              />
+              <GlobalLeaderboard
+                socket={socket}
+                isOpen={showLeaderboard}
+                onClose={() => setShowLeaderboard(false)}
+                onViewPlayerStats={(playerName) => {
+                  setSelectedPlayerName(playerName);
+                  setShowLeaderboard(false);
+                  setShowPlayerStats(true);
+                }}
+              />
+            </Suspense>
+          </ErrorBoundary>
         )}
       </>
     );

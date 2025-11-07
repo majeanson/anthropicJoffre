@@ -78,10 +78,13 @@ interface PlayerStatsModalProps {
 export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewReplay }: PlayerStatsModalProps) {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [correlationId, setCorrelationId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'round' | 'game' | 'history' | 'profile'>('round');
   const [historyTab, setHistoryTab] = useState<'finished' | 'unfinished'>('finished');
   const [gameHistory, setGameHistory] = useState<GameHistoryEntry[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   // Sprint 3 Phase 3: History filtering and sorting
   const [resultFilter, setResultFilter] = useState<'all' | 'won' | 'lost'>('all');
@@ -96,6 +99,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
   const [profile, setProfile] = useState<UserProfile | null>(null);
   // const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   // Sprint 3 Phase 3.3: Match details modal
   const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
@@ -112,12 +116,24 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       console.log('[PlayerStatsModal] Received stats response for:', responseName, 'stats:', receivedStats ? 'Found' : 'Not found');
       if (responseName === playerName) {
         setStats(receivedStats);
+        setError(null);
+        setCorrelationId(null);
         setLoading(false);
       }
     };
 
-    const handleError = (error: any) => {
-      console.error('[PlayerStatsModal] Socket error:', error);
+    const handleError = (errorData: any) => {
+      console.error('[PlayerStatsModal] Socket error:', errorData);
+
+      // Extract correlation ID if available
+      const corrId = errorData?.correlationId || errorData?.correlation_id || null;
+      if (corrId) {
+        setCorrelationId(corrId);
+      }
+
+      // Set user-friendly error message
+      const errorMessage = errorData?.message || 'Failed to load player statistics';
+      setError(errorMessage);
       setLoading(false);
     };
 
@@ -142,12 +158,17 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       console.log('[PlayerStatsModal] Received history response for:', responseName, 'games:', games?.length || 0);
       if (responseName === playerName) {
         setGameHistory(games);
+        setHistoryError(null);
         setHistoryLoading(false);
       }
     };
 
-    const handleError = (error: any) => {
-      console.error('[PlayerStatsModal] Socket error while loading history:', error);
+    const handleError = (errorData: any) => {
+      console.error('[PlayerStatsModal] Socket error while loading history:', errorData);
+
+      // Set user-friendly error message
+      const errorMessage = errorData?.message || 'Failed to load game history';
+      setHistoryError(errorMessage);
       setHistoryLoading(false);
     };
 
@@ -163,6 +184,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
   // Load profile data function - extracted for reuse after save
   const loadProfile = useCallback(async () => {
     setProfileLoading(true);
+    setProfileError(null);
     try {
       console.log('[PlayerStatsModal] Loading profile data');
       const data = await getUserProfile();
@@ -173,6 +195,8 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       }
     } catch (error) {
       console.error('[PlayerStatsModal] Error loading profile:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load profile data';
+      setProfileError(errorMessage);
     } finally {
       setProfileLoading(false);
     }
@@ -224,7 +248,41 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
             </div>
           )}
 
-          {!loading && !stats && (
+          {/* Sprint 6: Error State */}
+          {!loading && error && (
+            <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <span className="text-2xl">⚠️</span>
+                <div className="flex-1">
+                  <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                    {error}
+                  </p>
+                  {correlationId && (
+                    <p className="text-xs text-red-700 dark:text-red-300 font-mono mt-2">
+                      Error ID: {correlationId}
+                      <br />
+                      <span className="text-xs opacity-75">
+                        Please include this ID when reporting the issue
+                      </span>
+                    </p>
+                  )}
+                  <button
+                    onClick={() => {
+                      setError(null);
+                      setCorrelationId(null);
+                      setLoading(true);
+                      socket.emit('get_player_stats', { playerName });
+                    }}
+                    className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                  >
+                    🔄 Try Again
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!loading && !error && !stats && (
             <div className="text-center py-12">
               <span className="text-6xl">❌</span>
               <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold text-lg">
@@ -611,7 +669,31 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                     </div>
                   )}
 
-                  {!historyLoading && gameHistory.length === 0 && (
+                  {/* Sprint 6: History Error State */}
+                  {!historyLoading && historyError && (
+                    <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl">⚠️</span>
+                        <div className="flex-1">
+                          <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                            {historyError}
+                          </p>
+                          <button
+                            onClick={() => {
+                              setHistoryError(null);
+                              setHistoryLoading(true);
+                              socket.emit('get_player_history', { playerName, limit: 20 });
+                            }}
+                            className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                          >
+                            🔄 Try Again
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!historyLoading && !historyError && gameHistory.length === 0 && (
                     <div className="text-center py-12">
                       <span className="text-6xl">📭</span>
                       <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold text-lg">
@@ -712,7 +794,30 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                     </div>
                   )}
 
-                  {!profileLoading && (
+                  {/* Sprint 6: Profile Error State */}
+                  {!profileLoading && profileError && (
+                    <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <span className="text-2xl">⚠️</span>
+                        <div className="flex-1">
+                          <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                            {profileError}
+                          </p>
+                          <button
+                            onClick={() => {
+                              setProfileError(null);
+                              loadProfile();
+                            }}
+                            className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                          >
+                            🔄 Try Again
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!profileLoading && !profileError && (
                     <ProfileEditor
                       initialData={{
                         avatar_id: user?.avatar_url || 'dog',

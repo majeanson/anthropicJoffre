@@ -990,10 +990,10 @@ io.on('connection', (socket) => {
   });
 
   // ============================================================================
-  // Achievement Handlers - Sprint 2 Phase 1
+  // Achievement Handlers - Sprint 2 Phase 1 | Sprint 6: Added error boundaries
   // ============================================================================
-  registerAchievementHandlers(io, socket);
-  registerFriendHandlers(io, socket);
+  registerAchievementHandlers(io, socket, { errorBoundaries });
+  registerFriendHandlers(io, socket, { errorBoundaries });
 
   // ============================================================================
   // Notification Handlers - Sprint 3 Phase 5

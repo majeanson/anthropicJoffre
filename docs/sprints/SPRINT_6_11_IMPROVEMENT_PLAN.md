@@ -3,6 +3,7 @@
 **Duration**: 10 weeks (5 sprints × 2 weeks)
 **Focus**: Refactoring, Optimization, Error Handling, Test Coverage
 **Last Updated**: 2025-11-07
+**Status**: Sprint 6 Complete ✅ (All 6 tasks finished)
 
 ---
 
@@ -165,16 +166,22 @@ function withRequestTracing(handler: Function) {
 ```
 
 **Implementation Checklist**:
-- [ ] Create ErrorContext interface and GameError class
-- [ ] Create logError() function with stack trace parsing
-- [ ] Create correlation ID system (UUID v4)
-- [ ] Add request tracing middleware for Socket.io
-- [ ] Integrate with existing logger.ts
-- [ ] Add error aggregation (group similar errors)
-- [ ] Create error dashboard query helpers
-- [ ] Add error metrics tracking (errors/minute, top error types)
-- [ ] Update all socket handlers to use new error system
-- [ ] Add frontend error reporting (send to backend)
+- [x] Create ErrorContext interface and GameError class
+- [x] Create logError() function with stack trace parsing
+- [x] Create correlation ID system (UUID v4)
+- [x] Add request tracing middleware for Socket.io
+- [x] Integrate with existing logger.ts
+- [x] Add error aggregation (group similar errors)
+- [x] Create error dashboard query helpers
+- [x] Add error metrics tracking (errors/minute, top error types)
+- [x] Update all socket handlers to use new error system ✅ **COMPLETE (2025-11-07)**
+  - achievements.ts: Updated to use errorBoundaries.readOnly
+  - friends.ts: Updated to use errorBoundaries.gameAction/readOnly
+  - All 12 socket handler files now use error boundaries
+- [x] Add frontend error reporting (send to backend) ✅ **COMPLETE (2025-11-07)**
+  - POST /api/errors endpoint created in routes.ts
+  - Accepts error reports from frontend with full context
+  - Logs to backend logger with correlation IDs
 
 **Usage Example**:
 ```typescript
@@ -232,8 +239,10 @@ socket.on('place_bet', async (data: { gameId: string; amount: number }) => {
 - Error aggregation for pattern detection
 - Production-ready error analytics
 
-#### 3. Query Cache Integration (4 hours)
+#### 3. Query Cache Integration (4 hours) ✅ COMPLETE
 **Files**: `backend/src/db/index.ts`
+
+**Status**: Already integrated and working. Cache invalidation confirmed in `markGameFinished()` and `updatePlayerStats()`.
 
 **Wrap 5 functions**:
 ```typescript
@@ -290,7 +299,9 @@ export async function markGameFinished(gameId: string) {
 - API response times: <10ms (from 20-100ms)
 - Memory usage: <50MB for cache
 
-#### 4. Database Optimization (1 day)
+#### 4. Database Optimization (1 day) ✅ COMPLETE
+
+**Status**: Migration 014 created with 11 performance indexes. Applied successfully.
 
 **Add Missing Indexes**:
 ```sql
@@ -358,7 +369,9 @@ export const query = async (
 };
 ```
 
-**Replace SELECT * with Explicit Columns**:
+**Replace SELECT * with Explicit Columns**: ✅ COMPLETE
+
+**Status**: Replaced 18 SELECT * statements across 7 files (friends.ts, index.ts, achievements.ts, notifications.ts, sessions.ts, profiles.ts).
 ```typescript
 // Before (7 files)
 SELECT * FROM users WHERE user_id = $1
@@ -472,43 +485,43 @@ const fetchPlayerStats = async (playerName: string) => {
 - `FriendsPanel.tsx` - Friends list fetching
 - `SocialPanel.tsx` - Social data fetching
 
-#### 6. React Error Boundaries (2 hours)
+#### 6. React Error Boundaries (2 hours) ✅ COMPLETE (2025-11-07)
 
-**Wrap High-Risk Components**:
+**Status**: All high-risk components wrapped with ErrorBoundary
+
+**Wrapped Components**:
+- PlayingPhase (App.tsx) - Already wrapped ✅
+- GameReplay (App.tsx) - Wrapped with ReplayErrorFallback ✅
+- LobbyBrowser (Lobby.tsx) - Wrapped with LobbyErrorFallback ✅
+- PlayerStatsModal (Lobby.tsx) - Wrapped with StatsErrorFallback ✅
+- GlobalLeaderboard (Lobby.tsx) - Wrapped with StatsErrorFallback ✅
+
+**Created Fallback Components**:
+- `frontend/src/components/fallbacks/PlayingPhaseFallback.tsx` ✅
+- `frontend/src/components/fallbacks/ReplayErrorFallback.tsx` ✅
+- `frontend/src/components/fallbacks/StatsErrorFallback.tsx` ✅
+- `frontend/src/components/fallbacks/LobbyErrorFallback.tsx` ✅
+
+**Implementation**:
 ```tsx
-// frontend/src/App.tsx
-
-<ErrorBoundary componentName="PlayingPhase" fallback={<PlayingPhaseFallback />}>
-  <PlayingPhase {...playingPhaseProps} />
+// frontend/src/App.tsx - GameReplay wrapped
+<ErrorBoundary fallback={<ReplayErrorFallback onClose={() => setShowReplayModal(false)} />}>
+  <Suspense fallback={<LoadingSpinner />}>
+    <GameReplay {...props} />
+  </Suspense>
 </ErrorBoundary>
 
-<ErrorBoundary componentName="GameReplay" fallback={<ReplayErrorFallback />}>
-  <GameReplay gameId={replayGameId} />
+// frontend/src/components/Lobby.tsx - LobbyBrowser, Stats, Leaderboard wrapped
+<ErrorBoundary fallback={<LobbyErrorFallback onClose={() => setShowBrowser(false)} />}>
+  <LobbyBrowser {...props} />
 </ErrorBoundary>
 
-<ErrorBoundary componentName="PlayerStatsModal" fallback={<StatsErrorFallback />}>
-  <PlayerStatsModal {...statsProps} />
+<ErrorBoundary fallback={<StatsErrorFallback onClose={closeModals} />}>
+  <Suspense fallback={<div />}>
+    <PlayerStatsModal {...props} />
+    <GlobalLeaderboard {...props} />
+  </Suspense>
 </ErrorBoundary>
-
-<ErrorBoundary componentName="LobbyBrowser" fallback={<LobbyErrorFallback />}>
-  <LobbyBrowser {...lobbyProps} />
-</ErrorBoundary>
-```
-
-**Create Fallback Components**:
-```tsx
-// frontend/src/components/fallbacks/PlayingPhaseFallback.tsx
-export function PlayingPhaseFallback() {
-  return (
-    <div className="error-fallback">
-      <h2>Game Error</h2>
-      <p>Something went wrong during gameplay.</p>
-      <button onClick={() => window.location.reload()}>
-        Reload Game
-      </button>
-    </div>
-  );
-}
 ```
 
 ### Expected Impact
@@ -522,6 +535,7 @@ export function PlayingPhaseFallback() {
 ## Sprint 7: Backend Test Coverage
 
 **Duration**: 2 weeks | **Priority**: HIGH | **Effort**: 80 hours
+**Status**: Task 1 Complete ✅ (Socket Handler Tests)
 
 ### Goals
 - Increase backend test coverage from 60% to 85%
@@ -531,12 +545,30 @@ export function PlayingPhaseFallback() {
 
 ### Tasks
 
-#### 1. Socket Handler Tests - Critical (5 days)
+#### 1. Socket Handler Tests - Critical (5 days) ✅ COMPLETE (2025-11-07)
 
-**Test Files to Create**:
-- `socketHandlers/lobby.test.ts` (~400 lines, 20 tests)
-- `socketHandlers/gameplay.test.ts` (~350 lines, 18 tests)
-- `socketHandlers/connection.test.ts` (~300 lines, 15 tests)
+**Status**: 47 tests created across 3 test files
+
+**Test Files Created**:
+- ✅ `socketHandlers/lobby.test.ts` (340 lines, 20 tests)
+  - create_game: 4 tests (validation, host assignment, event emission)
+  - join_game: 4 tests (player addition, full game rejection, started game rejection, team assignment)
+  - select_team: 3 tests (timing, game phase validation, team balance)
+  - swap_position: 3 tests (intra-team swaps, cross-team rejection, order updates)
+  - kick_player: 3 tests (host validation, non-host rejection, state updates)
+  - start_game: 3 tests (4-player requirement, team balance, card dealing)
+
+- ✅ `socketHandlers/gameplay.test.ts` (280 lines, 16 tests)
+  - place_bet: 7 tests (range validation, hierarchy, without-trump, dealer rules, skip validation)
+  - play_card: 6 tests (valid play, suit-following, card ownership, turn validation, trick resolution, points calculation)
+  - player_ready: 3 tests (ready state, round start, game end conditions)
+
+- ✅ `socketHandlers/connection.test.ts` (230 lines, 11 tests)
+  - reconnect_to_game: 5 tests (valid session, invalid token, expired session, state restoration, player notification)
+  - disconnect: 3 tests (player disconnection, reconnection timer, event emission)
+  - leave_game: 3 tests (player removal, session deletion, event emission)
+
+**Test Results**: All 47 tests passing ✅
 
 **Coverage Areas**:
 
