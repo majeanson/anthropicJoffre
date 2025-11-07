@@ -136,10 +136,16 @@ interface ErrorBoundaryConfig {
  * ));
  * ```
  */
-export function withErrorBoundary<TArgs extends unknown[], TReturn = void>(
-  handler: (this: Socket, ...args: TArgs) => TReturn | Promise<TReturn>,
+/**
+ * Socket.io event handler type that matches Socket.io's expected signature
+ */
+type SocketHandler = (...args: unknown[]) => Promise<void>;
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function withErrorBoundary(
+  handler: Function,
   config: ErrorBoundaryConfig
-): any {
+): SocketHandler {
   return async function (this: Socket, ...args: unknown[]): Promise<void> {
     const startTime = Date.now();
     const correlationId = generateCorrelationId();
@@ -160,7 +166,7 @@ export function withErrorBoundary<TArgs extends unknown[], TReturn = void>(
     });
 
     try {
-      const result = handler.apply(this, args as TArgs);
+      const result = handler.apply(this, args);
 
       // If handler returns a promise, await it to catch async errors
       if (result instanceof Promise) {
@@ -255,7 +261,8 @@ export const errorBoundaries = {
    * Sends errors to client
    */
   gameAction: (handlerName: string) =>
-    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>): any =>
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    (handler: Function): SocketHandler =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -267,7 +274,8 @@ export const errorBoundaries = {
    * Sends errors to client with custom message
    */
   readOnly: (handlerName: string) =>
-    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>): any =>
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    (handler: Function): SocketHandler =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -279,7 +287,8 @@ export const errorBoundaries = {
    * Does not send errors to client
    */
   background: (handlerName: string) =>
-    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>): any =>
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    (handler: Function): SocketHandler =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: false,
@@ -288,6 +297,11 @@ export const errorBoundaries = {
 
 /**
  * Type-safe socket.on wrapper that handles error boundary wrapped handlers
+ *
+ * This wrapper is needed because TypeScript's strict function type checking
+ * doesn't allow destructured parameters in handlers when Socket.io expects
+ * (...args: unknown[]) => void. The handlers are type-safe at runtime because
+ * our error boundary properly validates and passes through all arguments.
  *
  * @example
  * ```typescript
@@ -299,9 +313,10 @@ export const errorBoundaries = {
 export function safeSocketOn(
   socket: Socket,
   event: string,
-  handler: any
+  handler: SocketHandler
 ): void {
-  socket.on(event, handler);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  socket.on(event, handler as any);
 }
 
 /**

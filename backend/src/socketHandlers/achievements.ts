@@ -24,10 +24,12 @@ export function registerAchievementHandlers(
 ) {
   const { errorBoundaries } = deps;
 
+  type AchievementCallback = (data: { success: boolean; [key: string]: unknown }) => void;
+
   // Get all achievements
   socket.on(
     'get_all_achievements',
-    errorBoundaries.readOnly('get_all_achievements')(async (callback) => {
+    errorBoundaries.readOnly('get_all_achievements')(async (callback: AchievementCallback) => {
       const achievements = await achievementDb.getAllAchievements();
       callback({ success: true, achievements });
     })
@@ -36,7 +38,7 @@ export function registerAchievementHandlers(
   // Get player's achievements with progress
   socket.on(
     'get_player_achievements',
-    errorBoundaries.readOnly('get_player_achievements')(async ({ playerName }, callback) => {
+    errorBoundaries.readOnly('get_player_achievements')(async ({ playerName }: { playerName: string }, callback: AchievementCallback) => {
       const achievements = await achievementDb.getPlayerAchievements(playerName);
       const points = await achievementDb.getPlayerAchievementPoints(playerName);
       callback({ success: true, achievements, points });
@@ -46,7 +48,7 @@ export function registerAchievementHandlers(
   // Get achievement leaderboard
   socket.on(
     'get_achievement_leaderboard',
-    errorBoundaries.readOnly('get_achievement_leaderboard')(async ({ limit = 10 }, callback) => {
+    errorBoundaries.readOnly('get_achievement_leaderboard')(async ({ limit = 10 }: { limit?: number }, callback: AchievementCallback) => {
       const leaderboard = await achievementDb.getAchievementLeaderboard(limit);
       callback({ success: true, leaderboard });
     })

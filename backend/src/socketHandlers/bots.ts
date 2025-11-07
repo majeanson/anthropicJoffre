@@ -21,6 +21,8 @@ import { RoundStatsData } from '../game/roundStatistics';
 interface OnlinePlayer {
   playerName: string;
   socketId: string;
+  status?: 'in_lobby' | 'in_game' | 'in_team_selection';
+  gameId?: string;
   lastActivity?: number;
 }
 
