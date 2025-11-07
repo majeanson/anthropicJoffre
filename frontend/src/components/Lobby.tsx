@@ -54,7 +54,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [showDebugInfo, setShowDebugInfo] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
-  const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat'>('online');
+  const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat' | 'friends'>('online');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -469,6 +469,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                         playerName={playerName}
                         setPlayerName={setPlayerName}
                         onJoinGame={onJoinGame}
+                        socket={socket}
+                        user={user}
                       />
                     )}
                   </div>

@@ -45,13 +45,15 @@ describe('SocialPanel', () => {
   ];
 
   const defaultProps = {
-    socialTab: 'online' as 'recent' | 'online' | 'chat',
+    socialTab: 'online' as 'recent' | 'online' | 'chat' | 'friends',
     setSocialTab: mockSetSocialTab,
     onlinePlayers,
     recentPlayers,
     playerName: 'TestPlayer',
     setPlayerName: mockSetPlayerName,
     onJoinGame: mockOnJoinGame,
+    socket: null,
+    user: null,
   };
 
   beforeEach(() => {
