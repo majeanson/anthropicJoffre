@@ -1,6 +1,6 @@
 {
   "name": "trick-card-game",
-  "version": "1.0.1",
+  "version": "2.0.0",
   "description": "A real-time trick card game",
   "scripts": {
     "install:all": "npm install --prefix backend && npm install --prefix frontend",

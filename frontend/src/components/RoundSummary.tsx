@@ -95,63 +95,42 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [dataReady, onReady]);
 
-  // Show loading animation while data is being calculated
-  if (!dataReady) {
-    return (
-      <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="flex flex-col items-center justify-center py-16">
-          <div className="relative">
-            {/* Spinning cards animation */}
-            <div className="flex gap-2 mb-4">
-              <div className="w-12 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg animate-bounce" style={{animationDelay: '0s'}}></div>
-              <div className="w-12 h-16 bg-gradient-to-br from-amber-700 to-amber-900 rounded-lg animate-bounce" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-12 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg animate-bounce" style={{animationDelay: '0.2s'}}></div>
-              <div className="w-12 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg animate-bounce" style={{animationDelay: '0.3s'}}></div>
-            </div>
-            <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
-              Calculating round results...
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Function to calculate "interestingness" score for each stat
+  // ✅ Helper function for calculating stat scores (not a hook, can be defined here)
   const getStatScore = (title: string, stat: any): number => {
     switch (title) {
       case 'Perfect Bet':
-        return 100; // Rare achievement
+        return 100;
       case 'Team MVP':
         return stat.contribution >= 70 ? 90 : stat.contribution >= 60 ? 60 : 50;
       case 'Lucky Player':
-        return stat.redZeros >= 2 ? 85 : 70; // Multiple red zeros is very lucky
+        return stat.redZeros >= 2 ? 85 : 70;
       case 'Point Leader':
         return stat.pointsEarned >= 10 ? 80 : stat.pointsEarned >= 8 ? 65 : 50;
       case 'Trick Master':
         return stat.tricksWon >= 5 ? 75 : stat.tricksWon >= 4 ? 60 : 45;
       case 'Monochrome':
-        return 70; // Interesting hand pattern
+        return 70;
       case 'Lucky Sevens':
-        return stat.sevensCount >= 3 ? 70 : 55; // Multiple high cards
+        return stat.sevensCount >= 3 ? 70 : 55;
       case 'Suited Up':
-        return stat.count >= 5 ? 65 : 50; // Very suited hand
+        return stat.count >= 5 ? 65 : 50;
       case 'Trump Heavy':
-        return stat.trumpCount >= 4 ? 60 : 45; // Strategic advantage
+        return stat.trumpCount >= 4 ? 60 : 45;
       case 'Rainbow':
-        return 55; // Balanced hand
+        return 55;
       case 'Trump Master':
-        return stat.trumpsPlayed >= 4 ? 55 : 40; // Effective trump usage
+        return stat.trumpsPlayed >= 4 ? 55 : 40;
       case 'High Roller':
-        return stat.avgValue >= 5 ? 45 : 35; // High value hand
+        return stat.avgValue >= 5 ? 45 : 35;
       case 'Lowball':
-        return stat.avgValue <= 2 ? 45 : 35; // Low value hand
+        return stat.avgValue <= 2 ? 45 : 35;
       default:
         return 30;
     }
   };
 
-  // Collect all available stats with scores (memoized to avoid recalculation)
+  // ✅ CRITICAL: ALL useMemo hooks must be here, BEFORE any conditional returns
+  // Collect all available stats with scores (memoized)
   const allStats = useMemo(() => {
     const stats: Array<{ title: string; icon: string; stat: any; score: number }> = [];
 
@@ -178,6 +157,8 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
   }, [allStats]);
+
+  // ✅ NOW hooks are done - render functions can be defined here
 
   const renderCard = (card: Card) => {
     return (
@@ -263,6 +244,28 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     );
   };
 
+  // ✅ Conditional rendering without early return (maintains same hook call count)
+  if (!dataReady) {
+    return (
+      <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="relative">
+            {/* Spinning cards animation */}
+            <div className="flex gap-2 mb-4">
+              <div className="w-12 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg animate-bounce" style={{animationDelay: '0s'}}></div>
+              <div className="w-12 h-16 bg-gradient-to-br from-amber-700 to-amber-900 rounded-lg animate-bounce" style={{animationDelay: '0.1s'}}></div>
+              <div className="w-12 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              <div className="w-12 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg animate-bounce" style={{animationDelay: '0.3s'}}></div>
+            </div>
+            <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
+              Calculating round results...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
@@ -272,7 +275,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
         </h2>
       </div>
 
-      
+
       {/* Player Ready Status */}
       <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '550ms' }}>
         <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200 text-center">👥 Ready Status</h3>
