@@ -1,8 +1,17 @@
+/**
+ * ErrorBoundary Component
+ * Sprint 8 Phase 8.1: Enhanced Error Handling with Verbose Logging
+ *
+ * Comprehensive error boundary with detailed debugging information
+ */
+
 import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+  componentName?: string;
 }
 
 interface State {
@@ -10,6 +19,7 @@ interface State {
   error: Error | null;
   errorInfo: ErrorInfo | null;
   errorCount: number;
+  lastErrorTime: number | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {

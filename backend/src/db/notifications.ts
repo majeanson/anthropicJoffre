@@ -46,7 +46,7 @@ export async function getUserNotifications(
       : 'user_id = $1 AND is_read = FALSE';
 
     const result = await query(
-      `SELECT * FROM notifications
+      `SELECT notification_id, user_id, notification_type, title, message, data, is_read, created_at FROM notifications
        WHERE ${whereClause}
        ORDER BY created_at DESC
        LIMIT $2`,

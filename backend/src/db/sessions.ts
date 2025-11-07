@@ -54,7 +54,7 @@ export async function createSession(
  */
 export async function validateSession(token: string): Promise<PlayerSession | null> {
   const text = `
-    SELECT *
+    SELECT session_token, player_name, player_id, game_id, is_active, created_at, last_active_at, expires_at
     FROM game_sessions
     WHERE session_token = $1
       AND is_active = TRUE
@@ -130,7 +130,7 @@ export async function deletePlayerSessions(playerName: string, gameId: string): 
  */
 export async function getGameSessions(gameId: string): Promise<PlayerSession[]> {
   const text = `
-    SELECT *
+    SELECT session_token, player_name, player_id, game_id, is_active, created_at, last_active_at, expires_at
     FROM game_sessions
     WHERE game_id = $1
       AND is_active = TRUE
@@ -168,7 +168,7 @@ export async function findSessionByPlayer(
   gameId: string
 ): Promise<PlayerSession | null> {
   const text = `
-    SELECT *
+    SELECT session_token, player_name, player_id, game_id, is_active, created_at, last_active_at, expires_at
     FROM game_sessions
     WHERE player_name = $1
       AND game_id = $2

@@ -15,7 +15,7 @@ import {
  */
 export async function getAllAchievements(): Promise<Achievement[]> {
   const result = await query(
-    'SELECT * FROM achievements ORDER BY tier, points ASC'
+    'SELECT achievement_id, achievement_key, achievement_name, description, icon, tier, points, is_secret, category, created_at FROM achievements ORDER BY tier, points ASC'
   );
   return result.rows;
 }
@@ -52,7 +52,7 @@ export async function unlockAchievement(
 ): Promise<{ achievement: Achievement; isNewUnlock: boolean }> {
   // Get achievement
   const achievementResult = await query(
-    'SELECT * FROM achievements WHERE achievement_key = $1',
+    'SELECT achievement_id, achievement_key, achievement_name, description, icon, tier, points, is_secret, category, created_at FROM achievements WHERE achievement_key = $1',
     [achievementKey]
   );
 
@@ -101,7 +101,7 @@ export async function updateAchievementProgress(
 ): Promise<{ achievement: Achievement; progress: number; unlocked: boolean }> {
   // Get achievement
   const achievementResult = await query(
-    'SELECT * FROM achievements WHERE achievement_key = $1',
+    'SELECT achievement_id, achievement_key, achievement_name, description, icon, tier, points, is_secret, category, created_at FROM achievements WHERE achievement_key = $1',
     [achievementKey]
   );
 

@@ -56,7 +56,7 @@ export interface PreferencesUpdateData {
 export async function getUserProfile(userId: number): Promise<UserProfile | null> {
   try {
     const result = await query(
-      'SELECT * FROM user_profiles WHERE user_id = $1',
+      'SELECT profile_id, user_id, bio, country, favorite_team, visibility, show_online_status, allow_friend_requests, created_at, updated_at FROM user_profiles WHERE user_id = $1',
       [userId]
     );
     return result.rows[0] || null;
@@ -154,7 +154,7 @@ export async function updateUserProfile(
 export async function getUserPreferences(userId: number): Promise<UserPreferences | null> {
   try {
     const result = await query(
-      'SELECT * FROM user_preferences WHERE user_id = $1',
+      'SELECT preference_id, user_id, theme, sound_enabled, sound_volume, notifications_enabled, email_notifications, language, autoplay_enabled, created_at FROM user_preferences WHERE user_id = $1',
       [userId]
     );
     return result.rows[0] || null;

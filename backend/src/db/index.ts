@@ -4,7 +4,7 @@ import { existsSync } from 'fs';
 import { resolve } from 'path';
 import type { GameState, Player } from '../types/game';
 import { withCache, CACHE_TTL, queryCache } from '../utils/queryCache';
-import { logDatabaseQuery } from '../utils/logger';
+import logger, { logDatabaseQuery } from '../utils/logger';
 
 // Prioritize .env.local for local development (avoids Neon quota usage)
 // Path: backend/src/db -> backend/.env.local (need to go up 2 levels)
@@ -48,30 +48,105 @@ export const getPool = () => {
 };
 
 /**
+ * Check if database error is retryable
+ */
+function isRetryableError(error: any): boolean {
+  // Network errors
+  if (['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
+    return true;
+  }
+
+  // PostgreSQL specific retryable errors
+  if (error.code === '40001') return true; // serialization_failure
+  if (error.code === '40P01') return true; // deadlock_detected
+  if (error.code === '53300') return true; // too_many_connections
+  if (error.code === '08006') return true; // connection_failure
+  if (error.code === '08003') return true; // connection_does_not_exist
+
+  return false;
+}
+
+/**
+ * Sleep helper for retry backoff
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Execute a database query with automatic connection pooling
  * Optimized for Neon with minimal connection usage
  *
  * Sprint 3: Added query performance logging in production for slow queries
+ * Sprint 6: Added retry logic with exponential backoff for transient failures
  */
-export const query = async (text: string, params?: any[]) => {
+export const query = async (text: string, params?: any[], maxRetries = 3) => {
   const dbPool = getPool();
   if (!dbPool) {
     throw new Error('Database not configured. Set DATABASE_URL environment variable.');
   }
 
-  const start = Date.now();
-  const result = await dbPool.query(text, params);
-  const duration = Date.now() - start;
+  let lastError: any;
 
-  // Log all queries in development, only slow queries (>100ms) in production
-  if (process.env.NODE_ENV !== 'production' || duration > 100) {
-    logDatabaseQuery(text, duration, {
-      params: params?.length,
-      rows: result.rows?.length || 0,
-    });
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const start = Date.now();
+      const result = await dbPool.query(text, params);
+      const duration = Date.now() - start;
+
+      // Log all queries in development, only slow queries (>100ms) in production
+      if (process.env.NODE_ENV !== 'production' || duration > 100) {
+        logDatabaseQuery(text, duration, {
+          params: params?.length,
+          rows: result.rows?.length || 0,
+        });
+      }
+
+      // Log successful retry
+      if (attempt > 1) {
+        logger.info('Database query succeeded after retry', {
+          attempt,
+          query: text.substring(0, 100),
+        });
+      }
+
+      return result;
+    } catch (error: any) {
+      lastError = error;
+
+      // Check if error is retryable
+      const shouldRetry = attempt < maxRetries && isRetryableError(error);
+
+      if (!shouldRetry) {
+        // Not retryable or out of retries, throw immediately
+        logger.error('Database query failed', {
+          error: error.message,
+          code: error.code,
+          query: text.substring(0, 100),
+          attempt,
+        });
+        throw error;
+      }
+
+      // Calculate backoff: 100ms, 200ms, 400ms, 800ms...
+      const backoffMs = Math.pow(2, attempt - 1) * 100;
+
+      logger.warn('Database query retry', {
+        attempt,
+        maxRetries,
+        backoffMs,
+        errorCode: error.code,
+        errorMessage: error.message,
+        query: text.substring(0, 100),
+      });
+
+      // Wait before retrying
+      await sleep(backoffMs);
+    }
   }
 
-  return result;
+  // All retries exhausted
+  throw lastError;
 };
 
 /**
@@ -485,7 +560,17 @@ export const getPlayerStats = async (playerName: string) => {
 
   return withCache(cacheKey, CACHE_TTL.PLAYER_STATS, async () => {
     const text = `
-      SELECT * FROM player_stats
+      SELECT
+        player_name, games_played, games_won, games_lost, win_percentage,
+        elo_rating, highest_rating, lowest_rating, current_win_streak,
+        best_win_streak, current_loss_streak, worst_loss_streak,
+        fastest_win, longest_game, avg_game_duration_minutes,
+        total_tricks_won, total_points_earned, total_rounds_played, rounds_won,
+        rounds_win_percentage, avg_tricks_per_round, avg_points_per_round,
+        total_bets_made, bets_won, bets_lost, bet_success_rate, avg_bet_amount,
+        highest_bet, without_trump_bets, trump_cards_played, red_zeros_collected,
+        brown_zeros_received, is_bot, created_at, updated_at
+      FROM player_stats
       WHERE player_name = $1 AND is_bot = FALSE
     `;
     const result = await query(text, [playerName]);
@@ -819,7 +904,12 @@ export const getRecentGames = async (limit: number = 10) => {
 
   return withCache(cacheKey, CACHE_TTL.RECENT_GAMES, async () => {
     const text = `
-      SELECT * FROM game_history
+      SELECT
+        game_id, winning_team, team1_score, team2_score, rounds,
+        player_names, player_teams, round_history, trump_suit,
+        game_duration_seconds, is_bot_game, is_finished,
+        created_at, finished_at, last_updated_at, persistence_mode
+      FROM game_history
       WHERE is_finished = TRUE
       ORDER BY finished_at DESC
       LIMIT $1

@@ -22,7 +22,7 @@ export async function sendFriendRequest(
 
     // Check if request already exists
     const existingRequest = await query(
-      'SELECT * FROM friend_requests WHERE from_player = $1 AND to_player = $2 AND status = $3',
+      'SELECT id, from_player, to_player, status, created_at FROM friend_requests WHERE from_player = $1 AND to_player = $2 AND status = $3',
       [fromPlayer, toPlayer, 'pending']
     );
 
@@ -51,7 +51,7 @@ export async function sendFriendRequest(
 export async function getPendingFriendRequests(playerName: string): Promise<FriendRequest[]> {
   try {
     const result = await query(
-      `SELECT * FROM friend_requests
+      `SELECT id, from_player, to_player, status, created_at, responded_at FROM friend_requests
        WHERE to_player = $1 AND status = 'pending'
        ORDER BY created_at DESC`,
       [playerName]
@@ -77,7 +77,7 @@ export async function acceptFriendRequest(requestId: number): Promise<Friendship
 
     // Get the friend request
     const requestResult = await client.query(
-      'SELECT * FROM friend_requests WHERE id = $1 AND status = $2',
+      'SELECT id, from_player, to_player, status, created_at, responded_at FROM friend_requests WHERE id = $1 AND status = $2',
       [requestId, 'pending']
     );
 
@@ -192,7 +192,7 @@ export async function getFriendship(player1: string, player2: string): Promise<F
   try {
     const [p1, p2] = [player1, player2].sort();
     const result = await query(
-      'SELECT * FROM friendships WHERE player1_name = $1 AND player2_name = $2',
+      'SELECT id, player1_name, player2_name, created_at FROM friendships WHERE player1_name = $1 AND player2_name = $2',
       [p1, p2]
     );
 
@@ -274,7 +274,7 @@ export async function getFriendsWithStatus(playerName: string): Promise<FriendWi
 export async function getSentFriendRequests(playerName: string): Promise<FriendRequest[]> {
   try {
     const result = await query(
-      `SELECT * FROM friend_requests
+      `SELECT id, from_player, to_player, status, created_at, responded_at FROM friend_requests
        WHERE from_player = $1 AND status = 'pending'
        ORDER BY created_at DESC`,
       [playerName]

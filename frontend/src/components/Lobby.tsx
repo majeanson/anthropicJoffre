@@ -8,6 +8,7 @@ import { SocialPanel } from './SocialPanel';
 import { StatsPanel } from './StatsPanel';
 import { GameCreationForm } from './GameCreationForm';
 import { JoinGameForm } from './JoinGameForm';
+import { ErrorBoundary } from './ErrorBoundary';
 import { PlayContent } from './PlayContent';
 import { SettingsContent } from './SettingsContent';
 import { Socket } from 'socket.io-client';

@@ -150,9 +150,9 @@ export function validateBet(
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
     const hasValidBets = game.currentBets.some(b => !b.skipped);
 
-    // Dealer MUST bet only if all other players have skipped
-    if (isDealer && !hasValidBets) {
-      return err('As dealer, you must place a bet when all other players have skipped.');
+    // Dealer CANNOT skip if there are valid bets
+    if (isDealer && hasValidBets) {
+      return err('As dealer, you cannot skip once betting has started. You must match or raise the current bet.');
     }
   }
 
@@ -233,6 +233,11 @@ export function validatePositionSwap(
   initiatorId: string,
   targetPlayerId: string
 ): ValidationResult {
+  // Check game phase
+  if (game.phase !== 'team_selection') {
+    return err('Position swapping is only allowed during team selection');
+  }
+
   const initiator = game.players.find(p => p.id === initiatorId);
   const target = game.players.find(p => p.id === targetPlayerId);
 
