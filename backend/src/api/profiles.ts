@@ -45,7 +45,7 @@ function requireAuth(req: Request, res: Response, next: NextFunction) {
  * GET /api/profiles/me
  * Get current user's profile and preferences
  */
-router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/me', requireAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user.user_id;
 
@@ -60,13 +60,13 @@ router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) 
     console.error('Error fetching profile:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-});
+}) as any);
 
 /**
  * PUT /api/profiles/me
  * Update current user's profile
  */
-router.put('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/me', requireAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user.user_id;
     const updates: ProfileUpdateData = req.body;
@@ -94,13 +94,13 @@ router.put('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) 
     console.error('Error updating profile:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-});
+}) as any);
 
 /**
  * GET /api/profiles/preferences
  * Get current user's preferences
  */
-router.get('/preferences', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.get('/preferences', requireAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user.user_id;
 
@@ -115,13 +115,13 @@ router.get('/preferences', requireAuth, async (req: AuthenticatedRequest, res: R
     console.error('Error fetching preferences:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-});
+}) as any);
 
 /**
  * PUT /api/profiles/preferences
  * Update current user's preferences
  */
-router.put('/preferences', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+router.put('/preferences', requireAuth, (async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user.user_id;
     const updates: PreferencesUpdateData = req.body;
@@ -137,7 +137,7 @@ router.put('/preferences', requireAuth, async (req: AuthenticatedRequest, res: R
     console.error('Error updating preferences:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
-});
+}) as any);
 
 /**
  * GET /api/profiles/:userId

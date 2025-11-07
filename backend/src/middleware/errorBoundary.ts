@@ -139,8 +139,8 @@ interface ErrorBoundaryConfig {
 export function withErrorBoundary<TArgs extends unknown[], TReturn = void>(
   handler: (this: Socket, ...args: TArgs) => TReturn | Promise<TReturn>,
   config: ErrorBoundaryConfig
-): (this: Socket, ...args: TArgs) => Promise<void> {
-  return async function (this: Socket, ...args: TArgs): Promise<void> {
+): any {
+  return async function (this: Socket, ...args: unknown[]): Promise<void> {
     const startTime = Date.now();
     const correlationId = generateCorrelationId();
     let success = true;
@@ -160,7 +160,7 @@ export function withErrorBoundary<TArgs extends unknown[], TReturn = void>(
     });
 
     try {
-      const result = handler.apply(this, args);
+      const result = handler.apply(this, args as TArgs);
 
       // If handler returns a promise, await it to catch async errors
       if (result instanceof Promise) {
@@ -194,7 +194,7 @@ export function withErrorBoundary<TArgs extends unknown[], TReturn = void>(
             address: this.handshake.address,
             time: this.handshake.time,
           },
-          arguments: args.length > 0 && typeof args[0] === 'object' ? Object.keys(args[0]) : args,
+          arguments: args.length > 0 && typeof args[0] === 'object' && args[0] !== null ? Object.keys(args[0]) : args,
         },
       });
 
@@ -255,7 +255,7 @@ export const errorBoundaries = {
    * Sends errors to client
    */
   gameAction: (handlerName: string) =>
-    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
+    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>): any =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -267,7 +267,7 @@ export const errorBoundaries = {
    * Sends errors to client with custom message
    */
   readOnly: (handlerName: string) =>
-    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
+    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>): any =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -279,12 +279,30 @@ export const errorBoundaries = {
    * Does not send errors to client
    */
   background: (handlerName: string) =>
-    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
+    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>): any =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: false,
       }),
 };
+
+/**
+ * Type-safe socket.on wrapper that handles error boundary wrapped handlers
+ *
+ * @example
+ * ```typescript
+ * safeSocketOn(socket, 'create_game', errorBoundaries.gameAction('create_game')((data) => {
+ *   // handler logic
+ * }));
+ * ```
+ */
+export function safeSocketOn(
+  socket: Socket,
+  event: string,
+  handler: any
+): void {
+  socket.on(event, handler);
+}
 
 /**
  * Error boundary for regular functions (non-socket handlers)

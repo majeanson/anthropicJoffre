@@ -14,7 +14,8 @@ import {
   GameEndData,
 } from '../types/achievements.js';
 import * as achievementDb from '../db/achievements.js';
-import { getPlayerStats, PlayerStats } from '../db/index.js';
+import { getPlayerStats } from '../db/index.js';
+import { PlayerStats } from '../types/game.js';
 
 /**
  * Check and unlock achievements for a player based on an event
@@ -33,10 +34,10 @@ export async function checkAchievements(
     // Check achievements based on event type
     switch (eventType) {
       case 'game_won':
-        await checkGameWonAchievements(playerName, stats, eventData, unlocked, progress);
+        await checkGameWonAchievements(playerName, stats, eventData as GameWonEventData | undefined, unlocked, progress);
         break;
       case 'bet_won':
-        await checkBetWonAchievements(playerName, stats, eventData, unlocked, progress);
+        await checkBetWonAchievements(playerName, stats, eventData as BetWonEventData | undefined, unlocked, progress);
         break;
       case 'red_zero_collected':
         await checkRedZeroAchievements(playerName, stats, unlocked, progress);
@@ -106,7 +107,7 @@ async function checkGameWonAchievements(
   }
 
   // Win streak tracking
-  if (eventData?.winStreak >= 5) {
+  if (eventData?.winStreak && eventData.winStreak >= 5) {
     const result = await achievementDb.unlockAchievement(playerName, 'win_streak_5');
     if (result.isNewUnlock) unlocked.push(result.achievement);
   }

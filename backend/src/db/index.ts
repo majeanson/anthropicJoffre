@@ -143,12 +143,17 @@ export const query = async (text: string, params?: unknown[], maxRetries = 3) =>
       // Calculate backoff: 100ms, 200ms, 400ms, 800ms...
       const backoffMs = Math.pow(2, attempt - 1) * 100;
 
+      const errorCode = typeof error === 'object' && error !== null && 'code' in error
+        ? (error as { code: string }).code
+        : undefined;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
       logger.warn('Database query retry', {
         attempt,
         maxRetries,
         backoffMs,
-        errorCode: error.code,
-        errorMessage: error.message,
+        errorCode,
+        errorMessage,
         query: text.substring(0, 100),
       });
 

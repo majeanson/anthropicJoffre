@@ -13,6 +13,15 @@ import winston from 'winston';
 import path from 'path';
 import { Request, Response, NextFunction } from 'express';
 
+// Augment Express Request type to include logger
+declare global {
+  namespace Express {
+    interface Request {
+      log: winston.Logger;
+    }
+  }
+}
+
 // Custom format for development (colorized, human-readable)
 const devFormat = winston.format.combine(
   winston.format.colorize(),

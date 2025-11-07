@@ -340,10 +340,15 @@ const gameCreateLimiter = rateLimit({
 });
 
 // Socket event rate limiters (stored per socket ID)
+interface RateLimiterData {
+  count: number;
+  lastReset: number;
+}
+
 const socketRateLimiters = {
-  chat: new Map<string, number>(), // Last message timestamp
-  bet: new Map<string, number>(), // Last bet timestamp
-  card: new Map<string, number>(), // Last card play timestamp
+  chat: new Map<string, RateLimiterData>(), // Rate limiter data
+  bet: new Map<string, RateLimiterData>(), // Rate limiter data
+  card: new Map<string, RateLimiterData>(), // Rate limiter data
 };
 
 

@@ -62,7 +62,7 @@ export function withRequestTracing<TData = unknown>(
       action,
       socketId: socket.id,
       userId: socket.data.userId,
-      gameId: data?.gameId,
+      gameId: (data && typeof data === 'object' && 'gameId' in data) ? (data as { gameId?: string }).gameId : undefined,
     };
 
     // Log request start
@@ -72,7 +72,7 @@ export function withRequestTracing<TData = unknown>(
         action,
         socketId: socket.id,
         userId: socket.data.userId,
-        gameId: data?.gameId,
+        gameId: metadata.gameId,
       });
     }
 
@@ -99,10 +99,10 @@ export function withRequestTracing<TData = unknown>(
         action,
         requestDuration: duration,
         userId: socket.data.userId,
-        gameId: data?.gameId,
+        gameId: metadata.gameId,
         metadata: {
           socketId: socket.id,
-          data: typeof data === 'object' ? Object.keys(data) : data,
+          data: typeof data === 'object' && data !== null ? Object.keys(data) : data,
         },
       });
 

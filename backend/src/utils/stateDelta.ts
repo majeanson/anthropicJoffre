@@ -78,11 +78,13 @@ function isEqual(a: unknown, b: unknown): boolean {
 
   // For objects, do shallow comparison (primitives only)
   if (typeof a === 'object' && !Array.isArray(a)) {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
+    const objA = a as Record<string, unknown>;
+    const objB = b as Record<string, unknown>;
+    const keysA = Object.keys(objA);
+    const keysB = Object.keys(objB);
     if (keysA.length !== keysB.length) return false;
 
-    return keysA.every(key => a[key] === b[key]);
+    return keysA.every(key => objA[key] === objB[key]);
   }
 
   // For arrays, compare length and elements
@@ -142,7 +144,8 @@ export function generateStateDelta(
   if (config.alwaysInclude) {
     for (const field of config.alwaysInclude) {
       if (field === 'id') continue; // Already included
-      (delta as Record<string, unknown>)[field] = (newState as Record<string, unknown>)[field];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (delta as any)[field] = (newState as any)[field];
     }
   }
 

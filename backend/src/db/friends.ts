@@ -269,9 +269,9 @@ export async function getFriendsWithStatus(playerName: string): Promise<FriendWi
     return result.rows.map((row: FriendWithStatusRow) => ({
       player_name: row.player_name,
       is_online: row.is_online,
-      status: row.status,
-      game_id: row.game_id,
-      friendship_date: row.friendship_date
+      status: (row.status as 'in_lobby' | 'in_game' | 'in_team_selection') || 'offline',
+      game_id: row.game_id || undefined,
+      friendship_date: new Date(row.friendship_date)
     }));
   } catch (error) {
     console.error('Error getting friends with status:', error);

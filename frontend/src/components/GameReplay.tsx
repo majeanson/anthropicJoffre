@@ -185,7 +185,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-bold transition-all"
               >
                 Close
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </div>
