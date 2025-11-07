@@ -182,6 +182,22 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
   // Health Check Endpoints
   // ============================================================================
 
+  // Lightweight ping endpoint for cold start wake-up
+  app.get('/api/ping', (req: Request, res: Response) => {
+    const memUsage = process.memoryUsage();
+    res.json({
+      status: 'ok',
+      timestamp: Date.now(),
+      memory: {
+        heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
+        heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024),
+        rssMB: Math.round(memUsage.rss / 1024 / 1024),
+      },
+      activeGames: games.size,
+      uptime: Math.floor(process.uptime()),
+    });
+  });
+
   app.get('/api/health', (req: Request, res: Response) => {
     const poolStats = getPoolStats();
     const cacheStats = queryCache.getStats();

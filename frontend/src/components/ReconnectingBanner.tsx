@@ -7,6 +7,7 @@ interface ReconnectingBannerProps {
 
 export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, maxAttempts }: ReconnectingBannerProps) {
   const progress = (attempt / maxAttempts) * 100;
+  const isFirstAttempt = attempt <= 2;
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
@@ -15,6 +16,13 @@ export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, ma
           <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
           <span className="font-bold">Reconnecting to game...</span>
         </div>
+
+        {/* Helpful hint for cold start */}
+        {isFirstAttempt && (
+          <p className="text-xs text-blue-100 mb-2">
+            ⏳ Server may be waking up (cold start). This can take 10-30 seconds...
+          </p>
+        )}
 
         {/* Attempt counter */}
         <div className="flex items-center justify-between text-sm mb-1">

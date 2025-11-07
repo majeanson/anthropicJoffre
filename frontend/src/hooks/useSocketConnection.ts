@@ -60,6 +60,31 @@ export function useSocketConnection() {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    // Pre-warm the server with a ping before establishing WebSocket connection
+    // This helps wake up the server if it's in cold start (Railway free tier)
+    const prewarmServer = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+        const response = await fetch(`${apiUrl}/api/ping`, {
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          console.log('✅ Server pre-warmed successfully');
+        }
+      } catch (error) {
+        // Silently fail - server might be cold starting
+        console.log('⏳ Server warming up...');
+      }
+    };
+
+    // Start pre-warming immediately
+    prewarmServer();
+
     const token = getAccessToken();
 
     const newSocket = io(SOCKET_URL, {

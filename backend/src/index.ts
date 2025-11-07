@@ -1492,6 +1492,36 @@ httpServer.listen(PORT, HOST, async () => {
     interval: '5 minutes',
   });
 
+  // ============= RAM USAGE MONITORING =============
+  // Log RAM usage every 30 seconds to monitor memory consumption
+  setInterval(() => {
+    const memUsage = process.memoryUsage();
+    const heapUsedMB = Math.round(memUsage.heapUsed / 1024 / 1024);
+    const heapTotalMB = Math.round(memUsage.heapTotal / 1024 / 1024);
+    const rssMB = Math.round(memUsage.rss / 1024 / 1024);
+    const heapPercent = Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100);
+
+    // Log basic info
+    console.log(`[RAM] Heap: ${heapUsedMB}MB / ${heapTotalMB}MB (${heapPercent}%) | RSS: ${rssMB}MB | Games: ${games.size}`);
+
+    // Warn if memory is high
+    if (heapPercent > 80) {
+      console.warn(`⚠️ [RAM] High memory usage: ${heapPercent}% (${heapUsedMB}MB / ${heapTotalMB}MB)`);
+    }
+
+    // Critical warning if memory is very high
+    if (heapPercent > 90) {
+      console.error(`🚨 [RAM] CRITICAL memory usage: ${heapPercent}% (${heapUsedMB}MB / ${heapTotalMB}MB)`);
+      logger.error('Critical memory usage detected', {
+        heapUsedMB,
+        heapTotalMB,
+        heapPercent,
+        rssMB,
+        activeGames: games.size,
+      });
+    }
+  }, 30000); // Every 30 seconds
+
   // ============= PERIODIC STATE SNAPSHOTS =============
   // Save game snapshots every 30 seconds for recovery (ONLY ELO games, NOT casual)
   setInterval(async () => {

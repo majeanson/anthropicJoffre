@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { GameState } from '../types/game';
 
 interface DebugPanelProps {
@@ -7,7 +8,53 @@ interface DebugPanelProps {
   onClose: () => void;
 }
 
+interface ServerHealth {
+  status: string;
+  memory: {
+    heapUsedMB: number;
+    heapTotalMB: number;
+    rssMB: number;
+  };
+  activeGames: number;
+  uptime: number;
+  timestamp: number;
+}
+
 export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelProps) {
+  const [serverHealth, setServerHealth] = useState<ServerHealth | null>(null);
+  const [healthError, setHealthError] = useState<string | null>(null);
+
+  // Fetch server health every 5 seconds when panel is open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchHealth = async () => {
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const response = await fetch(`${apiUrl}/api/ping`);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        setServerHealth(data);
+        setHealthError(null);
+      } catch (error) {
+        setHealthError(error instanceof Error ? error.message : 'Failed to fetch');
+        console.error('Failed to fetch server health:', error);
+      }
+    };
+
+    // Fetch immediately
+    fetchHealth();
+
+    // Then fetch every 5 seconds
+    const interval = setInterval(fetchHealth, 5000);
+
+    return () => clearInterval(interval);
+  }, [isOpen]);
+
   if (!isOpen || !gameState) return null;
 
   const highestBidder = gameState.highestBet
@@ -77,6 +124,74 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
                 <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{gameState.trump || 'Not set'}</p>
               </div>
             </div>
+          </section>
+
+          {/* Server Health */}
+          <section aria-labelledby="server-health-heading">
+            <h3 id="server-health-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
+              🖥️ Server Health
+            </h3>
+            {healthError ? (
+              <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4 text-center">
+                <p className="text-red-700 font-semibold">⚠️ Unable to fetch server health</p>
+                <p className="text-sm text-red-600 mt-1">{healthError}</p>
+              </div>
+            ) : serverHealth ? (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 rounded-lg p-4">
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Status:</span>
+                  <p className="text-lg font-bold text-green-600">{serverHealth.status.toUpperCase()}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Uptime:</span>
+                  <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                    {Math.floor(serverHealth.uptime / 60)}m {serverHealth.uptime % 60}s
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Active Games:</span>
+                  <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{serverHealth.activeGames}</p>
+                </div>
+                <div>
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Heap Used:</span>
+                  <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                    {serverHealth.memory.heapUsedMB}MB
+                  </p>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Memory:</span>
+                  <div className="mt-1">
+                    <div className="w-full bg-gray-200 rounded-full h-4">
+                      <div
+                        className={`h-4 rounded-full transition-all duration-300 ${
+                          (serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) > 0.8
+                            ? 'bg-red-500'
+                            : (serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) > 0.6
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
+                        }`}
+                        style={{
+                          width: `${(serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100}%`,
+                        }}
+                      ></div>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      {serverHealth.memory.heapUsedMB}MB / {serverHealth.memory.heapTotalMB}MB
+                      ({Math.round((serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100)}%)
+                    </p>
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">RSS (Total):</span>
+                  <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{serverHealth.memory.rssMB}MB</p>
+                  <p className="text-xs text-gray-500 mt-1">Resident Set Size (all memory)</p>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <p className="text-gray-500">Loading server health...</p>
+              </div>
+            )}
           </section>
 
           {/* Team Scores */}
