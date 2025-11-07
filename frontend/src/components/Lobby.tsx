@@ -328,24 +328,27 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       Logout
                     </button>
                   </div>
-                ) : playerName.trim() ? (
-                  <p className="text-sm text-umber-600 dark:text-gray-400 font-medium">
-                    Playing as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
-                  </p>
                 ) : (
-                  <div className="flex items-center justify-center gap-2">
-                    <button
-                      onClick={onShowLogin}
-                      className="text-sm px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
-                    >
-                      Login
-                    </button>
-                    <button
-                      onClick={onShowRegister}
-                      className="text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
-                    >
-                      Register
-                    </button>
+                  <div className="flex flex-col items-center gap-2">
+                    {playerName.trim() && (
+                      <p className="text-xs text-umber-600 dark:text-gray-400 font-medium">
+                        Playing as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
+                      </p>
+                    )}
+                    <div className="flex items-center justify-center gap-2">
+                      <button
+                        onClick={onShowLogin}
+                        className="text-sm px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
+                      >
+                        Login
+                      </button>
+                      <button
+                        onClick={onShowRegister}
+                        className="text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
+                      >
+                        Register
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
