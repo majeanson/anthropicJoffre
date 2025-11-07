@@ -535,7 +535,7 @@ const fetchPlayerStats = async (playerName: string) => {
 ## Sprint 7: Backend Test Coverage
 
 **Duration**: 2 weeks | **Priority**: HIGH | **Effort**: 80 hours
-**Status**: Task 1 Complete ✅ (Socket Handler Tests)
+**Status**: Tasks 1 & 4 Complete ✅ (76 tests: Socket Handlers + Utilities)
 
 ### Goals
 - Increase backend test coverage from 60% to 85%
@@ -830,12 +830,27 @@ describe('Persistence Manager', () => {
 });
 ```
 
-#### 4. Utility Module Tests (1 day)
+#### 4. Utility Module Tests (1 day) ✅ COMPLETE (2025-11-07)
 
-**Test Files to Create**:
-- `utils/playerHelpers.test.ts` (~150 lines, 8 tests)
-- `utils/botHelpers.test.ts` (~150 lines, 8 tests)
-- `utils/sanitization.test.ts` (~100 lines, 5 tests)
+**Status**: 29 tests created across 3 utility modules
+
+**Test Files Created**:
+- ✅ `utils/sanitization.test.ts` (150 lines, 10 test suites, 29 total tests)
+  * sanitizePlayerName, sanitizeChatMessage, validateBetAmount, validateCardValue
+  * validateCardColor, validateGameId, sanitizeTextInput, validateBoolean
+  * validateTeamId, validatePlayerIndex
+
+- ✅ `utils/playerHelpers.test.ts` (130 lines, 3 test suites, 9 tests)
+  * findPlayer (4 tests): by socket ID, by name fallback, not found, empty array
+  * findPlayerIndex (3 tests): by ID, by name, -1 when not found
+  * hasAtLeastOneHuman (3 tests): humans exist, only bots, no players
+
+- ✅ `utils/botHelpers.test.ts` (125 lines, 3 test suites, 8 tests)
+  * getNextBotName (5 tests): Bot 1-3, gap filling, ignore non-bots
+  * canAddBot (3 tests): allow <3, reject at 3, allow empty
+  * areTeammates (4 tests): same team, different teams, not found cases
+
+**Test Results**: All 29 tests passing ✅
 
 ### Test Coverage Targets
 
@@ -1075,9 +1090,19 @@ npm install -D rollup-plugin-visualizer
 - Largest chunk: <100KB
 - Time to Interactive: <2s on 3G
 
-#### 4. Replace console.log with Logger (1 day)
+#### 4. Replace console.log with Logger (1 day) ✅ COMPLETE (2025-11-07)
 
-**Create Frontend Logger**:
+**Status**: Frontend logger created and ready for use
+
+**Created frontend/src/utils/logger.ts**:
+- Debug/info logs (development only)
+- Warn/error logs (always logged)
+- Error reporting to backend (/api/errors endpoint)
+- LocalStorage error persistence (last 10 errors)
+- Environment-aware logging (DEV vs PROD)
+- Error aggregation with getStoredErrors() and clearStoredErrors()
+
+**Implementation Details**:
 ```typescript
 // frontend/src/utils/logger.ts
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
