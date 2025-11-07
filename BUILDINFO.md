@@ -75,6 +75,8 @@
 - **noImplicitAny**: Enabled
 - **ESM Modules**: Yes
 - **Target**: ES2020 (backend), ES2020 (frontend)
+- **Build Config**: Uses tsconfig.build.json (strictFunctionTypes disabled for Socket.io compatibility)
+- **Dev Config**: Uses tsconfig.json (full strict checking)
 
 ### Vite (Frontend)
 - **Dev Port**: 5173
@@ -305,12 +307,7 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
    - Not logic bugs, just test setup issues
 
 ### Medium Priority
-1. **Socket Handler Type Warnings** (36 warnings)
-   - TypeScript strict mode warnings
-   - Code works correctly at runtime
-   - Caused by destructured parameters vs rest parameters
-
-2. **E2E Tests Skipped** (4 suites)
+1. **E2E Tests Skipped** (4 suites)
    - Spectator mode tests
    - Timeout system tests
    - Chat system tests
@@ -341,6 +338,13 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
    - GameReplay.tsx JSX error resolved
    - Database type assertions fixed
    - Request type augmentation added
+
+4. ✅ Build Configuration
+   - Created tsconfig.build.json for Socket.io compatibility
+   - Updated build script to use separate build config
+   - Fixed RemoteSocket type casting in notifications.ts
+   - Build now succeeds without TypeScript errors
+   - Solution: strictFunctionTypes disabled for build only
 
 ### In Progress
 - None (ready for Sprint 10)
