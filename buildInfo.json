@@ -1,7 +1,7 @@
 {
-  "version": "1.8.0",
+  "version": "1.8.1",
   "releaseDate": "2025-11-06",
-  "sprint": "Sprint 4 - Code Optimization & Bundle Performance",
+  "sprint": "Sprint 4 - Code Optimization & Bug Fixes",
   "phases": {
     "phase4.3": {
       "name": "Lobby Component Extraction",
@@ -120,6 +120,23 @@
         "Performance mode",
         "Cache clearing"
       ]
+    },
+    "phase4.6": {
+      "name": "UX Bug Fixes & Polish",
+      "status": "✅ Completed",
+      "duration": "1-2 hours",
+      "features": [
+        "Centered confetti animation over trick area (reduced particles 25→15)",
+        "Fixed +Points badges z-index (mobile)",
+        "Fixed achievement buttons in gaming phase",
+        "Removed debug console from settings panel",
+        "Fixed dealer bet skip logic (must bet if all others skipped)",
+        "Clear toasts when leaving game",
+        "Added date display to global chat messages",
+        "Enabled stats viewing for unfinished games",
+        "Disabled ranked features for non-registered users",
+        "Added authentication gate with toast notifications"
+      ]
     }
   },
   "totalDuration": "5-8 hours (Sprint 4 only)",
@@ -177,7 +194,11 @@
     "Improved initial page load performance",
     "Enhanced code modularity and testability",
     "Better separation of concerns across components",
-    "Improved developer experience with smaller, focused files"
+    "Improved developer experience with smaller, focused files",
+    "Fixed 10 UX bugs: confetti positioning, z-index, achievements, dealer logic, toasts, chat dates, stats viewing, ranked features",
+    "Added authentication gates with informative toast messages",
+    "Improved mobile UI with proper z-index layering",
+    "Enhanced chat with date display for historical messages"
   ],
   "upcomingFeatures": [
     "Private game invitations",
@@ -194,16 +215,17 @@
     "e2e": "⚠️ Some tests need refactoring"
   },
   "notes": [
-    "Sprint 4 successfully completed phases 4.3, 4.4, and 4.5",
-    "Major code refactoring and optimization sprint",
+    "Sprint 4 successfully completed phases 4.3, 4.4, 4.5, and 4.6",
+    "Major code refactoring and optimization sprint + UX bug fixes",
     "Reduced total codebase complexity by extracting 6 components and 1 hook",
     "Achieved 78% reduction in main bundle size",
     "Improved initial load performance by 13% (gzipped)",
     "Better browser caching with vendor chunk splitting",
+    "Fixed 10 critical UX bugs (v1.8.1)",
     "All 150 backend tests passing",
     "TypeScript compilation successful with no errors",
     "Bundle visualization available at dist/stats.html",
     "Production build optimized with Terser minification",
-    "Ready for production deployment with improved performance"
+    "Ready for production deployment with improved performance and UX"
   ]
 }
