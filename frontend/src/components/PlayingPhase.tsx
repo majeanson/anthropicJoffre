@@ -1095,6 +1095,7 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             playerName={trickWinner.playerName}
             points={trickWinner.points}
             teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
+            position={trickWinner.position}
           />
         </>
       )}
