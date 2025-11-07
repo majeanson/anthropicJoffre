@@ -30,6 +30,15 @@ import {
 } from './chatHelpers';
 
 /**
+ * Database chat message type (snake_case from database)
+ */
+interface DbChatMessage {
+  player_name: string;
+  message: string;
+  created_at: Date;
+}
+
+/**
  * Dependencies needed by the chat handlers
  */
 export interface ChatHandlersDependencies {
@@ -51,7 +60,7 @@ export interface ChatHandlersDependencies {
   // Utility
   logger: Logger;
   errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
+    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
   };
 }
 
@@ -114,7 +123,7 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
     try {
       const dbMessages = await getLobbyChat(limit || 100);
       // Map snake_case DB fields to camelCase for frontend
-      const messages = dbMessages.map((msg: any) => ({
+      const messages = dbMessages.map((msg: DbChatMessage) => ({
         playerName: msg.player_name,
         message: msg.message,
         createdAt: msg.created_at

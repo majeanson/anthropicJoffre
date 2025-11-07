@@ -46,7 +46,7 @@ export interface ErrorContext {
   requestDuration?: number;
 
   // Additional data
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 /**
@@ -129,7 +129,7 @@ export class GameError extends Error {
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
 }
 
 /**
@@ -148,7 +148,7 @@ export interface ErrorResponse {
 /**
  * Success response
  */
-export interface SuccessResponse<T = any> {
+export interface SuccessResponse<T = unknown> {
   success: true;
   data: T;
 }
@@ -156,4 +156,4 @@ export interface SuccessResponse<T = any> {
 /**
  * API response type (success or error)
  */
-export type ApiResponse<T = any> = SuccessResponse<T> | ErrorResponse;
+export type ApiResponse<T = unknown> = SuccessResponse<T> | ErrorResponse;

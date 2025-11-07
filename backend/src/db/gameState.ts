@@ -141,7 +141,7 @@ export async function listActiveGames(options?: {
       AND LENGTH(game_id) >= ${GAME_ID_LENGTH}
   `;
 
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCount = 1;
 
   if (options?.status) {

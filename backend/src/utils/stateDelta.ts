@@ -70,7 +70,7 @@ const DEFAULT_CONFIG: DeltaConfig = {
 /**
  * Deep equality check for primitive values and simple objects
  */
-function isEqual(a: any, b: any): boolean {
+function isEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (a === null || b === null) return false;
   if (a === undefined || b === undefined) return false;
@@ -110,7 +110,7 @@ function diffPlayer(oldPlayer: Player, newPlayer: Player): Partial<Player> | nul
 
   for (const field of primitiveFields) {
     if (oldPlayer[field] !== newPlayer[field]) {
-      (changes as any)[field] = newPlayer[field];
+      (changes as Record<string, unknown>)[field] = newPlayer[field];
       hasChanges = true;
     }
   }
@@ -142,7 +142,7 @@ export function generateStateDelta(
   if (config.alwaysInclude) {
     for (const field of config.alwaysInclude) {
       if (field === 'id') continue; // Already included
-      (delta as any)[field] = newState[field];
+      (delta as Record<string, unknown>)[field] = (newState as Record<string, unknown>)[field];
     }
   }
 

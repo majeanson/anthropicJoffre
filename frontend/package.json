@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:analyze": "tsc && vite build && open dist/stats.html",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",

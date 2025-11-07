@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, Suspense, lazy } from 'react';
+import { useEffect, useState, useCallback, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
 import { GameHistoryEntry } from '../types/game';
@@ -207,6 +207,62 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     if (!isOpen || activeTab !== 'profile' || !isOwnProfile) return;
     loadProfile();
   }, [isOpen, activeTab, isOwnProfile, loadProfile]);
+
+  // Sprint 8 Task 2: Memoized computations for performance optimization
+  // Calculate win rate percentage
+  const winRate = useMemo(() => {
+    if (!stats || stats.games_played === 0) return '0.0';
+    return ((stats.games_won / stats.games_played) * 100).toFixed(1);
+  }, [stats?.games_won, stats?.games_played]);
+
+  // Calculate recent performance (wins in last 10 games)
+  const recentPerformance = useMemo(() => {
+    if (!gameHistory || gameHistory.length === 0) return 0;
+    return gameHistory
+      .filter(g => g.is_finished)
+      .slice(0, 10)
+      .filter(g => g.winning_team === g.team_id)
+      .length;
+  }, [gameHistory]);
+
+  // Filter and sort game history for display
+  const filteredAndSortedGames = useMemo(() => {
+    let filteredGames = gameHistory.filter(game =>
+      historyTab === 'finished' ? game.is_finished : !game.is_finished
+    );
+
+    // Apply result filter for finished games
+    if (historyTab === 'finished' && resultFilter !== 'all') {
+      filteredGames = filteredGames.filter(game => {
+        const playerTeamId = game.team_id;
+        const didWin = game.winning_team === playerTeamId;
+        return resultFilter === 'won' ? didWin : !didWin;
+      });
+    }
+
+    // Apply sorting
+    return [...filteredGames].sort((a, b) => {
+      let comparison = 0;
+
+      switch (sortBy) {
+        case 'date':
+          const dateA = new Date(a.finished_at || a.created_at).getTime();
+          const dateB = new Date(b.finished_at || b.created_at).getTime();
+          comparison = dateB - dateA; // Newest first by default
+          break;
+        case 'score':
+          const scoreA = Math.abs(a.team1_score - a.team2_score);
+          const scoreB = Math.abs(b.team1_score - b.team2_score);
+          comparison = scoreB - scoreA; // Bigger score difference first
+          break;
+        case 'rounds':
+          comparison = b.rounds - a.rounds; // More rounds first
+          break;
+      }
+
+      return sortOrder === 'desc' ? comparison : -comparison;
+    });
+  }, [gameHistory, historyTab, resultFilter, sortBy, sortOrder]);
 
   if (!isOpen) return null;
 
@@ -705,82 +761,43 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                     </div>
                   )}
 
-                  {!historyLoading && gameHistory.length > 0 && (() => {
-                    let filteredGames = gameHistory.filter(game =>
-                      historyTab === 'finished' ? game.is_finished : !game.is_finished
-                    );
-
-                    // Apply result filter for finished games
-                    if (historyTab === 'finished' && resultFilter !== 'all') {
-                      filteredGames = filteredGames.filter(game => {
-                        const playerTeamId = game.team_id;
-                        const didWin = game.winning_team === playerTeamId;
-                        return resultFilter === 'won' ? didWin : !didWin;
-                      });
-                    }
-
-                    // Apply sorting
-                    filteredGames = [...filteredGames].sort((a, b) => {
-                      let comparison = 0;
-
-                      switch (sortBy) {
-                        case 'date':
-                          const dateA = new Date(a.finished_at || a.created_at).getTime();
-                          const dateB = new Date(b.finished_at || b.created_at).getTime();
-                          comparison = dateB - dateA; // Newest first by default
-                          break;
-                        case 'score':
-                          const scoreA = Math.abs(a.team1_score - a.team2_score);
-                          const scoreB = Math.abs(b.team1_score - b.team2_score);
-                          comparison = scoreB - scoreA; // Bigger score difference first
-                          break;
-                        case 'rounds':
-                          comparison = b.rounds - a.rounds; // More rounds first
-                          break;
-                      }
-
-                      return sortOrder === 'desc' ? comparison : -comparison;
-                    });
-
-                    if (filteredGames.length === 0) {
-                      const filterText = resultFilter === 'won' ? 'wins' : resultFilter === 'lost' ? 'losses' : historyTab + ' games';
-                      return (
+                  {!historyLoading && gameHistory.length > 0 && (
+                    <>
+                      {filteredAndSortedGames.length === 0 ? (
                         <div className="text-center py-12">
                           <span className="text-4xl">🔍</span>
                           <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold">
-                            No {filterText} found
+                            No {resultFilter === 'won' ? 'wins' : resultFilter === 'lost' ? 'losses' : historyTab + ' games'} found
                           </p>
                         </div>
-                      );
-                    }
-
-                    return (
-                      <>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          Showing {filteredGames.length} {historyTab} game{filteredGames.length !== 1 ? 's' : ''}
-                          {historyTab === 'finished' && resultFilter !== 'all' && (
-                            <span className="font-semibold"> ({resultFilter === 'won' ? 'wins only' : 'losses only'})</span>
-                          )}
-                        </p>
-                        <div className="space-y-3">
-                          {filteredGames.map((game) => (
-                            <MatchCard
-                              key={game.game_id}
-                              game={game}
-                              onViewReplay={onViewReplay ? (gameId) => {
-                                onViewReplay(gameId);
-                                onClose();
-                              } : undefined}
-                              onViewDetails={(gameId) => {
-                                setSelectedMatchId(gameId);
-                                setShowMatchStatsModal(true);
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </>
-                    );
-                  })()}
+                      ) : (
+                        <>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                            Showing {filteredAndSortedGames.length} {historyTab} game{filteredAndSortedGames.length !== 1 ? 's' : ''}
+                            {historyTab === 'finished' && resultFilter !== 'all' && (
+                              <span className="font-semibold"> ({resultFilter === 'won' ? 'wins only' : 'losses only'})</span>
+                            )}
+                          </p>
+                          <div className="space-y-3">
+                            {filteredAndSortedGames.map((game) => (
+                              <MatchCard
+                                key={game.game_id}
+                                game={game}
+                                onViewReplay={onViewReplay ? (gameId) => {
+                                  onViewReplay(gameId);
+                                  onClose();
+                                } : undefined}
+                                onViewDetails={(gameId) => {
+                                  setSelectedMatchId(gameId);
+                                  setShowMatchStatsModal(true);
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </>
+                      )}
+                    </>
+                  )}
                 </div>
               )}
 

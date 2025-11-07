@@ -81,7 +81,7 @@ export interface LobbyHandlersDependencies {
   // Utility
   logger: Logger;
   errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
+    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
   };
 }
 

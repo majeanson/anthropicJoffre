@@ -41,13 +41,34 @@ export interface AchievementUnlockPayload {
   isNewUnlock: boolean;
 }
 
+/**
+ * Event data for different achievement triggers
+ */
+export interface GameWonEventData {
+  wasComeback?: boolean;
+  perfectGame?: boolean;
+  winStreak?: number;
+}
+
+export interface BetWonEventData {
+  hadTrump?: boolean;
+}
+
+export interface GameEndData {
+  won: boolean;
+  brownZerosCollected: number;
+  roundsAsLowestScorer: number;
+}
+
+export type AchievementEventData = GameWonEventData | BetWonEventData | Record<string, never>;
+
 // Achievement check context - data passed to achievement checkers
 export interface AchievementCheckContext {
   playerName: string;
   gameId?: string;
-  gameState?: any; // GameState type from game.ts
+  gameState?: import('./game').GameState;
   eventType: AchievementEventType;
-  eventData?: any;
+  eventData?: AchievementEventData;
 }
 
 export type AchievementEventType =

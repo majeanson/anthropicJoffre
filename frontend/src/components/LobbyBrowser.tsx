@@ -1,8 +1,31 @@
-import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
+
+// Sprint 8 Task 2: Move pure helper functions outside component for performance
+const getPhaseColor = (phase: string) => {
+  switch (phase) {
+    case 'team_selection': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+    case 'betting': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+    case 'playing': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+    case 'scoring': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+    case 'game_over': return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
+    default: return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
+  }
+};
+
+const getPhaseLabel = (phase: string) => {
+  switch (phase) {
+    case 'team_selection': return 'Team Selection';
+    case 'betting': return 'Betting';
+    case 'playing': return 'Playing';
+    case 'scoring': return 'Scoring';
+    case 'game_over': return 'Game Over';
+    default: return phase;
+  }
+};
 
 interface LobbyGame {
   gameId: string;
@@ -263,27 +286,18 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
     return filtered;
   }, [games, filterWithBots, filterNeedsPlayers, filterInProgress, sortBy]);
 
-  const getPhaseColor = (phase: string) => {
-    switch (phase) {
-      case 'team_selection': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'betting': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-      case 'playing': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'scoring': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-      case 'game_over': return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
-      default: return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
-    }
-  };
+  // Sprint 8 Task 2: Memoize event handlers for better performance
+  const handleJoinGame = useCallback((gameId: string) => {
+    onJoinGame(gameId);
+  }, [onJoinGame]);
 
-  const getPhaseLabel = (phase: string) => {
-    switch (phase) {
-      case 'team_selection': return 'Team Selection';
-      case 'betting': return 'Betting';
-      case 'playing': return 'Playing';
-      case 'scoring': return 'Scoring';
-      case 'game_over': return 'Game Over';
-      default: return phase;
-    }
-  };
+  const handleSpectateGame = useCallback((gameId: string) => {
+    onSpectateGame(gameId);
+  }, [onSpectateGame]);
+
+  const handleViewReplay = useCallback((gameId: string) => {
+    setReplayGameId(gameId);
+  }, []);
 
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {

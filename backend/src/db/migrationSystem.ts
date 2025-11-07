@@ -177,14 +177,15 @@ if (require.main === module) {
   const migrationsDir = join(__dirname, 'migrations');
   const isDryRun = process.argv.includes('--dry-run');
 
-  runMigrations(migrationsDir, isDryRun)
-    .then(() => {
+  (async () => {
+    try {
+      await runMigrations(migrationsDir, isDryRun);
       closePool();
       process.exit(0);
-    })
-    .catch(error => {
+    } catch (error) {
       console.error(error);
       closePool();
       process.exit(1);
-    });
+    }
+  })();
 }

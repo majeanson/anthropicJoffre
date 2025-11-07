@@ -133,8 +133,8 @@ function checkGlobalRateLimit(socketId: string): { limited: boolean; message?: s
  * }));
  * ```
  */
-export function rateLimitMiddleware(eventName: string, handler: (...args: any[]) => void) {
-  return function (this: Socket, ...args: any[]) {
+export function rateLimitMiddleware(eventName: string, handler: (...args: unknown[]) => void) {
+  return function (this: Socket, ...args: unknown[]) {
     const socketId = this.id;
 
     // Check global rate limit first

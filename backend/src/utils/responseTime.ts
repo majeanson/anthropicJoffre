@@ -5,6 +5,8 @@
  * Provides performance insights for Sprint 2 optimization goals.
  */
 
+import { Request, Response, NextFunction } from 'express';
+
 export interface ResponseTimeMetric {
   name: string; // Endpoint or event name
   count: number; // Total number of calls
@@ -154,7 +156,7 @@ export const responseTimeTracker = new ResponseTimeTracker(1000);
 /**
  * Express middleware for tracking REST endpoint response times
  */
-export function responseTimeMiddleware(req: any, res: any, next: any): void {
+export function responseTimeMiddleware(req: Request, res: Response, next: NextFunction): void {
   const startTime = Date.now();
   const route = `${req.method} ${req.route?.path || req.path}`;
 
@@ -175,7 +177,7 @@ export function responseTimeMiddleware(req: any, res: any, next: any): void {
 /**
  * Wrapper for Socket.io event handlers to track response times
  */
-export function trackSocketEvent<T extends any[]>(
+export function trackSocketEvent<T extends unknown[]>(
   eventName: string,
   handler: (...args: T) => void | Promise<void>
 ): (...args: T) => Promise<void> {

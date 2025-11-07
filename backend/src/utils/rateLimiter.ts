@@ -7,6 +7,8 @@
  * Sprint 2 Task #4: Enhanced rate limiting
  */
 
+import { Socket } from 'socket.io';
+
 interface RateLimitConfig {
   windowMs: number; // Time window in milliseconds
   maxRequests: number; // Maximum requests allowed in window
@@ -259,7 +261,7 @@ export function startRateLimiterCleanup(): NodeJS.Timeout {
 /**
  * Get IP address from socket
  */
-export function getSocketIP(socket: any): string {
+export function getSocketIP(socket: Socket): string {
   // Try handshake first (most reliable)
   const handshakeIP = socket.handshake?.address;
   if (handshakeIP) return handshakeIP;

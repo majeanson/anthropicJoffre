@@ -136,7 +136,7 @@ interface ErrorBoundaryConfig {
  * ));
  * ```
  */
-export function withErrorBoundary<TArgs extends any[], TReturn = void>(
+export function withErrorBoundary<TArgs extends unknown[], TReturn = void>(
   handler: (this: Socket, ...args: TArgs) => TReturn | Promise<TReturn>,
   config: ErrorBoundaryConfig
 ): (this: Socket, ...args: TArgs) => Promise<void> {
@@ -148,7 +148,7 @@ export function withErrorBoundary<TArgs extends any[], TReturn = void>(
 
     // Extract context from socket and arguments
     const userId = this.data?.userId;
-    const gameId = args.length > 0 && typeof args[0] === 'object' ? (args[0] as any)?.gameId : undefined;
+    const gameId = args.length > 0 && typeof args[0] === 'object' && args[0] !== null && 'gameId' in args[0] ? (args[0] as { gameId: string }).gameId : undefined;
 
     // Log request start (debug level)
     logger.debug('Socket handler started', {
@@ -255,7 +255,7 @@ export const errorBoundaries = {
    * Sends errors to client
    */
   gameAction: (handlerName: string) =>
-    <TArgs extends any[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
+    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -267,7 +267,7 @@ export const errorBoundaries = {
    * Sends errors to client with custom message
    */
   readOnly: (handlerName: string) =>
-    <TArgs extends any[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
+    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -279,7 +279,7 @@ export const errorBoundaries = {
    * Does not send errors to client
    */
   background: (handlerName: string) =>
-    <TArgs extends any[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
+    <TArgs extends unknown[]>(handler: (this: Socket, ...args: TArgs) => void | Promise<void>) =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: false,
@@ -297,7 +297,7 @@ export const errorBoundaries = {
  * );
  * ```
  */
-export function withFunctionErrorBoundary<TArgs extends any[], TReturn>(
+export function withFunctionErrorBoundary<TArgs extends unknown[], TReturn>(
   fn: (...args: TArgs) => TReturn | Promise<TReturn>,
   functionName: string
 ): (...args: TArgs) => Promise<TReturn | undefined> {

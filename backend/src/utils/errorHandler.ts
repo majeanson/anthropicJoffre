@@ -13,8 +13,27 @@ import {
   ErrorCategory,
   PlayerErrorContext,
 } from '../types/errors.js';
-import { GameState } from '../types/game.js';
+import { GameState, CardColor } from '../types/game.js';
 import { randomBytes } from 'crypto';
+
+/**
+ * Sanitized game state structure for logging
+ */
+interface SanitizedGameState {
+  id?: string;
+  phase?: string;
+  currentPlayerIndex?: number;
+  dealerIndex?: number;
+  trump?: CardColor | null;
+  currentTrick?: { length: number } | undefined;
+  players?: Array<{
+    id: string;
+    name: string;
+    teamId: 1 | 2;
+    handSize: number;
+    isBot?: boolean;
+  }>;
+}
 
 /**
  * Generate unique correlation ID for request tracing
@@ -89,7 +108,7 @@ export function extractCallChain(stack?: string): string[] {
 /**
  * Sanitize game state for logging (remove sensitive/large data)
  */
-export function sanitizeGameState(gameState?: GameState | Partial<GameState>): any {
+export function sanitizeGameState(gameState?: GameState | Partial<GameState>): SanitizedGameState | undefined {
   if (!gameState) return undefined;
 
   return {
@@ -97,14 +116,14 @@ export function sanitizeGameState(gameState?: GameState | Partial<GameState>): a
     phase: gameState.phase,
     currentPlayerIndex: gameState.currentPlayerIndex,
     dealerIndex: gameState.dealerIndex,
-    trumpColor: (gameState as any).trumpColor,
-    currentTrick: (gameState as any).currentTrick?.length ? { length: (gameState as any).currentTrick.length } : undefined,
+    trump: gameState.trump,
+    currentTrick: gameState.currentTrick?.length ? { length: gameState.currentTrick.length } : undefined,
     // Don't include full player hands (too much data)
     players: gameState.players?.map(p => ({
       id: p.id,
       name: p.name,
       teamId: p.teamId,
-      handSize: (p as any).hand?.length || 0,
+      handSize: p.hand?.length || 0,
       isBot: p.isBot,
     })),
   };
@@ -251,11 +270,11 @@ export function createErrorResponse(
 /**
  * Wrap async function with error handling
  */
-export function withErrorHandling<T extends (...args: any[]) => Promise<any>>(
+export function withErrorHandling<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
   context: { action: string; file?: string; function?: string }
 ): T {
-  return (async (...args: any[]) => {
+  return (async (...args: unknown[]) => {
     const correlationId = generateCorrelationId();
     const startTime = Date.now();
 

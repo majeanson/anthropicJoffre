@@ -50,18 +50,25 @@ export const getPool = () => {
 /**
  * Check if database error is retryable
  */
-function isRetryableError(error: any): boolean {
+function isRetryableError(error: unknown): boolean {
+  // Type guard: check if error has a code property
+  if (typeof error !== 'object' || error === null || !('code' in error)) {
+    return false;
+  }
+
+  const errorCode = (error as { code: string }).code;
+
   // Network errors
-  if (['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED'].includes(error.code)) {
+  if (['ECONNRESET', 'ETIMEDOUT', 'ENOTFOUND', 'ECONNREFUSED'].includes(errorCode)) {
     return true;
   }
 
   // PostgreSQL specific retryable errors
-  if (error.code === '40001') return true; // serialization_failure
-  if (error.code === '40P01') return true; // deadlock_detected
-  if (error.code === '53300') return true; // too_many_connections
-  if (error.code === '08006') return true; // connection_failure
-  if (error.code === '08003') return true; // connection_does_not_exist
+  if (errorCode === '40001') return true; // serialization_failure
+  if (errorCode === '40P01') return true; // deadlock_detected
+  if (errorCode === '53300') return true; // too_many_connections
+  if (errorCode === '08006') return true; // connection_failure
+  if (errorCode === '08003') return true; // connection_does_not_exist
 
   return false;
 }
@@ -80,13 +87,13 @@ function sleep(ms: number): Promise<void> {
  * Sprint 3: Added query performance logging in production for slow queries
  * Sprint 6: Added retry logic with exponential backoff for transient failures
  */
-export const query = async (text: string, params?: any[], maxRetries = 3) => {
+export const query = async (text: string, params?: unknown[], maxRetries = 3) => {
   const dbPool = getPool();
   if (!dbPool) {
     throw new Error('Database not configured. Set DATABASE_URL environment variable.');
   }
 
-  let lastError: any;
+  let lastError: unknown;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -111,7 +118,7 @@ export const query = async (text: string, params?: any[], maxRetries = 3) => {
       }
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       lastError = error;
 
       // Check if error is retryable
@@ -119,9 +126,14 @@ export const query = async (text: string, params?: any[], maxRetries = 3) => {
 
       if (!shouldRetry) {
         // Not retryable or out of retries, throw immediately
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorCode = typeof error === 'object' && error !== null && 'code' in error
+          ? (error as { code: string }).code
+          : undefined;
+
         logger.error('Database query failed', {
-          error: error.message,
-          code: error.code,
+          error: errorMessage,
+          code: errorCode,
           query: text.substring(0, 100),
           attempt,
         });

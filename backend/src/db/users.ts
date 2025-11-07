@@ -325,7 +325,7 @@ export async function updateUserProfile(
 ): Promise<User | null> {
   try {
     const setClauses: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
     let paramIndex = 1;
 
     if (updates.display_name !== undefined) {

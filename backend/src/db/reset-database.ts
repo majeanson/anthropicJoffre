@@ -255,18 +255,19 @@ async function resetDatabase() {
 
 // Run the reset if this file is executed directly
 if (require.main === module) {
-  resetDatabase()
-    .then(() => {
+  (async () => {
+    try {
+      await resetDatabase();
       console.log('📊 Neon Database Usage Note:');
       console.log('   - Tables are now optimized with indexes');
       console.log('   - This reduces compute time for queries');
       console.log('   - Connection pooling will further reduce usage');
       process.exit(0);
-    })
-    .catch(error => {
+    } catch (error) {
       console.error('Fatal error:', error);
       process.exit(1);
-    });
+    }
+  })();
 }
 
 export default resetDatabase;

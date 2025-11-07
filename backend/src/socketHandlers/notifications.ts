@@ -17,26 +17,33 @@ import {
 import { Notification } from '../types/notifications';
 
 /**
+ * Socket with authentication data
+ */
+interface SocketWithAuth extends Socket {
+  userId?: number;
+}
+
+/**
  * Dependencies needed by notification handlers
  */
 export interface NotificationHandlersDependencies {
   io: Server;
   logger: Logger;
   errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
+    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
   };
 }
 
 /**
  * Register notification socket handlers
  */
-export function registerNotificationHandlers(socket: Socket, deps: NotificationHandlersDependencies): void {
+export function registerNotificationHandlers(socket: SocketWithAuth, deps: NotificationHandlersDependencies): void {
   const { io, logger, errorBoundaries } = deps;
 
   // Store userId in socket data when authenticated
   // (This would be set during authentication in auth handlers)
   const getUserId = (): number | null => {
-    return (socket as any).userId || null;
+    return socket.userId || null;
   };
 
   /**
@@ -163,7 +170,9 @@ export async function sendNotificationToUser(
   try {
     // Find sockets for this user
     const sockets = await io.fetchSockets();
-    const userSockets = sockets.filter((s: any) => s.userId === userId);
+    const userSockets = sockets.filter((s): s is SocketWithAuth & { emit: typeof s.emit } =>
+      'userId' in s && (s as SocketWithAuth).userId === userId
+    );
 
     // Emit to all user's sockets
     for (const userSocket of userSockets) {

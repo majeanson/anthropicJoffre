@@ -149,8 +149,8 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
         message: `Successfully purged obsolete game IDs (< ${GAME_ID_LENGTH} characters)`,
         deletedCount,
         inMemoryGames: inMemoryDeleted,
-        activeGames: activeGamesResult.rows.map((r: any) => r.game_id || r.id),
-        finishedGames: finishedGamesResult.rows.map((r: any) => r.game_id || r.id),
+        activeGames: activeGamesResult.rows.map((r: { game_id?: string; id?: string }) => r.game_id || r.id),
+        finishedGames: finishedGamesResult.rows.map((r: { game_id?: string; id?: string }) => r.game_id || r.id),
       });
     } catch (error) {
       console.error('[Cleanup] Failed to purge obsolete game IDs:', error);
@@ -359,7 +359,16 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
   app.get('/api/metrics/error-boundaries', (req: Request, res: Response) => {
     try {
       const metrics = getAllMetrics();
-      const formattedMetrics: Record<string, any> = {};
+      const formattedMetrics: Record<string, {
+        totalCalls: number;
+        totalErrors: number;
+        totalSuccess: number;
+        errorRate: string;
+        successRate: string;
+        averageExecutionTime: string;
+        lastError: string | null;
+        errorsByType: Record<string, number>;
+      }> = {};
 
       metrics.forEach((value, key) => {
         formattedMetrics[key] = {
@@ -603,7 +612,7 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
       const dbGames = await listActiveGames({ isPublic: true, limit: 100 });
 
       // Merge with in-memory games
-      const gameMap = new Map<string, any>();
+      const gameMap = new Map<string, GameState>();
 
       // Add in-memory games first
       Array.from(games.values()).forEach((game) => {

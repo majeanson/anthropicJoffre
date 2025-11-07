@@ -7,6 +7,17 @@ import { query, getPool } from './index';
 import { Friendship, FriendRequest, FriendWithStatus } from '../types/friends';
 
 /**
+ * Database row for friend with status query
+ */
+interface FriendWithStatusRow {
+  player_name: string;
+  is_online: boolean;
+  status: string | null;
+  game_id: string | null;
+  friendship_date: string;
+}
+
+/**
  * Send a friend request from one player to another
  */
 export async function sendFriendRequest(
@@ -255,7 +266,7 @@ export async function getFriendsWithStatus(playerName: string): Promise<FriendWi
       [playerName]
     );
 
-    return result.rows.map((row: any) => ({
+    return result.rows.map((row: FriendWithStatusRow) => ({
       player_name: row.player_name,
       is_online: row.is_online,
       status: row.status,

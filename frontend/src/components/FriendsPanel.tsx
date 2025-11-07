@@ -247,7 +247,7 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
                     <div className="flex items-center gap-2">
                       {friend.is_online && friend.game_id && (
                         <button
-                          onClick={() => {/* TODO: Spectate game */}}
+                          onClick={() => socket.emit('spectate_game', { gameId: friend.game_id, spectatorName: currentPlayer })}
                           className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded transition-colors"
                         >
                           Watch

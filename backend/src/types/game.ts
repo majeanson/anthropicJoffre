@@ -221,6 +221,26 @@ export interface GameHistoryEntry {
 }
 
 /**
+ * Game replay data from database
+ */
+export interface GameReplayData {
+  game_id: string;
+  winning_team: 1 | 2 | null;
+  team1_score: number;
+  team2_score: number;
+  rounds: number;
+  player_names: string[];
+  player_teams: Array<1 | 2>;
+  round_history: RoundHistory[];
+  trump_suit: CardColor | null;
+  game_duration_seconds: number;
+  is_bot_game: boolean;
+  is_finished: boolean;
+  created_at: Date;
+  finished_at: Date | null;
+}
+
+/**
  * Online player status
  */
 export interface OnlinePlayer {

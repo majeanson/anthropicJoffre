@@ -526,8 +526,7 @@ export class BotPlayer {
    * Get all cards that have been played this round
    * (Currently unused but kept for future card counting enhancements)
    */
-  // @ts-ignore - Unused for now but will be used for advanced card counting
-  private static getPlayedCards(gameState: GameState): Card[] {
+  private static _getPlayedCards(gameState: GameState): Card[] {
     const played: Card[] = [];
 
     // Cards from completed tricks

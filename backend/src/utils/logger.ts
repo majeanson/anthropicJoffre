@@ -11,6 +11,7 @@
 
 import winston from 'winston';
 import path from 'path';
+import { Request, Response, NextFunction } from 'express';
 
 // Custom format for development (colorized, human-readable)
 const devFormat = winston.format.combine(
@@ -127,7 +128,7 @@ export class PerformanceTimer {
 /**
  * Request logger middleware for Express
  */
-export function requestLogger(req: any, res: any, next: any) {
+export function requestLogger(req: Request, res: Response, next: NextFunction) {
   const start = Date.now();
   const requestId = req.headers['x-request-id'] || generateRequestId();
 
@@ -166,7 +167,7 @@ export function requestLogger(req: any, res: any, next: any) {
 export function logSocketEvent(
   eventName: string,
   socketId: string,
-  data: any,
+  data: unknown,
   metadata?: object
 ) {
   logger.debug(`Socket event: ${eventName}`, {
@@ -255,10 +256,14 @@ function generateRequestId(): string {
   return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
-function sanitizeBody(body: any): any {
+function sanitizeBody(body: unknown): unknown {
   if (!body) return undefined;
 
-  const sanitized = { ...body };
+  if (typeof body !== 'object' || body === null) {
+    return body;
+  }
+
+  const sanitized = { ...body as Record<string, unknown> };
   const sensitiveFields = ['password', 'token', 'secret', 'apiKey'];
 
   for (const field of sensitiveFields) {
@@ -270,7 +275,7 @@ function sanitizeBody(body: any): any {
   return sanitized;
 }
 
-function sanitizeData(data: any): any {
+function sanitizeData(data: unknown): unknown {
   if (typeof data === 'string') {
     return data.length > 500 ? data.substring(0, 500) + '...' : data;
   }

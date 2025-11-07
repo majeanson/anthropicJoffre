@@ -7,7 +7,7 @@
 import { Server, Socket } from 'socket.io';
 import * as achievementDb from '../db/achievements.js';
 import { checkAchievements, checkSecretAchievements } from '../utils/achievementChecker.js';
-import { AchievementCheckContext } from '../types/achievements.js';
+import { Achievement, AchievementCheckContext } from '../types/achievements.js';
 import { errorBoundaries } from '../middleware/errorBoundary.js';
 
 interface AchievementHandlerDependencies {
@@ -60,7 +60,7 @@ export function emitAchievementUnlocked(
   io: Server,
   gameId: string,
   playerName: string,
-  achievement: any
+  achievement: Achievement
 ) {
   io.to(gameId).emit('achievement_unlocked', {
     playerName,

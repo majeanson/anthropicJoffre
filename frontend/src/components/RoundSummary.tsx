@@ -8,7 +8,7 @@
  * - Starting hands and bets for each player
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { GameState, Card } from '../types/game';
 import { TrickHistory } from './TrickHistory';
 import { Card as CardComponent } from './Card';
@@ -44,8 +44,14 @@ interface RoundSummaryProps {
 const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
   const [dataReady, setDataReady] = useState(false);
 
-  const lastRound = gameState.roundHistory[gameState.roundHistory.length - 1];
-  const statistics = lastRound?.statistics as RoundStatistics | undefined;
+  // Sprint 8 Task 2: Memoize expensive computations for performance
+  const roundData = useMemo(() => {
+    const lastRound = gameState.roundHistory[gameState.roundHistory.length - 1];
+    const statistics = lastRound?.statistics as RoundStatistics | undefined;
+    return { lastRound, statistics };
+  }, [gameState.roundHistory]);
+
+  const { lastRound, statistics } = roundData;
 
   // Check if round data is ready (prevents showing stale data during transition)
   useEffect(() => {
@@ -140,27 +146,33 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     }
   };
 
-  // Collect all available stats with scores
-  const allStats: Array<{ title: string; icon: string; stat: any; score: number }> = [];
+  // Collect all available stats with scores (memoized to avoid recalculation)
+  const allStats = useMemo(() => {
+    const stats: Array<{ title: string; icon: string; stat: any; score: number }> = [];
 
-  if (statistics?.perfectBet) allStats.push({ title: 'Perfect Bet', icon: '🎯', stat: statistics.perfectBet, score: getStatScore('Perfect Bet', statistics.perfectBet) });
-  if (statistics?.teamMVP) allStats.push({ title: 'Team MVP', icon: '⭐', stat: statistics.teamMVP, score: getStatScore('Team MVP', statistics.teamMVP) });
-  if (statistics?.luckyPlayer) allStats.push({ title: 'Lucky Player', icon: '🍀', stat: statistics.luckyPlayer, score: getStatScore('Lucky Player', statistics.luckyPlayer) });
-  if (statistics?.pointLeader) allStats.push({ title: 'Point Leader', icon: '💎', stat: statistics.pointLeader, score: getStatScore('Point Leader', statistics.pointLeader) });
-  if (statistics?.trickMaster) allStats.push({ title: 'Trick Master', icon: '🏆', stat: statistics.trickMaster, score: getStatScore('Trick Master', statistics.trickMaster) });
-  if (statistics?.monochrome) allStats.push({ title: 'Monochrome', icon: '🖤', stat: statistics.monochrome, score: getStatScore('Monochrome', statistics.monochrome) });
-  if (statistics?.luckySevens) allStats.push({ title: 'Lucky Sevens', icon: '7️⃣', stat: statistics.luckySevens, score: getStatScore('Lucky Sevens', statistics.luckySevens) });
-  if (statistics?.suitedUp) allStats.push({ title: 'Suited Up', icon: '♠', stat: statistics.suitedUp, score: getStatScore('Suited Up', statistics.suitedUp) });
-  if (statistics?.trumpHeavy) allStats.push({ title: 'Trump Heavy', icon: '🃏', stat: statistics.trumpHeavy, score: getStatScore('Trump Heavy', statistics.trumpHeavy) });
-  if (statistics?.rainbow) allStats.push({ title: 'Rainbow', icon: '🌈', stat: statistics.rainbow, score: getStatScore('Rainbow', statistics.rainbow) });
-  if (statistics?.trumpMaster) allStats.push({ title: 'Trump Master', icon: '👑', stat: statistics.trumpMaster, score: getStatScore('Trump Master', statistics.trumpMaster) });
-  if (statistics?.highRoller) allStats.push({ title: 'High Roller', icon: '📈', stat: statistics.highRoller, score: getStatScore('High Roller', statistics.highRoller) });
-  if (statistics?.lowball) allStats.push({ title: 'Lowball', icon: '📉', stat: statistics.lowball, score: getStatScore('Lowball', statistics.lowball) });
+    if (statistics?.perfectBet) stats.push({ title: 'Perfect Bet', icon: '🎯', stat: statistics.perfectBet, score: getStatScore('Perfect Bet', statistics.perfectBet) });
+    if (statistics?.teamMVP) stats.push({ title: 'Team MVP', icon: '⭐', stat: statistics.teamMVP, score: getStatScore('Team MVP', statistics.teamMVP) });
+    if (statistics?.luckyPlayer) stats.push({ title: 'Lucky Player', icon: '🍀', stat: statistics.luckyPlayer, score: getStatScore('Lucky Player', statistics.luckyPlayer) });
+    if (statistics?.pointLeader) stats.push({ title: 'Point Leader', icon: '💎', stat: statistics.pointLeader, score: getStatScore('Point Leader', statistics.pointLeader) });
+    if (statistics?.trickMaster) stats.push({ title: 'Trick Master', icon: '🏆', stat: statistics.trickMaster, score: getStatScore('Trick Master', statistics.trickMaster) });
+    if (statistics?.monochrome) stats.push({ title: 'Monochrome', icon: '🖤', stat: statistics.monochrome, score: getStatScore('Monochrome', statistics.monochrome) });
+    if (statistics?.luckySevens) stats.push({ title: 'Lucky Sevens', icon: '7️⃣', stat: statistics.luckySevens, score: getStatScore('Lucky Sevens', statistics.luckySevens) });
+    if (statistics?.suitedUp) stats.push({ title: 'Suited Up', icon: '♠', stat: statistics.suitedUp, score: getStatScore('Suited Up', statistics.suitedUp) });
+    if (statistics?.trumpHeavy) stats.push({ title: 'Trump Heavy', icon: '🃏', stat: statistics.trumpHeavy, score: getStatScore('Trump Heavy', statistics.trumpHeavy) });
+    if (statistics?.rainbow) stats.push({ title: 'Rainbow', icon: '🌈', stat: statistics.rainbow, score: getStatScore('Rainbow', statistics.rainbow) });
+    if (statistics?.trumpMaster) stats.push({ title: 'Trump Master', icon: '👑', stat: statistics.trumpMaster, score: getStatScore('Trump Master', statistics.trumpMaster) });
+    if (statistics?.highRoller) stats.push({ title: 'High Roller', icon: '📈', stat: statistics.highRoller, score: getStatScore('High Roller', statistics.highRoller) });
+    if (statistics?.lowball) stats.push({ title: 'Lowball', icon: '📉', stat: statistics.lowball, score: getStatScore('Lowball', statistics.lowball) });
 
-  // Sort by score (most interesting first) and take top 3
-  const displayedStats = allStats
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3);
+    return stats;
+  }, [statistics]);
+
+  // Sort by score (most interesting first) and take top 3 (memoized)
+  const displayedStats = useMemo(() => {
+    return allStats
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+  }, [allStats]);
 
   const renderCard = (card: Card) => {
     return (

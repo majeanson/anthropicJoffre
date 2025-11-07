@@ -3,7 +3,7 @@
  * Sprint 3 Phase 3.2
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import {
   getUserProfile,
   updateUserProfile,
@@ -16,13 +16,14 @@ import {
 import { updateUserProfile as updateUserAvatar, getUserById } from '../db/users';
 import { verifyAccessToken } from '../utils/authHelpers';
 import { areFriends } from '../db/friends';
+import { AuthenticatedRequest } from '../types/auth';
 
 const router = Router();
 
 /**
  * Middleware to verify authentication
  */
-function requireAuth(req: Request, res: Response, next: Function) {
+function requireAuth(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ error: 'Unauthorized' });
@@ -36,7 +37,7 @@ function requireAuth(req: Request, res: Response, next: Function) {
   }
 
   // Attach user info to request
-  (req as any).user = payload;
+  (req as AuthenticatedRequest).user = payload;
   next();
 }
 
@@ -44,9 +45,9 @@ function requireAuth(req: Request, res: Response, next: Function) {
  * GET /api/profiles/me
  * Get current user's profile and preferences
  */
-router.get('/me', requireAuth, async (req: Request, res: Response) => {
+router.get('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user.user_id;
+    const userId = req.user.user_id;
 
     const data = await getCompleteUserProfile(userId);
 
@@ -65,9 +66,9 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
  * PUT /api/profiles/me
  * Update current user's profile
  */
-router.put('/me', requireAuth, async (req: Request, res: Response) => {
+router.put('/me', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user.user_id;
+    const userId = req.user.user_id;
     const updates: ProfileUpdateData = req.body;
 
     // Update profile
@@ -78,10 +79,13 @@ router.put('/me', requireAuth, async (req: Request, res: Response) => {
     }
 
     // If avatar_id is provided, update user's avatar_url
-    if ((req.body as any).avatar_id) {
-      const avatarId = (req.body as any).avatar_id;
+    interface RequestBodyWithAvatar {
+      avatar_id?: string;
+    }
+    const body = req.body as RequestBodyWithAvatar;
+    if (body.avatar_id) {
       await updateUserAvatar(userId, {
-        avatar_url: avatarId // Store avatar ID as avatar_url for now
+        avatar_url: body.avatar_id // Store avatar ID as avatar_url for now
       });
     }
 
@@ -96,9 +100,9 @@ router.put('/me', requireAuth, async (req: Request, res: Response) => {
  * GET /api/profiles/preferences
  * Get current user's preferences
  */
-router.get('/preferences', requireAuth, async (req: Request, res: Response) => {
+router.get('/preferences', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user.user_id;
+    const userId = req.user.user_id;
 
     const preferences = await getUserPreferences(userId);
 
@@ -117,9 +121,9 @@ router.get('/preferences', requireAuth, async (req: Request, res: Response) => {
  * PUT /api/profiles/preferences
  * Update current user's preferences
  */
-router.put('/preferences', requireAuth, async (req: Request, res: Response) => {
+router.put('/preferences', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = (req as any).user.user_id;
+    const userId = req.user.user_id;
     const updates: PreferencesUpdateData = req.body;
 
     const preferences = await updateUserPreferences(userId, updates);

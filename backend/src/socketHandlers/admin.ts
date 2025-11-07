@@ -14,13 +14,22 @@ import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
 
 /**
+ * Online player tracking data
+ */
+interface OnlinePlayer {
+  playerName: string;
+  socketId: string;
+  lastActivity?: number;
+}
+
+/**
  * Dependencies needed by the admin handlers
  */
 export interface AdminHandlersDependencies {
   // State Maps
   games: Map<string, GameState>;
   playerSessions: Map<string, PlayerSession>;
-  onlinePlayers: Map<string, any>;
+  onlinePlayers: Map<string, OnlinePlayer>;
 
   // Socket.io
   io: Server;
@@ -37,7 +46,7 @@ export interface AdminHandlersDependencies {
   // Utility
   logger: Logger;
   errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
+    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
   };
 }
 

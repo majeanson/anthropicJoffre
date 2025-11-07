@@ -15,6 +15,23 @@ import { migratePlayerIdentity } from '../utils/playerMigrationHelpers';
 import { RoundStatsData } from '../game/roundStatistics';
 
 /**
+ * Online player tracking data
+ */
+interface OnlinePlayer {
+  playerName: string;
+  socketId: string;
+  lastActivity?: number;
+}
+
+/**
+ * Rate limiter data for socket events
+ */
+interface RateLimiterData {
+  count: number;
+  lastReset: number;
+}
+
+/**
  * Dependencies needed by the connection handlers
  */
 export interface ConnectionHandlersDependencies {
@@ -26,11 +43,11 @@ export interface ConnectionHandlersDependencies {
   disconnectTimeouts: Map<string, NodeJS.Timeout>;
   gameDeletionTimeouts: Map<string, NodeJS.Timeout>;
   countdownIntervals: Map<string, NodeJS.Timeout>;
-  onlinePlayers: Map<string, any>;
+  onlinePlayers: Map<string, OnlinePlayer>;
   socketRateLimiters: {
-    chat: Map<string, any>;
-    bet: Map<string, any>;
-    card: Map<string, any>;
+    chat: Map<string, RateLimiterData>;
+    bet: Map<string, RateLimiterData>;
+    card: Map<string, RateLimiterData>;
   };
 
   // Socket.io
@@ -57,8 +74,8 @@ export interface ConnectionHandlersDependencies {
   // Utility
   logger: Logger;
   errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
-    background: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
+    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
+    background: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
   };
 }
 

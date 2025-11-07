@@ -10,7 +10,7 @@
  * **Casual Mode**: Memory-only, no database operations (reduces Neon usage to 0)
  */
 
-import { GameState, Player } from '../types/game';
+import { GameState, Player, PlayerSession } from '../types/game';
 import {
   saveOrUpdateGame as dbSaveOrUpdateGame,
   saveGameParticipants as dbSaveGameParticipants,
@@ -140,7 +140,7 @@ export async function createSession(
   gameId: string,
   persistenceMode: 'elo' | 'casual',
   isBot: boolean
-): Promise<any> {
+): Promise<PlayerSession | null> {
   // Never create sessions for bots
   if (isBot) {
     console.log(`[Session] Skipped session for bot ${playerName}`);

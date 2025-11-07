@@ -24,7 +24,7 @@ interface RequestMetadata {
 /**
  * Socket handler function type
  */
-type SocketHandler = (socket: Socket, data: any, metadata: RequestMetadata) => Promise<void> | void;
+type SocketHandler<TData = unknown> = (socket: Socket, data: TData, metadata: RequestMetadata) => Promise<void> | void;
 
 /**
  * Wrap socket handler with request tracing
@@ -43,14 +43,14 @@ type SocketHandler = (socket: Socket, data: any, metadata: RequestMetadata) => P
  *   socket.emit('game_created', { game, correlationId: ctx.correlationId });
  * }));
  */
-export function withRequestTracing(
-  handler: SocketHandler,
+export function withRequestTracing<TData = unknown>(
+  handler: SocketHandler<TData>,
   options?: {
     action?: string;
     logLevel?: 'debug' | 'info' | 'warn' | 'error';
   }
-): (socket: Socket, data: any) => Promise<void> {
-  return async (socket: Socket, data: any) => {
+): (socket: Socket, data: TData) => Promise<void> {
+  return async (socket: Socket, data: TData) => {
     const correlationId = generateCorrelationId();
     const startTime = Date.now();
     const action = options?.action || handler.name || 'unknown_action';

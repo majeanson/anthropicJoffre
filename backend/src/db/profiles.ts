@@ -94,7 +94,7 @@ export async function updateUserProfile(
 ): Promise<UserProfile | null> {
   try {
     const setClauses: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
     let paramIndex = 1;
 
     if (updates.bio !== undefined) {
@@ -207,7 +207,7 @@ export async function updateUserPreferences(
 ): Promise<UserPreferences | null> {
   try {
     const setClauses: string[] = [];
-    const values: any[] = [];
+    const values: unknown[] = [];
     let paramIndex = 1;
 
     if (updates.theme !== undefined) {

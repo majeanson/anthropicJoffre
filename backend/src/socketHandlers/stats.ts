@@ -12,22 +12,28 @@
 
 import { Socket, Server } from 'socket.io';
 import { Logger } from 'winston';
+import {
+  PlayerStats,
+  LeaderboardEntry,
+  GameHistoryEntry,
+  GameReplayData,
+} from '../types/game.js';
 
 /**
  * Dependencies needed by the stats handlers
  */
 export interface StatsHandlersDependencies {
   // Database functions
-  getPlayerStats: (playerName: string) => Promise<any>;
-  getLeaderboard: (limit: number, excludeBots: boolean) => Promise<any[]>;
-  getPlayerGameHistory: (playerName: string, limit: number) => Promise<any[]>;
-  getGameReplayData: (gameId: string) => Promise<any | null>;
-  getAllFinishedGames: (limit: number, offset: number) => Promise<any[]>;
+  getPlayerStats: (playerName: string) => Promise<PlayerStats>;
+  getLeaderboard: (limit: number, excludeBots: boolean) => Promise<LeaderboardEntry[]>;
+  getPlayerGameHistory: (playerName: string, limit: number) => Promise<GameHistoryEntry[]>;
+  getGameReplayData: (gameId: string) => Promise<GameReplayData | null>;
+  getAllFinishedGames: (limit: number, offset: number) => Promise<GameReplayData[]>;
 
   // Utility
   logger: Logger;
   errorBoundaries: {
-    readOnly: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
+    readOnly: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
   };
 }
 

@@ -79,3 +79,13 @@ export interface JWTPayload {
   iat: number; // Issued at
   exp: number; // Expiration
 }
+
+/**
+ * Express Request with authenticated user
+ * Extends Express Request to include user property from JWT
+ */
+import { Request } from 'express';
+
+export interface AuthenticatedRequest extends Request {
+  user: JWTPayload;
+}

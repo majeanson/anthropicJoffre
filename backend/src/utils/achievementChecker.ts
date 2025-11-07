@@ -9,9 +9,12 @@ import {
   Achievement,
   AchievementCheckContext,
   AchievementCheckResult,
+  GameWonEventData,
+  BetWonEventData,
+  GameEndData,
 } from '../types/achievements.js';
 import * as achievementDb from '../db/achievements.js';
-import { getPlayerStats } from '../db/index.js';
+import { getPlayerStats, PlayerStats } from '../db/index.js';
 
 /**
  * Check and unlock achievements for a player based on an event
@@ -63,8 +66,8 @@ export async function checkAchievements(
  */
 async function checkGameWonAchievements(
   playerName: string,
-  stats: any,
-  eventData: any,
+  stats: PlayerStats,
+  eventData: GameWonEventData | undefined,
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
@@ -114,8 +117,8 @@ async function checkGameWonAchievements(
  */
 async function checkBetWonAchievements(
   playerName: string,
-  stats: any,
-  eventData: any,
+  stats: PlayerStats,
+  eventData: BetWonEventData | undefined,
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
@@ -155,7 +158,7 @@ async function checkPerfectBetAchievement(
  */
 async function checkNoTrumpAchievements(
   playerName: string,
-  stats: any,
+  stats: PlayerStats,
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
@@ -176,7 +179,7 @@ async function checkNoTrumpAchievements(
  */
 async function checkRedZeroAchievements(
   playerName: string,
-  stats: any,
+  stats: PlayerStats,
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
@@ -192,7 +195,7 @@ async function checkRedZeroAchievements(
  */
 async function checkBrownZeroAchievements(
   playerName: string,
-  stats: any,
+  stats: PlayerStats,
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
@@ -205,7 +208,7 @@ async function checkBrownZeroAchievements(
  */
 async function checkGameCompletedAchievements(
   playerName: string,
-  stats: any,
+  stats: PlayerStats,
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
@@ -221,7 +224,7 @@ async function checkGameCompletedAchievements(
  */
 export async function checkSecretAchievements(
   playerName: string,
-  gameData: any
+  gameData: GameEndData
 ): Promise<Achievement[]> {
   const unlocked: Achievement[] = [];
 

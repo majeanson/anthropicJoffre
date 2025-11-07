@@ -1,5 +1,5 @@
 import { Player, ChatMessage } from '../types/game';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { useSettings } from '../contexts/SettingsContext';
 import { HowToPlay } from './HowToPlay';
@@ -40,12 +40,25 @@ export function TeamSelection({
   onBotDifficultyChange,
 }: TeamSelectionProps) {
   const { darkMode, setDarkMode } = useSettings();
-  const currentPlayer = players.find(p => p.id === currentPlayerId);
-  const team1Players = players.filter(p => p.teamId === 1);
-  const team2Players = players.filter(p => p.teamId === 2);
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showRules, setShowRules] = useState(false);
+
+  // Sprint 8 Task 2: Memoize expensive computations for performance
+  const currentPlayer = useMemo(() =>
+    players.find(p => p.id === currentPlayerId),
+    [players, currentPlayerId]
+  );
+
+  const team1Players = useMemo(() =>
+    players.filter(p => p.teamId === 1),
+    [players]
+  );
+
+  const team2Players = useMemo(() =>
+    players.filter(p => p.teamId === 2),
+    [players]
+  );
 
   // Listen for chat messages (for FloatingTeamChat)
   useEffect(() => {
@@ -62,7 +75,7 @@ export function TeamSelection({
     };
   }, [socket]);
 
-  const handleCopyGameLink = async () => {
+  const handleCopyGameLink = useCallback(async () => {
     const gameUrl = `${window.location.origin}?join=${gameId}`;
     try {
       await navigator.clipboard.writeText(gameUrl);
@@ -70,10 +83,10 @@ export function TeamSelection({
       setTimeout(() => setShowCopyToast(false), 3000);
     } catch (err) {
     }
-  };
+  }, [gameId]);
 
-  // Validation for starting game
-  const canStartGame = (): boolean => {
+  // Validation for starting game (memoized to avoid recalculation on every render)
+  const canStartGame = useMemo(() => {
     // Must have 4 players (including real players, bots, but NOT empty seats)
     const realPlayers = players.filter(p => !p.isEmpty);
     if (realPlayers.length !== 4) return false;
@@ -84,9 +97,9 @@ export function TeamSelection({
     if (team1RealPlayers.length !== 2) return false;
     if (team2RealPlayers.length !== 2) return false;
     return true;
-  };
+  }, [players, team1Players, team2Players]);
 
-  const getStartGameMessage = (): string => {
+  const startGameMessage = useMemo(() => {
     const realPlayers = players.filter(p => !p.isEmpty);
     const emptySeats = players.filter(p => p.isEmpty).length;
 
@@ -103,7 +116,7 @@ export function TeamSelection({
       return 'Teams must have 2 players each (no empty seats)';
     }
     return '';
-  };
+  }, [players, team1Players, team2Players]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-6 relative overflow-hidden">
@@ -431,7 +444,7 @@ export function TeamSelection({
               </button>
             )}
 
-            {canStartGame() ? (
+            {canStartGame ? (
               <button
                 data-testid="start-game-button"
                 onClick={() => {
@@ -453,9 +466,9 @@ export function TeamSelection({
             )}
           </div>
 
-          {!canStartGame() && (
+          {!canStartGame && (
             <p data-testid="start-game-message" className="text-umber-800 dark:text-gray-200 bg-parchment-200 dark:bg-gray-600 border-2 border-umber-400 px-4 py-2 rounded-lg">
-              {getStartGameMessage()}
+              {startGameMessage}
             </p>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { RoundHistory } from '../types/game';
 import { sounds } from '../utils/sounds';
@@ -220,15 +220,25 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     );
   }
 
-  const currentRound = replayData.round_history[currentRoundIndex];
-  const currentTricks = currentRound?.tricks || [];
-  const hasNextRound = currentRoundIndex < replayData.round_history.length - 1;
-  const hasPrevRound = currentRoundIndex > 0;
-  const hasNextTrick = currentTrickIndex < currentTricks.length - 1;
-  const hasPrevTrick = currentTrickIndex > 0;
+  // Sprint 8 Task 2: Memoized computations for performance optimization
+  // Current round data and navigation state
+  const currentRoundData = useMemo(() => {
+    const currentRound = replayData.round_history[currentRoundIndex];
+    const currentTricks = currentRound?.tricks || [];
+    return {
+      currentRound,
+      currentTricks,
+      hasNextRound: currentRoundIndex < replayData.round_history.length - 1,
+      hasPrevRound: currentRoundIndex > 0,
+      hasNextTrick: currentTrickIndex < currentTricks.length - 1,
+      hasPrevTrick: currentTrickIndex > 0,
+    };
+  }, [replayData.round_history, currentRoundIndex, currentTrickIndex]);
 
-  // Calculate starting hands from trick history
-  const calculateStartingHands = () => {
+  const { currentRound, currentTricks, hasNextRound, hasPrevRound, hasNextTrick, hasPrevTrick } = currentRoundData;
+
+  // Calculate starting hands from trick history (expensive operation)
+  const startingHands = useMemo(() => {
     if (!currentRound?.tricks || currentRound.tricks.length === 0) return {};
 
     const hands: Record<string, any[]> = {};
@@ -255,9 +265,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     });
 
     return hands;
-  };
-
-  const startingHands = calculateStartingHands();
+  }, [currentRound, replayData.player_names, currentRoundIndex, currentTrickIndex]);
 
   const handleNextRound = () => {
     if (hasNextRound) {
@@ -302,25 +310,29 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     setIsPlaying(prev => !prev);
   };
 
-  const handleJumpToTrick = (trickIndex: number) => {
+  const handleJumpToTrick = useCallback((trickIndex: number) => {
     sounds.buttonClick();
     setCurrentTrickIndex(trickIndex);
     setIsPlaying(false);
-  };
+  }, []);
 
-  // Format date
-  const gameDate = new Date(replayData.finished_at).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
+  // Format date (memoized to avoid recalculating on every render)
+  const gameDate = useMemo(() => {
+    return new Date(replayData.finished_at).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }, [replayData.finished_at]);
 
-  // Calculate game duration
-  const durationMinutes = Math.floor(replayData.game_duration_seconds / 60);
-  const durationSeconds = replayData.game_duration_seconds % 60;
-  const durationText = `${durationMinutes}m ${durationSeconds}s`;
+  // Calculate game duration (memoized)
+  const durationText = useMemo(() => {
+    const durationMinutes = Math.floor(replayData.game_duration_seconds / 60);
+    const durationSeconds = replayData.game_duration_seconds % 60;
+    return `${durationMinutes}m ${durationSeconds}s`;
+  }, [replayData.game_duration_seconds]);
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>

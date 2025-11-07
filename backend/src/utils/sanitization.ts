@@ -71,7 +71,7 @@ export function sanitizeChatMessage(message: string): string {
  * Validate and sanitize bet amount
  * - Must be an integer between 7 and 12
  */
-export function validateBetAmount(amount: any): number {
+export function validateBetAmount(amount: unknown): number {
   // Convert to number
   const num = Number(amount);
 
@@ -92,7 +92,7 @@ export function validateBetAmount(amount: any): number {
  * Validate card value
  * - Must be an integer between 0 and 7
  */
-export function validateCardValue(value: any): number {
+export function validateCardValue(value: unknown): number {
   const num = Number(value);
 
   if (!Number.isInteger(num)) {
@@ -110,7 +110,7 @@ export function validateCardValue(value: any): number {
  * Validate card color
  * - Must be one of: yellow, blue, red, green, brown
  */
-export function validateCardColor(color: any): string {
+export function validateCardColor(color: unknown): string {
   const validColors = ['yellow', 'blue', 'red', 'green', 'brown'];
 
   if (typeof color !== 'string') {
@@ -130,7 +130,7 @@ export function validateCardColor(color: any): string {
  * Validate game ID format
  * - Must be a valid UUID or alphanumeric string
  */
-export function validateGameId(gameId: any): string {
+export function validateGameId(gameId: unknown): string {
   if (typeof gameId !== 'string') {
     throw new Error('Game ID must be a string');
   }
@@ -162,7 +162,7 @@ export function sanitizeTextInput(text: string, maxLength: number = 500): string
 /**
  * Validate boolean value
  */
-export function validateBoolean(value: any): boolean {
+export function validateBoolean(value: unknown): boolean {
   if (typeof value === 'boolean') {
     return value;
   }
@@ -182,7 +182,7 @@ export function validateBoolean(value: any): boolean {
  * Validate team ID
  * - Must be 1 or 2
  */
-export function validateTeamId(teamId: any): 1 | 2 {
+export function validateTeamId(teamId: unknown): 1 | 2 {
   const num = Number(teamId);
 
   if (!Number.isInteger(num) || (num !== 1 && num !== 2)) {
@@ -196,7 +196,7 @@ export function validateTeamId(teamId: any): 1 | 2 {
  * Validate player index/position
  * - Must be 0, 1, 2, or 3
  */
-export function validatePlayerIndex(index: any): number {
+export function validatePlayerIndex(index: unknown): number {
   const num = Number(index);
 
   if (!Number.isInteger(num) || num < 0 || num > 3) {

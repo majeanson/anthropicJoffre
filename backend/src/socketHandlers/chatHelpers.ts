@@ -60,7 +60,7 @@ export function rateLimitChatMessage(
       message: 'You are sending messages too fast. Please slow down.',
     });
 
-    const logContext: Record<string, any> = {
+    const logContext: Record<string, unknown> = {
       playerName,
       ipAddress,
       socketId: socket.id,

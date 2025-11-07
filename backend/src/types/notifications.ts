@@ -17,7 +17,7 @@ export interface Notification {
   notification_type: NotificationType;
   title: string;
   message: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   is_read: boolean;
   created_at: string;
   read_at: string | null;
@@ -29,7 +29,7 @@ export interface CreateNotificationData {
   notification_type: NotificationType;
   title: string;
   message: string;
-  data?: Record<string, any>;
+  data?: Record<string, unknown>;
   expires_at?: Date;
 }
 

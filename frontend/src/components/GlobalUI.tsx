@@ -12,13 +12,13 @@ import { ReconnectingBanner } from './ReconnectingBanner';
 import { Toast, ToastProps } from './Toast';
 import { AchievementUnlocked } from './AchievementUnlocked';
 import FriendRequestNotification from './FriendRequestNotification';
-import { NotificationCenter } from './NotificationCenter';
 import EmailVerificationBanner from './EmailVerificationBanner';
 import { Achievement } from '../types/achievements';
 import { FriendRequestNotification as FriendRequestNotificationType } from '../types/friends';
 import { useBotManagement } from '../hooks/useBotManagement';
 
 // Lazy load heavy modals for better initial load performance
+// Sprint 8 Task 3: Added NotificationCenter to lazy loading
 const BotManagementPanel = lazy(() => import('./BotManagementPanel').then(m => ({ default: m.BotManagementPanel })));
 const FriendsPanel = lazy(() => import('./FriendsPanel'));
 const AchievementsPanel = lazy(() => import('./AchievementsPanel').then(m => ({ default: m.AchievementsPanel })));
@@ -26,6 +26,7 @@ const CatchUpModal = lazy(() => import('./CatchUpModal').then(m => ({ default: m
 const LoginModal = lazy(() => import('./LoginModal'));
 const RegisterModal = lazy(() => import('./RegisterModal'));
 const PasswordResetModal = lazy(() => import('./PasswordResetModal'));
+const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => ({ default: m.NotificationCenter })));
 
 interface GlobalUIProps {
   reconnecting: boolean;

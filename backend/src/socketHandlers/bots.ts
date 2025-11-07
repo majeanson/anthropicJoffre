@@ -16,13 +16,22 @@ import { migratePlayerIdentity } from '../utils/playerMigrationHelpers';
 import { RoundStatsData } from '../game/roundStatistics';
 
 /**
+ * Online player tracking data
+ */
+interface OnlinePlayer {
+  playerName: string;
+  socketId: string;
+  lastActivity?: number;
+}
+
+/**
  * Dependencies needed by the bot handlers
  */
 export interface BotHandlersDependencies {
   // State Maps
   games: Map<string, GameState>;
   playerSessions: Map<string, PlayerSession>;
-  onlinePlayers: Map<string, any>;
+  onlinePlayers: Map<string, OnlinePlayer>;
   roundStats: Map<string, RoundStatsData>;
 
   // Socket.io
@@ -45,7 +54,7 @@ export interface BotHandlersDependencies {
   // Utility
   logger: Logger;
   errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: any[]) => void) => (...args: any[]) => void;
+    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
   };
 }
 
