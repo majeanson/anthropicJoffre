@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, lazy } from 'react';
+import { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
 import { GameHistoryEntry } from '../types/game';
@@ -160,29 +160,29 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     };
   }, [isOpen, activeTab, playerName, socket]);
 
+  // Load profile data function - extracted for reuse after save
+  const loadProfile = useCallback(async () => {
+    setProfileLoading(true);
+    try {
+      console.log('[PlayerStatsModal] Loading profile data');
+      const data = await getUserProfile();
+      if (data) {
+        setProfile(data.profile);
+        // setPreferences(data.preferences);
+        console.log('[PlayerStatsModal] Profile loaded:', data);
+      }
+    } catch (error) {
+      console.error('[PlayerStatsModal] Error loading profile:', error);
+    } finally {
+      setProfileLoading(false);
+    }
+  }, [getUserProfile]);
+
   // Fetch profile data when profile tab is active and it's the user's own profile
   useEffect(() => {
     if (!isOpen || activeTab !== 'profile' || !isOwnProfile) return;
-
-    const loadProfile = async () => {
-      setProfileLoading(true);
-      try {
-        console.log('[PlayerStatsModal] Loading profile data');
-        const data = await getUserProfile();
-        if (data) {
-          setProfile(data.profile);
-          // setPreferences(data.preferences);
-          console.log('[PlayerStatsModal] Profile loaded:', data);
-        }
-      } catch (error) {
-        console.error('[PlayerStatsModal] Error loading profile:', error);
-      } finally {
-        setProfileLoading(false);
-      }
-    };
-
     loadProfile();
-  }, [isOpen, activeTab, isOwnProfile, getUserProfile]);
+  }, [isOpen, activeTab, isOwnProfile, loadProfile]);
 
   if (!isOpen) return null;
 
@@ -727,8 +727,9 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                         try {
                           await updateProfile(data);
                           console.log('[PlayerStatsModal] Profile saved successfully');
-                          // Optionally show success message
-                          // Could close modal or switch to another tab
+                          // Refresh the profile data to show updated information
+                          await loadProfile();
+                          console.log('[PlayerStatsModal] Profile display refreshed');
                         } catch (error) {
                           console.error('[PlayerStatsModal] Error saving profile:', error);
                           // Optionally show error message to user

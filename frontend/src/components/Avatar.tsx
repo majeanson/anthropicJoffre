@@ -5,6 +5,8 @@
  * Displays user avatar with fallback to initials
  */
 
+import { getAvatarUrl } from '../utils/avatars';
+
 interface AvatarProps {
   username: string;
   avatarUrl?: string | null;
@@ -18,6 +20,13 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
     md: 'w-12 h-12 text-sm',
     lg: 'w-16 h-16 text-lg',
     xl: 'w-24 h-24 text-2xl'
+  };
+
+  const emojiSizeClasses = {
+    sm: 'text-base',
+    md: 'text-2xl',
+    lg: 'text-3xl',
+    xl: 'text-5xl'
   };
 
   // Get initials from username (first 2 characters)
@@ -45,18 +54,50 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
     return colors[index];
   };
 
+  // Check if avatarUrl is an emoji or avatar ID
+  const isEmoji = (str: string): boolean => {
+    // Emojis typically have high Unicode code points
+    const codePoint = str.codePointAt(0);
+    return codePoint !== undefined && codePoint > 127;
+  };
+
+  // Check if avatarUrl is a URL (starts with http or /)
+  const isUrl = (str: string): boolean => {
+    return str.startsWith('http') || str.startsWith('/');
+  };
+
   if (avatarUrl) {
+    // If it's an emoji, display it directly
+    if (isEmoji(avatarUrl)) {
+      return (
+        <div className={`${sizeClasses[size]} rounded-full flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 ${className}`}>
+          <span className={emojiSizeClasses[size]}>{avatarUrl}</span>
+        </div>
+      );
+    }
+
+    // If it's a URL, load as image
+    if (isUrl(avatarUrl)) {
+      return (
+        <div className={`${sizeClasses[size]} rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600 ${className}`}>
+          <img
+            src={avatarUrl}
+            alt={`${username}'s avatar`}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to initials if image fails to load
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+        </div>
+      );
+    }
+
+    // Otherwise, treat it as an avatar ID and convert to emoji
+    const emoji = getAvatarUrl(avatarUrl);
     return (
-      <div className={`${sizeClasses[size]} rounded-full overflow-hidden border-2 border-gray-300 dark:border-gray-600 ${className}`}>
-        <img
-          src={avatarUrl}
-          alt={`${username}'s avatar`}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // Fallback to initials if image fails to load
-            e.currentTarget.style.display = 'none';
-          }}
-        />
+      <div className={`${sizeClasses[size]} rounded-full flex items-center justify-center border-2 border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 ${className}`}>
+        <span className={emojiSizeClasses[size]}>{emoji}</span>
       </div>
     );
   }

@@ -98,23 +98,24 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
     let betsWon = 0;
     let tricksWon = 0;
 
-    matchData.round_history.forEach(round => {
-      const playerPoints = round.pointsWon[playerName] || 0;
+    matchData.round_history?.forEach(round => {
+      // Handle missing pointsWon for unfinished games
+      const playerPoints = round.pointsWon?.[playerName] || 0;
       totalPoints += playerPoints;
 
       if (round.winner === playerName) {
         roundsWon++;
       }
 
-      // Count tricks won
-      round.tricks.forEach(trick => {
-        if (trick.winner === playerName) {
+      // Count tricks won - handle missing tricks array for unfinished rounds
+      round.tricks?.forEach(trick => {
+        if (trick?.winner === playerName) {
           tricksWon++;
         }
       });
 
-      // Check if bet was successful
-      const playerBet = round.bets[playerName];
+      // Check if bet was successful - handle missing bets for unfinished rounds
+      const playerBet = round.bets?.[playerName];
       if (playerBet && playerPoints >= playerBet.amount) {
         betsWon++;
       }
@@ -204,19 +205,30 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
               {/* Overview Tab */}
               {selectedTab === 'overview' && (
                 <div className="space-y-6">
-                  {/* Winner Banner */}
-                  <div className={`p-6 rounded-xl text-center border-4 ${
-                    matchData.winning_team === 1
-                      ? 'bg-gradient-to-r from-orange-400 to-orange-600 border-orange-800'
-                      : 'bg-gradient-to-r from-purple-400 to-purple-600 border-purple-800'
-                  }`}>
-                    <h3 className="text-3xl font-bold text-white mb-2">
-                      🏆 Team {matchData.winning_team} Victory!
-                    </h3>
-                    <div className="text-xl text-white font-semibold">
-                      {getTeamPlayers(matchData.winning_team).join(' & ')}
+                  {/* Winner Banner - only for finished games */}
+                  {matchData.winning_team ? (
+                    <div className={`p-6 rounded-xl text-center border-4 ${
+                      matchData.winning_team === 1
+                        ? 'bg-gradient-to-r from-orange-400 to-orange-600 border-orange-800'
+                        : 'bg-gradient-to-r from-purple-400 to-purple-600 border-purple-800'
+                    }`}>
+                      <h3 className="text-3xl font-bold text-white mb-2">
+                        🏆 Team {matchData.winning_team} Victory!
+                      </h3>
+                      <div className="text-xl text-white font-semibold">
+                        {getTeamPlayers(matchData.winning_team).join(' & ')}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="p-6 rounded-xl text-center border-4 bg-gradient-to-r from-gray-400 to-gray-600 border-gray-800">
+                      <h3 className="text-3xl font-bold text-white mb-2">
+                        ⏳ Game In Progress
+                      </h3>
+                      <div className="text-xl text-white font-semibold">
+                        Match not yet finished
+                      </div>
+                    </div>
+                  )}
 
                   {/* Game Stats Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -316,8 +328,8 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                       <div>
                         <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Results:</h5>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {Object.entries(round.pointsWon).map(([player, points]) => {
-                            const bet = round.bets[player];
+                          {round.pointsWon ? Object.entries(round.pointsWon).map(([player, points]) => {
+                            const bet = round.bets?.[player];
                             const won = points >= (bet?.amount || 0);
                             return (
                               <div
@@ -334,7 +346,11 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                                 </div>
                               </div>
                             );
-                          })}
+                          }) : (
+                            <div className="col-span-full text-center text-gray-500 dark:text-gray-400 text-sm py-2">
+                              Round incomplete - no results yet
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

@@ -1096,8 +1096,6 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
             points={trickWinner.points}
             teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
           />
-          {/* Screen flash overlay */}
-          <div className="fixed inset-0 bg-white pointer-events-none z-[9997] motion-safe:animate-screen-flash motion-reduce:hidden" />
         </>
       )}
       </div>

@@ -15,6 +15,7 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { OnlinePlayer } from '../types/game';
 import { useAuth } from '../contexts/AuthContext';
+import Avatar from './Avatar';
 
 // Lazy load heavy modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -309,22 +310,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 dark:from-blue-400 dark:via-purple-500 dark:to-pink-500 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
                 J⋀ffre
               </h1>
-              {playerName.trim() && !user && (
-                <p className="text-sm text-umber-600 dark:text-gray-400 mt-2 font-medium">
-                  Joined as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
-                </p>
-              )}
-
               {/* Authentication Section */}
               <div className="mt-4">
                 {user ? (
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex flex-col items-center gap-2">
                     <div className="flex items-center gap-2 bg-parchment-200 dark:bg-gray-700 px-4 py-2 rounded-lg">
-                      {user.avatar_url && (
-                        <img src={user.avatar_url} alt={user.username} className="w-6 h-6 rounded-full" />
-                      )}
+                      <Avatar username={user.username} avatarUrl={user.avatar_url} size="sm" />
                       <span className="text-sm font-semibold text-umber-800 dark:text-gray-200">
-                        {user.display_name || user.username}
+                        {user.username}
                       </span>
                       {user.is_verified && <span className="text-blue-500" title="Verified">✓</span>}
                     </div>
@@ -335,6 +328,10 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       Logout
                     </button>
                   </div>
+                ) : playerName.trim() ? (
+                  <p className="text-sm text-umber-600 dark:text-gray-400 font-medium">
+                    Playing as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
+                  </p>
                 ) : (
                   <div className="flex items-center justify-center gap-2">
                     <button
