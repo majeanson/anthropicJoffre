@@ -8,7 +8,7 @@
  * - Starting hands and bets for each player
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { GameState, Card } from '../types/game';
 import { TrickHistory } from './TrickHistory';
 import { Card as CardComponent } from './Card';

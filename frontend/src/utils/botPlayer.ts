@@ -523,24 +523,6 @@ export class BotPlayer {
   }
 
   /**
-   * Get all cards that have been played this round
-   * (Currently unused but kept for future card counting enhancements)
-   */
-  private static _getPlayedCards(gameState: GameState): Card[] {
-    const played: Card[] = [];
-
-    // Cards from completed tricks
-    gameState.currentRoundTricks.forEach(trickResult => {
-      trickResult.trick.forEach(tc => played.push(tc.card));
-    });
-
-    // Cards from current trick
-    gameState.currentTrick.forEach(tc => played.push(tc.card));
-
-    return played;
-  }
-
-  /**
    * Get list of cards that are legal to play
    */
   private static getPlayableCards(gameState: GameState, hand: Card[]): Card[] {

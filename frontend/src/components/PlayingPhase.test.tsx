@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { PlayingPhase } from './PlayingPhase';
-import { GameState, Player, Card } from '../types/game';
+import { GameState, Player, Card, CardValue } from '../types/game';
 import { SettingsProvider } from '../contexts/SettingsContext';
 
 // Mock sounds utility
@@ -89,7 +89,7 @@ function createTestPlayer(overrides: Partial<Player> = {}): Player {
 function createTestCard(color: string, value: number): Card {
   return {
     color: color as any,
-    value,
+    value: value as CardValue,
   };
 }
 
@@ -127,11 +127,9 @@ function renderWithSettings(component: React.ReactElement) {
 
 describe('PlayingPhase', () => {
   let mockOnPlayCard: ReturnType<typeof vi.fn>;
-  let mockOnLeaveGame: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     mockOnPlayCard = vi.fn();
-    mockOnLeaveGame = vi.fn();
   });
 
   describe('Rendering and Basic UI', () => {
@@ -203,9 +201,9 @@ describe('PlayingPhase', () => {
           createTestPlayer({ id: 'player-1', hand }),
         ],
         currentTrick: [
-          { card: createTestCard('red', 7), playerId: 'player-2' },
+          { card: createTestCard('red', 7), playerId: 'player-2', playerName: 'Player 2' },
         ],
-        trumpColor: 'green',
+        trump: 'green',
       });
 
       renderWithSettings(
@@ -303,8 +301,8 @@ describe('PlayingPhase', () => {
     it('should show current trick cards', () => {
       const game = createTestGame({
         currentTrick: [
-          { card: createTestCard('red', 5), playerId: 'player-1' },
-          { card: createTestCard('red', 3), playerId: 'player-2' },
+          { card: createTestCard('red', 5), playerId: 'player-1', playerName: 'Player 1' },
+          { card: createTestCard('red', 3), playerId: 'player-2', playerName: 'Player 2' },
         ],
       });
 
@@ -322,7 +320,7 @@ describe('PlayingPhase', () => {
 
     it('should highlight current player turn', () => {
       const game = createTestGame({
-        currentPlayerId: 'player-2',
+        currentPlayerIndex: 1, // Player 2's turn
       });
 
       renderWithSettings(
@@ -359,7 +357,7 @@ describe('PlayingPhase', () => {
     it('should show led suit when trick started', () => {
       const game = createTestGame({
         currentTrick: [
-          { card: createTestCard('red', 7), playerId: 'player-2' },
+          { card: createTestCard('red', 7), playerId: 'player-2', playerName: 'Player 2' },
         ],
         players: [
           createTestPlayer({
@@ -403,7 +401,7 @@ describe('PlayingPhase', () => {
   describe('Game State Display', () => {
     it('should show current scores', () => {
       const game = createTestGame({
-        scores: { team1: 15, team2: 12 },
+        teamScores: { team1: 15, team2: 12 },
       });
 
       renderWithSettings(
@@ -420,7 +418,7 @@ describe('PlayingPhase', () => {
 
     it('should show trump color', () => {
       const game = createTestGame({
-        trumpColor: 'red',
+        trump: 'red',
       });
 
       renderWithSettings(
@@ -492,7 +490,7 @@ describe('PlayingPhase', () => {
     it('should handle invalid game state gracefully', () => {
       const game = createTestGame({
         currentTrick: [],
-        trumpColor: null,
+        trump: null,
       });
 
       renderWithSettings(

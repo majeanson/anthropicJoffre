@@ -31,8 +31,6 @@ interface GlobalLeaderboardProps {
 export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }: GlobalLeaderboardProps) {
   const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [correlationId, setCorrelationId] = useState<string | null>(null);
   const [showRoundStats, setShowRoundStats] = useState(false);
 
   useEffect(() => {

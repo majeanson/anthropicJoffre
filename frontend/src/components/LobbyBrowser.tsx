@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, Suspense, lazy } from 'react';
+import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 
 // Lazy load GameReplay component
@@ -285,19 +285,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
     return filtered;
   }, [games, filterWithBots, filterNeedsPlayers, filterInProgress, sortBy]);
-
-  // Sprint 8 Task 2: Memoize event handlers for better performance
-  const handleJoinGame = useCallback((gameId: string) => {
-    onJoinGame(gameId);
-  }, [onJoinGame]);
-
-  const handleSpectateGame = useCallback((gameId: string) => {
-    onSpectateGame(gameId);
-  }, [onSpectateGame]);
-
-  const handleViewReplay = useCallback((gameId: string) => {
-    setReplayGameId(gameId);
-  }, []);
 
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {

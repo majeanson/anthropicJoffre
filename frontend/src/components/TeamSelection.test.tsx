@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TeamSelection } from './TeamSelection';
-import { Player, ChatMessage } from '../types/game';
+import { Player } from '../types/game';
 import { SettingsProvider } from '../contexts/SettingsContext';
 import { Socket } from 'socket.io-client';
 
@@ -46,9 +46,9 @@ function createTestPlayer(overrides: Partial<Player> = {}): Player {
     name: 'TestPlayer',
     hand: [],
     teamId: 1,
+    tricksWon: 0,
+    pointsWon: 0,
     isBot: false,
-    isConnected: true,
-    isEmpty: false,
     ...overrides,
   };
 }
@@ -70,8 +70,6 @@ describe('TeamSelection', () => {
   let mockOnSwapPosition: ReturnType<typeof vi.fn>;
   let mockOnStartGame: ReturnType<typeof vi.fn>;
   let mockOnLeaveGame: ReturnType<typeof vi.fn>;
-  let mockOnAddBot: ReturnType<typeof vi.fn>;
-  let mockOnKickPlayer: ReturnType<typeof vi.fn>;
   let mockSocket: Socket;
 
   beforeEach(() => {
@@ -79,8 +77,6 @@ describe('TeamSelection', () => {
     mockOnSwapPosition = vi.fn();
     mockOnStartGame = vi.fn();
     mockOnLeaveGame = vi.fn();
-    mockOnAddBot = vi.fn();
-    mockOnKickPlayer = vi.fn();
     mockSocket = createMockSocket();
 
     // Mock clipboard API

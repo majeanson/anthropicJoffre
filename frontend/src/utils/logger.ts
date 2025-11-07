@@ -5,8 +5,6 @@
  * Structured logging for frontend with environment-aware behavior
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
-
 interface LogData {
   [key: string]: any;
 }

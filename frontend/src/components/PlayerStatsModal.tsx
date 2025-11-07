@@ -208,23 +208,6 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     loadProfile();
   }, [isOpen, activeTab, isOwnProfile, loadProfile]);
 
-  // Sprint 8 Task 2: Memoized computations for performance optimization
-  // Calculate win rate percentage
-  const winRate = useMemo(() => {
-    if (!stats || stats.games_played === 0) return '0.0';
-    return ((stats.games_won / stats.games_played) * 100).toFixed(1);
-  }, [stats?.games_won, stats?.games_played]);
-
-  // Calculate recent performance (wins in last 10 games)
-  const recentPerformance = useMemo(() => {
-    if (!gameHistory || gameHistory.length === 0) return 0;
-    return gameHistory
-      .filter(g => g.is_finished)
-      .slice(0, 10)
-      .filter(g => g.winning_team === g.team_id)
-      .length;
-  }, [gameHistory]);
-
   // Filter and sort game history for display
   const filteredAndSortedGames = useMemo(() => {
     let filteredGames = gameHistory.filter(game =>

@@ -30,6 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
       error: null,
       errorInfo: null,
       errorCount: 0,
+      lastErrorTime: null,
     };
   }
 

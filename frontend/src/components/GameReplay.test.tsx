@@ -6,8 +6,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { GameReplay } from './GameReplay';
-import { RoundHistory } from '../types/game';
-import { Socket } from 'socket.io-client';
+import { RoundHistory, Bet } from '../types/game';
 
 // Mock child components
 vi.mock('./TrickHistory', () => ({
@@ -41,30 +40,34 @@ function createMockSocket(): MockSocket {
 }
 
 function createTestRound(roundNumber: number): RoundHistory {
+  const mockBet: Bet = {
+    playerId: 'player-1',
+    amount: 9,
+    withoutTrump: false,
+    skipped: false,
+  };
+
   return {
-    round_number: roundNumber,
-    dealer: 'Player 1',
-    winning_team: 1,
-    points_team1: 10,
-    points_team2: 8,
-    contract_player: 'Player 1',
-    contract_amount: 9,
-    contract_with_trump: true,
-    trump_suit: 'red',
-    tricks: [
-      {
-        trick_number: 1,
-        trick: [
-          { player: 'Player 1', card: { color: 'red', value: 7 } },
-          { player: 'Player 2', card: { color: 'red', value: 5 } },
-          { player: 'Player 3', card: { color: 'red', value: 3 } },
-          { player: 'Player 4', card: { color: 'red', value: 2 } },
-        ],
-        winner: 'Player 1',
-        points: 1,
-      },
-    ],
-  } as RoundHistory;
+    roundNumber,
+    bets: [mockBet],
+    highestBet: mockBet,
+    offensiveTeam: 1,
+    offensivePoints: 10,
+    defensivePoints: 8,
+    betAmount: 9,
+    withoutTrump: false,
+    betMade: true,
+    roundScore: {
+      team1: 10,
+      team2: 8,
+    },
+    cumulativeScore: {
+      team1: 10,
+      team2: 8,
+    },
+    tricks: [],
+    trump: 'red',
+  };
 }
 
 function createTestReplayData(overrides = {}) {

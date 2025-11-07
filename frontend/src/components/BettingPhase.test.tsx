@@ -4,9 +4,9 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { BettingPhase } from './BettingPhase';
-import { GameState, Player, Bet, Card } from '../types/game';
+import { GameState, Player, Bet, Card, CardValue } from '../types/game';
 import { SettingsProvider } from '../contexts/SettingsContext';
 
 // Mock child components
@@ -74,7 +74,7 @@ function createTestPlayer(overrides: Partial<Player> = {}): Player {
 }
 
 function createTestCard(color: string, value: number): Card {
-  return { color: color as any, value };
+  return { color: color as any, value: value as CardValue };
 }
 
 function createTestBet(overrides: Partial<Bet> = {}): Bet {
@@ -121,11 +121,9 @@ function renderWithSettings(component: React.ReactElement) {
 
 describe('BettingPhase', () => {
   let mockOnPlaceBet: ReturnType<typeof vi.fn>;
-  let mockOnLeaveGame: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     mockOnPlaceBet = vi.fn();
-    mockOnLeaveGame = vi.fn();
   });
 
   describe('Rendering and Basic UI', () => {
