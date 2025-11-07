@@ -87,7 +87,7 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
   }));
 
   // ============================================================================
-  // kick_player - Host removes player during team selection
+  // kick_player - Host removes player from game (works in all phases)
   // ============================================================================
   socket.on('kick_player', errorBoundaries.gameAction('kick_player')(async ({ gameId, playerId }: { gameId: string; playerId: string }) => {
     const game = games.get(gameId);
@@ -105,12 +105,6 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
     // Cannot kick yourself
     if (playerId === socket.id) {
       socket.emit('error', { message: 'Cannot kick yourself' });
-      return;
-    }
-
-    // Only allow kicking during team selection phase
-    if (game.phase !== 'team_selection') {
-      socket.emit('error', { message: 'Can only kick players during team selection' });
       return;
     }
 

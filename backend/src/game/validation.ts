@@ -212,9 +212,10 @@ export function validateTeamSelection(
  * Validates if a position swap is allowed.
  *
  * Checks position swap rules:
- * - Game must be in team_selection phase
  * - Both initiator and target players exist
  * - Player is not swapping with themselves
+ * - Players are on the same team
+ * - Works in all game phases
  *
  * @param game - Current game state
  * @param initiatorId - ID of the player initiating the swap
@@ -232,11 +233,6 @@ export function validatePositionSwap(
   initiatorId: string,
   targetPlayerId: string
 ): ValidationResult {
-  // Check game phase
-  if (game.phase !== 'team_selection') {
-    return err('Position swapping is only allowed during team selection');
-  }
-
   const initiator = game.players.find(p => p.id === initiatorId);
   const target = game.players.find(p => p.id === targetPlayerId);
 
