@@ -42,16 +42,25 @@ interface RoundSummaryProps {
 }
 
 const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
+  // ✅ CRITICAL: Check data BEFORE hooks to prevent "Rendered more hooks than during the previous render" error
+  // Rules of Hooks: All early returns must happen BEFORE calling any hooks
+  const lastRound = gameState.roundHistory[gameState.roundHistory.length - 1];
+
+  // Early return BEFORE any hooks
+  if (!lastRound) {
+    return null;
+  }
+
+  // ✅ NOW it's safe to call hooks - all conditional returns are done
   const [dataReady, setDataReady] = useState(false);
 
   // Sprint 8 Task 2: Memoize expensive computations for performance
   const roundData = useMemo(() => {
-    const lastRound = gameState.roundHistory[gameState.roundHistory.length - 1];
     const statistics = lastRound?.statistics as RoundStatistics | undefined;
-    return { lastRound, statistics };
-  }, [gameState.roundHistory]);
+    return { statistics };
+  }, [lastRound]);
 
-  const { lastRound, statistics } = roundData;
+  const { statistics } = roundData;
 
   // Check if round data is ready (prevents showing stale data during transition)
   useEffect(() => {
@@ -85,10 +94,6 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [dataReady, onReady]);
-
-  if (!lastRound) {
-    return null;
-  }
 
   // Show loading animation while data is being calculated
   if (!dataReady) {

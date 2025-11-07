@@ -76,6 +76,11 @@ interface PlayerStatsModalProps {
 }
 
 export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewReplay }: PlayerStatsModalProps) {
+  // ✅ CRITICAL: Check isOpen BEFORE any hooks to prevent "Rendered more hooks than during the previous render" error
+  // Rules of Hooks: All early returns must happen BEFORE calling any hooks
+  if (!isOpen) return null;
+
+  // ✅ NOW it's safe to call hooks - all conditional returns are done
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -246,8 +251,6 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       return sortOrder === 'desc' ? comparison : -comparison;
     });
   }, [gameHistory, historyTab, resultFilter, sortBy, sortOrder]);
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">

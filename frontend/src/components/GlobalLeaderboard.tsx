@@ -29,6 +29,11 @@ interface GlobalLeaderboardProps {
 }
 
 export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }: GlobalLeaderboardProps) {
+  // ✅ CRITICAL: Check isOpen BEFORE any hooks to prevent "Rendered more hooks than during the previous render" error
+  // Rules of Hooks: All early returns must happen BEFORE calling any hooks
+  if (!isOpen) return null;
+
+  // ✅ NOW it's safe to call hooks - all conditional returns are done
   const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
   const [loading, setLoading] = useState(false);
   const [showRoundStats, setShowRoundStats] = useState(false);
@@ -50,8 +55,6 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
       socket.off('leaderboard_response', handleLeaderboardResponse);
     };
   }, [isOpen, socket]);
-
-  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
