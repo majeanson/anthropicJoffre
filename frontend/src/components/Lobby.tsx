@@ -6,6 +6,9 @@ import { HowToPlay } from './HowToPlay';
 import { DebugInfo } from './DebugInfo';
 import { LobbyChat } from './LobbyChat';
 import { ActiveGames } from './ActiveGames';
+import { QuickPlayPanel } from './QuickPlayPanel';
+import { SocialPanel } from './SocialPanel';
+import { StatsPanel } from './StatsPanel';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
@@ -246,15 +249,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'in_lobby': return 'In Lobby';
-      case 'in_game': return 'Playing';
-      case 'in_team_selection': return 'Setting up';
-      default: return status;
-    }
-  };
-
   if (mode === 'menu') {
     return (
       <>
@@ -443,302 +437,77 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       </div>
                     </div>
 
-                    {/* Quick Play Section */}
-                    <div className="bg-parchment-200 dark:bg-gray-700/50 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600">
-                      <h3 className="text-sm font-bold text-umber-800 dark:text-gray-200 mb-3 text-center">
-                        Practice with Bots
-                      </h3>
-
-                      {/* Bot Difficulty Selector */}
-                      <div className="mb-3">
-                        <label className="block text-xs font-semibold text-umber-700 dark:text-gray-300 mb-2">
-                          Bot Difficulty
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                          <button
-                            onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('easy'); }}
-                            className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
-                              botDifficulty === 'easy'
-                                ? 'bg-umber-600 dark:bg-slate-600 text-white shadow-md scale-105 border border-umber-800 dark:border-slate-500'
-                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                            }`}
-                          >
-                            Easy
-                          </button>
-                          <button
-                            onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('medium'); }}
-                            className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
-                              botDifficulty === 'medium'
-                                ? 'bg-umber-600 dark:bg-slate-600 text-white shadow-md scale-105 border border-umber-800 dark:border-slate-500'
-                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                            }`}
-                          >
-                            Medium
-                          </button>
-                          <button
-                            onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('hard'); }}
-                            className={`py-2 px-3 rounded font-bold transition-all duration-200 text-xs ${
-                              botDifficulty === 'hard'
-                                ? 'bg-umber-600 dark:bg-slate-600 text-white shadow-md scale-105 border border-umber-800 dark:border-slate-500'
-                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                            }`}
-                          >
-                            Hard
-                          </button>
-                        </div>
-                        <p className="text-xs text-umber-600 dark:text-gray-400 mt-2 text-center">
-                          {botDifficulty === 'easy' && 'Random play, good for beginners'}
-                          {botDifficulty === 'medium' && 'Strategic play with positional awareness'}
-                          {botDifficulty === 'hard' && 'Advanced AI with card counting'}
-                        </p>
-                      </div>
-
-                      {/* Persistence Mode Selector */}
-                      <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3">
-                        <div className="flex items-center justify-between gap-3">
-                          <label className="flex items-center gap-2 cursor-pointer flex-1">
-                            <input
-                              type="checkbox"
-                              checked={quickPlayPersistence === 'elo'}
-                              onChange={(e) => setQuickPlayPersistence(e.target.checked ? 'elo' : 'casual')}
-                              className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2"
-                            />
-                            <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
-                              Ranked Mode
-                            </span>
-                          </label>
-                          <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                            quickPlayPersistence === 'elo'
-                              ? 'bg-amber-200 dark:bg-purple-900 text-amber-900 dark:text-purple-200'
-                              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                          }`}>
-                            {quickPlayPersistence === 'elo' ? '🏆 Ranked' : '🎮 Casual'}
-                          </span>
-                        </div>
-                        <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
-                          {quickPlayPersistence === 'elo'
-                            ? 'Game will be saved to your profile and affect your ranking'
-                            : 'No stats saved - play without affecting your ELO rating'}
-                        </p>
-                      </div>
-
-                      <button
-                        data-testid="quick-play-button"
-                        onClick={() => { sounds.buttonClick(); onQuickPlay(botDifficulty, quickPlayPersistence); }}
-                        className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-violet-700 dark:to-violet-800 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-violet-600 dark:hover:to-violet-700 transition-all duration-200 flex items-center justify-center gap-2 border border-umber-900 dark:border-violet-600 shadow"
-                      >
-                        <span>⚡</span>
-                        <span>Quick Play (1P + 3 Bots)</span>
-                      </button>
-                    </div>
+                    {/* Quick Play Section - Extracted to QuickPlayPanel */}
+                    <QuickPlayPanel
+                      botDifficulty={botDifficulty}
+                      onBotDifficultyChange={onBotDifficultyChange}
+                      quickPlayPersistence={quickPlayPersistence}
+                      setQuickPlayPersistence={setQuickPlayPersistence}
+                      onQuickPlay={onQuickPlay}
+                    />
                   </div>
                 )}
 
-                {/* SOCIAL TAB */}
+                {/* SOCIAL TAB - Extracted to SocialPanel */}
                 {mainTab === 'social' && (
                   <div className="space-y-4">
-                    {/* Sub-tabs for Social */}
-                    <div className="flex gap-2">
-                      <button
-                        data-keyboard-nav="social-online"
-                        onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
-                        className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
-                          socialTab === 'online'
-                            ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg'
-                            : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        🟢 Online ({onlinePlayers.length})
-                      </button>
-                      <button
-                        data-keyboard-nav="social-chat"
-                        onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
-                        className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
-                          socialTab === 'chat'
-                            ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg'
-                            : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        💬 Chat
-                      </button>
-                      <button
-                        data-keyboard-nav="social-recent"
-                        onClick={() => { sounds.buttonClick(); setSocialTab('recent'); }}
-                        className={`flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm ${
-                          socialTab === 'recent'
-                            ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg'
-                            : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                        }`}
-                      >
-                        📜 Recent
-                      </button>
-                    </div>
-
-                    {/* Players List / Chat */}
                     {socialTab === 'chat' ? (
-                      <LobbyChat
-                        socket={socket}
-                        playerName={playerName}
-                        onSetPlayerName={setPlayerName}
-                      />
+                      <>
+                        {/* Chat tab button */}
+                        <div className="flex gap-2">
+                          <button
+                            data-keyboard-nav="social-online"
+                            onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
+                            className="flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600"
+                          >
+                            🟢 Online ({onlinePlayers.length})
+                          </button>
+                          <button
+                            data-keyboard-nav="social-chat"
+                            onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
+                            className="flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg"
+                          >
+                            💬 Chat
+                          </button>
+                          <button
+                            data-keyboard-nav="social-recent"
+                            onClick={() => { sounds.buttonClick(); setSocialTab('recent'); }}
+                            className="flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600"
+                          >
+                            📜 Recent
+                          </button>
+                        </div>
+                        <LobbyChat
+                          socket={socket}
+                          playerName={playerName}
+                          onSetPlayerName={setPlayerName}
+                        />
+                      </>
                     ) : (
-                    <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 min-h-[320px] max-h-[320px] overflow-y-auto">
-                      {socialTab === 'online' && (
-                        <div className="space-y-2">
-                          {onlinePlayers.length === 0 ? (
-                            <div className="text-center text-umber-600 dark:text-gray-400 py-16">
-                              <p className="text-2xl mb-2">😴</p>
-                              <p className="text-lg font-semibold">No players online</p>
-                              <p className="text-sm mt-2">Online players will appear here</p>
-                            </div>
-                          ) : (
-                            onlinePlayers.map(player => (
-                              <div
-                                key={player.socketId}
-                                className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-green-400 dark:hover:border-green-500 transition-colors"
-                              >
-                                <div className="flex items-center justify-between gap-2">
-                                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                                    <span className="text-green-500 text-lg flex-shrink-0">🟢</span>
-                                    <div className="min-w-0 flex-1">
-                                      <p className="font-bold text-umber-900 dark:text-gray-100 truncate">
-                                        {player.playerName || player.socketId || 'Unknown'}
-                                      </p>
-                                      <p className="text-xs text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
-                                    </div>
-                                  </div>
-                                  {player.gameId && player.status !== 'in_lobby' && (
-                                    <button
-                                      data-keyboard-nav={`join-player-${player.socketId}`}
-                                      onClick={() => {
-                                        sounds.buttonClick();
-                                        const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
-                                        if (nameToUse && nameToUse.trim()) {
-                                          if (!playerName.trim()) {
-                                            setPlayerName(nameToUse.trim());
-                                          }
-                                          onJoinGame(player.gameId!, nameToUse.trim());
-                                        }
-                                      }}
-                                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs font-bold transition-colors flex-shrink-0"
-                                      title="Join their game"
-                                    >
-                                      🎮 Join
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
-
-                      {socialTab === 'recent' && (
-                        <div className="space-y-2">
-                          {(() => {
-                            // Filter out bots (names starting with "Bot ")
-                            const humanPlayers = recentPlayers.filter(p => !p.name.startsWith('Bot '));
-
-                            if (humanPlayers.length === 0) {
-                              return (
-                                <div className="text-center text-umber-600 dark:text-gray-400 py-16">
-                                  <p className="text-2xl mb-2">📭</p>
-                                  <p className="text-lg font-semibold">No recent players yet</p>
-                                  <p className="text-sm mt-2">Players you've played with will appear here</p>
-                                </div>
-                              );
-                            }
-
-                            return humanPlayers.map(player => (
-                              <div
-                                key={player.name}
-                                className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex-1">
-                                    <p className="font-bold text-umber-900 dark:text-gray-100">{player.name}</p>
-                                    <p className="text-xs text-umber-600 dark:text-gray-400">
-                                      {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} • {new Date(player.lastPlayed).toLocaleDateString()}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            ));
-                          })()}
-                        </div>
-                      )}
-                    </div>
+                      <SocialPanel
+                        socialTab={socialTab}
+                        setSocialTab={setSocialTab}
+                        onlinePlayers={onlinePlayers}
+                        recentPlayers={recentPlayers}
+                        playerName={playerName}
+                        setPlayerName={setPlayerName}
+                        onJoinGame={onJoinGame}
+                      />
                     )}
                   </div>
                 )}
 
-                {/* STATS TAB */}
+                {/* STATS TAB - Extracted to StatsPanel */}
                 {mainTab === 'stats' && (
-                  <div className="space-y-3">
-                    <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-6 border-2 border-parchment-400 dark:border-gray-600 text-center">
-                      <p className="text-4xl mb-3">📊</p>
-                      <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4">Player Statistics</h3>
-
-                      <div className="space-y-3">
-                        <button
-                          data-keyboard-nav="my-stats"
-                          onClick={() => {
-                            if (!socket) return;
-                            sounds.buttonClick();
-                            if (!playerName.trim()) {
-                              const name = window.prompt('Enter your player name to view stats:');
-                              if (name && name.trim()) {
-                                setPlayerName(name.trim());
-                                setSelectedPlayerName(name.trim());
-                                setShowPlayerStats(true);
-                              }
-                            } else {
-                              setSelectedPlayerName(playerName);
-                              setShowPlayerStats(true);
-                            }
-                          }}
-                          className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-blue-700 dark:to-blue-800 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-blue-600 dark:hover:to-blue-700 transition-all duration-200 border border-umber-900 dark:border-blue-600 shadow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={!socket}
-                        >
-                          <span className="text-xl">📊</span>
-                          My Stats
-                        </button>
-
-                        <button
-                          data-keyboard-nav="leaderboard"
-                          onClick={() => {
-                            if (socket) {
-                              sounds.buttonClick();
-                              setShowLeaderboard(true);
-                            }
-                          }}
-                          className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-indigo-700 dark:to-indigo-800 text-white py-4 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-indigo-600 dark:hover:to-indigo-700 transition-all duration-200 border border-amber-900 dark:border-indigo-600 shadow flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={!socket}
-                        >
-                          <span className="text-xl">🏆</span>
-                          Global Leaderboard
-                        </button>
-
-                        <button
-                          data-keyboard-nav="recent-games"
-                          onClick={() => {
-                            sounds.buttonClick();
-                            setShowBrowser(true);
-                          }}
-                          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-700 dark:to-pink-800 text-white py-4 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-700 transition-all duration-200 border border-purple-800 dark:border-pink-600 shadow flex items-center justify-center gap-2"
-                        >
-                          <span className="text-xl">📜</span>
-                          Recent Games
-                        </button>
-                      </div>
-
-                      {!socket && (
-                        <p className="text-sm text-red-600 dark:text-red-400 mt-4">
-                          ⚠️ Connect to server to view stats
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                  <StatsPanel
+                    socket={socket}
+                    playerName={playerName}
+                    setPlayerName={setPlayerName}
+                    setSelectedPlayerName={setSelectedPlayerName}
+                    setShowPlayerStats={setShowPlayerStats}
+                    setShowLeaderboard={setShowLeaderboard}
+                    setShowBrowser={setShowBrowser}
+                  />
                 )}
 
                 {/* SETTINGS TAB */}
