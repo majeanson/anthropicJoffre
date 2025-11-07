@@ -8,6 +8,7 @@ interface UseGameEventListenersProps {
   gameState: GameState | null;
   autoJoinGameId: string;
   showToast: (message: string, type: 'success' | 'error' | 'info' | 'warning', duration?: number) => void;
+  setToast: (toast: any) => void;
   setError: Dispatch<SetStateAction<string>>;
   setGameState: (gameState: GameState | null) => void;
   setGameId: (gameId: string) => void;
@@ -38,6 +39,7 @@ export function useGameEventListeners({
   gameState,
   autoJoinGameId,
   showToast,
+  setToast,
   setError,
   setGameState,
   setGameId,
@@ -107,6 +109,7 @@ export function useGameEventListeners({
 
     // Kicked from game
     const handleKickedFromGame = ({ message }: { message: string }) => {
+      setToast(null); // Clear existing toasts
       showToast(message, 'error', 5000);
       sessionStorage.removeItem('gameSession');
       setGameState(null);
@@ -116,6 +119,7 @@ export function useGameEventListeners({
 
     // Leave game success
     const handleLeaveGameSuccess = () => {
+      setToast(null); // Clear toasts when leaving
       sessionStorage.removeItem('gameSession');
       setGameState(null);
       setGameId('');
@@ -169,6 +173,7 @@ export function useGameEventListeners({
     };
 
     const handleReplacedByBot = ({ message }: { message: string; gameId: string }) => {
+      setToast(null); // Clear existing toasts
       showToast(message, 'warning', 5000);
       sessionStorage.removeItem('gameSession');
       setGameState(null);
@@ -238,5 +243,5 @@ export function useGameEventListeners({
       socket.off('replaced_by_bot', handleReplacedByBot);
       socket.off('game_full_with_bots', handleGameFullWithBots);
     };
-  }, [socket, gameState, showToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound]);
+  }, [socket, gameState, showToast, setToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound]);
 }

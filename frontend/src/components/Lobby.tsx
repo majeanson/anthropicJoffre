@@ -424,6 +424,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     quickPlayPersistence={quickPlayPersistence}
                     setQuickPlayPersistence={setQuickPlayPersistence}
                     onQuickPlay={onQuickPlay}
+                    user={user}
                   />
                 )}
 

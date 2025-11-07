@@ -40,7 +40,7 @@ export function SettingsPanel({
   isSpectator = false,
   connectionStats
 }: SettingsPanelProps) {
-  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled, debugMode, setDebugMode, setDebugPanelOpen } = useSettings();
+  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled } = useSettings();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
   if (!isOpen) return null;
@@ -58,14 +58,6 @@ export function SettingsPanel({
   const handleRules = () => {
     onClose();
     onOpenRules?.();
-  };
-
-  const handleOpenDebugPanel = () => {
-    if (!debugMode) {
-      setDebugMode(true);
-    }
-    setDebugPanelOpen(true);
-    onClose();
   };
 
   const tabs: { key: SettingsTab; label: string; icon: string }[] = [
@@ -199,22 +191,7 @@ export function SettingsPanel({
               Advanced settings for power users
             </p>
 
-            {/* Debug Mode */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🐛</span>
-                  <span className="text-umber-900 dark:text-gray-100 text-sm font-semibold">Debug Mode</span>
-                </div>
-                <ToggleSwitch enabled={debugMode} onChange={handleOpenDebugPanel} label="Debug Mode" />
-              </div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 ml-7">
-                Opens the game state inspector for debugging
-              </p>
-            </div>
-
             {/* Clear Cache Button */}
-            <div className="border-t border-amber-700/30 dark:border-gray-600"></div>
             <button
               onClick={() => {
                 localStorage.clear();

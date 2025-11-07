@@ -3,7 +3,7 @@
  * Sprint 1 Phase 3: Trick Winner Celebrations
  *
  * Canvas-based confetti animation for trick winner celebration
- * Positioned above the winning player in a minimal size
+ * Positioned in the center of the trick area
  */
 
 import { useEffect, useRef } from 'react';
@@ -14,7 +14,7 @@ type PlayerPosition = 'bottom' | 'left' | 'top' | 'right';
 interface ConfettiEffectProps {
   teamColor: 'orange' | 'purple';
   duration?: number;
-  position?: PlayerPosition;
+  position?: PlayerPosition; // Kept for backward compatibility but not used
 }
 
 interface ConfettiParticle {
@@ -28,7 +28,7 @@ interface ConfettiParticle {
   size: number;
 }
 
-export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom' }: ConfettiEffectProps) {
+export function ConfettiEffect({ teamColor, duration = 2000, position: _position = 'bottom' }: ConfettiEffectProps) {
   const { animationsEnabled } = useSettings();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -42,9 +42,9 @@ export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom'
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Minimal canvas size (much smaller)
-    const canvasWidth = 200;
-    const canvasHeight = 150;
+    // Small canvas size to cover trick area only
+    const canvasWidth = 250;
+    const canvasHeight = 200;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
@@ -53,9 +53,9 @@ export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom'
       ? ['#ea580c', '#fb923c', '#fdba74', '#fed7aa', '#ffedd5']
       : ['#9333ea', '#c084fc', '#d8b4fe', '#e9d5ff', '#f3e8ff'];
 
-    // Create confetti particles (minimal count for small area)
+    // Create confetti particles (minimal count for small animation)
     const particles: ConfettiParticle[] = [];
-    const particleCount = 25; // Reduced from 50
+    const particleCount = 15; // Reduced for subtle effect
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -116,20 +116,12 @@ export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom'
         cancelAnimationFrame(animationId);
       }
     };
-  }, [teamColor, duration, position]);
-
-  // Position classes based on player position
-  const positionClasses = {
-    bottom: 'bottom-[30%] left-1/2 -translate-x-1/2', // Above bottom player
-    left: 'top-1/2 left-[15%] -translate-y-1/2',      // Above left player
-    top: 'top-[15%] left-1/2 -translate-x-1/2',       // Above top player
-    right: 'top-1/2 right-[15%] -translate-y-1/2',    // Above right player
-  };
+  }, [teamColor, duration]);
 
   return (
     <canvas
       ref={canvasRef}
-      className={`fixed ${positionClasses[position]} pointer-events-none z-[9998] motion-reduce:hidden w-[200px] h-[150px]`}
+      className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[9998] motion-reduce:hidden w-[250px] h-[200px]"
       style={{ opacity: 0.9, backgroundColor: 'transparent' }}
     />
   );

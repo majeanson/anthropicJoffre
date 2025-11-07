@@ -3,6 +3,7 @@ import { QuickPlayPanel } from './QuickPlayPanel';
 import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
+import { User } from '../types/auth';
 
 interface PlayContentProps {
   hasValidSession?: boolean;
@@ -17,6 +18,7 @@ interface PlayContentProps {
   quickPlayPersistence: 'elo' | 'casual';
   setQuickPlayPersistence: (mode: 'elo' | 'casual') => void;
   onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') => void;
+  user: User | null;
 }
 
 export function PlayContent({
@@ -31,7 +33,8 @@ export function PlayContent({
   onBotDifficultyChange,
   quickPlayPersistence,
   setQuickPlayPersistence,
-  onQuickPlay
+  onQuickPlay,
+  user,
 }: PlayContentProps) {
   return (
     <div className="space-y-4">
@@ -86,6 +89,7 @@ export function PlayContent({
         quickPlayPersistence={quickPlayPersistence}
         setQuickPlayPersistence={setQuickPlayPersistence}
         onQuickPlay={onQuickPlay}
+        user={user}
       />
     </div>
   );

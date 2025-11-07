@@ -85,14 +85,14 @@ export function registerStatsHandlers(socket: Socket, deps: StatsHandlersDepende
   }));
 
   // ============================================================================
-  // get_game_replay - Get game replay data
+  // get_game_replay - Get game replay data (finished or unfinished)
   // ============================================================================
   socket.on('get_game_replay', errorBoundaries.readOnly('get_game_replay')(async ({ gameId }: { gameId: string }) => {
     try {
       const replayData = await getGameReplayData(gameId);
 
       if (!replayData) {
-        socket.emit('error', { message: 'Game replay not found or game is not finished yet' });
+        socket.emit('error', { message: 'Game not found' });
         return;
       }
 

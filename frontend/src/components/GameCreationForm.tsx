@@ -69,15 +69,16 @@ export function GameCreationForm({
           </div>
 
           {/* Persistence Mode Selector */}
-          <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3">
+          <div className={`bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3 ${!user ? 'opacity-60' : ''}`}>
             <div className="flex items-center justify-between gap-3">
-              <label className="flex items-center gap-2 cursor-pointer flex-1">
+              <label className={`flex items-center gap-2 flex-1 ${user ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
                 <input
                   data-testid="persistence-mode-checkbox"
                   type="checkbox"
                   checked={createGamePersistence === 'elo'}
                   onChange={(e) => setCreateGamePersistence(e.target.checked ? 'elo' : 'casual')}
-                  className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2"
+                  disabled={!user}
+                  className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
                   Ranked Mode
@@ -92,7 +93,9 @@ export function GameCreationForm({
               </span>
             </div>
             <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
-              {createGamePersistence === 'elo'
+              {!user
+                ? '🔒 Available when registered - Register to enable ranked mode'
+                : createGamePersistence === 'elo'
                 ? 'Game will be saved to your profile and affect your ranking'
                 : 'No stats saved - play without affecting your ELO rating'}
             </p>

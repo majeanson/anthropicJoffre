@@ -21,6 +21,7 @@ import { useBotManagement } from '../hooks/useBotManagement';
 // Lazy load heavy modals for better initial load performance
 const BotManagementPanel = lazy(() => import('./BotManagementPanel').then(m => ({ default: m.BotManagementPanel })));
 const FriendsPanel = lazy(() => import('./FriendsPanel'));
+const AchievementsPanel = lazy(() => import('./AchievementsPanel').then(m => ({ default: m.AchievementsPanel })));
 const CatchUpModal = lazy(() => import('./CatchUpModal').then(m => ({ default: m.CatchUpModal })));
 const LoginModal = lazy(() => import('./LoginModal'));
 const RegisterModal = lazy(() => import('./RegisterModal'));
@@ -44,6 +45,8 @@ interface GlobalUIProps {
   setFriendRequestNotification: (notification: FriendRequestNotificationType | null) => void;
   showFriendsPanel: boolean;
   setShowFriendsPanel: (show: boolean) => void;
+  showAchievementsPanel: boolean;
+  setShowAchievementsPanel: (show: boolean) => void;
   gameId: string;
   socket: any;
 }
@@ -65,6 +68,8 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   setFriendRequestNotification,
   showFriendsPanel,
   setShowFriendsPanel,
+  showAchievementsPanel,
+  setShowAchievementsPanel,
   gameId,
   socket
 }) => {
@@ -122,6 +127,12 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
             onClose={() => setShowFriendsPanel(false)}
             socket={socket}
             currentPlayer={gameState.players.find(p => p.id === socket?.id)?.name || ''}
+          />
+          <AchievementsPanel
+            isOpen={showAchievementsPanel}
+            onClose={() => setShowAchievementsPanel(false)}
+            socket={socket}
+            playerName={gameState.players.find(p => p.id === socket?.id)?.name || ''}
           />
         </Suspense>
       )}

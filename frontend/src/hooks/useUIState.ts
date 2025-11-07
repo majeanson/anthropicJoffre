@@ -10,14 +10,17 @@ interface UseUIStateReturn {
   showBotManagement: boolean;
   showFriendsPanel: boolean;
   showReplayModal: boolean;
+  showAchievementsPanel: boolean;
 
   setShowBotManagement: (show: boolean) => void;
   setShowFriendsPanel: (show: boolean) => void;
   setShowReplayModal: (show: boolean) => void;
+  setShowAchievementsPanel: (show: boolean) => void;
 
   toggleBotManagement: () => void;
   toggleFriendsPanel: () => void;
   toggleReplayModal: () => void;
+  toggleAchievementsPanel: () => void;
 
   closeAllPanels: () => void;
 }
@@ -32,6 +35,7 @@ export function useUIState(): UseUIStateReturn {
   const [showBotManagement, setShowBotManagement] = useState<boolean>(false);
   const [showFriendsPanel, setShowFriendsPanel] = useState<boolean>(false);
   const [showReplayModal, setShowReplayModal] = useState<boolean>(false);
+  const [showAchievementsPanel, setShowAchievementsPanel] = useState<boolean>(false);
 
   const toggleBotManagement = useCallback(() => {
     setShowBotManagement(prev => !prev);
@@ -45,24 +49,32 @@ export function useUIState(): UseUIStateReturn {
     setShowReplayModal(prev => !prev);
   }, []);
 
+  const toggleAchievementsPanel = useCallback(() => {
+    setShowAchievementsPanel(prev => !prev);
+  }, []);
+
   const closeAllPanels = useCallback(() => {
     setShowBotManagement(false);
     setShowFriendsPanel(false);
     setShowReplayModal(false);
+    setShowAchievementsPanel(false);
   }, []);
 
   return {
     showBotManagement,
     showFriendsPanel,
     showReplayModal,
+    showAchievementsPanel,
 
     setShowBotManagement,
     setShowFriendsPanel,
     setShowReplayModal,
+    setShowAchievementsPanel,
 
     toggleBotManagement,
     toggleFriendsPanel,
     toggleReplayModal,
+    toggleAchievementsPanel,
 
     closeAllPanels,
   };

@@ -19,6 +19,7 @@ describe('QuickPlayPanel', () => {
     quickPlayPersistence: 'casual' as 'elo' | 'casual',
     setQuickPlayPersistence: mockSetQuickPlayPersistence,
     onQuickPlay: mockOnQuickPlay,
+    user: null,
   };
 
   beforeEach(() => {

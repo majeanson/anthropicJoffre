@@ -150,9 +150,9 @@ export function validateBet(
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
     const hasValidBets = game.currentBets.some(b => !b.skipped);
 
-    // Dealer cannot skip once betting has started (if anyone has bet)
-    if (isDealer && hasValidBets) {
-      return err('As dealer, you cannot skip once betting has started. You must match or raise the current bet.');
+    // Dealer MUST bet only if all other players have skipped
+    if (isDealer && !hasValidBets) {
+      return err('As dealer, you must place a bet when all other players have skipped.');
     }
   }
 

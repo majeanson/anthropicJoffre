@@ -102,9 +102,11 @@ function AppContent() {
     showBotManagement,
     showFriendsPanel,
     showReplayModal,
+    showAchievementsPanel,
     setShowBotManagement,
     setShowFriendsPanel,
     setShowReplayModal,
+    setShowAchievementsPanel,
   } = useUIState();
 
   // UI state
@@ -113,7 +115,6 @@ function AppContent() {
 
   // Sprint 2 Phase 1: Achievement state
   const [achievementNotification, setAchievementNotification] = useState<{ achievement: Achievement; playerName: string } | null>(null);
-  const [, setShowAchievementsPanel] = useState<boolean>(false);
 
   // Sprint 2 Phase 2: Friends state
   const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
@@ -127,6 +128,23 @@ function AppContent() {
 
   // Sprint 3 Phase 5: Notification state
   useNotifications(socket, auth?.isAuthenticated || false);
+
+  // Authentication-gated feature handlers
+  const handleOpenAchievements = useCallback(() => {
+    if (!auth.isAuthenticated) {
+      showToast('Please register to access achievements', 'info', 3000);
+      return;
+    }
+    setShowAchievementsPanel(true);
+  }, [auth.isAuthenticated, showToast, setShowAchievementsPanel]);
+
+  const handleOpenFriends = useCallback(() => {
+    if (!auth.isAuthenticated) {
+      showToast('Please register to access friends', 'info', 3000);
+      return;
+    }
+    setShowFriendsPanel(true);
+  }, [auth.isAuthenticated, showToast, setShowFriendsPanel]);
 
   // Online players tracking
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
@@ -189,6 +207,7 @@ function AppContent() {
     gameState,
     autoJoinGameId,
     showToast,
+    setToast,
     setError,
     setGameState,
     setGameId,
@@ -294,8 +313,9 @@ function AppContent() {
     // If spectator or player not found, just leave normally
     if (isSpectator || !currentPlayer || currentPlayer.isBot) {
       socket.emit('leave_game', { gameId });
-      // Clear chat messages when leaving game
+      // Clear chat messages and toasts when leaving game
       setChatMessages([]);
+      setToast(null);
 
       // Clean up bot sockets
       botSocketsRef.current.forEach((botSocket) => {
@@ -321,8 +341,9 @@ function AppContent() {
       }
 
       socket.emit('leave_game', { gameId });
-      // Clear chat messages when leaving game
+      // Clear chat messages and toasts when leaving game
       setChatMessages([]);
+      setToast(null);
 
       // Clean up bot sockets
       botSocketsRef.current.forEach((botSocket) => {
@@ -443,6 +464,8 @@ function AppContent() {
     setFriendRequestNotification,
     showFriendsPanel,
     setShowFriendsPanel,
+    showAchievementsPanel,
+    setShowAchievementsPanel,
     gameId,
     socket
   };
@@ -585,8 +608,8 @@ function AppContent() {
             autoplayEnabled={autoplayEnabled}
             onAutoplayToggle={toggleAutoplay}
             onOpenBotManagement={() => setShowBotManagement(true)}
-            onOpenAchievements={() => setShowAchievementsPanel(true)}
-            onOpenFriends={() => setShowFriendsPanel(true)}
+            onOpenAchievements={handleOpenAchievements}
+            onOpenFriends={handleOpenFriends}
             socket={socket}
             gameId={gameId}
             chatMessages={chatMessages}
@@ -639,8 +662,8 @@ function AppContent() {
           soundEnabled={soundEnabled}
           onSoundToggle={toggleSound}
           onOpenBotManagement={() => setShowBotManagement(true)}
-          onOpenAchievements={() => setShowAchievementsPanel(true)}
-          onOpenFriends={() => setShowFriendsPanel(true)}
+          onOpenAchievements={handleOpenAchievements}
+          onOpenFriends={handleOpenFriends}
           socket={socket}
           gameId={gameId}
           chatMessages={chatMessages}

@@ -161,7 +161,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
           {!loading && !matchData && (
             <div className="text-center py-12">
               <span className="text-6xl mb-4 block">😞</span>
-              <p className="text-gray-600 dark:text-gray-400 font-semibold">Match data not found or game not finished</p>
+              <p className="text-gray-600 dark:text-gray-400 font-semibold">Match data not found</p>
             </div>
           )}
 

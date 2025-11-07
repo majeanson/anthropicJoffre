@@ -591,8 +591,9 @@ export const getPlayerGameHistory = async (playerName: string, limit: number = 2
 };
 
 /**
- * Get complete replay data for a finished game
+ * Get complete replay data for a game (finished or unfinished)
  * Returns all rounds with full trick-by-trick history
+ * For unfinished games, winning_team and finished_at will be null
  */
 export const getGameReplayData = async (gameId: string) => {
   const cacheKey = `game_replay:${gameId}`;
@@ -611,10 +612,11 @@ export const getGameReplayData = async (gameId: string) => {
         trump_suit,
         game_duration_seconds,
         is_bot_game,
+        is_finished,
         created_at,
         finished_at
       FROM game_history
-      WHERE game_id = $1 AND is_finished = TRUE
+      WHERE game_id = $1
     `;
     const result = await query(text, [gameId]);
 
