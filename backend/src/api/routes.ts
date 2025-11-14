@@ -686,6 +686,7 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
           return {
             gameId: game.id,
             phase: game.phase,
+            persistenceMode: game.persistenceMode,
             playerCount: game.players.length,
             humanPlayerCount,
             botPlayerCount,

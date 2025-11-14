@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
+import { useAuth } from '../contexts/AuthContext';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -30,6 +31,7 @@ const getPhaseLabel = (phase: string) => {
 interface LobbyGame {
   gameId: string;
   phase: string;
+  persistenceMode: 'elo' | 'casual';
   playerCount: number;
   humanPlayerCount: number;
   botPlayerCount: number;
@@ -72,6 +74,7 @@ interface LobbyBrowserProps {
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: LobbyBrowserProps) {
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'active' | 'recent'>('active');
   const [games, setGames] = useState<LobbyGame[]>([]);
   const [recentGames, setRecentGames] = useState<RecentGame[]>([]);
@@ -87,11 +90,27 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   const [filterWithBots, setFilterWithBots] = useState(false);
   const [filterNeedsPlayers, setFilterNeedsPlayers] = useState(false);
   const [filterInProgress, setFilterInProgress] = useState(false);
+  const [filterGameMode, setFilterGameMode] = useState<'all' | 'ranked' | 'casual'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'players' | 'score'>('newest');
 
   // Track if we've done the initial load for each tab
   const hasLoadedActiveGames = useRef(false);
   const hasLoadedRecentGames = useRef(false);
+
+  // Handler to validate join game request
+  const handleJoinGameClick = (game: LobbyGame) => {
+    // Check if game is ranked and user is not authenticated
+    if (game.persistenceMode === 'elo' && !isAuthenticated) {
+      setError('Please register to join ranked games');
+      // Clear error after 5 seconds
+      setTimeout(() => setError(null), 5000);
+      return;
+    }
+
+    // Valid - proceed with join
+    onJoinGame(game.gameId);
+    onClose();
+  };
 
   const fetchGames = async (isInitialLoad = false, retryCount = 0) => {
     try {
@@ -266,6 +285,11 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
     if (filterInProgress) {
       filtered = filtered.filter(game => game.isInProgress);
     }
+    if (filterGameMode === 'ranked') {
+      filtered = filtered.filter(game => game.persistenceMode === 'elo');
+    } else if (filterGameMode === 'casual') {
+      filtered = filtered.filter(game => game.persistenceMode === 'casual');
+    }
 
     // Apply sorting
     filtered.sort((a, b) => {
@@ -284,7 +308,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
     });
 
     return filtered;
-  }, [games, filterWithBots, filterNeedsPlayers, filterInProgress, sortBy]);
+  }, [games, filterWithBots, filterNeedsPlayers, filterInProgress, filterGameMode, sortBy]);
 
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {
@@ -434,6 +458,22 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   </label>
                 </div>
 
+                {/* Game Mode Filter */}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
+                    Mode:
+                  </span>
+                  <select
+                    value={filterGameMode}
+                    onChange={(e) => setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')}
+                    className="px-3 py-1.5 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-600 text-umber-900 dark:text-gray-100 text-sm font-medium cursor-pointer"
+                  >
+                    <option value="all">🎯 All Games</option>
+                    <option value="ranked">🏆 Ranked</option>
+                    <option value="casual">🎲 Casual</option>
+                  </select>
+                </div>
+
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-2 ml-auto">
                   <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
@@ -452,7 +492,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
               </div>
 
               {/* Active filter count */}
-              {(filterWithBots || filterNeedsPlayers || filterInProgress) && (
+              {(filterWithBots || filterNeedsPlayers || filterInProgress || filterGameMode !== 'all') && (
                 <div className="mt-2 text-xs text-umber-600 dark:text-gray-400">
                   Showing {filteredAndSortedGames.length} of {games.length} games
                 </div>
@@ -564,6 +604,13 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                           <span className={`px-3 py-1 rounded-full text-xs font-bold ${getPhaseColor(game.phase)}`}>
                             {getPhaseLabel(game.phase)}
                           </span>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                            game.persistenceMode === 'elo'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                              : 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
+                          }`}>
+                            {game.persistenceMode === 'elo' ? '🏆 Ranked' : '🎲 Casual'}
+                          </span>
                         </div>
                         <div className="text-sm text-umber-600 dark:text-gray-400 flex items-center gap-4">
                           <span>👥 {game.humanPlayerCount} player{game.humanPlayerCount !== 1 ? 's' : ''}</span>
@@ -590,10 +637,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                             2. In-progress games with bots (to replace them) */}
                         {(game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) && (
                           <button
-                            onClick={() => {
-                              onJoinGame(game.gameId);
-                              onClose();
-                            }}
+                            onClick={() => handleJoinGameClick(game)}
                             className="bg-gradient-to-r from-green-600 to-green-700 text-white px-3 md:px-4 py-2 rounded-lg font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 text-sm"
                           >
                             Join
