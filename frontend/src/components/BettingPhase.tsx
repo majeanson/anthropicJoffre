@@ -6,6 +6,7 @@ import { TimeoutIndicator } from './TimeoutIndicator';
 import { Leaderboard } from './Leaderboard';
 import { ChatPanel, ChatMessage } from './ChatPanel';
 import { GameHeader } from './GameHeader';
+import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { sounds } from '../utils/sounds';
 import { InlineBetStatus } from './InlineBetStatus';
 import { SmartValidationMessage } from './SmartValidationMessage';
@@ -24,13 +25,16 @@ interface BettingPhaseProps {
   onOpenBotManagement?: () => void;
   onOpenAchievements?: () => void; // Sprint 2 Phase 1
   onOpenFriends?: () => void; // Sprint 2 Phase 2
+  soundEnabled?: boolean;
+  onSoundToggle?: () => void;
+  connectionStats?: ConnectionStats;
   socket?: Socket | null;
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
   // Memoize expensive computations
   const hasPlacedBet = useMemo(
     () => currentBets.some(b => b.playerId === currentPlayerId),
@@ -209,6 +213,12 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
         unreadChatCount={unreadChatCount}
+        soundEnabled={soundEnabled}
+        onSoundToggle={onSoundToggle}
+        connectionStats={connectionStats}
+        highestBet={highestBet ? { amount: highestBet.amount, withoutTrump: highestBet.withoutTrump, playerId: highestBet.playerId } : undefined}
+        trump={gameState.trump}
+        bettingTeamId={gameState.highestBet?.playerId ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId : null}
       />
 
       <div className="flex-1 flex items-center justify-center p-4">

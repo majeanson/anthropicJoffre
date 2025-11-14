@@ -620,6 +620,9 @@ function AppContent() {
             gameState={gameState}
             autoplayEnabled={autoplayEnabled}
             onAutoplayToggle={toggleAutoplay}
+            soundEnabled={soundEnabled}
+            onSoundToggle={toggleSound}
+            connectionStats={connectionStats}
             onOpenBotManagement={() => setShowBotManagement(true)}
             onOpenAchievements={handleOpenAchievements}
             onOpenFriends={handleOpenFriends}
@@ -728,11 +731,11 @@ function AppContent() {
             <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-5xl w-full">
                 <RoundSummary
-                gameState={gameState}
-                onReady={handleReady}
-              />
+                  gameState={gameState}
+                  onReady={handleReady}
+                />
+              </div>
             </div>
-          </div>
           </Suspense>
         </ErrorBoundary>
       </>
