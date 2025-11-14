@@ -12,6 +12,8 @@
 import winston from 'winston';
 import path from 'path';
 import { Request, Response, NextFunction } from 'express';
+import { Logtail } from '@logtail/node';
+import { LogtailTransport } from '@logtail/winston';
 
 // Augment Express Request type to include logger
 declare global {
@@ -45,6 +47,26 @@ const prodFormat = winston.format.combine(
 // Determine log level from environment
 const logLevel = process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production' ? 'info' : 'debug');
 
+// Initialize Logtail (only in production with token)
+let logtail: Logtail | null = null;
+if (process.env.LOGTAIL_SOURCE_TOKEN) {
+  logtail = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN);
+  console.log('✅ Logtail log aggregation enabled');
+}
+
+// Build transports array
+const transports: winston.transport[] = [
+  // Console output (always enabled)
+  new winston.transports.Console({
+    stderrLevels: ['error'],
+  }),
+];
+
+// Add Logtail transport if configured
+if (logtail) {
+  transports.push(new LogtailTransport(logtail));
+}
+
 // Create Winston logger
 const logger = winston.createLogger({
   level: logLevel,
@@ -53,12 +75,7 @@ const logger = winston.createLogger({
     service: 'trick-card-game-backend',
     environment: process.env.NODE_ENV || 'development',
   },
-  transports: [
-    // Console output
-    new winston.transports.Console({
-      stderrLevels: ['error'],
-    }),
-  ],
+  transports,
 });
 
 // Add file transports in production
@@ -293,5 +310,18 @@ function sanitizeData(data: unknown): unknown {
   }
   return data;
 }
+
+// Flush Logtail logs on exit (important for graceful shutdown)
+process.on('SIGTERM', async () => {
+  if (logtail) {
+    await logtail.flush();
+  }
+});
+
+process.on('SIGINT', async () => {
+  if (logtail) {
+    await logtail.flush();
+  }
+});
 
 export default logger;
