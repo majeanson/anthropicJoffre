@@ -30,9 +30,12 @@
     "pre-commit:full": "node scripts/pre-commit-check.js --build --tests",
     "build:backend": "npm run build --prefix backend",
     "build:frontend": "npm run generate:build-info && npm run sync:buildinfo && npm run build --prefix frontend",
-    "build": "npm run build:backend && npm run build:frontend"
+    "build": "npm run build:backend && npm run build:frontend",
+    "load-test": "node load-test.js",
+    "load-test:prod": "BACKEND_URL=https://anthropicjoffre-production.up.railway.app node load-test.js"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "socket.io-client": "^4.7.2"
   }
 }
