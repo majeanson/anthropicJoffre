@@ -36,6 +36,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
 import { ConnectionManager } from './connection/ConnectionManager';
 import { GameState, Player, Bet, TrickCard, Card, PlayerSession, GamePhase } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
@@ -316,6 +317,18 @@ app.use(cors({
   },
   credentials: true,
 }));
+
+// Security headers middleware with helmet
+// Configured for production deployment with HTTPS
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable CSP for now (conflicts with Socket.io)
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true,
+  },
+}));
+
 app.use(express.json());
 
 // Add structured logging for HTTP requests

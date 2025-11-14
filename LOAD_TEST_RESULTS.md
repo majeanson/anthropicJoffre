@@ -1,7 +1,10 @@
-# Load Testing Results - Sprint 15
+# Load Testing Results - Sprint 15 (Updated)
 
 **Date**: 2025-11-14
-**Tool**: Custom Socket.IO load testing script
+**Last Updated**: 2025-11-14
+**Tools**:
+- Basic load test: `load-test.js`
+- Advanced load test: `load-test-advanced.js` (NEW!)
 **Backend**: https://anthropicjoffre-production.up.railway.app
 
 ---
@@ -57,43 +60,91 @@
 
 ---
 
-## 🔧 How to Run the Load Test
+## 🔧 How to Run the Load Tests
 
 ### Prerequisites
 ```bash
 npm install  # Installs socket.io-client
 ```
 
-### Run Against Local Backend
+### Basic Load Test (5 Concurrent Games)
+
+**Local Backend**:
 ```bash
 npm run load-test
-# OR
-node load-test.js
 ```
 
-### Run Against Production Backend
-
-**Windows**:
+**Production Backend**:
 ```bash
-set BACKEND_URL=https://anthropicjoffre-production.up.railway.app&& node load-test.js
+npm run load-test:prod
 ```
 
-**Linux/Mac**:
+### Advanced Load Tests (NEW!)
+
+**Baseline (5 concurrent games)**:
 ```bash
-BACKEND_URL=https://anthropicjoffre-production.up.railway.app npm run load-test:prod
+npm run load-test:advanced
+```
+
+**Moderate Load (10 concurrent games)**:
+```bash
+npm run load-test:moderate
+```
+
+**Heavy Load (20 concurrent games)**:
+```bash
+npm run load-test:heavy
+```
+
+**Stress Test (50 concurrent games)**:
+```bash
+npm run load-test:stress
+```
+
+**Spike Test (gradual ramp-up to 30 games)**:
+```bash
+npm run load-test:spike
+```
+
+**Custom Configuration**:
+```bash
+# Custom number of games
+NUM_GAMES=15 node load-test-advanced.js
+
+# Custom game duration
+GAME_DURATION_MS=60000 node load-test-advanced.js
+
+# Disable reconnection tests
+RECONNECT_TEST=false node load-test-advanced.js
+
+# Production backend
+BACKEND_URL=https://anthropicjoffre-production.up.railway.app NUM_GAMES=10 node load-test-advanced.js
 ```
 
 ---
 
 ## 📝 Load Test Script Features
 
-### Metrics Tracked
+### Basic Load Test (`load-test.js`)
+**Metrics Tracked**:
 - ✅ Games created successfully
 - ✅ Players joined successfully
 - ✅ Games that failed to start
 - ✅ Average connection latency
 - ✅ Error count and details
-- ✅ Reconnection success rate
+- ✅ Reconnection success rate (1 player per test)
+
+### Advanced Load Test (`load-test-advanced.js`) - NEW!
+**Enhanced Metrics**:
+- ✅ **Latency Distribution**: Min, Max, Average, p95, p99 percentiles
+- ✅ **Success Rates**: Game creation, player joins, reconnections (%)
+- ✅ **Error Categorization**: Connection, game creation, player join, reconnection, timeout, other
+- ✅ **Transport Tracking**: WebSocket vs Polling ratio
+- ✅ **Memory Monitoring**: Client-side heap and RSS usage
+- ✅ **Comprehensive Reporting**: Detailed pass/fail criteria evaluation
+- ✅ **Flexible Testing**: Concurrent and spike test modes
+- ✅ **Individual Timeouts**: Per-player join timeout detection (15s)
+- ✅ **Game Timeout Protection**: 60s timeout for entire game setup
 
 ### Test Output Example
 ```
@@ -190,16 +241,90 @@ Based on Railway's free tier limits and Socket.IO performance:
 
 ---
 
+## ✅ Advanced Load Test Output Example
+
+```
+📊 ADVANCED LOAD TEST RESULTS
+======================================================================
+Backend URL:               http://localhost:3000
+Test Type:                 concurrent
+Test Duration:             42.15s
+Target Concurrent Games:   10
+Game Duration Each:        30s
+
+📈 Connection Metrics:
+  Games Created:           10/10 (100.00%)
+  Players Joined:          30/30 (100.00%)
+  Games Failed:            0
+  Players Connected:       40
+  Players Disconnected:    40
+
+⚡ Latency Statistics:
+  Average:                 145.32ms
+  Min:                     89ms
+  Max:                     312ms
+  95th Percentile (p95):   287ms
+  99th Percentile (p99):   305ms
+
+🔄 Reconnection Metrics:
+  Attempts:                2
+  Successes:               2
+  Failures:                0
+  Success Rate:            100.00%
+
+🔌 Transport Distribution:
+  WebSocket:               40 (100.00%)
+  Polling:                 0 (0.00%)
+
+❌ Error Summary:
+  Total Errors:            0
+  Connection Errors:       0
+  Game Creation Errors:    0
+  Player Join Errors:      0
+  Reconnection Errors:     0
+  Timeout Errors:          0
+  Other Errors:            0
+
+💾 Memory Usage (Client):
+  Heap Used:               45.23 MB
+  Heap Total:              58.12 MB
+  RSS:                     112.34 MB
+
+======================================================================
+✅ LOAD TEST PASSED - Server performs well under load
+
+Passing Criteria:
+  ✓ Game creation success rate ≥ 90%
+  ✓ Player join success rate ≥ 90%
+  ✓ Total errors < number of games
+  ✓ Average latency < 1000ms
+  ✓ Reconnection success rate ≥ 80%
+======================================================================
+```
+
 ## ✅ Conclusion
 
-The load testing script is ready for use. Key features:
-- ✅ Simulates realistic multiplayer game scenarios
-- ✅ Tests concurrent game creation and joining
-- ✅ Validates reconnection functionality
-- ✅ Measures latency and error rates
-- ✅ Provides detailed metrics report
+**Two Load Testing Tools Available**:
 
-**Recommendation**: Run load tests against a local backend or staging environment first, then schedule production tests during off-peak hours.
+1. **Basic Load Test** (`load-test.js`):
+   - ✅ Simple 5-game concurrent test
+   - ✅ Basic metrics (games created, latency, errors)
+   - ✅ Good for quick smoke testing
+
+2. **Advanced Load Test** (`load-test-advanced.js`) - **RECOMMENDED**:
+   - ✅ Multiple test modes (concurrent, spike)
+   - ✅ Configurable game count (5, 10, 20, 50+)
+   - ✅ Comprehensive metrics (latency distribution, error categorization)
+   - ✅ Transport tracking (WebSocket vs Polling)
+   - ✅ Memory monitoring
+   - ✅ Detailed pass/fail criteria evaluation
+   - ✅ Better error handling and timeout detection
+
+**Recommendation**:
+- Use **advanced load test** for comprehensive performance validation
+- Start with 5-10 games locally to verify functionality
+- Run 20-50 game stress tests before production deployment
+- Schedule production tests during off-peak hours with monitoring
 
 ---
 
