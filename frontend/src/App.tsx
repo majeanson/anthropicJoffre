@@ -263,14 +263,24 @@ function AppContent() {
 
   const handleSpectateGame = (gameId: string, spectatorName?: string) => {
     if (socket) {
-      socket.emit('spectate_game', { gameId, spectatorName });
+      // Explicitly include optional fields for .strict() validation
+      socket.emit('spectate_game', {
+        gameId,
+        spectatorName: spectatorName || undefined
+      });
       setGameId(gameId);
     }
   };
 
   const handlePlaceBet = useCallback((amount: number, withoutTrump: boolean, skipped?: boolean) => {
     if (socket && gameId) {
-      socket.emit('place_bet', { gameId, amount, withoutTrump, skipped });
+      // Explicitly include all fields for .strict() validation
+      socket.emit('place_bet', {
+        gameId,
+        amount,
+        withoutTrump,
+        skipped: skipped ?? false
+      });
     }
   }, [socket, gameId]);
 
