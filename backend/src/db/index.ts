@@ -22,8 +22,8 @@ export const getPool = () => {
   if (!pool && process.env.DATABASE_URL) {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
-      max: 5,                        // Reduced to 5 for Neon Free Tier (was 10)
-      min: 0,                        // Allow pool to scale to 0 when idle
+      max: 3,                        // MEMORY OPTIMIZATION: Max 3 connections (was 5)
+      min: 1,                        // MEMORY OPTIMIZATION: Keep 1 warm connection (was 0)
       idleTimeoutMillis: 30000,      // Close idle connections after 30s (Neon scale-to-zero)
       connectionTimeoutMillis: 10000, // 10s timeout (was 3s - too aggressive for cold starts)
       allowExitOnIdle: true,         // Allow process to exit when pool is idle

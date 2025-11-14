@@ -255,7 +255,7 @@ const io = new Server(httpServer, {
     zlibDeflateOptions: {
       chunkSize: 1024,
       memLevel: 7,
-      level: 3, // Compression level (1-9, lower = faster, higher = better compression)
+      level: 1, // MEMORY OPTIMIZATION: Level 1 = faster, less memory (was 3)
     },
     zlibInflateOptions: {
       chunkSize: 10 * 1024,
@@ -1390,7 +1390,24 @@ async function endRound(gameId: string) {
     // Track when game finished for cleanup (15 min TTL)
     gameFinishTimes.set(gameId, Date.now());
 
+    // Broadcast game_over event BEFORE removing from memory
     broadcastGameUpdate(gameId, 'game_over', { winningTeam, gameState: game });
+
+    // ============================================================================
+    // MEMORY OPTIMIZATION: Remove finished games from memory immediately
+    // Game is already saved to database, so we only need DB reference for replays
+    // ============================================================================
+    console.log(`[Memory] Removing finished game ${gameId} from memory (saved to database)`);
+
+    // Remove from all tracking Maps
+    games.delete(gameId);
+    gameFinishTimes.delete(gameId);
+    gameCreationTimes.delete(gameId);
+    previousGameStates.delete(gameId);
+
+    // Log memory freed
+    const memUsage = memoryManager.getMemoryUsage();
+    console.log(`[Memory] Current usage: ${memUsage.heapUsedPercent}% (${memUsage.heapUsedMB}MB / ${memUsage.heapTotalMB}MB)`);
   } else {
     // Initialize player ready tracking and round end timestamp
     game.playersReady = [];
