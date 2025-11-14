@@ -88,6 +88,8 @@ export function useSocketConnection() {
     const token = getAccessToken();
 
     const newSocket = io(SOCKET_URL, {
+      // Enable both transports for Railway compatibility
+      transports: ['websocket', 'polling'],
       // Enable automatic reconnection with exponential backoff
       reconnection: true,
       reconnectionAttempts: 10,

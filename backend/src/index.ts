@@ -243,6 +243,11 @@ const io = new Server(httpServer, {
   // Increased to 60s to prevent false timeouts when clients are busy processing bot actions/deltas
   pingTimeout: 60000, // 60 seconds (was 10s - too aggressive)
   pingInterval: 25000,  // 25 seconds (was 5s)
+  // Enable both transports for Railway compatibility
+  // Railway's proxy sometimes has issues with WebSocket upgrades, so allow polling fallback
+  transports: ['websocket', 'polling'],
+  // Allow upgrades from polling to websocket
+  allowUpgrades: true,
   // Enable WebSocket compression (reduces bandwidth by 30-60%)
   perMessageDeflate: {
     threshold: 1024, // Only compress messages > 1KB

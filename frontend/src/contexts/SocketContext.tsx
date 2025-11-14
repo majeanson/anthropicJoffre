@@ -16,6 +16,8 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL, {
+      // Enable both transports for Railway compatibility
+      transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
