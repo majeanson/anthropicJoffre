@@ -39,7 +39,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
 
     const fetchData = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const apiUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
         console.log('[GlobalDebug] Fetching from:', apiUrl);
 
         // Fetch server health

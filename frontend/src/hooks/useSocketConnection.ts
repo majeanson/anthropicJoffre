@@ -64,7 +64,7 @@ export function useSocketConnection() {
     // This helps wake up the server if it's in cold start (Railway free tier)
     const prewarmServer = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        const apiUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
