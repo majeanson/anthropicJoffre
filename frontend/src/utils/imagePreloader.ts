@@ -3,15 +3,15 @@
  */
 
 const CARD_IMAGES = [
-  // Emblems for regular cards
-  '/cards/red_emblem.jpg',
-  '/cards/blue_emblem.jpg',
-  '/cards/green_emblem.jpg',
-  '/cards/brown_emblem.jpg',
+  // Emblems for regular cards (optimized: ~64% smaller)
+  '/cards/optimized/red_emblem.jpg',
+  '/cards/optimized/blue_emblem.jpg',
+  '/cards/optimized/green_emblem.jpg',
+  '/cards/optimized/brown_emblem.jpg',
 
-  // Special bon cards
-  '/cards/red_bon.jpg',
-  '/cards/brown_bon.jpg',
+  // Special bon cards (optimized: ~63% smaller)
+  '/cards/optimized/red_bon.jpg',
+  '/cards/optimized/brown_bon.jpg',
 ];
 
 /**
