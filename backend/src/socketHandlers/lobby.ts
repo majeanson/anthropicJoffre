@@ -212,18 +212,42 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   // join_game - Join existing game
   // ============================================================================
   socket.on('join_game', errorBoundaries.gameAction('join_game')(async (payload: { gameId: string; playerName: string; isBot?: boolean; botDifficulty?: BotDifficulty }) => {
+    // Sprint 14: Enhanced logging for debugging join failures
+    console.log('[JOIN_GAME] Request received:', {
+      socketId: socket.id,
+      payload: JSON.stringify(payload),
+      timestamp: new Date().toISOString()
+    });
+
     // Sprint 2: Validate input with Zod schema
     const validation = validateInput(joinGamePayloadSchema, payload);
     if (!validation.success) {
-      console.error('[VALIDATION ERROR] join_game failed:', {
+      const errorMsg = `Invalid input: ${validation.error}`;
+      console.error('[JOIN_GAME] VALIDATION FAILED:', {
         payload: JSON.stringify(payload),
         error: validation.error,
-        socketId: socket.id
+        socketId: socket.id,
+        timestamp: new Date().toISOString()
       });
-      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+
+      // Emit error to client (this is critical - must not fail silently)
+      try {
+        socket.emit('error', { message: errorMsg });
+        console.log('[JOIN_GAME] Error emitted to client:', errorMsg);
+      } catch (emitError) {
+        console.error('[JOIN_GAME] CRITICAL: Failed to emit error to client:', emitError);
+      }
+
       logger.warn('Invalid join_game payload', { payload, error: validation.error });
       return;
     }
+
+    console.log('[JOIN_GAME] Validation passed:', {
+      gameId: validation.data.gameId,
+      playerName: validation.data.playerName,
+      isBot: validation.data.isBot,
+      botDifficulty: validation.data.botDifficulty
+    });
 
     const { gameId, playerName: validatedPlayerName, isBot, botDifficulty } = validation.data;
 
@@ -232,9 +256,23 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
 
     const game = games.get(gameId);
     if (!game) {
-      socket.emit('error', { message: `Game ${gameId} not found. It may have ended or the ID is incorrect.` });
+      const errorMsg = `Game ${gameId} not found. It may have ended or the ID is incorrect.`;
+      console.error('[JOIN_GAME] Game not found:', {
+        gameId,
+        playerName: sanitizedName,
+        socketId: socket.id,
+        availableGames: Array.from(games.keys())
+      });
+      socket.emit('error', { message: errorMsg });
       return;
     }
+
+    console.log('[JOIN_GAME] Game found:', {
+      gameId,
+      gamePhase: game.phase,
+      currentPlayers: game.players.length,
+      maxPlayers: 4
+    });
 
     // Check if player is trying to rejoin with same name
     const existingPlayer = game.players.find(p => p.name === sanitizedName);
@@ -438,6 +476,17 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
 
     // Associate player with connection manager
     connectionManager.associatePlayer(socket.id, sanitizedName, player.id, gameId, isBot || false);
+
+    console.log('[JOIN_GAME] SUCCESS:', {
+      playerName: sanitizedName,
+      gameId,
+      socketId: socket.id,
+      teamId: player.teamId,
+      isBot: isBot || false,
+      botDifficulty: player.botDifficulty,
+      totalPlayers: game.players.length,
+      gamePhase: game.phase
+    });
   }));
 
   // ============================================================================

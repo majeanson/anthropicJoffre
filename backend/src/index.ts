@@ -358,6 +358,9 @@ const games = new Map<string, GameState>();
 // Track game creation timestamps (gameId -> timestamp in milliseconds)
 const gameCreationTimes = new Map<string, number>();
 
+// Track when games finish (gameId -> timestamp in milliseconds)
+const gameFinishTimes = new Map<string, number>();
+
 // Session storage for reconnection (maps token to session data)
 const playerSessions = new Map<string, PlayerSession>();
 
@@ -487,6 +490,7 @@ async function deleteGame(gameId: string): Promise<void> {
   // Remove from cache
   games.delete(gameId);
   gameCreationTimes.delete(gameId);
+  gameFinishTimes.delete(gameId);
   previousGameStates.delete(gameId); // Clean up delta tracking
 
   // Remove from database (conditional on persistence mode)
@@ -1377,6 +1381,9 @@ async function endRound(gameId: string) {
     // Clean up round stats after all database updates
     roundStats.delete(gameId);
 
+    // Track when game finished for cleanup (15 min TTL)
+    gameFinishTimes.set(gameId, Date.now());
+
     broadcastGameUpdate(gameId, 'game_over', { winningTeam, gameState: game });
   } else {
     // Initialize player ready tracking and round end timestamp
@@ -1466,6 +1473,42 @@ httpServer.listen(PORT, HOST, async () => {
   }
 
   // ============= PERIODIC CLEANUP =============
+
+  // Clean up finished games every 15 minutes (aggressive cleanup for game_over phase)
+  setInterval(() => {
+    if (games.size === 0) return;
+
+    const now = Date.now();
+    const FINISHED_GAME_TTL = 15 * 60 * 1000; // 15 minutes
+    let cleanedCount = 0;
+
+    for (const [gameId, game] of games.entries()) {
+      // Remove games that have been in game_over phase for 15+ minutes
+      if (game.phase === 'game_over') {
+        const finishTime = gameFinishTimes.get(gameId);
+
+        if (finishTime) {
+          const timeSinceFinish = now - finishTime;
+
+          // Clean up if game has been finished for 15+ minutes
+          if (timeSinceFinish > FINISHED_GAME_TTL) {
+            games.delete(gameId);
+            gameCreationTimes.delete(gameId);
+            gameFinishTimes.delete(gameId);
+            previousGameStates.delete(gameId);
+            roundStats.delete(gameId);
+            cleanedCount++;
+            console.log(`[Cleanup] Removed finished game from memory: ${gameId} (finished ${Math.round(timeSinceFinish / 60000)}min ago)`);
+          }
+        }
+      }
+    }
+
+    if (cleanedCount > 0) {
+      console.log(`[Cleanup] Removed ${cleanedCount} finished game(s) from memory. Active games: ${games.size}`);
+    }
+  }, 900000); // Run every 15 minutes
+
   // Clean up stale games every hour (ONLY when games exist to reduce DB compute usage)
   setInterval(async () => {
     // Skip cleanup if no games in memory (reduces Neon compute usage)
@@ -1482,6 +1525,8 @@ httpServer.listen(PORT, HOST, async () => {
         if (games.has(staleGame.game_id)) {
           games.delete(staleGame.game_id);
           gameCreationTimes.delete(staleGame.game_id);
+          previousGameStates.delete(staleGame.game_id);
+          roundStats.delete(staleGame.game_id);
           console.log(`[Cleanup] Removed stale game from memory: ${staleGame.game_id}`);
         }
       }

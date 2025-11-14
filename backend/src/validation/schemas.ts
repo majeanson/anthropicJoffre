@@ -143,13 +143,15 @@ export const createGamePayloadSchema = z.object({
 
 /**
  * Join game payload
+ * NOTE: .strict() removed to allow omitted optional fields (isBot, botDifficulty)
+ * Human joins send only {gameId, playerName}, which is valid
  */
 export const joinGamePayloadSchema = z.object({
   gameId: gameIdSchema,
   playerName: playerNameSchema,
   isBot: booleanSchema.optional(),
   botDifficulty: botDifficultySchema.optional(),
-}).strict();
+});
 
 /**
  * Select team payload
