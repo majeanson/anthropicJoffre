@@ -28,6 +28,7 @@ interface PlayingPhaseProps {
   onOpenBotManagement?: () => void;
   onOpenAchievements?: () => void; // Sprint 2 Phase 1
   onOpenFriends?: () => void; // Sprint 2 Phase 2
+  onSwapPosition?: (targetPlayerId: string) => void;
   socket?: Socket | null;
   gameId?: string;
   chatMessages?: ChatMessage[];
@@ -35,7 +36,7 @@ interface PlayingPhaseProps {
   connectionStats?: ConnectionStats;
 }
 
-function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, soundEnabled = true, onSoundToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
+function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpectator = false, currentTrickWinnerId = null, onLeaveGame, autoplayEnabled = false, onAutoplayToggle, soundEnabled = true, onSoundToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, onSwapPosition, socket, gameId, chatMessages = [], onNewChatMessage, connectionStats }: PlayingPhaseProps) {
   // ✅ CRITICAL: Check player existence BEFORE any hooks to prevent "Rendered fewer hooks than expected" error
   // Rules of Hooks: All hooks must be called in the same order on every render
   // Early returns before hooks are safe, but early returns AFTER hooks will cause React to crash
@@ -578,6 +579,22 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     );
   };
 
+  // Helper to check if swap button should be shown for a position
+  const canSwapWithPlayer = (positionIndex: number): boolean => {
+    if (!currentPlayer || !onSwapPosition || isSpectator) return false;
+
+    // Only during active gameplay (not team_selection or game_over)
+    if (gameState.phase === 'team_selection' || gameState.phase === 'game_over') return false;
+
+    const player = getPlayer(positionIndex);
+
+    // Can't swap with yourself
+    if (!player || player.id === currentPlayerId) return false;
+
+    // Can swap with any bot (any team - position determines team after swap)
+    return player.isBot === true;
+  };
+
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
       return (
@@ -885,50 +902,83 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 {/* Bottom - You (position 0) */}
                 <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
                   {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
-                  <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
-                    isPlayerEmpty(0)
-                      ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
-                      : getPlayerTeam(0) === 1
-                        ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
-                        : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
-                  } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    <span className="flex items-center justify-center">
-                      {isPlayerEmpty(0) ? '💺 ' : ''}{getPlayerName(0)} (You)
-                      {getBotDifficultyBadge(0)}
-                    </span>
+                  <div className="flex items-center gap-1">
+                    <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                      isPlayerEmpty(0)
+                        ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
+                        : getPlayerTeam(0) === 1
+                          ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                          : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
+                    } ${cardPositions[0]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
+                      <span className="flex items-center justify-center">
+                        {isPlayerEmpty(0) ? '💺 ' : ''}{getPlayerName(0)} (You)
+                        {getBotDifficultyBadge(0)}
+                      </span>
+                    </div>
+                    {canSwapWithPlayer(0) && (
+                      <button
+                        onClick={() => onSwapPosition?.(getPlayer(0)!.id)}
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-2 py-1 rounded text-xs font-bold transition-all shadow-lg hover:shadow-xl active:scale-95"
+                        title={`Swap positions with ${getPlayer(0)!.name}${getPlayer(0)!.teamId !== currentPlayer?.teamId ? ' (changes teams!)' : ''}`}
+                      >
+                        ↔
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Left - Next player anti-clockwise (position 1) */}
                 <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
-                  <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
-                    isPlayerEmpty(1)
-                      ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
-                      : getPlayerTeam(1) === 1
-                        ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
-                        : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
-                  } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    <span className="flex items-center justify-center">
-                      {isPlayerEmpty(1) ? '💺 ' : ''}{getPlayerName(1)}
-                      {getBotDifficultyBadge(1)}
-                    </span>
+                  <div className="flex items-center gap-1">
+                    <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                      isPlayerEmpty(1)
+                        ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
+                        : getPlayerTeam(1) === 1
+                          ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                          : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
+                    } ${cardPositions[1]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
+                      <span className="flex items-center justify-center">
+                        {isPlayerEmpty(1) ? '💺 ' : ''}{getPlayerName(1)}
+                        {getBotDifficultyBadge(1)}
+                      </span>
+                    </div>
+                    {canSwapWithPlayer(1) && (
+                      <button
+                        onClick={() => onSwapPosition?.(getPlayer(1)!.id)}
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-2 py-1 rounded text-xs font-bold transition-all shadow-lg hover:shadow-xl active:scale-95"
+                        title={`Swap positions with ${getPlayer(1)!.name}${getPlayer(1)!.teamId !== currentPlayer?.teamId ? ' (changes teams!)' : ''}`}
+                      >
+                        ↔
+                      </button>
+                    )}
                   </div>
                 </div>
 
                 {/* Top - Opposite player (position 2) */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
-                  <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
-                    isPlayerEmpty(2)
-                      ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
-                      : getPlayerTeam(2) === 1
-                        ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
-                        : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
-                  } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    <span className="flex items-center justify-center">
-                      {isPlayerEmpty(2) ? '💺 ' : ''}{getPlayerName(2)}
-                      {getBotDifficultyBadge(2)}
-                    </span>
+                  <div className="flex items-center gap-1">
+                    <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                      isPlayerEmpty(2)
+                        ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
+                        : getPlayerTeam(2) === 1
+                          ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                          : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
+                    } ${cardPositions[2]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
+                      <span className="flex items-center justify-center">
+                        {isPlayerEmpty(2) ? '💺 ' : ''}{getPlayerName(2)}
+                        {getBotDifficultyBadge(2)}
+                      </span>
+                    </div>
+                    {canSwapWithPlayer(2) && (
+                      <button
+                        onClick={() => onSwapPosition?.(getPlayer(2)!.id)}
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-2 py-1 rounded text-xs font-bold transition-all shadow-lg hover:shadow-xl active:scale-95"
+                        title={`Swap positions with ${getPlayer(2)!.name}${getPlayer(2)!.teamId !== currentPlayer?.teamId ? ' (changes teams!)' : ''}`}
+                      >
+                        ↔
+                      </button>
+                    )}
                   </div>
                   {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId, 2)}
                 </div>
@@ -936,17 +986,28 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                 {/* Right - Previous player anti-clockwise (position 3) */}
                 <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
                   {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
-                  <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
-                    isPlayerEmpty(3)
-                      ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
-                      : getPlayerTeam(3) === 1
-                        ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
-                        : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
-                  } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
-                    <span className="flex items-center justify-center">
-                      {isPlayerEmpty(3) ? '💺 ' : ''}{getPlayerName(3)}
-                      {getBotDifficultyBadge(3)}
-                    </span>
+                  <div className="flex items-center gap-1">
+                    <div className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg ${
+                      isPlayerEmpty(3)
+                        ? 'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500'
+                        : getPlayerTeam(3) === 1
+                          ? 'bg-gradient-to-br from-orange-500 to-orange-700 text-white'
+                          : 'bg-gradient-to-br from-purple-500 to-purple-700 text-white'
+                    } ${cardPositions[3]?.playerId === currentTrickWinnerId ? 'ring-2 md:ring-3 ring-yellow-400' : ''}`}>
+                      <span className="flex items-center justify-center">
+                        {isPlayerEmpty(3) ? '💺 ' : ''}{getPlayerName(3)}
+                        {getBotDifficultyBadge(3)}
+                      </span>
+                    </div>
+                    {canSwapWithPlayer(3) && (
+                      <button
+                        onClick={() => onSwapPosition?.(getPlayer(3)!.id)}
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-2 py-1 rounded text-xs font-bold transition-all shadow-lg hover:shadow-xl active:scale-95"
+                        title={`Swap positions with ${getPlayer(3)!.name}${getPlayer(3)!.teamId !== currentPlayer?.teamId ? ' (changes teams!)' : ''}`}
+                      >
+                        ↔
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

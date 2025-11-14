@@ -230,9 +230,62 @@ export function applyPositionSwap(
   const player2Index = game.players.findIndex(p => p.id === player2Id);
 
   if (player1Index !== -1 && player2Index !== -1) {
-    // Swap players in array
+    const player1 = game.players[player1Index];
+    const player2 = game.players[player2Index];
+
+    // Store complete player data before swap
+    const player1Data = {
+      hand: [...player1.hand],
+      tricksWon: player1.tricksWon,
+      pointsWon: player1.pointsWon,
+    };
+
+    const player2Data = {
+      hand: [...player2.hand],
+      tricksWon: player2.tricksWon,
+      pointsWon: player2.pointsWon,
+    };
+
+    // Swap positions in array
     [game.players[player1Index], game.players[player2Index]] =
       [game.players[player2Index], game.players[player1Index]];
+
+    // Swap game data (hand, tricks, points)
+    // After position swap, player1 is now at player2Index and vice versa
+    game.players[player2Index].hand = player1Data.hand;
+    game.players[player2Index].tricksWon = player1Data.tricksWon;
+    game.players[player2Index].pointsWon = player1Data.pointsWon;
+
+    game.players[player1Index].hand = player2Data.hand;
+    game.players[player1Index].tricksWon = player2Data.tricksWon;
+    game.players[player1Index].pointsWon = player2Data.pointsWon;
+
+    // Update currentTrick playerId references (critical for display)
+    game.currentTrick.forEach(tc => {
+      if (tc.playerId === player1Id) {
+        tc.playerId = player2Id;
+      } else if (tc.playerId === player2Id) {
+        tc.playerId = player1Id;
+      }
+    });
+
+    // Update currentBets playerId references (critical for scoring)
+    game.currentBets.forEach(bet => {
+      if (bet.playerId === player1Id) {
+        bet.playerId = player2Id;
+      } else if (bet.playerId === player2Id) {
+        bet.playerId = player1Id;
+      }
+    });
+
+    // Update highestBet playerId reference
+    if (game.highestBet) {
+      if (game.highestBet.playerId === player1Id) {
+        game.highestBet.playerId = player2Id;
+      } else if (game.highestBet.playerId === player2Id) {
+        game.highestBet.playerId = player1Id;
+      }
+    }
 
     // FIX: Enforce alternating team pattern (1-2-1-2) to maintain turn order
     // This prevents turn order bugs when positions are swapped

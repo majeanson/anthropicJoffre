@@ -73,11 +73,24 @@ export const BotManagementPanel = memo(function BotManagementPanel({
     }
   };
 
-  // Can swap with any other non-empty player
+  // Can swap with other players based on game phase
   const canSwap = (player: typeof gameState.players[0]) => {
-    return !player.isEmpty &&
-           player.id !== currentPlayerId &&
-           onSwapPosition;
+    if (!onSwapPosition || player.isEmpty || player.id === currentPlayerId) {
+      return false;
+    }
+
+    // During team_selection: can swap with any teammate
+    if (gameState.phase === 'team_selection') {
+      const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+      return currentPlayer && currentPlayer.teamId === player.teamId;
+    }
+
+    // During active gameplay: can only swap with bots (any team)
+    if (gameState.phase !== 'game_over') {
+      return player.isBot === true;
+    }
+
+    return false;
   };
 
   return (

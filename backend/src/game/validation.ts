@@ -233,11 +233,6 @@ export function validatePositionSwap(
   initiatorId: string,
   targetPlayerId: string
 ): ValidationResult {
-  // Check game phase
-  if (game.phase !== 'team_selection') {
-    return err('Position swapping is only allowed during team selection');
-  }
-
   const initiator = game.players.find(p => p.id === initiatorId);
   const target = game.players.find(p => p.id === targetPlayerId);
 
@@ -250,9 +245,24 @@ export function validatePositionSwap(
     return err('Cannot swap position with yourself');
   }
 
-  // Can only swap with players on the same team
-  if (initiator.teamId !== target.teamId) {
-    return err('Can only swap positions with teammates');
+  // During team selection: Can only swap with players on the same team
+  if (game.phase === 'team_selection') {
+    if (initiator.teamId !== target.teamId) {
+      return err('Can only swap positions with teammates');
+    }
+  }
+
+  // During active gameplay: Can only swap with bots (any team)
+  if (game.phase !== 'team_selection' && game.phase !== 'game_over') {
+    if (!target.isBot) {
+      return err('Can only swap positions with bots during active gameplay');
+    }
+    // Can swap with bots on any team (position-based team will be enforced after swap)
+  }
+
+  // Cannot swap during game_over phase
+  if (game.phase === 'game_over') {
+    return err('Cannot swap positions after the game has ended');
   }
 
   return ok(undefined);

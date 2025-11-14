@@ -285,6 +285,47 @@ GET /api/player-history/:playerName // Player game history
 
 **Important for Testing**: First round betting order is Player 3, 4, 1, 2 (not 1, 2, 3, 4)
 
+### Position Swapping
+Players can swap positions with teammates or bots depending on the game phase:
+
+**Team Selection Phase:**
+- Players can swap positions with any teammate
+- Swap button appears next to teammates in team panels
+- Allows strategic positioning before game starts
+- Enforces alternating team pattern (1-2-1-2) after swap
+
+**Active Gameplay (Betting, Playing, Scoring):**
+- Players can swap positions with **ANY bot** (same team OR opposite team)
+- Cannot swap with human players during active gameplay
+- Swap buttons (↔) appear next to all bots in the circular player layout
+- **Cross-team swapping**: Swapping with a bot on the opposite team changes YOUR team
+  - Example: 1 human (Team 1) + 1 bot (Team 1) + 1 human (Team 2) + 1 bot (Team 2)
+  - Human from Team 1 swaps with bot from Team 2
+  - Result: 2 humans (Team 2) + 2 bots (Team 1)
+- Tooltip indicates when swapping will change teams: "Swap positions with BotName (changes teams!)"
+- Useful for adjusting turn order mid-game, changing visual layout, or switching teams
+- All game data (hand, tricks won, points) is preserved and swapped correctly
+
+**Restrictions:**
+- Cannot swap with yourself
+- Cannot swap with other human players during active gameplay
+- Cannot swap during `game_over` phase
+- Swapping enforces alternating team pattern (1-2-1-2), which determines final team assignments
+
+**Implementation:**
+- `backend/src/game/validation.ts:255-261` - Dual-phase validation logic (any bot allowed during gameplay)
+- `backend/src/game/state.ts:224-296` - Position swap with data preservation
+- `frontend/src/components/TeamSelection.tsx:214-220, 313-319` - Team selection swap UI
+- `frontend/src/components/PlayingPhase.tsx:583-596, 918-1010` - Gameplay swap UI with cross-team support
+- Socket event: `'swap_position': { gameId: string; targetPlayerId: string }`
+
+**Critical Details:**
+- Swapping updates player positions in the array (affects turn order)
+- Preserves all player data: hand, tricksWon, pointsWon
+- Updates references in currentTrick, currentBets, and highestBet
+- Team IDs are recalculated based on position (alternating 1-2-1-2 pattern)
+- **Position determines team**: After swap, teams are reassigned by position (not by original team)
+
 ---
 
 ## 🎨 UI/UX Validation Patterns

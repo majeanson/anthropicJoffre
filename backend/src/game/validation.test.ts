@@ -356,13 +356,69 @@ describe('validateTeamSelection', () => {
 });
 
 describe('validatePositionSwap', () => {
-  it('should reject when not in team_selection phase', () => {
-    const game = createTestGame({ phase: 'betting' });
-    const result = validatePositionSwap(game, 'p1', 'p2');
+  it('should reject swapping with human during active gameplay', () => {
+    const game = createTestGame({
+      phase: 'betting',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: true },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: true },
+      ]
+    });
+    const result = validatePositionSwap(game, 'p1', 'p2'); // Trying to swap with human
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toBe('Position swapping is only allowed during team selection');
+      expect(result.error).toBe('Can only swap positions with bots during active gameplay');
+    }
+  });
+
+  it('should allow swapping with bot during active gameplay', () => {
+    const game = createTestGame({
+      phase: 'betting',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p3', name: 'Bot1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: true },
+        { id: 'p4', name: 'Bot2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: true },
+      ]
+    });
+    const result = validatePositionSwap(game, 'p1', 'p3'); // Swapping with bot on same team
+
+    expect(result.success).toBe(true);
+  });
+
+  it('should allow cross-team swap with bot during active gameplay', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p3', name: 'Bot1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: true },
+        { id: 'p4', name: 'Bot2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: true },
+      ]
+    });
+    const result = validatePositionSwap(game, 'p1', 'p4'); // Swapping with bot on different team
+
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject swapping during game_over phase', () => {
+    const game = createTestGame({
+      phase: 'game_over',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p3', name: 'Bot1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: true },
+        { id: 'p4', name: 'Bot2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: true },
+      ]
+    });
+    const result = validatePositionSwap(game, 'p1', 'p3');
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe('Cannot swap positions after the game has ended');
     }
   });
 
@@ -399,6 +455,24 @@ describe('validatePositionSwap', () => {
     const result = validatePositionSwap(game, 'p1', 'p3'); // Both on team 1
 
     expect(result.success).toBe(true);
+  });
+
+  it('should reject cross-team swap during team_selection', () => {
+    const game = createTestGame({
+      phase: 'team_selection',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ]
+    });
+    const result = validatePositionSwap(game, 'p1', 'p2'); // Different teams
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe('Can only swap positions with teammates');
+    }
   });
 });
 

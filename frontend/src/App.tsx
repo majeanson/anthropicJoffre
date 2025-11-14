@@ -681,6 +681,7 @@ function AppContent() {
           onOpenBotManagement={() => setShowBotManagement(true)}
           onOpenAchievements={handleOpenAchievements}
           onOpenFriends={handleOpenFriends}
+          onSwapPosition={handleSwapPosition}
           socket={socket}
           gameId={gameId}
           chatMessages={chatMessages}

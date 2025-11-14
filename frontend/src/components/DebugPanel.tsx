@@ -76,7 +76,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
     // Fetch immediately
     fetchHealthNow();
 
-    // Then fetch every 5 seconds
+    // Then fetch every 5 seconds be
     const interval = setInterval(fetchHealthNow, 5000);
 
     return () => clearInterval(interval);
