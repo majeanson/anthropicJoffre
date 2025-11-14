@@ -12,6 +12,7 @@ import { Socket, Server } from 'socket.io';
 import { GameState, PlayerSession } from '../types/game';
 import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
+import { clearAllGameSnapshots } from '../db/index';
 
 /**
  * Online player tracking data
@@ -222,11 +223,11 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
   // ============================================================================
   // clear_all_games - Admin tool to clear all games from memory (Debug Panel)
   // ============================================================================
-  socket.on('clear_all_games', errorBoundaries.gameAction('clear_all_games')(() => {
+  socket.on('clear_all_games', errorBoundaries.gameAction('clear_all_games')(async () => {
     const gameCount = games.size;
     const sessionCount = playerSessions.size;
 
-    // Clear all games
+    // Clear all games from memory
     games.clear();
 
     // Clear all player sessions
@@ -235,14 +236,18 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
     // Clear all online players
     onlinePlayers.clear();
 
-    logger.info(`[ADMIN] Cleared ${gameCount} games and ${sessionCount} sessions from memory`);
-    console.log(`✓ Memory cleared: ${gameCount} games, ${sessionCount} sessions removed`);
+    // IMPORTANT: Clear game snapshots from database to prevent restoration on restart
+    const snapshotsCleared = await clearAllGameSnapshots();
+
+    logger.info(`[ADMIN] Cleared ${gameCount} games and ${sessionCount} sessions from memory, ${snapshotsCleared} snapshots from database`);
+    console.log(`✓ Memory cleared: ${gameCount} games, ${sessionCount} sessions, ${snapshotsCleared} DB snapshots removed`);
 
     // Notify the requester
     socket.emit('all_games_cleared', {
       gamesCleared: gameCount,
       sessionsCleared: sessionCount,
-      message: `Successfully cleared ${gameCount} games and ${sessionCount} sessions from memory`,
+      snapshotsCleared,
+      message: `Successfully cleared ${gameCount} games, ${sessionCount} sessions from memory, and ${snapshotsCleared} snapshots from database`,
     });
 
     // Broadcast online players update (now empty)

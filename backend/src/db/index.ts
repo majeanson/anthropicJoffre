@@ -876,6 +876,29 @@ export const loadGameSnapshots = async (): Promise<GameState[]> => {
 };
 
 /**
+ * Clear all game snapshots from database (for clear_all_games)
+ * This prevents cleared games from being restored on server restart
+ */
+export const clearAllGameSnapshots = async (): Promise<number> => {
+  try {
+    const text = `
+      UPDATE game_history
+      SET game_state_snapshot = NULL
+      WHERE is_finished = FALSE
+        AND game_state_snapshot IS NOT NULL
+      RETURNING game_id
+    `;
+    const result = await query(text);
+    const count = result.rows.length;
+    console.log(`[Recovery] Cleared ${count} game snapshots from database`);
+    return count;
+  } catch (error) {
+    console.error('[Recovery] Failed to clear game snapshots:', error);
+    return 0;
+  }
+};
+
+/**
  * Get active games that might need cleanup
  */
 export const getActiveGamesForCleanup = async () => {
