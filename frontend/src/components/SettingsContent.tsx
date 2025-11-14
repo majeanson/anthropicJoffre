@@ -5,9 +5,10 @@ import { sounds } from '../utils/sounds';
 interface SettingsContentProps {
   onShowRules: () => void;
   onShowDebugInfo: () => void;
+  onShowGlobalDebug?: () => void;
 }
 
-export function SettingsContent({ onShowRules, onShowDebugInfo }: SettingsContentProps) {
+export function SettingsContent({ onShowRules, onShowDebugInfo, onShowGlobalDebug }: SettingsContentProps) {
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
 
@@ -107,6 +108,19 @@ export function SettingsContent({ onShowRules, onShowDebugInfo }: SettingsConten
               🎮 Debug Fun
             </button>
           </div>
+
+          {/* Global Debug (Homepage Only) */}
+          {onShowGlobalDebug && (
+            <div className="pt-2">
+              <button
+                data-keyboard-nav="global-debug"
+                onClick={() => { sounds.buttonClick(); onShowGlobalDebug(); }}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 dark:from-blue-700 dark:to-cyan-700 text-white py-3 rounded-lg font-bold hover:from-blue-700 hover:to-cyan-700 dark:hover:from-blue-600 dark:hover:to-cyan-600 transition-all duration-200 border border-blue-800 dark:border-blue-600 shadow flex items-center justify-center gap-2"
+              >
+                🌐 Global Debug
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

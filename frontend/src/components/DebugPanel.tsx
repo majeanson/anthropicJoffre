@@ -262,6 +262,133 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
             )}
           </section>
 
+          {/* Automation Controls */}
+          <section aria-labelledby="automation-heading">
+            <h3 id="automation-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
+              🎮 Automation Controls
+            </h3>
+
+            {/* Playing Phase Controls */}
+            {gameState.phase === 'playing' && (
+              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-semibold text-green-700">Playing Phase</span>
+                  <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                    ACTIVE
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <button
+                    onClick={() => socket?.emit('debug_auto_play_card', { gameId })}
+                    disabled={!socket}
+                    className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+                    title="Play a valid card for the current player"
+                  >
+                    🤖 Auto-Play Card
+                  </button>
+                  <button
+                    onClick={() => socket?.emit('debug_skip_trick', { gameId })}
+                    disabled={!socket || gameState.currentTrick.length === 0}
+                    className="px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+                    title="Complete the current trick by auto-playing remaining cards"
+                  >
+                    ⏭️ Skip Trick
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Skip entire round? This will auto-play all remaining cards.')) {
+                        socket?.emit('debug_skip_round', { gameId });
+                      }
+                    }}
+                    disabled={!socket}
+                    className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+                    title="Complete the entire round by auto-playing all cards"
+                  >
+                    ⏭️⏭️ Skip Round
+                  </button>
+                </div>
+                <p className="text-xs text-green-700 mt-3">
+                  These controls automatically play cards for the current player. Use for testing game flow.
+                </p>
+              </div>
+            )}
+
+            {/* Betting Phase Controls */}
+            {gameState.phase === 'betting' && (
+              <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-sm font-semibold text-orange-700">Betting Phase</span>
+                  <span className="px-2 py-0.5 bg-orange-100 text-orange-800 text-xs font-semibold rounded-full">
+                    ACTIVE
+                  </span>
+                </div>
+
+                {/* Auto-bet and Skip Betting */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  <button
+                    onClick={() => socket?.emit('debug_auto_bet', { gameId })}
+                    disabled={!socket}
+                    className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+                    title="Place a valid bet for the current player"
+                  >
+                    💰 Auto-Bet
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Skip betting phase? This will auto-bet for all players.')) {
+                        socket?.emit('debug_skip_betting', { gameId });
+                      }
+                    }}
+                    disabled={!socket}
+                    className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
+                    title="Complete betting phase by auto-betting for all players"
+                  >
+                    ⏭️ Skip Betting
+                  </button>
+                </div>
+
+                {/* Force Bet Override */}
+                <div className="border-t-2 border-orange-200 pt-4">
+                  <p className="text-sm font-semibold text-orange-700 mb-2">Force Bet Override</p>
+                  <div className="grid grid-cols-12 gap-2">
+                    {[7, 8, 9, 10, 11, 12].map(amount => (
+                      <div key={amount} className="col-span-6 md:col-span-2 flex flex-col gap-1">
+                        <button
+                          onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: false })}
+                          disabled={!socket}
+                          className="px-2 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                          title={`Force bet ${amount} with trump`}
+                        >
+                          {amount}
+                        </button>
+                        <button
+                          onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: true })}
+                          disabled={!socket}
+                          className="px-2 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                          title={`Force bet ${amount} WITHOUT trump (2x)`}
+                        >
+                          {amount} 🚫
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-orange-600 mt-2">
+                    Click amount to force bet for current player. 🚫 = Without Trump (2x multiplier)
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* No Automation Available */}
+            {gameState.phase !== 'playing' && gameState.phase !== 'betting' && (
+              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 text-center">
+                <p className="text-gray-600">
+                  No automation controls available for <span className="font-semibold">{gameState.phase.replace('_', ' ')}</span> phase
+                </p>
+              </div>
+            )}
+          </section>
+
           {/* Team Scores */}
           <section aria-labelledby="scores-heading">
             <h3 id="scores-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">

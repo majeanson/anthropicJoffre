@@ -964,4 +964,34 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
       res.status(500).json({ error: 'Failed to fetch leaderboard' });
     }
   });
+
+  // Debug endpoint: List all games with stats
+  app.get('/api/debug/games', (req: Request, res: Response) => {
+    try {
+      const { games, gameCreationTimes } = deps;
+
+      const gamesList = Array.from(games.values()).map((game: GameState) => {
+        const createdAt = gameCreationTimes.get(game.id) || Date.now();
+        const uptimeMs = Date.now() - createdAt;
+
+        return {
+          gameId: game.id,
+          phase: game.phase,
+          playerCount: game.players.length,
+          roundNumber: game.roundNumber,
+          uptimeMinutes: Math.floor(uptimeMs / 60000),
+          createdAt,
+        };
+      });
+
+      res.json({
+        games: gamesList,
+        total: gamesList.length,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      console.error('Error fetching debug games list:', error);
+      res.status(500).json({ error: 'Failed to fetch games list' });
+    }
+  });
 }

@@ -3,6 +3,7 @@ import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
 import { LobbyBrowser } from './LobbyBrowser';
 import { HowToPlay } from './HowToPlay';
 import { DebugInfo } from './DebugInfo';
+import { GlobalDebugModal } from './GlobalDebugModal';
 import { LobbyChat } from './LobbyChat';
 import { SocialPanel } from './SocialPanel';
 import { StatsPanel } from './StatsPanel';
@@ -55,6 +56,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
   const [showDebugInfo, setShowDebugInfo] = useState(false);
+  const [showGlobalDebug, setShowGlobalDebug] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
   const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat' | 'friends'>('online');
@@ -277,6 +279,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
       <>
         <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
         <DebugInfo isOpen={showDebugInfo} onClose={() => setShowDebugInfo(false)} />
+        <GlobalDebugModal
+          isOpen={showGlobalDebug}
+          onClose={() => setShowGlobalDebug(false)}
+          socket={socket}
+        />
         {showBrowser && (
           <ErrorBoundary fallback={<LobbyErrorFallback onClose={() => setShowBrowser(false)} />}>
             <LobbyBrowser
@@ -502,6 +509,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   <SettingsContent
                     onShowRules={() => setShowRules(true)}
                     onShowDebugInfo={() => setShowDebugInfo(true)}
+                    onShowGlobalDebug={() => setShowGlobalDebug(true)}
                   />
                 )}
               </div>
