@@ -67,14 +67,14 @@ function CardComponent({
     [size]
   );
 
-  // Determine which image to show (using optimized images for 60-70% faster load)
+  // Determine which image to show (using production images <95KB each for fast load)
   const cardImage = useMemo(() => {
     if (isSpecial) {
       // Use special bon images for red 0 and brown 0
-      return `/cards/optimized/${card.color}_bon.jpg`;
+      return `/cards/production/${card.color}_bon.jpg`;
     }
     // Use emblem for regular cards
-    return `/cards/optimized/${card.color}_emblem.jpg`;
+    return `/cards/production/${card.color}_emblem.jpg`;
   }, [isSpecial, card.color]);
 
 

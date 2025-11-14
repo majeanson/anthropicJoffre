@@ -3,15 +3,15 @@
  */
 
 const CARD_IMAGES = [
-  // Emblems for regular cards (optimized: ~64% smaller)
-  '/cards/optimized/red_emblem.jpg',
-  '/cards/optimized/blue_emblem.jpg',
-  '/cards/optimized/green_emblem.jpg',
-  '/cards/optimized/brown_emblem.jpg',
+  // Emblems for regular cards (production: <95KB each, 37% smaller)
+  '/cards/production/red_emblem.jpg',
+  '/cards/production/blue_emblem.jpg',
+  '/cards/production/green_emblem.jpg',
+  '/cards/production/brown_emblem.jpg',
 
-  // Special bon cards (optimized: ~63% smaller)
-  '/cards/optimized/red_bon.jpg',
-  '/cards/optimized/brown_bon.jpg',
+  // Special bon cards (production: <95KB each, 37% smaller)
+  '/cards/production/red_bon.jpg',
+  '/cards/production/brown_bon.jpg',
 ];
 
 /**
