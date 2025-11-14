@@ -40,21 +40,33 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
     const fetchData = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+        console.log('[GlobalDebug] Fetching from:', apiUrl);
 
         // Fetch server health
         const healthResponse = await fetch(`${apiUrl}/api/ping`);
+        console.log('[GlobalDebug] Health response status:', healthResponse.status);
         if (healthResponse.ok) {
-          setServerHealth(await healthResponse.json());
+          const healthData = await healthResponse.json();
+          console.log('[GlobalDebug] Health data:', healthData);
+          setServerHealth(healthData);
+        } else {
+          console.error('[GlobalDebug] Health fetch failed:', healthResponse.status, healthResponse.statusText);
         }
 
         // Fetch games list
         const gamesResponse = await fetch(`${apiUrl}/api/debug/games`);
+        console.log('[GlobalDebug] Games response status:', gamesResponse.status);
         if (gamesResponse.ok) {
           const data = await gamesResponse.json();
+          console.log('[GlobalDebug] Games data:', data);
           setGames(data.games || []);
+        } else {
+          console.error('[GlobalDebug] Games fetch failed:', gamesResponse.status, gamesResponse.statusText);
+          const errorData = await gamesResponse.text();
+          console.error('[GlobalDebug] Error response:', errorData);
         }
       } catch (error) {
-        console.error('Failed to fetch debug data:', error);
+        console.error('[GlobalDebug] Failed to fetch debug data:', error);
       }
     };
 

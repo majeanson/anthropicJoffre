@@ -970,6 +970,17 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
     try {
       const { games, gameCreationTimes } = deps;
 
+      console.log(`[DEBUG] /api/debug/games called - Active games: ${games.size}`);
+
+      if (!games || !gameCreationTimes) {
+        console.error('[DEBUG] Missing dependencies: games or gameCreationTimes');
+        return res.status(500).json({
+          error: 'Server configuration error',
+          games: [],
+          total: 0,
+        });
+      }
+
       const gamesList = Array.from(games.values()).map((game: GameState) => {
         const createdAt = gameCreationTimes.get(game.id) || Date.now();
         const uptimeMs = Date.now() - createdAt;
@@ -984,14 +995,21 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
         };
       });
 
+      console.log(`[DEBUG] Returning ${gamesList.length} games`);
+
       res.json({
         games: gamesList,
         total: gamesList.length,
         timestamp: Date.now(),
       });
     } catch (error) {
-      console.error('Error fetching debug games list:', error);
-      res.status(500).json({ error: 'Failed to fetch games list' });
+      console.error('[DEBUG] Error fetching debug games list:', error);
+      res.status(500).json({
+        error: 'Failed to fetch games list',
+        details: error instanceof Error ? error.message : 'Unknown error',
+        games: [],
+        total: 0,
+      });
     }
   });
 }
