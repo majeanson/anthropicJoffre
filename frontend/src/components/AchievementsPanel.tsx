@@ -98,7 +98,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
               <label className="text-sm font-semibold text-umber-800 dark:text-gray-200">Category:</label>
               <select
                 value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value as any)}
+                onChange={(e) => setFilterCategory(e.target.value as AchievementCategory | 'all')}
                 className="px-3 py-1 rounded-lg border-2 border-parchment-400 dark:border-gray-600 bg-white dark:bg-gray-700 text-umber-800 dark:text-gray-200 text-sm"
               >
                 <option value="all">All</option>
@@ -114,7 +114,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
               <label className="text-sm font-semibold text-umber-800 dark:text-gray-200">Tier:</label>
               <select
                 value={filterTier}
-                onChange={(e) => setFilterTier(e.target.value as any)}
+                onChange={(e) => setFilterTier(e.target.value as AchievementTier | 'all')}
                 className="px-3 py-1 rounded-lg border-2 border-parchment-400 dark:border-gray-600 bg-white dark:bg-gray-700 text-umber-800 dark:text-gray-200 text-sm"
               >
                 <option value="all">All</option>

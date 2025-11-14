@@ -1,0 +1,1698 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Copy/Paste Detector Report</title><link href="styles/tailwind.css" rel="stylesheet"><link href="styles/prism.css" rel="stylesheet"></head><body class="bg-gray-100"><header class="bg-white shadow py-4"><div class="container mx-auto px-4"><h1 class="text-3xl font-semibold text-gray-800">jscpd - copy/paste report</h1></div></header><main class="container mx-auto my-8 p-4 bg-white shadow rounded"><section class="mb-8" id="dashboard"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Dashboard</h2><div class="grid grid-cols-4 gap-4"><div class="bg-blue-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-blue-800 mb-2">Total Files</h3><span class="text-4xl font-bold text-blue-800">289</span></div><div class="bg-green-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-green-800 mb-2">Total Lines of Code</h3><span class="text-4xl font-bold text-green-800">50109</span></div><div class="bg-yellow-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-yellow-800 mb-2">Number of Clones</h3><span class="text-4xl font-bold text-yellow-800">85</span></div><div class="bg-red-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-red-800 mb-2">Duplicated Lines</h3><span class="text-4xl font-bold text-red-800">1689 (3.37%)</span></div></div></section><section class="mb-8" id="formats"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Formats with Duplications</h2><table class="w-full table-auto"><thead><tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Format</th><th class="py-3 px-6 text-left">Files</th><th class="py-3 px-6 text-left">Lines</th><th class="py-3 px-6 text-left">Clones</th><th class="py-3 px-6 text-left">Duplicated Lines</th><th class="py-3 px-6 text-left">Duplicated Tokens</th></tr></thead><tbody><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#javascript-clones">javascript</a></td><td class="py-3 px-6">92</td><td class="py-3 px-6">9479</td><td class="py-3 px-6">10</td><td class="py-3 px-6">379</td><td class="py-3 px-6">3027</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#tsx-clones">tsx</a></td><td class="py-3 px-6">86</td><td class="py-3 px-6">16878</td><td class="py-3 px-6">27</td><td class="py-3 px-6">426</td><td class="py-3 px-6">3690</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#typescript-clones">typescript</a></td><td class="py-3 px-6">111</td><td class="py-3 px-6">23752</td><td class="py-3 px-6">48</td><td class="py-3 px-6">884</td><td class="py-3 px-6">8840</td></tr></tbody></table></section><section class="mb-8" id="txt-clones"><a name="javascript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">javascript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">frontend\src\components\TeamSelection.tsx (Line 300:76 - Line 373:2), frontend\src\components\TeamSelection.tsx (Line 194:76 - Line 267:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup14"><code class="language-javascript text-sm text-gray-800">
+                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
+                    }`}
+                  &gt;
+                    {playerAtPosition &amp;&amp; !isEmptySeat ? (
+                      &lt;div className=&quot;flex flex-col sm:flex-row items-center justify-between gap-2&quot;&gt;
+                        &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+                          &lt;span className=&quot;font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left&quot;&gt;
+                            {playerAtPosition.name}
+                            {isCurrentPlayer &amp;&amp; ' (You)'}
+                          &lt;/span&gt;
+                          {!playerAtPosition.isBot &amp;&amp; (
+                            &lt;PlayerConnectionIndicator
+                              status={playerAtPosition.connectionStatus}
+                              reconnectTimeLeft={playerAtPosition.reconnectTimeLeft}
+                              small
+                            /&gt;
+                          )}
+                        &lt;/div&gt;
+                        &lt;div className=&quot;flex gap-2&quot;&gt;
+                          {!isCurrentPlayer &amp;&amp; currentPlayer &amp;&amp; currentPlayer.teamId === 2 &amp;&amp; (
+                            &lt;button
+                              onClick={() =&gt; onSwapPosition(playerAtPosition.id)}
+                              className=&quot;text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0&quot;
+                            &gt;
+                              Swap
+                            &lt;/button&gt;
+                          )}
+                          {!isCurrentPlayer &amp;&amp; currentPlayerId === creatorId &amp;&amp; onKickPlayer &amp;&amp; (
+                            &lt;button
+                              onClick={() =&gt; onKickPlayer(playerAtPosition.id)}
+                              className=&quot;text-xs bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0&quot;
+                              title=&quot;Remove player from game&quot;
+                            &gt;
+                              ✕
+                            &lt;/button&gt;
+                          )}
+                        &lt;/div&gt;
+                      &lt;/div&gt;
+                    ) : (
+                      &lt;div className=&quot;text-center&quot;&gt;
+                        {isEmptySeat ? (
+                          &lt;div className=&quot;space-y-2&quot;&gt;
+                            &lt;div className=&quot;text-umber-400 dark:text-gray-500 text-sm italic&quot;&gt;
+                              💺 {playerAtPosition.emptySlotName || 'Empty Seat'}
+                            &lt;/div&gt;
+                            {!currentPlayer &amp;&amp; socket &amp;&amp; (
+                              &lt;button
+                                onClick={() =&gt; {
+                                  // Get player index to fill the seat
+                                  const allPlayers = players;
+                                  const seatIndex = allPlayers.findIndex(p =&gt; p.id === playerAtPosition.id);
+                                  if (seatIndex !== -1) {
+                                    const playerName = prompt('Enter your name to fill this seat:');
+                                    if (playerName &amp;&amp; playerName.trim()) {
+                                      socket.emit('fill_empty_seat', {
+                                        gameId,
+                                        playerName: playerName.trim(),
+                                        emptySlotIndex: seatIndex,
+                                      });
+                                    }
+                                  }
+                                }}
+                                className=&quot;text-xs bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm&quot;
+                              &gt;
+                                Fill Seat
+                              &lt;/button&gt;
+                            )}
+                          &lt;/div&gt;
+                        ) : currentPlayer?.teamId !== 2 ? (
+                          &lt;button
+                            onClick={() =&gt; {
+                              sounds.teamSwitch(); // Sprint 1 Phase 6
+                              onSelectTeam(2</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\JoinGameForm.tsx (Line 79:6 - Line 109:11), frontend\src\components\Lobby.tsx (Line 300:6 - Line 315:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn28" onclick="toggleCodeBlock('cloneGroup28', 'expandBtn28', 'collapseBtn28')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup28"><code class="language-javascript text-sm text-gray-800">={{ animationDuration: '3s', animationDelay: '0s' }}&gt;🃏&lt;/div&gt;
+          &lt;div className=&quot;absolute top-20 right-20 text-6xl animate-bounce&quot; style={{ animationDuration: '4s', animationDelay: '1s' }}&gt;🎴&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-20 left-20 text-6xl animate-bounce&quot; style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}&gt;🂡&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-10 right-10 text-6xl animate-bounce&quot; style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}&gt;🂱&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div className=&quot;bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative&quot;&gt;
+          {/* Decorative corners */}
+          &lt;div className=&quot;absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl&quot;&gt;&lt;/div&gt;
+          &lt;div className=&quot;absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl&quot;&gt;&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl&quot;&gt;&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl&quot;&gt;&lt;/div&gt;
+
+          &lt;h2 className=&quot;text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center&quot;&gt;Join Game&lt;/h2&gt;
+
+          {/* Show message when joining from URL */}
+          {autoJoinGameId &amp;&amp; (
+            &lt;div className=&quot;mb-6 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 border-2 border-blue-500 dark:border-blue-600 rounded-lg p-5 animate-pulse shadow-lg&quot;&gt;
+              &lt;div className=&quot;flex items-center justify-center gap-2 mb-2&quot;&gt;
+                &lt;span className=&quot;text-2xl&quot;&gt;🎮&lt;/span&gt;
+                &lt;p className=&quot;text-blue-900 dark:text-blue-200 font-bold text-lg text-center&quot;&gt;
+                  Joining game: &lt;span className=&quot;font-mono bg-white dark:bg-gray-800 px-2 py-1 rounded border border-blue-400 dark:border-blue-500&quot;&gt;{gameId}&lt;/span&gt;
+                &lt;/p&gt;
+              &lt;/div&gt;
+              &lt;p className=&quot;text-blue-700 dark:text-blue-300 font-medium text-center&quot;&gt;
+                👇 Enter your name below to join!
+              &lt;/p&gt;
+            &lt;/div&gt;
+          )}
+
+          &lt;form onSubmit={handleJoin</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\JoinGameForm.tsx (Line 214:2 - Line 237:15), frontend\src\components\Lobby.tsx (Line 514:2 - Line 527:19)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn29" onclick="toggleCodeBlock('cloneGroup29', 'expandBtn29', 'collapseBtn29')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup29"><code class="language-javascript text-sm text-gray-800">}
+              &gt;
+                {joinType === 'player' ? 'Join as Player' : 'Join as Guest'}
+              &lt;/button&gt;
+            &lt;/div&gt;
+          &lt;/form&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      {/* Stats &amp; Leaderboard Modals */}
+      {socket &amp;&amp; (
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;PlayerStatsModal
+            playerName={selectedPlayerName}
+            socket={socket}
+            isOpen={showPlayerStats}
+            onClose={() =&gt; setShowPlayerStats(false)}
+          /&gt;
+          &lt;GlobalLeaderboard
+            socket={socket}
+            isOpen={showLeaderboard}
+            onClose={() =&gt; setShowLeaderboard(false)}
+            onViewPlayerStats={(playerName) =&gt; {
+              </code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\GameHeader.tsx (Line 323:25 - Line 335:25), frontend\src\components\GameHeader.tsx (Line 173:87 - Line 185:87)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn32" onclick="toggleCodeBlock('cloneGroup32', 'expandBtn32', 'collapseBtn32')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn32" onclick="toggleCodeBlock('cloneGroup32', 'expandBtn32', 'collapseBtn32')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup32"><code class="language-javascript text-sm text-gray-800"> : ''} ${team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}&gt;
+                &lt;p className=&quot;text-xs text-white/90 font-semibold&quot;&gt;T1&lt;/p&gt;
+                &lt;p className=&quot;text-base text-white font-black&quot;&gt;{animatedTeam1Score}&lt;/p&gt;
+                {team1ScoreChange !== null &amp;&amp; (
+                  &lt;div className=&quot;absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap&quot;&gt;
+                    &lt;span className={team1ScoreChange &gt; 0 ? 'text-green-400' : 'text-red-400'}&gt;
+                      {team1ScoreChange &gt; 0 ? '+' : ''}{team1ScoreChange}
+                    &lt;/span&gt;
+                  &lt;/div&gt;
+                )}
+              &lt;/div&gt;
+              &lt;div className=&quot;text-white dark:text-gray-300 font-bold text-sm flex-shrink-0&quot;&gt;:&lt;/div&gt;
+              &lt;div className={`relative bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300'</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\GameHeader.tsx (Line 335:25 - Line 402:2), frontend\src\components\GameHeader.tsx (Line 185:87 - Line 263:20)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn33" onclick="toggleCodeBlock('cloneGroup33', 'expandBtn33', 'collapseBtn33')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn33" onclick="toggleCodeBlock('cloneGroup33', 'expandBtn33', 'collapseBtn33')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup33"><code class="language-javascript text-sm text-gray-800"> : ''} ${team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}&gt;
+                &lt;p className=&quot;text-xs text-white/90 font-semibold&quot;&gt;T2&lt;/p&gt;
+                &lt;p className=&quot;text-base text-white font-black&quot;&gt;{animatedTeam2Score}&lt;/p&gt;
+                {team2ScoreChange !== null &amp;&amp; (
+                  &lt;div className=&quot;absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap&quot;&gt;
+                    &lt;span className={team2ScoreChange &gt; 0 ? 'text-green-400' : 'text-red-400'}&gt;
+                      {team2ScoreChange &gt; 0 ? '+' : ''}{team2ScoreChange}
+                    &lt;/span&gt;
+                  &lt;/div&gt;
+                )}
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          {/* Row 2: Action Buttons */}
+          &lt;div className=&quot;flex items-center justify-center gap-1&quot;&gt;
+            {/* Chat Button */}
+            {onOpenChat &amp;&amp; (
+              &lt;button
+                onClick={onOpenChat}
+                className=&quot;relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center&quot;
+                title=&quot;Chat&quot;
+              &gt;
+                &lt;span className=&quot;text-base&quot;&gt;💬&lt;/span&gt;
+                {unreadChatCount &gt; 0 &amp;&amp; (
+                  &lt;span className=&quot;absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse&quot;&gt;
+                    {unreadChatCount}
+                  &lt;/span&gt;
+                )}
+              &lt;/button&gt;
+            )}
+
+            {/* Leaderboard Button */}
+            {onOpenLeaderboard &amp;&amp; (
+              &lt;button
+                onClick={onOpenLeaderboard}
+                className=&quot;bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600&quot;
+                title=&quot;Leaderboard&quot;
+              &gt;
+                &lt;span className=&quot;text-base&quot;&gt;🏆&lt;/span&gt;
+              &lt;/button&gt;
+            )}
+
+            {/* Achievements Button - Sprint 2 Phase 1 */}
+            {onOpenAchievements &amp;&amp; (
+              &lt;button
+                onClick={onOpenAchievements}
+                className=&quot;bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600&quot;
+                title=&quot;Achievements&quot;
+              &gt;
+                &lt;span className=&quot;text-base&quot;&gt;🏅&lt;/span&gt;
+              &lt;/button&gt;
+            )}
+
+            {/* Friends Button - Sprint 2 Phase 2 */}
+            {onOpenFriends &amp;&amp; (
+              &lt;button
+                onClick={onOpenFriends}
+                className=&quot;bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600&quot;
+                title=&quot;Friends&quot;
+              &gt;
+                &lt;span className=&quot;text-base&quot;&gt;👥&lt;/span&gt;
+              &lt;/button&gt;
+            )}
+
+            {/* Settings Button */}
+            &lt;button
+              onClick={(</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\GameCreationForm.tsx (Line 40:6 - Line 54:13), frontend\src\components\Lobby.tsx (Line 300:6 - Line 315:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn35" onclick="toggleCodeBlock('cloneGroup35', 'expandBtn35', 'collapseBtn35')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn35" onclick="toggleCodeBlock('cloneGroup35', 'expandBtn35', 'collapseBtn35')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup35"><code class="language-javascript text-sm text-gray-800">={{ animationDuration: '3s', animationDelay: '0s' }}&gt;🃏&lt;/div&gt;
+        &lt;div className=&quot;absolute top-20 right-20 text-6xl animate-bounce&quot; style={{ animationDuration: '4s', animationDelay: '1s' }}&gt;🎴&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-20 left-20 text-6xl animate-bounce&quot; style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}&gt;🂡&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-10 right-10 text-6xl animate-bounce&quot; style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}&gt;🂱&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative&quot;&gt;
+        {/* Decorative corners */}
+        &lt;div className=&quot;absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl&quot;&gt;&lt;/div&gt;
+        &lt;div className=&quot;absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl&quot;&gt;&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl&quot;&gt;&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl&quot;&gt;&lt;/div&gt;
+
+        &lt;h2 className=&quot;text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center&quot;&gt;Create Game&lt;/h2&gt;
+        &lt;form onSubmit={handleCreate</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 564:17 - Line 599:161), frontend\src\App.tsx (Line 517:21 - Line 550:159)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn73" onclick="toggleCodeBlock('cloneGroup73', 'expandBtn73', 'collapseBtn73')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn73" onclick="toggleCodeBlock('cloneGroup73', 'expandBtn73', 'collapseBtn73')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup73"><code class="language-javascript text-sm text-gray-800">}
+          /&gt;
+        &lt;/Suspense&gt;
+      &lt;/&gt;
+    );
+  }
+
+  if (gameState.phase === 'betting') {
+    return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;ErrorBoundary&gt;
+          &lt;Suspense fallback={&lt;div className=&quot;min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 617:21 - Line 653:158), frontend\src\App.tsx (Line 517:21 - Line 550:159)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn74" onclick="toggleCodeBlock('cloneGroup74', 'expandBtn74', 'collapseBtn74')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn74" onclick="toggleCodeBlock('cloneGroup74', 'expandBtn74', 'collapseBtn74')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup74"><code class="language-javascript text-sm text-gray-800">}
+          /&gt;
+          &lt;/Suspense&gt;
+        &lt;/ErrorBoundary&gt;
+      &lt;/&gt;
+    );
+  }
+
+  if (gameState.phase === 'playing') {
+    return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;ErrorBoundary&gt;
+          &lt;Suspense fallback={&lt;div className=&quot;min-h-screen bg-gradient-to-br from-green-900 via-teal-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 672:16 - Line 713:161), frontend\src\App.tsx (Line 517:21 - Line 550:159)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn75" onclick="toggleCodeBlock('cloneGroup75', 'expandBtn75', 'collapseBtn75')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn75" onclick="toggleCodeBlock('cloneGroup75', 'expandBtn75', 'collapseBtn75')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup75"><code class="language-javascript text-sm text-gray-800">}
+        /&gt;
+          &lt;/Suspense&gt;
+        &lt;/ErrorBoundary&gt;
+      &lt;/&gt;
+    );
+  }
+
+  if (gameState.phase === 'scoring') {
+    const handleReady = () =&gt; {
+      if (!socket) return;
+      socket.emit('player_ready', { gameId });
+    };
+
+    return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;ErrorBoundary&gt;
+          &lt;Suspense fallback={&lt;div className=&quot;min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 718:12 - Line 766:27), frontend\src\App.tsx (Line 517:21 - Line 550:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn76" onclick="toggleCodeBlock('cloneGroup76', 'expandBtn76', 'collapseBtn76')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn76" onclick="toggleCodeBlock('cloneGroup76', 'expandBtn76', 'collapseBtn76')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup76"><code class="language-javascript text-sm text-gray-800">}
+              /&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;/Suspense&gt;
+        &lt;/ErrorBoundary&gt;
+      &lt;/&gt;
+    );
+  }
+
+  if (gameState.phase === 'game_over') {
+    const winningTeam = gameState.teamScores.team1 &gt;= 41 ? 1 : 2;
+    const team1Players = gameState.players.filter(p =&gt; p.teamId === 1);
+    const team2Players = gameState.players.filter(p =&gt; p.teamId === 2);
+
+    return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;div className=&quot;min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6&quot;&gt;
+          &lt;div className=&quot;bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-4xl w-full border-4 border-amber-700 dark:border-gray-600&quot;&gt;
+            {/* Victory Banner */}
+            &lt;div className=&quot;text-center mb-8&quot;&gt;
+              &lt;h2 className=&quot;text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 mb-4 animate-pulse&quot;&gt;
+                🏆 Game Over! 🏆
+              &lt;/h2&gt;
+              &lt;div className={`text-6xl font-black mb-2 </code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="tsx-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">tsx</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">frontend\src\contexts\AuthContext.tsx (Line 136:20 - Line 147:22), frontend\src\contexts\AuthContext.tsx (Line 105:17 - Line 116:15)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup13"><code class="language-tsx text-sm text-gray-800">, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Registration failed'</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\TeamSelection.tsx (Line 307:27 - Line 320:2), frontend\src\components\TeamSelection.tsx (Line 201:27 - Line 214:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup15"><code class="language-tsx text-sm text-gray-800">&lt;span className=&quot;font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left&quot;&gt;
+                            {playerAtPosition.name}
+                            {isCurrentPlayer &amp;&amp; ' (You)'}
+                          &lt;/span&gt;
+                          {!playerAtPosition.isBot &amp;&amp; (
+                            &lt;PlayerConnectionIndicator
+                              status={playerAtPosition.connectionStatus}
+                              reconnectTimeLeft={playerAtPosition.reconnectTimeLeft}
+                              small
+                            /&gt;
+                          )}
+                        &lt;/div&gt;
+                        &lt;div className=&quot;flex gap-2&quot;&gt;
+                          {!isCurrentPlayer &amp;&amp; currentPlayer &amp;&amp; currentPlayer.teamId === 2</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\TeamSelection.tsx (Line 323:205 - Line 369:2), frontend\src\components\TeamSelection.tsx (Line 217:205 - Line 263:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn16" onclick="toggleCodeBlock('cloneGroup16', 'expandBtn16', 'collapseBtn16')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup16"><code class="language-tsx text-sm text-gray-800">&quot;
+                            &gt;
+                              Swap
+                            &lt;/button&gt;
+                          )}
+                          {!isCurrentPlayer &amp;&amp; currentPlayerId === creatorId &amp;&amp; onKickPlayer &amp;&amp; (
+                            &lt;button
+                              onClick={() =&gt; onKickPlayer(playerAtPosition.id)}
+                              className=&quot;text-xs bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0&quot;
+                              title=&quot;Remove player from game&quot;
+                            &gt;
+                              ✕
+                            &lt;/button&gt;
+                          )}
+                        &lt;/div&gt;
+                      &lt;/div&gt;
+                    ) : (
+                      &lt;div className=&quot;text-center&quot;&gt;
+                        {isEmptySeat ? (
+                          &lt;div className=&quot;space-y-2&quot;&gt;
+                            &lt;div className=&quot;text-umber-400 dark:text-gray-500 text-sm italic&quot;&gt;
+                              💺 {playerAtPosition.emptySlotName || 'Empty Seat'}
+                            &lt;/div&gt;
+                            {!currentPlayer &amp;&amp; socket &amp;&amp; (
+                              &lt;button
+                                onClick={() =&gt; {
+                                  // Get player index to fill the seat
+                                  const allPlayers = players;
+                                  const seatIndex = allPlayers.findIndex(p =&gt; p.id === playerAtPosition.id);
+                                  if (seatIndex !== -1) {
+                                    const playerName = prompt('Enter your name to fill this seat:');
+                                    if (playerName &amp;&amp; playerName.trim()) {
+                                      socket.emit('fill_empty_seat', {
+                                        gameId,
+                                        playerName: playerName.trim(),
+                                        emptySlotIndex: seatIndex,
+                                      });
+                                    }
+                                  }
+                                }}
+                                className=&quot;text-xs bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm&quot;
+                              &gt;
+                                Fill Seat
+                              &lt;/button&gt;
+                            )}
+                          &lt;/div&gt;
+                        ) : currentPlayer?.teamId !== 2</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\SocialPanel.tsx (Line 278:12 - Line 286:13), frontend\src\components\SocialPanel.tsx (Line 167:9 - Line 175:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn17" onclick="toggleCodeBlock('cloneGroup17', 'expandBtn17', 'collapseBtn17')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup17"><code class="language-tsx text-sm text-gray-800">}`}
+                          onClick={() =&gt; {
+                            sounds.buttonClick();
+                            const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
+                            if (nameToUse &amp;&amp; nameToUse.trim()) {
+                              if (!playerName.trim()) {
+                                setPlayerName(nameToUse.trim());
+                              }
+                              onJoinGame(onlinePlayer</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\RoundSummary.tsx (Line 63:10 - Line 83:48), frontend\src\components\ScoringPhase.tsx (Line 45:2 - Line 65:28)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn18" onclick="toggleCodeBlock('cloneGroup18', 'expandBtn18', 'collapseBtn18')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup18"><code class="language-tsx text-sm text-gray-800">;
+
+  // Check if round data is ready (prevents showing stale data during transition)
+  useEffect(() =&gt; {
+    const latestRound = gameState.roundHistory[gameState.roundHistory.length - 1];
+    const expectedRoundNumber = gameState.roundNumber;
+
+    // Wait for the latest round to match the expected round number
+    // This ensures we don't show stale data from the previous round
+    if (latestRound &amp;&amp; latestRound.roundNumber === expectedRoundNumber) {
+      // Add a small delay to ensure all data is fully computed
+      const timer = setTimeout(() =&gt; {
+        setDataReady(true);
+      }, 300);
+      return () =&gt; clearTimeout(timer);
+    } else {
+      setDataReady(false);
+    }
+  }, [gameState.roundHistory, gameState.roundNumber]);
+
+  // Keyboard accessibility - Enter to mark ready</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\RoundSummary.tsx (Line 251:9 - Line 256:82), frontend\src\components\ScoringPhase.tsx (Line 199:11 - Line 204:80)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn19" onclick="toggleCodeBlock('cloneGroup19', 'expandBtn19', 'collapseBtn19')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup19"><code class="language-tsx text-sm text-gray-800">&lt;div className=&quot;flex flex-col items-center justify-center py-16&quot;&gt;
+          &lt;div className=&quot;relative&quot;&gt;
+            {/* Spinning cards animation */}
+            &lt;div className=&quot;flex gap-2 mb-4&quot;&gt;
+              &lt;div className=&quot;w-12 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg animate-bounce&quot; style={{animationDelay: '0s'}}&gt;&lt;/div&gt;
+              &lt;div className=&quot;w-12 h-16 bg-gradient-to-br from-amber-700 to-amber-900 rounded-lg animate-bounce</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\PlayerStatsModal.tsx (Line 715:2 - Line 721:13), frontend\src\components\PlayerStatsModal.tsx (Line 294:2 - Line 300:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn20" onclick="toggleCodeBlock('cloneGroup20', 'expandBtn20', 'collapseBtn20')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup20"><code class="language-tsx text-sm text-gray-800">&amp;&amp; (
+                    &lt;div className=&quot;bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4&quot;&gt;
+                      &lt;div className=&quot;flex items-start gap-3&quot;&gt;
+                        &lt;span className=&quot;text-2xl&quot;&gt;⚠️&lt;/span&gt;
+                        &lt;div className=&quot;flex-1&quot;&gt;
+                          &lt;p className=&quot;text-red-800 dark:text-red-200 font-semibold mb-1&quot;&gt;
+                            {historyError</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\PlayerStatsModal.tsx (Line 801:2 - Line 807:13), frontend\src\components\PlayerStatsModal.tsx (Line 294:2 - Line 300:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn21" onclick="toggleCodeBlock('cloneGroup21', 'expandBtn21', 'collapseBtn21')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup21"><code class="language-tsx text-sm text-gray-800">&amp;&amp; (
+                    &lt;div className=&quot;bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4&quot;&gt;
+                      &lt;div className=&quot;flex items-start gap-3&quot;&gt;
+                        &lt;span className=&quot;text-2xl&quot;&gt;⚠️&lt;/span&gt;
+                        &lt;div className=&quot;flex-1&quot;&gt;
+                          &lt;p className=&quot;text-red-800 dark:text-red-200 font-semibold mb-1&quot;&gt;
+                            {profileError</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\PlayContent.tsx (Line 16:2 - Line 24:12), frontend\src\components\QuickPlayPanel.tsx (Line 16:14 - Line 24:15)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn22" onclick="toggleCodeBlock('cloneGroup22', 'expandBtn22', 'collapseBtn22')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup22"><code class="language-tsx text-sm text-gray-800">: BotDifficulty;
+  onBotDifficultyChange?: (difficulty: BotDifficulty) =&gt; void;
+  quickPlayPersistence: 'elo' | 'casual';
+  setQuickPlayPersistence: (mode: 'elo' | 'casual') =&gt; void;
+  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') =&gt; void;
+  user: User | null;
+}
+
+export function PlayContent</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\PasswordResetModal.tsx (Line 80:9 - Line 100:13), frontend\src\components\RegisterModal.tsx (Line 176:8 - Line 196:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn23" onclick="toggleCodeBlock('cloneGroup23', 'expandBtn23', 'collapseBtn23')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup23"><code class="language-tsx text-sm text-gray-800">&lt;/h2&gt;
+          &lt;/div&gt;
+          &lt;button
+            onClick={handleClose}
+            className=&quot;text-gray-400 hover:text-white text-2xl font-bold transition-colors&quot;
+          &gt;
+            ×
+          &lt;/button&gt;
+        &lt;/div&gt;
+
+        {/* Content */}
+        &lt;form onSubmit={handleSubmit} className=&quot;p-6 space-y-4&quot;&gt;
+          {/* Success Message */}
+          {successMessage &amp;&amp; (
+            &lt;div className=&quot;bg-green-500/20 border border-green-500 rounded p-3 text-green-200 text-sm&quot;&gt;
+              {successMessage}
+            &lt;/div&gt;
+          )}
+
+          {/* Error Message */}
+          {errorMessage</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\MatchStatsModal.tsx (Line 142:2 - Line 157:94), frontend\src\components\PlayerStatsModal.tsx (Line 273:4 - Line 288:93)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn24" onclick="toggleCodeBlock('cloneGroup24', 'expandBtn24', 'collapseBtn24')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup24"><code class="language-tsx text-sm text-gray-800">&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;button
+            onClick={onClose}
+            className=&quot;bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg&quot;
+          &gt;
+            ✕
+          &lt;/button&gt;
+        &lt;/div&gt;
+
+        {/* Content */}
+        &lt;div className=&quot;p-6 space-y-6&quot;&gt;
+          {loading &amp;&amp; (
+            &lt;div className=&quot;text-center py-12&quot;&gt;
+              &lt;div className=&quot;inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-purple-700</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\LobbyBrowser.tsx (Line 180:28 - Line 202:39), frontend\src\components\LobbyBrowser.tsx (Line 107:18 - Line 129:57)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn25" onclick="toggleCodeBlock('cloneGroup25', 'expandBtn25', 'collapseBtn25')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup25"><code class="language-tsx text-sm text-gray-800">, {
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
+      console.log('[LobbyBrowser] Response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        // Try to parse error as JSON to extract correlation ID
+        let errorData: any;
+        try {
+          errorData = await response.json();
+        } catch {
+          errorData = { message: await response.text() };
+        }
+
+        console.error('[LobbyBrowser] Server error:', errorData);
+
+        // Extract correlation ID if available
+        const corrId = errorData.correlationId || errorData.correlation_id || null;
+        if (corrId) {
+          setCorrelationId(corrId);
+        }
+
+        // Retry on 5xx errors (server errors)</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\LobbyBrowser.tsx (Line 217:21 - Line 229:17), frontend\src\components\LobbyBrowser.tsx (Line 144:21 - Line 156:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn26" onclick="toggleCodeBlock('cloneGroup26', 'expandBtn26', 'collapseBtn26')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup26"><code class="language-tsx text-sm text-gray-800">.current = true;
+    } catch (err) {
+      // Network errors (fetch failed)
+      if (err instanceof TypeError &amp;&amp; err.message.includes('fetch')) {
+        const errorMessage = 'Network error. Please check your connection.';
+        console.error('[LobbyBrowser] Network error:', err);
+        setError(errorMessage);
+
+        // Retry on network errors
+        if (retryCount &lt; 2) {
+          console.log(`[LobbyBrowser] Retrying after network error (attempt ${retryCount + 1}/2)`);
+          await new Promise(resolve =&gt; setTimeout(resolve, 1000 * (retryCount + 1)));
+          return fetchRecentGames</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\LobbyBrowser.tsx (Line 496:2 - Line 517:3), frontend\src\components\PlayerStatsModal.tsx (Line 294:2 - Line 315:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn27" onclick="toggleCodeBlock('cloneGroup27', 'expandBtn27', 'collapseBtn27')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup27"><code class="language-tsx text-sm text-gray-800">error &amp;&amp; (
+            &lt;div className=&quot;bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4&quot;&gt;
+              &lt;div className=&quot;flex items-start gap-3&quot;&gt;
+                &lt;span className=&quot;text-2xl&quot;&gt;⚠️&lt;/span&gt;
+                &lt;div className=&quot;flex-1&quot;&gt;
+                  &lt;p className=&quot;text-red-800 dark:text-red-200 font-semibold mb-1&quot;&gt;
+                    {error}
+                  &lt;/p&gt;
+                  {correlationId &amp;&amp; (
+                    &lt;p className=&quot;text-xs text-red-700 dark:text-red-300 font-mono mt-2&quot;&gt;
+                      Error ID: {correlationId}
+                      &lt;br /&gt;
+                      &lt;span className=&quot;text-xs opacity-75&quot;&gt;
+                        Please include this ID when reporting the issue
+                      &lt;/span&gt;
+                    &lt;/p&gt;
+                  )}
+                  &lt;button
+                    onClick={() =&gt; {
+                      setError(null);
+                      setCorrelationId(null);
+                      if</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\JoinGameForm.tsx (Line 76:134 - Line 85:188), frontend\src\components\Lobby.tsx (Line 297:188 - Line 306:189)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn30" onclick="toggleCodeBlock('cloneGroup30', 'expandBtn30', 'collapseBtn30')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup30"><code class="language-tsx text-sm text-gray-800">&quot;&gt;
+        {/* Animated background cards */}
+        &lt;div className=&quot;absolute inset-0 opacity-10 pointer-events-none&quot;&gt;
+          &lt;div className=&quot;absolute top-10 left-10 text-6xl animate-bounce&quot; style={{ animationDuration: '3s', animationDelay: '0s' }}&gt;🃏&lt;/div&gt;
+          &lt;div className=&quot;absolute top-20 right-20 text-6xl animate-bounce&quot; style={{ animationDuration: '4s', animationDelay: '1s' }}&gt;🎴&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-20 left-20 text-6xl animate-bounce&quot; style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}&gt;🂡&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-10 right-10 text-6xl animate-bounce&quot; style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}&gt;🂱&lt;/div&gt;
+        &lt;/div&gt;
+
+        &lt;div className=&quot;bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\JoinGameForm.tsx (Line 85:188 - Line 92:2), frontend\src\components\Lobby.tsx (Line 306:189 - Line 313:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn31" onclick="toggleCodeBlock('cloneGroup31', 'expandBtn31', 'collapseBtn31')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup31"><code class="language-tsx text-sm text-gray-800">&quot;&gt;
+          {/* Decorative corners */}
+          &lt;div className=&quot;absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl&quot;&gt;&lt;/div&gt;
+          &lt;div className=&quot;absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl&quot;&gt;&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl&quot;&gt;&lt;/div&gt;
+          &lt;div className=&quot;absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl&quot;&gt;&lt;/div&gt;
+
+          &lt;</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\GameHeader.tsx (Line 327:162 - Line 339:162), frontend\src\components\GameHeader.tsx (Line 177:162 - Line 189:162)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn34" onclick="toggleCodeBlock('cloneGroup34', 'expandBtn34', 'collapseBtn34')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn34" onclick="toggleCodeBlock('cloneGroup34', 'expandBtn34', 'collapseBtn34')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup34"><code class="language-tsx text-sm text-gray-800">&quot;&gt;
+                    &lt;span className={team1ScoreChange &gt; 0 ? 'text-green-400' : 'text-red-400'}&gt;
+                      {team1ScoreChange &gt; 0 ? '+' : ''}{team1ScoreChange}
+                    &lt;/span&gt;
+                  &lt;/div&gt;
+                )}
+              &lt;/div&gt;
+              &lt;div className=&quot;text-white dark:text-gray-300 font-bold text-sm flex-shrink-0&quot;&gt;:&lt;/div&gt;
+              &lt;div className={`relative bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300' : ''} ${team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}&gt;
+                &lt;p className=&quot;text-xs text-white/90 font-semibold&quot;&gt;T2&lt;/p&gt;
+                &lt;p className=&quot;text-base text-white font-black&quot;&gt;{animatedTeam2Score}&lt;/p&gt;
+                {team2ScoreChange !== null &amp;&amp; (
+                  &lt;div className=&quot;absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\GameCreationForm.tsx (Line 37:5 - Line 53:7), frontend\src\components\JoinGameForm.tsx (Line 76:7 - Line 92:5)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn36" onclick="toggleCodeBlock('cloneGroup36', 'expandBtn36', 'collapseBtn36')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn36" onclick="toggleCodeBlock('cloneGroup36', 'expandBtn36', 'collapseBtn36')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup36"><code class="language-tsx text-sm text-gray-800">&lt;div className=&quot;min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden&quot;&gt;
+      {/* Animated background cards */}
+      &lt;div className=&quot;absolute inset-0 opacity-10 pointer-events-none&quot;&gt;
+        &lt;div className=&quot;absolute top-10 left-10 text-6xl animate-bounce&quot; style={{ animationDuration: '3s', animationDelay: '0s' }}&gt;🃏&lt;/div&gt;
+        &lt;div className=&quot;absolute top-20 right-20 text-6xl animate-bounce&quot; style={{ animationDuration: '4s', animationDelay: '1s' }}&gt;🎴&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-20 left-20 text-6xl animate-bounce&quot; style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}&gt;🂡&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-10 right-10 text-6xl animate-bounce&quot; style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}&gt;🂱&lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div className=&quot;bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative&quot;&gt;
+        {/* Decorative corners */}
+        &lt;div className=&quot;absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl&quot;&gt;&lt;/div&gt;
+        &lt;div className=&quot;absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl&quot;&gt;&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl&quot;&gt;&lt;/div&gt;
+        &lt;div className=&quot;absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl&quot;&gt;&lt;/div&gt;
+
+        &lt;h2 className=&quot;text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center&quot;&gt;Create</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\components\BettingPhase.tsx (Line 74:19 - Line 89:42), frontend\src\components\ScoringPhase.tsx (Line 88:15 - Line 103:38)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn37" onclick="toggleCodeBlock('cloneGroup37', 'expandBtn37', 'collapseBtn37')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn37" onclick="toggleCodeBlock('cloneGroup37', 'expandBtn37', 'collapseBtn37')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup37"><code class="language-tsx text-sm text-gray-800">(prev =&gt; prev + 1);
+        // Play notification sound if message is from another player
+        if (msg.playerId !== currentPlayerId) {
+          sounds.chatNotification();
+        }
+      }
+    };
+
+    socket.on('game_chat_message', handleChatMessage);
+
+    return () =&gt; {
+      socket.off('game_chat_message', handleChatMessage);
+    };
+  }, [socket, chatOpen]);
+
+  // Reset unread count when chat is opened</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 344:7 - Line 363:45), frontend\src\App.tsx (Line 316:7 - Line 335:22)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn77" onclick="toggleCodeBlock('cloneGroup77', 'expandBtn77', 'collapseBtn77')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn77" onclick="toggleCodeBlock('cloneGroup77', 'expandBtn77', 'collapseBtn77')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup77"><code class="language-tsx text-sm text-gray-800">socket.emit('leave_game', { gameId });
+      // Clear chat messages and toasts when leaving game
+      setChatMessages([]);
+      setToast(null);
+
+      // Clean up bot sockets
+      botSocketsRef.current.forEach((botSocket) =&gt; {
+        botSocket.disconnect();
+      });
+      botSocketsRef.current.clear();
+
+      // Clear bot timeouts
+      botTimeoutsRef.current.forEach((timeout) =&gt; {
+        clearTimeout(timeout);
+      });
+      botTimeoutsRef.current.clear();
+      return;
+    }
+
+    // For players, confirm and replace with bot</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 571:10 - Line 598:14), frontend\src\App.tsx (Line 523:17 - Line 550:9)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn78" onclick="toggleCodeBlock('cloneGroup78', 'expandBtn78', 'collapseBtn78')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn78" onclick="toggleCodeBlock('cloneGroup78', 'expandBtn78', 'collapseBtn78')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup78"><code class="language-tsx text-sm text-gray-800">) {
+    return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;ErrorBoundary</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 625:10 - Line 654:13), frontend\src\App.tsx (Line 523:17 - Line 600:13)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn79" onclick="toggleCodeBlock('cloneGroup79', 'expandBtn79', 'collapseBtn79')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn79" onclick="toggleCodeBlock('cloneGroup79', 'expandBtn79', 'collapseBtn79')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup79"><code class="language-tsx text-sm text-gray-800">) {
+    return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;ErrorBoundary&gt;
+          &lt;Suspense fallback={&lt;div className=&quot;min-h-screen bg-gradient-to-br from-green-900 via-teal-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center&quot;&gt;&lt;div className=&quot;text-white text-2xl&quot;&gt;Loading...&lt;/div&gt;&lt;/div&gt;}&gt;
+            &lt;PlayingPhase</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 686:5 - Line 714:4), frontend\src\App.tsx (Line 524:5 - Line 600:13)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn80" onclick="toggleCodeBlock('cloneGroup80', 'expandBtn80', 'collapseBtn80')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn80" onclick="toggleCodeBlock('cloneGroup80', 'expandBtn80', 'collapseBtn80')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup80"><code class="language-tsx text-sm text-gray-800">return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;ErrorBoundary&gt;
+          &lt;Suspense fallback={&lt;div className=&quot;min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center&quot;&gt;&lt;div className=&quot;text-white text-2xl&quot;&gt;Loading...&lt;/div&gt;&lt;/div&gt;}&gt;
+            &lt;div</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 731:2 - Line 759:4), frontend\src\App.tsx (Line 684:2 - Line 550:9)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn81" onclick="toggleCodeBlock('cloneGroup81', 'expandBtn81', 'collapseBtn81')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn81" onclick="toggleCodeBlock('cloneGroup81', 'expandBtn81', 'collapseBtn81')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup81"><code class="language-tsx text-sm text-gray-800">;
+
+    return (
+      &lt;&gt;
+        &lt;GlobalUI {...globalUIProps} /&gt;
+        &lt;DebugControls
+          gameState={gameState}
+          gameId={gameId}
+          socket={socket}
+          debugMenuOpen={debugMenuOpen}
+          setDebugMenuOpen={setDebugMenuOpen}
+          testPanelOpen={testPanelOpen}
+          setTestPanelOpen={setTestPanelOpen}
+          debugPanelOpen={debugPanelOpen}
+          setDebugPanelOpen={setDebugPanelOpen}
+          debugInfoOpen={debugInfoOpen}
+          setDebugInfoOpen={setDebugInfoOpen}
+          showBotManagement={showBotManagement}
+          setShowBotManagement={setShowBotManagement}
+        /&gt;
+        &lt;Suspense fallback={&lt;div /&gt;}&gt;
+          &lt;DebugPanel
+            gameState={gameState}
+            gameId={gameId}
+            isOpen={debugPanelOpen}
+            onClose={() =&gt; setDebugPanelOpen(false)}
+          /&gt;
+        &lt;/Suspense&gt;
+        &lt;div</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 814:89 - Line 823:3), frontend\src\App.tsx (Line 799:89 - Line 809:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn82" onclick="toggleCodeBlock('cloneGroup82', 'expandBtn82', 'collapseBtn82')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn82" onclick="toggleCodeBlock('cloneGroup82', 'expandBtn82', 'collapseBtn82')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup82"><code class="language-tsx text-sm text-gray-800">&quot;&gt;
+                      &lt;div className=&quot;font-semibold text-umber-900 dark:text-gray-100&quot;&gt;{player.name}&lt;/div&gt;
+                      &lt;div className=&quot;text-sm text-umber-700 dark:text-gray-300&quot;&gt;
+                        {player.tricksWon} tricks • {player.pointsWon} pts
+                      &lt;/div&gt;
+                    &lt;/div&gt;
+                  ))}
+                &lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 867:56 - Line 875:2), frontend\src\components\Leaderboard.tsx (Line 207:48 - Line 215:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn83" onclick="toggleCodeBlock('cloneGroup83', 'expandBtn83', 'collapseBtn83')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn83" onclick="toggleCodeBlock('cloneGroup83', 'expandBtn83', 'collapseBtn83')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup83"><code class="language-tsx text-sm text-gray-800">&quot;&gt;Points Earned&lt;/p&gt;
+                            &lt;p className=&quot;font-bold text-umber-900 dark:text-gray-100&quot;&gt;
+                              {round.offensivePoints} / {round.betAmount}
+                            &lt;/p&gt;
+                            &lt;p className=&quot;text-xs text-umber-600 dark:text-gray-400&quot;&gt;
+                              Defensive: {round.defensivePoints}
+                            &lt;/p&gt;
+                          &lt;/div&gt;
+                          &lt;div </code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\App.tsx (Line 876:56 - Line 882:23), frontend\src\components\Leaderboard.tsx (Line 216:48 - Line 222:42)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn84" onclick="toggleCodeBlock('cloneGroup84', 'expandBtn84', 'collapseBtn84')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn84" onclick="toggleCodeBlock('cloneGroup84', 'expandBtn84', 'collapseBtn84')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup84"><code class="language-tsx text-sm text-gray-800">&quot;&gt;Round Score&lt;/p&gt;
+                            &lt;p className=&quot;font-bold&quot;&gt;
+                              &lt;span className=&quot;text-orange-600&quot;&gt;{round.roundScore.team1 &gt;= 0 ? '+' : ''}{round.roundScore.team1}&lt;/span&gt;
+                              {' / '}
+                              &lt;span className=&quot;text-purple-600&quot;&gt;{round.roundScore.team2 &gt;= 0 ? '+' : ''}{round.roundScore.team2}&lt;/span&gt;
+                            &lt;/p&gt;
+                            &lt;p className=&quot;text-xs text-umber-600</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="typescript-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">typescript</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">frontend\src\utils\sounds.ts (Line 299:5 - Line 311:46), frontend\src\utils\sounds.ts (Line 119:5 - Line 131:38)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup0"><code class="language-typescript text-sm text-gray-800">gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(this.masterVolume * 0.25, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.15);
+  }
+
+  // Sprint 1 Phase 6: Additional sound effects</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\sounds.ts (Line 344:15 - Line 355:21), frontend\src\utils\sounds.ts (Line 227:16 - Line 238:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup1"><code class="language-typescript text-sm text-gray-800">() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // Descending whoosh</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\sounds.ts (Line 371:15 - Line 382:4), frontend\src\utils\sounds.ts (Line 227:16 - Line 238:5)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup2"><code class="language-typescript text-sm text-gray-800">() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.frequency.setValueAtTime(600</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\botPlayer.ts (Line 56:3 - Line 63:6), frontend\src\utils\botPlayerEnhanced.ts (Line 107:3 - Line 114:16)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup3"><code class="language-typescript text-sm text-gray-800">static makeBet(
+    gameState: GameState,
+    playerId: string
+  ): { amount: number; withoutTrump: boolean; skipped: boolean } {
+    const player = gameState.players.find(p =&gt; p.id === playerId);
+    if (!player) return { amount: 7, withoutTrump: false, skipped: true };
+
+    const</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\botPlayer.ts (Line 409:9 - Line 416:37), frontend\src\utils\botPlayer.ts (Line 394:9 - Line 401:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup4"><code class="language-typescript text-sm text-gray-800">const winningCards = impacts.filter(i =&gt; i.canWinTrick);
+        if (winningCards.length &gt; 0) {
+          return winningCards.sort((a, b) =&gt; a.card.value - b.card.value)[0].card;
+        }
+      }
+    }
+
+    // Fallback: Play safest medium card</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\botPlayer.ts (Line 516:6 - Line 522:2), frontend\src\utils\botPlayer.ts (Line 507:13 - Line 514:34)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup5"><code class="language-typescript text-sm text-gray-800">.forEach(tc =&gt; {
+        const alreadyTracked = memory.some(c =&gt; c.color === tc.card.color &amp;&amp; c.value === tc.card.value);
+        if (!alreadyTracked) {
+          memory.push(tc.card);
+        }
+      });
+    }</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\utils\botPlayer.ts (Line 559:3 - Line 568:4), frontend\src\utils\botPlayerEnhanced.ts (Line 674:3 - Line 682:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup6"><code class="language-typescript text-sm text-gray-800">private static getCurrentTrickWinner(gameState: GameState): string | null {
+    const trick = gameState.currentTrick;
+    if (trick.length === 0) return null;
+
+    const trump = gameState.trump;
+    const ledSuit = trick[0].card.color;
+
+    let winner = trick[0];
+
+    for</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useBotManagement.ts (Line 285:14 - Line 291:2), frontend\src\hooks\useBotManagement.ts (Line 271:16 - Line 278:10)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup7"><code class="language-typescript text-sm text-gray-800">, (state: GameState) =&gt; {
+        const botPlayerId = state.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+        if (botPlayerId) {
+          handleBotAction(botSocket, state, botPlayerId);
+        }
+      });
+    }</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useBotManagement.ts (Line 328:15 - Line 335:21), frontend\src\hooks\useBotManagement.ts (Line 271:16 - Line 278:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup8"><code class="language-typescript text-sm text-gray-800">, (state: GameState) =&gt; {
+      const botPlayerId = state.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, state, botPlayerId);
+      }
+    });
+
+    botSocket.on('game_updated_delta'</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useBotManagement.ts (Line 329:7 - Line 339:17), frontend\src\hooks\useBotManagement.ts (Line 244:9 - Line 254:21)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup9"><code class="language-typescript text-sm text-gray-800">const botPlayerId = state.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, state, botPlayerId);
+      }
+    });
+
+    botSocket.on('game_updated_delta', (delta: GameStateDelta) =&gt; {
+      // Get the last known state for this bot
+      const lastState = botStatesRef.current.get(botName);
+      if (!lastState) {
+        console.warn(`[handleAddBot] </code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useBotManagement.ts (Line 339:17 - Line 376:2), frontend\src\hooks\useBotManagement.ts (Line 254:21 - Line 291:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup10"><code class="language-typescript text-sm text-gray-800">${botName} has no previous state, cannot apply delta`);
+        return;
+      }
+
+      // Apply delta to get new state
+      const newState = applyStateDelta(lastState, delta);
+
+      // Store the new state for next delta (CRITICAL: prevents state drift)
+      botStatesRef.current.set(botName, newState);
+
+      // Find bot player ID and handle action
+      const botPlayerId = newState.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, newState, botPlayerId);
+      }
+    });
+
+    botSocket.on('round_started', (state: GameState) =&gt; {
+      const botPlayerId = state.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, state, botPlayerId);
+      }
+    });
+
+    botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) =&gt; {
+      const botPlayerId = newState.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, newState, botPlayerId);
+      }
+    });
+
+    botSocket.on('round_ended', (state: GameState) =&gt; {
+      const botPlayerId = state.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+      if (botPlayerId) {
+        handleBotAction(botSocket, state, botPlayerId);
+      }
+    });
+  },</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useBotManagement.ts (Line 440:2 - Line 459:2), frontend\src\hooks\useBotManagement.ts (Line 259:6 - Line 278:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup11"><code class="language-typescript text-sm text-gray-800">);
+
+            // Store the new state for next delta (CRITICAL: prevents state drift)
+            botStatesRef.current.set(botName, newState);
+
+            // Find bot player ID and handle action
+            const botPlayerId = newState.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, newState, botPlayerId);
+            }
+          });
+
+          botSocket.on('round_started', (state: GameState) =&gt; {
+            const botPlayerId = state.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, state, botPlayerId);
+            }
+          });
+
+          botSocket.on('trick_resolved', ({ gameState }</code></pre></div><div class="py-4"><p class="text-gray-600">frontend\src\hooks\useBotManagement.ts (Line 462:10 - Line 473:2), frontend\src\hooks\useBotManagement.ts (Line 281:9 - Line 291:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup12"><code class="language-typescript text-sm text-gray-800">, botPlayerId);
+            }
+          });
+
+          botSocket.on('round_ended', (state: GameState) =&gt; {
+            const botPlayerId = state.players.find(p =&gt; p.name === botName &amp;&amp; p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, state, botPlayerId);
+            }
+          });
+        }
+      }</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\utils\stateDelta.ts (Line 10:2 - Line 32:10), frontend\src\utils\stateDelta.ts (Line 10:2 - Line 32:10)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn38" onclick="toggleCodeBlock('cloneGroup38', 'expandBtn38', 'collapseBtn38')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn38" onclick="toggleCodeBlock('cloneGroup38', 'expandBtn38', 'collapseBtn38')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup38"><code class="language-typescript text-sm text-gray-800">} from '../types/game';
+
+/**
+ * Delta update representing only changed fields
+ */
+export interface GameStateDelta {
+  id: string; // Game ID (always included for routing)
+
+  // Changed primitive fields
+  phase?: GameState['phase'];
+  currentPlayerIndex?: number;
+  dealerIndex?: number;
+  trump?: GameState['trump'];
+  roundNumber?: number;
+  roundEndTimestamp?: number;
+
+  // Changed nested objects
+  teamScores?: GameState['teamScores'];
+  highestBet?: GameState['highestBet'];
+  previousTrick?: GameState['previousTrick'];
+
+  // Changed arrays (send full array if changed)
+  currentTrick?: TrickCard</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\utils\stateDelta.ts (Line 233:1 - Line 289:2), frontend\src\utils\stateDelta.ts (Line 52:1 - Line 108:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn39" onclick="toggleCodeBlock('cloneGroup39', 'expandBtn39', 'collapseBtn39')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn39" onclick="toggleCodeBlock('cloneGroup39', 'expandBtn39', 'collapseBtn39')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup39"><code class="language-typescript text-sm text-gray-800">}
+
+/**
+ * Apply delta to existing game state (client-side)
+ */
+export function applyStateDelta(currentState: GameState, delta: GameStateDelta): GameState {
+  // Create shallow copy
+  const newState: GameState = { ...currentState };
+
+  // Apply primitive field changes
+  if (delta.phase !== undefined) newState.phase = delta.phase;
+  if (delta.currentPlayerIndex !== undefined) newState.currentPlayerIndex = delta.currentPlayerIndex;
+  if (delta.dealerIndex !== undefined) newState.dealerIndex = delta.dealerIndex;
+  if (delta.trump !== undefined) newState.trump = delta.trump;
+  if (delta.roundNumber !== undefined) newState.roundNumber = delta.roundNumber;
+  if (delta.roundEndTimestamp !== undefined) newState.roundEndTimestamp = delta.roundEndTimestamp;
+
+  // Apply nested object changes
+  if (delta.teamScores !== undefined) newState.teamScores = delta.teamScores;
+  if (delta.highestBet !== undefined) newState.highestBet = delta.highestBet;
+  if (delta.previousTrick !== undefined) newState.previousTrick = delta.previousTrick;
+
+  // Apply array changes
+  if (delta.currentTrick !== undefined) newState.currentTrick = delta.currentTrick;
+  if (delta.currentBets !== undefined) newState.currentBets = delta.currentBets;
+  if (delta.playersReady !== undefined) newState.playersReady = delta.playersReady;
+  if (delta.rematchVotes !== undefined) newState.rematchVotes = delta.rematchVotes;
+
+  // Apply player updates
+  if (delta.playerUpdates &amp;&amp; delta.playerUpdates.length &gt; 0) {
+    // Clone players array to avoid mutation
+    newState.players = [...currentState.players];
+
+    for (const update of delta.playerUpdates) {
+      const { index, changes } = update;
+      if (newState.players[index]) {
+        // Merge changes into player
+        newState.players[index] = {
+          ...newState.players[index],
+          ...changes,
+        };
+      }
+    }
+  }
+
+  // Apply round history additions
+  if (delta.newRoundHistory &amp;&amp; delta.newRoundHistory.length &gt; 0) {
+    newState.roundHistory = [...currentState.roundHistory, ...delta.newRoundHistory];
+  }
+
+  // Apply current round tricks additions
+  if (delta.newCurrentRoundTricks &amp;&amp; delta.newCurrentRoundTricks.length &gt; 0) {
+    newState.currentRoundTricks = [...currentState.currentRoundTricks, ...delta.newCurrentRoundTricks];
+  }
+
+  return newState;
+}</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\utils\emailService.ts (Line 208:40 - Line 214:50), backend\src\utils\emailService.ts (Line 116:38 - Line 122:48)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn40" onclick="toggleCodeBlock('cloneGroup40', 'expandBtn40', 'collapseBtn40')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn40" onclick="toggleCodeBlock('cloneGroup40', 'expandBtn40', 'collapseBtn40')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup40"><code class="language-typescript text-sm text-gray-800">);
+    console.error('   Error type:', error instanceof Error ? error.constructor.name : typeof error);
+    console.error('   Error message:', error instanceof Error ? error.message : String(error));
+    if (error instanceof Error &amp;&amp; error.stack) {
+      console.error('   Stack trace:', error.stack);
+    }
+    // Don't block password reset flow if email fails</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\game.ts (Line 1:1 - Line 19:47), frontend\src\types\game.ts (Line 1:1 - Line 20:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn41" onclick="toggleCodeBlock('cloneGroup41', 'expandBtn41', 'collapseBtn41')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn41" onclick="toggleCodeBlock('cloneGroup41', 'expandBtn41', 'collapseBtn41')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup41"><code class="language-typescript text-sm text-gray-800">export type CardColor = 'red' | 'brown' | 'green' | 'blue';
+export type CardValue = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7;
+
+export interface Card {
+  color: CardColor;
+  value: CardValue;
+}
+
+export type BotDifficulty = 'easy' | 'medium' | 'hard';
+
+export type ConnectionStatus = 'connected' | 'disconnected' | 'reconnecting';
+
+export interface Player {
+  id: string;
+  name: string;
+  teamId: 1 | 2;
+  hand: Card[];
+  tricksWon: number;
+  pointsWon: number; // Points earned from tricks and special cards</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\game.ts (Line 20:3 - Line 74:79), frontend\src\types\game.ts (Line 20:3 - Line 74:33)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn42" onclick="toggleCodeBlock('cloneGroup42', 'expandBtn42', 'collapseBtn42')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn42" onclick="toggleCodeBlock('cloneGroup42', 'expandBtn42', 'collapseBtn42')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup42"><code class="language-typescript text-sm text-gray-800">isBot?: boolean; // True if this player is a bot
+  botDifficulty?: BotDifficulty; // Difficulty level if this is a bot
+  connectionStatus?: ConnectionStatus; // Connection status for real-time feedback
+  disconnectedAt?: number; // Timestamp when player disconnected
+  reconnectTimeLeft?: number; // Seconds left to reconnect (countdown)
+  isEmpty?: boolean; // True if this is an empty seat waiting to be filled
+  emptySlotName?: string; // Display name for empty slot (e.g., &quot;Empty Seat&quot; or previous player name)
+}
+
+export interface Bet {
+  playerId: string;
+  amount: number; // 7-12, or -1 for skip
+  withoutTrump: boolean;
+  skipped?: boolean; // True if player skipped their bet
+}
+
+export type GamePhase =
+  | 'team_selection'
+  | 'betting'
+  | 'playing'
+  | 'scoring'
+  | 'game_over';
+
+export interface TrickCard {
+  playerId: string; // Socket ID (changes on reconnect) - kept for backwards compat
+  playerName: string; // STABLE identifier - use this for lookups
+  card: Card;
+}
+
+export interface TrickResult {
+  trick: TrickCard[];
+  winnerId: string; // Socket ID (changes on reconnect) - kept for backwards compat
+  winnerName: string; // STABLE identifier - use this for lookups
+  points: number;
+}
+
+export interface RoundStatistics {
+  // Performance-based stats
+  trickMaster?: { playerId: string; playerName: string; tricksWon: number };
+  pointLeader?: { playerId: string; playerName: string; pointsEarned: number };
+  perfectBet?: { playerId: string; playerName: string; betAmount: number };
+  teamMVP?: { playerId: string; playerName: string; contribution: number };
+  trumpMaster?: { playerId: string; playerName: string; trumpsPlayed: number };
+  luckyPlayer?: { playerId: string; playerName: string; redZeros: number };
+
+  // Starting hand stats
+  monochrome?: { playerId: string; playerName: string };
+  suitedUp?: { playerId: string; playerName: string; suit: string; count: number };
+  luckySevens?: { playerId: string; playerName: string; sevensCount: number };
+  rainbow?: { playerId: string; playerName: string };
+  lowball?: { playerId: string; playerName: string; avgValue: number };
+  highRoller?: { playerId: string; playerName: string; avgValue: number };
+  trumpHeavy?: { playerId: string; playerName: string; trumpCount: number };
+
+  // Raw data for detailed display (Maps will be serialized to objects for JSON)</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\game.ts (Line 75:3 - Line 109:10), frontend\src\types\game.ts (Line 75:3 - Line 109:14)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn43" onclick="toggleCodeBlock('cloneGroup43', 'expandBtn43', 'collapseBtn43')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn43" onclick="toggleCodeBlock('cloneGroup43', 'expandBtn43', 'collapseBtn43')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup43"><code class="language-typescript text-sm text-gray-800">initialHands?: { [playerName: string]: Card[] };
+  playerBets?: { [playerName: string]: { amount: number; withoutTrump: boolean } | null };
+}
+
+export interface RoundHistory {
+  roundNumber: number;
+  bets: Bet[];
+  highestBet: Bet;
+  offensiveTeam: 1 | 2;
+  offensivePoints: number;
+  defensivePoints: number;
+  betAmount: number;
+  withoutTrump: boolean;
+  betMade: boolean;
+  roundScore: {
+    team1: number;
+    team2: number;
+  };
+  cumulativeScore: {
+    team1: number;
+    team2: number;
+  };
+  tricks: TrickResult[]; // All tricks played in this round
+  trump: CardColor | null; // Trump suit for this round
+  statistics?: RoundStatistics; // Fun stats for this round
+  playerStats?: Array&lt;{
+    playerName: string;
+    tricksWon: number;
+    pointsWon: number;
+    redZerosCollected: number;
+    brownZerosReceived: number;
+  }&gt;;
+}
+
+export interface GameState</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\game.ts (Line 107:1 - Line 122:31), frontend\src\types\game.ts (Line 115:1 - Line 131:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn44" onclick="toggleCodeBlock('cloneGroup44', 'expandBtn44', 'collapseBtn44')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn44" onclick="toggleCodeBlock('cloneGroup44', 'expandBtn44', 'collapseBtn44')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup44"><code class="language-typescript text-sm text-gray-800">}
+
+export interface GameState {
+  id: string;
+  creatorId: string; // Socket ID of the player who created the game
+  persistenceMode: 'elo' | 'casual'; // ELO = full database persistence, Casual = memory-only
+  isBotGame: boolean; // True if game was created via Quick Play (has bots)
+  phase: GamePhase;
+  players: Player[];
+  currentBets: Bet[];
+  highestBet: Bet | null;
+  trump: CardColor | null;
+  currentTrick: TrickCard[];
+  previousTrick: TrickResult | null;
+  currentPlayerIndex: number;
+  dealerIndex: number; // Index of the current dealer</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\game.ts (Line 123:3 - Line 134:12), frontend\src\types\game.ts (Line 131:3 - Line 142:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn45" onclick="toggleCodeBlock('cloneGroup45', 'expandBtn45', 'collapseBtn45')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn45" onclick="toggleCodeBlock('cloneGroup45', 'expandBtn45', 'collapseBtn45')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup45"><code class="language-typescript text-sm text-gray-800">teamScores: {
+    team1: number;
+    team2: number;
+  };
+  roundNumber: number;
+  roundHistory: RoundHistory[];
+  currentRoundTricks: TrickResult[]; // Tricks completed in current round (before endRound)
+  playersReady?: string[]; // Array of player names who are ready for next round (stable across reconnections)
+  roundEndTimestamp?: number; // Timestamp when round ended (for 60s timer)
+  rematchVotes?: string[]; // Array of player names who voted for rematch (stable across reconnections)
+  currentTimeout?: PlayerTimeout; // Current active timeout for turn-based phases
+  afkWarnings</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\game.ts (Line 184:1 - Line 205:4), frontend\src\types\game.ts (Line 217:1 - Line 239:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn46" onclick="toggleCodeBlock('cloneGroup46', 'expandBtn46', 'collapseBtn46')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn46" onclick="toggleCodeBlock('cloneGroup46', 'expandBtn46', 'collapseBtn46')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup46"><code class="language-typescript text-sm text-gray-800">export interface LeaderboardEntry {
+  player_name: string;
+  games_played: number;
+  games_won: number;
+  games_lost: number;
+  win_percentage: number;
+  elo_rating: number;
+  highest_rating: number;
+  total_tricks_won: number;
+  total_points_earned: number;
+  total_rounds_played: number;
+  rounds_won: number;
+  rounds_win_percentage: number;
+  avg_tricks_per_round: number;
+  bet_success_rate: number;
+  avg_points_per_round: number;
+  ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+}
+
+/**
+ * Game history entry for a player
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\friends.ts (Line 6:1 - Line 34:2), frontend\src\types\friends.ts (Line 6:1 - Line 34:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn47" onclick="toggleCodeBlock('cloneGroup47', 'expandBtn47', 'collapseBtn47')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn47" onclick="toggleCodeBlock('cloneGroup47', 'expandBtn47', 'collapseBtn47')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup47"><code class="language-typescript text-sm text-gray-800">export interface Friendship {
+  id: number;
+  player1_name: string;
+  player2_name: string;
+  created_at: Date;
+}
+
+export interface FriendRequest {
+  id: number;
+  from_player: string;
+  to_player: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  created_at: Date;
+  responded_at?: Date;
+}
+
+export interface FriendWithStatus {
+  player_name: string;
+  is_online: boolean;
+  status: 'in_lobby' | 'in_game' | 'in_team_selection' | 'offline';
+  game_id?: string;
+  friendship_date: Date;
+}
+
+export interface FriendRequestNotification {
+  request_id: number;
+  from_player: string;
+  created_at: Date;
+}</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\types\achievements.ts (Line 13:7 - Line 38:25), frontend\src\types\achievements.ts (Line 15:12 - Line 40:30)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn48" onclick="toggleCodeBlock('cloneGroup48', 'expandBtn48', 'collapseBtn48')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn48" onclick="toggleCodeBlock('cloneGroup48', 'expandBtn48', 'collapseBtn48')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup48"><code class="language-typescript text-sm text-gray-800">;
+  icon: string; // Emoji
+  tier: AchievementTier;
+  points: number;
+  is_secret: boolean;
+  category: AchievementCategory;
+  created_at: Date;
+}
+
+export interface PlayerAchievement {
+  id: number;
+  player_name: string;
+  achievement_id: number;
+  unlocked_at: Date;
+  progress: number;
+  max_progress: number;
+}
+
+export interface AchievementProgress extends Achievement {
+  progress: number;
+  max_progress: number;
+  is_unlocked: boolean;
+  unlocked_at?: Date;
+}
+
+export interface AchievementUnlockPayload</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\lobby.ts (Line 611:45 - Line 620:2), backend\src\socketHandlers\lobby.ts (Line 527:40 - Line 536:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn49" onclick="toggleCodeBlock('cloneGroup49', 'expandBtn49', 'collapseBtn49')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn49" onclick="toggleCodeBlock('cloneGroup49', 'expandBtn49', 'collapseBtn49')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup49"><code class="language-typescript text-sm text-gray-800">, {
+        payload: JSON.stringify(payload),
+        error: validation.error,
+        socketId: socket.id
+      });
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      return;
+    }
+
+    const { gameId,</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\connection.ts (Line 249:2 - Line 260:8), backend\src\socketHandlers\lobby.ts (Line 268:3 - Line 279:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn50" onclick="toggleCodeBlock('cloneGroup50', 'expandBtn50', 'collapseBtn50')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn50" onclick="toggleCodeBlock('cloneGroup50', 'expandBtn50', 'collapseBtn50')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup50"><code class="language-typescript text-sm text-gray-800">gameId}-${oldSocketId}`;
+    const existingTimeout = activeTimeouts.get(oldTimeoutKey);
+    if (existingTimeout) {
+      clearTimeout(existingTimeout);
+      activeTimeouts.delete(oldTimeoutKey);
+      console.log(`Cleared old timeout for ${oldSocketId}, restarting for ${socket.id}`);
+
+      // Restart timeout with new socket ID if it's their turn
+      const currentPlayer = game.players[game.currentPlayerIndex];
+      if (currentPlayer &amp;&amp; currentPlayer.id === socket.id) {
+        const phase = game.phase === 'betting' ? 'betting' : 'playing';
+        startPlayerTimeout(session</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\connection.ts (Line 420:12 - Line 434:3), backend\src\socketHandlers\lobby.ts (Line 559:5 - Line 573:23)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn51" onclick="toggleCodeBlock('cloneGroup51', 'expandBtn51', 'collapseBtn51')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn51" onclick="toggleCodeBlock('cloneGroup51', 'expandBtn51', 'collapseBtn51')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup51"><code class="language-typescript text-sm text-gray-800">.players[playerIndex] = {
+            ...player,
+            id: `empty_${playerIndex}_${Date.now()}`, // Unique ID for empty seat
+            name: `Empty Seat (${player.name})`, // Show who left
+            hand: [], // Clear hand
+            isEmpty: true,
+            emptySlotName: `Empty Seat`,
+            isBot: false,
+            botDifficulty: undefined,
+            connectionStatus: 'disconnected',
+            tricksWon: 0, // Reset stats for new player
+            pointsWon: 0,
+          };
+
+          io</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\chat.ts (Line 147:2 - Line 161:3), backend\src\socketHandlers\lobby.ts (Line 536:2 - Line 550:76)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn52" onclick="toggleCodeBlock('cloneGroup52', 'expandBtn52', 'collapseBtn52')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn52" onclick="toggleCodeBlock('cloneGroup52', 'expandBtn52', 'collapseBtn52')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup52"><code class="language-typescript text-sm text-gray-800">} = validation.data;
+
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    const player = game.players.find(p =&gt; p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    if</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\chat.ts (Line 203:17 - Line 220:10), backend\src\socketHandlers\chat.ts (Line 144:27 - Line 161:17)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn53" onclick="toggleCodeBlock('cloneGroup53', 'expandBtn53', 'collapseBtn53')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn53" onclick="toggleCodeBlock('cloneGroup53', 'expandBtn53', 'collapseBtn53')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup53"><code class="language-typescript text-sm text-gray-800">);
+    if (!validation.success) return;
+
+    const { gameId, message: validatedMessage } = validation.data;
+
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    const player = game.players.find(p =&gt; p.id === socket.id);
+    if (!player) {
+      socket.emit('error', { message: 'You are not in this game' });
+      return;
+    }
+
+    if (game.phase !== 'betting'</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\chat.ts (Line 244:20 - Line 254:47), backend\src\socketHandlers\chat.ts (Line 185:30 - Line 195:57)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn54" onclick="toggleCodeBlock('cloneGroup54', 'expandBtn54', 'collapseBtn54')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn54" onclick="toggleCodeBlock('cloneGroup54', 'expandBtn54', 'collapseBtn54')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup54"><code class="language-typescript text-sm text-gray-800">, {
+      playerId: socket.id,
+      playerName: player.name,
+      teamId: player.teamId,
+      message: sanitizedMessage,
+      timestamp
+    });
+
+    // Persist message to database (async, don't block)
+    saveChatMessage('game', player.name, sanitizedMessage, gameId, player.teamId)
+      .catch(err =&gt; logger.error('Failed to save game chat message to database'</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\bots.ts (Line 51:2 - Line 60:2), backend\src\socketHandlers\connection.ts (Line 69:10 - Line 78:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn55" onclick="toggleCodeBlock('cloneGroup55', 'expandBtn55', 'collapseBtn55')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn55" onclick="toggleCodeBlock('cloneGroup55', 'expandBtn55', 'collapseBtn55')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup55"><code class="language-typescript text-sm text-gray-800">) =&gt; void;
+
+  // Emission helpers
+  emitGameUpdate: (gameId: string, gameState: GameState, forceFull?: boolean) =&gt; void;
+
+  // Utility
+  logger: Logger;
+  errorBoundaries: {
+    gameAction: (actionName: string) =&gt; (handler: (...args: unknown[]) =&gt; void) =&gt; (...args: unknown[]) =&gt; void;
+  }</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\bots.ts (Line 233:2 - Line 244:20), backend\src\socketHandlers\bots.ts (Line 110:2 - Line 121:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn56" onclick="toggleCodeBlock('cloneGroup56', 'expandBtn56', 'collapseBtn56')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn56" onclick="toggleCodeBlock('cloneGroup56', 'expandBtn56', 'collapseBtn56')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup56"><code class="language-typescript text-sm text-gray-800">});
+      return;
+    }
+
+    // Check bot limit (max 3 bots)
+    if (!canAddBot(game)) {
+      socket.emit('error', { message: 'Maximum of 3 bots allowed per game' });
+      return;
+    }
+
+    // Check if at least 1 human would remain
+    const humanCountAfterReplace = game.players.filter(p =&gt; !p.isBot &amp;&amp; p.name !== playerNameToReplace</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\bots.ts (Line 271:5 - Line 286:20), backend\src\socketHandlers\bots.ts (Line 148:5 - Line 163:11)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn57" onclick="toggleCodeBlock('cloneGroup57', 'expandBtn57', 'collapseBtn57')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn57" onclick="toggleCodeBlock('cloneGroup57', 'expandBtn57', 'collapseBtn57')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup57"><code class="language-typescript text-sm text-gray-800">game.currentBets.forEach(bet =&gt; {
+      if (bet.playerId === oldSocketId) {
+        bet.playerId = newBotId;
+      }
+    });
+    if (game.highestBet &amp;&amp; game.highestBet.playerId === oldSocketId) {
+      game.highestBet.playerId = newBotId;
+    }
+
+    // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
+    migratePlayerIdentity({
+      gameState: game,
+      roundStats: roundStats.get(gameId),
+      oldPlayerId: oldSocketId,
+      newPlayerId: newBotId,
+      oldPlayerName: playerNameToReplace</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\socketHandlers\admin.ts (Line 41:3 - Line 55:4), backend\src\socketHandlers\bots.ts (Line 51:3 - Line 65:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn58" onclick="toggleCodeBlock('cloneGroup58', 'expandBtn58', 'collapseBtn58')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn58" onclick="toggleCodeBlock('cloneGroup58', 'expandBtn58', 'collapseBtn58')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup58"><code class="language-typescript text-sm text-gray-800">broadcastOnlinePlayers: () =&gt; void;
+
+  // Emission helpers
+  emitGameUpdate: (gameId: string, gameState: GameState, forceFull?: boolean) =&gt; void;
+
+  // Utility
+  logger: Logger;
+  errorBoundaries: {
+    gameAction: (actionName: string) =&gt; (handler: (...args: unknown[]) =&gt; void) =&gt; (...args: unknown[]) =&gt; void;
+  };
+}
+
+/**
+ * Register all admin-related Socket.io handlers
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\stateTransitions.ts (Line 192:29 - Line 202:24), backend\src\game\stateTransitions.ts (Line 95:29 - Line 105:23)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn59" onclick="toggleCodeBlock('cloneGroup59', 'expandBtn59', 'collapseBtn59')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn59" onclick="toggleCodeBlock('cloneGroup59', 'expandBtn59', 'collapseBtn59')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup59"><code class="language-typescript text-sm text-gray-800">${game.phase}`);
+  }
+
+  const playerIndex = game.players.findIndex(p =&gt; p.id === playerId);
+  if (playerIndex === -1) {
+    throw new Error('Player not found');
+  }
+
+  // Verify it's player's turn
+  if (game.currentPlayerIndex !== playerIndex) {
+    throw new Error('Not your turn to play'</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 62:2 - Line 93:75), frontend\src\utils\botPlayer.ts (Line 321:2 - Line 352:54)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn60" onclick="toggleCodeBlock('cloneGroup60', 'expandBtn60', 'collapseBtn60')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn60" onclick="toggleCodeBlock('cloneGroup60', 'expandBtn60', 'collapseBtn60')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup60"><code class="language-typescript text-sm text-gray-800">getCurrentTrickWinner(gameState);
+
+  // Priority 1: Get rid of brown 0 strategically
+  const brownZero = impacts.find(i =&gt; i.card.color === 'brown' &amp;&amp; i.card.value === 0);
+  if (brownZero) {
+    // Play it if we're not winning or if it's safe
+    if (position &gt; 1 &amp;&amp; (!currentWinner || currentWinner !== playerId)) {
+      return brownZero.card;
+    }
+  }
+
+  // Priority 2: Win red 0 at minimal cost
+  const redZeroInTrick = currentTrick.some(tc =&gt; tc.card.color === 'red' &amp;&amp; tc.card.value === 0);
+  if (redZeroInTrick &amp;&amp; position &gt; 1) {
+    const winningCards = impacts.filter(i =&gt; i.canWinTrick).sort((a, b) =&gt; a.card.value - b.card.value);
+    if (winningCards.length &gt; 0) {
+      // Use the lowest card that can win
+      return winningCards[0].card;
+    }
+  }
+
+  // Priority 3: Partner is winning - dump low cards or valuable cards to give points
+  if (position &gt;= 3 &amp;&amp; partner &amp;&amp; currentWinner === partner.id) {
+    const lowCards = impacts.filter(i =&gt; i.impact === 'low' &amp;&amp; !i.isSpecial).sort((a, b) =&gt; a.card.value - b.card.value);
+    if (lowCards.length &gt; 0) {
+      return lowCards[0].card;
+    }
+  }
+
+  // Priority 4: Positional play based on position
+  if (position === 1) {
+    // Leading: Use medium-high cards in long suits, avoid trump unless strong</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 94:5 - Line 165:4), frontend\src\utils\botPlayer.ts (Line 354:7 - Line 425:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn61" onclick="toggleCodeBlock('cloneGroup61', 'expandBtn61', 'collapseBtn61')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn61" onclick="toggleCodeBlock('cloneGroup61', 'expandBtn61', 'collapseBtn61')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup61"><code class="language-typescript text-sm text-gray-800">const nonTrumpMedium = impacts.filter(i =&gt; !i.isTrump &amp;&amp; i.impact === 'medium');
+    if (nonTrumpMedium.length &gt; 0) {
+      // Lead from longest suit
+      const suitCounts: Record&lt;CardColor, number&gt; = { red: 0, brown: 0, green: 0, blue: 0 };
+      playableCards.forEach(card =&gt; suitCounts[card.color]++);
+      const longestSuit = (Object.entries(suitCounts) as [CardColor, number][]).reduce((max, [color, count]) =&gt;
+        count &gt; max.count ? { color, count } : max
+      , { color: 'red' as CardColor, count: 0 });
+
+      const longestSuitCards = nonTrumpMedium.filter(i =&gt; i.card.color === longestSuit.color);
+      if (longestSuitCards.length &gt; 0) {
+        return longestSuitCards[0].card;
+      }
+      return nonTrumpMedium[0].card;
+    }
+  }
+
+  if (position === 2) {
+    // Second to play: Decide whether to win or duck
+    const canBeatFirst = impacts.some(i =&gt; i.canWinTrick);
+
+    if (canBeatFirst) {
+      // Win with lowest possible card
+      const winningCards = impacts.filter(i =&gt; i.canWinTrick).sort((a, b) =&gt; a.card.value - b.card.value);
+      return winningCards[0].card;
+    } else {
+      // Can't win, play lowest
+      const lowCards = impacts.filter(i =&gt; i.impact === 'low');
+      if (lowCards.length &gt; 0) return lowCards[0].card;
+    }
+  }
+
+  if (position === 3) {
+    // Third to play: React to first two cards
+    if (partner &amp;&amp; currentWinner === partner.id) {
+      // Partner winning, play low
+      const lowCards = impacts.filter(i =&gt; i.impact === 'low');
+      if (lowCards.length &gt; 0) return lowCards[0].card;
+    } else {
+      // Try to win or overtrump
+      const winningCards = impacts.filter(i =&gt; i.canWinTrick);
+      if (winningCards.length &gt; 0) {
+        return winningCards.sort((a, b) =&gt; a.card.value - b.card.value)[0].card;
+      }
+    }
+  }
+
+  if (position === 4) {
+    // Last to play: Know exactly what's needed
+    if (partner &amp;&amp; currentWinner === partner.id) {
+      // Partner winning, dump lowest or give high value card if safe
+      const lowCards = impacts.filter(i =&gt; i.impact === 'low');
+      if (lowCards.length &gt; 0) return lowCards[0].card;
+    } else {
+      // Enemy winning, win if possible
+      const winningCards = impacts.filter(i =&gt; i.canWinTrick);
+      if (winningCards.length &gt; 0) {
+        return winningCards.sort((a, b) =&gt; a.card.value - b.card.value)[0].card;
+      }
+    }
+  }
+
+  // Fallback: Play safest medium card
+  const safeCards = impacts.filter(i =&gt; i.impact === 'medium');
+  if (safeCards.length &gt; 0) return safeCards[0].card;
+
+  return playableCards[0];
+}
+
+/**
+ * Assess the impact of playing a card
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 166:2 - Line 176:16), frontend\src\utils\botPlayer.ts (Line 426:2 - Line 436:5)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn62" onclick="toggleCodeBlock('cloneGroup62', 'expandBtn62', 'collapseBtn62')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn62" onclick="toggleCodeBlock('cloneGroup62', 'expandBtn62', 'collapseBtn62')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup62"><code class="language-typescript text-sm text-gray-800">assessCardImpact(
+  card: Card,
+  gameState: GameState,
+  position: number
+): CardImpact {
+  const trump = gameState.trump;
+  const isTrump = card.color === trump;
+  const isSpecial = (card.color === 'red' &amp;&amp; card.value === 0) || (card.color === 'brown' &amp;&amp; card.value === 0);
+
+  // Determine if this card can win the current trick
+  const canWinTrick = position === 1 ? true : canCardWinTrick</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 176:2 - Line 202:4), frontend\src\utils\botPlayer.ts (Line 436:2 - Line 462:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn63" onclick="toggleCodeBlock('cloneGroup63', 'expandBtn63', 'collapseBtn63')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn63" onclick="toggleCodeBlock('cloneGroup63', 'expandBtn63', 'collapseBtn63')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup63"><code class="language-typescript text-sm text-gray-800">canCardWinTrick(card, gameState);
+
+  // Assess impact level
+  let impact: 'low' | 'medium' | 'high';
+
+  if (isTrump) {
+    // Trump cards
+    if (card.value &gt;= 6) impact = 'high'; // High trump is very valuable
+    else if (card.value &gt;= 4) impact = 'medium';
+    else impact = 'low';
+  } else {
+    // Non-trump cards
+    if (card.value &gt;= 6) impact = 'high'; // High cards can win tricks
+    else if (card.value &gt;= 3) impact = 'medium';
+    else impact = 'low';
+  }
+
+  // Special cards adjustment
+  if (card.color === 'red' &amp;&amp; card.value === 0) impact = 'high'; // Red 0 is valuable
+  if (card.color === 'brown' &amp;&amp; card.value === 0) impact = 'low'; // Brown 0 is bad
+
+  return { card, impact, isTrump, canWinTrick, isSpecial };
+}
+
+/**
+ * Check if a card can win the current trick
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 203:2 - Line 236:4), frontend\src\utils\botPlayer.ts (Line 463:2 - Line 496:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn64" onclick="toggleCodeBlock('cloneGroup64', 'expandBtn64', 'collapseBtn64')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn64" onclick="toggleCodeBlock('cloneGroup64', 'expandBtn64', 'collapseBtn64')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup64"><code class="language-typescript text-sm text-gray-800">canCardWinTrick(card: Card, gameState: GameState): boolean {
+  const trick = gameState.currentTrick;
+  if (trick.length === 0) return true; // First card always &quot;wins&quot; initially
+
+  const trump = gameState.trump;
+  const ledSuit = trick[0].card.color;
+
+  // Find current best card
+  let currentBest = trick[0].card;
+  for (const tc of trick) {
+    if (tc.card.color === trump &amp;&amp; currentBest.color !== trump) {
+      currentBest = tc.card;
+    } else if (tc.card.color === currentBest.color &amp;&amp; tc.card.value &gt; currentBest.value) {
+      currentBest = tc.card;
+    } else if (tc.card.color === ledSuit &amp;&amp; currentBest.color !== ledSuit &amp;&amp; currentBest.color !== trump) {
+      currentBest = tc.card;
+    }
+  }
+
+  // Check if our card beats current best
+  if (card.color === trump) {
+    return currentBest.color !== trump || card.value &gt; currentBest.value;
+  }
+
+  if (card.color === ledSuit) {
+    return currentBest.color !== trump &amp;&amp; card.value &gt; currentBest.value;
+  }
+
+  return false; // Off-suit non-trump can't win
+}
+
+/**
+ * Get list of cards that are legal to play
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 237:2 - Line 256:4), frontend\src\utils\botPlayer.ts (Line 528:2 - Line 547:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn65" onclick="toggleCodeBlock('cloneGroup65', 'expandBtn65', 'collapseBtn65')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn65" onclick="toggleCodeBlock('cloneGroup65', 'expandBtn65', 'collapseBtn65')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup65"><code class="language-typescript text-sm text-gray-800">getPlayableCards(gameState: GameState, hand: Card[]): Card[] {
+  // If no cards in trick, all cards are playable
+  if (gameState.currentTrick.length === 0) return hand;
+
+  // Get led suit
+  const ledSuit = gameState.currentTrick[0].card.color;
+  const cardsInLedSuit = hand.filter(c =&gt; c.color === ledSuit);
+
+  // If player has led suit, they must play it
+  if (cardsInLedSuit.length &gt; 0) {
+    return cardsInLedSuit;
+  }
+
+  // Otherwise, all cards are playable
+  return hand;
+}
+
+/**
+ * Get the bot's partner player
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 257:2 - Line 267:4), frontend\src\utils\botPlayer.ts (Line 548:2 - Line 558:6)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn66" onclick="toggleCodeBlock('cloneGroup66', 'expandBtn66', 'collapseBtn66')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn66" onclick="toggleCodeBlock('cloneGroup66', 'expandBtn66', 'collapseBtn66')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup66"><code class="language-typescript text-sm text-gray-800">| null {
+  const player = gameState.players.find(p =&gt; p.id === playerId);
+  if (!player) return null;
+
+  const partner = gameState.players.find(p =&gt; p.id !== playerId &amp;&amp; p.teamId === player.teamId);
+  return partner || null;
+}
+
+/**
+ * Determine who is currently winning the trick
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\game\botLogic.ts (Line 268:2 - Line 303:2), frontend\src\utils\botPlayerEnhanced.ts (Line 674:2 - Line 594:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn67" onclick="toggleCodeBlock('cloneGroup67', 'expandBtn67', 'collapseBtn67')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn67" onclick="toggleCodeBlock('cloneGroup67', 'expandBtn67', 'collapseBtn67')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup67"><code class="language-typescript text-sm text-gray-800">getCurrentTrickWinner(gameState: GameState): string | null {
+  const trick = gameState.currentTrick;
+  if (trick.length === 0) return null;
+
+  const trump = gameState.trump;
+  const ledSuit = trick[0].card.color;
+
+  let winner = trick[0];
+
+  for (let i = 1; i &lt; trick.length; i++) {
+    const current = trick[i];
+
+    // Trump beats non-trump
+    if (current.card.color === trump &amp;&amp; winner.card.color !== trump) {
+      winner = current;
+      continue;
+    }
+
+    // If winner is trump but current isn't, winner stays
+    if (winner.card.color === trump &amp;&amp; current.card.color !== trump) {
+      continue;
+    }
+
+    // Both trump or both non-trump: higher value wins (within led suit)
+    if (current.card.color === winner.card.color) {
+      if (current.card.value &gt; winner.card.value) {
+        winner = current;
+      }
+    } else if (current.card.color === ledSuit &amp;&amp; winner.card.color !== ledSuit &amp;&amp; winner.card.color !== trump) {
+      // Led suit beats off-suit (when neither is trump)
+      winner = current;
+    }
+  }
+
+  return winner.playerId;
+}</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\db\sessions.ts (Line 181:7 - Line 195:2), backend\src\db\sessions.ts (Line 64:6 - Line 78:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn68" onclick="toggleCodeBlock('cloneGroup68', 'expandBtn68', 'collapseBtn68')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn68" onclick="toggleCodeBlock('cloneGroup68', 'expandBtn68', 'collapseBtn68')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup68"><code class="language-typescript text-sm text-gray-800">]);
+
+  if (result.rows.length === 0) {
+    return null;
+  }
+
+  const row = result.rows[0];
+  return {
+    token: row.session_token,
+    playerId: row.player_id,
+    playerName: row.player_name,
+    gameId: row.game_id,
+    timestamp: new Date(row.last_active_at).getTime(),
+  };
+}</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\db\profiles.ts (Line 8:1 - Line 17:5), frontend\src\types\auth.ts (Line 35:1 - Line 44:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn69" onclick="toggleCodeBlock('cloneGroup69', 'expandBtn69', 'collapseBtn69')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn69" onclick="toggleCodeBlock('cloneGroup69', 'expandBtn69', 'collapseBtn69')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup69"><code class="language-typescript text-sm text-gray-800">export interface UserProfile {
+  profile_id: number;
+  user_id: number;
+  bio: string | null;
+  country: string | null;
+  favorite_team: 1 | 2 | null;
+  visibility: 'public' | 'friends_only' | 'private';
+  show_online_status: boolean;
+  allow_friend_requests: boolean;
+  created_at: Date</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\db\init.ts (Line 1:12 - Line 12:70), backend\src\db\setup.ts (Line 1:13 - Line 11:7)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn70" onclick="toggleCodeBlock('cloneGroup70', 'expandBtn70', 'collapseBtn70')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn70" onclick="toggleCodeBlock('cloneGroup70', 'expandBtn70', 'collapseBtn70')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup70"><code class="language-typescript text-sm text-gray-800">, existsSync } from 'fs';
+import { join, resolve } from 'path';
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+
+// Prioritize .env.local for local development (avoids Neon quota usage)
+// Path: backend/src/db -&gt; backend/.env.local (need to go up 2 levels)
+const localEnvPath = resolve(__dirname, '../../.env.local');
+
+if (existsSync(localEnvPath)) {
+  console.log('📝 Using local environment (.env.local)');
+  // Use override: true to replace DATABASE_URL that was already loaded</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\db\gameState.ts (Line 221:2 - Line 247:4), backend\src\db\gameState.ts (Line 175:7 - Line 202:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn71" onclick="toggleCodeBlock('cloneGroup71', 'expandBtn71', 'collapseBtn71')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn71" onclick="toggleCodeBlock('cloneGroup71', 'expandBtn71', 'collapseBtn71')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup71"><code class="language-typescript text-sm text-gray-800">);
+
+  return result.rows.map(row =&gt; {
+    const gameState: GameState = row.game_state;
+    const playerNames = gameState.players.map(p =&gt; p.name);
+    const teamAssignments = gameState.players.reduce((acc, p) =&gt; {
+      acc[p.name] = p.teamId;
+      return acc;
+    }, {} as Record&lt;string, number&gt;);
+
+    return {
+      gameId: row.game_id,
+      phase: row.phase,
+      status: row.status,
+      playerCount: row.player_count,
+      creatorName: row.creator_name,
+      isPublic: row.is_public,
+      createdAt: row.created_at,
+      playerNames,
+      teamAssignments,
+    };
+  });
+}
+
+/**
+ * Check if a game exists in the database
+ */</code></pre></div><div class="py-4"><p class="text-gray-600">backend\src\db\achievements.ts (Line 101:9 - Line 113:6), backend\src\db\achievements.ts (Line 52:12 - Line 65:29)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn72" onclick="toggleCodeBlock('cloneGroup72', 'expandBtn72', 'collapseBtn72')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn72" onclick="toggleCodeBlock('cloneGroup72', 'expandBtn72', 'collapseBtn72')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup72"><code class="language-typescript text-sm text-gray-800">: boolean }&gt; {
+  // Get achievement
+  const achievementResult = await query(
+    'SELECT achievement_id, achievement_key, achievement_name, description, icon, tier, points, is_secret, category, created_at FROM achievements WHERE achievement_key = $1',
+    [achievementKey]
+  );
+
+  if (achievementResult.rows.length === 0) {
+    throw new Error(`Achievement not found: ${achievementKey}`);
+  }
+
+  const achievement = achievementResult.rows[0];
+  const</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div></section><!-- Add more sections for other formats and clone groups as needed--></main><footer class="bg-white shadow mt-8 py-4"><div class="container mx-auto px-4 text-center"><p class="text-sm text-gray-600">This report is generated by jscpd, an open-source copy/paste detector.</p><p class="text-sm text-gray-600">jscpd is licensed under the MIT License.</p><a class="text-blue-500 text-sm" href="https://github.com/kucherenko/jscpd" target="_blank" rel="noopener noreferrer">View jscpd on GitHub</a></div></footer><script src="js/prism.js"></script><script>function toggleCodeBlock(codeBlockId, expandBtnId, collapseBtnId) {
+  const codeBlock = document.getElementById(codeBlockId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const collapseBtn = document.getElementById(collapseBtnId);
+
+  codeBlock.classList.toggle('hidden');
+  expandBtn.classList.toggle('hidden');
+  collapseBtn.classList.toggle('hidden');
+}</script></body></html>

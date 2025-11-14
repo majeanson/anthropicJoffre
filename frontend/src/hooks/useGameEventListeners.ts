@@ -8,7 +8,7 @@ interface UseGameEventListenersProps {
   gameState: GameState | null;
   autoJoinGameId: string;
   showToast: (message: string, type: 'success' | 'error' | 'info' | 'warning', duration?: number) => void;
-  setToast: (toast: any) => void;
+  setToast: (toast: { message: string; type: 'success' | 'error' | 'info' | 'warning'; duration?: number } | null) => void;
   setError: Dispatch<SetStateAction<string>>;
   setGameState: (gameState: GameState | null) => void;
   setGameId: (gameId: string) => void;

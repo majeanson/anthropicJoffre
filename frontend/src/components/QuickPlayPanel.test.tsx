@@ -69,7 +69,16 @@ describe('QuickPlayPanel', () => {
 
   it('toggles persistence mode when checkbox is clicked', async () => {
     const user = userEvent.setup();
-    const mockUser = { id: '1', username: 'testuser', email: 'test@example.com' };
+    const mockUser = {
+      user_id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      display_name: null,
+      avatar_url: null,
+      is_verified: false,
+      created_at: '2025-01-01T00:00:00Z',
+      last_login_at: null,
+    };
     renderWithProviders(<QuickPlayPanel {...defaultProps} user={mockUser} />);
 
     const checkbox = screen.getByRole('checkbox');
@@ -87,7 +96,16 @@ describe('QuickPlayPanel', () => {
   });
 
   it('shows ranked badge when persistence is elo', () => {
-    const mockUser = { id: '1', username: 'testuser', email: 'test@example.com' };
+    const mockUser = {
+      user_id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      display_name: null,
+      avatar_url: null,
+      is_verified: false,
+      created_at: '2025-01-01T00:00:00Z',
+      last_login_at: null,
+    };
     renderWithProviders(<QuickPlayPanel {...defaultProps} quickPlayPersistence="elo" user={mockUser} />);
 
     expect(screen.getByText('🏆 Ranked')).toBeInTheDocument();

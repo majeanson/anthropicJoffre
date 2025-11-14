@@ -11,7 +11,7 @@
 
 import { useRef, useState, useCallback } from 'react';
 import { Socket, io } from 'socket.io-client';
-import { GameState, PlayerSession } from '../types/game';
+import { GameState, Player, PlayerSession } from '../types/game';
 import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from '../utils/botPlayerEnhanced';
 import { applyStateDelta, GameStateDelta } from '../utils/stateDelta';
 
@@ -230,7 +230,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
         botSocket.emit('join_game', { gameId: gameState.id, playerName: botName, isBot: true, botDifficulty: difficulty });
       });
 
-      botSocket.on('player_joined', ({ player, gameState: newState }: { player?: any; gameState: GameState; session?: PlayerSession }) => {
+      botSocket.on('player_joined', ({ player, gameState: newState }: { player?: Player; gameState: GameState; session?: PlayerSession }) => {
         // Use the player ID from the game state, not botSocket.id
         const botPlayerId = player?.id || newState.players.find(p => p.name === botName && p.isBot)?.id;
         if (botPlayerId) {
@@ -400,7 +400,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
             botSocket.emit('join_game', { gameId: createdGameId, playerName: botName, isBot: true, botDifficulty: difficulty });
           });
 
-          botSocket.on('error', (error: any) => {
+          botSocket.on('error', (error: { message: string }) => {
             console.error(`[Quick Play] ${botName} error:`, error);
           });
 

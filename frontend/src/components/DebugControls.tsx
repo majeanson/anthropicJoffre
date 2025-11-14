@@ -5,6 +5,7 @@
  */
 
 import React from 'react';
+import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
 import { TestPanel } from './TestPanel';
 import { DebugPanel } from './DebugPanel';
@@ -12,7 +13,7 @@ import { DebugInfo } from './DebugInfo';
 
 interface DebugControlsProps {
   gameState: GameState | null;
-  socket: any;
+  socket: Socket | null;
   gameId: string;
   debugMenuOpen: boolean;
   setDebugMenuOpen: (open: boolean) => void;

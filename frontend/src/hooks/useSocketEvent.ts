@@ -14,11 +14,11 @@ import { Socket } from 'socket.io-client';
  *   setGameState(gameState);
  * }, []);
  */
-export function useSocketEvent<T = any>(
+export function useSocketEvent<T = unknown>(
   socket: Socket | null,
   eventName: string,
   handler: (data: T) => void,
-  dependencies: any[] = []
+  dependencies: React.DependencyList = []
 ): void {
   useEffect(() => {
     if (!socket) return;

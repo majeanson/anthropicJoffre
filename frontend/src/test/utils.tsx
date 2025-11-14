@@ -37,16 +37,19 @@ export function renderWithProviders(
 /**
  * Mock Socket.IO client for testing
  */
-export function createMockSocket() {
+export function createMockSocket(): any {
   const listeners: Record<string, Function[]> = {};
 
-  return {
+  const mockSocket: any = {
     id: 'test-socket-id',
+    connected: true,
+    disconnected: false,
     on: vi.fn((event: string, callback: Function) => {
       if (!listeners[event]) {
         listeners[event] = [];
       }
       listeners[event].push(callback);
+      return mockSocket;
     }),
     off: vi.fn((event: string, callback?: Function) => {
       if (callback && listeners[event]) {
@@ -54,22 +57,30 @@ export function createMockSocket() {
       } else {
         delete listeners[event];
       }
+      return mockSocket;
     }),
-    emit: vi.fn((event: string, ...args: any[]) => {
+    emit: vi.fn((event: string, ...args: unknown[]) => {
       // Optionally trigger listeners for testing
       if (listeners[event]) {
         listeners[event].forEach(cb => cb(...args));
       }
+      return mockSocket;
     }),
-    disconnect: vi.fn(),
-    connected: true,
+    disconnect: vi.fn(() => mockSocket),
+    connect: vi.fn(() => mockSocket),
+    once: vi.fn((event: string, callback: Function) => {
+      mockSocket.on(event, callback);
+      return mockSocket;
+    }),
     // Helper to trigger events from tests
-    __triggerEvent: (event: string, ...args: any[]) => {
+    __triggerEvent: (event: string, ...args: unknown[]) => {
       if (listeners[event]) {
         listeners[event].forEach(cb => cb(...args));
       }
     },
   };
+
+  return mockSocket;
 }
 
 /**

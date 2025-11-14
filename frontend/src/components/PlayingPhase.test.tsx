@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { PlayingPhase } from './PlayingPhase';
-import { GameState, Player, Card, CardValue } from '../types/game';
+import { GameState, Player, Card, CardValue, CardColor } from '../types/game';
 import { SettingsProvider } from '../contexts/SettingsContext';
 
 // Mock sounds utility
@@ -19,7 +19,10 @@ vi.mock('../utils/sounds', () => ({
     playCardDeal: vi.fn(),
     playCardPlay: vi.fn(),
     playCardConfirm: vi.fn(),
+    cardPlay: vi.fn(),
+    cardConfirm: vi.fn(),
     trickWon: vi.fn(),
+    roundStart: vi.fn(),
     roundWon: vi.fn(),
     gameWon: vi.fn(),
   },
@@ -86,10 +89,10 @@ function createTestPlayer(overrides: Partial<Player> = {}): Player {
   };
 }
 
-function createTestCard(color: string, value: number): Card {
+function createTestCard(color: CardColor, value: CardValue): Card {
   return {
-    color: color as any,
-    value: value as CardValue,
+    color,
+    value,
   };
 }
 

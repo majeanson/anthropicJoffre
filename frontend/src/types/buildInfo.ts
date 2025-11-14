@@ -1,11 +1,61 @@
+/**
+ * Type definitions for buildInfo.json structure
+ */
+
 export interface BuildInfo {
   buildDate: string;
   version: string;
-  git: {
+  git?: {
     commitMessage: string;
     commitHash: string;
     commitDate: string;
     branch: string;
   };
-  futureTodos: string[];
+  releaseDate?: string;
+  buildStatus?: string;
+  testsStatus?: {
+    backend: string;
+    frontend: string;
+    e2e: string;
+  };
+  sprint?: string;
+  currentPhases?: string[];
+  recentChanges?: string[];
+  keyFeatures?: string[];
+  techStack?: {
+    frontend: string[];
+    backend: string[];
+  };
+  notes?: string[];
+  phases?: Record<string, PhaseInfo>;
+  totalDuration?: string;
+  newFeatures?: string[];
+  databaseTables?: string[];
+  improvements?: string[];
+  upcomingFeatures?: string[];
+  latestDoneFeatures?: FeatureGroup[];
+  futureTodos?: string[];
+}
+
+export interface PhaseInfo {
+  name: string;
+  status: string;
+  duration: string;
+  features: string[];
+}
+
+export interface FeatureGroup {
+  title: string;
+  date: string;
+  features: string[];
+}
+
+export interface CleanupResult {
+  message: string;
+  deletedCount?: {
+    inMemory?: number;
+    activeGames?: number;
+    finishedGames?: number;
+    sessions?: number;
+  };
 }

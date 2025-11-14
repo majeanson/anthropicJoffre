@@ -1,0 +1,18 @@
+{
+  "threshold": 5,
+  "reporters": ["html", "console"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/coverage/**",
+    "**/migrations/**",
+    "**/*.md"
+  ],
+  "format": ["javascript", "typescript", "tsx"],
+  "absolute": false,
+  "gitignore": true
+}

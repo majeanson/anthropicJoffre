@@ -34,6 +34,7 @@ vi.mock('../utils/sounds', () => ({
     setVolume: vi.fn(),
     playCardDeal: vi.fn(),
     teamSelect: vi.fn(),
+    teamSwitch: vi.fn(),
     positionSwap: vi.fn(),
     gameStart: vi.fn(),
     buttonClick: vi.fn(),
@@ -270,9 +271,9 @@ describe('TeamSelection', () => {
         />
       );
 
-      // Look for "Join Team 1" button or similar
-      const team1Button = screen.getByText(/Join Team 1|Select Team 1/i);
-      fireEvent.click(team1Button);
+      // Use getAllByText and click the first available "Join Team 1" button
+      const team1Buttons = screen.getAllByText(/Join Team 1|Select Team 1/i);
+      fireEvent.click(team1Buttons[0]);
 
       expect(mockOnSelectTeam).toHaveBeenCalledWith(1);
     });
@@ -294,9 +295,9 @@ describe('TeamSelection', () => {
         />
       );
 
-      // Look for "Join Team 2" button or similar
-      const team2Button = screen.getByText(/Join Team 2|Select Team 2/i);
-      fireEvent.click(team2Button);
+      // Use getAllByText and click the first available "Join Team 2" button
+      const team2Buttons = screen.getAllByText(/Join Team 2|Select Team 2/i);
+      fireEvent.click(team2Buttons[0]);
 
       expect(mockOnSelectTeam).toHaveBeenCalledWith(2);
     });

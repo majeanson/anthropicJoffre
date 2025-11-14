@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
 
 interface TestPanelProps {
   gameState: GameState | null;
-  socket: any;
+  socket: Socket | null;
   isOpen: boolean;
   onClose: () => void;
 }

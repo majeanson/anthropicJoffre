@@ -121,7 +121,7 @@ function AppContent() {
   const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
 
   // Missing state variables for GlobalUI and DebugControls
-  const [missedActions, setMissedActions] = useState<any[]>([]);
+  const [missedActions, setMissedActions] = useState<unknown[]>([]);
 
   // Sprint 3 Phase 1: Authentication state
   const auth = useAuth();

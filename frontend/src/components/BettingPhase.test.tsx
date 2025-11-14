@@ -6,7 +6,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BettingPhase } from './BettingPhase';
-import { GameState, Player, Bet, Card, CardValue } from '../types/game';
+import { GameState, Player, Bet, Card, CardValue, CardColor } from '../types/game';
 import { SettingsProvider } from '../contexts/SettingsContext';
 
 // Mock child components
@@ -47,9 +47,17 @@ vi.mock('./GameHeader', () => ({
 }));
 
 vi.mock('./InlineBetStatus', () => ({
-  InlineBetStatus: ({ bet }: any) => (
-    <div data-testid={`bet-status-${bet.playerId}`}>
-      {bet.amount} pts {bet.withoutTrump ? 'without trump' : ''}
+  InlineBetStatus: ({ players, currentBets, skippedPlayers }: any) => (
+    <div data-testid="inline-bet-status">
+      {players.map((p: any) => {
+        const bet = currentBets.get(p.id);
+        const skipped = skippedPlayers.has(p.id);
+        return (
+          <div key={p.id} data-testid={`bet-status-${p.name}`}>
+            {p.name}: {bet ? `${bet.amount} pts ${bet.withoutTrump ? 'without trump' : ''}` : skipped ? 'Skipped' : 'No bet'}
+          </div>
+        );
+      })}
     </div>
   ),
 }));
@@ -73,8 +81,8 @@ function createTestPlayer(overrides: Partial<Player> = {}): Player {
   };
 }
 
-function createTestCard(color: string, value: number): Card {
-  return { color: color as any, value: value as CardValue };
+function createTestCard(color: CardColor, value: CardValue): Card {
+  return { color, value };
 }
 
 function createTestBet(overrides: Partial<Bet> = {}): Bet {
@@ -299,7 +307,7 @@ describe('BettingPhase', () => {
       );
 
       // Skipped badge should be visible in inline bet status
-      expect(screen.getByTestId('bet-status-player-2')).toBeInTheDocument();
+      expect(screen.getByTestId('bet-status-Player 2')).toBeInTheDocument();
     });
   });
 
@@ -325,7 +333,7 @@ describe('BettingPhase', () => {
       );
 
       // Should display bet information
-      expect(screen.getByTestId('bet-status-player-2')).toBeInTheDocument();
+      expect(screen.getByTestId('bet-status-Player 2')).toBeInTheDocument();
       expect(screen.getByText(/10 pts/)).toBeInTheDocument();
     });
 
@@ -372,9 +380,9 @@ describe('BettingPhase', () => {
         />
       );
 
-      expect(screen.getByTestId('bet-status-player-1')).toBeInTheDocument();
-      expect(screen.getByTestId('bet-status-player-2')).toBeInTheDocument();
-      expect(screen.getByTestId('bet-status-player-3')).toBeInTheDocument();
+      expect(screen.getByTestId('bet-status-Player 1')).toBeInTheDocument();
+      expect(screen.getByTestId('bet-status-Player 2')).toBeInTheDocument();
+      expect(screen.getByTestId('bet-status-Player 3')).toBeInTheDocument();
     });
   });
 

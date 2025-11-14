@@ -75,7 +75,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       setLoading(false);
     };
 
-    const handleError = (errorData: any) => {
+    const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
       console.error('[GameReplay] Error loading replay:', errorData, 'for game:', gameId);
 
       // Extract correlation ID if available
@@ -128,13 +128,121 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     return () => clearTimeout(timer);
   }, [isPlaying, currentTrickIndex, currentRoundIndex, playSpeed, replayData]);
 
+  // Sprint 8 Task 2: Memoized computations for performance optimization
+  // Current round data and navigation state - MUST be before early returns
+  const currentRoundData = useMemo(() => {
+    if (!replayData || !replayData.round_history || replayData.round_history.length === 0) {
+      return {
+        currentRound: null,
+        currentTricks: [],
+        hasNextRound: false,
+        hasPrevRound: false,
+        hasNextTrick: false,
+        hasPrevTrick: false,
+      };
+    }
+
+    const currentRound = replayData.round_history[currentRoundIndex];
+    const currentTricks = currentRound?.tricks || [];
+    return {
+      currentRound,
+      currentTricks,
+      hasNextRound: currentRoundIndex < replayData.round_history.length - 1,
+      hasPrevRound: currentRoundIndex > 0,
+      hasNextTrick: currentTrickIndex < currentTricks.length - 1,
+      hasPrevTrick: currentTrickIndex > 0,
+    };
+  }, [replayData, currentRoundIndex, currentTrickIndex]);
+
+  const { currentRound, currentTricks, hasNextRound, hasPrevRound, hasNextTrick, hasPrevTrick } = currentRoundData;
+
+  // Calculate starting hands from trick history (expensive operation) - MUST be before early returns
+  const startingHands = useMemo(() => {
+    if (!currentRound?.tricks || currentRound.tricks.length === 0) return {};
+
+    const hands: Record<string, any[]> = {};
+    if (replayData) {
+      replayData.player_names.forEach(name => hands[name] = []);
+
+      currentRound.tricks.forEach(trick => {
+        trick.trick.forEach(trickCard => {
+          // Defensive check: ensure player exists in hands before pushing
+          // This handles cases where player names changed (e.g., bot replacement)
+          if (!hands[trickCard.playerName]) {
+            console.warn('[GameReplay] Calculating starting hands: Player not found. Action: Building hand from trick history. PlayerName from trick:', trickCard.playerName, 'Available players:', Object.keys(hands), 'Round:', currentRoundIndex, 'Trick:', currentTrickIndex);
+            hands[trickCard.playerName] = [];
+          }
+          hands[trickCard.playerName].push(trickCard.card);
+        });
+      });
+    }
+
+    return hands;
+  }, [currentRound, replayData, currentRoundIndex, currentTrickIndex]);
+
+  // Calculate which cards have been played so far - MUST be before early returns
+  const playedCards = useMemo(() => {
+    const played: Set<string> = new Set();
+
+    if (!currentTricks) return played;
+
+    for (let i = 0; i <= currentTrickIndex && i < currentTricks.length; i++) {
+      currentTricks[i].trick.forEach(trickCard => {
+        played.add(`${trickCard.card.color}-${trickCard.card.value}`);
+      });
+    }
+
+    return played;
+  }, [currentTricks, currentTrickIndex]);
+
+  // Sprint 8 Task 2: Memoized navigation callbacks - MUST be before early returns
+  const navigateToRound = useCallback((index: number) => {
+    if (index >= 0 && index < (replayData?.round_history?.length || 0)) {
+      setCurrentRoundIndex(index);
+      setCurrentTrickIndex(0);
+      setIsPlaying(false);
+      sounds.trickWon();
+    }
+  }, [replayData]);
+
+  const handleNextTrick = useCallback(() => {
+    if (hasNextTrick) {
+      setCurrentTrickIndex(prev => prev + 1);
+      sounds.cardPlay();
+    } else if (hasNextRound) {
+      setCurrentRoundIndex(prev => prev + 1);
+      setCurrentTrickIndex(0);
+      sounds.trickWon();
+    }
+  }, [hasNextTrick, hasNextRound]);
+
+  const handlePrevTrick = useCallback(() => {
+    if (hasPrevTrick) {
+      setCurrentTrickIndex(prev => prev - 1);
+      sounds.cardPlay();
+    } else if (hasPrevRound) {
+      const prevRoundIndex = currentRoundIndex - 1;
+      const prevRound = replayData?.round_history[prevRoundIndex];
+      const lastTrickIndex = (prevRound?.tricks?.length || 1) - 1;
+      setCurrentRoundIndex(prevRoundIndex);
+      setCurrentTrickIndex(lastTrickIndex);
+      sounds.trickWon();
+    }
+  }, [hasPrevTrick, hasPrevRound, currentRoundIndex, replayData]);
+
+  const handlePlayPause = useCallback(() => {
+    setIsPlaying(prev => !prev);
+    sounds.cardPlay();
+  }, []);
+
+  // Early returns AFTER all hooks
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
         <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md">
           <div className="text-center">
             <div className="animate-spin text-4xl mb-4">🔄</div>
-            <p className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-200" data-testid="loading-message">
               Loading replay...
             </p>
           </div>
@@ -153,11 +261,11 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
           {/* Sprint 6: Enhanced error display */}
           <div className="text-center">
             <div className="text-4xl mb-4">⚠️</div>
-            <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2">
+            <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2" data-testid="error-message">
               {error || 'Failed to load replay'}
             </p>
             {correlationId && (
-              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-700">
+              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-700" data-testid="error-correlation-id">
                 <p className="text-xs text-red-700 dark:text-red-300 font-mono">
                   Error ID: {correlationId}
                 </p>
@@ -168,6 +276,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             )}
             <div className="flex gap-3 mt-6 justify-center">
               <button
+                data-testid="retry-button"
                 onClick={() => {
                   setError(null);
                   setCorrelationId(null);
@@ -181,6 +290,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 🔄 Try Again
               </button>
               <button
+                data-testid="close-button"
                 onClick={onClose}
                 className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-bold transition-all"
               >
@@ -203,13 +313,14 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         >
           <div className="text-center">
             <div className="text-4xl mb-4">⚠️</div>
-            <p className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2">
+            <p className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2" data-testid="no-data-warning">
               No Replay Data Available
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               This game has no recorded rounds. The game may have ended prematurely or data was not saved.
             </p>
             <button
+              data-testid="close-button"
               onClick={onClose}
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all"
             >
@@ -221,531 +332,367 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     );
   }
 
-  // Sprint 8 Task 2: Memoized computations for performance optimization
-  // Current round data and navigation state
-  const currentRoundData = useMemo(() => {
-    const currentRound = replayData.round_history[currentRoundIndex];
-    const currentTricks = currentRound?.tricks || [];
-    return {
-      currentRound,
-      currentTricks,
-      hasNextRound: currentRoundIndex < replayData.round_history.length - 1,
-      hasPrevRound: currentRoundIndex > 0,
-      hasNextTrick: currentTrickIndex < currentTricks.length - 1,
-      hasPrevTrick: currentTrickIndex > 0,
-    };
-  }, [replayData.round_history, currentRoundIndex, currentTrickIndex]);
-
-  const { currentRound, currentTricks, hasNextRound, hasPrevRound, hasNextTrick, hasPrevTrick } = currentRoundData;
-
-  // Calculate starting hands from trick history (expensive operation)
-  const startingHands = useMemo(() => {
-    if (!currentRound?.tricks || currentRound.tricks.length === 0) return {};
-
-    const hands: Record<string, any[]> = {};
-    replayData.player_names.forEach(name => hands[name] = []);
-
-    currentRound.tricks.forEach(trick => {
-      trick.trick.forEach(trickCard => {
-        // Defensive check: ensure player exists in hands before pushing
-        // This handles cases where player names changed (e.g., bot replacement)
-        if (!hands[trickCard.playerName]) {
-          console.warn('[GameReplay] Calculating starting hands: Player not found. Action: Building hand from trick history. PlayerName from trick:', trickCard.playerName, 'Available players:', Object.keys(hands), 'Round:', currentRoundIndex, 'Trick:', currentTrickIndex);
-          hands[trickCard.playerName] = [];
-        }
-        hands[trickCard.playerName].push(trickCard.card);
-      });
-    });
-
-    // Sort each hand by color then value
-    Object.keys(hands).forEach(playerName => {
-      hands[playerName].sort((a, b) => {
-        if (a.color !== b.color) return a.color.localeCompare(b.color);
-        return a.value - b.value;
-      });
-    });
-
-    return hands;
-  }, [currentRound, replayData.player_names, currentRoundIndex, currentTrickIndex]);
-
-  const handleNextRound = () => {
-    if (hasNextRound) {
-      sounds.buttonClick();
-      setCurrentRoundIndex(prev => prev + 1);
-      setCurrentTrickIndex(0);
-      setIsPlaying(false);
-    }
-  };
-
-  const handlePrevRound = () => {
-    if (hasPrevRound) {
-      sounds.buttonClick();
-      setCurrentRoundIndex(prev => prev - 1);
-      setCurrentTrickIndex(0);
-      setIsPlaying(false);
-    }
-  };
-
-  const handleNextTrick = () => {
-    if (hasNextTrick) {
-      sounds.buttonClick();
-      setCurrentTrickIndex(prev => prev + 1);
-    } else if (hasNextRound) {
-      handleNextRound();
-    }
-  };
-
-  const handlePrevTrick = () => {
-    if (hasPrevTrick) {
-      sounds.buttonClick();
-      setCurrentTrickIndex(prev => prev - 1);
-    } else if (hasPrevRound) {
-      setCurrentRoundIndex(prev => prev - 1);
-      const prevRound = replayData.round_history[currentRoundIndex - 1];
-      setCurrentTrickIndex((prevRound?.tricks?.length || 1) - 1);
-    }
-  };
-
-  const togglePlayback = () => {
-    sounds.buttonClick();
-    setIsPlaying(prev => !prev);
-  };
-
-  const handleJumpToTrick = useCallback((trickIndex: number) => {
-    sounds.buttonClick();
-    setCurrentTrickIndex(trickIndex);
-    setIsPlaying(false);
-  }, []);
-
-  // Format date (memoized to avoid recalculating on every render)
-  const gameDate = useMemo(() => {
-    return new Date(replayData.finished_at).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }, [replayData.finished_at]);
-
-  // Calculate game duration (memoized)
-  const durationText = useMemo(() => {
-    const durationMinutes = Math.floor(replayData.game_duration_seconds / 60);
-    const durationSeconds = replayData.game_duration_seconds % 60;
-    return `${durationMinutes}m ${durationSeconds}s`;
-  }, [replayData.game_duration_seconds]);
+  const currentTrick = currentTricks[currentTrickIndex];
+  const currentBet = currentRound?.highestBet;
+  const dealerName = 'Unknown'; // TODO: Add dealerName to RoundHistory type if needed
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div
-        className="bg-gradient-to-br from-purple-900 to-pink-900 rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto border-4 border-emerald-600 dark:border-emerald-500"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-800 to-pink-800 px-6 py-4 border-b-2 border-purple-600 flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold text-white mb-1">
-              Game Replay
-            </h2>
-            <p className="text-sm text-purple-200">
-              {gameDate} • {durationText} • Round {currentRoundIndex + 1}/{replayData.round_history.length}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:text-red-300 text-3xl font-bold transition-all"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Game Overview */}
-        <div className="px-6 py-4 bg-white/10 border-b-2 border-purple-600">
-          <div className="grid grid-cols-2 gap-6">
-            {/* Team 1 */}
-            <div className="bg-orange-500/20 rounded-lg p-4 border-2 border-orange-400">
-              <h3 className="text-lg font-semibold text-orange-300 mb-2">Team 1</h3>
-              <div className="space-y-1 mb-3">
-                {replayData.player_names
-                  .map((name, idx) => ({ name, team: replayData.player_teams[idx] }))
-                  .filter(p => p.team === 1)
-                  .map((player, idx) => (
-                    <p key={idx} className="text-white text-sm">
-                      {player.name}
-                    </p>
-                  ))}
+        <div className="bg-gradient-to-r from-emerald-600 to-green-600 dark:from-emerald-700 dark:to-green-700 text-white px-8 py-6 rounded-t-xl">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="text-4xl">🎮</span>
+              <div>
+                <h2 className="text-3xl font-black">Game Replay</h2>
+                <p className="text-emerald-100 text-sm mt-1">
+                  Game ID: {gameId} • {replayData.rounds} rounds played
+                </p>
               </div>
-              <p className={`text-4xl font-bold ${
-                replayData.winning_team === 1 ? 'text-yellow-300' : 'text-orange-300'
-              }`}>
-                {replayData.team1_score}
-                {replayData.winning_team === 1 && ' 👑'}
-              </p>
             </div>
-
-            {/* Team 2 */}
-            <div className="bg-purple-500/20 rounded-lg p-4 border-2 border-purple-400">
-              <h3 className="text-lg font-semibold text-purple-300 mb-2">Team 2</h3>
-              <div className="space-y-1 mb-3">
-                {replayData.player_names
-                  .map((name, idx) => ({ name, team: replayData.player_teams[idx] }))
-                  .filter(p => p.team === 2)
-                  .map((player, idx) => (
-                    <p key={idx} className="text-white text-sm">
-                      {player.name}
-                    </p>
-                  ))}
-              </div>
-              <p className={`text-4xl font-bold ${
-                replayData.winning_team === 2 ? 'text-yellow-300' : 'text-purple-300'
-              }`}>
-                {replayData.team2_score}
-                {replayData.winning_team === 2 && ' 👑'}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Playback Controls */}
-        <div className="px-6 py-4 bg-white/5 border-b-2 border-purple-600">
-          {/* Round Navigation */}
-          <div className="flex items-center justify-between mb-4">
             <button
-              onClick={handlePrevRound}
-              disabled={!hasPrevRound}
-              className={`px-4 py-2 rounded-lg font-bold transition-all ${
-                hasPrevRound
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              }`}
+              onClick={onClose}
+              className="text-white hover:text-emerald-100 text-4xl font-bold leading-none transition-colors"
+              aria-label="Close replay viewer"
             >
-              ← Previous Round
-            </button>
-
-            <span className="text-xl font-bold text-white">
-              Round {currentRoundIndex + 1} of {replayData.round_history.length}
-            </span>
-
-            <button
-              onClick={handleNextRound}
-              disabled={!hasNextRound}
-              className={`px-4 py-2 rounded-lg font-bold transition-all ${
-                hasNextRound
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              Next Round →
+              ×
             </button>
           </div>
-
-          {/* Trick Navigation & Playback */}
-          <div className="flex items-center justify-between gap-4">
-            {/* Trick Navigation */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handlePrevTrick}
-                disabled={!hasPrevTrick && !hasPrevRound}
-                className={`px-3 py-1.5 rounded-lg font-bold text-sm transition-all ${
-                  hasPrevTrick || hasPrevRound
-                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                ← Prev Trick
-              </button>
-
-              <span className="text-sm font-bold text-white">
-                Trick {currentTrickIndex + 1} of {currentTricks.length}
-              </span>
-
-              <button
-                onClick={handleNextTrick}
-                disabled={!hasNextTrick && !hasNextRound}
-                className={`px-3 py-1.5 rounded-lg font-bold text-sm transition-all ${
-                  hasNextTrick || hasNextRound
-                    ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    : 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                Next Trick →
-              </button>
-            </div>
-
-            {/* Playback Controls */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={togglePlayback}
-                className="px-4 py-2 rounded-lg font-bold bg-green-600 hover:bg-green-700 text-white transition-all"
-              >
-                {isPlaying ? '⏸ Pause' : '▶ Play'}
-              </button>
-
-              <select
-                value={playSpeed}
-                onChange={(e) => setPlaySpeed(Number(e.target.value) as 0.5 | 1 | 2)}
-                className="bg-gray-700 text-white px-3 py-2 rounded-lg font-bold text-sm border-2 border-gray-600"
-              >
-                <option value={0.5}>0.5x</option>
-                <option value={1}>1x</option>
-                <option value={2}>2x</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Trick Timeline */}
-          {currentTricks.length > 0 && (
-            <div className="mt-4 flex gap-2">
-              {currentTricks.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleJumpToTrick(index)}
-                  className={`flex-1 py-2 rounded-lg font-bold text-sm transition-all ${
-                    index === currentTrickIndex
-                      ? 'bg-yellow-500 text-black'
-                      : index < currentTrickIndex
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                  }`}
-                >
-                  T{index + 1}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Round Content */}
-        <div className="px-6 py-6">
-          {currentRound && (
-            <>
-              {/* Round Bet Information */}
-              <section className="mb-6">
-                <h3 className="text-xl font-bold text-white mb-4 border-b-2 border-white/30 pb-2">
-                  🎲 Round Bet
-                </h3>
-                <div className="bg-gradient-to-r from-blue-500/20 to-indigo-500/20 rounded-lg p-4 border-2 border-blue-400">
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div>
-                      <p className="text-sm text-blue-200 font-semibold mb-1">Highest Bidder</p>
-                      <p className="text-lg font-bold text-white">
-                        {(() => {
-                          // Find player name from the first trick's winner or any trick player
-                          if (currentRound.tricks && currentRound.tricks.length > 0) {
-                            const firstTrick = currentRound.tricks[0];
-                            const bidder = firstTrick.trick.find(tc => tc.playerId === currentRound.highestBet?.playerId);
-                            if (bidder) return bidder.playerName;
-                          }
-                          return 'Unknown';
-                        })()}
-                      </p>
-                      <p className="text-xs text-blue-300">Team {currentRound.offensiveTeam}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-200 font-semibold mb-1">Bet Amount</p>
-                      <p className="text-lg font-bold text-white">
-                        {currentRound.betAmount} points
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-blue-200 font-semibold mb-1">Type</p>
-                      <p className="text-lg font-bold text-white">
-                        {currentRound.withoutTrump ? (
-                          <span className="text-red-400">Without Trump (2x)</span>
-                        ) : (
-                          'With Trump'
-                        )}
-                      </p>
-                    </div>
+        {/* Game Info Bar */}
+        <div className="bg-white dark:bg-gray-800 px-8 py-4 border-b-2 border-emerald-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div className="flex gap-6">
+              {/* Final Score */}
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">🏆</span>
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Final Score</p>
+                  <div className="flex items-center gap-2" data-testid="final-scores">
+                    <span className={`text-xl font-black ${replayData.winning_team === 1 ? 'text-green-600' : 'text-gray-600'}`} data-testid="team1-score">
+                      Team 1: {replayData.team1_score}
+                    </span>
+                    <span className="text-gray-400">vs</span>
+                    <span className={`text-xl font-black ${replayData.winning_team === 2 ? 'text-green-600' : 'text-gray-600'}`} data-testid="team2-score">
+                      Team 2: {replayData.team2_score}
+                    </span>
                   </div>
                 </div>
-              </section>
+              </div>
 
-              {/* Round Results */}
-              <section className="mb-6">
-                <h3 className="text-xl font-bold text-white mb-4 border-b-2 border-white/30 pb-2">
-                  📊 Round Results
-                </h3>
-                <div className="bg-gradient-to-r from-gray-700 to-gray-800 rounded-lg p-4 border-2 border-gray-600">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-                    <div>
-                      <p className="text-gray-300 font-semibold mb-1">Offensive Team</p>
-                      <p className="font-bold text-white">Team {currentRound.offensiveTeam}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-300 font-semibold mb-1">Points Earned</p>
-                      <p className="font-bold text-white">
-                        {currentRound.offensivePoints} / {currentRound.betAmount}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-300 font-semibold mb-1">Defensive Points</p>
-                      <p className="font-bold text-white">
-                        {currentRound.defensivePoints}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-300 font-semibold mb-1">Result</p>
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border-2 ${
-                        currentRound.betMade
-                          ? 'bg-green-500/30 text-green-300 border-green-400'
-                          : 'bg-red-500/30 text-red-300 border-red-400'
-                      }`}>
-                        {currentRound.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
+              {/* Game Duration */}
+              <div className="flex items-center gap-2">
+                <span className="text-xl">⏱️</span>
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Duration</p>
+                  <p className="text-lg font-bold text-gray-700 dark:text-gray-200">
+                    {Math.floor(replayData.game_duration_seconds / 60)}m {replayData.game_duration_seconds % 60}s
+                  </p>
+                </div>
+              </div>
+
+              {/* Players */}
+              <div className="flex items-center gap-2">
+                <span className="text-xl">👥</span>
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Players</p>
+                  <div className="flex flex-wrap gap-2">
+                    {replayData.player_names.map((name, idx) => (
+                      <span
+                        key={idx}
+                        className={`text-xs px-2 py-1 rounded ${
+                          replayData.player_teams[idx] === 1
+                            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                            : 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400'
+                        }`}
+                      >
+                        {name}
                       </span>
-                    </div>
-                  </div>
-                  <div className="border-t-2 border-gray-600 pt-3">
-                    <p className="text-sm text-gray-300 font-semibold mb-2">Round Score:</p>
-                    <p className="font-bold text-white">
-                      <span className="text-orange-400">
-                        Team 1: {currentRound.roundScore.team1 >= 0 ? '+' : ''}{currentRound.roundScore.team1}
-                      </span>
-                      {' | '}
-                      <span className="text-purple-400">
-                        Team 2: {currentRound.roundScore.team2 >= 0 ? '+' : ''}{currentRound.roundScore.team2}
-                      </span>
-                    </p>
+                    ))}
                   </div>
                 </div>
-              </section>
+              </div>
+            </div>
 
-              {/* Starting Hands */}
-              {Object.keys(startingHands).length > 0 && (
-                <section className="mb-6">
-                  <h3 className="text-xl font-bold text-white mb-4 border-b-2 border-white/30 pb-2">
-                    🃏 Starting Hands
+            {/* Bot Game Indicator */}
+            {replayData.is_bot_game && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <span className="text-xl">🤖</span>
+                <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">Bot Game</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Current Round/Trick Info */}
+        {currentRound && (
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-800 px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold">Round</p>
+                  <p className="text-2xl font-black text-indigo-700 dark:text-indigo-300">
+                    {currentRoundIndex + 1} / {replayData.round_history.length}
+                  </p>
+                </div>
+
+                {currentBet && (
+                  <>
+                    <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
+                    <div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold">Bet</p>
+                      <p className="text-lg font-bold text-gray-700 dark:text-gray-200">
+                        {currentBet.amount} pts {currentBet.withoutTrump && '(No Trump)'}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold">Dealer</p>
+                  <p className="text-lg font-bold text-gray-700 dark:text-gray-200">{dealerName}</p>
+                </div>
+
+                <div className="w-px h-8 bg-gray-300 dark:bg-gray-600" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 font-semibold">Trick</p>
+                  <p className="text-2xl font-black text-purple-700 dark:text-purple-300">
+                    {currentTrickIndex + 1} / {currentTricks.length}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400">Round Score:</span>
+                <span className="text-lg font-bold text-orange-600">Team 1: {currentRound.roundScore?.team1 || 0}</span>
+                <span className="text-gray-400">/</span>
+                <span className="text-lg font-bold text-purple-600">Team 2: {currentRound.roundScore?.team2 || 0}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <div className="p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left: Trick Display */}
+            <div className="lg:col-span-2">
+              {/* Current Trick */}
+              {currentTrick && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg mb-6">
+                  <h3 className="text-xl font-black text-gray-700 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🎴</span>
+                    Current Trick
+                    {currentTrick.winnerName && (
+                      <span className="ml-auto text-sm font-semibold text-green-600 dark:text-green-400">
+                        Won by {currentTrick.winnerName} ({currentTrick.points} pts)
+                      </span>
+                    )}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(startingHands).map(([playerName, cards]) => {
-                      const playerIndex = replayData.player_names.indexOf(playerName);
-                      const teamId = replayData.player_teams[playerIndex];
-                      const teamColor = teamId === 1 ? 'from-orange-500/20 to-orange-600/20 border-orange-400' : 'from-purple-500/20 to-purple-600/20 border-purple-400';
 
-                      // Sort cards by color then value
-                      const sortedCards = [...(cards as any[])].sort((a, b) => {
-                        if (a.color !== b.color) {
-                          const suitOrder = ['red', 'blue', 'green', 'brown'];
-                          return suitOrder.indexOf(a.color) - suitOrder.indexOf(b.color);
-                        }
-                        return a.value - b.value;
-                      });
+                  {/* Cards in Trick */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {currentTrick.trick.map((trickCard, idx) => {
+                      const isWinner = trickCard.playerName === currentTrick.winnerName;
+                      const cardKey = `${trickCard.card.color}-${trickCard.card.value}`;
+                      const isPlayed = playedCards.has(cardKey);
 
                       return (
-                        <div key={playerName} className={`bg-gradient-to-r ${teamColor} rounded-lg p-3 border-2`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-bold text-white">{playerName}</span>
-                            <span className={`text-xs px-2 py-1 rounded-full font-semibold ${teamId === 1 ? 'bg-orange-500 text-white' : 'bg-purple-500 text-white'}`}>
-                              Team {teamId}
-                            </span>
+                        <div
+                          key={idx}
+                          className={`relative ${isWinner ? 'ring-4 ring-green-500 ring-offset-2' : ''}`}
+                        >
+                          <div className="text-center mb-2">
+                            <p className={`text-sm font-bold ${
+                              replayData.player_teams[replayData.player_names.indexOf(trickCard.playerName)] === 1
+                                ? 'text-orange-600'
+                                : 'text-purple-600'
+                            }`}>
+                              {trickCard.playerName}
+                            </p>
                           </div>
-                          <div className="grid grid-cols-4 gap-1">
-                            {sortedCards.map((card, idx) => (
-                              <div key={idx} className="bg-gray-800/50 rounded p-1 text-center">
-                                <div className={`text-lg font-bold ${
-                                  card.color === 'red' ? 'text-red-400' :
-                                  card.color === 'blue' ? 'text-blue-400' :
-                                  card.color === 'green' ? 'text-green-400' :
-                                  card.color === 'brown' ? 'text-amber-500' :
-                                  'text-gray-400'
-                                }`}>
+                          <div
+                            className={`
+                              aspect-[2/3] rounded-lg shadow-lg flex items-center justify-center text-4xl font-black
+                              ${isPlayed ? 'opacity-100' : 'opacity-30'}
+                              ${
+                                trickCard.card.color === 'red'
+                                  ? 'bg-gradient-to-br from-red-400 to-red-600 text-white'
+                                  : trickCard.card.color === 'blue'
+                                  ? 'bg-gradient-to-br from-blue-400 to-blue-600 text-white'
+                                  : trickCard.card.color === 'green'
+                                  ? 'bg-gradient-to-br from-green-400 to-green-600 text-white'
+                                  : 'bg-gradient-to-br from-amber-700 to-amber-900 text-white'
+                              }
+                            `}
+                          >
+                            {trickCard.card.value}
+                          </div>
+                          {isWinner && (
+                            <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg">
+                              👑
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Player Hands */}
+              {Object.keys(startingHands).length > 0 && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+                  <h3 className="text-xl font-black text-gray-700 dark:text-gray-200 mb-4 flex items-center gap-2">
+                    <span className="text-2xl">🃏</span>
+                    Player Hands (Round Start)
+                  </h3>
+                  <div className="space-y-3">
+                    {Object.entries(startingHands).map(([playerName, cards]) => {
+                      const teamId = replayData.player_teams[replayData.player_names.indexOf(playerName)];
+                      return (
+                        <div key={playerName} className="flex items-center gap-3">
+                          <span className={`font-bold text-sm w-24 ${
+                            teamId === 1 ? 'text-orange-600' : 'text-purple-600'
+                          }`}>
+                            {playerName}:
+                          </span>
+                          <div className="flex gap-2 flex-wrap">
+                            {cards.map((card: any, idx: number) => {
+                              const cardKey = `${card.color}-${card.value}`;
+                              const isPlayed = playedCards.has(cardKey);
+
+                              return (
+                                <div
+                                  key={idx}
+                                  className={`
+                                    w-10 h-14 rounded flex items-center justify-center text-sm font-bold shadow
+                                    ${isPlayed ? 'opacity-30' : 'opacity-100'}
+                                    ${
+                                      card.color === 'red'
+                                        ? 'bg-red-500 text-white'
+                                        : card.color === 'blue'
+                                        ? 'bg-blue-500 text-white'
+                                        : card.color === 'yellow'
+                                        ? 'bg-yellow-400 text-gray-800'
+                                        : 'bg-amber-800 text-white'
+                                    }
+                                  `}
+                                >
                                   {card.value}
                                 </div>
-                                <div className="text-xs text-gray-400 capitalize">{card.color}</div>
-                              </div>
-                            ))}
+                              );
+                            })}
                           </div>
                         </div>
                       );
                     })}
                   </div>
-                </section>
+                </div>
               )}
+            </div>
 
-              {/* Game Statistics */}
-              <section className="mb-6">
-                <h3 className="text-xl font-bold text-white mb-4 border-b-2 border-white/30 pb-2">
-                  📊 Round Statistics
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Trick count */}
-                  <div className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-lg p-4 border-2 border-blue-400">
-                    <p className="text-blue-200 text-sm font-semibold mb-1">Total Tricks</p>
-                    <p className="text-3xl font-bold text-white">{currentRound.tricks?.length || 0}</p>
-                  </div>
+            {/* Right: Controls & History */}
+            <div className="space-y-6">
+              {/* Playback Controls */}
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+                <h3 className="text-lg font-black text-gray-700 dark:text-gray-200 mb-4">Playback Controls</h3>
 
-                  {/* Points distribution */}
-                  <div className="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-lg p-4 border-2 border-emerald-400">
-                    <p className="text-emerald-200 text-sm font-semibold mb-1">Points Earned</p>
-                    <p className="text-xl font-bold text-white">
-                      Team 1: {currentRound.offensiveTeam === 1 ? currentRound.offensivePoints : currentRound.defensivePoints}
-                      {' | '}
-                      Team 2: {currentRound.offensiveTeam === 2 ? currentRound.offensivePoints : currentRound.defensivePoints}
-                    </p>
-                  </div>
-
-                  {/* Bet result */}
-                  <div className={`bg-gradient-to-r rounded-lg p-4 border-2 ${
-                    currentRound.betMade
-                      ? 'from-green-500/20 to-lime-500/20 border-green-400'
-                      : 'from-red-500/20 to-pink-500/20 border-red-400'
-                  }`}>
-                    <p className={`text-sm font-semibold mb-1 ${currentRound.betMade ? 'text-green-200' : 'text-red-200'}`}>
-                      Bet Status
-                    </p>
-                    <p className="text-xl font-bold text-white">
-                      {currentRound.betMade ? '✓ Made' : '✗ Failed'}
-                    </p>
-                    <p className="text-sm text-gray-300">
-                      {currentRound.offensivePoints}/{currentRound.betAmount} pts
-                    </p>
+                {/* Speed Control */}
+                <div className="mb-4">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Speed:</p>
+                  <div className="flex gap-2">
+                    {[0.5, 1, 2].map(speed => (
+                      <button
+                        key={speed}
+                        data-testid={`speed-${speed}x`}
+                        onClick={() => setPlaySpeed(speed as 0.5 | 1 | 2)}
+                        className={`px-3 py-1 rounded ${
+                          playSpeed === speed
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
+                        } transition-colors text-sm font-semibold`}
+                      >
+                        {speed}x
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </section>
 
-              {/* Tricks Played */}
-              {currentRound.tricks && currentRound.tricks.length > 0 && (
-                <section>
-                  <h3 className="text-xl font-bold text-white mb-4 border-b-2 border-white/30 pb-2">
-                    🃏 Tricks Played
-                  </h3>
-                  <div className="bg-gradient-to-r from-indigo-500/20 to-blue-500/20 rounded-lg p-4 border-2 border-indigo-400">
-                    {currentRound.trump && (
-                      <div className="mb-4 flex items-center justify-center gap-2">
-                        <span className="text-sm bg-blue-500/30 text-blue-200 px-3 py-1 rounded-full font-semibold border-2 border-blue-400">
-                          Trump: <span className="capitalize">{currentRound.trump}</span>
-                        </span>
-                      </div>
-                    )}
-                    <TrickHistory
-                      tricks={currentRound.tricks.slice(0, currentTrickIndex + 1)}
-                      players={replayData.player_names.map((name, idx) => ({
-                        id: name,
-                        name: name,
-                        teamId: replayData.player_teams[idx],
-                        hand: [],
-                        tricksWon: 0,
-                        pointsWon: 0
-                      }))}
-                      trump={currentRound.trump}
-                      currentTrickIndex={currentTrickIndex}
-                      showWinner={true}
-                    />
+                {/* Play/Pause & Navigation */}
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <button
+                    data-testid="prev-trick-button"
+                    onClick={handlePrevTrick}
+                    disabled={!hasPrevTrick && !hasPrevRound}
+                    className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Previous trick"
+                  >
+                    ⏮️
+                  </button>
+                  <button
+                    data-testid="play-pause-button"
+                    onClick={handlePlayPause}
+                    className="p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-xl"
+                    aria-label={isPlaying ? 'Pause' : 'Play'}
+                  >
+                    {isPlaying ? '⏸️' : '▶️'}
+                  </button>
+                  <button
+                    data-testid="next-trick-button"
+                    onClick={handleNextTrick}
+                    disabled={!hasNextTrick && !hasNextRound}
+                    className="p-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Next trick"
+                  >
+                    ⏭️
+                  </button>
+                </div>
+
+                {/* Round Jump Buttons */}
+                <div className="border-t pt-4 dark:border-gray-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">Jump to Round:</p>
+                  <div className="grid grid-cols-3 gap-1">
+                    {replayData.round_history.map((_, idx) => (
+                      <button
+                        key={idx}
+                        data-testid={`round-jump-${idx + 1}`}
+                        onClick={() => navigateToRound(idx)}
+                        className={`p-1 text-xs rounded ${
+                          idx === currentRoundIndex
+                            ? 'bg-blue-600 text-white'
+                            : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
+                        } transition-colors font-semibold`}
+                      >
+                        R{idx + 1}
+                      </button>
+                    ))}
                   </div>
-                </section>
-              )}
-            </>
-          )}
-        </div>
+                </div>
+              </div>
 
-        {/* Footer with Close Button */}
-        <div className="sticky bottom-0 px-6 py-4 bg-gradient-to-r from-purple-800 to-pink-800 border-t-2 border-purple-600 flex justify-center">
-          <button
-            onClick={onClose}
-            className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-all"
-          >
-            Close Replay
-          </button>
+              {/* Trick History */}
+              {currentRound && (
+                <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg">
+                  <h3 className="text-lg font-black text-gray-700 dark:text-gray-200 mb-4">
+                    Round {currentRoundIndex + 1} Tricks
+                  </h3>
+                  <TrickHistory
+                    tricks={currentTricks}
+                    currentTrickIndex={currentTrickIndex}
+                    players={[]}
+                    trump={null}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

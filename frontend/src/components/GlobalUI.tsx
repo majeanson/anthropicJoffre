@@ -5,6 +5,7 @@
  */
 
 import React, { Suspense, lazy } from 'react';
+import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
 import { useModals } from '../contexts/ModalContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -36,8 +37,8 @@ interface GlobalUIProps {
   gameState: GameState | null;
   showCatchUpModal: boolean;
   setShowCatchUpModal: (show: boolean) => void;
-  missedActions: any[];
-  setMissedActions: (actions: any[]) => void;
+  missedActions: unknown[];
+  setMissedActions: (actions: unknown[]) => void;
   showBotManagement: boolean;
   setShowBotManagement: (show: boolean) => void;
   achievementNotification: Achievement | null;
@@ -49,7 +50,7 @@ interface GlobalUIProps {
   showAchievementsPanel: boolean;
   setShowAchievementsPanel: (show: boolean) => void;
   gameId: string;
-  socket: any;
+  socket: Socket | null;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({

@@ -118,8 +118,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       setTokens(result.tokens);
       setUser(result.user);
-    } catch (err: any) {
-      setError(err.message || 'Login failed');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Login failed';
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);
@@ -148,8 +149,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Registration successful, but user needs to verify email
       // Don't set user or tokens yet
-    } catch (err: any) {
-      setError(err.message || 'Registration failed');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Registration failed';
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);
@@ -219,8 +221,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Always refresh current user after profile update to show latest data
       await fetchCurrentUser();
-    } catch (err: any) {
-      setError(err.message || 'Failed to update profile');
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to update profile';
+      setError(message);
       throw err;
     }
   }, [fetchCurrentUser]);

@@ -1,5 +1,9 @@
 import { useState, useEffect } from 'react';
-import buildInfo from '../buildInfo.json';
+import buildInfoJson from '../buildInfo.json';
+import { BuildInfo, CleanupResult } from '../types/buildInfo';
+
+// Type the imported JSON
+const buildInfo = buildInfoJson as BuildInfo;
 
 // Use environment-aware API URL (same as Socket.io connection)
 const API_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
@@ -55,7 +59,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
   // Temporary cleanup state (remove after production cleanup is done)
   const [cleanupLoading, setCleanupLoading] = useState(false);
-  const [cleanupResult, setCleanupResult] = useState<any>(null);
+  const [cleanupResult, setCleanupResult] = useState<CleanupResult | null>(null);
   const [cleanupError, setCleanupError] = useState<string | null>(null);
   const SHOW_CLEANUP_BUTTON = true; // Set to false after cleanup is complete
 
@@ -166,13 +170,13 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             <div className="flex-1">
               <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Build Date</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
-                {formatDate((buildInfo as any).buildDate || buildInfo.releaseDate || new Date().toISOString())}
+                {formatDate(buildInfo.buildDate || buildInfo.releaseDate || new Date().toISOString())}
               </p>
             </div>
           </div>
 
           {/* Latest Commit */}
-          {(buildInfo as any).git && (
+          {buildInfo.git && (
             <div className="flex items-start gap-3">
               <span className="text-2xl flex-shrink-0">💾</span>
               <div className="flex-1">
@@ -180,14 +184,14 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                 <div className="bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">
-                      {(buildInfo as any).git.commitHash}
+                      {buildInfo.git.commitHash}
                     </span>
                     <span className="text-xs text-gray-500 dark:text-gray-400">
-                      on {(buildInfo as any).git.branch}
+                      on {buildInfo.git.branch}
                     </span>
                   </div>
                   <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
-                    {getCommitTitle((buildInfo as any).git.commitMessage)}
+                    {getCommitTitle(buildInfo.git.commitMessage)}
                   </p>
                 </div>
               </div>
@@ -195,7 +199,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
           )}
 
           {/* Latest Done Features (Collapsible) */}
-          {(buildInfo as any).latestDoneFeatures && (buildInfo as any).latestDoneFeatures.length > 0 && (
+          {buildInfo.latestDoneFeatures && buildInfo.latestDoneFeatures.length > 0 && (
             <div className="flex items-start gap-3">
               <span className="text-2xl flex-shrink-0">✨</span>
               <div className="flex-1">
@@ -211,7 +215,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
                 {showLatestFeatures && (
                   <div className="space-y-3">
-                    {(buildInfo as any).latestDoneFeatures.map((featureGroup: any, index: number) => (
+                    {buildInfo.latestDoneFeatures.map((featureGroup, index) => (
                       <div
                         key={index}
                         className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700"
@@ -225,7 +229,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                           </span>
                         </div>
                         <ul className="space-y-1 ml-4">
-                          {featureGroup.features.map((feature: string, fIndex: number) => (
+                          {featureGroup.features.map((feature, fIndex) => (
                             <li
                               key={fIndex}
                               className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
@@ -244,7 +248,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
           )}
 
           {/* Future Features (Collapsible) */}
-          {(buildInfo as any).futureTodos && (buildInfo as any).futureTodos.length > 0 && (
+          {buildInfo.futureTodos && buildInfo.futureTodos.length > 0 && (
             <div className="flex items-start gap-3">
               <span className="text-2xl flex-shrink-0">🚀</span>
               <div className="flex-1">
@@ -260,7 +264,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
                 {showFutureFeatures && (
                   <ul className="space-y-2">
-                    {(buildInfo as any).futureTodos.map((todo: string, index: number) => (
+                    {buildInfo.futureTodos.map((todo, index) => (
                     <li
                       key={index}
                       className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700"

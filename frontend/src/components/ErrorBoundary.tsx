@@ -7,6 +7,14 @@
 
 import { Component, ErrorInfo, ReactNode } from 'react';
 
+declare global {
+  interface Window {
+    Sentry?: {
+      captureException: (error: Error, context?: Record<string, unknown>) => void;
+    };
+  }
+}
+
 interface Props {
   children: ReactNode;
   fallback?: ReactNode;
@@ -60,8 +68,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
   logErrorToService = (error: Error, errorInfo: ErrorInfo) => {
     // If Sentry is configured, log the error
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
-      (window as any).Sentry.captureException(error, {
+    if (typeof window !== 'undefined' && window.Sentry) {
+      window.Sentry.captureException(error, {
         contexts: {
           react: {
             componentStack: errorInfo.componentStack,

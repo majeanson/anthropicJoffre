@@ -821,6 +821,10 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
 // ============================================================================
 // REST API Routes - Refactored (Sprint 3)
 // ============================================================================
+// Setup Swagger API documentation
+import { setupSwagger } from './api/swagger';
+setupSwagger(app);
+
 // Register all REST API routes from the extracted module
 registerRoutes(app, {
   games,

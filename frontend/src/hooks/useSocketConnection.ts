@@ -105,7 +105,7 @@ export function useSocketConnection() {
 
     // Expose socket on window for E2E tests
     if (typeof window !== 'undefined') {
-      (window as any).socket = newSocket;
+      (window as unknown as { socket?: Socket }).socket = newSocket;
     }
 
     // Connection event handlers

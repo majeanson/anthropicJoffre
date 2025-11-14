@@ -2,20 +2,25 @@ import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
 // Mock AudioContext for testing (not available in jsdom)
-(globalThis as any).AudioContext = vi.fn().mockImplementation(() => ({
+const MockAudioContext = vi.fn().mockImplementation(() => ({
   createOscillator: vi.fn(() => ({
     connect: vi.fn(),
     start: vi.fn(),
     stop: vi.fn(),
-    frequency: { value: 0 },
+    frequency: { value: 0, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
+    type: 'sine',
   })),
   createGain: vi.fn(() => ({
     connect: vi.fn(),
-    gain: { value: 0 },
+    gain: { value: 0, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
   })),
   destination: {},
   currentTime: 0,
-})) as any;
+  state: 'running',
+  resume: vi.fn(),
+}));
+
+(globalThis as typeof globalThis & { AudioContext: typeof MockAudioContext }).AudioContext = MockAudioContext;
 
 // Mock sounds module
 vi.mock('../utils/sounds', () => ({
