@@ -1,0 +1,245 @@
+# Lighthouse Performance Audit - Sprint 15
+
+**Date**: 2025-11-14
+**URL**: https://jaffre.vercel.app/
+**Tool**: Lighthouse CLI v12.x
+
+---
+
+## 📊 Overall Scores
+
+| Category | Score | Target | Status |
+|----------|-------|--------|--------|
+| **Performance** | 87/100 | 90 | ⚠️ Close (3 points below) |
+| **Accessibility** | 83/100 | 90 | ⚠️ Needs improvement |
+| **Best Practices** | 96/100 | 90 | ✅ Exceeds target |
+| **SEO** | 90/100 | 90 | ✅ Meets target |
+
+**Overall**: 3 of 4 categories meet or exceed target. Performance and Accessibility need minor improvements.
+
+---
+
+## 🔴 Critical Issues (Priority 1)
+
+### 1. Browser Console Errors [0/100]
+**Impact**: High - Indicates unresolved problems
+**Category**: Best Practices (despite 96 score, this needs fixing)
+
+**Issue**: Errors logged to console indicate unresolved problems from network requests or browser concerns.
+
+**Recommended Fix**:
+1. Check browser console on production for specific errors
+2. Fix Socket.IO connection errors if any
+3. Handle failed network requests gracefully
+4. Add proper error boundaries in React components
+
+**Implementation**:
+```javascript
+// Add to index.html or App.tsx
+window.addEventListener('error', (event) => {
+  // Log to Sentry instead of console
+  console.error('Caught error:', event.error);
+});
+```
+
+### 2. Viewport Zoom Disabled [0/100]
+**Impact**: High - Accessibility violation
+**Category**: Accessibility
+
+**Issue**: `user-scalable="no"` prevents users with low vision from zooming.
+
+**Recommended Fix**:
+Edit `frontend/index.html`:
+```html
+<!-- BEFORE -->
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+
+<!-- AFTER -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+```
+
+**Impact**: +5-10 points to Accessibility score
+
+### 3. Heading Order Not Sequential [0/100]
+**Impact**: Medium - Accessibility
+**Category**: Accessibility
+
+**Issue**: Headings skip levels (e.g., h1 → h3), breaking semantic structure.
+
+**Recommended Fix**:
+Audit all components for proper heading hierarchy:
+- Use h1 for main page title
+- Use h2 for section titles
+- Use h3 for subsections
+- Never skip levels
+
+**Files to Check**:
+- `Lobby.tsx`
+- `TeamSelection.tsx`
+- `PlayingPhase.tsx`
+- `BettingPhase.tsx`
+
+---
+
+## 🟡 Performance Optimizations (Priority 2)
+
+### 4. Preconnect to Required Origins [0/100]
+**Impact**: Medium - Reduces connection latency
+**Category**: Performance
+
+**Issue**: Missing `preconnect` hints for external origins (Socket.IO, Sentry, etc.)
+
+**Recommended Fix**:
+Add to `frontend/index.html` `<head>`:
+```html
+<!-- Preconnect to backend Socket.IO -->
+<link rel="preconnect" href="https://anthropicjoffre-production.up.railway.app" crossorigin>
+
+<!-- Preconnect to Sentry -->
+<link rel="preconnect" href="https://o4508236154822656.ingest.us.sentry.io" crossorigin>
+```
+
+**Impact**: +2-3 points to Performance score
+
+### 5. Eliminate Render-Blocking Resources [0/100]
+**Impact**: High - Delays First Paint
+**Category**: Performance
+
+**Issue**: CSS/JS blocks initial page rendering.
+
+**Recommended Fix**:
+```html
+<!-- Add to index.html -->
+<link rel="preload" href="/assets/index.css" as="style">
+<link rel="preload" href="/assets/index.js" as="script">
+```
+
+Or use Vite's built-in code splitting (already enabled).
+
+### 6. Reduce Unused CSS [0/100]
+**Impact**: Medium - Reduces bundle size
+**Category**: Performance
+
+**Issue**: Tailwind CSS includes unused utility classes.
+
+**Recommended Fix**:
+Tailwind purge is already configured in `tailwind.config.js`. Verify it's working:
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'], // ✓ Already configured
+  // ...
+}
+```
+
+### 7. Reduce Unused JavaScript [0/100]
+**Impact**: High - Reduces bundle size
+**Category**: Performance
+
+**Issue**: Vite bundle includes unused code from libraries.
+
+**Recommended Fix**:
+1. ✅ Already using code splitting (lazy loading components)
+2. ✅ Already using tree shaking (Vite default)
+3. Consider lazy loading Socket.IO client:
+```typescript
+// Only load when needed
+const io = await import('socket.io-client');
+```
+
+---
+
+## 🟢 SEO Improvements (Priority 3)
+
+### 8. Missing Meta Description [0/100]
+**Impact**: Low - Affects search results
+**Category**: SEO
+
+**Issue**: No meta description for search engines.
+
+**Recommended Fix**:
+Add to `frontend/index.html` `<head>`:
+```html
+<meta name="description" content="Play Jaffre - A real-time multiplayer trick-taking card game. Challenge friends or AI bots in this strategic 4-player, 2-team card game with betting and trump suits." />
+
+<meta name="keywords" content="card game, multiplayer, trick-taking, online game, jaffre, real-time game" />
+
+<!-- Open Graph for social sharing -->
+<meta property="og:title" content="Jaffre - Multiplayer Card Game" />
+<meta property="og:description" content="Real-time 4-player, 2-team trick-taking card game" />
+<meta property="og:url" content="https://jaffre.vercel.app/" />
+<meta property="og:type" content="website" />
+```
+
+**Impact**: +5 points to SEO score (95/100)
+
+---
+
+## 📈 Performance Metrics
+
+**Current Performance**: 87/100
+
+### Core Web Vitals:
+- **First Contentful Paint (FCP)**: 83/100 (Good)
+- **Largest Contentful Paint (LCP)**: 68/100 (Needs Improvement)
+- **Total Blocking Time (TBT)**: 90/100 (Good)
+- **Cumulative Layout Shift (CLS)**: 100/100 (Perfect!)
+- **Speed Index**: 99/100 (Excellent!)
+
+### To Reach 90+ Performance:
+1. Fix LCP (Largest Contentful Paint) - currently 68/100
+   - Optimize card images ✅ (DONE - 63.7% reduction!)
+   - Add preconnect hints
+   - Lazy load below-the-fold content
+
+2. Maintain good metrics:
+   - CLS perfect ✅
+   - Speed Index excellent ✅
+   - TBT good ✅
+
+**Expected Impact**: +3-5 points → 90-92/100
+
+---
+
+## 🎯 Action Plan (Recommended Priority)
+
+### Quick Wins (15-30 minutes):
+1. ✅ **Enable viewport zoom** - Remove `user-scalable="no"` (+5-10 Accessibility)
+2. ✅ **Add meta description** - SEO tags in index.html (+5 SEO)
+3. ✅ **Add preconnect hints** - Backend + Sentry (+2-3 Performance)
+
+### Medium Priority (1-2 hours):
+4. **Fix heading hierarchy** - Audit all components (+3-5 Accessibility)
+5. **Fix console errors** - Debug production errors (+2-3 Best Practices)
+
+### Long-term (Future sprints):
+6. **Optimize bundle size** - Further code splitting
+7. **Lazy load Socket.IO** - Only when needed
+8. **Service Worker** - Offline support + caching
+
+---
+
+## 📊 Expected Results After Quick Wins
+
+| Category | Current | After Fixes | Change |
+|----------|---------|-------------|--------|
+| Performance | 87 | **90-92** | +3-5 |
+| Accessibility | 83 | **93-95** | +10-12 |
+| Best Practices | 96 | **98-100** | +2-4 |
+| SEO | 90 | **95** | +5 |
+
+**Overall**: All 4 categories will meet or exceed 90/100 target! 🎉
+
+---
+
+## 🔄 Next Steps
+
+1. Implement quick wins (index.html changes)
+2. Commit and deploy to production
+3. Re-run Lighthouse audit to verify improvements
+4. Schedule medium-priority fixes for Sprint 16
+
+---
+
+*Generated: 2025-11-14*
+*Report File: lighthouse-report.json*

@@ -2,7 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <!-- Lighthouse Fix: Enable zoom for accessibility (removed user-scalable=no, maximum-scale) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- SEO: Meta description for search engines -->
+    <meta name="description" content="Play Jaffre - A real-time multiplayer trick-taking card game. Challenge friends or AI bots in this strategic 4-player, 2-team card game with betting and trump suits." />
+    <meta name="keywords" content="card game, multiplayer, trick-taking, online game, jaffre, real-time game" />
+
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="Jaffre - Multiplayer Card Game" />
+    <meta property="og:description" content="Real-time 4-player, 2-team trick-taking card game" />
+    <meta property="og:url" content="https://jaffre.vercel.app/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Lighthouse Fix: Preconnect to external origins for faster connections -->
+    <link rel="preconnect" href="https://anthropicjoffre-production.up.railway.app" crossorigin>
+    <link rel="preconnect" href="https://o4508236154822656.ingest.us.sentry.io" crossorigin>
+
     <title>J⋀ffre</title>
   </head>
   <body>
