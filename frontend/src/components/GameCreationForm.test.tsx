@@ -61,7 +61,8 @@ describe('GameCreationForm', () => {
 
   it('toggles between ranked and casual mode', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<GameCreationForm {...defaultProps} />);
+    const mockUser = { id: 1, username: 'TestUser', email: 'test@example.com' };
+    renderWithProviders(<GameCreationForm {...defaultProps} user={mockUser as any} />);
 
     const checkbox = screen.getByTestId('persistence-mode-checkbox');
 
@@ -79,14 +80,16 @@ describe('GameCreationForm', () => {
   });
 
   it('shows appropriate info message for ranked mode', () => {
-    renderWithProviders(<GameCreationForm {...defaultProps} />);
+    const mockUser = { id: 1, username: 'TestUser', email: 'test@example.com' };
+    renderWithProviders(<GameCreationForm {...defaultProps} user={mockUser as any} />);
 
     expect(screen.getByText('Game will be saved to your profile and affect your ranking')).toBeInTheDocument();
   });
 
   it('shows appropriate info message for casual mode', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<GameCreationForm {...defaultProps} />);
+    const mockUser = { id: 1, username: 'TestUser', email: 'test@example.com' };
+    renderWithProviders(<GameCreationForm {...defaultProps} user={mockUser as any} />);
 
     const checkbox = screen.getByTestId('persistence-mode-checkbox');
     await user.click(checkbox);
@@ -105,7 +108,8 @@ describe('GameCreationForm', () => {
 
   it('calls onCreateGame with casual mode when checkbox is unchecked', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<GameCreationForm {...defaultProps} />);
+    const mockUser = { id: 1, username: 'TestUser', email: 'test@example.com' };
+    renderWithProviders(<GameCreationForm {...defaultProps} user={mockUser as any} />);
 
     const checkbox = screen.getByTestId('persistence-mode-checkbox');
     await user.click(checkbox);
