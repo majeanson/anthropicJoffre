@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { GameState } from '../types/game';
+import { Socket } from 'socket.io-client';
 
 interface DebugPanelProps {
   gameState: GameState | null;
   gameId: string;
   isOpen: boolean;
   onClose: () => void;
+  socket: Socket | null;
 }
 
 interface ServerHealth {
@@ -20,40 +22,81 @@ interface ServerHealth {
   timestamp: number;
 }
 
-export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelProps) {
+export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: DebugPanelProps) {
   const [serverHealth, setServerHealth] = useState<ServerHealth | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
+  const [clearMessage, setClearMessage] = useState<string | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
+
+  // Listen for clear all games response
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleAllGamesCleared = (data: { gamesCleared: number; sessionsCleared: number; message: string }) => {
+      setClearMessage(`✅ ${data.message}`);
+      setIsClearing(false);
+
+      // Clear message after 5 seconds
+      setTimeout(() => setClearMessage(null), 5000);
+
+      // Refresh health immediately
+      fetchHealthNow();
+    };
+
+    socket.on('all_games_cleared', handleAllGamesCleared);
+
+    return () => {
+      socket.off('all_games_cleared', handleAllGamesCleared);
+    };
+  }, [socket]);
+
+  // Fetch server health function (extracted for reuse)
+  const fetchHealthNow = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+      const response = await fetch(`${apiUrl}/api/ping`);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+      setServerHealth(data);
+      setHealthError(null);
+    } catch (error) {
+      setHealthError(error instanceof Error ? error.message : 'Failed to fetch');
+      console.error('Failed to fetch server health:', error);
+    }
+  };
 
   // Fetch server health every 5 seconds when panel is open
   useEffect(() => {
     if (!isOpen) return;
 
-    const fetchHealth = async () => {
-      try {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/api/ping`);
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-        setServerHealth(data);
-        setHealthError(null);
-      } catch (error) {
-        setHealthError(error instanceof Error ? error.message : 'Failed to fetch');
-        console.error('Failed to fetch server health:', error);
-      }
-    };
-
     // Fetch immediately
-    fetchHealth();
+    fetchHealthNow();
 
     // Then fetch every 5 seconds
-    const interval = setInterval(fetchHealth, 5000);
+    const interval = setInterval(fetchHealthNow, 5000);
 
     return () => clearInterval(interval);
   }, [isOpen]);
+
+  // Handle clear all games
+  const handleClearAllGames = () => {
+    if (!socket) {
+      setClearMessage('❌ No socket connection');
+      return;
+    }
+
+    if (!window.confirm('⚠️ Clear ALL games from memory?\n\nThis will disconnect all active players and remove all game data.\n\nAre you sure?')) {
+      return;
+    }
+
+    setIsClearing(true);
+    setClearMessage('🔄 Clearing all games...');
+    socket.emit('clear_all_games');
+  };
 
   if (!isOpen || !gameState) return null;
 
@@ -128,9 +171,34 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose }: DebugPanelPro
 
           {/* Server Health */}
           <section aria-labelledby="server-health-heading">
-            <h3 id="server-health-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
-              🖥️ Server Health
-            </h3>
+            <div className="flex items-center justify-between mb-3 border-b-2 border-purple-200 pb-2">
+              <h3 id="server-health-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                🖥️ Server Health
+              </h3>
+              <button
+                onClick={handleClearAllGames}
+                disabled={isClearing || !socket}
+                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                  isClearing || !socket
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg'
+                }`}
+                title="Clear all games from memory (use when memory is high)"
+              >
+                {isClearing ? '🔄 Clearing...' : '🗑️ Clear All Games'}
+              </button>
+            </div>
+            {clearMessage && (
+              <div className={`mb-3 p-3 rounded-lg border-2 ${
+                clearMessage.startsWith('✅')
+                  ? 'bg-green-50 border-green-400 text-green-800'
+                  : clearMessage.startsWith('❌')
+                  ? 'bg-red-50 border-red-400 text-red-800'
+                  : 'bg-blue-50 border-blue-400 text-blue-800'
+              }`}>
+                <p className="font-semibold">{clearMessage}</p>
+              </div>
+            )}
             {healthError ? (
               <div className="bg-red-50 border-2 border-red-300 rounded-lg p-4 text-center">
                 <p className="text-red-700 font-semibold">⚠️ Unable to fetch server health</p>

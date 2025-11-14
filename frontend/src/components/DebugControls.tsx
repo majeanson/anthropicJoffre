@@ -129,6 +129,7 @@ const DebugControls: React.FC<DebugControlsProps> = ({
           gameState={gameState}
           isOpen={debugPanelOpen}
           gameId={gameId}
+          socket={socket}
           onClose={() => setDebugPanelOpen(false)}
         />
       )}

@@ -554,6 +554,7 @@ function AppContent() {
             gameState={gameState}
             gameId={gameId}
             isOpen={debugPanelOpen}
+            socket={socket}
             onClose={() => setDebugPanelOpen(false)}
           />
         </Suspense>
@@ -602,6 +603,7 @@ function AppContent() {
             gameState={gameState}
             gameId={gameId}
             isOpen={debugPanelOpen}
+            socket={socket}
             onClose={() => setDebugPanelOpen(false)}
           />
         </Suspense>
@@ -656,6 +658,7 @@ function AppContent() {
             gameState={gameState}
             gameId={gameId}
             isOpen={debugPanelOpen}
+            socket={socket}
             onClose={() => setDebugPanelOpen(false)}
           />
         </Suspense>
@@ -716,6 +719,7 @@ function AppContent() {
             gameState={gameState}
             gameId={gameId}
             isOpen={debugPanelOpen}
+            socket={socket}
             onClose={() => setDebugPanelOpen(false)}
           />
         </Suspense>
@@ -763,6 +767,7 @@ function AppContent() {
             gameState={gameState}
             gameId={gameId}
             isOpen={debugPanelOpen}
+            socket={socket}
             onClose={() => setDebugPanelOpen(false)}
           />
         </Suspense>

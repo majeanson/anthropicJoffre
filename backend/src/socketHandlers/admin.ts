@@ -162,6 +162,36 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
   }));
 
   // ============================================================================
+  // clear_all_games - Admin tool to clear all games from memory (Debug Panel)
+  // ============================================================================
+  socket.on('clear_all_games', errorBoundaries.gameAction('clear_all_games')(() => {
+    const gameCount = games.size;
+    const sessionCount = playerSessions.size;
+
+    // Clear all games
+    games.clear();
+
+    // Clear all player sessions
+    playerSessions.clear();
+
+    // Clear all online players
+    onlinePlayers.clear();
+
+    logger.info(`[ADMIN] Cleared ${gameCount} games and ${sessionCount} sessions from memory`);
+    console.log(`✓ Memory cleared: ${gameCount} games, ${sessionCount} sessions removed`);
+
+    // Notify the requester
+    socket.emit('all_games_cleared', {
+      gamesCleared: gameCount,
+      sessionsCleared: sessionCount,
+      message: `Successfully cleared ${gameCount} games and ${sessionCount} sessions from memory`,
+    });
+
+    // Broadcast online players update (now empty)
+    broadcastOnlinePlayers();
+  }));
+
+  // ============================================================================
   // vote_rematch - Vote to restart game after completion
   // ============================================================================
   socket.on('vote_rematch', errorBoundaries.gameAction('vote_rematch')(({ gameId }: { gameId: string }) => {
