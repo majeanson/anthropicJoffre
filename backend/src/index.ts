@@ -117,6 +117,7 @@ import {
   validateCardColor,
 } from './utils/sanitization';
 import { queryCache } from './utils/queryCache';
+import { memoryManager } from './utils/memoryManager';
 import {
   createSession as createDBSession,
   validateSession as validateDBSession,
@@ -1623,6 +1624,23 @@ httpServer.listen(PORT, HOST, async () => {
       console.error('[Startup] Initial cleanup failed:', error);
     }
   }, 5000); // Wait 5 seconds after startup
+
+  // ============= MEMORY MANAGEMENT =============
+  // Start memory monitoring and automatic cleanup
+  memoryManager.startMonitoring(
+    games,
+    previousGameStates,
+    gameFinishTimes,
+    gameCreationTimes,
+    () => {
+      // Callback after cleanup: force save to database
+      queryCache.clear();
+      if (global.gc) {
+        global.gc(); // Force garbage collection if available
+      }
+    }
+  );
+  console.log('[MemoryManager] Active memory monitoring enabled');
 }).on('error', (error: NodeJS.ErrnoException) => {
   console.error('❌ Server failed to start:', error.message);
   process.exit(1);

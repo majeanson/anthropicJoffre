@@ -19,6 +19,7 @@ interface CacheEntry<T> {
 class QueryCache {
   private cache: Map<string, CacheEntry<unknown>>;
   private cleanupInterval: NodeJS.Timeout | null;
+  private readonly maxSize: number = 50; // Limit cache to 50 entries for low memory
 
   constructor() {
     this.cache = new Map();
@@ -53,8 +54,17 @@ class QueryCache {
 
   /**
    * Store data in cache with TTL
+   * Enforces max cache size to prevent memory bloat
    */
   set<T>(key: string, data: T, ttl: number): void {
+    // If cache is full, remove oldest entry
+    if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+      const oldestKey = this.cache.keys().next().value;
+      if (oldestKey) {
+        this.cache.delete(oldestKey);
+      }
+    }
+
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
