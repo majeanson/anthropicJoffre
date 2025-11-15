@@ -342,10 +342,12 @@ app.use(responseTimeMiddleware);
 // Configure rate limiting
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 3000, // Increased from 100 - allows polling endpoints like /api/debug/games
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false, // Disable X-RateLimit-* headers
+  // Trust Railway proxy headers
+  trustProxy: true,
 });
 
 // Apply rate limiting to all API routes
@@ -354,8 +356,9 @@ app.use('/api/', apiLimiter);
 // Stricter rate limit for game creation
 const gameCreateLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 10, // Limit to 10 game creations per 5 minutes
+  max: 30, // Increased from 10 - allows more testing/development
   message: 'Too many games created, please try again later.',
+  trustProxy: true, // Trust Railway proxy headers
 });
 
 // Socket event rate limiters (stored per socket ID)

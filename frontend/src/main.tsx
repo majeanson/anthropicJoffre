@@ -11,9 +11,10 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Initialize Sentry for error tracking
 if (import.meta.env.VITE_SENTRY_DSN) {
+  console.log('🚨 Initializing Sentry with DSN:', import.meta.env.VITE_SENTRY_DSN?.substring(0, 30) + '...');
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN,
-    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'production',
+    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'development',
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({
@@ -27,6 +28,9 @@ if (import.meta.env.VITE_SENTRY_DSN) {
     replaysSessionSampleRate: 0.1, // 10% of sessions
     replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
   });
+  console.log('✅ Sentry initialized successfully');
+} else {
+  console.warn('⚠️ Sentry DSN not found. Error tracking disabled.');
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
