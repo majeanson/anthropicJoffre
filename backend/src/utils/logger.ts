@@ -50,8 +50,11 @@ const logLevel = process.env.LOG_LEVEL || (process.env.NODE_ENV === 'production'
 // Initialize Logtail (only in production with token)
 let logtail: Logtail | null = null;
 if (process.env.LOGTAIL_SOURCE_TOKEN) {
+  console.log('🔧 Initializing Logtail with token:', process.env.LOGTAIL_SOURCE_TOKEN.substring(0, 10) + '...');
   logtail = new Logtail(process.env.LOGTAIL_SOURCE_TOKEN);
   console.log('✅ Logtail log aggregation enabled');
+} else {
+  console.log('⚠️  LOGTAIL_SOURCE_TOKEN not set - log aggregation disabled');
 }
 
 // Build transports array
