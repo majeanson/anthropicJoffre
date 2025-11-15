@@ -115,7 +115,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
     socket.emit('clear_all_games');
   };
 
-  const handleTestFrontendSentry = () => {
+  const handleTestFrontendSentry = async () => {
     console.log('🧪 Testing Frontend Sentry...');
     try {
       const eventId = Sentry.captureException(new Error('🧪 Test Error - Frontend Sentry Integration'), {
@@ -132,7 +132,13 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
         },
       });
       console.log('✅ Sentry event captured with ID:', eventId);
-      alert('✅ Frontend Sentry test error sent! Event ID: ' + eventId + '\nCheck your Sentry dashboard.');
+
+      // Force flush to ensure event is sent immediately
+      console.log('⏳ Flushing Sentry queue...');
+      await Sentry.flush(2000); // Wait up to 2 seconds for events to send
+      console.log('✅ Sentry queue flushed');
+
+      alert('✅ Frontend Sentry test error sent! Event ID: ' + eventId + '\nCheck your Sentry dashboard in ~10 seconds.');
     } catch (error) {
       console.error('❌ Error capturing Sentry event:', error);
       alert('❌ Error sending to Sentry: ' + error);
