@@ -482,27 +482,41 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
    * Bypasses ad blockers by proxying Sentry events through our own domain
    * https://docs.sentry.io/platforms/javascript/troubleshooting/#using-the-tunnel-option
    */
-  app.post('/api/sentry-tunnel', express.raw({ type: 'application/x-sentry-envelope', limit: '10mb' }), async (req: Request, res: Response) => {
+  app.post('/api/sentry-tunnel', express.raw({ type: '*/*', limit: '10mb' }), async (req: Request, res: Response) => {
     try {
+      console.log('[Sentry Tunnel] 📨 Received envelope from frontend, content-type:', req.headers['content-type']);
       const envelope = req.body;
 
-      // Parse the envelope to get the DSN
-      const envelopeString = envelope.toString('utf-8');
-      const headerLine = envelopeString.split('\n')[0];
+      // Handle both Buffer and string
+      const envelopeString = Buffer.isBuffer(envelope) ? envelope.toString('utf-8') : envelope;
+      const lines = envelopeString.split('\n');
+      const headerLine = lines[0];
+
+      console.log('[Sentry Tunnel] 📋 Header line:', headerLine);
+
       const header = JSON.parse(headerLine);
+
+      console.log('[Sentry Tunnel] 📋 Envelope header:', {
+        dsn: header.dsn?.substring(0, 50) + '...',
+        event_id: header.event_id,
+        sent_at: header.sent_at
+      });
 
       // Extract Sentry project ID and host from DSN
       const dsnMatch = header.dsn?.match(/https:\/\/([^@]+)@([^\/]+)\/(\d+)/);
 
       if (!dsnMatch) {
-        console.error('[Sentry Tunnel] Invalid DSN in envelope:', header.dsn);
+        console.error('[Sentry Tunnel] ❌ Invalid DSN in envelope:', header.dsn);
         return res.status(400).send('Invalid DSN');
       }
 
       const [, publicKey, host, projectId] = dsnMatch;
       const sentryIngestUrl = `https://${host}/api/${projectId}/envelope/`;
 
-      // Forward the envelope to Sentry
+      console.log('[Sentry Tunnel] 📤 Forwarding to:', sentryIngestUrl);
+      console.log('[Sentry Tunnel] 📤 Project ID:', projectId);
+
+      // Forward the envelope to Sentry (as raw bytes)
       const response = await fetch(sentryIngestUrl, {
         method: 'POST',
         headers: {
@@ -513,13 +527,21 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
       });
 
       if (!response.ok) {
-        console.error('[Sentry Tunnel] Sentry API error:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('[Sentry Tunnel] ❌ Sentry API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText,
+          projectId,
+        });
         return res.status(response.status).send(response.statusText);
       }
 
+      const responseText = await response.text();
+      console.log('[Sentry Tunnel] ✅ Successfully forwarded to Sentry, response:', responseText || 'OK');
       res.status(200).send('OK');
     } catch (error) {
-      console.error('[Sentry Tunnel] Error forwarding to Sentry:', error);
+      console.error('[Sentry Tunnel] ❌ Error forwarding to Sentry:', error);
       res.status(500).send('Internal Server Error');
     }
   });
