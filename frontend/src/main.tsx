@@ -34,6 +34,8 @@ if (SENTRY_DSN) {
     environment: sentryEnvironment,
     // Use tunnel to bypass ad blockers
     tunnel: tunnelUrl,
+    // Release version for tracking deployments
+    release: 'trick-card-game@2.0.0',
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({
