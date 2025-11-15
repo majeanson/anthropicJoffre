@@ -291,6 +291,75 @@ connectionManager.on('connection_timeout', ({ playerName, socketId }) => {
   console.log(`Connection timeout: ${playerName} (${socketId})`);
 });
 
+// ============================================================================
+// Sentry Tunnel Endpoint (MUST be registered BEFORE CORS middleware)
+// ============================================================================
+// This endpoint proxies Sentry events to bypass ad blockers
+// CRITICAL: Must be registered before CORS to avoid blocking Sentry's ingest domain
+app.post('/api/sentry-tunnel', express.raw({ type: '*/*', limit: '10mb' }), async (req, res) => {
+  try {
+    console.log('[Sentry Tunnel] 📨 Received envelope from frontend, content-type:', req.headers['content-type']);
+    const envelope = req.body;
+
+    // Handle both Buffer and string
+    const envelopeString = Buffer.isBuffer(envelope) ? envelope.toString('utf-8') : envelope;
+    const lines = envelopeString.split('\n');
+    const headerLine = lines[0];
+
+    console.log('[Sentry Tunnel] 📋 Header line:', headerLine);
+
+    const header = JSON.parse(headerLine);
+
+    console.log('[Sentry Tunnel] 📋 Envelope header:', {
+      dsn: header.dsn?.substring(0, 50) + '...',
+      event_id: header.event_id,
+      sent_at: header.sent_at
+    });
+
+    // Extract Sentry project ID and host from DSN
+    const dsnMatch = header.dsn?.match(/https:\/\/([^@]+)@([^\/]+)\/(\d+)/);
+
+    if (!dsnMatch) {
+      console.error('[Sentry Tunnel] ❌ Invalid DSN in envelope:', header.dsn);
+      return res.status(400).send('Invalid DSN');
+    }
+
+    const [, publicKey, host, projectId] = dsnMatch;
+    const sentryIngestUrl = `https://${host}/api/${projectId}/envelope/`;
+
+    console.log('[Sentry Tunnel] 📤 Forwarding to:', sentryIngestUrl);
+    console.log('[Sentry Tunnel] 📤 Project ID:', projectId);
+
+    // Forward the envelope to Sentry (as raw bytes)
+    const response = await fetch(sentryIngestUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-sentry-envelope',
+        'X-Sentry-Auth': `Sentry sentry_key=${publicKey}, sentry_version=7`,
+      },
+      body: envelope,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[Sentry Tunnel] ❌ Sentry API error:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+        projectId,
+      });
+      return res.status(response.status).send(response.statusText);
+    }
+
+    const responseText = await response.text();
+    console.log('[Sentry Tunnel] ✅ Successfully forwarded to Sentry, response:', responseText || 'OK');
+    res.status(200).send('OK');
+  } catch (error) {
+    console.error('[Sentry Tunnel] ❌ Error forwarding to Sentry:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // Configure CORS for Express with validation logging
 app.use(cors({
   origin: (origin, callback) => {
