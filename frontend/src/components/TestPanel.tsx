@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
+import * as Sentry from '@sentry/react';
 
 interface TestPanelProps {
   gameState: GameState | null;
@@ -18,6 +19,38 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
   const handleSetScores = () => {
     if (socket) {
       socket.emit('__test_set_scores', { team1: team1Score, team2: team2Score });
+    }
+  };
+
+  const handleTestFrontendSentry = () => {
+    // Trigger a test error in Sentry (frontend)
+    Sentry.captureException(new Error('🧪 Test Error - Frontend Sentry Integration'), {
+      level: 'error',
+      tags: {
+        test: true,
+        source: 'debug_panel',
+        type: 'manual_test',
+      },
+      extra: {
+        gameId: gameState?.id,
+        playerCount: gameState?.players.length,
+        phase: gameState?.phase,
+        timestamp: new Date().toISOString(),
+      },
+    });
+    alert('✅ Frontend Sentry test error sent! Check your Sentry dashboard.');
+  };
+
+  const handleTestBackendSentry = () => {
+    // Trigger a test error in backend via socket event
+    if (socket) {
+      socket.emit('__test_sentry_error', {
+        message: '🧪 Test Error - Backend Sentry Integration',
+        gameId: gameState?.id,
+      });
+      alert('✅ Backend Sentry test request sent! Check your Sentry dashboard in ~10 seconds.');
+    } else {
+      alert('❌ Socket not connected. Cannot test backend Sentry.');
     }
   };
 
@@ -163,6 +196,49 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
               >
                 Reset Scores (0-0)
               </button>
+            </div>
+          </section>
+
+          {/* Sentry Testing */}
+          <section>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-red-200 pb-2">
+              🚨 Sentry Error Tracking Tests
+            </h3>
+            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                Test Sentry error tracking integration for both frontend and backend.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={handleTestFrontendSentry}
+                  className="bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                >
+                  <span>📱</span>
+                  <span>Test Frontend Sentry</span>
+                </button>
+                <button
+                  onClick={handleTestBackendSentry}
+                  className="bg-orange-100 hover:bg-orange-200 text-orange-800 font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  disabled={!socket}
+                >
+                  <span>🖥️</span>
+                  <span>Test Backend Sentry</span>
+                </button>
+              </div>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+                <p className="text-xs text-blue-800">
+                  <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
+                  <a
+                    href="https://sentry.io"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-blue-600"
+                  >
+                    sentry.io
+                  </a>
+                  {' '}to verify errors appear and configure alerts.
+                </p>
+              </div>
             </div>
           </section>
 

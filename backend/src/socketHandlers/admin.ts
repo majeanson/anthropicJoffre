@@ -13,6 +13,7 @@ import { GameState, PlayerSession } from '../types/game';
 import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
 import { clearAllGameSnapshots } from '../db/index';
+import * as Sentry from '@sentry/node';
 
 /**
  * Online player tracking data
@@ -66,6 +67,37 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
     logger,
     errorBoundaries,
   } = deps;
+
+  // ============================================================================
+  // __test_sentry_error - Test Sentry error tracking (backend)
+  // ============================================================================
+  socket.on('__test_sentry_error', errorBoundaries.gameAction('__test_sentry_error')(({ message, gameId }: { message: string; gameId?: string }) => {
+    logger.info('[SENTRY TEST] Triggering test error for Sentry integration');
+    console.log('🧪 SENTRY TEST: Capturing test error to Sentry...');
+
+    // Capture a test error to Sentry
+    Sentry.captureException(new Error(message || '🧪 Test Error - Backend Sentry Integration'), {
+      level: 'error',
+      tags: {
+        test: true,
+        source: 'debug_panel',
+        type: 'manual_test',
+        socketId: socket.id,
+      },
+      extra: {
+        gameId: gameId || 'none',
+        socketId: socket.id,
+        timestamp: new Date().toISOString(),
+        activeGames: games.size,
+      },
+    });
+
+    console.log('✅ SENTRY TEST: Test error sent to Sentry successfully');
+    socket.emit('sentry_test_success', {
+      message: 'Test error sent to Sentry backend',
+      timestamp: new Date().toISOString(),
+    });
+  }));
 
   // ============================================================================
   // __test_set_scores - Test-only score manipulation
