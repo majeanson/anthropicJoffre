@@ -17,6 +17,7 @@ if (existsSync(localEnvPath)) {
 
 // Initialize Sentry for error tracking
 if (process.env.SENTRY_DSN) {
+  console.log('🚨 Initializing Sentry for backend...');
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV || 'production',
@@ -28,6 +29,9 @@ if (process.env.SENTRY_DSN) {
     // Profiling
     profilesSampleRate: 1.0, // Profile 100% of transactions
   });
+  console.log('✅ Sentry initialized successfully for backend');
+} else {
+  console.warn('⚠️ SENTRY_DSN not found. Backend error tracking disabled.');
 }
 
 import express from 'express';
