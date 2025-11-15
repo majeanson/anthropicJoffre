@@ -20,10 +20,13 @@ console.log('🔍 Environment check:', {
 });
 
 if (SENTRY_DSN) {
+  const sentryEnvironment = import.meta.env.VITE_SENTRY_ENVIRONMENT || 'production';
   console.log('🚨 Initializing Sentry with DSN:', SENTRY_DSN.substring(0, 30) + '...');
+  console.log('🌍 Sentry environment:', sentryEnvironment);
+
   Sentry.init({
     dsn: SENTRY_DSN,
-    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'development',
+    environment: sentryEnvironment,
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({
@@ -32,10 +35,15 @@ if (SENTRY_DSN) {
       }),
     ],
     // Performance Monitoring
-    tracesSampleRate: 1.0, // Capture 100% of transactions in development
+    tracesSampleRate: 1.0, // Capture 100% of transactions
     // Session Replay
     replaysSessionSampleRate: 0.1, // 10% of sessions
     replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
+    // Ensure errors are sent
+    beforeSend(event) {
+      console.log('📤 Sentry sending event:', event.event_id, event.message || event.exception);
+      return event; // Always send the event
+    },
   });
   console.log('✅ Sentry initialized successfully');
 } else {
