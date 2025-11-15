@@ -116,20 +116,27 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
   };
 
   const handleTestFrontendSentry = () => {
-    Sentry.captureException(new Error('🧪 Test Error - Frontend Sentry Integration'), {
-      level: 'error',
-      tags: {
-        test: true,
-        source: 'global_debug_panel',
-        type: 'manual_test',
-      },
-      extra: {
-        activeGames: games.length,
-        serverHealth: serverHealth,
-        timestamp: new Date().toISOString(),
-      },
-    });
-    alert('✅ Frontend Sentry test error sent! Check your Sentry dashboard.');
+    console.log('🧪 Testing Frontend Sentry...');
+    try {
+      const eventId = Sentry.captureException(new Error('🧪 Test Error - Frontend Sentry Integration'), {
+        level: 'error',
+        tags: {
+          test: true,
+          source: 'global_debug_panel',
+          type: 'manual_test',
+        },
+        extra: {
+          activeGames: games.length,
+          serverHealth: serverHealth,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      console.log('✅ Sentry event captured with ID:', eventId);
+      alert('✅ Frontend Sentry test error sent! Event ID: ' + eventId + '\nCheck your Sentry dashboard.');
+    } catch (error) {
+      console.error('❌ Error capturing Sentry event:', error);
+      alert('❌ Error sending to Sentry: ' + error);
+    }
   };
 
   const handleTestBackendSentry = () => {
