@@ -1,7 +1,27 @@
 {
-  "buildDate": "2025-11-14T12:30:00Z",
+  "buildDate": "2025-11-15T04:32:51.750Z",
   "version": "2.2.0",
+  "git": {
+    "commitMessage": "feat: Add Sentry initialization logging for debugging\n\n- Add console logs to show if Sentry initializes successfully\n- Helps debug missing SENTRY_DSN environment variable",
+    "commitHash": "b709f06",
+    "commitDate": "2025-11-14 23:22:40 -0500",
+    "branch": "main"
+  },
+  "futureTodos": [
+    "Game Replay Feature",
+    "Improve Bot AI",
+    "Enhanced Leaderboard",
+    "Achievements & Badges",
+    "Friend System"
+  ],
   "releaseDate": "2025-11-14",
+  "buildStatus": "✅ Production Ready",
+  "testsStatus": {
+    "backend": "✅ 357 tests passing (100%)",
+    "frontend": "✅ 142 tests passing (100%)",
+    "e2e": "⚠️ Some tests need refactoring",
+    "typescript": "✅ Zero compilation errors"
+  },
   "sprint": "Sprint 15 - Performance Optimization & Production Readiness",
   "phases": {
     "sprint12": {
@@ -294,19 +314,6 @@
     "Further bundle size optimization",
     "Service worker for offline support"
   ],
-  "buildStatus": "✅ Production Ready",
-  "testsStatus": {
-    "backend": "✅ 357 tests passing (100%)",
-    "frontend": "✅ 142 tests passing (100%)",
-    "e2e": "⚠️ Some tests need refactoring",
-    "typescript": "✅ Zero compilation errors"
-  },
-  "deploymentStatus": {
-    "frontend": "✅ Live (https://jaffre.vercel.app/)",
-    "backend": "✅ Healthy (160+ hours uptime)",
-    "database": "✅ Connected and operational",
-    "readinessScore": "85/100"
-  },
   "notes": [
     "Sprint 12 completed in 2 days (5 days ahead of schedule)",
     "Sprint 13 completed in 1 day (2 days ahead of schedule)",
