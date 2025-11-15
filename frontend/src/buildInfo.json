@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-15T04:32:51.750Z",
+  "buildDate": "2025-11-15T04:58:55.000Z",
   "version": "2.2.0",
   "git": {
-    "commitMessage": "feat: Add Sentry initialization logging for debugging\n\n- Add console logs to show if Sentry initializes successfully\n- Helps debug missing SENTRY_DSN environment variable",
-    "commitHash": "b709f06",
-    "commitDate": "2025-11-14 23:22:40 -0500",
+    "commitMessage": "fix: Enable Sentry debug mode and fix preconnect URL",
+    "commitHash": "1f0bafb",
+    "commitDate": "2025-11-14 23:58:55 -0500",
     "branch": "main"
   },
   "futureTodos": [
