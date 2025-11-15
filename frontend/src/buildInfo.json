@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-15T04:58:55.000Z",
-  "version": "2.2.0",
+  "buildDate": "2025-11-15T05:15:00.000Z",
+  "version": "2.2.1",
   "git": {
-    "commitMessage": "fix: Enable Sentry debug mode and fix preconnect URL",
-    "commitHash": "1f0bafb",
-    "commitDate": "2025-11-14 23:58:55 -0500",
+    "commitMessage": "fix: Add explicit CORS headers to Sentry tunnel endpoint",
+    "commitHash": "b2e04ed",
+    "commitDate": "2025-11-15 00:15:00 -0500",
     "branch": "main"
   },
   "futureTodos": [

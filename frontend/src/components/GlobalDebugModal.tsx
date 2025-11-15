@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import * as Sentry from '@sentry/react';
+import buildInfo from '../buildInfo.json';
 
 interface GlobalDebugModalProps {
   isOpen: boolean;
@@ -365,6 +366,47 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                 </table>
               </div>
             )}
+          </section>
+
+          {/* Build Info & Features */}
+          <section>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">🏗️ Build Information</h3>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Version:</span>
+                  <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.version}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Commit:</span>
+                  <p className="font-mono text-sm text-gray-800 dark:text-gray-200">{buildInfo.git.commitHash}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Branch:</span>
+                  <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.git.branch}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Build Date:</span>
+                  <p className="text-sm text-gray-800 dark:text-gray-200">
+                    {new Date(buildInfo.buildDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400 block mb-2">Latest Commit:</span>
+                <p className="text-sm italic text-gray-700 dark:text-gray-300">{buildInfo.git.commitMessage}</p>
+              </div>
+              {buildInfo.newFeatures && buildInfo.newFeatures.length > 0 && (
+                <div>
+                  <span className="text-sm text-gray-600 dark:text-gray-400 block mb-2">Recent Features:</span>
+                  <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
+                    {buildInfo.newFeatures.slice(0, 5).map((feature, idx) => (
+                      <li key={idx}>{feature}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </section>
 
           {/* Summary Stats */}
