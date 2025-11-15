@@ -346,8 +346,6 @@ const apiLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in headers
   legacyHeaders: false, // Disable X-RateLimit-* headers
-  // Trust Railway proxy headers
-  trustProxy: true,
 });
 
 // Apply rate limiting to all API routes
@@ -358,7 +356,6 @@ const gameCreateLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 30, // Increased from 10 - allows more testing/development
   message: 'Too many games created, please try again later.',
-  trustProxy: true, // Trust Railway proxy headers
 });
 
 // Socket event rate limiters (stored per socket ID)
