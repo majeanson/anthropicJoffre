@@ -39,10 +39,17 @@ if (SENTRY_DSN) {
     // Session Replay
     replaysSessionSampleRate: 0.1, // 10% of sessions
     replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
+    // Debug mode for troubleshooting
+    debug: true,
     // Ensure errors are sent
     beforeSend(event) {
       console.log('📤 Sentry sending event:', event.event_id, event.message || event.exception);
       return event; // Always send the event
+    },
+    // Track transport errors
+    beforeSendTransaction(transaction) {
+      console.log('📤 Sentry sending transaction:', transaction.transaction);
+      return transaction;
     },
   });
   console.log('✅ Sentry initialized successfully');
