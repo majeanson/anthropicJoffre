@@ -477,6 +477,53 @@ export function registerRoutes(app: Express, deps: RoutesDependencies): void {
     }
   });
 
+  /**
+   * POST /api/sentry-tunnel - Sentry tunnel endpoint
+   * Bypasses ad blockers by proxying Sentry events through our own domain
+   * https://docs.sentry.io/platforms/javascript/troubleshooting/#using-the-tunnel-option
+   */
+  app.post('/api/sentry-tunnel', express.raw({ type: 'application/x-sentry-envelope', limit: '10mb' }), async (req: Request, res: Response) => {
+    try {
+      const envelope = req.body;
+
+      // Parse the envelope to get the DSN
+      const envelopeString = envelope.toString('utf-8');
+      const headerLine = envelopeString.split('\n')[0];
+      const header = JSON.parse(headerLine);
+
+      // Extract Sentry project ID and host from DSN
+      const dsnMatch = header.dsn?.match(/https:\/\/([^@]+)@([^\/]+)\/(\d+)/);
+
+      if (!dsnMatch) {
+        console.error('[Sentry Tunnel] Invalid DSN in envelope:', header.dsn);
+        return res.status(400).send('Invalid DSN');
+      }
+
+      const [, publicKey, host, projectId] = dsnMatch;
+      const sentryIngestUrl = `https://${host}/api/${projectId}/envelope/`;
+
+      // Forward the envelope to Sentry
+      const response = await fetch(sentryIngestUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-sentry-envelope',
+          'X-Sentry-Auth': `Sentry sentry_key=${publicKey}, sentry_version=7`,
+        },
+        body: envelope,
+      });
+
+      if (!response.ok) {
+        console.error('[Sentry Tunnel] Sentry API error:', response.status, response.statusText);
+        return res.status(response.status).send(response.statusText);
+      }
+
+      res.status(200).send('OK');
+    } catch (error) {
+      console.error('[Sentry Tunnel] Error forwarding to Sentry:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  });
+
   // ============================================================================
   // Test/Admin Endpoints
   // ============================================================================

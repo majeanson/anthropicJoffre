@@ -24,9 +24,16 @@ if (SENTRY_DSN) {
   console.log('🚨 Initializing Sentry with DSN:', SENTRY_DSN.substring(0, 30) + '...');
   console.log('🌍 Sentry environment:', sentryEnvironment);
 
+  // Get backend URL for tunnel (use production URL or local dev)
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://anthropicjoffre-production.up.railway.app';
+  const tunnelUrl = `${BACKEND_URL}/api/sentry-tunnel`;
+  console.log('🚇 Sentry tunnel:', tunnelUrl);
+
   Sentry.init({
     dsn: SENTRY_DSN,
     environment: sentryEnvironment,
+    // Use tunnel to bypass ad blockers
+    tunnel: tunnelUrl,
     integrations: [
       Sentry.browserTracingIntegration(),
       Sentry.replayIntegration({
