@@ -10,10 +10,19 @@ import { AuthProvider } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Initialize Sentry for error tracking
-if (import.meta.env.VITE_SENTRY_DSN) {
-  console.log('🚨 Initializing Sentry with DSN:', import.meta.env.VITE_SENTRY_DSN?.substring(0, 30) + '...');
+// TEMPORARY: Hardcode DSN to test Sentry - TODO: Remove after verifying Vercel env vars
+const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || 'https://98c89a1454b32d24fd78092cf6a297e8@o4510241708244992.ingest.us.sentry.io/4510241709293568';
+
+console.log('🔍 Environment check:', {
+  hasEnvVar: !!import.meta.env.VITE_SENTRY_DSN,
+  envVarValue: import.meta.env.VITE_SENTRY_DSN ? import.meta.env.VITE_SENTRY_DSN.substring(0, 30) + '...' : 'NOT SET',
+  usingDSN: SENTRY_DSN.substring(0, 30) + '...'
+});
+
+if (SENTRY_DSN) {
+  console.log('🚨 Initializing Sentry with DSN:', SENTRY_DSN.substring(0, 30) + '...');
   Sentry.init({
-    dsn: import.meta.env.VITE_SENTRY_DSN,
+    dsn: SENTRY_DSN,
     environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || 'development',
     integrations: [
       Sentry.browserTracingIntegration(),
