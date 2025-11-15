@@ -296,9 +296,22 @@ connectionManager.on('connection_timeout', ({ playerName, socketId }) => {
 // ============================================================================
 // This endpoint proxies Sentry events to bypass ad blockers
 // CRITICAL: Must be registered before CORS to avoid blocking Sentry's ingest domain
+app.options('/api/sentry-tunnel', (req, res) => {
+  // Handle preflight CORS request for Sentry tunnel
+  res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours
+  res.status(204).send();
+});
+
 app.post('/api/sentry-tunnel', express.raw({ type: '*/*', limit: '10mb' }), async (req, res) => {
   try {
-    console.log('[Sentry Tunnel] 📨 Received envelope from frontend, content-type:', req.headers['content-type']);
+    // Set CORS headers for actual POST request
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Credentials', 'false');
+
+    console.log('[Sentry Tunnel] 📨 Received envelope from:', req.headers.origin);
     const envelope = req.body;
 
     // Handle both Buffer and string
