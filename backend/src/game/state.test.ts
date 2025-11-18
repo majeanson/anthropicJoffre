@@ -325,6 +325,182 @@ describe('applyPositionSwap', () => {
     expect(game.players[2].id).toBe('p1');
   });
 
+  it('should swap all player data fields', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      players: [
+        {
+          id: 'p1', name: 'P1',
+          hand: [{color: 'red', value: 1}, {color: 'blue', value: 2}],
+          teamId: 1, tricksWon: 3, pointsWon: 5,
+          isBot: false
+        },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+        {
+          id: 'p3', name: 'P3',
+          hand: [{color: 'green', value: 3}, {color: 'brown', value: 4}],
+          teamId: 1, tricksWon: 1, pointsWon: 2,
+          isBot: true, botDifficulty: 'hard'
+        },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ],
+    });
+
+    applyPositionSwap(game, 'p1', 'p3');
+
+    // Check that positions swapped
+    expect(game.players[0].id).toBe('p3');
+    expect(game.players[2].id).toBe('p1');
+
+    // Check that game data swapped (player at index 0 has p1's data)
+    expect(game.players[0].hand).toEqual([{color: 'red', value: 1}, {color: 'blue', value: 2}]);
+    expect(game.players[0].tricksWon).toBe(3);
+    expect(game.players[0].pointsWon).toBe(5);
+    expect(game.players[0].isBot).toBe(false);
+    expect(game.players[0].botDifficulty).toBeUndefined();
+
+    // Check that game data swapped (player at index 2 has p3's data)
+    expect(game.players[2].hand).toEqual([{color: 'green', value: 3}, {color: 'brown', value: 4}]);
+    expect(game.players[2].tricksWon).toBe(1);
+    expect(game.players[2].pointsWon).toBe(2);
+    expect(game.players[2].isBot).toBe(true);
+    expect(game.players[2].botDifficulty).toBe('hard');
+  });
+
+  it('should swap bot status and difficulty', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      players: [
+        { id: 'p1', name: 'Human', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0, isBot: false },
+        { id: 'p2', name: 'Bot', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: true, botDifficulty: 'medium' },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ],
+    });
+
+    applyPositionSwap(game, 'p1', 'p2');
+
+    // Bot (now at index 0) should have human's data (false bot status)
+    expect(game.players[0].isBot).toBe(false);
+    expect(game.players[0].botDifficulty).toBeUndefined();
+
+    // Human (now at index 1) should have bot's data (true bot status and difficulty)
+    expect(game.players[1].isBot).toBe(true);
+    expect(game.players[1].botDifficulty).toBe('medium');
+  });
+
+  it('should swap connection status fields', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      players: [
+        {
+          id: 'p1', name: 'Connected', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0,
+          connectionStatus: 'connected'
+        },
+        {
+          id: 'p2', name: 'Disconnected', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0,
+          connectionStatus: 'disconnected', disconnectedAt: 12345, reconnectTimeLeft: 30
+        },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ],
+    });
+
+    applyPositionSwap(game, 'p1', 'p2');
+
+    // Disconnected player (now at index 0) should have connected player's data
+    expect(game.players[0].connectionStatus).toBe('connected');
+    expect(game.players[0].disconnectedAt).toBeUndefined();
+    expect(game.players[0].reconnectTimeLeft).toBeUndefined();
+
+    // Connected player (now at index 1) should have disconnected player's data
+    expect(game.players[1].connectionStatus).toBe('disconnected');
+    expect(game.players[1].disconnectedAt).toBe(12345);
+    expect(game.players[1].reconnectTimeLeft).toBe(30);
+  });
+
+  it('should update currentTrick references after swap', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ],
+      currentTrick: [
+        { playerId: 'p1', card: { color: 'red', value: 5 } },
+        { playerId: 'p2', card: { color: 'blue', value: 6 } },
+      ],
+    });
+
+    applyPositionSwap(game, 'p1', 'p3');
+
+    // p1 and p3 swapped, so their IDs in currentTrick should swap
+    expect(game.currentTrick[0].playerId).toBe('p3');
+    expect(game.currentTrick[1].playerId).toBe('p2'); // p2 unchanged
+  });
+
+  it('should update currentBets references after swap', () => {
+    const game = createTestGame({
+      phase: 'betting',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ],
+      currentBets: [
+        { playerId: 'p1', amount: 8, withoutTrump: false },
+        { playerId: 'p3', amount: 9, withoutTrump: true },
+      ],
+    });
+
+    applyPositionSwap(game, 'p1', 'p3');
+
+    // Bets should now reference swapped player IDs
+    expect(game.currentBets[0].playerId).toBe('p3');
+    expect(game.currentBets[1].playerId).toBe('p1');
+  });
+
+  it('should update highestBet reference after swap', () => {
+    const game = createTestGame({
+      phase: 'betting',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ],
+      highestBet: { playerId: 'p1', amount: 10, withoutTrump: true },
+    });
+
+    applyPositionSwap(game, 'p1', 'p2');
+
+    // Highest bet should now reference p2
+    expect(game.highestBet?.playerId).toBe('p2');
+  });
+
+  it('should recalculate team IDs based on position after swap', () => {
+    const game = createTestGame({
+      phase: 'playing',
+      players: [
+        { id: 'p1', name: 'P1', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p2', name: 'P2', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+        { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
+        { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
+      ],
+    });
+
+    applyPositionSwap(game, 'p1', 'p2');
+
+    // After swap, team IDs should follow 1-2-1-2 pattern based on position
+    expect(game.players[0].teamId).toBe(1); // p2 now at index 0
+    expect(game.players[1].teamId).toBe(2); // p1 now at index 1
+    expect(game.players[2].teamId).toBe(1); // p3 still at index 2
+    expect(game.players[3].teamId).toBe(2); // p4 still at index 3
+  });
+
   it('should do nothing if player not found', () => {
     const game = createTestGame({ phase: 'team_selection' });
     const originalOrder = game.players.map(p => p.id);

@@ -60,7 +60,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
       setSwapMode(false);
       setSelectedPlayerToSwap(null);
     } else if (swapMode && selectedPlayerToSwap && selectedPlayerToSwap !== playerId) {
-      // Complete the swap
+      // Complete the swap (allow swapping with yourself)
       if (onSwapPosition) {
         onSwapPosition(playerId);
       }
@@ -75,15 +75,17 @@ export const BotManagementPanel = memo(function BotManagementPanel({
 
   // Can swap with other players based on game phase
   const canSwap = (player: typeof gameState.players[0]) => {
-    if (!onSwapPosition || player.isEmpty || player.id === currentPlayerId) {
+    if (!onSwapPosition || player.isEmpty) {
       return false;
     }
 
-    // Can swap with any player during any phase (except game_over)
+    // All players can swap with any other player (bots and humans)
+    // You can't swap with yourself, but you can swap with anyone else
     // Position-based team assignment (1-2-1-2 pattern) enforced after swap
     // Human-to-human swaps require confirmation (handled by App.tsx)
+    // Bot swaps are immediate, human swaps require confirmation
     if (gameState.phase !== 'game_over') {
-      return player.isBot === true;
+      return true;  // Allow swapping with ALL players (bots and humans)
     }
 
     return false;

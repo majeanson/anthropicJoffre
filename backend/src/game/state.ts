@@ -243,12 +243,26 @@ export function applyPositionSwap(
       hand: [...player1.hand],
       tricksWon: player1.tricksWon,
       pointsWon: player1.pointsWon,
+      isBot: player1.isBot,
+      botDifficulty: player1.botDifficulty,
+      connectionStatus: player1.connectionStatus,
+      disconnectedAt: player1.disconnectedAt,
+      reconnectTimeLeft: player1.reconnectTimeLeft,
+      isEmpty: player1.isEmpty,
+      emptySlotName: player1.emptySlotName,
     };
 
     const player2Data = {
       hand: [...player2.hand],
       tricksWon: player2.tricksWon,
       pointsWon: player2.pointsWon,
+      isBot: player2.isBot,
+      botDifficulty: player2.botDifficulty,
+      connectionStatus: player2.connectionStatus,
+      disconnectedAt: player2.disconnectedAt,
+      reconnectTimeLeft: player2.reconnectTimeLeft,
+      isEmpty: player2.isEmpty,
+      emptySlotName: player2.emptySlotName,
     };
 
     console.log(`🔄 SWAP: Stored player1Data.hand length: ${player1Data.hand.length}`);
@@ -267,10 +281,24 @@ export function applyPositionSwap(
     game.players[player1Index].hand = player1Data.hand;  // player2's object gets player1's hand
     game.players[player1Index].tricksWon = player1Data.tricksWon;
     game.players[player1Index].pointsWon = player1Data.pointsWon;
+    game.players[player1Index].isBot = player1Data.isBot;
+    game.players[player1Index].botDifficulty = player1Data.botDifficulty;
+    game.players[player1Index].connectionStatus = player1Data.connectionStatus;
+    game.players[player1Index].disconnectedAt = player1Data.disconnectedAt;
+    game.players[player1Index].reconnectTimeLeft = player1Data.reconnectTimeLeft;
+    game.players[player1Index].isEmpty = player1Data.isEmpty;
+    game.players[player1Index].emptySlotName = player1Data.emptySlotName;
 
     game.players[player2Index].hand = player2Data.hand;  // player1's object gets player2's hand
     game.players[player2Index].tricksWon = player2Data.tricksWon;
     game.players[player2Index].pointsWon = player2Data.pointsWon;
+    game.players[player2Index].isBot = player2Data.isBot;
+    game.players[player2Index].botDifficulty = player2Data.botDifficulty;
+    game.players[player2Index].connectionStatus = player2Data.connectionStatus;
+    game.players[player2Index].disconnectedAt = player2Data.disconnectedAt;
+    game.players[player2Index].reconnectTimeLeft = player2Data.reconnectTimeLeft;
+    game.players[player2Index].isEmpty = player2Data.isEmpty;
+    game.players[player2Index].emptySlotName = player2Data.emptySlotName;
 
     console.log(`🔄 SWAP: After - Player at index ${player1Index} (${game.players[player1Index].name}) has ${game.players[player1Index].hand.length} cards`);
     console.log(`🔄 SWAP: After - Player at index ${player2Index} (${game.players[player2Index].name}) has ${game.players[player2Index].hand.length} cards`);
