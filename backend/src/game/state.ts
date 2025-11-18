@@ -235,6 +235,8 @@ export function applyPositionSwap(
 
     console.log(`🔄 SWAP: Before - Player1(${player1.name}) at index ${player1Index} has ${player1.hand.length} cards`);
     console.log(`🔄 SWAP: Before - Player2(${player2.name}) at index ${player2Index} has ${player2.hand.length} cards`);
+    console.log(`🔄 SWAP: Player1 hand:`, player1.hand.map(c => `${c.color}-${c.value}`).join(', '));
+    console.log(`🔄 SWAP: Player2 hand:`, player2.hand.map(c => `${c.color}-${c.value}`).join(', '));
 
     // Store complete player data before swap
     const player1Data = {
@@ -248,6 +250,9 @@ export function applyPositionSwap(
       tricksWon: player2.tricksWon,
       pointsWon: player2.pointsWon,
     };
+
+    console.log(`🔄 SWAP: Stored player1Data.hand length: ${player1Data.hand.length}`);
+    console.log(`🔄 SWAP: Stored player2Data.hand length: ${player2Data.hand.length}`);
 
     // Swap positions in array
     [game.players[player1Index], game.players[player2Index]] =
