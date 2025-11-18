@@ -246,21 +246,14 @@ export function validatePositionSwap(
     return err('Cannot swap position with yourself');
   }
 
-  // During team selection: Can only swap with players on the same team
-  if (game.phase === 'team_selection') {
-    if (initiator.teamId !== target.teamId) {
-      return err('Can only swap positions with teammates');
-    }
-  }
-
-  // During active gameplay: Can swap with any player (any team)
-  // Position-based team assignment (1-2-1-2 pattern) will be enforced after swap
-  // Note: Human-to-human swaps require confirmation (handled at socket handler level)
-
   // Cannot swap during game_over phase
   if (game.phase === 'game_over') {
     return err('Cannot swap positions after the game has ended');
   }
+
+  // Can swap with any player during any phase (except game_over)
+  // Position-based team assignment (1-2-1-2 pattern) will be enforced after swap
+  // Note: Human-to-human swaps require confirmation (handled at socket handler level)
 
   return ok(undefined);
 }

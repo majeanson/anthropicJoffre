@@ -279,7 +279,7 @@ describe('lobby handlers', () => {
       expect(game.players[1].name).toBe('P1');
     });
 
-    it('should reject cross-team swaps', () => {
+    it('should detect cross-team scenarios', () => {
       const game = createTestGame({
         players: [
           { id: '1', name: 'P1', hand: [], teamId: 1, isBot: false, isConnected: true },
@@ -290,8 +290,10 @@ describe('lobby handlers', () => {
       const player1 = game.players[0];
       const player2 = game.players[1];
 
-      const canSwap = player1.teamId === player2.teamId;
-      expect(canSwap).toBe(false);
+      // Note: Cross-team swaps are now allowed in Sprint 16.1
+      // This test just verifies team detection logic
+      const areDifferentTeams = player1.teamId !== player2.teamId;
+      expect(areDifferentTeams).toBe(true);
     });
 
     it('should update player order', () => {

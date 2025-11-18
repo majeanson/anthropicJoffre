@@ -454,7 +454,7 @@ describe('validatePositionSwap', () => {
     expect(result.success).toBe(true);
   });
 
-  it('should reject cross-team swap during team_selection', () => {
+  it('should allow cross-team swap during team_selection', () => {
     const game = createTestGame({
       phase: 'team_selection',
       players: [
@@ -466,10 +466,8 @@ describe('validatePositionSwap', () => {
     });
     const result = validatePositionSwap(game, 'p1', 'p2'); // Different teams
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error).toBe('Can only swap positions with teammates');
-    }
+    // Should succeed - position determines team after swap (1-2-1-2 pattern)
+    expect(result.success).toBe(true);
   });
 });
 

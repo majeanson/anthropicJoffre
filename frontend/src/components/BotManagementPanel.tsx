@@ -79,13 +79,9 @@ export const BotManagementPanel = memo(function BotManagementPanel({
       return false;
     }
 
-    // During team_selection: can swap with any teammate
-    if (gameState.phase === 'team_selection') {
-      const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
-      return currentPlayer && currentPlayer.teamId === player.teamId;
-    }
-
-    // During active gameplay: can only swap with bots (any team)
+    // Can swap with any player during any phase (except game_over)
+    // Position-based team assignment (1-2-1-2 pattern) enforced after swap
+    // Human-to-human swaps require confirmation (handled by App.tsx)
     if (gameState.phase !== 'game_over') {
       return player.isBot === true;
     }
