@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import { GameState, BotDifficulty } from '../types/game';
 
 interface BotManagementPanelProps {
@@ -27,9 +27,6 @@ export const BotManagementPanel = memo(function BotManagementPanel({
   // Early return BEFORE any logic to prevent flickering
   if (!isOpen || !gameState) return null;
 
-  const [swapMode, setSwapMode] = useState(false);
-  const [selectedPlayerToSwap, setSelectedPlayerToSwap] = useState<string | null>(null);
-
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
   const botCount = gameState.players.filter(p => p.isBot).length;
   const canAddMoreBots = botCount < 3;
@@ -53,42 +50,24 @@ export const BotManagementPanel = memo(function BotManagementPanel({
            onKickPlayer;
   };
 
-  // Handle swap initiation
-  const handleSwapClick = (playerId: string) => {
-    if (swapMode && selectedPlayerToSwap === playerId) {
-      // Cancel swap if clicking the same player
-      setSwapMode(false);
-      setSelectedPlayerToSwap(null);
-    } else if (swapMode && selectedPlayerToSwap && selectedPlayerToSwap !== playerId) {
-      // Complete the swap (allow swapping with yourself)
-      if (onSwapPosition) {
-        onSwapPosition(playerId);
-      }
-      setSwapMode(false);
-      setSelectedPlayerToSwap(null);
-    } else {
-      // Start swap mode
-      setSwapMode(true);
-      setSelectedPlayerToSwap(playerId);
+  // Handle swap - single click swaps you with target player
+  const handleSwapClick = (targetPlayerId: string) => {
+    if (onSwapPosition) {
+      onSwapPosition(targetPlayerId);
     }
   };
 
   // Can swap with other players based on game phase
   const canSwap = (player: typeof gameState.players[0]) => {
-    if (!onSwapPosition || player.isEmpty) {
+    if (!onSwapPosition || player.isEmpty || player.id === currentPlayerId) {
       return false;
     }
 
-    // All players can swap with any other player (bots and humans)
-    // You can't swap with yourself, but you can swap with anyone else
+    // Allow swapping with any other player (bots and humans) during active game
     // Position-based team assignment (1-2-1-2 pattern) enforced after swap
     // Human-to-human swaps require confirmation (handled by App.tsx)
-    // Bot swaps are immediate, human swaps require confirmation
-    if (gameState.phase !== 'game_over') {
-      return true;  // Allow swapping with ALL players (bots and humans)
-    }
-
-    return false;
+    // Bot swaps are immediate
+    return gameState.phase !== 'game_over';
   };
 
   return (
@@ -112,11 +91,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
             </div>
           </div>
           <button
-            onClick={() => {
-              setSwapMode(false);
-              setSelectedPlayerToSwap(null);
-              onClose();
-            }}
+            onClick={onClose}
             className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
           >
             ✕
@@ -212,16 +187,10 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                             e.stopPropagation();
                             handleSwapClick(player.id);
                           }}
-                          className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                            swapMode && selectedPlayerToSwap === player.id
-                              ? 'bg-yellow-600 hover:bg-yellow-700 text-white ring-2 ring-yellow-400'
-                              : swapMode
-                              ? 'bg-green-600 hover:bg-green-700 text-white'
-                              : 'bg-blue-600 hover:bg-blue-700 text-white'
-                          }`}
-                          title={swapMode && selectedPlayerToSwap === player.id ? 'Cancel swap' : swapMode ? 'Swap with this bot' : 'Swap positions'}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                          title="Swap positions with this bot"
                         >
-                          {swapMode && selectedPlayerToSwap === player.id ? 'Cancel' : swapMode ? '↔️ Swap' : '↔️'}
+                          ↔️
                         </button>
                       )}
 
@@ -256,16 +225,10 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                               e.stopPropagation();
                               handleSwapClick(player.id);
                             }}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-all ${
-                              swapMode && selectedPlayerToSwap === player.id
-                                ? 'bg-yellow-600 hover:bg-yellow-700 text-white ring-2 ring-yellow-400'
-                                : swapMode
-                                ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white'
-                            }`}
-                            title={swapMode && selectedPlayerToSwap === player.id ? 'Cancel swap' : swapMode ? 'Swap with this player' : 'Swap positions'}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
+                            title="Swap positions with this player (requires confirmation)"
                           >
-                            {swapMode && selectedPlayerToSwap === player.id ? 'Cancel' : swapMode ? '↔️ Swap' : '↔️'}
+                            ↔️
                           </button>
                         )}
 
@@ -302,30 +265,9 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                     </div>
                   )}
                 </div>
-
-                {/* Swap Mode Indicator */}
-                {swapMode && selectedPlayerToSwap === player.id && (
-                  <div className="mt-2 text-sm bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-3 py-2 rounded-lg border-2 border-yellow-300 dark:border-yellow-600 font-semibold animate-pulse">
-                    👆 Click another player to swap positions
-                  </div>
-                )}
               </div>
             );
           })}
-
-          {/* Swap Mode Global Indicator */}
-          {swapMode && (
-            <div className="mt-4 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 border-2 border-blue-500 dark:border-blue-600 rounded-lg p-4 text-center">
-              <p className="text-blue-900 dark:text-blue-200 font-bold text-lg mb-2">
-                🔄 Swap Mode Active
-              </p>
-              <p className="text-blue-700 dark:text-blue-300 text-sm">
-                {selectedPlayerToSwap
-                  ? 'Click another player to complete the swap, or click the yellow "Cancel" button'
-                  : 'Select a player to swap with'}
-              </p>
-            </div>
-          )}
 
           {/* Help Text for Non-Creators */}
           {!isCreator && (
