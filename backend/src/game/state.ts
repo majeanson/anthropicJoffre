@@ -238,67 +238,40 @@ export function applyPositionSwap(
     console.log(`🔄 SWAP: Player1 hand:`, player1.hand.map(c => `${c.color}-${c.value}`).join(', '));
     console.log(`🔄 SWAP: Player2 hand:`, player2.hand.map(c => `${c.color}-${c.value}`).join(', '));
 
-    // Store complete player data before swap
-    const player1Data = {
+    // Store ONLY game state data that should be swapped (NOT player identity)
+    const player1GameData = {
       hand: [...player1.hand],
       tricksWon: player1.tricksWon,
       pointsWon: player1.pointsWon,
-      isBot: player1.isBot,
-      botDifficulty: player1.botDifficulty,
-      connectionStatus: player1.connectionStatus,
-      disconnectedAt: player1.disconnectedAt,
-      reconnectTimeLeft: player1.reconnectTimeLeft,
-      isEmpty: player1.isEmpty,
-      emptySlotName: player1.emptySlotName,
     };
 
-    const player2Data = {
+    const player2GameData = {
       hand: [...player2.hand],
       tricksWon: player2.tricksWon,
       pointsWon: player2.pointsWon,
-      isBot: player2.isBot,
-      botDifficulty: player2.botDifficulty,
-      connectionStatus: player2.connectionStatus,
-      disconnectedAt: player2.disconnectedAt,
-      reconnectTimeLeft: player2.reconnectTimeLeft,
-      isEmpty: player2.isEmpty,
-      emptySlotName: player2.emptySlotName,
     };
 
-    console.log(`🔄 SWAP: Stored player1Data.hand length: ${player1Data.hand.length}`);
-    console.log(`🔄 SWAP: Stored player2Data.hand length: ${player2Data.hand.length}`);
+    console.log(`🔄 SWAP: Stored player1GameData.hand length: ${player1GameData.hand.length}`);
+    console.log(`🔄 SWAP: Stored player2GameData.hand length: ${player2GameData.hand.length}`);
 
-    // Swap positions in array
+    // Swap positions in array (physically move player objects)
     [game.players[player1Index], game.players[player2Index]] =
       [game.players[player2Index], game.players[player1Index]];
 
-    // CRITICAL FIX: After swapping positions, the player references are now swapped!
-    // player1Index now contains player2's object, player2Index now contains player1's object
-    // So we need to assign the OPPOSITE data to each position:
-    // - Position player1Index (now has player2) should get player2's data
-    // - Position player2Index (now has player1) should get player1's data
-    // But we WANT to swap hands, so we assign cross-data:
-    game.players[player1Index].hand = player1Data.hand;  // player2's object gets player1's hand
-    game.players[player1Index].tricksWon = player1Data.tricksWon;
-    game.players[player1Index].pointsWon = player1Data.pointsWon;
-    game.players[player1Index].isBot = player1Data.isBot;
-    game.players[player1Index].botDifficulty = player1Data.botDifficulty;
-    game.players[player1Index].connectionStatus = player1Data.connectionStatus;
-    game.players[player1Index].disconnectedAt = player1Data.disconnectedAt;
-    game.players[player1Index].reconnectTimeLeft = player1Data.reconnectTimeLeft;
-    game.players[player1Index].isEmpty = player1Data.isEmpty;
-    game.players[player1Index].emptySlotName = player1Data.emptySlotName;
+    // After swapping positions:
+    // - player1Index now contains player2's object (with player2's id, name, isBot)
+    // - player2Index now contains player1's object (with player1's id, name, isBot)
+    // We swap ONLY the game data (hand, tricks, points), NOT identity (isBot, name, id)
 
-    game.players[player2Index].hand = player2Data.hand;  // player1's object gets player2's hand
-    game.players[player2Index].tricksWon = player2Data.tricksWon;
-    game.players[player2Index].pointsWon = player2Data.pointsWon;
-    game.players[player2Index].isBot = player2Data.isBot;
-    game.players[player2Index].botDifficulty = player2Data.botDifficulty;
-    game.players[player2Index].connectionStatus = player2Data.connectionStatus;
-    game.players[player2Index].disconnectedAt = player2Data.disconnectedAt;
-    game.players[player2Index].reconnectTimeLeft = player2Data.reconnectTimeLeft;
-    game.players[player2Index].isEmpty = player2Data.isEmpty;
-    game.players[player2Index].emptySlotName = player2Data.emptySlotName;
+    // Player2's object (now at player1Index) gets player1's game data
+    game.players[player1Index].hand = player1GameData.hand;
+    game.players[player1Index].tricksWon = player1GameData.tricksWon;
+    game.players[player1Index].pointsWon = player1GameData.pointsWon;
+
+    // Player1's object (now at player2Index) gets player2's game data
+    game.players[player2Index].hand = player2GameData.hand;
+    game.players[player2Index].tricksWon = player2GameData.tricksWon;
+    game.players[player2Index].pointsWon = player2GameData.pointsWon;
 
     console.log(`🔄 SWAP: After - Player at index ${player1Index} (${game.players[player1Index].name}) has ${game.players[player1Index].hand.length} cards`);
     console.log(`🔄 SWAP: After - Player at index ${player2Index} (${game.players[player2Index].name}) has ${game.players[player2Index].hand.length} cards`);

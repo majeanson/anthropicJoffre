@@ -352,22 +352,23 @@ describe('applyPositionSwap', () => {
     expect(game.players[0].id).toBe('p3');
     expect(game.players[2].id).toBe('p1');
 
-    // Check that game data swapped (player at index 0 has p1's data)
+    // Check that ONLY game data swapped (hand, tricks, points), NOT identity (isBot)
+    // Player p3 (bot) moved to index 0, gets p1's game data but keeps bot identity
     expect(game.players[0].hand).toEqual([{color: 'red', value: 1}, {color: 'blue', value: 2}]);
     expect(game.players[0].tricksWon).toBe(3);
     expect(game.players[0].pointsWon).toBe(5);
-    expect(game.players[0].isBot).toBe(false);
-    expect(game.players[0].botDifficulty).toBeUndefined();
+    expect(game.players[0].isBot).toBe(true); // PRESERVED: p3 stays a bot
+    expect(game.players[0].botDifficulty).toBe('hard'); // PRESERVED: p3 keeps difficulty
 
-    // Check that game data swapped (player at index 2 has p3's data)
+    // Player p1 (human) moved to index 2, gets p3's game data but keeps human identity
     expect(game.players[2].hand).toEqual([{color: 'green', value: 3}, {color: 'brown', value: 4}]);
     expect(game.players[2].tricksWon).toBe(1);
     expect(game.players[2].pointsWon).toBe(2);
-    expect(game.players[2].isBot).toBe(true);
-    expect(game.players[2].botDifficulty).toBe('hard');
+    expect(game.players[2].isBot).toBe(false); // PRESERVED: p1 stays human
+    expect(game.players[2].botDifficulty).toBeUndefined(); // PRESERVED: p1 has no difficulty
   });
 
-  it('should swap bot status and difficulty', () => {
+  it('should preserve bot status and difficulty when swapping', () => {
     const game = createTestGame({
       phase: 'playing',
       players: [
@@ -380,16 +381,16 @@ describe('applyPositionSwap', () => {
 
     applyPositionSwap(game, 'p1', 'p2');
 
-    // Bot (now at index 0) should have human's data (false bot status)
-    expect(game.players[0].isBot).toBe(false);
-    expect(game.players[0].botDifficulty).toBeUndefined();
+    // Bot p2 moved to index 0, should KEEP bot status (identity preserved)
+    expect(game.players[0].isBot).toBe(true);
+    expect(game.players[0].botDifficulty).toBe('medium');
 
-    // Human (now at index 1) should have bot's data (true bot status and difficulty)
-    expect(game.players[1].isBot).toBe(true);
-    expect(game.players[1].botDifficulty).toBe('medium');
+    // Human p1 moved to index 1, should KEEP human status (identity preserved)
+    expect(game.players[1].isBot).toBe(false);
+    expect(game.players[1].botDifficulty).toBeUndefined();
   });
 
-  it('should swap connection status fields', () => {
+  it('should preserve connection status fields when swapping', () => {
     const game = createTestGame({
       phase: 'playing',
       players: [
@@ -408,15 +409,15 @@ describe('applyPositionSwap', () => {
 
     applyPositionSwap(game, 'p1', 'p2');
 
-    // Disconnected player (now at index 0) should have connected player's data
-    expect(game.players[0].connectionStatus).toBe('connected');
-    expect(game.players[0].disconnectedAt).toBeUndefined();
-    expect(game.players[0].reconnectTimeLeft).toBeUndefined();
+    // Disconnected player p2 moved to index 0, should KEEP disconnected status
+    expect(game.players[0].connectionStatus).toBe('disconnected');
+    expect(game.players[0].disconnectedAt).toBe(12345);
+    expect(game.players[0].reconnectTimeLeft).toBe(30);
 
-    // Connected player (now at index 1) should have disconnected player's data
-    expect(game.players[1].connectionStatus).toBe('disconnected');
-    expect(game.players[1].disconnectedAt).toBe(12345);
-    expect(game.players[1].reconnectTimeLeft).toBe(30);
+    // Connected player p1 moved to index 1, should KEEP connected status
+    expect(game.players[1].connectionStatus).toBe('connected');
+    expect(game.players[1].disconnectedAt).toBeUndefined();
+    expect(game.players[1].reconnectTimeLeft).toBeUndefined();
   });
 
   it('should update currentTrick references after swap', () => {
