@@ -253,15 +253,19 @@ export function applyPositionSwap(
     [game.players[player1Index], game.players[player2Index]] =
       [game.players[player2Index], game.players[player1Index]];
 
-    // Swap game data (hand, tricks, points)
-    // After position swap, player1 is now at player2Index and vice versa
-    game.players[player2Index].hand = player1Data.hand;
-    game.players[player2Index].tricksWon = player1Data.tricksWon;
-    game.players[player2Index].pointsWon = player1Data.pointsWon;
+    // CRITICAL FIX: After swapping positions, the player references are now swapped!
+    // player1Index now contains player2's object, player2Index now contains player1's object
+    // So we need to assign the OPPOSITE data to each position:
+    // - Position player1Index (now has player2) should get player2's data
+    // - Position player2Index (now has player1) should get player1's data
+    // But we WANT to swap hands, so we assign cross-data:
+    game.players[player1Index].hand = player1Data.hand;  // player2's object gets player1's hand
+    game.players[player1Index].tricksWon = player1Data.tricksWon;
+    game.players[player1Index].pointsWon = player1Data.pointsWon;
 
-    game.players[player1Index].hand = player2Data.hand;
-    game.players[player1Index].tricksWon = player2Data.tricksWon;
-    game.players[player1Index].pointsWon = player2Data.pointsWon;
+    game.players[player2Index].hand = player2Data.hand;  // player1's object gets player2's hand
+    game.players[player2Index].tricksWon = player2Data.tricksWon;
+    game.players[player2Index].pointsWon = player2Data.pointsWon;
 
     console.log(`🔄 SWAP: After - Player at index ${player1Index} (${game.players[player1Index].name}) has ${game.players[player1Index].hand.length} cards`);
     console.log(`🔄 SWAP: After - Player at index ${player2Index} (${game.players[player2Index].name}) has ${game.players[player2Index].hand.length} cards`);
