@@ -1070,6 +1070,8 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                       // Create combined hand: actual hand + card in transition (if it's no longer in hand)
                       const displayHand = [...currentPlayer!.hand];
 
+                      console.log(`🎴 Rendering hand for ${currentPlayer!.name}: ${displayHand.map(c => `${c.color}-${c.value}`).join(', ')}`);
+
                       // If a card is in transition and not in the current hand, add it temporarily
                       if (cardInTransition && !currentPlayer!.hand.some(c => c.color === cardInTransition.color && c.value === cardInTransition.value)) {
                         displayHand.push(cardInTransition);
