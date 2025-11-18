@@ -42,6 +42,8 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
   // Early returns before hooks are safe, but early returns AFTER hooks will cause React to crash
   const playerLookup = isSpectator ? gameState.players[0] : gameState.players.find(p => p.id === currentPlayerId);
 
+  console.log(`🎮 PlayingPhase render - currentPlayerId: ${currentPlayerId}, found player: ${playerLookup?.name} at index ${gameState.players.findIndex(p => p.id === currentPlayerId)}, hand size: ${playerLookup?.hand.length}`);
+
   // Safety check: If player not found and not spectator, show error BEFORE calling any hooks
   if (!playerLookup && !isSpectator) {
     return (
