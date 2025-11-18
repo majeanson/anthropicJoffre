@@ -547,8 +547,8 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // STATE TRANSFORMATION - Use pure state function
     applyPositionSwap(game, socket.id, targetPlayerId);
 
-    // I/O - Emit updates
-    emitGameUpdate(gameId, game);
+    // I/O - Emit updates (force full update to ensure hands are synced)
+    emitGameUpdate(gameId, game, true);
   }));
 
   // ============================================================================
@@ -675,8 +675,8 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
         message: `You swapped positions with ${requester.name}`
       });
 
-      // Update all players with new game state
-      emitGameUpdate(gameId, game);
+      // Update all players with new game state (force full update to ensure hands are synced)
+      emitGameUpdate(gameId, game, true);
     } else {
       // Notify requester of rejection
       io.to(requesterId).emit('swap_rejected', {
