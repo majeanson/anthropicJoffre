@@ -29,6 +29,9 @@ import {
   sanitizeChatMessage,
 } from './chatHelpers';
 
+// Constants
+const MAX_MESSAGE_LENGTH = 500;
+
 /**
  * Database chat message type (snake_case from database)
  */
@@ -283,5 +286,160 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
       logger.error('Failed to load game chat history', { error: err, gameId, socketId: socket.id });
       socket.emit('error', { message: 'Failed to load chat history' });
     }
+  }));
+
+  // ============================================================================
+  // UNIFIED send_chat_message - Routes to appropriate chat handler based on context
+  // Sprint 16 Day 3 Task 4.3 - Backward compatible unified handler
+  // Note: The old events (send_lobby_chat, send_team_selection_chat, send_game_chat)
+  // remain active for backward compatibility
+  // ============================================================================
+  socket.on('send_chat_message', errorBoundaries.gameAction('send_chat_message')(async (payload: {
+    roomType: 'lobby' | 'team' | 'game';
+    gameId?: string;
+    message: string;
+    playerName?: string; // For lobby chat
+  }) => {
+    const { roomType, gameId, message, playerName } = payload;
+
+    // Validate message
+    if (!message || typeof message !== 'string' || message.trim().length === 0) {
+      socket.emit('error', { message: 'Message cannot be empty' });
+      return;
+    }
+
+    const sanitizedMessage = message.trim().substring(0, MAX_MESSAGE_LENGTH);
+
+    // Route to appropriate handler logic based on roomType
+    switch (roomType) {
+      case 'lobby':
+        // Lobby chat logic
+        if (!playerName || playerName.trim().length === 0) {
+          socket.emit('error', { message: 'Player name is required for lobby chat' });
+          return;
+        }
+
+        // Check rate limit
+        const ipAddress = getSocketIP(socket);
+        const lobbyRateCheck = rateLimitChatMessage(
+          playerName.trim(),
+          ipAddress,
+          rateLimiters.chat,
+          socket,
+          logger,
+          'send_lobby_chat'
+        );
+        if (!lobbyRateCheck.allowed) return;
+
+        // Emit to all connected clients
+        io.emit('lobby_chat_message', {
+          playerName: playerName.trim(),
+          message: sanitizedMessage,
+          timestamp: Date.now()
+        });
+
+        // Save to database
+        saveChatMessage('lobby', playerName.trim(), sanitizedMessage)
+          .catch(err => logger.error('Failed to save lobby chat message', { error: err }));
+        break;
+
+      case 'team':
+        // Team selection chat logic
+        if (!gameId) {
+          socket.emit('error', { message: 'Game ID is required for team chat' });
+          return;
+        }
+
+        const teamGame = games.get(gameId);
+        if (!teamGame) {
+          socket.emit('error', { message: 'Game not found' });
+          return;
+        }
+
+        const teamPlayer = teamGame.players.find(p => p.id === socket.id);
+        if (!teamPlayer) {
+          socket.emit('error', { message: 'You are not in this game' });
+          return;
+        }
+
+        // Check rate limit
+        const teamIpAddress = getSocketIP(socket);
+        const teamRateCheck = rateLimitChatMessage(
+          teamPlayer.name,
+          teamIpAddress,
+          rateLimiters.chat,
+          socket,
+          logger,
+          'send_team_selection_chat'
+        );
+        if (!teamRateCheck.allowed) return;
+
+        // Emit to room
+        io.to(gameId).emit('team_selection_chat', {
+          playerName: teamPlayer.name,
+          message: sanitizedMessage,
+          teamId: teamPlayer.teamId || 0,
+          timestamp: Date.now()
+        });
+
+        // Save to database
+        saveChatMessage('game', teamPlayer.name, sanitizedMessage, gameId, teamPlayer.teamId)
+          .catch(err => logger.error('Failed to save team chat message', { error: err }));
+        break;
+
+      case 'game':
+        // In-game chat logic
+        if (!gameId) {
+          socket.emit('error', { message: 'Game ID is required for game chat' });
+          return;
+        }
+
+        const game = games.get(gameId);
+        if (!game) {
+          socket.emit('error', { message: 'Game not found' });
+          return;
+        }
+
+        const gamePlayer = game.players.find(p => p.id === socket.id);
+        if (!gamePlayer) {
+          socket.emit('error', { message: 'You are not in this game' });
+          return;
+        }
+
+        // Check rate limit
+        const gameIpAddress = getSocketIP(socket);
+        const gameRateCheck = rateLimitChatMessage(
+          gamePlayer.name,
+          gameIpAddress,
+          rateLimiters.chat,
+          socket,
+          logger,
+          'send_game_chat'
+        );
+        if (!gameRateCheck.allowed) return;
+
+        // Emit to room
+        io.to(gameId).emit('game_chat', {
+          playerName: gamePlayer.name,
+          message: sanitizedMessage,
+          teamId: gamePlayer.teamId || 0,
+          timestamp: Date.now()
+        });
+
+        // Save to database
+        saveChatMessage('game', gamePlayer.name, sanitizedMessage, gameId, gamePlayer.teamId)
+          .catch(err => logger.error('Failed to save game chat message', { error: err }));
+        break;
+
+      default:
+        socket.emit('error', { message: `Unknown chat room type: ${roomType}` });
+    }
+
+    logger.debug('Unified chat message processed', {
+      roomType,
+      gameId,
+      playerName,
+      socketId: socket.id
+    });
   }));
 }

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState, RoundStatistics } from '../types/game';
-import { ChatPanel, ChatMessage } from './ChatPanel';
+import { UnifiedChat } from './UnifiedChat';
+import { ChatMessage } from '../types/game';
 import { sounds } from '../utils/sounds';
 import { GameHeader } from './GameHeader';
 import { TrickHistory } from './TrickHistory';
@@ -136,14 +137,30 @@ export function ScoringPhase({
 
       {/* Chat Panel */}
       {socket && onNewChatMessage && (
-        <ChatPanel
+        <UnifiedChat
+          mode="panel"
+          context="game"
           socket={socket}
           gameId={gameId}
           currentPlayerId={currentPlayerId}
           isOpen={chatOpen}
           onClose={() => setChatOpen(false)}
           messages={chatMessages}
-          onNewMessage={onNewChatMessage}
+          onSendMessage={(message) => {
+            socket.emit('send_game_chat', {
+              gameId,
+              message: message.trim()
+            });
+            // Trigger new message callback for sound effects
+            onNewChatMessage({
+              playerId: currentPlayerId,
+              playerName: gameState.players.find(p => p.id === currentPlayerId)?.name || 'Unknown',
+              message: message.trim(),
+              timestamp: Date.now(),
+              teamId: gameState.players.find(p => p.id === currentPlayerId)?.teamId || null
+            });
+          }}
+          title="💬 Game Chat"
         />
       )}
 

@@ -40,7 +40,7 @@ export function migratePlayerIdentity(params: MigrationParams): void {
     migrateRoundStatsMaps(roundStats, oldPlayerName, newPlayerName);
   }
 
-  // 2. Migrate currentTrick playerName (BUG FIX: currently only playerId is updated)
+  // 2. Migrate currentTrick playerName (playerId is updated in bot handler before this call)
   migrateCurrentTrick(gameState, oldPlayerName, newPlayerName);
 
   // 3. Migrate currentRoundTricks (not migrated at all currently)

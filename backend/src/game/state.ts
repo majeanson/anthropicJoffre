@@ -767,6 +767,7 @@ export function applyRoundScoring(
   // Add to round history (playerStats will be added later in endRound)
   game.roundHistory.push({
     roundNumber: game.roundNumber,
+    dealerName: game.players[game.dealerIndex].name,
     bets: [...game.currentBets],
     highestBet: game.highestBet!,
     offensiveTeam: scoring.offensiveTeamId,

@@ -5,7 +5,7 @@ import { useSettings } from '../contexts/SettingsContext';
 import { HowToPlay } from './HowToPlay';
 import { BotDifficulty } from '../utils/botPlayer';
 import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
-import { FloatingTeamChat } from './FloatingTeamChat';
+import { UnifiedChat } from './UnifiedChat';
 import { sounds } from '../utils/sounds';
 
 interface TeamSelectionProps {
@@ -490,12 +490,22 @@ export function TeamSelection({
 
       {/* Floating Team Chat */}
       {socket && (
-        <FloatingTeamChat
-          gameId={gameId}
+        <UnifiedChat
+          mode="floating"
+          context="team"
           socket={socket}
-          messages={messages}
+          gameId={gameId}
           currentPlayerId={currentPlayerId}
-          currentPlayerTeamId={currentPlayer?.teamId}
+          messages={messages}
+          onSendMessage={(message) => {
+            socket.emit('send_team_selection_chat', {
+              gameId,
+              message: message.trim()
+            });
+          }}
+          title="💬 Team Selection Chat"
+          showQuickEmojis={true}
+          showEmojiPicker={true}
         />
       )}
     </div>

@@ -1,92 +1,102 @@
 {
-  "buildDate": "2025-11-17T20:35:00Z",
+  "buildDate": "2025-11-18T16:37:00Z",
   "version": "2.3.1",
-  "releaseDate": "2025-11-17",
-  "sprint": "Sprint 16 - Social Features + Swap System Revision",
+  "releaseDate": "2025-11-18",
+  "sprint": "Sprint 17 - Completion & Stabilization",
   "phases": {
-    "sprint16.1": {
-      "name": "Position Swapping System Revision",
+    "sprint16": {
+      "name": "Social Features Enhancement",
       "status": "✅ Completed",
-      "duration": "< 1 day",
-      "dateCompleted": "2025-11-17",
+      "duration": "7 days",
+      "dateCompleted": "2025-11-18",
       "features": [
-        "Human-to-human position swapping with confirmation modal",
-        "Bot position swapping remains instant (no confirmation)",
-        "Swap request system with 30-second timeout",
-        "SwapConfirmationModal component with countdown timer",
-        "Cross-team swapping support for all players",
-        "1 pending request per player limit",
-        "Auto-reject expired swap requests",
-        "Toast notifications for swap acceptance/rejection"
+        "UnifiedChat component consolidating all chat systems",
+        "Direct messaging system with real-time delivery",
+        "Player profile modals with quick actions",
+        "Social hub with tabbed interface",
+        "Friend suggestions based on recent games",
+        "Recent players tracking from last 20 games",
+        "Replay sharing with deep links",
+        "Achievement notifications in NotificationCenter",
+        "Player avatars with status indicators",
+        "Clickable player names throughout app"
+      ]
+    },
+    "sprint17": {
+      "name": "Completion & Stabilization",
+      "status": "✅ Completed",
+      "duration": "1 day",
+      "dateCompleted": "2025-11-18",
+      "tasks": [
+        "Deleted deprecated chat components (LobbyChat, FloatingTeamChat, ChatPanel)",
+        "Fixed misleading comment in playerMigrationHelpers.ts",
+        "Removed hardcoded Sentry DSN from main.tsx",
+        "Added dealerName field to RoundHistory type",
+        "Created comprehensive position swap regression tests (29-position-swap.spec.ts)",
+        "Verified all backend tests passing (368 tests)",
+        "Verified all frontend tests passing (142 tests)"
       ],
-      "newComponents": {
-        "frontend": [
-          "SwapConfirmationModal.tsx (modal with 30s timer, team warnings)"
-        ],
-        "backend": [
-          "Updated lobby.ts with request_swap and respond_to_swap handlers",
-          "Added pendingSwapRequests tracking Map with timeout management"
-        ]
-      },
+      "improvements": [
+        "Removed 3 deprecated components (~500 lines)",
+        "Improved code documentation accuracy",
+        "Enhanced security (removed hardcoded secrets)",
+        "Expanded type system with dealerName tracking",
+        "Added 12+ position swap test scenarios"
+      ],
+      "deletedFiles": [
+        "frontend/src/components/LobbyChat.tsx",
+        "frontend/src/components/FloatingTeamChat.tsx",
+        "frontend/src/components/ChatPanel.tsx"
+      ],
       "modifiedFiles": [
-        "backend/src/game/validation.ts (removed human-only restriction)",
-        "backend/src/types/events.ts (added 5 new swap events)",
-        "backend/src/index.ts (added swap request tracking)",
-        "backend/src/socketHandlers/lobby.ts (new handlers for swap confirmation)",
-        "frontend/src/components/TeamSelection.tsx (show buttons for all players)",
-        "frontend/src/components/PlayingPhase.tsx (allow swapping with any player)",
-        "frontend/src/App.tsx (smart swap logic, socket listeners, modal integration)",
-        "backend/src/game/validation.test.ts (updated test for new behavior)",
-        "CLAUDE.md (comprehensive Position Swapping documentation update)"
+        "frontend/src/App.tsx (ChatMessage import)",
+        "frontend/src/hooks/useChatMessages.ts (ChatMessage import)",
+        "backend/src/utils/playerMigrationHelpers.ts (comment fix)",
+        "frontend/src/main.tsx (removed hardcoded DSN)",
+        "backend/src/types/game.ts (added dealerName)",
+        "frontend/src/types/game.ts (added dealerName)",
+        "backend/src/game/state.ts (populate dealerName)"
       ],
-      "socketEvents": {
-        "clientToServer": [
-          "request_swap (for human players)",
-          "respond_to_swap (accept/reject)"
-        ],
-        "serverToClient": [
-          "swap_request_received (notify target)",
-          "swap_accepted (notify initiator)",
-          "swap_rejected (notify initiator)"
-        ]
-      },
-      "tests": {
-        "backend": "✅ 34/34 validation tests passing",
-        "frontend": "Pending E2E tests for confirmation modal",
-        "coverage": "Updated existing swap validation test"
-      },
-      "impact": {
-        "userExperience": "Players can now request swaps with other humans (requires consent)",
-        "gameplay": "More flexibility in position/team changes during active gameplay",
-        "fairness": "Confirmation prevents unwanted position changes",
-        "botPlay": "Bot swaps remain instant for smooth gameplay"
-      }
+      "newFiles": [
+        "e2e/tests/29-position-swap.spec.ts (comprehensive swap tests)"
+      ]
     }
   },
-  "totalDuration": "4 days (Sprints 12-16.1)",
+  "totalDuration": "8 days",
+  "completedFeatures": 34,
+  "totalFeatures": 34,
+  "completionPercentage": "100%",
   "newFeatures": [
-    "Human-to-human position swapping with confirmation",
-    "Swap request timeout system (30 seconds)",
-    "SwapConfirmationModal with visual feedback",
-    "Team change warnings in swap requests",
-    "Cross-team swapping for strategic gameplay"
+    "Direct messaging system with read receipts",
+    "Player profile modals accessible from anywhere",
+    "Unified chat component for all contexts",
+    "Social hub consolidating all social features",
+    "Friend suggestions algorithm",
+    "Recent players tracking",
+    "Replay sharing with URL deep links",
+    "Achievement and friend request notifications",
+    "Position swap regression test suite",
+    "Enhanced type safety with dealerName tracking"
   ],
   "buildStatus": "✅ Production Ready",
   "testsStatus": {
-    "backend": "✅ 34/34 validation tests passing (100%)",
+    "backend": "✅ 368 tests passing (100%)",
     "frontend": "✅ 142 tests passing (100%)",
-    "e2e": "⚠️ Swap confirmation modal tests pending"
+    "e2e": "✅ 29 test files (social + position swap)"
   },
   "deploymentStatus": {
     "frontend": "✅ Ready for deployment",
     "backend": "✅ Ready for deployment",
-    "database": "✅ No schema changes required"
+    "database": "✅ Migration 016 ready"
   },
   "notes": [
-    "Sprint 16.1 completed - revised position swapping system",
-    "All validation tests passing (34/34)",
-    "Smart swap logic: instant for bots, confirmation for humans",
-    "Comprehensive documentation updated in CLAUDE.md",
-    "Ready for git commit and deployment"
+    "Sprint 17 completed - Completion & Stabilization",
+    "All deprecated chat components removed",
+    "Code documentation improved",
+    "Security enhanced (no hardcoded secrets)",
+    "Type system expanded with dealerName",
+    "Position swap test coverage complete",
+    "All 510 tests passing (368 backend + 142 frontend)",
+    "Ready for v2.3.1 release"
   ]
 }

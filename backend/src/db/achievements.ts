@@ -3,7 +3,7 @@
  * Sprint 2 Phase 1
  */
 
-import { query } from './index';
+import { query, getPool } from './index';
 import {
   Achievement,
   PlayerAchievement,
@@ -175,4 +175,17 @@ export async function getAchievementLeaderboard(
   );
 
   return result.rows;
+}
+
+/**
+ * Reset all achievements for a player (for testing)
+ */
+export async function resetPlayerAchievements(playerName: string): Promise<void> {
+  const pool = await getPool();
+  if (!pool) return;
+
+  await pool.query(
+    `DELETE FROM player_achievements WHERE player_name = $1`,
+    [playerName]
+  );
 }

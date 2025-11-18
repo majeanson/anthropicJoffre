@@ -4,7 +4,8 @@ import { Bet, Player, GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { Leaderboard } from './Leaderboard';
-import { ChatPanel, ChatMessage } from './ChatPanel';
+import { UnifiedChat } from './UnifiedChat';
+import { ChatMessage } from '../types/game';
 import { GameHeader } from './GameHeader';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { sounds } from '../utils/sounds';
@@ -422,14 +423,30 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
       />
 
       {socket && gameId && onNewChatMessage && (
-        <ChatPanel
+        <UnifiedChat
+          mode="panel"
+          context="game"
           socket={socket}
           gameId={gameId}
           currentPlayerId={currentPlayerId}
           isOpen={chatOpen}
           onClose={() => setChatOpen(false)}
           messages={chatMessages}
-          onNewMessage={onNewChatMessage}
+          onSendMessage={(message) => {
+            socket.emit('send_game_chat', {
+              gameId,
+              message: message.trim()
+            });
+            // Trigger new message callback for sound effects
+            onNewChatMessage({
+              playerId: currentPlayerId,
+              playerName: currentPlayer?.name || 'Unknown',
+              message: message.trim(),
+              timestamp: Date.now(),
+              teamId: currentPlayer?.teamId || null
+            });
+          }}
+          title="💬 Game Chat"
         />
       )}
     </div>

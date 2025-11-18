@@ -78,6 +78,7 @@ export interface RoundStatistics {
 
 export interface RoundHistory {
   roundNumber: number;
+  dealerName: string; // Name of the dealer for this round
   bets: Bet[];
   highestBet: Bet;
   offensiveTeam: 1 | 2;

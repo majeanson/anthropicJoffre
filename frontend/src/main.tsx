@@ -10,8 +10,7 @@ import { AuthProvider } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Initialize Sentry for error tracking
-// TEMPORARY: Hardcode DSN to test Sentry - TODO: Remove after verifying Vercel env vars
-const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN || 'https://98c89a1454b32d24fd78092cf6a297e8@o4510241708244992.ingest.us.sentry.io/4510241709293568';
+const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 
 console.log('🔍 Environment check:', {
   hasEnvVar: !!import.meta.env.VITE_SENTRY_DSN,

@@ -21,8 +21,8 @@ vi.mock('./PlayerConnectionIndicator', () => ({
   ),
 }));
 
-vi.mock('./FloatingTeamChat', () => ({
-  FloatingTeamChat: () => <div data-testid="floating-chat">Chat</div>,
+vi.mock('./UnifiedChat', () => ({
+  UnifiedChat: () => <div data-testid="unified-chat">Chat</div>,
 }));
 
 // Mock sounds utility
@@ -452,7 +452,7 @@ describe('TeamSelection', () => {
         />
       );
 
-      expect(screen.getByTestId('floating-chat')).toBeInTheDocument();
+      expect(screen.getByTestId('unified-chat')).toBeInTheDocument();
     });
 
     it('should listen for chat messages when socket provided', () => {

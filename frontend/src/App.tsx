@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback, Suspense, lazy } from 'react';
-import { Card, PlayerSession } from './types/game';
+import { Card, PlayerSession, ChatMessage } from './types/game';
 import { Lobby } from './components/Lobby';
 import GlobalUI from './components/GlobalUI';
-import { ChatMessage } from './components/ChatPanel';
 
 // Lazy load heavy components for better initial load performance
 // Game phase components (only loaded when needed)

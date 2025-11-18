@@ -9,7 +9,7 @@
 
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { ChatMessage } from '../components/ChatPanel';
+import { ChatMessage } from '../types/game';
 
 interface UseChatMessagesProps {
   socket: Socket | null;

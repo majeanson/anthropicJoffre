@@ -4,7 +4,8 @@ import { LobbyBrowser } from './LobbyBrowser';
 import { HowToPlay } from './HowToPlay';
 import { DebugInfo } from './DebugInfo';
 import { GlobalDebugModal } from './GlobalDebugModal';
-import { LobbyChat } from './LobbyChat';
+import { UnifiedChat } from './UnifiedChat';
+import { useLobbyChat } from '../hooks/useLobbyChat';
 import { SocialPanel } from './SocialPanel';
 import { StatsPanel } from './StatsPanel';
 import { GameCreationForm } from './GameCreationForm';
@@ -63,6 +64,12 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+
+  // Lobby chat hook for UnifiedChat
+  const { messages: lobbyMessages, sendMessage: sendLobbyMessage } = useLobbyChat({
+    socket,
+    playerName
+  });
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
   const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual'); // Default to casual for Quick Play
   const [focusedTabIndex, setFocusedTabIndex] = useState<number | null>(null); // 0=PLAY, 1=SOCIAL, 2=STATS, 3=SETTINGS
@@ -469,10 +476,27 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                             📜 Recent
                           </button>
                         </div>
-                        <LobbyChat
+                        <UnifiedChat
+                          mode="embedded"
+                          context="lobby"
                           socket={socket}
-                          playerName={playerName}
-                          onSetPlayerName={setPlayerName}
+                          currentPlayerId={playerName}
+                          messages={lobbyMessages}
+                          onSendMessage={(message) => {
+                            if (!playerName.trim()) {
+                              const name = window.prompt('Please enter your name to chat:');
+                              if (name && name.trim()) {
+                                setPlayerName(name.trim());
+                                localStorage.setItem('playerName', name.trim());
+                                // Try to send after setting name
+                                setTimeout(() => sendLobbyMessage(message), 100);
+                              }
+                            } else {
+                              sendLobbyMessage(message);
+                            }
+                          }}
+                          placeholder={playerName.trim() ? "Type a message..." : "Click to enter your name..."}
+                          className="h-[400px]"
                         />
                       </>
                     ) : (

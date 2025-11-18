@@ -6,7 +6,8 @@ import { ConfettiEffect } from './ConfettiEffect'; // Sprint 1 Phase 3
 import { TrickWinnerBanner } from './TrickWinnerBanner'; // Sprint 1 Phase 3
 import { Leaderboard } from './Leaderboard';
 import { TimeoutIndicator } from './TimeoutIndicator';
-import { ChatPanel, ChatMessage } from './ChatPanel';
+import { UnifiedChat } from './UnifiedChat';
+import { ChatMessage } from '../types/game';
 import { GameHeader } from './GameHeader';
 import { GameState, Card as CardType, TrickCard, CardColor } from '../types/game';
 import { sounds } from '../utils/sounds';
@@ -1127,14 +1128,30 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
       />
 
       {socket && gameId && !isSpectator && onNewChatMessage && (
-        <ChatPanel
+        <UnifiedChat
+          mode="panel"
+          context="game"
           socket={socket}
           gameId={gameId}
           currentPlayerId={currentPlayerId}
           isOpen={chatOpen}
           onClose={() => setChatOpen(false)}
           messages={chatMessages}
-          onNewMessage={onNewChatMessage}
+          onSendMessage={(message) => {
+            socket.emit('send_game_chat', {
+              gameId,
+              message: message.trim()
+            });
+            // Trigger new message callback for sound effects
+            onNewChatMessage({
+              playerId: currentPlayerId,
+              playerName: currentPlayer?.name || 'Unknown',
+              message: message.trim(),
+              timestamp: Date.now(),
+              teamId: currentPlayer?.teamId || null
+            });
+          }}
+          title="💬 Game Chat"
         />
       )}
 

@@ -50,6 +50,7 @@ function createTestRound(roundNumber: number): RoundHistory {
 
   return {
     roundNumber,
+    dealerName: 'Player 1',
     bets: [mockBet],
     highestBet: mockBet,
     offensiveTeam: 1,
