@@ -360,7 +360,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 onClick={() => {
                   const replayUrl = `${window.location.origin}?replay=${gameId}`;
                   navigator.clipboard.writeText(replayUrl);
-                  sounds.playSound('achievement_unlock');
+                  sounds.buttonClick();
                 }}
                 className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2"
                 title="Copy replay link"

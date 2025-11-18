@@ -25,15 +25,11 @@
  * ```
  */
 
-import { useState, useEffect, Suspense, lazy } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { Socket } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
 import Avatar from './Avatar';
 import { PlayerNameButton } from './PlayerNameButton';
-
-// Lazy load heavy sub-components
-const FriendsPanel = lazy(() => import('./FriendsPanel'));
-const AchievementsPanel = lazy(() => import('./AchievementsPanel').then(m => ({ default: m.AchievementsPanel })));
 
 type SocialTab = 'friends' | 'achievements' | 'recent' | 'suggestions';
 

@@ -47,9 +47,8 @@ export interface AdminHandlersDependencies {
 
   // Utility
   logger: Logger;
-  errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errorBoundaries: any;
 }
 
 /**

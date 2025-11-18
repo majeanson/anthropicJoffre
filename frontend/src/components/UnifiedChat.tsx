@@ -74,8 +74,6 @@ export function UnifiedChat({
   title,
   isOpen = true,
   onClose,
-  socket,
-  gameId,
   currentPlayerId,
   messages,
   onSendMessage,
@@ -315,7 +313,7 @@ export function UnifiedChat({
                 </button>
                 {showEmojis && (
                   <div className="absolute bottom-full mb-2 left-0">
-                    <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+                    <EmojiPicker onSelectEmoji={handleEmojiSelect} onClose={() => setShowEmojis(false)} />
                   </div>
                 )}
               </div>

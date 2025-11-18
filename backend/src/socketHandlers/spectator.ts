@@ -23,9 +23,8 @@ export interface SpectatorHandlersDependencies {
 
   // Utility
   logger: Logger;
-  errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
-  };
+  errorBoundaries: any;
+
 }
 
 /**

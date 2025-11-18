@@ -51,7 +51,7 @@ export function ShareReplayPrompt({
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(replayUrl);
-    sounds.playSound('achievement_unlock');
+    sounds.buttonClick();
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   };

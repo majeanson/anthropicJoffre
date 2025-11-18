@@ -82,13 +82,13 @@ export async function emitAchievementUnlocked(
     const user = await getUserByUsername(playerName);
     if (user) {
       await createNotification({
-        user_id: user.id,
+        user_id: user.user_id,
         notification_type: 'achievement_unlocked',
-        title: `Achievement Unlocked: ${achievement.name}`,
+        title: `Achievement Unlocked: ${achievement.achievement_name}`,
         message: achievement.description,
         data: {
           achievement_id: achievement.achievement_id,
-          achievement_name: achievement.name,
+          achievement_name: achievement.achievement_name,
           achievement_icon: achievement.icon,
           achievement_tier: achievement.tier,
           points: achievement.points,
@@ -102,7 +102,7 @@ export async function emitAchievementUnlocked(
       if (userSocket) {
         userSocket.emit('notification_received', {
           notification_type: 'achievement_unlocked',
-          title: `Achievement Unlocked: ${achievement.name}`,
+          title: `Achievement Unlocked: ${achievement.achievement_name}`,
           message: achievement.description,
         });
       }

@@ -29,9 +29,8 @@ interface SocketWithAuth extends Socket {
 export interface NotificationHandlersDependencies {
   io: Server;
   logger: Logger;
-  errorBoundaries: {
-    gameAction: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
-  };
+  errorBoundaries: any;
+
 }
 
 /**

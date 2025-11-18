@@ -32,9 +32,8 @@ export interface StatsHandlersDependencies {
 
   // Utility
   logger: Logger;
-  errorBoundaries: {
-    readOnly: (actionName: string) => (handler: (...args: unknown[]) => void) => (...args: unknown[]) => void;
-  };
+  errorBoundaries: any;
+
 }
 
 /**

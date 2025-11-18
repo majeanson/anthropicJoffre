@@ -71,7 +71,7 @@ export function registerFriendHandlers(
         const recipientUser = await getUserByUsername(toPlayer);
         if (recipientUser) {
           await createNotification({
-            user_id: recipientUser.id,
+            user_id: recipientUser.user_id,
             notification_type: 'friend_request',
             title: 'New Friend Request',
             message: `${fromPlayer} sent you a friend request`,
@@ -185,7 +185,7 @@ export function registerFriendHandlers(
         const senderUser = await getUserByUsername(otherPlayer);
         if (senderUser) {
           await createNotification({
-            user_id: senderUser.id,
+            user_id: senderUser.user_id,
             notification_type: 'friend_request_accepted',
             title: 'Friend Request Accepted',
             message: `${playerName} accepted your friend request`,

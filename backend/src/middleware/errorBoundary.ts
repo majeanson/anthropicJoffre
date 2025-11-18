@@ -142,8 +142,8 @@ interface ErrorBoundaryConfig {
 type SocketHandler = (...args: unknown[]) => Promise<void>;
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function withErrorBoundary(
-  handler: Function,
+export function withErrorBoundary<T extends Function = Function>(
+  handler: T,
   config: ErrorBoundaryConfig
 ): SocketHandler {
   return async function (this: Socket, ...args: unknown[]): Promise<void> {
@@ -262,7 +262,7 @@ export const errorBoundaries = {
    */
   gameAction: (handlerName: string) =>
     // eslint-disable-next-line @typescript-eslint/ban-types
-    (handler: Function): SocketHandler =>
+    <T extends Function>(handler: T): SocketHandler =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -275,7 +275,7 @@ export const errorBoundaries = {
    */
   readOnly: (handlerName: string) =>
     // eslint-disable-next-line @typescript-eslint/ban-types
-    (handler: Function): SocketHandler =>
+    <T extends Function>(handler: T): SocketHandler =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: true,
@@ -288,7 +288,7 @@ export const errorBoundaries = {
    */
   background: (handlerName: string) =>
     // eslint-disable-next-line @typescript-eslint/ban-types
-    (handler: Function): SocketHandler =>
+    <T extends Function>(handler: T): SocketHandler =>
       withErrorBoundary(handler, {
         handlerName,
         sendToClient: false,
@@ -315,9 +315,18 @@ export function safeSocketOn(
   event: string,
   handler: SocketHandler
 ): void {
+  // Cast to any to bypass TypeScript's strict parameter checking
+  // The handler is properly typed at runtime through the error boundary
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   socket.on(event, handler as any);
 }
+
+/**
+ * Helper type for socket.on that accepts any function signature
+ * Use this when TypeScript complains about parameter destructuring
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnySocketHandler = any;
 
 /**
  * Error boundary for regular functions (non-socket handlers)

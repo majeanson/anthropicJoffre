@@ -27,7 +27,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import Avatar from './Avatar';
-import { PlayerNameButton } from './PlayerNameButton';
 
 interface DirectMessage {
   message_id: number;
@@ -61,7 +60,6 @@ interface DirectMessagesPanelProps {
   socket: Socket | null;
   currentUsername: string;
   initialRecipient?: string; // Open directly to a conversation
-  onPlayerClick?: (playerName: string) => void;
 }
 
 export function DirectMessagesPanel({
@@ -69,8 +67,7 @@ export function DirectMessagesPanel({
   onClose,
   socket,
   currentUsername,
-  initialRecipient,
-  onPlayerClick
+  initialRecipient
 }: DirectMessagesPanelProps) {
   // ✅ Early return BEFORE hooks
   if (!isOpen) return null;
