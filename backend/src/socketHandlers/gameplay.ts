@@ -87,7 +87,7 @@ export interface GameplayHandlersDependencies {
 
   // Utility
   logger: Logger;
-  errorBoundaries: any;
+  errorBoundaries: import('../middleware/errorBoundary').ErrorBoundaries;
 
 }
 

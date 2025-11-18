@@ -29,7 +29,7 @@ interface SocketWithAuth extends Socket {
 export interface NotificationHandlersDependencies {
   io: Server;
   logger: Logger;
-  errorBoundaries: any;
+  errorBoundaries: import('../middleware/errorBoundary').ErrorBoundaries;
 
 }
 

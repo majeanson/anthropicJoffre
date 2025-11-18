@@ -73,7 +73,7 @@ export interface ConnectionHandlersDependencies {
 
   // Utility
   logger: Logger;
-  errorBoundaries: any;
+  errorBoundaries: import('../middleware/errorBoundary').ErrorBoundaries;
 
 }
 

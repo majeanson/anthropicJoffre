@@ -62,7 +62,7 @@ export interface ChatHandlersDependencies {
 
   // Utility
   logger: Logger;
-  errorBoundaries: any;
+  errorBoundaries: import('../middleware/errorBoundary').ErrorBoundaries;
 
 }
 

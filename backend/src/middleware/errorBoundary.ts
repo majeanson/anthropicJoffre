@@ -141,6 +141,21 @@ interface ErrorBoundaryConfig {
  */
 type SocketHandler = (...args: unknown[]) => Promise<void>;
 
+/**
+ * Error boundary wrapper function type
+ */
+// eslint-disable-next-line @typescript-eslint/ban-types
+export type ErrorBoundaryWrapper = <T extends Function>(handler: T) => SocketHandler;
+
+/**
+ * Error boundaries collection type
+ */
+export interface ErrorBoundaries {
+  gameAction: (handlerName: string) => ErrorBoundaryWrapper;
+  readOnly: (handlerName: string) => ErrorBoundaryWrapper;
+  background: (handlerName: string) => ErrorBoundaryWrapper;
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function withErrorBoundary<T extends Function = Function>(
   handler: T,

@@ -48,7 +48,7 @@ export interface AdminHandlersDependencies {
   // Utility
   logger: Logger;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  errorBoundaries: any;
+  errorBoundaries: import('../middleware/errorBoundary').ErrorBoundaries;
 }
 
 /**
