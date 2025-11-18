@@ -78,7 +78,7 @@ export interface LobbyHandlersDependencies {
   startNewRound: (gameId: string) => void;
 
   // Emission helpers
-  emitGameUpdate: (gameId: string, gameState: GameState) => void;
+  emitGameUpdate: (gameId: string, gameState: GameState, forceFull?: boolean) => void;
   broadcastGameUpdate: (gameId: string, event: string, gameState: GameState) => void;
 
   // Validation functions
