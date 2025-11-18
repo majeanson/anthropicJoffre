@@ -394,7 +394,7 @@ export function TeamSelection({
         {/* Bot Difficulty & Start Game Section */}
         <div className="text-center space-y-3">
           {/* Bot Difficulty Selector */}
-          {players.length < 4 && onAddBot && onBotDifficultyChange && (
+          {players.filter(p => !p.isEmpty).length < 4 && onAddBot && onBotDifficultyChange && (
             <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600 max-w-md mx-auto">
               <label className="block text-xs font-semibold text-umber-700 dark:text-gray-300 mb-2">
                 Bot Difficulty
@@ -435,8 +435,8 @@ export function TeamSelection({
           )}
 
           <div className="flex gap-3 justify-center items-center">
-            {/* Add Bot Button - only show if less than 4 players and onAddBot is provided */}
-            {players.length < 4 && onAddBot && (
+            {/* Add Bot Button - only show if less than 4 real players (excluding empty seats) */}
+            {players.filter(p => !p.isEmpty).length < 4 && onAddBot && (
               <button
                 onClick={onAddBot}
                 className="bg-gradient-to-r from-umber-600 to-amber-700 dark:from-gray-600 dark:to-gray-700 hover:from-umber-700 hover:to-amber-800 dark:hover:from-gray-700 dark:hover:to-gray-800 text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-200 border border-umber-800 dark:border-gray-600 shadow flex items-center gap-2"

@@ -379,7 +379,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
           tricksWon: 0,
           pointsWon: 0,
           isBot: isBot || false,
-          botDifficulty: undefined,
+          botDifficulty: isBot ? (botDifficulty || 'medium') : undefined,
           connectionStatus: 'connected',
         };
 
