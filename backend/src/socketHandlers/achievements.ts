@@ -57,17 +57,61 @@ export function registerAchievementHandlers(
 
 /**
  * Helper function to emit achievement unlocked event to all players in a game
+ * Also creates a notification for authenticated users
  */
-export function emitAchievementUnlocked(
+export async function emitAchievementUnlocked(
   io: Server,
   gameId: string,
   playerName: string,
   achievement: Achievement
 ) {
+  // Emit real-time event to all players in game
   io.to(gameId).emit('achievement_unlocked', {
     playerName,
     achievement,
   });
+
+  // Create notification for authenticated users
+  // Note: For guest players (no user_id), notification is skipped
+  // This is handled by the notification system's user lookup
+  try {
+    const { createNotification } = await import('../db/notifications.js');
+    const { getUserByUsername } = await import('../db/users.js');
+
+    // Try to get user ID from player name (if authenticated)
+    const user = await getUserByUsername(playerName);
+    if (user) {
+      await createNotification({
+        user_id: user.id,
+        notification_type: 'achievement_unlocked',
+        title: `Achievement Unlocked: ${achievement.name}`,
+        message: achievement.description,
+        data: {
+          achievement_id: achievement.achievement_id,
+          achievement_name: achievement.name,
+          achievement_icon: achievement.icon,
+          achievement_tier: achievement.tier,
+          points: achievement.points,
+        },
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+      });
+
+      // Emit notification to the specific user's socket
+      const userSocket = Array.from(io.sockets.sockets.values())
+        .find(s => s.data.playerName === playerName);
+      if (userSocket) {
+        userSocket.emit('notification_received', {
+          notification_type: 'achievement_unlocked',
+          title: `Achievement Unlocked: ${achievement.name}`,
+          message: achievement.description,
+        });
+      }
+    }
+  } catch (error) {
+    // Silently fail for guest users (no user account)
+    // Achievement toast will still show via achievement_unlocked event
+    console.log(`Achievement notification skipped for guest player: ${playerName}`);
+  }
 }
 
 /**

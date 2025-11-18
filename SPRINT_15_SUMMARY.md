@@ -51,11 +51,13 @@ npm test -- --run
 
 **Files Created**:
 - `frontend/optimize-with-sharp.mjs` - Image optimization script
-- `frontend/public/cards/optimized/` - Optimized images directory
+- `frontend/public/cards/production/` - Production-optimized images directory
 
 **Files Updated**:
-- `frontend/src/utils/imagePreloader.ts` - Updated paths to optimized images
+- `frontend/src/utils/imagePreloader.ts` - Updated paths to production images
 - `frontend/src/components/Card.tsx` - Updated image sources
+
+**Note on Folder Naming**: The implementation uses `/cards/production/` instead of `/cards/optimized/` as originally planned. The "production" naming was chosen to better reflect that these are the production-ready, optimized images actively served to users.
 
 ### 3. Lighthouse Performance Audit
 **URL**: https://jaffre.vercel.app/

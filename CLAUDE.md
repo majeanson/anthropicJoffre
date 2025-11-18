@@ -7,13 +7,17 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 
 **Stack**: React + TypeScript, Tailwind CSS, Socket.io, Node.js, PostgreSQL
 
-**Current Status**: Feature-complete for core gameplay and social features (October 2025)
+**Current Status**: Feature-complete for core gameplay and enhanced social features (November 2025)
 - ✅ 150 backend unit tests passing (~1s runtime)
 - ✅ 22 E2E test files (Playwright)
 - ✅ Database persistence
-- ✅ Game replay system
+- ✅ Game replay system with sharing
 - ✅ Lobby browser with tabs
 - ✅ Bot AI with 3 difficulty levels
+- ✅ Direct messaging system
+- ✅ Friend suggestions & recent players
+- ✅ Player profiles with quick actions
+- ✅ Unified social hub
 
 ---
 
@@ -155,6 +159,21 @@ function PlayingPhase({ gameState, currentPlayerId }) {
 'get_player_history': { playerName: string; limit?: number }
 'get_game_replay': { gameId: string }
 '__test_set_scores': { team1: number; team2: number }
+
+// Sprint 16: Direct Messages
+'send_direct_message': { recipientUsername: string; messageText: string }
+'get_conversation': { otherUsername: string; limit?: number; offset?: number }
+'get_conversations': ()
+'mark_messages_read': { senderUsername: string }
+'get_unread_count': ()
+'delete_message': { messageId: number; isSender: boolean }
+'delete_conversation': { otherUsername: string }
+'search_messages': { searchQuery: string; limit?: number }
+
+// Sprint 16: Social Features
+'get_recent_players': { limit?: number }
+'get_friend_suggestions': { limit?: number }
+'get_mutual_friends': { otherUsername: string }
 ```
 
 **Server → Client:**
@@ -186,6 +205,21 @@ function PlayingPhase({ gameState, currentPlayerId }) {
 'leaderboard': { players: LeaderboardEntry[] }
 'player_history': { playerName: string; games: GameHistoryEntry[] }
 'online_players': { players: OnlinePlayer[] }
+
+// Sprint 16: Direct Messages (Server → Client)
+'direct_message_sent': { message: DirectMessage }
+'conversation_messages': { otherUsername: string; messages: DirectMessage[] }
+'conversations_list': { conversations: Conversation[] }
+'messages_marked_read': { senderUsername: string; count: number }
+'unread_count': { count: number }
+'message_deleted': { messageId: number }
+'conversation_deleted': { otherUsername: string; count: number }
+'message_search_results': { results: DirectMessage[] }
+
+// Sprint 16: Social Features (Server → Client)
+'recent_players': { players: RecentPlayer[] }
+'friend_suggestions': { suggestions: FriendSuggestion[] }
+'mutual_friends': { otherUsername: string; mutualFriends: string[] }
 ```
 
 ### Adding New Events
@@ -206,29 +240,6 @@ GET /api/leaderboard             // Global leaderboard (query: ?limit=100&exclud
 GET /api/stats/:playerName       // Player statistics (returns 404 if player not found)
 GET /api/player-history/:playerName // Player game history
 ```
-
-**Implementation Notes**:
-- `/api/stats/:playerName` - Returns player stats object or 404 error
-  ```typescript
-  Response: {
-    player_name: string;
-    games_played: number;
-    games_won: number;
-    // ... other PlayerStats fields
-  }
-  ```
-
-- `/api/leaderboard` - Returns top players with optional filters
-  ```typescript
-  Query params:
-    - limit: number (default: 100) - Max players to return
-    - excludeBots: boolean (default: true) - Filter out bot players
-  Response: {
-    players: LeaderboardEntry[];
-    total: number;
-  }
-  ```
-
 ---
 
 ## 🎮 Game Rules Implementation
@@ -239,8 +250,7 @@ GET /api/player-history/:playerName // Player game history
 - **Skip Option**: Players can skip their bet if no one has bet yet, or if they're not the dealer
 - **Dealer rule**:
   - Betting order: Player after dealer → ... → Dealer last
-  - Non-dealers MUST raise (beat current highest) OR skip (if no bets yet)
-  - Dealer CAN equalize (match highest) or raise, but CANNOT skip if there are bets
+  - Dealer CAN equalize (match highest) or raise, but CANNOT skip if there are no bets
   - If all 4 players skip, betting restarts from player after dealer
 
 **Implementation**:
@@ -286,38 +296,62 @@ GET /api/player-history/:playerName // Player game history
 **Important for Testing**: First round betting order is Player 3, 4, 1, 2 (not 1, 2, 3, 4)
 
 ### Position Swapping
-Players can swap positions with teammates or bots depending on the game phase:
+Players can swap positions with any other player in any phase (team selection, betting, playing phase):
 
 **Team Selection Phase:**
 - Players can swap positions with any teammate
-- Swap button appears next to teammates in team panels
+- Swap button appears next to all teammates in team panels
 - Allows strategic positioning before game starts
-- Enforces alternating team pattern (1-2-1-2) after swap
+- Enforces alternating team pattern (1-2-1-2) after any swap
 
 **Active Gameplay (Betting, Playing, Scoring):**
-- Players can swap positions with **ANY bot** (same team OR opposite team)
-- Cannot swap with human players during active gameplay
-- Swap buttons (↔) appear next to all bots in the circular player layout
-- **Cross-team swapping**: Swapping with a bot on the opposite team changes YOUR team
+- Players can swap positions with **ANY PLAYER** (same team OR opposite team, bot or human)
+- Swap buttons (↔) appear next to all players in the circular player layout
+- **Bot swaps**: Immediate execution (no confirmation needed)
+- **Human swaps**: Requires confirmation from target player
+  - Initiator sends swap request via `request_swap` socket event
+  - Target receives `swap_request_received` event and sees confirmation modal
+  - Target has 30 seconds to accept or reject
+  - Auto-rejects after timeout
+  - Limit: 1 pending request per player
+- **Cross-team swapping**: Swapping with a player on the opposite team changes YOUR team
   - Example: 1 human (Team 1) + 1 bot (Team 1) + 1 human (Team 2) + 1 bot (Team 2)
-  - Human from Team 1 swaps with bot from Team 2
-  - Result: 2 humans (Team 2) + 2 bots (Team 1)
-- Tooltip indicates when swapping will change teams: "Swap positions with BotName (changes teams!)"
+  - Human from Team 1 swaps with player from Team 2
+  - Result: Both players switch teams based on new positions
+- Tooltip indicates when swapping will change teams: "Swap with this player (changes teams!)"
 - Useful for adjusting turn order mid-game, changing visual layout, or switching teams
 - All game data (hand, tricks won, points) is preserved and swapped correctly
 
-**Restrictions:**
-- Cannot swap with yourself
-- Cannot swap with other human players during active gameplay
-- Cannot swap during `game_over` phase
-- Swapping enforces alternating team pattern (1-2-1-2), which determines final team assignments
-
 **Implementation:**
-- `backend/src/game/validation.ts:255-261` - Dual-phase validation logic (any bot allowed during gameplay)
+- `backend/src/game/validation.ts:256-263` - Validation logic (allows any player swaps)
 - `backend/src/game/state.ts:224-296` - Position swap with data preservation
-- `frontend/src/components/TeamSelection.tsx:214-220, 313-319` - Team selection swap UI
-- `frontend/src/components/PlayingPhase.tsx:583-596, 918-1010` - Gameplay swap UI with cross-team support
-- Socket event: `'swap_position': { gameId: string; targetPlayerId: string }`
+- `backend/src/socketHandlers/lobby.ts:530-686` - Swap handlers (immediate and confirmation flows)
+- `frontend/src/components/TeamSelection.tsx:214-222, 321-329` - Team selection swap UI
+- `frontend/src/components/PlayingPhase.tsx:583-596, 918-1010` - Gameplay swap UI
+- `frontend/src/components/SwapConfirmationModal.tsx` - Confirmation modal for human swaps
+- `frontend/src/App.tsx:347-384` - Swap logic and socket listeners
+
+**Socket Events:**
+- `'swap_position'` (Client → Server) - Immediate swap (for bots)
+  ```typescript
+  { gameId: string; targetPlayerId: string }
+  ```
+- `'request_swap'` (Client → Server) - Request swap (for humans)
+  ```typescript
+  { gameId: string; targetPlayerId: string }
+  ```
+- `'swap_request_received'` (Server → Client) - Notify target of swap request
+  ```typescript
+  { fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean }
+  ```
+- `'respond_to_swap'` (Client → Server) - Accept/reject swap
+  ```typescript
+  { gameId: string; requesterId: string; accepted: boolean }
+  ```
+- `'swap_accepted'` / `'swap_rejected'` (Server → Client) - Notify initiator
+  ```typescript
+  { message: string }
+  ```
 
 **Critical Details:**
 - Swapping updates player positions in the array (affects turn order)
@@ -325,6 +359,8 @@ Players can swap positions with teammates or bots depending on the game phase:
 - Updates references in currentTrick, currentBets, and highestBet
 - Team IDs are recalculated based on position (alternating 1-2-1-2 pattern)
 - **Position determines team**: After swap, teams are reassigned by position (not by original team)
+- Swap requests expire after 30 seconds (auto-reject)
+- Limit of 1 pending request per player (new request cancels old)
 
 ---
 
@@ -757,254 +793,6 @@ if (gameMode === 'ranked' && !isAuthenticated) {
 - Friends list
 - Achievements tracking
 - Match history persistence
-
----
-
-## 🪟 Modal State Management (Sprint 3)
-
-### Problem: Forms Clearing Unexpectedly
-
-**Root Cause**: React re-renders caused modals to remount, losing form state
-
-### Solution: ModalContext Pattern
-
-**Location**: `frontend/src/contexts/ModalContext.tsx`
-
-```typescript
-interface ModalContextType {
-  activeModal: string | null;
-  openModal: (modalName: string) => void;
-  closeModal: () => void;
-}
-
-export function ModalProvider({ children }) {
-  const [activeModal, setActiveModal] = useState<string | null>(null);
-
-  return (
-    <ModalContext.Provider value={{ activeModal, openModal, closeModal }}>
-      {children}
-    </ModalContext.Provider>
-  );
-}
-```
-
-### Usage Pattern
-
-```typescript
-// In App.tsx
-<ModalProvider>
-  <LoginModal />
-  <RegisterModal />
-  <PasswordResetModal />
-  {/* Modals stay mounted but hidden when not active */}
-</ModalProvider>
-
-// In any component
-function SomeComponent() {
-  const { openModal } = useModal();
-
-  return <button onClick={() => openModal('login')}>Sign In</button>;
-}
-
-// In modal component
-function LoginModal() {
-  const { activeModal, closeModal } = useModal();
-  const [email, setEmail] = useState('');
-
-  // Modal stays mounted, so form state persists
-  if (activeModal !== 'login') return null;
-
-  return (
-    <div onClick={closeModal}> {/* Backdrop */}
-      <div onClick={(e) => e.stopPropagation()}> {/* Content */}
-        {/* Form keeps state when reopened */}
-      </div>
-    </div>
-  );
-}
-```
-
-**Key Benefits**:
-- Form state persists when modal is closed/reopened
-- No Rules of Hooks violations
-- Backdrop click closes modal safely
-- Single source of truth for modal visibility
-
----
-
-## 🏗️ Sprint 3 Refactoring Patterns
-
-### Socket Handler Extraction
-
-**Before (Sprint 2)**: `backend/src/index.ts` was 2,500+ lines
-
-**After (Sprint 3)**: Modular socket handlers (~200-300 lines each)
-
-```
-backend/src/socketHandlers/
-├── lobby.ts          - Game creation, joining, team selection
-├── gameplay.ts       - Betting, card playing, ready states
-├── chat.ts           - Team and lobby chat
-├── spectator.ts      - Spectator mode
-├── bots.ts           - Bot management
-├── connection.ts     - Reconnection and disconnection
-├── stats.ts          - Stats, leaderboard, history
-├── admin.ts          - Kick, rematch, test utils
-├── achievements.ts   - Achievement unlocking
-├── friends.ts        - Friend requests
-└── notifications.ts  - Notification center
-```
-
-**Pattern**:
-```typescript
-// Each handler exports register function
-export function registerLobbyHandlers(
-  io: Server,
-  socket: Socket,
-  games: Map<string, GameState>
-) {
-  socket.on('create_game', async (playerName: string) => {
-    // Handler logic
-  });
-
-  socket.on('join_game', async (data: { gameId: string; playerName: string }) => {
-    // Handler logic
-  });
-}
-
-// In index.ts
-io.on('connection', (socket) => {
-  registerLobbyHandlers(io, socket, games);
-  registerGameplayHandlers(io, socket, games);
-  registerChatHandlers(io, socket, games);
-  // ...
-});
-```
-
-### Database Migration System
-
-**Pattern**: Sequential numbered migrations with automatic tracking
-
-```sql
--- backend/src/db/migrations/012_user_authentication.sql
-CREATE TABLE IF NOT EXISTS users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) UNIQUE NOT NULL,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  email_verified BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS email_verification_tokens (
-  id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  token VARCHAR(255) UNIQUE NOT NULL,
-  expires_at TIMESTAMP NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-**Execution**:
-```typescript
-// backend/src/db/runMigrations.ts
-export async function runMigrations() {
-  const migrations = await fs.readdir('./migrations');
-
-  for (const file of migrations.sort()) {
-    const sql = await fs.readFile(`./migrations/${file}`, 'utf-8');
-    await query(sql);
-    console.log(`✅ Ran migration: ${file}`);
-  }
-}
-```
-
-### Component Composition Pattern
-
-**Sprint 3 Example**: Settings Panel consolidation
-
-**Before**: 4 separate tabs, 800+ lines total
-**After**: 2 tabs, 291 lines, using composition
-
-```typescript
-// SettingsPanel.tsx
-function SettingsPanel() {
-  const [activeTab, setActiveTab] = useState('settings');
-
-  return (
-    <Modal>
-      <Tabs>
-        <Tab active={activeTab === 'settings'} onClick={() => setActiveTab('settings')}>
-          Settings
-        </Tab>
-        <Tab active={activeTab === 'advanced'} onClick={() => setActiveTab('advanced')}>
-          Advanced
-        </Tab>
-      </Tabs>
-
-      {activeTab === 'settings' && <SettingsContent />}
-      {activeTab === 'advanced' && <AdvancedContent />}
-    </Modal>
-  );
-}
-```
-
-**Principle**: Consolidate related functionality, extract unrelated concerns
-
----
-
-## 🚨 Common Pitfalls
-
-### ❌ DON'T
-```typescript
-// Don't use setTimeout for game logic
-setTimeout(() => {
-  resolveTrick(gameId);
-}, 500);
-
-// Don't create monolithic components
-function GameBoard() {
-  // 500 lines of mixed concerns...
-}
-
-// Don't use regex for test selectors
-const card = page.locator('button').filter({ hasText: /^[0-7]$/ });
-```
-
-### ✅ DO
-```typescript
-// Use event-driven flow
-io.to(gameId).emit('game_updated', game);
-resolveTrick(gameId); // Immediate
-
-// Split into focused components
-<TeamSelection />
-<BettingPhase />
-<PlayingPhase />
-
-// Use semantic data attributes
-const card = page.locator('[data-card-value]');
-```
-
----
-
-## 🔄 State Management
-
-### GameState Flow
-1. Server maintains single source of truth in `Map<string, GameState>`
-2. All state changes happen server-side
-3. Server emits `game_updated` or specific events
-4. Clients receive and render new state
-
-### Phase Transitions
-```
-team_selection → betting → playing → scoring → betting → ...
-                                                ↓
-                                          game_over (if team >= 41 pts)
-```
-
-**Implementation**:
-- `backend/src/index.ts` - `startNewRound()` and `endRound()`
 
 ---
 

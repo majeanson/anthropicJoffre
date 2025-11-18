@@ -1,0 +1,291 @@
+/**
+ * PlayerProfileModal Component
+ * Sprint 16 Task 3.1
+ *
+ * Lightweight player profile modal for quick access to player info and actions.
+ * Opens when clicking on player names throughout the app.
+ *
+ * Features:
+ * - Quick stats summary (ELO, tier, win rate, games played)
+ * - Friend actions (add/remove friend, send message)
+ * - "View Full Stats" button to open PlayerStatsModal
+ * - Works for both authenticated and guest players
+ */
+
+import { useEffect, useState } from 'react';
+import { Socket } from 'socket.io-client';
+import { getTierColor, getTierIcon } from '../utils/tierBadge';
+import Avatar from './Avatar';
+import { useAuth } from '../contexts/AuthContext';
+
+interface QuickStats {
+  player_name: string;
+  games_played: number;
+  games_won: number;
+  win_percentage: number;
+  elo_rating: number;
+  ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+}
+
+interface PlayerProfileModalProps {
+  playerName: string;
+  socket: Socket | null;
+  isOpen: boolean;
+  onClose: () => void;
+  onViewFullStats?: () => void; // Opens PlayerStatsModal
+}
+
+export function PlayerProfileModal({
+  playerName,
+  socket,
+  isOpen,
+  onClose,
+  onViewFullStats
+}: PlayerProfileModalProps) {
+  // ✅ Early return BEFORE hooks
+  if (!isOpen || !playerName) return null;
+
+  // ✅ NOW safe to call hooks
+  const [stats, setStats] = useState<QuickStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [friendStatus, setFriendStatus] = useState<'none' | 'pending' | 'friends'>('none');
+  const [sendingRequest, setSendingRequest] = useState(false);
+
+  const { user, isAuthenticated } = useAuth();
+  const isOwnProfile = isAuthenticated && user?.username === playerName;
+
+  // Fetch quick stats
+  useEffect(() => {
+    if (!socket || !isOpen || !playerName) return;
+
+    setLoading(true);
+    setError(null);
+
+    socket.emit('get_player_stats', { playerName });
+
+    const handleStatsResponse = ({
+      stats: receivedStats,
+      playerName: responseName
+    }: {
+      stats: QuickStats | null;
+      playerName: string;
+    }) => {
+      if (responseName === playerName) {
+        setStats(receivedStats);
+        setLoading(false);
+      }
+    };
+
+    const handleError = (errorData: any) => {
+      if (errorData?.context === 'get_player_stats') {
+        setError(errorData.message || 'Failed to load player profile');
+        setLoading(false);
+      }
+    };
+
+    socket.on('player_stats_response', handleStatsResponse);
+    socket.on('error', handleError);
+
+    return () => {
+      socket.off('player_stats_response', handleStatsResponse);
+      socket.off('error', handleError);
+    };
+  }, [socket, isOpen, playerName]);
+
+  // Check friend status
+  useEffect(() => {
+    if (!socket || !isAuthenticated || isOwnProfile) return;
+
+    socket.emit('get_friends_list');
+
+    const handleFriendsList = ({ friends }: { friends: Array<{ friend_name: string }> }) => {
+      const isFriend = friends.some(f => f.friend_name === playerName);
+      setFriendStatus(isFriend ? 'friends' : 'none');
+    };
+
+    socket.on('friends_list', handleFriendsList);
+
+    return () => {
+      socket.off('friends_list', handleFriendsList);
+    };
+  }, [socket, isAuthenticated, isOwnProfile, playerName]);
+
+  // Handle friend request
+  const handleSendFriendRequest = () => {
+    if (!socket || !isAuthenticated) return;
+
+    setSendingRequest(true);
+    socket.emit('send_friend_request', { toPlayer: playerName });
+
+    const handleSent = () => {
+      setFriendStatus('pending');
+      setSendingRequest(false);
+    };
+
+    const handleError = () => {
+      setSendingRequest(false);
+    };
+
+    socket.once('friend_request_sent', handleSent);
+    socket.once('error', handleError);
+  };
+
+  // Handle remove friend
+  const handleRemoveFriend = () => {
+    if (!socket || !isAuthenticated) return;
+
+    socket.emit('remove_friend', { friendName: playerName });
+
+    const handleRemoved = () => {
+      setFriendStatus('none');
+    };
+
+    socket.once('friend_removed', handleRemoved);
+  };
+
+  // Tier badge styling
+  const tierColor = stats ? getTierColor(stats.ranking_tier) : 'gray';
+  const tierIcon = stats ? getTierIcon(stats.ranking_tier) : '🏅';
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-orange-500/30 p-6 w-full max-w-md shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-orange-400">Player Profile</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-white text-2xl leading-none"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-8">
+            <div className="animate-spin text-4xl mb-2">⏳</div>
+            <p className="text-gray-400">Loading profile...</p>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="text-center py-8">
+            <p className="text-red-400 mb-4">{error}</p>
+            <button
+              onClick={onClose}
+              className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        )}
+
+        {/* Profile Content */}
+        {!loading && !error && stats && (
+          <div className="space-y-6">
+            {/* Player Header */}
+            <div className="flex items-center gap-4">
+              <Avatar username={playerName} size="lg" />
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-white">{playerName}</h3>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className={`text-lg ${tierColor}`}>{tierIcon}</span>
+                  <span className={`font-semibold ${tierColor}`}>
+                    {stats.ranking_tier}
+                  </span>
+                  <span className="text-gray-400">•</span>
+                  <span className="text-gray-300">{stats.elo_rating} ELO</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                <div className="text-2xl font-bold text-orange-400">
+                  {stats.games_played}
+                </div>
+                <div className="text-sm text-gray-400">Games Played</div>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                <div className="text-2xl font-bold text-green-400">
+                  {stats.games_won}
+                </div>
+                <div className="text-sm text-gray-400">Games Won</div>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700 col-span-2">
+                <div className="text-2xl font-bold text-blue-400">
+                  {stats.win_percentage.toFixed(1)}%
+                </div>
+                <div className="text-sm text-gray-400">Win Rate</div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2">
+              {/* View Full Stats Button */}
+              {onViewFullStats && (
+                <button
+                  onClick={onViewFullStats}
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-colors"
+                >
+                  📊 View Full Statistics
+                </button>
+              )}
+
+              {/* Friend Actions - Only show if authenticated and not own profile */}
+              {isAuthenticated && !isOwnProfile && (
+                <>
+                  {friendStatus === 'none' && (
+                    <button
+                      onClick={handleSendFriendRequest}
+                      disabled={sendingRequest}
+                      className="w-full py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-colors"
+                    >
+                      {sendingRequest ? '⏳ Sending...' : '➕ Add Friend'}
+                    </button>
+                  )}
+                  {friendStatus === 'pending' && (
+                    <button
+                      disabled
+                      className="w-full py-2 bg-gray-600 text-gray-400 rounded-lg font-semibold cursor-not-allowed"
+                    >
+                      ⏳ Friend Request Pending
+                    </button>
+                  )}
+                  {friendStatus === 'friends' && (
+                    <button
+                      onClick={handleRemoveFriend}
+                      className="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+                    >
+                      🗑️ Remove Friend
+                    </button>
+                  )}
+                </>
+              )}
+
+              {/* Guest prompt */}
+              {!isAuthenticated && !isOwnProfile && (
+                <div className="text-center py-2 px-4 bg-blue-900/30 border border-blue-500/30 rounded-lg">
+                  <p className="text-sm text-blue-300">
+                    Sign in to add friends and send messages
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

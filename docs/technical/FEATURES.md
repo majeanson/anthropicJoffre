@@ -292,6 +292,323 @@ Players can easily share games with friends using a one-click shareable link fea
 
 ---
 
+## 💬 Social Features (Sprint 16)
+
+### Direct Messaging System
+**Location**: `frontend/src/components/DirectMessagesPanel.tsx`
+
+**Access**: Click "Messages" icon in GlobalUI or from player profiles
+
+**Features**:
+- **1-on-1 Messaging**: Private conversations between players
+- **Conversation Threads**: Organized message history with timestamps
+- **Read Receipts**: Track unread messages with counters
+- **Real-time Delivery**: Instant message delivery via WebSocket
+- **Search Messages**: Full-text search across all conversations
+- **Message Management**: Soft delete for both sender and recipient
+- **Notifications**: Automatic notifications for new messages
+
+**Database Design**:
+```sql
+CREATE TABLE direct_messages (
+  message_id SERIAL PRIMARY KEY,
+  sender_id INTEGER REFERENCES users(user_id),
+  recipient_id INTEGER REFERENCES users(user_id),
+  message_text TEXT CHECK (LENGTH(message_text) <= 2000),
+  is_read BOOLEAN DEFAULT FALSE,
+  is_deleted_by_sender BOOLEAN DEFAULT FALSE,
+  is_deleted_by_recipient BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+**Backend Operations** (`backend/src/db/directMessages.ts`):
+- `sendDirectMessage()` - Send new message
+- `getConversation()` - Load message thread
+- `getConversations()` - List all conversations with unread counts
+- `markMessagesRead()` - Update read status
+- `deleteMessage()` - Soft delete for user
+- `deleteConversation()` - Remove entire conversation
+- `searchMessages()` - Full-text search
+
+**Socket Events**:
+- `send_direct_message` - Send message to recipient
+- `get_conversation` - Load conversation history
+- `get_conversations` - List all conversations
+- `mark_messages_read` - Mark messages as read
+- `get_unread_count` - Get total unread count
+- `delete_message` - Delete single message
+- `delete_conversation` - Delete entire conversation
+- `search_messages` - Search across all messages
+
+**Real-time Events**:
+- `direct_message_received` - New message notification (recipient)
+- `message_read` - Read receipt (sender)
+- `conversation_deleted` - Conversation removed
+
+### Player Profiles
+**Components**:
+- `PlayerProfileModal.tsx` - Quick profile viewer
+- `PlayerNameButton.tsx` - Clickable player names
+- `PlayerAvatar.tsx` - Player display with indicators
+
+**PlayerProfileModal Features**:
+- **Quick Stats**: ELO rating, tier badge, games played/won, win rate
+- **Friend Actions**: Add/Remove friend, Send message (auth-gated)
+- **View Full Stats**: Link to comprehensive statistics modal
+- **Avatar Display**: Visual player identifier
+- **Keyboard Accessible**: ESC to close, button focus management
+
+**PlayerNameButton Variants**:
+- `inline` - Text link style (e.g., in chat messages)
+- `badge` - Pill-style button (e.g., in player lists)
+- `plain` - Minimal styling (e.g., in compact displays)
+
+**PlayerAvatar Indicators**:
+- **Online Status**: Green dot (online) / Gray dot (offline)
+- **Bot Indicator**: 🤖 emoji for bot players
+- **Dealer Badge**: ♦️ emoji for current dealer
+- **Current Turn**: Visual highlight when active
+- **Team Colors**: Orange (Team 1) / Purple (Team 2)
+- **Size Variants**: `sm`, `md`, `lg` for different contexts
+
+**Integration Points**:
+- Chat messages (clickable names)
+- Leaderboard entries
+- Game player lists
+- Recent players tab
+- Friend suggestions
+- Spectator lists
+
+### Replay Sharing
+**Location**: Post-game modal, GameReplay component
+
+**Features**:
+- **Deep Linking**: `?replay=gameId` URL parameter support
+- **One-click Copy**: Clipboard integration with sound feedback
+- **Social Media Sharing**: Twitter and Facebook integration
+- **Post-game Prompts**: Victory celebration modal with share options
+- **Quick Stats Summary**: Final score and winning team display
+
+**URL Format**: `https://yourapp.com/?replay=ABC123`
+
+**User Flow**:
+1. Game finishes with winner
+2. ShareReplayPrompt modal appears automatically
+3. Player can:
+   - Copy replay link to clipboard
+   - Share to Twitter with pre-filled text
+   - Share to Facebook
+   - View replay immediately
+   - Close and continue playing
+
+**Share Button Locations**:
+- Post-game victory modal (ShareReplayPrompt)
+- Replay viewer header (GameReplay)
+- Game history entries
+
+**Technical Implementation**:
+- `App.tsx` - URL parameter parsing and session storage
+- `GameReplay.tsx` - Share button in header
+- `ShareReplayPrompt.tsx` - Post-game modal with social sharing
+
+**Security**:
+- Replay IDs are public (shareable by design)
+- No authentication tokens in URLs
+- Server validates replay exists before loading
+- Read-only access (no game modification)
+
+### Social Hub
+**Location**: `frontend/src/components/SocialHub.tsx`
+
+**Access**: Click "Social" button in GlobalUI (requires authentication)
+
+**Tabs**:
+1. **Friends** - Friend list with online status
+2. **Achievements** - Unlocked achievements gallery
+3. **Recent Players** - Players from last 20 games
+4. **Suggestions** - Friend suggestions based on gameplay
+
+**Recent Players Features**:
+- **Tracking**: Players from finished games (excludes current user)
+- **Metrics**: Last played date, total games together
+- **Friend Status**: Shows if already friends
+- **Quick Actions**: View profile, Send message, Add friend
+- **Real-time Updates**: Refreshes when new games finish
+
+**Backend Implementation** (`backend/src/utils/socialHelpers.ts`):
+```typescript
+export async function getRecentPlayers(
+  username: string,
+  limit: number = 20
+): Promise<RecentPlayer[]> {
+  // Query game_history table
+  // Unnest player_names array
+  // Filter out current user
+  // Check friend status
+  // Sort by last_played_at DESC
+  // Return with games_together count
+}
+```
+
+**Friend Suggestions Algorithm**:
+
+**Scoring System** (multi-factor):
+1. **Games Together** (+10 points per game) - Players you've played with 3+ times
+2. **Mutual Friends** (+20 points per mutual friend) - Friends of your friends (2+ mutual required)
+3. **Similar Skill** (+5 points) - Players within 100 ELO points with 5+ games played
+
+**Implementation**:
+```typescript
+export async function getFriendSuggestions(
+  username: string,
+  limit: number = 10
+): Promise<FriendSuggestion[]> {
+  const suggestions: FriendSuggestion[] = [];
+
+  // 1. Get players you've played with (not friends)
+  // HAVING COUNT(*) >= 3
+
+  // 2. Get players with mutual friends
+  // Self-join friendships table
+  // HAVING COUNT(*) >= 2
+
+  // 3. Get players with similar ELO
+  // ABS(elo_rating difference) <= 100
+  // games_played >= 5
+
+  // Combine and enhance existing suggestions
+  // Sort by score DESC
+  // Return top N
+}
+```
+
+**Suggestion Display**:
+- **Player Name**: Clickable to view profile
+- **Reason**: Why they're suggested (e.g., "Played together 5 times • 3 mutual friends")
+- **Score**: Internal relevance score (not shown to user)
+- **Quick Actions**: Add Friend, Send Message, View Profile
+
+**Mutual Friends Feature**:
+```typescript
+export async function getMutualFriends(
+  username1: string,
+  username2: string
+): Promise<string[]> {
+  // Find common friends between two players
+  // Used to enhance friend suggestions
+  // Displayed in player profiles
+}
+```
+
+**Socket Events**:
+- `get_recent_players` - Fetch recent players list
+- `get_friend_suggestions` - Fetch friend suggestions
+- `get_mutual_friends` - Get mutual friends with another player
+
+**Real-time Events**:
+- `recent_players` - Recent players data (server → client)
+- `friend_suggestions` - Suggestions data (server → client)
+- `mutual_friends` - Mutual friends list (server → client)
+
+**Database Queries**:
+- **Recent Players**: Uses `unnest()` on `game_history.player_names` array
+- **Friend Suggestions**: Complex query joining game_history and friendships tables
+- **Mutual Friends**: Self-join on friendships table
+
+**Authentication Required**:
+- Social Hub requires authenticated user (not available for guests)
+- Guest users see login prompt when clicking Social button
+- All social features tied to user accounts (not temporary player names)
+
+### Unified Chat Component
+**Location**: `frontend/src/components/UnifiedChat.tsx`
+
+**Purpose**: Consolidates 3 separate chat systems (team selection, game chat, DMs) into one reusable component
+
+**Display Modes**:
+- `panel` - Sidebar panel (e.g., team selection)
+- `floating` - Collapsible floating window (e.g., in-game)
+- `embedded` - Inline chat area (e.g., lobby)
+- `modal` - Full-screen modal (e.g., DM conversations)
+
+**Chat Contexts**:
+- `team` - Team selection chat (color-coded by team)
+- `game` - In-game chat (betting, playing, scoring)
+- `lobby` - Pre-game lobby chat
+- `dm` - Direct messages (1-on-1)
+
+**Features**:
+- **Quick Emojis**: One-click emoji reactions (👍, 👎, 🔥, 😂, GG, ✨)
+- **Emoji Picker**: Full emoji selector (optional)
+- **Unread Counter**: Badge showing unread message count
+- **Clickable Player Names**: All player names are clickable to view profile
+- **Auto-scroll**: Automatically scrolls to latest message
+- **Timestamps**: Relative time display (e.g., "2 minutes ago")
+- **Character Limit**: 200 character maximum per message
+- **Sound Feedback**: Plays sound on message send
+
+**Usage Example**:
+```typescript
+<UnifiedChat
+  mode="floating"
+  context="game"
+  socket={socket}
+  gameId={gameId}
+  currentPlayerId={currentPlayerId}
+  messages={messages}
+  onSendMessage={handleSendMessage}
+  onPlayerClick={openPlayerProfile}
+  showQuickEmojis={true}
+  showEmojiPicker={true}
+/>
+```
+
+**Integration Status**:
+- ✅ Created UnifiedChat component (358 lines)
+- 🔲 Refactor TeamSelection to use UnifiedChat
+- 🔲 Refactor PlayingPhase to use UnifiedChat for game chat
+- 🔲 Consolidate backend chat socket events
+
+### Notification System Integration
+**Enhanced in Sprint 16**: Wired achievements and friend requests to notification system
+
+**Achievement Notifications**:
+- **Trigger**: When achievement unlocks (`emitAchievementUnlocked()`)
+- **Type**: `achievement_unlocked`
+- **Title**: "Achievement Unlocked: [Name]"
+- **Message**: Achievement description
+- **Data**: `{ achievement_id, achievement_name, achievement_description, rarity }`
+- **Expiration**: 30 days
+
+**Friend Request Notifications**:
+- **Send Notification**:
+  - **Trigger**: When friend request sent
+  - **Type**: `friend_request`
+  - **Title**: "New Friend Request"
+  - **Message**: "[PlayerName] sent you a friend request"
+  - **Data**: `{ request_id, from_player }`
+  - **Expiration**: 30 days
+
+- **Accept Notification**:
+  - **Trigger**: When friend request accepted
+  - **Type**: `friend_request_accepted`
+  - **Title**: "Friend Request Accepted"
+  - **Message**: "[PlayerName] accepted your friend request"
+  - **Data**: `{ friendship_id, friend_name }`
+  - **Expiration**: 7 days
+
+**Implementation**:
+- `backend/src/socketHandlers/achievements.ts` - Added `createNotification()` call in `emitAchievementUnlocked()`
+- `backend/src/socketHandlers/friends.ts` - Added `createNotification()` calls for send and accept
+
+**Guest User Handling**:
+- Notifications only created for authenticated users (have user_id)
+- Guest players gracefully skip notification creation (console log only)
+- No errors thrown for guest users
+
+---
+
 ## Current Implementation Status
 
 ### Core Gameplay ✅
@@ -320,6 +637,12 @@ Players can easily share games with friends using a one-click shareable link fea
 ✅ Pre-lobby Chat (team selection phase, team-colored messages)
 ✅ In-game Chat (betting/playing/scoring phases, persistence across phases)
 ✅ Chat Features (quick emoji reactions, unread counter, 200 char limit)
+✅ **Direct Messaging** (1-on-1 conversations, read receipts, soft delete, search, notifications)
+✅ **Player Profiles** (quick stats modal, clickable names, avatar system with status indicators)
+✅ **Replay Sharing** (deep linking, one-click copy, social media sharing, post-game prompts)
+✅ **Social Hub** (unified tabs: friends, achievements, recent players, friend suggestions)
+✅ **Friend Suggestions** (multi-factor algorithm: games together, mutual friends, similar ELO)
+✅ **Unified Chat Component** (4 modes, 4 contexts, reusable architecture)
 
 ### Game Stats & Analytics ✅
 ✅ Leaderboard with round history (comprehensive game stats tracking)

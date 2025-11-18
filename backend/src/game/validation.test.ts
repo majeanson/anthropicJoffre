@@ -241,7 +241,7 @@ describe('validateBet', () => {
     }
   });
 
-  it('should allow dealer to skip when no valid bets', () => {
+  it('should reject dealer skip when no valid bets', () => {
     const game = createTestGame({
       phase: 'betting',
       dealerIndex: 0,
@@ -254,10 +254,13 @@ describe('validateBet', () => {
     });
     const result = validateBet(game, 'p1', 0, false, true); // dealer trying to skip
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toBe('As dealer, you cannot skip if no one has bet yet. You must place a bet.');
+    }
   });
 
-  it('should reject dealer skip when there are valid bets', () => {
+  it('should allow dealer to skip when there are valid bets', () => {
     const game = createTestGame({
       phase: 'betting',
       dealerIndex: 0,
@@ -268,10 +271,7 @@ describe('validateBet', () => {
     });
     const result = validateBet(game, 'p1', 0, false, true);
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error).toBe('As dealer, you cannot skip once betting has started. You must match or raise the current bet.');
-    }
+    expect(result.success).toBe(true);
   });
 
   it('should allow valid bet', () => {
@@ -356,7 +356,7 @@ describe('validateTeamSelection', () => {
 });
 
 describe('validatePositionSwap', () => {
-  it('should reject swapping with human during active gameplay', () => {
+  it('should allow swapping with human during active gameplay', () => {
     const game = createTestGame({
       phase: 'betting',
       players: [
@@ -366,12 +366,9 @@ describe('validatePositionSwap', () => {
         { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0, isBot: true },
       ]
     });
-    const result = validatePositionSwap(game, 'p1', 'p2'); // Trying to swap with human
+    const result = validatePositionSwap(game, 'p1', 'p2'); // Swapping with another human
 
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error).toBe('Can only swap positions with bots during active gameplay');
-    }
+    expect(result.success).toBe(true);
   });
 
   it('should allow swapping with bot during active gameplay', () => {

@@ -199,6 +199,8 @@ import { registerAdminHandlers } from './socketHandlers/admin';
 import { registerAchievementHandlers } from './socketHandlers/achievements'; // Sprint 2 Phase 1
 import { registerFriendHandlers } from './socketHandlers/friends'; // Sprint 2 Phase 2
 import { registerNotificationHandlers } from './socketHandlers/notifications'; // Sprint 3 Phase 5
+import { registerDirectMessageHandlers } from './socketHandlers/directMessages'; // Sprint 16 Day 4
+import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 Day 6
 import {
   generateSessionToken as generateSessionTokenUtil,
   createPlayerSession as createPlayerSessionUtil,
@@ -474,6 +476,16 @@ const activeTimeouts = new Map<string, NodeJS.Timeout>();
 
 // Disconnect timeout storage (maps socket.id to timeout ID)
 const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
+
+// Swap request tracking (maps gameId-targetPlayerId to request data)
+interface SwapRequest {
+  gameId: string;
+  requesterId: string;
+  requesterName: string;
+  targetId: string;
+  timeout: NodeJS.Timeout;
+}
+const pendingSwapRequests = new Map<string, SwapRequest>();
 
 // Countdown interval storage (maps socket.id to interval ID)
 const countdownIntervals = new Map<string, NodeJS.Timeout>();
@@ -996,6 +1008,7 @@ io.on('connection', (socket) => {
     activeTimeouts,
     disconnectTimeouts,
     gameDeletionTimeouts,
+    pendingSwapRequests,
     io,
     saveGame: saveGameToDB,
     deletePlayerSessions,
@@ -1121,6 +1134,16 @@ io.on('connection', (socket) => {
     logger,
     errorBoundaries,
   });
+
+  // ============================================================================
+  // Direct Message Handlers - Sprint 16 Day 4
+  // ============================================================================
+  registerDirectMessageHandlers(io, socket, { errorBoundaries });
+
+  // ============================================================================
+  // Social Handlers - Sprint 16 Day 6
+  // ============================================================================
+  registerSocialHandlers(io, socket, { errorBoundaries });
 
   // ============================================================================
   // Connection Handlers - Refactored (Sprint 3)

@@ -63,13 +63,45 @@ export function registerFriendHandlers(
       // Notify sender
       socket.emit('friend_request_sent', { request });
 
-      // Notify recipient if they're online
+      // Create database notification for recipient (if authenticated)
+      try {
+        const { createNotification } = await import('../db/notifications.js');
+        const { getUserByUsername } = await import('../db/users.js');
+
+        const recipientUser = await getUserByUsername(toPlayer);
+        if (recipientUser) {
+          await createNotification({
+            user_id: recipientUser.id,
+            notification_type: 'friend_request',
+            title: 'New Friend Request',
+            message: `${fromPlayer} sent you a friend request`,
+            data: {
+              request_id: request.id,
+              from_player: fromPlayer,
+              created_at: request.created_at
+            },
+            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          });
+        }
+      } catch (error) {
+        // Silently fail - guest users won't have notifications
+        console.log(`Friend request notification skipped for guest player: ${toPlayer}`);
+      }
+
+      // Notify recipient if they're online (real-time socket event)
       const recipientSockets = await io.in(`player:${toPlayer}`).fetchSockets();
       if (recipientSockets.length > 0) {
         io.to(`player:${toPlayer}`).emit('friend_request_received', {
           request_id: request.id,
           from_player: fromPlayer,
           created_at: request.created_at
+        });
+
+        // Also emit notification_received for NotificationCenter
+        io.to(`player:${toPlayer}`).emit('notification_received', {
+          notification_type: 'friend_request',
+          title: 'New Friend Request',
+          message: `${fromPlayer} sent you a friend request`,
         });
       }
     })
@@ -144,9 +176,40 @@ export function registerFriendHandlers(
 
       // Notify the sender that their request was accepted
       const otherPlayer = player1 === playerName ? player2 : player1;
+
+      // Create database notification for the original sender (if authenticated)
+      try {
+        const { createNotification } = await import('../db/notifications.js');
+        const { getUserByUsername } = await import('../db/users.js');
+
+        const senderUser = await getUserByUsername(otherPlayer);
+        if (senderUser) {
+          await createNotification({
+            user_id: senderUser.id,
+            notification_type: 'friend_request_accepted',
+            title: 'Friend Request Accepted',
+            message: `${playerName} accepted your friend request`,
+            data: {
+              friend_name: playerName,
+              friendship_id: friendship.id
+            },
+            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          });
+        }
+      } catch (error) {
+        console.log(`Friend request accepted notification skipped for guest player: ${otherPlayer}`);
+      }
+
       io.to(`player:${otherPlayer}`).emit('friend_request_accepted', {
         playerName: playerName,
         friendship
+      });
+
+      // Also emit notification_received for NotificationCenter
+      io.to(`player:${otherPlayer}`).emit('notification_received', {
+        notification_type: 'friend_request_accepted',
+        title: 'Friend Request Accepted',
+        message: `${playerName} accepted your friend request`,
       });
 
       socket.emit('friend_request_accepted_confirm', { friendship });

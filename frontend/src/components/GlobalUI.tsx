@@ -155,10 +155,12 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
       )}
 
       {/* Authentication UI */}
-      <NotificationCenter
-        socket={socket}
-        isAuthenticated={auth.isAuthenticated}
-      />
+      <Suspense fallback={<div />}>
+        <NotificationCenter
+          socket={socket}
+          isAuthenticated={auth.isAuthenticated}
+        />
+      </Suspense>
       <EmailVerificationBanner />
 
       {/* Authentication Modals - Lazy loaded */}

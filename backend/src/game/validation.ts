@@ -150,9 +150,10 @@ export function validateBet(
     const isDealer = game.currentPlayerIndex === game.dealerIndex;
     const hasValidBets = game.currentBets.some(b => !b.skipped);
 
-    // Dealer CANNOT skip if there are valid bets
-    if (isDealer && hasValidBets) {
-      return err('As dealer, you cannot skip once betting has started. You must match or raise the current bet.');
+    // Dealer CANNOT skip if NO valid bets exist (must start the betting)
+    // Dealer CAN skip if there ARE valid bets
+    if (isDealer && !hasValidBets) {
+      return err('As dealer, you cannot skip if no one has bet yet. You must place a bet.');
     }
   }
 
@@ -252,13 +253,9 @@ export function validatePositionSwap(
     }
   }
 
-  // During active gameplay: Can only swap with bots (any team)
-  if (game.phase !== 'team_selection' && game.phase !== 'game_over') {
-    if (!target.isBot) {
-      return err('Can only swap positions with bots during active gameplay');
-    }
-    // Can swap with bots on any team (position-based team will be enforced after swap)
-  }
+  // During active gameplay: Can swap with any player (any team)
+  // Position-based team assignment (1-2-1-2 pattern) will be enforced after swap
+  // Note: Human-to-human swaps require confirmation (handled at socket handler level)
 
   // Cannot swap during game_over phase
   if (game.phase === 'game_over') {

@@ -1,0 +1,770 @@
+
+> trick-card-game-frontend@2.0.0 test
+> vitest --reporter=verbose --run
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/Users/marc_/Documents/WebApp/anthropicJoffre/frontend[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mLoading State[2m > [22m[2mshould show loading spinner on mount[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mLoading State[2m > [22m[2mshould emit get_game_replay on mount[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mLoading State[2m > [22m[2mshould register socket event handlers[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould display replay data when loaded successfully[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mLoading State[2m > [22mshould show loading spinner on mount
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mLoading State[2m > [22mshould emit get_game_replay on mount
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mLoading State[2m > [22mshould register socket event handlers
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle 404 errors with correlation ID[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle 404 errors with correlation ID[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Game not found'[39m, correlationId: [32m'abc-123-def'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle network errors[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle network errors[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Network connection failed'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould show warning when replay has no rounds[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m0[39m
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould show warning when replay has no rounds[22m[39m
+[GameReplay] round_history is empty for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have play/pause button[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould start auto-playback when play clicked[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have step forward button[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mRendering and Basic UI[2m > [22mshould render betting phase UI
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mRendering and Basic UI[2m > [22mshould show player hand
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mBet Validation[2m > [22mshould disable Place Bet when bet too low
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mBet Validation[2m > [22mshould enable Place Bet when bet valid
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mBet Validation[2m > [22mshould call onPlaceBet with correct values
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mSkip Bet Functionality[2m > [22mshould show Skip button when no bets exist
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mSkip Bet Functionality[2m > [22mshould hide Skip button for dealer when bets exist
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mSkip Bet Functionality[2m > [22mshould display Skipped badge for skipped bets
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mBet Display[2m > [22mshould show current highest bet
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mBet Display[2m > [22mshould display without-trump indicator
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mBet Display[2m > [22mshould show all player bets
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mDealer Privilege[2m > [22mshould show dealer privilege message for dealer
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mDealer Privilege[2m > [22mshould show must raise message for non-dealer
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mTurn Indication[2m > [22mshould highlight when it is player turn
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mTurn Indication[2m > [22mshould show waiting when not player turn
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mWithout Trump Option[2m > [22mshould allow toggling without trump checkbox
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mWithout Trump Option[2m > [22mshould show without trump indicator in bet preview
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mError States[2m > [22mshould handle missing player gracefully
+ [32m✓[39m src/components/BettingPhase.test.tsx[2m > [22mBettingPhase[2m > [22mError States[2m > [22mshould handle empty players array gracefully
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have step backward button[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mRendering and Basic UI[2m > [22mshould render team selection UI
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mRendering and Basic UI[2m > [22mshould display player count
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mRendering and Basic UI[2m > [22mshould show both team containers
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mTeam Balance Validation[2m > [22mshould disable Start Game with unbalanced teams
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mTeam Balance Validation[2m > [22mshould enable Start Game with balanced teams (2v2)
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mTeam Balance Validation[2m > [22mshould show team balance warning message
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mTeam Balance Validation[2m > [22mshould call onStartGame when Start Game clicked with valid teams
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mTeam Selection Actions[2m > [22mshould allow selecting Team 1
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mTeam Selection Actions[2m > [22mshould allow selecting Team 2
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mPosition Swapping[2m > [22mshould allow swapping positions within team
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mGame Link Copying[2m > [22mshould copy game link to clipboard
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mrenders all stat buttons[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens player stats when My Stats button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mrenders all stat buttons
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mrenders online and recent tab buttons[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mswitches tabs when tab buttons are clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mrenders online and recent tab buttons
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have speed control[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mrenders with all difficulty buttons[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mhighlights the selected difficulty[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mshows correct description for each difficulty level[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onBotDifficultyChange when difficulty button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould change playback speed[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mGame Link Copying[2m > [22mshould show success toast after copying
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mLeave Game Functionality[2m > [22mshould call onLeaveGame when Leave button clicked
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mLeave Game Functionality[2m > [22mshould not show Leave button when onLeaveGame not provided
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mChat Integration[2m > [22mshould render chat component
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mChat Integration[2m > [22mshould listen for chat messages when socket provided
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mError States[2m > [22mshould handle empty players array gracefully
+ [32m✓[39m src/components/TeamSelection.test.tsx[2m > [22mTeamSelection[2m > [22mError States[2m > [22mshould handle missing current player gracefully
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mrenders create game form with all elements[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows player name input with placeholder for guests[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mdisables player name input for authenticated users[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mdefaults to ranked mode (ELO)[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mtoggles between ranked and casual mode[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mrenders create game form with all elements
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mshows player name input with placeholder for guests
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mdisables player name input for authenticated users
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mdefaults to ranked mode (ELO)
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mrenders join game form with all elements[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows join type selection with player and spectator options[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mdefaults to player join type[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mswitches to spectator join type when clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould display current round number[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mRendering and Basic UI[2m > [22mshould render player hand
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mRendering and Basic UI[2m > [22mshould show error state when player not found
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mRendering and Basic UI[2m > [22mshould render spectator view
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mCard Play Functionality[2m > [22mshould disable unplayable cards
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mCard Play Functionality[2m > [22mshould enable all cards when leading trick
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mCard Play Functionality[2m > [22mshould call onPlayCard when card clicked
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mCard Play Functionality[2m > [22mshould prevent double-clicking same card
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mTrick Display[2m > [22mshould show current trick cards
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mTrick Display[2m > [22mshould highlight current player turn
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mTrick Display[2m > [22mshould show empty trick at round start
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mLed Suit Indicator[2m > [22mshould show led suit when trick started
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mLed Suit Indicator[2m > [22mshould not show led suit when leading
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mGame State Display[2m > [22mshould show current scores
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mGame State Display[2m > [22mshould show trump color
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mGame State Display[2m > [22mshould show round number
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mError States[2m > [22mshould handle missing player gracefully
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mError States[2m > [22mshould handle empty hand gracefully
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mError States[2m > [22mshould handle invalid game state gracefully
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mAutoplay Feature[2m > [22mshould show autoplay toggle when enabled
+ [32m✓[39m src/components/PlayingPhase.test.tsx[2m > [22mPlayingPhase[2m > [22mSpectator Mode[2m > [22mshould not allow card play in spectator mode
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould navigate to next round[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould navigate to previous round[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould jump to specific round[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould show game scores[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould display trick history[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould show trump suit[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mrenders with all difficulty buttons
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mhighlights the selected difficulty
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mshows correct description for each difficulty level
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould display winning team[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens leaderboard when Global Leaderboard button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould have Try Again button on error[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould have Try Again button on error[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Connection failed'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould retry fetching on Try Again click[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould retry fetching on Try Again click[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Connection failed'[39m } for game: test-game-123
+
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mrenders join game form with all elements
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows join type selection with player and spectator options
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mdefaults to player join type
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould close on Close button click[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould close on Close button click[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Connection failed'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mCleanup[2m > [22m[2mshould unregister socket handlers on unmount[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mData Loading[2m > [22mshould display replay data when loaded successfully
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mData Loading[2m > [22mshould handle 404 errors with correlation ID
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mData Loading[2m > [22mshould handle network errors
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mData Loading[2m > [22mshould show warning when replay has no rounds
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mPlayback Controls[2m > [22mshould have play/pause button
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mPlayback Controls[2m > [22mshould start auto-playback when play clicked
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mPlayback Controls[2m > [22mshould have step forward button
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mPlayback Controls[2m > [22mshould have step backward button
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mPlayback Controls[2m > [22mshould have speed control
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mPlayback Controls[2m > [22mshould change playback speed
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mNavigation[2m > [22mshould display current round number
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mNavigation[2m > [22mshould navigate to next round
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mNavigation[2m > [22mshould navigate to previous round
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mNavigation[2m > [22mshould jump to specific round
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mState Visualization[2m > [22mshould show game scores
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mState Visualization[2m > [22mshould display trick history
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mState Visualization[2m > [22mshould show trump suit
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mState Visualization[2m > [22mshould display winning team
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mError Recovery[2m > [22mshould have Try Again button on error
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mError Recovery[2m > [22mshould retry fetching on Try Again click
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mError Recovery[2m > [22mshould close on Close button click
+ [32m✓[39m src/components/GameReplay.test.tsx[2m > [22mGameReplay[2m > [22mCleanup[2m > [22mshould unregister socket handlers on unmount
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mopens player stats when My Stats button is clicked
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens browser when Recent Games button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays online players when on online tab[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mshows join button for players in game[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdoes not show join button for players in lobby[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays message when no online players[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays recent players when on recent tab[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mfilters out bot players from recent list[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mshows game count for recent players[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays message when no recent players[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mshows player status labels correctly[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mswitches tabs when tab buttons are clicked
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mdisplays online players when on online tab
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mshows join button for players in game
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mdoes not show join button for players in lobby
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mdisplays message when no online players
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mdisplays recent players when on recent tab
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mfilters out bot players from recent list
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mshows game count for recent players
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mdisplays message when no recent players
+ [32m✓[39m src/components/SocialPanel.test.tsx[2m > [22mSocialPanel[2m > [22mshows player status labels correctly
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows spectator info message when spectator type is selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows (Optional) for player name when spectator type is selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onJoinGame with correct parameters when joining as player[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mdisplays persistence mode toggle[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mtoggles persistence mode when checkbox is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mcalls onBotDifficultyChange when difficulty button is clicked
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mdisplays persistence mode toggle
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mopens leaderboard when Global Leaderboard button is clicked
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mswitches to spectator join type when clicked
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows spectator info message when spectator type is selected
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows (Optional) for player name when spectator type is selected
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows appropriate info message for ranked mode[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows appropriate info message for casual mode[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onSpectateGame when joining as spectator[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mdisables My Stats and Leaderboard buttons when socket is null[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mshows warning message when socket is null[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mRecent Games button is always enabled[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mdisplays player statistics title[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mopens browser when Recent Games button is clicked
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mdisables My Stats and Leaderboard buttons when socket is null
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mshows warning message when socket is null
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mRecent Games button is always enabled
+ [32m✓[39m src/components/StatsPanel.test.tsx[2m > [22mStatsPanel[2m > [22mdisplays player statistics title
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mtoggles between ranked and casual mode[33m 335[2mms[22m[39m
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mshows appropriate info message for ranked mode
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mcalls onJoinGame with correct parameters when joining as player
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mdisables ranked mode checkbox when user is not authenticated[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mshows ranked badge when persistence is elo[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onQuickPlay with correct parameters when button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with player name and ranked mode on submit[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mtoggles persistence mode when checkbox is clicked
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mdisables ranked mode checkbox when user is not authenticated
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mshows ranked badge when persistence is elo
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mshows appropriate info message for casual mode
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows auto-join message when autoJoinGameId is provided[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows back to homepage button when autoJoinGameId is provided[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows regular back button when autoJoinGameId is not provided[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mrenders Quick Play button with correct text[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mcalls onQuickPlay with correct parameters when button is clicked
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx[2m > [22mQuickPlayPanel[2m > [22mrenders Quick Play button with correct text
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mcalls onSpectateGame when joining as spectator
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows auto-join message when autoJoinGameId is provided
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows back to homepage button when autoJoinGameId is provided
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows regular back button when autoJoinGameId is not provided
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with casual mode when checkbox is unchecked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mcalls onBack when back button is clicked
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBackToHomepage when back to homepage button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mcalls onCreateGame with player name and ranked mode on submit
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mdisables player name input for authenticated users[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mrequires game ID to submit[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mrequires player name when joining as player[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mdoes not require player name when joining as spectator[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows Join as Player button text when player type selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows Join as Guest button text when spectator type selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mcalls onBackToHomepage when back to homepage button is clicked
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mdisables player name input for authenticated users
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mrequires game ID to submit
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mrequires player name when joining as player
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mdoes not require player name when joining as spectator
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows Join as Player button text when player type selected
+ [32m✓[39m src/components/JoinGameForm.test.tsx[2m > [22mJoinGameForm[2m > [22mshows Join as Guest button text when spectator type selected
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mcalls onCreateGame with casual mode when checkbox is unchecked
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mupdates player name when typing in input[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mcalls onBack when back button is clicked
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mrequires player name to submit[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - fetching current user
+
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mupdates player name when typing in input
+ [32m✓[39m src/components/GameCreationForm.test.tsx[2m > [22mGameCreationForm[2m > [22mrequires player name to submit
+
+[2m Test Files [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m      Tests [22m [1m[32m142 passed[39m[22m[90m (142)[39m
+[2m   Start at [22m 17:27:53
+[2m   Duration [22m 4.02s[2m (transform 1.61s, setup 1.87s, collect 4.96s, tests 4.48s, environment 12.41s, prepare 4.34s)[22m
+

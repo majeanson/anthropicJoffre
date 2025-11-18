@@ -28,6 +28,17 @@ import {
 import * as PersistenceManager from '../db/persistenceManager';
 
 /**
+ * Swap request tracking interface
+ */
+export interface SwapRequest {
+  gameId: string;
+  requesterId: string;
+  requesterName: string;
+  targetId: string;
+  timeout: NodeJS.Timeout;
+}
+
+/**
  * Dependencies needed by the lobby handlers
  */
 export interface LobbyHandlersDependencies {
@@ -37,6 +48,7 @@ export interface LobbyHandlersDependencies {
   activeTimeouts: Map<string, NodeJS.Timeout>;
   disconnectTimeouts: Map<string, NodeJS.Timeout>;
   gameDeletionTimeouts: Map<string, NodeJS.Timeout>;
+  pendingSwapRequests: Map<string, SwapRequest>;
 
   // Socket.io
   io: Server;
@@ -95,6 +107,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     activeTimeouts,
     disconnectTimeouts,
     gameDeletionTimeouts,
+    pendingSwapRequests,
     io,
     saveGame,
     deletePlayerSessions,
@@ -515,7 +528,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   }));
 
   // ============================================================================
-  // swap_position - Swap positions with another player
+  // swap_position - Swap positions with another player (immediate, for bots)
   // ============================================================================
   socket.on('swap_position', errorBoundaries.gameAction('swap_position')(({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
     // Basic validation: game exists
@@ -537,6 +550,140 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
 
     // I/O - Emit updates
     emitGameUpdate(gameId, game);
+  }));
+
+  // ============================================================================
+  // request_swap - Request position swap (for human players)
+  // ============================================================================
+  socket.on('request_swap', errorBoundaries.gameAction('request_swap')(({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // VALIDATION
+    const validation = validatePositionSwap(game, socket.id, targetPlayerId);
+    if (!validation.success) {
+      socket.emit('error', { message: validation.error });
+      return;
+    }
+
+    const requester = game.players.find(p => p.id === socket.id);
+    const target = game.players.find(p => p.id === targetPlayerId);
+
+    if (!requester || !target) {
+      socket.emit('error', { message: 'Player not found' });
+      return;
+    }
+
+    // If target is a bot, execute swap immediately
+    if (target.isBot) {
+      applyPositionSwap(game, socket.id, targetPlayerId);
+      emitGameUpdate(gameId, game);
+      return;
+    }
+
+    // Cancel any existing request from this requester (1 request per player limit)
+    const existingRequestKey = Array.from(pendingSwapRequests.keys()).find(key => {
+      const request = pendingSwapRequests.get(key);
+      return request && request.requesterId === socket.id;
+    });
+    if (existingRequestKey) {
+      const existingRequest = pendingSwapRequests.get(existingRequestKey);
+      if (existingRequest) {
+        clearTimeout(existingRequest.timeout);
+        pendingSwapRequests.delete(existingRequestKey);
+      }
+    }
+
+    // Determine if swap will change teams
+    const requesterIndex = game.players.findIndex(p => p.id === socket.id);
+    const targetIndex = game.players.findIndex(p => p.id === targetPlayerId);
+    const requesterTeam = requesterIndex % 2 === 0 ? 1 : 2;
+    const targetTeam = targetIndex % 2 === 0 ? 1 : 2;
+    const willChangeTeams = requesterTeam !== targetTeam;
+
+    // Create timeout for auto-rejection (30 seconds)
+    const timeout = setTimeout(() => {
+      const requestKey = `${gameId}-${targetPlayerId}`;
+      pendingSwapRequests.delete(requestKey);
+
+      // Notify requester that request expired
+      io.to(socket.id).emit('swap_rejected', {
+        message: `${target.name} didn't respond to your swap request`
+      });
+    }, 30000);
+
+    // Store pending request
+    const requestKey = `${gameId}-${targetPlayerId}`;
+    pendingSwapRequests.set(requestKey, {
+      gameId,
+      requesterId: socket.id,
+      requesterName: requester.name,
+      targetId: targetPlayerId,
+      timeout
+    });
+
+    // Notify target player
+    io.to(targetPlayerId).emit('swap_request_received', {
+      fromPlayerId: socket.id,
+      fromPlayerName: requester.name,
+      willChangeTeams
+    });
+  }));
+
+  // ============================================================================
+  // respond_to_swap - Accept or reject swap request
+  // ============================================================================
+  socket.on('respond_to_swap', errorBoundaries.gameAction('respond_to_swap')(({ gameId, requesterId, accepted }: { gameId: string; requesterId: string; accepted: boolean }) => {
+    const game = games.get(gameId);
+    if (!game) {
+      socket.emit('error', { message: 'Game not found' });
+      return;
+    }
+
+    // Find and validate pending request
+    const requestKey = `${gameId}-${socket.id}`;
+    const swapRequest = pendingSwapRequests.get(requestKey);
+
+    if (!swapRequest || swapRequest.requesterId !== requesterId) {
+      socket.emit('error', { message: 'No pending swap request found' });
+      return;
+    }
+
+    // Clear timeout and remove request
+    clearTimeout(swapRequest.timeout);
+    pendingSwapRequests.delete(requestKey);
+
+    const requester = game.players.find(p => p.id === requesterId);
+    const target = game.players.find(p => p.id === socket.id);
+
+    if (!requester || !target) {
+      socket.emit('error', { message: 'Player not found' });
+      return;
+    }
+
+    if (accepted) {
+      // Execute the swap
+      applyPositionSwap(game, requesterId, socket.id);
+
+      // Notify both players
+      io.to(requesterId).emit('swap_accepted', {
+        message: `${target.name} accepted your swap request`
+      });
+      io.to(socket.id).emit('swap_accepted', {
+        message: `You swapped positions with ${requester.name}`
+      });
+
+      // Update all players with new game state
+      emitGameUpdate(gameId, game);
+    } else {
+      // Notify requester of rejection
+      io.to(requesterId).emit('swap_rejected', {
+        message: `${target.name} rejected your swap request`
+      });
+    }
   }));
 
   // ============================================================================

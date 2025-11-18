@@ -211,11 +211,11 @@ export function TeamSelection({
                           )}
                         </div>
                         <div className="flex gap-2">
-                          {!isCurrentPlayer && currentPlayer && (currentPlayer.teamId === 1 || playerAtPosition.isBot) && (
+                          {!isCurrentPlayer && currentPlayer && (
                             <button
                               onClick={() => onSwapPosition(playerAtPosition.id)}
                               className="text-xs bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0"
-                              title={playerAtPosition.isBot && currentPlayer.teamId !== 1 ? 'Swap with this bot (changes teams!)' : 'Swap positions'}
+                              title={currentPlayer.teamId !== 1 ? 'Swap with this player (changes teams!)' : 'Swap positions'}
                             >
                               Swap
                             </button>
@@ -318,11 +318,11 @@ export function TeamSelection({
                           )}
                         </div>
                         <div className="flex gap-2">
-                          {!isCurrentPlayer && currentPlayer && (currentPlayer.teamId === 2 || playerAtPosition.isBot) && (
+                          {!isCurrentPlayer && currentPlayer && (
                             <button
                               onClick={() => onSwapPosition(playerAtPosition.id)}
                               className="text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0"
-                              title={playerAtPosition.isBot && currentPlayer.teamId !== 2 ? 'Swap with this bot (changes teams!)' : 'Swap positions'}
+                              title={currentPlayer.teamId !== 2 ? 'Swap with this player (changes teams!)' : 'Swap positions'}
                             >
                               Swap
                             </button>

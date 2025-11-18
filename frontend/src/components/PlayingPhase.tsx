@@ -591,8 +591,8 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
     // Can't swap with yourself
     if (!player || player.id === currentPlayerId) return false;
 
-    // Can swap with any bot (any team - position determines team after swap)
-    return player.isBot === true;
+    // Can swap with any player (bot or human, any team - position determines team after swap)
+    return true;
   };
 
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {

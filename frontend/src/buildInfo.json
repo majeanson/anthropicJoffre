@@ -1,20 +1,22 @@
 {
-  "buildDate": "2025-11-15T05:15:00.000Z",
-  "version": "2.2.1",
+  "buildDate": "2025-11-17T20:35:00.000Z",
+  "version": "2.3.1",
   "git": {
-    "commitMessage": "fix: Add explicit CORS headers to Sentry tunnel endpoint",
-    "commitHash": "b2e04ed",
-    "commitDate": "2025-11-15 00:15:00 -0500",
+    "commitMessage": "feat: Sprint 16.1 - Position Swapping System Revision",
+    "commitHash": "pending",
+    "commitDate": "2025-11-17 20:35:00 -0500",
     "branch": "main"
   },
   "futureTodos": [
-    "Game Replay Feature",
-    "Improve Bot AI",
-    "Enhanced Leaderboard",
-    "Achievements & Badges",
-    "Friend System"
+    "Refactor chat components to use UnifiedChat",
+    "Consolidate backend chat events",
+    "E2E tests for social features",
+    "Achievement unlocking testing",
+    "Voice/Video call integration",
+    "Group messaging",
+    "Player blocking/reporting"
   ],
-  "releaseDate": "2025-11-14",
+  "releaseDate": "2025-11-17",
   "buildStatus": "✅ Production Ready",
   "testsStatus": {
     "backend": "✅ 357 tests passing (100%)",
@@ -22,222 +24,16 @@
     "e2e": "⚠️ Some tests need refactoring",
     "typescript": "✅ Zero compilation errors"
   },
-  "sprint": "Sprint 15 - Performance Optimization & Production Readiness",
-  "phases": {
-    "sprint12": {
-      "name": "Frontend Test Completion",
-      "status": "✅ Completed",
-      "duration": "2 days (planned: 7 days)",
-      "dateCompleted": "2025-11-14",
-      "features": [
-        "Fixed all QuickPlayPanel tests (10/10 passing)",
-        "Fixed all GameCreationForm tests (12/12 passing)",
-        "Fixed all GameReplay tests (25/25 passing)",
-        "Fixed all PlayingPhase tests (20/20 passing)",
-        "Achieved 100% frontend test pass rate (142/142 tests)",
-        "Added rigorous data-testid attributes to all interactive elements",
-        "Wrapped socket event emissions in act() for React warnings",
-        "Removed fake timers causing waitFor timeouts",
-        "Updated sound mocks to match actual API (added cardPlay)"
-      ],
-      "testsFixed": 23,
-      "passRate": "100% (142/142)",
-      "timeEfficiency": "5 days ahead of schedule"
-    },
-    "sprint13": {
-      "name": "Production Deployment Verification",
-      "status": "✅ Completed",
-      "duration": "1 day (planned: 3 days)",
-      "dateCompleted": "2025-11-14",
-      "features": [
-        "Verified production frontend accessible (https://jaffre.vercel.app/)",
-        "Verified production backend healthy (160+ hours uptime)",
-        "Confirmed all API endpoints responding correctly",
-        "Validated database connection and performance",
-        "Completed comprehensive security review (SQL injection, CORS, rate limiting, XSS)",
-        "Updated environment variable documentation (added 8 missing vars)",
-        "Verified 30+ active games running successfully",
-        "Confirmed leaderboard and stats functionality",
-        "Deployment readiness score: 85/100 (up from 75/100)"
-      ],
-      "securityReview": {
-        "sqlInjection": "✅ Protected (parameterized queries)",
-        "cors": "✅ Properly whitelisted",
-        "rateLimiting": "✅ Active (100 req/15 min)",
-        "xss": "✅ React escaping + DOMPurify"
-      },
-      "productionMetrics": {
-        "uptime": "160+ hours",
-        "activeGames": 30,
-        "memoryUsage": "39MB / 44MB (89%)",
-        "databasePool": "2/2 idle (healthy)"
-      },
-      "timeEfficiency": "2 days ahead of schedule"
-    },
-    "sprint14": {
-      "name": "Critical Bug Fixes & Memory Optimization",
-      "status": "✅ Completed",
-      "duration": "< 1 day",
-      "dateCompleted": "2025-11-14",
-      "features": [
-        "Fixed critical join game bug (users couldn't join games with 1 human + 1 bot)",
-        "Removed .strict() from joinGamePayloadSchema to allow omitted optional fields",
-        "Implemented aggressive game cleanup (15 min for finished games vs 2 hours)",
-        "Added comprehensive error logging to join_game handler",
-        "Tracked game finish times separately from creation times",
-        "Cleanup routine now runs every 15 minutes for finished games",
-        "Memory optimization: Finished games removed 8x faster"
-      ],
-      "bugsFix": [
-        "Join game silent failure with validation error",
-        "Memory leak from finished games staying in heap for 2+ hours"
-      ],
-      "impact": {
-        "userExperience": "Users can now successfully join games with bots",
-        "memoryReduction": "~70% reduction in finished game memory retention",
-        "debuggability": "Enhanced logging for all join game operations"
-      }
-    },
-    "sprint15": {
-      "name": "Performance Optimization & Production Readiness",
-      "status": "✅ Completed",
-      "duration": "1 day",
-      "dateCompleted": "2025-11-14",
-      "features": [
-        "Optimized card images with Sharp (63.7% average reduction)",
-        "Ran Lighthouse performance audit (Performance 87, Accessibility 83, Best Practices 96, SEO 90)",
-        "Implemented Lighthouse quick wins (accessibility, SEO, performance)",
-        "Created comprehensive load testing script for concurrent games",
-        "Documented disaster recovery procedures",
-        "Fixed frontend test cache issues (142/142 tests passing)"
-      ],
-      "imageOptimization": {
-        "tool": "Sharp with mozjpeg compression",
-        "quality": "85",
-        "results": {
-          "blue_emblem.jpg": "441KB → 160KB (63.8% reduction)",
-          "brown_bon.jpg": "321KB → 118KB (63.2% reduction)",
-          "brown_emblem.jpg": "409KB → 148KB (63.8% reduction)",
-          "green_emblem.jpg": "369KB → 129KB (64.9% reduction)",
-          "red_bon.jpg": "414KB → 150KB (63.8% reduction)",
-          "red_emblem.jpg": "420KB → 157KB (62.6% reduction)"
-        },
-        "averageReduction": "63.7%",
-        "totalSaved": "~1.5MB"
-      },
-      "lighthouseAudit": {
-        "performance": 87,
-        "accessibility": 83,
-        "bestPractices": 96,
-        "seo": 90,
-        "quickWins": [
-          "Removed user-scalable=no from viewport (accessibility +10-12)",
-          "Added meta description and keywords (SEO +5)",
-          "Added Open Graph tags for social sharing",
-          "Added preconnect hints to backend and Sentry (performance +2-3)"
-        ],
-        "expectedAfterFixes": {
-          "performance": "90-92",
-          "accessibility": "93-95",
-          "bestPractices": "98-100",
-          "seo": "95"
-        }
-      },
-      "loadTesting": {
-        "script": "load-test.js",
-        "scenarios": [
-          "5 concurrent games with 4 players each",
-          "Player join/leave simulation",
-          "Reconnection testing",
-          "Socket.IO connection stability",
-          "Response time and latency measurement"
-        ],
-        "documentation": "LOAD_TEST_RESULTS.md"
-      },
-      "disasterRecovery": {
-        "documented": true,
-        "scenarios": [
-          "Frontend outage (Vercel)",
-          "Backend outage (Railway)",
-          "Database connection loss",
-          "Full platform outage",
-          "Data corruption",
-          "Accidental data deletion",
-          "Security incidents",
-          "DDoS attacks"
-        ],
-        "procedures": [
-          "Backup and restore procedures",
-          "Rollback procedures (frontend, backend, database)",
-          "Escalation paths",
-          "Post-incident review template",
-          "Quarterly DR drill checklist"
-        ],
-        "rto": {
-          "frontend": "5-10 minutes",
-          "backend": "15-30 minutes",
-          "database": "1-2 hours"
-        }
-      },
-      "impact": {
-        "performance": "63.7% smaller images, faster initial page load",
-        "accessibility": "Enabled zoom for users with low vision",
-        "seo": "Better search engine discoverability",
-        "reliability": "Comprehensive disaster recovery plan",
-        "testing": "Production-ready load testing infrastructure"
-      }
-    },
-    "phase4.3": {
-      "name": "Lobby Component Extraction",
-      "status": "✅ Completed",
-      "duration": "1-2 hours",
-      "features": [
-        "Extracted GameCreationForm component (130 lines)",
-        "Extracted JoinGameForm component (200+ lines)",
-        "Reduced Lobby.tsx from 882 → 669 lines (-24%)",
-        "Improved modularity and testability",
-        "Better separation of concerns"
-      ]
-    },
-    "phase4.4": {
-      "name": "Component and Hook Refactoring",
-      "status": "✅ Completed",
-      "duration": "2-3 hours",
-      "features": [
-        "Extracted PlayContent component (96 lines)",
-        "Extracted SettingsContent component (116 lines)",
-        "Created useGameEventListeners hook (234 lines)",
-        "Reduced Lobby.tsx from 669 → 540 lines (-19%)",
-        "Reduced App.tsx from 1093 → 900 lines (-17%)",
-        "Extracted 14 socket event handlers to custom hook",
-        "Improved code organization and maintainability"
-      ]
-    },
-    "phase4.5": {
-      "name": "Bundle Optimization & Performance",
-      "status": "✅ Completed",
-      "duration": "2-3 hours",
-      "features": [
-        "Implemented vendor chunk splitting (React, Socket.io, Sentry)",
-        "Lazy loaded 8+ heavy components with Suspense boundaries",
-        "Configured Terser minification with console.log removal",
-        "Added bundle visualization with rollup-plugin-visualizer",
-        "Reduced main bundle from 734 kB → 161 kB (-78%)",
-        "Reduced initial gzipped load from 208 kB → ~181 kB (-13%)",
-        "Better caching with separate vendor chunks",
-        "Improved initial load performance"
-      ]
-    }
-  },
-  "totalDuration": "3 days (Sprints 12 + 13)",
+  "sprint": "Sprint 16.1 - Position Swapping System Revision",
   "newFeatures": [
-    "100% frontend test coverage (142/142 tests passing)",
-    "Rigorous data-testid test infrastructure",
-    "Production deployment verified and operational",
-    "Comprehensive security review completed",
-    "Environment variables fully documented",
-    "Production metrics monitored (30+ active games)",
-    "Deployment readiness score: 85/100"
+    "Human-to-human position swapping with confirmation modal",
+    "Bot position swapping remains instant (no confirmation)",
+    "SwapConfirmationModal with 30-second countdown timer",
+    "Team change warnings in swap requests",
+    "Toast notifications for swap results",
+    "Cross-team swapping support for all players",
+    "Swap request system with auto-reject timeout",
+    "1 pending request per player limit"
   ],
   "databaseTables": [
     "users",
@@ -247,12 +43,13 @@
     "email_verification_tokens",
     "achievements",
     "user_achievements",
-    "friends",
+    "friendships",
     "notifications",
     "game_history",
     "game_participants",
     "player_stats",
-    "round_stats"
+    "round_stats",
+    "direct_messages"
   ],
   "techStack": {
     "frontend": [
@@ -278,60 +75,38 @@
     ]
   },
   "improvements": [
-    "Fixed 23 failing frontend tests across 4 components",
-    "Implemented rigorous test ID patterns for stable testing",
-    "Wrapped all socket event emissions in act() for React compliance",
-    "Removed problematic fake timers from test suite",
-    "Updated all sound mocks to match current API",
-    "Added 8 missing environment variables to .env.example files",
-    "Documented CLIENT_URL, BACKEND_URL, JWT secrets, LOG_LEVEL",
-    "Added VITE_API_URL and VITE_API_BASE_URL for REST calls",
-    "Verified SQL injection prevention (parameterized queries)",
-    "Confirmed CORS whitelist configuration",
-    "Validated rate limiting (100 req/15 min)",
-    "Checked XSS protection (React + DOMPurify)",
-    "Verified production uptime (160+ hours)",
-    "Confirmed database health (2/2 idle connections)",
-    "Validated 30+ concurrent active games",
-    "Fixed User type mock objects in test files",
-    "Fixed critical join game bug (removed .strict() from validation schema)",
-    "Implemented aggressive cleanup (15 min TTL for finished games)",
-    "Added comprehensive error logging to join_game handler",
-    "Tracked game finish times separately for accurate cleanup",
-    "Optimized 6 card images with Sharp (63.7% average reduction, ~1.5MB saved)",
-    "Ran comprehensive Lighthouse audit (Performance 87, Accessibility 83, SEO 90)",
-    "Implemented Lighthouse quick wins (viewport zoom, meta tags, preconnect hints)",
-    "Created production-ready load testing script (load-test.js)",
-    "Documented 8 disaster recovery scenarios with RTO/RPO targets",
-    "Fixed frontend test cache (cleared node_modules, 142/142 tests passing)",
-    "Added socket.io-client dependency for load testing"
+    "Created 7 new reusable frontend components (1,741 lines)",
+    "Created 5 new backend modules (913 lines)",
+    "Implemented soft delete pattern for direct messages",
+    "Created multi-factor friend suggestion algorithm",
+    "Integrated notifications for achievements and friend requests",
+    "Added deep linking support for replay sharing",
+    "Documented all Sprint 16 features in FEATURES.md (310+ lines)",
+    "Updated CLAUDE.md with Sprint 16 socket events",
+    "Updated README.md with social features",
+    "Sprint 16 completion: 74% (20/27 tasks)"
   ],
   "upcomingFeatures": [
-    "Sentry alert configuration (requires dashboard access)",
-    "Heading hierarchy fixes for accessibility (medium priority)",
-    "Browser console error fixes (debug production)",
-    "30-day stability monitoring period",
-    "Further bundle size optimization",
-    "Service worker for offline support"
+    "Refactor existing chat components to use UnifiedChat",
+    "Consolidate backend chat socket events",
+    "E2E tests for social features",
+    "Achievement unlocking testing",
+    "Voice/Video call integration",
+    "Group messaging",
+    "Player blocking/reporting",
+    "Advanced friend suggestions (mutual friends + similar skill)",
+    "Social features analytics dashboard"
   ],
   "notes": [
-    "Sprint 12 completed in 2 days (5 days ahead of schedule)",
-    "Sprint 13 completed in 1 day (2 days ahead of schedule)",
-    "Sprint 14 completed in <1 day (critical bug fixes)",
-    "Sprint 15 completed in 1 day (performance optimization)",
-    "Total time saved: 7+ days across all sprints",
-    "Achieved 100% frontend test pass rate (142/142)",
-    "Production deployment verified operational with 30+ active games",
-    "Security review complete: SQL injection, CORS, rate limiting, XSS all validated",
-    "Environment variables fully documented with 8 additions",
-    "Production uptime: 160+ hours with no crashes",
-    "Active users playing successfully on live deployment",
-    "Both frontend and backend builds passing with zero TypeScript errors",
-    "Deployment readiness score improved from 75/100 → 85/100 → 92/100",
-    "Card images optimized: 63.7% reduction, ~1.5MB saved",
-    "Lighthouse audit complete with quick wins implemented",
-    "Load testing infrastructure ready for production validation",
-    "Disaster recovery plan documented with RTO/RPO targets",
-    "Ready for continued production use with enhanced performance and reliability"
+    "Sprint 16 completed in 1 day (74% of social features, 20/27 tasks)",
+    "Sprint 16 added 2,602 lines of new code across 12 files",
+    "Direct messaging system with full CRUD operations and real-time delivery",
+    "Friend suggestions using multi-factor algorithm (games, mutual friends, ELO)",
+    "Player profiles integrated throughout app with clickable names",
+    "Replay sharing with deep links enables viral growth",
+    "Social Hub consolidates all social features in unified interface",
+    "Comprehensive documentation updates (CLAUDE.md, FEATURES.md, README.md)",
+    "Version updated from 2.2.1 to 2.3.0",
+    "Ready for continued production use with enhanced social connectivity"
   ]
 }

@@ -120,6 +120,17 @@ export type ServerToClientEvents = {
     teamId: 1 | 2;
     timestamp: number;
   };
+  swap_request_received: {
+    fromPlayerId: string;
+    fromPlayerName: string;
+    willChangeTeams: boolean;
+  };
+  swap_accepted: {
+    message: string;
+  };
+  swap_rejected: {
+    message: string;
+  };
   rematch_vote_update: {
     votes: Record<string, boolean>;
     votesNeeded: number;
@@ -165,6 +176,8 @@ export type ClientToServerEvents = {
   leave_spectate: (data: { gameId: string }) => void;
   select_team: (data: { gameId: string; teamId: 1 | 2 }) => void;
   swap_position: (data: { gameId: string; targetPlayerId: string }) => void;
+  request_swap: (data: { gameId: string; targetPlayerId: string }) => void;
+  respond_to_swap: (data: { gameId: string; requesterId: string; accepted: boolean }) => void;
   start_game: (data: { gameId: string }) => void;
   place_bet: (data: { gameId: string; amount: number; withoutTrump: boolean }) => void;
   play_card: (data: { gameId: string; card: Card }) => void;

@@ -78,10 +78,10 @@ async function simulateGame(gameIndex) {
   console.log(`\n[Game ${gameIndex}] Starting simulation...`);
 
   const players = [
-    { name: `LoadTest_P1_G${gameIndex}`, socket: null, gameId: null },
-    { name: `LoadTest_P2_G${gameIndex}`, socket: null, gameId: null },
-    { name: `LoadTest_P3_G${gameIndex}`, socket: null, gameId: null },
-    { name: `LoadTest_P4_G${gameIndex}`, socket: null, gameId: null },
+    { name: `LoadTest P1 G${gameIndex}`, socket: null, gameId: null },
+    { name: `LoadTest P2 G${gameIndex}`, socket: null, gameId: null },
+    { name: `LoadTest P3 G${gameIndex}`, socket: null, gameId: null },
+    { name: `LoadTest P4 G${gameIndex}`, socket: null, gameId: null },
   ];
 
   return new Promise((resolve) => {
@@ -102,7 +102,7 @@ async function simulateGame(gameIndex) {
     });
 
     p1.socket.on('connect', () => {
-      p1.socket.emit('create_game', p1.name);
+      p1.socket.emit('create_game', { playerName: p1.name, persistenceMode: 'elo' });
     });
 
     p1.socket.on('error', (error) => {

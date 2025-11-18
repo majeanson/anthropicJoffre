@@ -109,12 +109,15 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   }, [currentBets]);
 
   const canSkip = (): boolean => {
-    // Dealer can NEVER skip (must match/raise if bets exist, or bet minimum 7 if all skipped)
-    // Non-dealers can always skip (if no bets yet) or must raise
-    if (isDealer) {
-      return false; // Dealer can never skip
+    // Non-dealers can always skip
+    if (!isDealer) {
+      return true;
     }
-    return true; // Non-dealers can always skip
+
+    // Dealer CANNOT skip if NO valid bets exist (must start the betting)
+    // Dealer CAN skip if there ARE valid bets
+    const hasValidBets = currentBets.some(b => !b.skipped);
+    return hasValidBets; // Dealer can skip only if someone has bet
   };
 
   const handlePlaceBet = () => {

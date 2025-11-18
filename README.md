@@ -11,12 +11,33 @@ A real-time multiplayer trick-taking card game built with React, Node.js, Socket
 - **No-trump betting** - Double or nothing gameplay
 - **Reconnection support** - 15-minute grace period with catch-up modal
 
-### Social & Multiplayer
-- **Spectator mode** - Watch ongoing games without playing
-- **In-game chat** - Team selection and gameplay chat with emoji reactions
-- **Lobby browser** - Browse and join public games
-- **Quick share links** - One-click shareable game URLs
-- **Rematch system** - Vote to play again with same players
+### Social & Multiplayer (Sprint 16 🆕)
+- **Direct Messaging System** 🆕
+  - Private 1-on-1 conversations between players
+  - Real-time delivery via WebSocket with read receipts
+  - Full-text search across all conversations
+  - Message management with soft delete
+  - Unread message counters and notifications
+
+- **Social Discovery** 🆕
+  - Recent Players tracking (last 50 unique players)
+  - Friend Suggestions based on mutual connections
+  - Mutual Friends display for social context
+  - Player profiles with quick actions (Message, Add Friend, View Profile)
+  - Avatar display with player info tooltips
+
+- **Unified Social Hub** 🆕
+  - Dedicated tabs: Friends, Recent Players, Messages
+  - One-click access to all social features
+  - Quick actions for each player
+  - Integrated with player profiles and direct messages
+
+- **Classic Features**
+  - Replay sharing via URL, Twitter, or Facebook
+  - Spectator mode to watch ongoing games
+  - In-game chat with team selection and gameplay channels
+  - Lobby browser to browse and join public games
+  - Rematch system with voting
 
 ### Stats & Progression
 - **Global leaderboard** - Top 100 players worldwide
@@ -223,6 +244,9 @@ VITE_SOCKET_URL=http://localhost:3001
 - `place_bet` - Submit bet
 - `play_card` - Play a card
 - `send_game_chat` - Send in-game chat message
+- `send_direct_message` - Send DM to player
+- `get_recent_players` - Fetch recent players
+- `get_friend_suggestions` - Get friend recommendations
 - `vote_rematch` - Vote for rematch
 - `kick_player` - Kick AFK player (host only)
 - `reconnect_to_game` - Reconnect after disconnect
@@ -236,6 +260,10 @@ VITE_SOCKET_URL=http://localhost:3001
 - `round_ended` - Round complete
 - `game_over` - Game finished
 - `game_chat` - Chat message received
+- `direct_message_received` - New DM received
+- `recent_players` - Recent players list
+- `friend_suggestions` - Friend recommendations
+- `achievement_unlocked` - Achievement earned
 - `rematch_vote_update` - Rematch vote status
 - `player_stats` - Player statistics
 - `leaderboard` - Leaderboard data

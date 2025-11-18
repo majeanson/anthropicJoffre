@@ -354,13 +354,27 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 </p>
               </div>
             </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-emerald-100 text-4xl font-bold leading-none transition-colors"
-              aria-label="Close replay viewer"
-            >
-              ×
-            </button>
+            <div className="flex items-center gap-3">
+              {/* Share Button */}
+              <button
+                onClick={() => {
+                  const replayUrl = `${window.location.origin}?replay=${gameId}`;
+                  navigator.clipboard.writeText(replayUrl);
+                  sounds.playSound('achievement_unlock');
+                }}
+                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                title="Copy replay link"
+              >
+                🔗 Share
+              </button>
+              <button
+                onClick={onClose}
+                className="text-white hover:text-emerald-100 text-4xl font-bold leading-none transition-colors"
+                aria-label="Close replay viewer"
+              >
+                ×
+              </button>
+            </div>
           </div>
         </div>
 

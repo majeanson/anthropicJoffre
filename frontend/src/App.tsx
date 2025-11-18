@@ -15,6 +15,7 @@ const RematchVoting = lazy(() => import('./components/RematchVoting').then(m => 
 // Modals and overlays (only loaded when opened)
 const GameReplay = lazy(() => import('./components/GameReplay').then(m => ({ default: m.GameReplay })));
 const BotTakeoverModal = lazy(() => import('./components/BotTakeoverModal').then(m => ({ default: m.BotTakeoverModal })));
+const SwapConfirmationModal = lazy(() => import('./components/SwapConfirmationModal').then(m => ({ default: m.SwapConfirmationModal })));
 
 // Debug components (only loaded in debug mode)
 const DebugControls = lazy(() => import('./components/DebugControls'));
@@ -120,6 +121,9 @@ function AppContent() {
   // Sprint 2 Phase 2: Friends state
   const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
 
+  // Sprint 16: Swap request state
+  const [swapRequest, setSwapRequest] = useState<{ fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean } | null>(null);
+
   // Missing state variables for GlobalUI and DebugControls
   const [missedActions, setMissedActions] = useState<unknown[]>([]);
 
@@ -220,6 +224,33 @@ function AppContent() {
     playErrorSound,
   });
 
+  // Sprint 16: Swap request event listeners
+  useEffect(() => {
+    if (!socket || !gameId) return;
+
+    const handleSwapRequestReceived = (data: { fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean }) => {
+      setSwapRequest(data);
+    };
+
+    const handleSwapAccepted = (data: { message: string }) => {
+      showToast(data.message, 'success', 3000);
+    };
+
+    const handleSwapRejected = (data: { message: string }) => {
+      showToast(data.message, 'info', 3000);
+    };
+
+    socket.on('swap_request_received', handleSwapRequestReceived);
+    socket.on('swap_accepted', handleSwapAccepted);
+    socket.on('swap_rejected', handleSwapRejected);
+
+    return () => {
+      socket.off('swap_request_received', handleSwapRequestReceived);
+      socket.off('swap_accepted', handleSwapAccepted);
+      socket.off('swap_rejected', handleSwapRejected);
+    };
+  }, [socket, gameId, showToast]);
+
   // Sprint 5 Phase 2: Handle bot spawning on reconnection
   // This ensures bots continue playing after human player reconnects
   useEffect(() => {
@@ -231,18 +262,28 @@ function AppContent() {
     }
   }, [showCatchUpModal]); // Trigger when catch-up modal is shown (indicates reconnection)
 
-  // URL parameter parsing for auto-join from shared links
+  // URL parameter parsing for auto-join from shared links and replay viewing
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const joinGameId = urlParams.get('join');
+    const replayGameId = urlParams.get('replay');
 
     if (joinGameId) {
       setAutoJoinGameId(joinGameId);
-
       // Clean the URL without reloading the page
       window.history.replaceState({}, '', window.location.pathname);
     }
-  }, []);
+
+    if (replayGameId) {
+      // Open replay modal for shared replay link
+      setShowReplayModal(true);
+      // Note: The replay gameId will be handled by the URL parameter
+      // We'll store it in state for the GameReplay component to use
+      sessionStorage.setItem('sharedReplayId', replayGameId);
+      // Clean the URL without reloading the page
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [setShowReplayModal]);
 
   const handleCreateGame = (playerName: string, persistenceMode: 'elo' | 'casual' = 'elo') => {
     if (socket) {
@@ -305,9 +346,42 @@ function AppContent() {
   };
 
   const handleSwapPosition = (targetPlayerId: string) => {
-    if (socket && gameId) {
+    if (!socket || !gameId || !gameState) return;
+
+    const targetPlayer = gameState.players.find(p => p.id === targetPlayerId);
+    if (!targetPlayer) return;
+
+    // If target is a bot, swap immediately
+    if (targetPlayer.isBot) {
       socket.emit('swap_position', { gameId, targetPlayerId });
+    } else {
+      // If target is human, send swap request (requires confirmation)
+      socket.emit('request_swap', { gameId, targetPlayerId });
     }
+  };
+
+  const handleAcceptSwap = () => {
+    if (!socket || !gameId || !swapRequest) return;
+
+    socket.emit('respond_to_swap', {
+      gameId,
+      requesterId: swapRequest.fromPlayerId,
+      accepted: true
+    });
+
+    setSwapRequest(null);
+  };
+
+  const handleRejectSwap = () => {
+    if (!socket || !gameId || !swapRequest) return;
+
+    socket.emit('respond_to_swap', {
+      gameId,
+      requesterId: swapRequest.fromPlayerId,
+      accepted: false
+    });
+
+    setSwapRequest(null);
   };
 
   const handleStartGame = () => {
@@ -967,6 +1041,19 @@ function AppContent() {
             onTakeOver={handleTakeOverBot}
             onCancel={() => setBotTakeoverModal(null)}
           />
+          </Suspense>
+        )}
+
+        {/* Swap Confirmation Modal */}
+        {swapRequest && (
+          <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+            <SwapConfirmationModal
+              isOpen={!!swapRequest}
+              fromPlayerName={swapRequest.fromPlayerName}
+              willChangeTeams={swapRequest.willChangeTeams}
+              onAccept={handleAcceptSwap}
+              onReject={handleRejectSwap}
+            />
           </Suspense>
         )}
       </>
