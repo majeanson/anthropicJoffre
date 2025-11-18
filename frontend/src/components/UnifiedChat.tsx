@@ -87,7 +87,7 @@ export function UnifiedChat({
   compact = false
 }: UnifiedChatProps) {
   const [inputMessage, setInputMessage] = useState('');
-  const [isExpanded, setIsExpanded] = useState(mode !== 'floating' || isOpen);
+  const [isExpanded, setIsExpanded] = useState(mode !== 'floating'); // Start collapsed for floating mode
   const [unreadCount, setUnreadCount] = useState(0);
   const [showEmojis, setShowEmojis] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -193,7 +193,7 @@ export function UnifiedChat({
   // Container styles based on mode
   const containerClasses = {
     panel: 'fixed right-4 bottom-4 w-80 md:w-80 bg-parchment-50 dark:bg-gray-800 rounded-lg shadow-2xl border-4 border-amber-700 dark:border-gray-600 flex flex-col max-h-96 z-50',
-    floating: 'fixed bottom-4 right-4 w-80 max-w-[calc(100vw-2rem)] bg-parchment-50 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg shadow-2xl z-40 flex flex-col animate-slide-in',
+    floating: 'fixed bottom-4 right-4 w-[90vw] sm:w-80 max-w-[calc(100vw-2rem)] max-h-[80vh] sm:max-h-[500px] bg-parchment-50 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg shadow-2xl z-40 flex flex-col animate-slide-in',
     embedded: 'w-full bg-parchment-50 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg flex flex-col',
     modal: 'fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4'
   }[mode];
@@ -239,7 +239,7 @@ export function UnifiedChat({
         </div>
 
         {/* Messages */}
-        <div className={`flex-1 overflow-y-auto p-3 bg-parchment-100 dark:bg-gray-700 ${compact ? 'min-h-[150px] max-h-[200px]' : 'min-h-[200px] max-h-[400px]'}`}>
+        <div className={`flex-1 overflow-y-auto overflow-x-hidden p-3 bg-parchment-100 dark:bg-gray-700 ${compact ? 'min-h-[150px] max-h-[200px]' : 'min-h-[150px] sm:min-h-[200px] max-h-[300px] sm:max-h-[400px]'}`}>
           {messages.length === 0 ? (
             <p className="text-sm text-umber-500 dark:text-gray-400 text-center py-4">
               No messages yet. Say something!
@@ -284,12 +284,12 @@ export function UnifiedChat({
 
         {/* Quick Emojis */}
         {showQuickEmojis && (
-          <div className="px-3 py-2 bg-parchment-100 dark:bg-gray-700 border-t border-amber-200 dark:border-gray-600 flex gap-2 flex-wrap">
+          <div className="px-2 sm:px-3 py-2 bg-parchment-100 dark:bg-gray-700 border-t border-amber-200 dark:border-gray-600 flex gap-1 sm:gap-2 flex-wrap overflow-x-hidden">
             {quickEmojis.map((emoji) => (
               <button
                 key={emoji}
                 onClick={() => handleQuickEmoji(emoji)}
-                className="px-2 py-1 bg-white dark:bg-gray-600 hover:bg-amber-100 dark:hover:bg-gray-500 rounded transition-colors text-sm border border-amber-200 dark:border-gray-500"
+                className="px-2 py-1 bg-white dark:bg-gray-600 hover:bg-amber-100 dark:hover:bg-gray-500 rounded transition-colors text-xs sm:text-sm border border-amber-200 dark:border-gray-500 flex-shrink-0"
                 type="button"
               >
                 {emoji}
@@ -299,20 +299,20 @@ export function UnifiedChat({
         )}
 
         {/* Input */}
-        <form onSubmit={handleSendMessage} className="p-3 bg-parchment-50 dark:bg-gray-800 border-t border-amber-200 dark:border-gray-600 rounded-b-md">
-          <div className="flex gap-2">
+        <form onSubmit={handleSendMessage} className="p-2 sm:p-3 bg-parchment-50 dark:bg-gray-800 border-t border-amber-200 dark:border-gray-600 rounded-b-md">
+          <div className="flex gap-1 sm:gap-2">
             {showEmojiPicker && (
-              <div className="relative">
+              <div className="relative flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowEmojis(!showEmojis)}
-                  className="px-3 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-gray-600 dark:hover:bg-gray-500 text-white rounded transition-colors"
+                  className="px-2 sm:px-3 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-gray-600 dark:hover:bg-gray-500 text-white rounded transition-colors text-sm"
                   aria-label="Emoji picker"
                 >
                   😀
                 </button>
                 {showEmojis && (
-                  <div className="absolute bottom-full mb-2 left-0">
+                  <div className="absolute bottom-full mb-2 left-0 z-10">
                     <EmojiPicker onSelectEmoji={handleEmojiSelect} onClose={() => setShowEmojis(false)} />
                   </div>
                 )}
@@ -324,13 +324,13 @@ export function UnifiedChat({
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder={placeholder}
-              className="flex-1 px-3 py-2 border-2 border-amber-200 dark:border-gray-600 rounded focus:outline-none focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100"
+              className="flex-1 min-w-0 px-2 sm:px-3 py-2 border-2 border-amber-200 dark:border-gray-600 rounded focus:outline-none focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
               maxLength={200}
             />
             <button
               type="submit"
               disabled={!inputMessage.trim()}
-              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-blue-600 dark:hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded transition-colors"
+              className="px-3 sm:px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-blue-600 dark:hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded transition-colors text-sm flex-shrink-0"
             >
               Send
             </button>
