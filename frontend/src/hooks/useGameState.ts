@@ -127,6 +127,7 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
     // Game Updated Event (Full State)
     const handleGameUpdated = (newGameState: GameState) => {
       console.log(`📥 Frontend received game_updated, currentTrick.length = ${newGameState.currentTrick.length}`);
+      console.log(`📥 Players in new state:`, newGameState.players.map(p => ({ name: p.name, handSize: p.hand?.length || 0 })));
       setGameState(newGameState);
 
       // Clear winner ID when trick is cleared

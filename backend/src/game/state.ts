@@ -233,6 +233,9 @@ export function applyPositionSwap(
     const player1 = game.players[player1Index];
     const player2 = game.players[player2Index];
 
+    console.log(`🔄 SWAP: Before - Player1(${player1.name}) at index ${player1Index} has ${player1.hand.length} cards`);
+    console.log(`🔄 SWAP: Before - Player2(${player2.name}) at index ${player2Index} has ${player2.hand.length} cards`);
+
     // Store complete player data before swap
     const player1Data = {
       hand: [...player1.hand],
@@ -259,6 +262,9 @@ export function applyPositionSwap(
     game.players[player1Index].hand = player2Data.hand;
     game.players[player1Index].tricksWon = player2Data.tricksWon;
     game.players[player1Index].pointsWon = player2Data.pointsWon;
+
+    console.log(`🔄 SWAP: After - Player at index ${player1Index} (${game.players[player1Index].name}) has ${game.players[player1Index].hand.length} cards`);
+    console.log(`🔄 SWAP: After - Player at index ${player2Index} (${game.players[player2Index].name}) has ${game.players[player2Index].hand.length} cards`);
 
     // Update currentTrick playerId references (critical for display)
     game.currentTrick.forEach(tc => {
