@@ -1,6 +1,6 @@
 {
   "name": "trick-card-game-backend",
-  "version": "2.0.0",
+  "version": "2.3.0",
   "description": "Backend server for trick card game",
   "main": "dist/index.js",
   "scripts": {
