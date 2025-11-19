@@ -75,7 +75,7 @@ export interface AuthContextType {
   login: (data: LoginData) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
-  refreshToken: () => Promise<void>;
+  refreshToken: () => Promise<boolean>; // Sprint 18: Returns success status
   error: string | null;
   clearError: () => void;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;

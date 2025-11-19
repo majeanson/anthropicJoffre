@@ -774,7 +774,13 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       // Check if all seats are empty - if so, schedule game deletion
       const allEmpty = game.players.every(p => p.isEmpty);
       if (allEmpty) {
-        console.log(`Game ${gameId} - all seats are now empty, scheduling deletion in 5 minutes`);
+        // For Quick Play games or games that had multiple human players, give more time for reconnection
+        // Check if game ever had multiple human players (not counting bots)
+        const hadMultipleHumans = game.isBotGame || game.players.filter(p => !p.isBot).length >= 2;
+        const deletionDelay = hadMultipleHumans ? 15 * 60 * 1000 : 5 * 60 * 1000; // 15 min for multiplayer, 5 min for solo
+        const deletionMinutes = hadMultipleHumans ? 15 : 5;
+
+        console.log(`Game ${gameId} - all seats are now empty, scheduling deletion in ${deletionMinutes} minutes${hadMultipleHumans ? ' (multiplayer/Quick Play)' : ''}`);
 
         const deletionTimeout = setTimeout(() => {
           if (games.has(gameId)) {
@@ -786,7 +792,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
               console.log(`Game ${gameId} deleted after timeout (all seats empty)`);
             }
           }
-        }, 5 * 60 * 1000); // 5 minutes
+        }, deletionDelay);
 
         gameDeletionTimeouts.set(gameId, deletionTimeout);
       }

@@ -111,15 +111,30 @@ export async function acceptFriendRequest(requestId: number): Promise<Friendship
     const friendshipResult = await client.query(
       `INSERT INTO friendships (player1_name, player2_name)
        VALUES ($1, $2)
+       ON CONFLICT (player1_name, player2_name) DO NOTHING
        RETURNING *`,
       [player1, player2]
     );
 
-    // Update friends count for both players
+    // If friendship already existed, fetch it
+    if (friendshipResult.rows.length === 0) {
+      const existingFriendship = await client.query(
+        'SELECT * FROM friendships WHERE player1_name = $1 AND player2_name = $2',
+        [player1, player2]
+      );
+      if (existingFriendship.rows.length === 0) {
+        throw new Error('Failed to create friendship');
+      }
+      // Use existing friendship but still update counts below
+      friendshipResult.rows[0] = existingFriendship.rows[0];
+    }
+
+    // Update friends count for both players (ensure rows exist first)
     await client.query(
-      `UPDATE player_stats
-       SET friends_count = friends_count + 1
-       WHERE player_name IN ($1, $2)`,
+      `INSERT INTO player_stats (player_name, friends_count)
+       VALUES ($1, 1), ($2, 1)
+       ON CONFLICT (player_name) DO UPDATE
+       SET friends_count = player_stats.friends_count + 1`,
       [player1, player2]
     );
 

@@ -4,7 +4,6 @@ import { LobbyBrowser } from './LobbyBrowser';
 import { HowToPlay } from './HowToPlay';
 import { DebugInfo } from './DebugInfo';
 import { GlobalDebugModal } from './GlobalDebugModal';
-import { UnifiedChat } from './UnifiedChat';
 import { useLobbyChat } from '../hooks/useLobbyChat';
 import { SocialPanel } from './SocialPanel';
 import { StatsPanel } from './StatsPanel';
@@ -20,7 +19,8 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { OnlinePlayer } from '../types/game';
 import { useAuth } from '../contexts/AuthContext';
-import Avatar from './Avatar';
+import { ProfileButton } from './ProfileButton';
+import { ProfileEditorModal } from './ProfileEditorModal';
 
 // Lazy load heavy modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -44,7 +44,7 @@ interface LobbyProps {
 
 
 export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister }: LobbyProps) {
-  const { user, logout } = useAuth();
+  const { user, updateProfile, getUserProfile } = useAuth();
   // Use authenticated username if available, otherwise use stored playerName for guests
   const [playerName, setPlayerName] = useState(() => {
     if (user?.username) {
@@ -60,10 +60,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [showGlobalDebug, setShowGlobalDebug] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
-  const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat' | 'friends'>('online');
+  const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat' | 'friends' | 'messages' | 'profile'>('online');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showProfileEditor, setShowProfileEditor] = useState(false);
 
   // Lobby chat hook for UnifiedChat
   const { messages: lobbyMessages, sendMessage: sendLobbyMessage } = useLobbyChat({
@@ -333,19 +334,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               <div className="mt-4">
                 {user ? (
                   <div className="flex flex-col items-center gap-2">
-                    <div className="flex items-center gap-2 bg-parchment-200 dark:bg-gray-700 px-4 py-2 rounded-lg">
-                      <Avatar username={user.username} avatarUrl={user.avatar_url} size="sm" />
-                      <span className="text-sm font-semibold text-umber-800 dark:text-gray-200">
-                        {user.username}
-                      </span>
-                      {user.is_verified && <span className="text-blue-500" title="Verified">✓</span>}
-                    </div>
-                    <button
-                      onClick={() => logout()}
-                      className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                    >
-                      Logout
-                    </button>
+                    {/* Profile Button - Clickable dropdown menu with profile actions */}
+                    <ProfileButton
+                      user={user}
+                      playerName={playerName}
+                      socket={socket}
+                      onShowLogin={onShowLogin}
+                      onShowProfileEditor={() => setShowProfileEditor(true)}
+                    />
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-2">
@@ -378,9 +374,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               <div className="grid grid-cols-4 gap-2 mb-4">
                 <button
                   onClick={() => { sounds.buttonClick(); setMainTab('play'); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'play'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -388,9 +384,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 </button>
                 <button
                   onClick={() => { sounds.buttonClick(); setMainTab('social'); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'social'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -403,9 +399,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 </button>
                 <button
                   onClick={() => { sounds.buttonClick(); setMainTab('stats'); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'stats'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -413,9 +409,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 </button>
                 <button
                   onClick={() => { sounds.buttonClick(); setMainTab('settings'); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'settings'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -449,70 +445,19 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
                 {/* SOCIAL TAB - Extracted to SocialPanel */}
                 {mainTab === 'social' && (
-                  <div className="space-y-4">
-                    {socialTab === 'chat' ? (
-                      <>
-                        {/* Chat tab button */}
-                        <div className="flex gap-2">
-                          <button
-                            data-keyboard-nav="social-online"
-                            onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
-                            className="flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600"
-                          >
-                            🟢 Online ({onlinePlayers.length})
-                          </button>
-                          <button
-                            data-keyboard-nav="social-chat"
-                            onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
-                            className="flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg"
-                          >
-                            💬 Chat
-                          </button>
-                          <button
-                            data-keyboard-nav="social-recent"
-                            onClick={() => { sounds.buttonClick(); setSocialTab('recent'); }}
-                            className="flex-1 py-2 rounded-lg font-bold transition-all duration-200 text-sm bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600"
-                          >
-                            📜 Recent
-                          </button>
-                        </div>
-                        <UnifiedChat
-                          mode="embedded"
-                          context="lobby"
-                          socket={socket}
-                          currentPlayerId={playerName}
-                          messages={lobbyMessages}
-                          onSendMessage={(message) => {
-                            if (!playerName.trim()) {
-                              const name = window.prompt('Please enter your name to chat:');
-                              if (name && name.trim()) {
-                                setPlayerName(name.trim());
-                                localStorage.setItem('playerName', name.trim());
-                                // Try to send after setting name
-                                setTimeout(() => sendLobbyMessage(message), 100);
-                              }
-                            } else {
-                              sendLobbyMessage(message);
-                            }
-                          }}
-                          placeholder={playerName.trim() ? "Type a message..." : "Click to enter your name..."}
-                          className="h-[400px]"
-                        />
-                      </>
-                    ) : (
-                      <SocialPanel
-                        socialTab={socialTab}
-                        setSocialTab={setSocialTab}
-                        onlinePlayers={onlinePlayers}
-                        recentPlayers={recentPlayers}
-                        playerName={playerName}
-                        setPlayerName={setPlayerName}
-                        onJoinGame={onJoinGame}
-                        socket={socket}
-                        user={user}
-                      />
-                    )}
-                  </div>
+                  <SocialPanel
+                    socialTab={socialTab}
+                    setSocialTab={setSocialTab}
+                    onlinePlayers={onlinePlayers}
+                    recentPlayers={recentPlayers}
+                    playerName={playerName}
+                    setPlayerName={setPlayerName}
+                    onJoinGame={onJoinGame}
+                    socket={socket}
+                    user={user}
+                    lobbyMessages={lobbyMessages}
+                    sendLobbyMessage={sendLobbyMessage}
+                  />
                 )}
 
                 {/* STATS TAB - Extracted to StatsPanel */}
@@ -563,6 +508,16 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               />
             </Suspense>
           </ErrorBoundary>
+        )}
+
+        {/* Profile Editor Modal */}
+        {showProfileEditor && user && (
+          <ProfileEditorModal
+            user={user}
+            onClose={() => setShowProfileEditor(false)}
+            updateProfile={updateProfile}
+            getUserProfile={getUserProfile}
+          />
         )}
       </>
     );

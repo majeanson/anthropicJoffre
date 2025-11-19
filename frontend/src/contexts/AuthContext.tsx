@@ -4,7 +4,8 @@
  */
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { User, AuthTokens, AuthContextType, LoginData, RegisterData, ProfileUpdateData } from '../types/auth';
+import { User, AuthContextType, LoginData, RegisterData, ProfileUpdateData } from '../types/auth';
+import { fetchWithCsrf, initializeCsrf, clearCsrfToken } from '../utils/csrf';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -15,16 +16,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load tokens from localStorage
+  // Load access token from localStorage
+  // Sprint 18: Refresh token now stored in httpOnly cookie (not localStorage)
   const getAccessToken = () => localStorage.getItem('access_token');
-  const getRefreshToken = () => localStorage.getItem('refresh_token');
-  const setTokens = (tokens: AuthTokens) => {
-    localStorage.setItem('access_token', tokens.access_token);
-    localStorage.setItem('refresh_token', tokens.refresh_token);
+  const setAccessToken = (token: string) => {
+    localStorage.setItem('access_token', token);
   };
   const clearTokens = () => {
     localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
+    // Refresh token is in httpOnly cookie, cleared server-side on logout
   };
 
   // Fetch current user info
@@ -63,50 +63,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Refresh access token
+  // Sprint 18: Refresh token rotation with httpOnly cookies
   const refreshToken = useCallback(async () => {
-    const refresh = getRefreshToken();
-    if (!refresh) {
-      setIsLoading(false);
-      return;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
         method: 'POST',
+        credentials: 'include', // Send httpOnly cookies
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refresh_token: refresh })
+        }
       });
 
       if (!response.ok) {
+        // Security violation or invalid token
+        const data = await response.json().catch(() => ({}));
+        if (data.code === 'TOKEN_THEFT_DETECTED') {
+          console.warn('🚨 Token theft detected! User must re-login.');
+        }
         throw new Error('Failed to refresh token');
       }
 
       const data = await response.json();
-      setTokens(data.tokens);
+      setAccessToken(data.access_token);
 
       // Fetch user info with new token
       await fetchCurrentUser();
+      return true;
     } catch (err) {
       console.error('Error refreshing token:', err);
       clearTokens();
       setUser(null);
       setIsLoading(false);
+      return false;
     }
   }, [fetchCurrentUser]);
 
   // Login
+  // Sprint 18: Refresh token in httpOnly cookie + CSRF protection
   const login = useCallback(async (data: LoginData) => {
     setError(null);
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetchWithCsrf(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(data)
       });
 
@@ -116,7 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error(result.error || 'Login failed');
       }
 
-      setTokens(result.tokens);
+      // Only store access token (refresh is in httpOnly cookie)
+      setAccessToken(result.access_token);
       setUser(result.user);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Login failed';
@@ -128,16 +129,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Register
+  // Sprint 18: CSRF protection
   const register = useCallback(async (data: RegisterData) => {
     setError(null);
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetchWithCsrf(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
         body: JSON.stringify(data)
       });
 
@@ -159,12 +158,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Logout
+  // Sprint 18: Revoke refresh token on server + clear CSRF token
   const logout = useCallback(() => {
     clearTokens();
     setUser(null);
+    clearCsrfToken(); // Clear CSRF token cache
 
-    // Optional: Call logout endpoint
-    fetch(`${API_BASE_URL}/api/auth/logout`, {
+    // Call logout endpoint to revoke refresh token
+    fetchWithCsrf(`${API_BASE_URL}/api/auth/logout`, {
       method: 'POST'
     }).catch(console.error);
   }, []);
@@ -199,16 +200,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Update user profile
+  // Sprint 18: CSRF protection
   const updateProfile = useCallback(async (data: ProfileUpdateData) => {
     const token = getAccessToken();
     if (!token) return;
 
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/profiles/me`, {
+      const response = await fetchWithCsrf(`${API_BASE_URL}/api/profiles/me`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
@@ -228,21 +229,56 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [fetchCurrentUser]);
 
-  // Load user on mount
+  // Load user on mount and initialize CSRF
+  // Sprint 18: Initialize CSRF token cache on app load
   useEffect(() => {
-    console.log('[AuthContext] Initial load - fetching current user');
+    console.log('[AuthContext] Initial load - initializing CSRF and fetching current user');
+
+    // Initialize CSRF token in parallel with user fetch
+    initializeCsrf().catch(console.error);
+
     fetchCurrentUser();
   }, [fetchCurrentUser]);
 
-  // Auto-refresh token before expiry (every 10 minutes)
+  // Auto-refresh token before expiry
+  // Sprint 18: JWT expires in 1 hour, refresh 5 minutes before expiration
   useEffect(() => {
     if (!user) return;
 
-    const interval = setInterval(() => {
-      refreshToken();
-    }, 10 * 60 * 1000); // 10 minutes
+    // Check token expiration and schedule refresh
+    const scheduleRefresh = () => {
+      const token = getAccessToken();
+      if (!token) return;
 
-    return () => clearInterval(interval);
+      try {
+        // Decode JWT to get expiration time
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const expiresAt = payload.exp * 1000; // Convert to milliseconds
+        const now = Date.now();
+        const timeUntilExpiry = expiresAt - now;
+
+        // Refresh 5 minutes before expiration (or immediately if < 5 min left)
+        const refreshIn = Math.max(0, timeUntilExpiry - 5 * 60 * 1000);
+
+        console.log(`[AuthContext] Token expires in ${Math.floor(timeUntilExpiry / 1000 / 60)} minutes, refreshing in ${Math.floor(refreshIn / 1000 / 60)} minutes`);
+
+        const timeout = setTimeout(() => {
+          console.log('[AuthContext] Auto-refreshing token...');
+          refreshToken();
+        }, refreshIn);
+
+        return timeout;
+      } catch (err) {
+        console.error('[AuthContext] Error decoding token for auto-refresh:', err);
+        return null;
+      }
+    };
+
+    const timeout = scheduleRefresh();
+
+    return () => {
+      if (timeout) clearTimeout(timeout);
+    };
   }, [user, refreshToken]);
 
   const value: AuthContextType = {

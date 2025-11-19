@@ -22,12 +22,18 @@ import {
   comparePassword,
   generateTokens,
   verifyAccessToken,
-  verifyRefreshToken,
   validatePassword,
   validateUsername,
   validateEmail,
   sanitizeDisplayName
 } from '../utils/authHelpers';
+import {
+  createRefreshToken,
+  rotateRefreshToken,
+  revokeRefreshToken,
+  revokeAllUserTokens,
+  detectSuspiciousUsage
+} from '../db/refreshTokens';
 import {
   RegisterRequest,
   LoginRequest,
@@ -169,10 +175,30 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
     // Update last login
     await updateLastLogin(user.user_id);
 
-    // Generate tokens
+    // Generate access token (short-lived, 1 hour)
     const tokens = generateTokens(user.user_id, user.username);
 
-    // Return user info and tokens
+    // Generate refresh token (long-lived, 30 days) and store in database
+    const refreshToken = await createRefreshToken(
+      user.user_id,
+      req.ip || req.socket.remoteAddress,
+      req.headers['user-agent']
+    );
+
+    if (!refreshToken) {
+      return res.status(500).json({ error: 'Failed to create refresh token' });
+    }
+
+    // Set refresh token in httpOnly cookie (secure, not accessible to JavaScript)
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true, // Prevents XSS attacks
+      secure: process.env.NODE_ENV === 'production', // Only HTTPS in production
+      sameSite: 'strict', // CSRF protection
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/api/auth/refresh' // Only sent to refresh endpoint
+    });
+
+    // Return user info and access token (NOT refresh token)
     return res.status(200).json({
       message: 'Login successful',
       user: {
@@ -183,7 +209,7 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
         avatar_url: user.avatar_url,
         is_verified: user.is_verified
       },
-      tokens
+      access_token: tokens.access_token
     });
   } catch (error) {
     console.error('Login error:', error);
@@ -193,38 +219,86 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/refresh
- * Refresh access token using refresh token
+ * Refresh access token using refresh token with rotation
+ * Sprint 18 Phase 1 Task 1.1: Database-backed refresh token system
+ *
+ * Rate limit: 10 requests per hour per user (prevents token theft abuse)
  */
-router.post('/refresh', async (req: Request, res: Response) => {
-  try {
-    const { refresh_token }: RefreshTokenRequest = req.body;
+const refreshLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // 10 refresh attempts per hour
+  message: 'Too many token refresh attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Use IP + cookie combination for keying (more specific than IP alone)
+  keyGenerator: (req) => {
+    const token = req.cookies.refresh_token || 'no-token';
+    return `${req.ip}-${token.substring(0, 16)}`;
+  }
+});
 
-    if (!refresh_token) {
-      return res.status(400).json({ error: 'Refresh token is required' });
+router.post('/refresh', refreshLimiter, async (req: Request, res: Response) => {
+  try {
+    // Get refresh token from httpOnly cookie (not from body for security)
+    const oldRefreshToken = req.cookies.refresh_token;
+
+    if (!oldRefreshToken) {
+      return res.status(401).json({ error: 'No refresh token provided' });
     }
 
-    // Verify refresh token
-    const payload = verifyRefreshToken(refresh_token);
-    if (!payload) {
+    // Detect suspicious usage (revoked token being reused = token theft)
+    const isSuspicious = await detectSuspiciousUsage(oldRefreshToken);
+    if (isSuspicious) {
+      // All user tokens have been revoked as security measure
+      res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
+      return res.status(401).json({
+        error: 'Security violation detected. Please log in again.',
+        code: 'TOKEN_THEFT_DETECTED'
+      });
+    }
+
+    // Rotate the refresh token (invalidate old, create new)
+    const result = await rotateRefreshToken(
+      oldRefreshToken,
+      req.ip || req.socket.remoteAddress,
+      req.headers['user-agent']
+    );
+
+    if (!result) {
+      res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
       return res.status(401).json({ error: 'Invalid or expired refresh token' });
     }
 
+    const { newToken, userId } = result;
+
     // Get user to ensure they still exist and aren't banned
-    const user = await getUserById(payload.user_id);
+    const user = await getUserById(userId);
     if (!user) {
+      res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
       return res.status(401).json({ error: 'User not found' });
     }
 
     if (user.is_banned) {
+      await revokeAllUserTokens(userId);
+      res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
       return res.status(403).json({ error: 'Account has been banned' });
     }
 
-    // Generate new tokens
+    // Generate new access token
     const tokens = generateTokens(user.user_id, user.username);
+
+    // Set new refresh token in httpOnly cookie
+    res.cookie('refresh_token', newToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      path: '/api/auth/refresh'
+    });
 
     return res.status(200).json({
       message: 'Token refreshed successfully',
-      tokens
+      access_token: tokens.access_token
     });
   } catch (error) {
     console.error('Refresh token error:', error);
@@ -373,12 +447,64 @@ router.get('/me', async (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/logout
- * Logout (client-side token removal, placeholder for future session management)
+ * Logout and revoke refresh token
+ * Sprint 18: Added refresh token revocation
  */
 router.post('/logout', async (req: Request, res: Response) => {
-  // In a JWT-based system, logout is primarily client-side
-  // Future enhancement: Add token blacklisting or session management
-  return res.status(200).json({ message: 'Logout successful' });
+  try {
+    const refreshToken = req.cookies.refresh_token;
+
+    if (refreshToken) {
+      // Revoke the refresh token
+      await revokeRefreshToken(refreshToken);
+    }
+
+    // Clear the refresh token cookie
+    res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
+
+    return res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    // Still return success even if revocation failed (user experience)
+    res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
+    return res.status(200).json({ message: 'Logout successful' });
+  }
+});
+
+/**
+ * POST /api/auth/logout-all
+ * Logout from all devices (revoke all refresh tokens)
+ * Sprint 18: New endpoint for revoking all user sessions
+ */
+router.post('/logout-all', async (req: Request, res: Response) => {
+  try {
+    // Extract user ID from access token
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+
+    const token = authHeader.substring(7);
+    const payload = verifyAccessToken(token);
+
+    if (!payload) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    // Revoke all refresh tokens for this user
+    const revokedCount = await revokeAllUserTokens(payload.user_id);
+
+    // Clear current device's refresh token cookie
+    res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
+
+    return res.status(200).json({
+      message: 'Logged out from all devices successfully',
+      sessions_revoked: revokedCount
+    });
+  } catch (error) {
+    console.error('Logout all error:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 export default router;

@@ -18,6 +18,29 @@ export function SettingsContent({ onShowRules, onShowDebugInfo, onShowGlobalDebu
         <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 text-center">⚙️ Settings</h3>
 
         <div className="space-y-4">
+          {/* Keyboard Navigation Hint */}
+          <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-3 mb-4">
+            <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+              <span>⌨️</span>
+              <span>Keyboard Navigation</span>
+            </h4>
+            <p className="text-xs text-blue-700 dark:text-blue-400 mb-2">
+              Navigate the lobby with arrow keys:
+            </p>
+            <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400">
+              <kbd className="px-2 py-1 bg-white dark:bg-gray-700 border border-blue-300 dark:border-gray-600 rounded font-mono">← →</kbd>
+              <span>Switch tabs</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400 mt-1">
+              <kbd className="px-2 py-1 bg-white dark:bg-gray-700 border border-blue-300 dark:border-gray-600 rounded font-mono">↑ ↓</kbd>
+              <span>Navigate buttons</span>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400 mt-1">
+              <kbd className="px-2 py-1 bg-white dark:bg-gray-700 border border-blue-300 dark:border-gray-600 rounded font-mono">Enter</kbd>
+              <span>Activate</span>
+            </div>
+          </div>
+
           {/* Dark Mode */}
           <div>
             <label className="block text-sm font-semibold text-umber-800 dark:text-gray-200 mb-2">

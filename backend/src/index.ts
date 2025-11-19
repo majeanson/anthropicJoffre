@@ -41,6 +41,7 @@ import cors from 'cors';
 import crypto from 'crypto';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 import { ConnectionManager } from './connection/ConnectionManager';
 import { GameState, Player, Bet, TrickCard, Card, PlayerSession, GamePhase } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
@@ -418,6 +419,7 @@ app.use(helmet({
 }));
 
 app.use(express.json());
+app.use(cookieParser()); // Sprint 18: Parse cookies for refresh tokens
 
 // Add structured logging for HTTP requests
 if (process.env.NODE_ENV !== 'test') {
@@ -959,11 +961,20 @@ registerRoutes(app, {
   formatBytes,
 });
 
-// Sprint 3 Phase 1: Authentication routes
-app.use('/api/auth', authRoutes);
+// Sprint 18 Phase 1: CSRF Protection
+import { getCsrfToken, csrfProtection, csrfErrorHandler } from './middleware/csrf';
 
-// Sprint 3 Phase 3.2: Profile routes
-app.use('/api/profiles', profileRoutes);
+// CSRF token endpoint (GET request, no protection needed)
+app.get('/api/csrf-token', getCsrfToken);
+
+// Sprint 3 Phase 1: Authentication routes (with CSRF protection)
+app.use('/api/auth', csrfProtection, authRoutes);
+
+// Sprint 3 Phase 3.2: Profile routes (with CSRF protection)
+app.use('/api/profiles', csrfProtection, profileRoutes);
+
+// CSRF error handler (must be after protected routes)
+app.use(csrfErrorHandler);
 
 // ============================================================================
 

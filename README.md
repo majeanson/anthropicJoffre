@@ -11,22 +11,43 @@ A real-time multiplayer trick-taking card game built with React, Node.js, Socket
 - **No-trump betting** - Double or nothing gameplay
 - **Reconnection support** - 15-minute grace period with catch-up modal
 
-### Social & Multiplayer (Sprint 16 🆕)
-- **Direct Messaging System** 🆕
+### Security & Production (Sprint 18 🆕)
+- **JWT Refresh Tokens** 🆕
+  - Automatic token refresh 1 hour before expiration
+  - OAuth 2.0 refresh token rotation
+  - HttpOnly secure cookies for refresh tokens
+  - Rate limiting (10 req/hour/user)
+  - No more sudden logouts for active users
+
+- **CSRF Protection** 🆕
+  - Double-submit cookie pattern
+  - All POST/PUT/DELETE endpoints protected
+  - Automatic token rotation on auth changes
+  - User-friendly error handling
+
+- **Production Monitoring** 🆕
+  - Sentry error tracking with email alerts
+  - Performance monitoring (p95 transaction tracking)
+  - Automated database backups (daily retention)
+  - Load testing infrastructure (k6)
+  - Production smoke test automation
+
+### Social & Multiplayer (Sprint 16-17)
+- **Direct Messaging System**
   - Private 1-on-1 conversations between players
   - Real-time delivery via WebSocket with read receipts
   - Full-text search across all conversations
   - Message management with soft delete
   - Unread message counters and notifications
 
-- **Social Discovery** 🆕
+- **Social Discovery**
   - Recent Players tracking (last 50 unique players)
   - Friend Suggestions based on mutual connections
   - Mutual Friends display for social context
   - Player profiles with quick actions (Message, Add Friend, View Profile)
   - Avatar display with player info tooltips
 
-- **Unified Social Hub** 🆕
+- **Unified Social Hub**
   - Dedicated tabs: Friends, Recent Players, Messages
   - One-click access to all social features
   - Quick actions for each player
@@ -214,10 +235,22 @@ npm run build
 
 **Backend** (`.env`)
 ```env
-DATABASE_URL=postgresql://...
+DATABASE_URL=postgresql://...?sslmode=require
 PORT=3001
 NODE_ENV=development
 CLIENT_URL=http://localhost:5173
+
+# Security (Sprint 18)
+JWT_SECRET=<64+ character random string>
+JWT_REFRESH_SECRET=<64+ character random string, different from JWT_SECRET>
+CSRF_SECRET=<64+ character random string>
+
+# Email Service (Resend)
+RESEND_API_KEY=re_<your_key>
+EMAIL_FROM=YourApp <onboarding@resend.dev>
+
+# Error Monitoring (Sentry)
+SENTRY_DSN=https://<key>@<project>.ingest.sentry.io/<id>
 ```
 
 **Frontend** (`.env`)
@@ -308,8 +341,21 @@ docs/
 ├── design/            # UI/UX documentation
 │   ├── DARK_MODE_COLORS.md   # Dark theme palette
 │   └── LIGHT_MODE_COLORS.md  # Light theme palette
-└── deployment/        # Deployment guides
-    └── RAILWAY_DEPLOY.md      # Railway deployment
+├── deployment/        # Deployment guides (Sprint 18)
+│   ├── RAILWAY_DEPLOY.md         # Railway deployment
+│   ├── PRODUCTION_CONFIG_AUDIT.md # Configuration audit checklist
+│   ├── DATABASE_BACKUP.md        # Backup procedures
+│   └── INCIDENT_RESPONSE.md      # Incident handling
+├── testing/           # Testing guides (Sprint 18)
+│   ├── PRODUCTION_SMOKE_TEST.md  # Smoke test checklist
+│   ├── PERFORMANCE_BASELINE.md   # Performance benchmarks
+│   └── MANUAL_TESTING_CHECKLIST.md # Manual test guide
+└── sprints/           # Sprint documentation
+    ├── SPRINT_18_PRODUCTION_HARDENING.md # Sprint 18 plan
+    ├── SPRINT_18_PHASE1_COMPLETE.md  # Security & stability
+    ├── SPRINT_18_PHASE2_GUIDE.md     # Performance tooling
+    ├── SPRINT_18_PHASE3_COMPLETE.md  # Testing & validation
+    └── SPRINT_18_PHASE4_COMPLETE.md  # Production validation
 ```
 
 ## 📄 License
