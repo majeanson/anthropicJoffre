@@ -63,16 +63,21 @@ describe('SocialPanel', () => {
   it('renders online and recent tab buttons', () => {
     renderWithProviders(<SocialPanel {...defaultProps} />);
 
-    expect(screen.getByText(/Online \(2\)/)).toBeInTheDocument();
-    expect(screen.getByText('📜 Recent')).toBeInTheDocument();
+    // Online tab shows emoji and count: "🟢 2"
+    expect(screen.getByText(/🟢\s*2/)).toBeInTheDocument();
+    // Recent tab has been replaced with messages, friends, profile, and chat tabs
+    // The component now has: 💬 (messages), 👥 (friends), 🟢 (online), 👤 (profile), 💭 (chat)
+    expect(screen.getByText(/💬/)).toBeInTheDocument();
   });
 
   it('switches tabs when tab buttons are clicked', async () => {
     const user = userEvent.setup();
     renderWithProviders(<SocialPanel {...defaultProps} />);
 
-    await user.click(screen.getByText('📜 Recent'));
-    expect(mockSetSocialTab).toHaveBeenCalledWith('recent');
+    // Click the chat tab (💭 emoji button)
+    const chatButton = screen.getByRole('button', { name: /💭/ });
+    await user.click(chatButton);
+    expect(mockSetSocialTab).toHaveBeenCalledWith('chat');
   });
 
   it('displays online players when on online tab', () => {
@@ -95,7 +100,10 @@ describe('SocialPanel', () => {
     const bobElement = screen.getByText('Bob');
     const bobContainer = bobElement.closest('div')?.parentElement;
 
-    expect(bobContainer?.querySelector('button')).toBeNull();
+    // Bob is in lobby, so should not have a "🎮 Join" button
+    // Note: The PlayerNameButton is a button, but not a join button
+    const joinButton = bobContainer?.querySelector('button[title="Join their game"]');
+    expect(joinButton).toBeNull();
   });
 
   it('displays message when no online players', () => {

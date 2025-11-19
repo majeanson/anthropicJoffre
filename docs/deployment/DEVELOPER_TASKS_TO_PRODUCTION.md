@@ -42,7 +42,7 @@ This is your comprehensive guide to deploying the Trick Card Game to production.
 
 **Command**:
 ```bash
-cd /path/to/project
+cd "C:/Users/marc_/Documents/WebApp/anthropicJoffre"
 ./scripts/pre-production-validation.sh
 ```
 

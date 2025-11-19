@@ -112,7 +112,6 @@ if npx playwright test \
   07-full-game \
   --project=chromium \
   --reporter=list \
-  --reporter=json:../$RESULTS_DIR/e2e-tests-${TIMESTAMP}.json \
   > ../$RESULTS_DIR/e2e-tests-${TIMESTAMP}.txt 2>&1; then
   echo -e "${GREEN}✅ E2E core tests PASSED${NC}"
 else

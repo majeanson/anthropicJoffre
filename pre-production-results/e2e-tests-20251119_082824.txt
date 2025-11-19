@@ -1,0 +1,19 @@
+Error: Cannot find module 'json:../pre-production-results/e2e-tests-20251119_082824.json'
+Require stack:
+- C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\playwright\lib\program.js
+- C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\@playwright\test\cli.js
+    at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+    at Function.resolve (node:internal/modules/helpers:145:19)
+    at resolveReporter (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\playwright\lib\program.js:358:18)
+    at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\playwright\lib\program.js:330:42
+    at Array.map (<anonymous>)
+    at resolveReporterOption (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\playwright\lib\program.js:330:30)
+    at overridesFromOptions (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\playwright\lib\program.js:292:15)
+    at runTests (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\playwright\lib\program.js:205:24)
+    at async i.<anonymous> (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\node_modules\playwright\lib\program.js:71:7) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\marc_\\Documents\\WebApp\\anthropicJoffre\\e2e\\node_modules\\playwright\\lib\\program.js',
+    'C:\\Users\\marc_\\Documents\\WebApp\\anthropicJoffre\\e2e\\node_modules\\@playwright\\test\\cli.js'
+  ]
+}
