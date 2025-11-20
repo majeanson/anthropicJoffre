@@ -27,6 +27,7 @@ import {
   LeaveGamePayload,
   FillEmptySeatPayload,
 } from '../validation/schemas';
+import { logValidationError } from '../utils/logger';
 
 // Import conditional persistence manager
 import * as PersistenceManager from '../db/persistenceManager';
@@ -723,11 +724,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // Validate input with Zod schema
     const validation = validateInput(leaveGamePayloadSchema, payload);
     if (!validation.success) {
-      console.error('[VALIDATION ERROR] leave_game failed:', {
-        payload: JSON.stringify(payload),
-        error: validation.error,
-        socketId: socket.id
-      });
+      logValidationError('leave_game', validation.error, payload, socket.id);
       socket.emit('error', { message: `Invalid input: ${validation.error}` });
       return;
     }
@@ -813,11 +810,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // Validate input with Zod schema
     const validation = validateInput(fillEmptySeatPayloadSchema, payload);
     if (!validation.success) {
-      console.error('[VALIDATION ERROR] fill_empty_seat failed:', {
-        payload: JSON.stringify(payload),
-        error: validation.error,
-        socketId: socket.id
-      });
+      logValidationError('fill_empty_seat', validation.error, payload, socket.id);
       socket.emit('error', { message: `Invalid input: ${validation.error}` });
       return;
     }

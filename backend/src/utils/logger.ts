@@ -259,6 +259,62 @@ export function logPerformance(
   });
 }
 
+/**
+ * Validation error logger for socket events
+ *
+ * Logs validation failures with structured metadata for easy production monitoring:
+ * - Searchable by event name via [VALIDATION_ERROR] prefix
+ * - Includes full payload for debugging (sanitized)
+ * - Contains socket and player context
+ * - Tracks validation error types
+ *
+ * Production monitoring tips:
+ * - Search logs for: "VALIDATION_ERROR"
+ * - Filter by event: "eventName"="take_over_bot"
+ * - Track error frequency by: "validationError" field
+ * - Identify problematic clients by: "socketId" or "playerName"
+ */
+export function logValidationError(
+  eventName: string,
+  validationError: string,
+  payload: unknown,
+  socketId: string,
+  playerName?: string,
+  gameId?: string
+) {
+  logger.warn(`[VALIDATION_ERROR] ${eventName} - Invalid payload`, {
+    // Error classification (for alerting/metrics)
+    errorType: 'VALIDATION_ERROR',
+    eventName,
+    validationError,
+
+    // Context for debugging
+    socketId,
+    playerName: playerName || 'unknown',
+    gameId: gameId || 'none',
+
+    // Full payload for investigation (sanitized)
+    payload: sanitizeData(payload),
+
+    // Timestamp for correlation
+    timestamp: new Date().toISOString(),
+
+    // Environment context
+    environment: process.env.NODE_ENV || 'development',
+  });
+
+  // Also log to console in development for immediate visibility
+  if (process.env.NODE_ENV !== 'production') {
+    console.error(`[VALIDATION_ERROR] ${eventName} failed:`, {
+      error: validationError,
+      payload: JSON.stringify(payload, null, 2),
+      socketId,
+      playerName,
+      gameId,
+    });
+  }
+}
+
 // Utility functions
 
 function generateRequestId(): string {

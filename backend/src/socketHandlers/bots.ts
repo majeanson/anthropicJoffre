@@ -23,6 +23,7 @@ import {
   ReplacePlayerWithBotPayload,
   ChangeBotDifficultyPayload,
 } from '../validation/schemas';
+import { logValidationError } from '../utils/logger';
 
 /**
  * Online player tracking data
@@ -212,13 +213,8 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
     // Validate input with Zod schema
     const validation = validateInput(replacePlayerWithBotPayloadSchema, payload);
     if (!validation.success) {
-      console.error('[VALIDATION ERROR] replace_with_bot failed:', {
-        payload: JSON.stringify(payload),
-        error: validation.error,
-        socketId: socket.id
-      });
+      logValidationError('replace_with_bot', validation.error, payload, socket.id);
       socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid replace_with_bot payload', { payload, error: validation.error });
       return;
     }
 
@@ -342,13 +338,8 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
     // Validate input with Zod schema
     const validation = validateInput(takeOverBotPayloadSchema, payload);
     if (!validation.success) {
-      console.error('[VALIDATION ERROR] take_over_bot failed:', {
-        payload: JSON.stringify(payload),
-        error: validation.error,
-        socketId: socket.id
-      });
+      logValidationError('take_over_bot', validation.error, payload, socket.id);
       socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid take_over_bot payload', { payload, error: validation.error });
       return;
     }
 
@@ -531,13 +522,8 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
     // Validate input with Zod schema
     const validation = validateInput(changeBotDifficultyPayloadSchema, payload);
     if (!validation.success) {
-      console.error('[VALIDATION ERROR] change_bot_difficulty failed:', {
-        payload: JSON.stringify(payload),
-        error: validation.error,
-        socketId: socket.id
-      });
+      logValidationError('change_bot_difficulty', validation.error, payload, socket.id);
       socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      logger.warn('Invalid change_bot_difficulty payload', { payload, error: validation.error });
       return;
     }
 
