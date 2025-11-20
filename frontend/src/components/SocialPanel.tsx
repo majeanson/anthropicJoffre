@@ -62,9 +62,9 @@ export function SocialPanel({
   const [friendSuggestions, setFriendSuggestions] = useState<string[]>([]);
   const [selectedPlayerProfile, setSelectedPlayerProfile] = useState<string | null>(null);
 
-  // Fetch friends list when friends tab is active
+  // Fetch friends list when friends or online tab is active
   useEffect(() => {
-    if (socialTab === 'friends' && socket && user) {
+    if ((socialTab === 'friends' || socialTab === 'online') && socket && user) {
       setIsLoadingFriends(true);
       socket.emit('get_friends_list');
     }
@@ -289,46 +289,67 @@ export function SocialPanel({
                 <p className="text-sm mt-2">Online players will appear here</p>
               </div>
             ) : (
-              onlinePlayers.map(player => (
-                <div
-                  key={player.socketId}
-                  className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-green-400 dark:hover:border-green-500 transition-colors"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <span className="text-green-500 text-lg flex-shrink-0">🟢</span>
-                      <div className="min-w-0 flex-1">
-                        <PlayerNameButton
-                          playerName={player.playerName || player.socketId || 'Unknown'}
-                          onClick={() => setSelectedPlayerProfile(player.playerName || 'Unknown')}
-                          variant="plain"
-                          className="font-bold text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400 truncate text-left"
-                        />
-                        <p className="text-xs text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
+              onlinePlayers.map(player => {
+                const isBot = player.playerName?.startsWith('Bot ');
+                const isSelf = player.playerName === playerName;
+                const isFriend = friends.some(f => f.player_name === player.playerName);
+                const showFriendButton = user && !isBot && !isSelf && !isFriend;
+
+                return (
+                  <div
+                    key={player.socketId}
+                    className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-green-400 dark:hover:border-green-500 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="text-green-500 text-lg flex-shrink-0">🟢</span>
+                        <div className="min-w-0 flex-1">
+                          <PlayerNameButton
+                            playerName={player.playerName || player.socketId || 'Unknown'}
+                            onClick={() => setSelectedPlayerProfile(player.playerName || 'Unknown')}
+                            variant="plain"
+                            className="font-bold text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400 truncate text-left"
+                          />
+                          <p className="text-xs text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {showFriendButton && (
+                          <button
+                            onClick={() => {
+                              sounds.buttonClick();
+                              handleSendFriendRequest(player.playerName!);
+                            }}
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs font-bold transition-colors"
+                            title="Send friend request"
+                          >
+                            ➕
+                          </button>
+                        )}
+                        {player.gameId && player.status !== 'in_lobby' && (
+                          <button
+                            data-keyboard-nav={`join-player-${player.socketId}`}
+                            onClick={() => {
+                              sounds.buttonClick();
+                              const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
+                              if (nameToUse && nameToUse.trim()) {
+                                if (!playerName.trim()) {
+                                  setPlayerName(nameToUse.trim());
+                                }
+                                onJoinGame(player.gameId!, nameToUse.trim());
+                              }
+                            }}
+                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs font-bold transition-colors"
+                            title="Join their game"
+                          >
+                            🎮 Join
+                          </button>
+                        )}
                       </div>
                     </div>
-                    {player.gameId && player.status !== 'in_lobby' && (
-                      <button
-                        data-keyboard-nav={`join-player-${player.socketId}`}
-                        onClick={() => {
-                          sounds.buttonClick();
-                          const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
-                          if (nameToUse && nameToUse.trim()) {
-                            if (!playerName.trim()) {
-                              setPlayerName(nameToUse.trim());
-                            }
-                            onJoinGame(player.gameId!, nameToUse.trim());
-                          }
-                        }}
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs font-bold transition-colors flex-shrink-0"
-                        title="Join their game"
-                      >
-                        🎮 Join
-                      </button>
-                    )}
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         )}
