@@ -22,6 +22,10 @@ import {
   joinGamePayloadSchema,
   leaveGamePayloadSchema,
   fillEmptySeatPayloadSchema,
+  CreateGamePayload,
+  JoinGamePayload,
+  LeaveGamePayload,
+  FillEmptySeatPayload,
 } from '../validation/schemas';
 
 // Import conditional persistence manager
@@ -131,7 +135,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   // ============================================================================
   // create_game - Create new game
   // ============================================================================
-  socket.on('create_game', errorBoundaries.gameAction('create_game')(async (payload: unknown) => {
+  socket.on('create_game', errorBoundaries.gameAction('create_game')(async (payload: CreateGamePayload) => {
     // Sprint 2: Validate input with Zod schema
     const validation = validateInput(createGamePayloadSchema, payload);
     if (!validation.success) {
@@ -715,7 +719,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   // ============================================================================
   // leave_game - Leave the game
   // ============================================================================
-  socket.on('leave_game', errorBoundaries.gameAction('leave_game')(async (payload: unknown) => {
+  socket.on('leave_game', errorBoundaries.gameAction('leave_game')(async (payload: LeaveGamePayload) => {
     // Validate input with Zod schema
     const validation = validateInput(leaveGamePayloadSchema, payload);
     if (!validation.success) {
@@ -805,7 +809,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
   // ============================================================================
   // fill_empty_seat - Fill an empty seat with a new player or bot
   // ============================================================================
-  socket.on('fill_empty_seat', errorBoundaries.gameAction('fill_empty_seat')(async (payload: unknown) => {
+  socket.on('fill_empty_seat', errorBoundaries.gameAction('fill_empty_seat')(async (payload: FillEmptySeatPayload) => {
     // Validate input with Zod schema
     const validation = validateInput(fillEmptySeatPayloadSchema, payload);
     if (!validation.success) {

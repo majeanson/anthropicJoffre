@@ -364,3 +364,28 @@ export function validateInputOrThrow<T>(
     throw new Error(context ? `${context}: Invalid input` : 'Invalid input');
   }
 }
+
+// ============= TYPESCRIPT TYPE EXPORTS =============
+// Export TypeScript types inferred from Zod schemas for use in handlers
+
+export type CreateGamePayload = z.infer<typeof createGamePayloadSchema>;
+export type JoinGamePayload = z.infer<typeof joinGamePayloadSchema>;
+export type SelectTeamPayload = z.infer<typeof selectTeamPayloadSchema>;
+export type SwapPositionPayload = z.infer<typeof swapPositionPayloadSchema>;
+export type StartGamePayload = z.infer<typeof startGamePayloadSchema>;
+export type PlaceBetPayload = z.infer<typeof placeBetPayloadSchema>;
+export type PlayCardPayload = z.infer<typeof playCardPayloadSchema>;
+export type LobbyChatPayload = z.infer<typeof lobbyChatPayloadSchema>;
+export type TeamChatPayload = z.infer<typeof teamChatPayloadSchema>;
+export type GameChatPayload = z.infer<typeof gameChatPayloadSchema>;
+export type PlayerReadyPayload = z.infer<typeof playerReadyPayloadSchema>;
+export type VoteRematchPayload = z.infer<typeof voteRematchPayloadSchema>;
+export type KickPlayerPayload = z.infer<typeof kickPlayerPayloadSchema>;
+export type LeaveGamePayload = z.infer<typeof leaveGamePayloadSchema>;
+export type FillEmptySeatPayload = z.infer<typeof fillEmptySeatPayloadSchema>;
+export type SpectateGamePayload = z.infer<typeof spectateGamePayloadSchema>;
+export type LeaveSpectatePayload = z.infer<typeof leaveSpectatePayloadSchema>;
+export type TakeOverBotPayload = z.infer<typeof takeOverBotPayloadSchema>;
+export type ReplacePlayerWithBotPayload = z.infer<typeof replacePlayerWithBotPayloadSchema>;
+export type ChangeBotDifficultyPayload = z.infer<typeof changeBotDifficultyPayloadSchema>;
+export type AddBotPayload = z.infer<typeof addBotPayloadSchema>;

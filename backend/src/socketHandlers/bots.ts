@@ -19,6 +19,9 @@ import {
   takeOverBotPayloadSchema,
   replacePlayerWithBotPayloadSchema,
   changeBotDifficultyPayloadSchema,
+  TakeOverBotPayload,
+  ReplacePlayerWithBotPayload,
+  ChangeBotDifficultyPayload,
 } from '../validation/schemas';
 
 /**
@@ -205,7 +208,7 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
   // ============================================================================
   // replace_with_bot - Replace a human player with a bot
   // ============================================================================
-  socket.on('replace_with_bot', errorBoundaries.gameAction('replace_with_bot')(async (payload: unknown) => {
+  socket.on('replace_with_bot', errorBoundaries.gameAction('replace_with_bot')(async (payload: ReplacePlayerWithBotPayload) => {
     // Validate input with Zod schema
     const validation = validateInput(replacePlayerWithBotPayloadSchema, payload);
     if (!validation.success) {
@@ -335,7 +338,7 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
   // ============================================================================
   // take_over_bot - Take over a bot with a human player
   // ============================================================================
-  socket.on('take_over_bot', errorBoundaries.gameAction('take_over_bot')(async (payload: unknown) => {
+  socket.on('take_over_bot', errorBoundaries.gameAction('take_over_bot')(async (payload: TakeOverBotPayload) => {
     // Validate input with Zod schema
     const validation = validateInput(takeOverBotPayloadSchema, payload);
     if (!validation.success) {
@@ -524,7 +527,7 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
   // ============================================================================
   // change_bot_difficulty - Change bot difficulty level
   // ============================================================================
-  socket.on('change_bot_difficulty', errorBoundaries.gameAction('change_bot_difficulty')(async (payload: unknown) => {
+  socket.on('change_bot_difficulty', errorBoundaries.gameAction('change_bot_difficulty')(async (payload: ChangeBotDifficultyPayload) => {
     // Validate input with Zod schema
     const validation = validateInput(changeBotDifficultyPayloadSchema, payload);
     if (!validation.success) {
