@@ -195,8 +195,8 @@ export function useGameEventListeners({
         if (socket) {
           socket.emit('take_over_bot', {
             gameId,
-            playerName: storedPlayerName,
-            botName: availableBots[0].name
+            newPlayerName: storedPlayerName,
+            botNameToReplace: availableBots[0].name
           });
         }
         return;
