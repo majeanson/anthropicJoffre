@@ -239,7 +239,7 @@ export function UnifiedChat({
         </div>
 
         {/* Messages */}
-        <div className={`flex-1 overflow-y-auto overflow-x-hidden p-3 bg-parchment-100 dark:bg-gray-700 ${compact ? 'min-h-[150px] max-h-[200px]' : 'min-h-[150px] sm:min-h-[200px] max-h-[300px] sm:max-h-[400px]'}`}>
+        <div className={`flex-1 overflow-y-auto p-3 bg-parchment-100 dark:bg-gray-700 ${compact ? 'min-h-[150px] max-h-[200px]' : 'min-h-[150px] sm:min-h-[200px] max-h-[300px] sm:max-h-[400px]'}`}>
           {messages.length === 0 ? (
             <p className="text-sm text-umber-500 dark:text-gray-400 text-center py-4">
               No messages yet. Say something!
@@ -284,7 +284,7 @@ export function UnifiedChat({
 
         {/* Quick Emojis */}
         {showQuickEmojis && (
-          <div className="px-2 sm:px-3 py-2 bg-parchment-100 dark:bg-gray-700 border-t border-amber-200 dark:border-gray-600 flex gap-1 sm:gap-2 flex-wrap overflow-x-hidden">
+          <div className="flex-shrink-0 px-2 sm:px-3 py-2 bg-parchment-100 dark:bg-gray-700 border-t border-amber-200 dark:border-gray-600 flex gap-1 sm:gap-2 flex-wrap">
             {quickEmojis.map((emoji) => (
               <button
                 key={emoji}
@@ -299,14 +299,14 @@ export function UnifiedChat({
         )}
 
         {/* Input */}
-        <form onSubmit={handleSendMessage} className="p-2 sm:p-3 bg-parchment-50 dark:bg-gray-800 border-t border-amber-200 dark:border-gray-600 rounded-b-md">
-          <div className="flex gap-1 sm:gap-2">
+        <form onSubmit={handleSendMessage} className="flex-shrink-0 p-2 sm:p-3 bg-parchment-50 dark:bg-gray-800 border-t border-amber-200 dark:border-gray-600 rounded-b-md">
+          <div className="flex gap-1 sm:gap-2 items-center">
             {showEmojiPicker && (
               <div className="relative flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => setShowEmojis(!showEmojis)}
-                  className="px-2 sm:px-3 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-gray-600 dark:hover:bg-gray-500 text-white rounded transition-colors text-sm"
+                  className="px-2 sm:px-3 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-gray-600 dark:hover:bg-gray-500 text-white rounded transition-colors text-sm h-[38px] flex items-center justify-center"
                   aria-label="Emoji picker"
                 >
                   😀
@@ -324,13 +324,13 @@ export function UnifiedChat({
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder={placeholder}
-              className="flex-1 min-w-0 px-2 sm:px-3 py-2 border-2 border-amber-200 dark:border-gray-600 rounded focus:outline-none focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 text-sm"
+              className="flex-1 min-w-0 px-2 sm:px-3 py-2 border-2 border-amber-200 dark:border-gray-600 rounded focus:outline-none focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 text-sm h-[38px]"
               maxLength={200}
             />
             <button
               type="submit"
               disabled={!inputMessage.trim()}
-              className="px-3 sm:px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-blue-600 dark:hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded transition-colors text-sm flex-shrink-0"
+              className="px-3 sm:px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-blue-600 dark:hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded transition-colors text-sm flex-shrink-0 h-[38px] flex items-center justify-center"
             >
               Send
             </button>
