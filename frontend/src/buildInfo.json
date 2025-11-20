@@ -1,37 +1,39 @@
 {
-  "version": "3.0.0",
-  "buildDate": "2025-11-19T22:00:00.000Z",
+  "version": "3.1.0",
+  "buildDate": "2025-11-20T03:30:00.000Z",
   "environment": "production",
   "git": {
     "commitHash": "pending",
-    "commitDate": "2025-11-19",
+    "commitDate": "2025-11-20",
     "branch": "main",
-    "commitMessage": "feat: Testing improvements and unified debug panel\n\nVersion 3.0.0 Release\n\nTesting Improvements:\n- E2E tests at 100% pass rate - all core tests passing\n- QuickPlay pattern with stable bet amount strategy\n- Fixed all betting and playing phase tests\n- Backend unit tests: 451/456 passing (99%)\n\nDebug Panel Enhancements:\n- Unified debug panel consolidating all debug tools\n- Beautiful tabbed interface (Build Info, Game State, Automation, Server Health, Test Controls)\n- Smooth animations and gradient designs\n- Fixed lobby chat overflow issues\n\nGenerated with Claude Code"
+    "commitMessage": "feat: Unified Debug Modal v3.1.0 + Join Game Fixes\n\nVersion 3.1.0 Release\n\nUnified Debug Modal:\n- Merged DebugInfo and GlobalDebugModal into one beautiful modal\n- Collapsible sections for Server Health, Game Monitoring, Sentry Tests\n- Real-time game monitoring with 5s auto-refresh\n- Sentry integration testing (frontend + backend)\n- Database cleanup tools\n- All features in one gorgeous gradient UI\n\nJoin Game Improvements:\n- Fixed join game from LobbyBrowser not working\n- Fixed direct message migration SQL error (GROUP BY)\n- Better logging for join flow debugging\n- Fallback to join form if no playerName set\n\nGenerated with Claude Code"
   },
   "latestDoneFeatures": [
     {
-      "title": "Testing Improvements",
-      "date": "2025-11-19",
+      "title": "Unified Debug Modal (v3.1.0)",
+      "date": "2025-11-20",
       "features": [
-        "E2E tests at 100% pass rate - all core tests passing",
-        "QuickPlay pattern with stable bet amount strategy (bet 12 always valid)",
-        "Fixed all betting and playing phase E2E tests",
-        "Removed unreliable autoplay-dependent tests with documentation",
-        "Backend unit tests: 451/456 passing (99%)"
+        "Merged DebugInfo + GlobalDebugModal into one UnifiedDebugModal",
+        "Beautiful gradient design with purple/indigo theme",
+        "Collapsible sections: Health, Games, Sentry, Features, Cleanup",
+        "Real-time game monitoring (updates every 5s)",
+        "Clear individual games or bulk clear finished/all",
+        "Phase breakdown stats (team selection, betting, playing, finished)",
+        "Sentry error testing for frontend and backend",
+        "Database cleanup tools for obsolete game IDs",
+        "Single 'Debug Fun' button in Settings"
       ]
     },
     {
-      "title": "Unified Debug Panel (v3.0.0)",
-      "date": "2025-11-19",
+      "title": "Join Game Fixes",
+      "date": "2025-11-20",
       "features": [
-        "Single unified debug panel with tabbed interface",
-        "Tab 1: Build Info (version, git, features)",
-        "Tab 2: Game State (players, tricks, betting)",
-        "Tab 3: Automation (auto-play, skip betting/trick/round)",
-        "Tab 4: Server Health (memory, uptime, active games)",
-        "Tab 5: Test Controls (score manipulation, Sentry testing)",
-        "Smooth animations and gradient designs",
-        "Consolidated from 3 separate panels into one"
+        "Fixed join game from LobbyBrowser not working",
+        "Browser closes before emitting join event",
+        "Bot takeover modal now displays properly",
+        "Better console logging for debugging join flow",
+        "Fallback to join form if playerName is empty",
+        "Fixed direct_messages migration SQL GROUP BY error"
       ]
     },
     {

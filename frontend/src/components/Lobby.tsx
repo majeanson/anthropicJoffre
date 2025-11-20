@@ -2,8 +2,7 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
 import { LobbyBrowser } from './LobbyBrowser';
 import { HowToPlay } from './HowToPlay';
-import { DebugInfo } from './DebugInfo';
-import { GlobalDebugModal } from './GlobalDebugModal';
+import { UnifiedDebugModal } from './UnifiedDebugModal';
 import { useLobbyChat } from '../hooks/useLobbyChat';
 import { SocialPanel } from './SocialPanel';
 import { StatsPanel } from './StatsPanel';
@@ -56,8 +55,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
-  const [showDebugInfo, setShowDebugInfo] = useState(false);
-  const [showGlobalDebug, setShowGlobalDebug] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
   const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat' | 'friends' | 'messages' | 'profile'>('online');
@@ -286,10 +284,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     return (
       <>
         <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
-        <DebugInfo isOpen={showDebugInfo} onClose={() => setShowDebugInfo(false)} />
-        <GlobalDebugModal
-          isOpen={showGlobalDebug}
-          onClose={() => setShowGlobalDebug(false)}
+        <UnifiedDebugModal
+          isOpen={showDebug}
+          onClose={() => setShowDebug(false)}
           socket={socket}
         />
         {showBrowser && (
@@ -297,9 +294,18 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <LobbyBrowser
               socket={socket}
               onJoinGame={(gameId) => {
-                console.log('[Lobby] Joining game from browser:', gameId, playerName);
+                console.log('[Lobby] Joining game from browser:', gameId, 'playerName:', playerName);
                 // Close browser and directly join the game (don't show join form)
                 setShowBrowser(false);
+
+                // If playerName is empty, prompt user to enter name first
+                if (!playerName.trim()) {
+                  console.warn('[Lobby] No player name set, showing join form');
+                  setGameId(gameId);
+                  setMode('join');
+                  return;
+                }
+
                 onJoinGame(gameId, playerName);
               }}
               onSpectateGame={(gameId) => {
@@ -479,8 +485,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 {mainTab === 'settings' && (
                   <SettingsContent
                     onShowRules={() => setShowRules(true)}
-                    onShowDebugInfo={() => setShowDebugInfo(true)}
-                    onShowGlobalDebug={() => setShowGlobalDebug(true)}
+                    onShowDebug={() => setShowDebug(true)}
                   />
                 )}
               </div>
