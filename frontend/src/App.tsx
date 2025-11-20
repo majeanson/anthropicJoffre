@@ -625,32 +625,36 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <Suspense fallback={<div />}>
-          <DebugPanel
-            gameState={gameState}
-            gameId={gameId}
-            isOpen={debugPanelOpen}
-            socket={socket}
-            onClose={() => setDebugPanelOpen(false)}
-          />
-        </Suspense>
-        <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
-          <TeamSelection
-            players={gameState.players}
-            gameId={gameId}
-            currentPlayerId={socket?.id || ''}
-            creatorId={gameState.creatorId}
-            onSelectTeam={handleSelectTeam}
-            onSwapPosition={handleSwapPosition}
-            onStartGame={handleStartGame}
-            onLeaveGame={handleLeaveGame}
-            onAddBot={handleAddBot}
-            onKickPlayer={handleKickPlayer}
-            socket={socket}
-            botDifficulty={botDifficulty}
-            onBotDifficultyChange={setBotDifficulty}
-          />
-        </Suspense>
+        <ErrorBoundary componentName="DebugPanel">
+          <Suspense fallback={<div />}>
+            <DebugPanel
+              gameState={gameState}
+              gameId={gameId}
+              isOpen={debugPanelOpen}
+              socket={socket}
+              onClose={() => setDebugPanelOpen(false)}
+            />
+          </Suspense>
+        </ErrorBoundary>
+        <ErrorBoundary componentName="TeamSelection">
+          <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
+            <TeamSelection
+              players={gameState.players}
+              gameId={gameId}
+              currentPlayerId={socket?.id || ''}
+              creatorId={gameState.creatorId}
+              onSelectTeam={handleSelectTeam}
+              onSwapPosition={handleSwapPosition}
+              onStartGame={handleStartGame}
+              onLeaveGame={handleLeaveGame}
+              onAddBot={handleAddBot}
+              onKickPlayer={handleKickPlayer}
+              socket={socket}
+              botDifficulty={botDifficulty}
+              onBotDifficultyChange={setBotDifficulty}
+            />
+          </Suspense>
+        </ErrorBoundary>
       </>
     );
   }
@@ -674,15 +678,17 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <Suspense fallback={<div />}>
-          <DebugPanel
-            gameState={gameState}
-            gameId={gameId}
-            isOpen={debugPanelOpen}
-            socket={socket}
-            onClose={() => setDebugPanelOpen(false)}
-          />
-        </Suspense>
+        <ErrorBoundary componentName="DebugPanel">
+          <Suspense fallback={<div />}>
+            <DebugPanel
+              gameState={gameState}
+              gameId={gameId}
+              isOpen={debugPanelOpen}
+              socket={socket}
+              onClose={() => setDebugPanelOpen(false)}
+            />
+          </Suspense>
+        </ErrorBoundary>
         <ErrorBoundary>
           <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
             <BettingPhase
@@ -732,15 +738,17 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <Suspense fallback={<div />}>
-          <DebugPanel
-            gameState={gameState}
-            gameId={gameId}
-            isOpen={debugPanelOpen}
-            socket={socket}
-            onClose={() => setDebugPanelOpen(false)}
-          />
-        </Suspense>
+        <ErrorBoundary componentName="DebugPanel">
+          <Suspense fallback={<div />}>
+            <DebugPanel
+              gameState={gameState}
+              gameId={gameId}
+              isOpen={debugPanelOpen}
+              socket={socket}
+              onClose={() => setDebugPanelOpen(false)}
+            />
+          </Suspense>
+        </ErrorBoundary>
         <ErrorBoundary>
           <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-green-900 via-teal-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
             <PlayingPhase
@@ -794,15 +802,17 @@ function AppContent() {
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
-        <Suspense fallback={<div />}>
-          <DebugPanel
-            gameState={gameState}
-            gameId={gameId}
-            isOpen={debugPanelOpen}
-            socket={socket}
-            onClose={() => setDebugPanelOpen(false)}
-          />
-        </Suspense>
+        <ErrorBoundary componentName="DebugPanel">
+          <Suspense fallback={<div />}>
+            <DebugPanel
+              gameState={gameState}
+              gameId={gameId}
+              isOpen={debugPanelOpen}
+              socket={socket}
+              onClose={() => setDebugPanelOpen(false)}
+            />
+          </Suspense>
+        </ErrorBoundary>
         <ErrorBoundary>
           <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
             <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
@@ -988,14 +998,16 @@ function AppContent() {
 
             {/* Rematch Voting */}
             <div className="mb-6">
-              <Suspense fallback={<div className="text-center text-gray-500">Loading...</div>}>
-                <RematchVoting
-                  socket={socket}
-                  gameId={gameId}
-                  gameState={gameState}
-                  currentPlayerId={socket?.id || ''}
-                />
-              </Suspense>
+              <ErrorBoundary componentName="RematchVoting">
+                <Suspense fallback={<div className="text-center text-gray-500">Loading...</div>}>
+                  <RematchVoting
+                    socket={socket}
+                    gameId={gameId}
+                    gameState={gameState}
+                    currentPlayerId={socket?.id || ''}
+                  />
+                </Suspense>
+              </ErrorBoundary>
             </div>
 
             {/* Action Buttons */}
@@ -1036,27 +1048,31 @@ function AppContent() {
 
         {/* Bot Takeover Modal */}
         {botTakeoverModal && (
-          <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
-            <BotTakeoverModal
-            isOpen={!!botTakeoverModal}
-            availableBots={botTakeoverModal.availableBots}
-            onTakeOver={handleTakeOverBot}
-            onCancel={() => setBotTakeoverModal(null)}
-          />
-          </Suspense>
+          <ErrorBoundary componentName="BotTakeoverModal">
+            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+              <BotTakeoverModal
+              isOpen={!!botTakeoverModal}
+              availableBots={botTakeoverModal.availableBots}
+              onTakeOver={handleTakeOverBot}
+              onCancel={() => setBotTakeoverModal(null)}
+            />
+            </Suspense>
+          </ErrorBoundary>
         )}
 
         {/* Swap Confirmation Modal */}
         {swapRequest && (
-          <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
-            <SwapConfirmationModal
-              isOpen={!!swapRequest}
-              fromPlayerName={swapRequest.fromPlayerName}
-              willChangeTeams={swapRequest.willChangeTeams}
-              onAccept={handleAcceptSwap}
-              onReject={handleRejectSwap}
-            />
-          </Suspense>
+          <ErrorBoundary componentName="SwapConfirmationModal">
+            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+              <SwapConfirmationModal
+                isOpen={!!swapRequest}
+                fromPlayerName={swapRequest.fromPlayerName}
+                willChangeTeams={swapRequest.willChangeTeams}
+                onAccept={handleAcceptSwap}
+                onReject={handleRejectSwap}
+              />
+            </Suspense>
+          </ErrorBoundary>
         )}
       </>
     );

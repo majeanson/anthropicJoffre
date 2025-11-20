@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import * as Sentry from '@sentry/react';
 import buildInfoJson from '../buildInfo.json';
-import { BuildInfo, CleanupResult } from '../types/buildInfo';
+import { BuildInfo } from '../types/buildInfo';
 import { CONFIG } from '../config/constants';
 
 // Type the imported JSON
@@ -74,12 +74,6 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
   const [clearMessage, setClearMessage] = useState<string | null>(null);
   const [isClearing, setIsClearing] = useState(false);
 
-  // Temporary cleanup state (remove after production cleanup is done)
-  const [cleanupLoading, setCleanupLoading] = useState(false);
-  const [cleanupResult, setCleanupResult] = useState<CleanupResult | null>(null);
-  const [cleanupError, setCleanupError] = useState<string | null>(null);
-  const SHOW_CLEANUP_BUTTON = true; // Set to false after cleanup is complete
-
   const fetchHealthData = async () => {
     setHealthLoading(true);
     setHealthError(null);
@@ -107,32 +101,6 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
       }
     } catch (error) {
       console.error('[UnifiedDebug] Failed to fetch games data:', error);
-    }
-  };
-
-  const runCleanup = async () => {
-    if (!confirm('⚠️ This will DELETE all obsolete 6-character game IDs from the database.\n\nAre you sure you want to continue?')) {
-      return;
-    }
-
-    setCleanupLoading(true);
-    setCleanupError(null);
-    setCleanupResult(null);
-    try {
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/admin/cleanup-obsolete-games`, {
-        method: 'POST',
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      const data = await response.json();
-      setCleanupResult(data);
-      console.log('[UnifiedDebug] Cleanup successful:', data);
-    } catch (error) {
-      setCleanupError(error instanceof Error ? error.message : 'Failed to run cleanup');
-      console.error('Cleanup failed:', error);
-    } finally {
-      setCleanupLoading(false);
     }
   };
 
@@ -712,47 +680,6 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
               )}
             </div>
           </div>
-
-          {/* TEMPORARY: Database Cleanup (remove after cleanup is done) */}
-          {SHOW_CLEANUP_BUTTON && (
-            <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">🗑️</span>
-              <div className="flex-1">
-                <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-2">Database Cleanup</h3>
-                <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                  Remove obsolete 6-character game IDs from production database
-                </p>
-
-                <button
-                  onClick={runCleanup}
-                  disabled={cleanupLoading}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg font-bold transition-colors"
-                >
-                  {cleanupLoading ? '⏳ Cleaning...' : '🗑️ Run Cleanup'}
-                </button>
-
-                {cleanupError && (
-                  <div className="mt-2 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded border border-red-300 dark:border-red-700">
-                    <p className="text-sm text-red-700 dark:text-red-300">❌ {cleanupError}</p>
-                  </div>
-                )}
-
-                {cleanupResult && (
-                  <div className="mt-2 bg-green-50 dark:bg-green-900/20 px-3 py-3 rounded border border-green-300 dark:border-green-700">
-                    <p className="text-sm font-bold text-green-700 dark:text-green-300 mb-2">
-                      ✅ {cleanupResult.message}
-                    </p>
-                    <div className="text-xs text-gray-700 dark:text-gray-300 space-y-1">
-                      <p>• In-memory games deleted: {cleanupResult.deletedCount?.inMemory || 0}</p>
-                      <p>• Active games (DB) deleted: {cleanupResult.deletedCount?.activeGames || 0}</p>
-                      <p>• Finished games (DB) deleted: {cleanupResult.deletedCount?.finishedGames || 0}</p>
-                      <p>• Sessions deleted: {cleanupResult.deletedCount?.sessions || 0}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Fun Stats */}
           <div className="mt-6 p-4 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-purple-300 dark:border-purple-700">
