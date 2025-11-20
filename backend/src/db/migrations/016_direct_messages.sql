@@ -60,23 +60,28 @@ CREATE INDEX IF NOT EXISTS idx_dm_thread
 -- View for active conversations with last message preview
 CREATE OR REPLACE VIEW dm_conversations AS
 SELECT
-  LEAST(sender_id, recipient_id) AS user1_id,
-  GREATEST(sender_id, recipient_id) AS user2_id,
-  MAX(created_at) AS last_message_at,
-  COUNT(*) FILTER (WHERE is_read = FALSE) AS unread_count,
+  user1_id,
+  user2_id,
+  last_message_at,
+  unread_count,
   (
     SELECT message_text
     FROM direct_messages dm2
-    WHERE (dm2.sender_id = LEAST(dm1.sender_id, dm1.recipient_id)
-           AND dm2.recipient_id = GREATEST(dm1.sender_id, dm1.recipient_id))
-       OR (dm2.sender_id = GREATEST(dm1.sender_id, dm1.recipient_id)
-           AND dm2.recipient_id = LEAST(dm1.sender_id, dm1.recipient_id))
+    WHERE (dm2.sender_id = user1_id AND dm2.recipient_id = user2_id)
+       OR (dm2.sender_id = user2_id AND dm2.recipient_id = user1_id)
     ORDER BY created_at DESC
     LIMIT 1
   ) AS last_message_preview
-FROM direct_messages dm1
-WHERE is_deleted_by_sender = FALSE OR is_deleted_by_recipient = FALSE
-GROUP BY LEAST(sender_id, recipient_id), GREATEST(sender_id, recipient_id);
+FROM (
+  SELECT
+    LEAST(sender_id, recipient_id) AS user1_id,
+    GREATEST(sender_id, recipient_id) AS user2_id,
+    MAX(created_at) AS last_message_at,
+    COUNT(*) FILTER (WHERE is_read = FALSE) AS unread_count
+  FROM direct_messages dm1
+  WHERE is_deleted_by_sender = FALSE OR is_deleted_by_recipient = FALSE
+  GROUP BY LEAST(sender_id, recipient_id), GREATEST(sender_id, recipient_id)
+) conversations;
 
 COMMENT ON TABLE direct_messages IS 'Stores 1-on-1 direct messages between users';
 COMMENT ON VIEW dm_conversations IS 'Shows active conversations with last message preview and unread count';
