@@ -30,10 +30,9 @@ const csrfUtilities = doubleCsrf({
   cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    // Use 'lax' for both dev and production
-    // 'lax' provides good security while allowing cookies to be sent on navigation
-    // 'strict' would block cookies even on same-site navigation in some cases
-    sameSite: 'lax',
+    // Use 'none' in production to support cross-origin requests (required for Railway deployment)
+    // Use 'lax' in development for localhost cross-port requests
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     path: '/',
   },
   size: 64,
