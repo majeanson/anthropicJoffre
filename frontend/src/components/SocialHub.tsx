@@ -86,11 +86,11 @@ export function SocialHub({
     // Get recent game history
     socket.emit('get_player_history', { playerName: currentUsername || user?.username, limit: 10 });
 
-    const handlePlayerHistory = ({ games }: { games: any[] }) => {
+    const handlePlayerHistory = ({ games }: { games: GameHistoryEntry[] }) => {
       // Extract unique players from recent games
       const playersMap = new Map<string, RecentPlayer>();
 
-      games.forEach((game: any) => {
+      games.forEach((game: GameHistoryEntry) => {
         const playerNames = game.player_names || [];
         playerNames.forEach((name: string) => {
           if (name !== (currentUsername || user?.username)) {

@@ -375,7 +375,7 @@ export class EnhancedBotPlayer {
     gameState: GameState,
     playerId: string,
     position: number,
-    partner: any,
+    partner: Player | null,
     memory: CardMemory
   ): PlayDecision {
     const trick = gameState.currentTrick;
@@ -695,17 +695,17 @@ export class EnhancedBotPlayer {
   /**
    * Get partner player
    */
-  private static getPartner(gameState: GameState, playerId: string): any {
+  private static getPartner(gameState: GameState, playerId: string): Player | null {
     const player = gameState.players.find(p => p.id === playerId);
     if (!player) return null;
 
-    return gameState.players.find(p => p.id !== playerId && p.teamId === player.teamId);
+    return gameState.players.find(p => p.id !== playerId && p.teamId === player.teamId) || null;
   }
 
   /**
    * Get highest bet from current bets
    */
-  private static getHighestBet(bets: any[]): any {
+  private static getHighestBet(bets: Bet[]): Bet | null {
     if (bets.length === 0) return null;
 
     return bets.reduce((highest, current) => {

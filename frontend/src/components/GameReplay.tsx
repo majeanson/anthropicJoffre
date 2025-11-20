@@ -572,7 +572,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                             {playerName}:
                           </span>
                           <div className="flex gap-2 flex-wrap">
-                            {cards.map((card: any, idx: number) => {
+                            {cards.map((card: Card, idx: number) => {
                               const cardKey = `${card.color}-${card.value}`;
                               const isPlayed = playedCards.has(cardKey);
 

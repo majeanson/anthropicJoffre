@@ -36,6 +36,22 @@ interface RoundStatistics {
   playerBets?: { [playerName: string]: { amount: number; withoutTrump: boolean } | null };
 }
 
+// Type for all possible stat values
+type StatValue =
+  | RoundStatistics['trickMaster']
+  | RoundStatistics['pointLeader']
+  | RoundStatistics['perfectBet']
+  | RoundStatistics['teamMVP']
+  | RoundStatistics['trumpMaster']
+  | RoundStatistics['luckyPlayer']
+  | RoundStatistics['monochrome']
+  | RoundStatistics['suitedUp']
+  | RoundStatistics['luckySevens']
+  | RoundStatistics['rainbow']
+  | RoundStatistics['lowball']
+  | RoundStatistics['highRoller']
+  | RoundStatistics['trumpHeavy'];
+
 interface RoundSummaryProps {
   gameState: GameState;
   onReady: () => void;
@@ -96,7 +112,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
   }, [dataReady, onReady]);
 
   // ✅ Helper function for calculating stat scores (not a hook, can be defined here)
-  const getStatScore = (title: string, stat: any): number => {
+  const getStatScore = (title: string, stat: StatValue): number => {
     switch (title) {
       case 'Perfect Bet':
         return 100;
@@ -132,7 +148,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
   // ✅ CRITICAL: ALL useMemo hooks must be here, BEFORE any conditional returns
   // Collect all available stats with scores (memoized)
   const allStats = useMemo(() => {
-    const stats: Array<{ title: string; icon: string; stat: any; score: number }> = [];
+    const stats: Array<{ title: string; icon: string; stat: StatValue; score: number }> = [];
 
     if (statistics?.perfectBet) stats.push({ title: 'Perfect Bet', icon: '🎯', stat: statistics.perfectBet, score: getStatScore('Perfect Bet', statistics.perfectBet) });
     if (statistics?.teamMVP) stats.push({ title: 'Team MVP', icon: '⭐', stat: statistics.teamMVP, score: getStatScore('Team MVP', statistics.teamMVP) });
@@ -212,7 +228,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     );
   };
 
-  const renderHighlight = (title: string, icon: string, stat: any, index: number) => {
+  const renderHighlight = (title: string, icon: string, stat: StatValue, index: number) => {
     if (!stat) return null;
 
     let description = '';
