@@ -189,8 +189,6 @@ export function useGameEventListeners({
 
       // If user arrived via share link (autoJoinGameId is set), automatically take over first available bot
       if (autoJoinGameId === gameId && storedPlayerName && availableBots.length > 0) {
-        console.log(`[Auto-Join] Automatically taking over bot for share link join. GameId: ${gameId}, PlayerName: ${storedPlayerName}, Bot: ${availableBots[0].name}`);
-
         // Automatically take over the first available bot
         if (socket) {
           socket.emit('take_over_bot', {

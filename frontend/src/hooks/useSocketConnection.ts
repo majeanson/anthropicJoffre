@@ -13,8 +13,8 @@ import { useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { PlayerSession } from '../types/game';
 import { useAuth } from '../contexts/AuthContext';
+import { CONFIG } from '../config/constants';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 const SESSION_TIMEOUT = 900000; // 15 minutes
 
 /**
@@ -64,21 +64,15 @@ export function useSocketConnection() {
     // This helps wake up the server if it's in cold start (Railway free tier)
     const prewarmServer = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
-        const response = await fetch(`${apiUrl}/api/ping`, {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/ping`, {
           signal: controller.signal,
         });
         clearTimeout(timeoutId);
-
-        if (response.ok) {
-          console.log('✅ Server pre-warmed successfully');
-        }
       } catch (error) {
         // Silently fail - server might be cold starting
-        console.log('⏳ Server warming up...');
       }
     };
 
@@ -87,7 +81,7 @@ export function useSocketConnection() {
 
     const token = getAccessToken();
 
-    const newSocket = io(SOCKET_URL, {
+    const newSocket = io(CONFIG.SOCKET_URL, {
       // Enable both transports for Railway compatibility
       transports: ['websocket', 'polling'],
       // Enable automatic reconnection with exponential backoff

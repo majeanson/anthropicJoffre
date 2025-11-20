@@ -126,11 +126,6 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
 
     // Game Updated Event (Full State)
     const handleGameUpdated = (newGameState: GameState) => {
-      console.log(`📥 Frontend received game_updated, currentTrick.length = ${newGameState.currentTrick.length}`);
-      console.log(`📥 Players in new state:`);
-      newGameState.players.forEach((p, idx) => {
-        console.log(`   ${idx}. ${p.name}: ${p.hand?.length || 0} cards`);
-      });
       setGameState(newGameState);
 
       // Clear winner ID when trick is cleared
@@ -141,7 +136,6 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
 
     // Game Updated Delta Event (Bandwidth Optimization)
     const handleGameUpdatedDelta = (delta: GameStateDelta) => {
-      console.log(`📥 Frontend received game_updated_delta`);
       setGameState(prevState => {
         if (!prevState) return prevState; // Can't apply delta without previous state
         const newState = applyStateDelta(prevState, delta);
@@ -164,7 +158,6 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
       winnerId: string;
       gameState: GameState;
     }) => {
-      console.log(`📥 Frontend received trick_resolved, currentTrick.length = ${newGameState.currentTrick.length}`);
       setGameState(newGameState);
 
       // Store the winner ID for highlighting during the delay

@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
+import { CONFIG } from '../config/constants';
 
 interface ActiveGame {
   gameId: string;
@@ -40,8 +41,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
       setError(null);
 
       try {
-        const apiUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
-        const response = await fetch(`${apiUrl}/api/players/${encodeURIComponent(playerName)}/active-games`);
+        const response = await fetch(`${CONFIG.API_BASE_URL}/api/players/${encodeURIComponent(playerName)}/active-games`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch active games');

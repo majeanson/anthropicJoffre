@@ -293,31 +293,15 @@ function AppContent() {
   };
 
   const handleJoinGame = (gameId: string, playerName: string) => {
-    console.log('[App.handleJoinGame] Called with:', { gameId, playerName, socketConnected: !!socket });
-
-    if (!socket) {
-      console.error('[App.handleJoinGame] Socket not connected!');
-      return;
-    }
-
-    if (!gameId || !gameId.trim()) {
-      console.error('[App.handleJoinGame] Invalid gameId:', gameId);
-      return;
-    }
-
-    if (!playerName || !playerName.trim()) {
-      console.error('[App.handleJoinGame] Invalid playerName:', playerName);
+    if (!socket || !gameId?.trim() || !playerName?.trim()) {
       return;
     }
 
     // Store player name in localStorage for persistence
     localStorage.setItem('playerName', playerName);
-    console.log('[App.handleJoinGame] Stored playerName in localStorage:', playerName);
 
-    console.log('[App.handleJoinGame] Emitting join_game event:', { gameId, playerName });
     socket.emit('join_game', { gameId, playerName });
     setGameId(gameId);
-    console.log('[App.handleJoinGame] Updated gameId state:', gameId);
   };
 
   const handleSpectateGame = (gameId: string, spectatorName?: string) => {
@@ -1083,13 +1067,6 @@ function AppContent() {
 
 // Wrapper component to provide modal context
 function App() {
-  React.useEffect(() => {
-    console.log('[App] Main App component mounted');
-    return () => {
-      console.log('[App] Main App component unmounting - THIS SHOULD NOT HAPPEN!');
-    };
-  }, []);
-
   return (
     <ModalProvider>
       <AppContent />

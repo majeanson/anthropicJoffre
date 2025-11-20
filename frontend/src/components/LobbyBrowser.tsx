@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
+import { API_ENDPOINTS } from '../config/constants';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -71,7 +72,6 @@ interface LobbyBrowserProps {
   onClose: () => void;
 }
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: LobbyBrowserProps) {
   const { isAuthenticated } = useAuth();
@@ -108,7 +108,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
     }
 
     // Valid - proceed with join
-    console.log('[LobbyBrowser] Joining game:', game.gameId);
     onJoinGame(game.gameId);
   };
 
@@ -122,11 +121,9 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         setIsRetrying(true);
       }
 
-      console.log('[LobbyBrowser] Fetching games from:', `${SOCKET_URL}/api/games/lobby`);
-      const response = await fetch(`${SOCKET_URL}/api/games/lobby`, {
+      const response = await fetch(API_ENDPOINTS.gamesLobby(), {
         signal: AbortSignal.timeout(10000), // 10 second timeout
       });
-      console.log('[LobbyBrowser] Response status:', response.status, response.statusText);
 
       if (!response.ok) {
         // Try to parse error as JSON to extract correlation ID
@@ -147,7 +144,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
         // Retry on 5xx errors (server errors) or network issues
         if (response.status >= 500 && retryCount < 2) {
-          console.log(`[LobbyBrowser] Retrying after server error (attempt ${retryCount + 1}/2)`);
           await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
           return fetchGames(isInitialLoad, retryCount + 1);
         }
@@ -156,7 +152,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
       }
 
       const data = await response.json();
-      console.log('[LobbyBrowser] Received games:', data.games?.length || 0);
       setGames(data.games);
       setError(null);
       setCorrelationId(null);
@@ -170,7 +165,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
         // Retry on network errors
         if (retryCount < 2) {
-          console.log(`[LobbyBrowser] Retrying after network error (attempt ${retryCount + 1}/2)`);
           await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchGames(isInitialLoad, retryCount + 1);
         }
@@ -195,11 +189,9 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         setIsRetrying(true);
       }
 
-      console.log('[LobbyBrowser] Fetching recent games from:', `${SOCKET_URL}/api/games/recent?limit=20`);
-      const response = await fetch(`${SOCKET_URL}/api/games/recent?limit=20`, {
+      const response = await fetch(API_ENDPOINTS.recentGames(), {
         signal: AbortSignal.timeout(10000), // 10 second timeout
       });
-      console.log('[LobbyBrowser] Response status:', response.status, response.statusText);
 
       if (!response.ok) {
         // Try to parse error as JSON to extract correlation ID
@@ -220,7 +212,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
         // Retry on 5xx errors (server errors)
         if (response.status >= 500 && retryCount < 2) {
-          console.log(`[LobbyBrowser] Retrying after server error (attempt ${retryCount + 1}/2)`);
           await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchRecentGames(isInitialLoad, retryCount + 1);
         }
@@ -229,7 +220,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
       }
 
       const data = await response.json();
-      console.log('[LobbyBrowser] Received recent games:', data.games?.length || 0);
       setRecentGames(data.games);
       setError(null);
       setCorrelationId(null);
@@ -243,7 +233,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
         // Retry on network errors
         if (retryCount < 2) {
-          console.log(`[LobbyBrowser] Retrying after network error (attempt ${retryCount + 1}/2)`);
           await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchRecentGames(isInitialLoad, retryCount + 1);
         }

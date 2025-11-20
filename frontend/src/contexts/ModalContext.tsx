@@ -37,70 +37,57 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
 
-  // Debug: Log when ModalProvider re-renders
-  console.log('[ModalProvider] Render, states:', { showLoginModal, showRegisterModal, showPasswordResetModal });
-
   // Modal control functions
   const openLoginModal = () => {
-    console.log('[ModalContext] Opening login modal');
     setShowLoginModal(true);
     setShowRegisterModal(false);
     setShowPasswordResetModal(false);
   };
 
   const closeLoginModal = () => {
-    console.log('[ModalContext] Closing login modal');
     setShowLoginModal(false);
   };
 
   const openRegisterModal = () => {
-    console.log('[ModalContext] Opening register modal');
     setShowRegisterModal(true);
     setShowLoginModal(false);
     setShowPasswordResetModal(false);
   };
 
   const closeRegisterModal = () => {
-    console.log('[ModalContext] Closing register modal');
     setShowRegisterModal(false);
   };
 
   const openPasswordResetModal = () => {
-    console.log('[ModalContext] Opening password reset modal');
     setShowPasswordResetModal(true);
     setShowLoginModal(false);
     setShowRegisterModal(false);
   };
 
   const closePasswordResetModal = () => {
-    console.log('[ModalContext] Closing password reset modal');
     setShowPasswordResetModal(false);
   };
 
   // Switch functions (close others, open target)
   const switchToLogin = () => {
-    console.log('[ModalContext] Switching to login');
     setShowLoginModal(true);
     setShowRegisterModal(false);
     setShowPasswordResetModal(false);
   };
 
   const switchToRegister = () => {
-    console.log('[ModalContext] Switching to register');
     setShowRegisterModal(true);
     setShowLoginModal(false);
     setShowPasswordResetModal(false);
   };
 
   const switchToPasswordReset = () => {
-    console.log('[ModalContext] Switching to password reset');
     setShowPasswordResetModal(true);
     setShowLoginModal(false);
     setShowRegisterModal(false);
   };
 
   const closeAllModals = () => {
-    console.log('[ModalContext] Closing all modals');
     setShowLoginModal(false);
     setShowRegisterModal(false);
     setShowPasswordResetModal(false);

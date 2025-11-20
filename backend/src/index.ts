@@ -287,11 +287,11 @@ const connectionManager = new ConnectionManager(io, {
 
 // Log connection events
 connectionManager.on('connection_lost', ({ playerName, gameId }) => {
-  console.log(`Connection lost: ${playerName} in game ${gameId}`);
+  // Connection events are logged via ConnectionManager
 });
 
 connectionManager.on('connection_timeout', ({ playerName, socketId }) => {
-  console.log(`Connection timeout: ${playerName} (${socketId})`);
+  // Connection events are logged via ConnectionManager
 });
 
 // ============================================================================
@@ -314,7 +314,6 @@ app.post('/api/sentry-tunnel', express.raw({ type: '*/*', limit: '10mb' }), asyn
     res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.setHeader('Access-Control-Allow-Credentials', 'false');
 
-    console.log('[Sentry Tunnel] 📨 Received envelope from:', req.headers.origin);
     const envelope = req.body;
 
     // Handle both Buffer and string
@@ -322,29 +321,18 @@ app.post('/api/sentry-tunnel', express.raw({ type: '*/*', limit: '10mb' }), asyn
     const lines = envelopeString.split('\n');
     const headerLine = lines[0];
 
-    console.log('[Sentry Tunnel] 📋 Header line:', headerLine);
-
     const header = JSON.parse(headerLine);
-
-    console.log('[Sentry Tunnel] 📋 Envelope header:', {
-      dsn: header.dsn?.substring(0, 50) + '...',
-      event_id: header.event_id,
-      sent_at: header.sent_at
-    });
 
     // Extract Sentry project ID and host from DSN
     const dsnMatch = header.dsn?.match(/https:\/\/([^@]+)@([^\/]+)\/(\d+)/);
 
     if (!dsnMatch) {
-      console.error('[Sentry Tunnel] ❌ Invalid DSN in envelope:', header.dsn);
+      console.error('[Sentry Tunnel] Invalid DSN in envelope:', header.dsn);
       return res.status(400).send('Invalid DSN');
     }
 
     const [, publicKey, host, projectId] = dsnMatch;
     const sentryIngestUrl = `https://${host}/api/${projectId}/envelope/`;
-
-    console.log('[Sentry Tunnel] 📤 Forwarding to:', sentryIngestUrl);
-    console.log('[Sentry Tunnel] 📤 Project ID:', projectId);
 
     // Forward the envelope to Sentry (as raw bytes)
     const response = await fetch(sentryIngestUrl, {
@@ -358,7 +346,7 @@ app.post('/api/sentry-tunnel', express.raw({ type: '*/*', limit: '10mb' }), asyn
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[Sentry Tunnel] ❌ Sentry API error:', {
+      console.error('[Sentry Tunnel] Sentry API error:', {
         status: response.status,
         statusText: response.statusText,
         error: errorText,
@@ -367,11 +355,9 @@ app.post('/api/sentry-tunnel', express.raw({ type: '*/*', limit: '10mb' }), asyn
       return res.status(response.status).send(response.statusText);
     }
 
-    const responseText = await response.text();
-    console.log('[Sentry Tunnel] ✅ Successfully forwarded to Sentry, response:', responseText || 'OK');
     res.status(200).send('OK');
   } catch (error) {
-    console.error('[Sentry Tunnel] ❌ Error forwarding to Sentry:', error);
+    console.error('[Sentry Tunnel] Error forwarding to Sentry:', error);
     res.status(500).send('Internal Server Error');
   }
 });
@@ -616,12 +602,9 @@ async function deleteGame(gameId: string): Promise<void> {
   if (persistenceMode === 'elo') {
     try {
       await deleteGameFromDB(gameId);
-      console.log(`[ELO] Deleted game ${gameId} from database`);
     } catch (error) {
       console.error(`Failed to delete game ${gameId} from database:`, error);
     }
-  } else {
-    console.log(`[Casual] Skipped database deletion for game ${gameId}`);
   }
 }
 
@@ -685,10 +668,8 @@ function clearPlayerTimeout(gameId: string, playerNameOrId: string) {
 
 // Helper to start timeout for current player (uses stable playerName)
 function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'betting' | 'playing') {
-  console.log(`⏲️  startPlayerTimeout: Called for game ${gameId}, player ${playerNameOrId}, phase ${phase}`);
   const game = games.get(gameId);
   if (!game) {
-    console.log(`⏲️  startPlayerTimeout: Game not found, returning`);
     return;
   }
 
@@ -698,10 +679,8 @@ function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'bett
     player = game.players.find(p => p.id === playerNameOrId);
   }
   if (!player) {
-    console.log(`⏲️  startPlayerTimeout: Player ${playerNameOrId} not found, returning`);
     return;
   }
-  console.log(`⏲️  startPlayerTimeout: Found player ${player.name}, starting 15s timeout`);
 
   const playerName = player.name;
   const key = `${gameId}-${playerName}`; // Use stable playerName for key
@@ -759,8 +738,6 @@ function startPlayerTimeout(gameId: string, playerNameOrId: string, phase: 'bett
     const player = game.players.find(p => p.name === playerName);
     if (!player) return;
 
-    console.log(`⏰ Timeout: ${player.name} in ${phase} phase`);
-
     // Emit auto-action notification (skip for bots - they're already in autoplay)
     if (!player.isBot) {
       io.to(gameId).emit('auto_action_taken', {
@@ -796,8 +773,6 @@ function handleBettingTimeout(gameId: string, playerName: string) {
   const hasAlreadyBet = game.currentBets.some(b => b.playerId === player.id);
   if (hasAlreadyBet) return; // Already bet
 
-  console.log(`Auto-skipping bet for ${currentPlayer.name} due to timeout`);
-
   const isDealer = game.currentPlayerIndex === game.dealerIndex;
   const hasValidBets = game.currentBets.some(b => !b.skipped);
 
@@ -810,7 +785,6 @@ function handleBettingTimeout(gameId: string, playerName: string) {
       skipped: false,
     };
     game.currentBets.push(bet);
-    console.log(`Auto-bet 7 points for dealer ${currentPlayer.name}`);
   } else {
     // Skip the bet
     const bet: Bet = {
@@ -877,8 +851,6 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
 
   if (game.currentTrick.length >= 4) return; // Trick complete
 
-  console.log(`Auto-playing card for ${currentPlayer.name} due to timeout`);
-
   // Use hard bot logic to select best card (same strategy as frontend autoplay)
   const selectedCard = selectBotCard(game, player.id);
 
@@ -886,8 +858,6 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
     console.error(`No valid cards found for ${currentPlayer.name}`);
     return;
   }
-
-  console.log(`Auto-playing (bot logic): ${selectedCard.color} ${selectedCard.value}`);
 
   // Set trump on first card (unless bet was "without trump")
   if (game.currentTrick.length === 0 && !game.trump && !game.highestBet?.withoutTrump) {
@@ -911,23 +881,12 @@ function handlePlayingTimeout(gameId: string, playerName: string) {
 
   // Check if trick is complete
   if (game.currentTrick.length === 4) {
-    console.log(`   🎯 Trick complete! (via timeout auto-play)`);
-    console.log(`   Final trick state before resolution:`);
-    game.currentTrick.forEach((tc, idx) => {
-      const player = game.players.find(p => p.id === tc.playerId);
-      console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
-    });
     // HOT PATH: Emit immediately for client rendering, skip DB save (trick will be saved after resolution)
     // Using direct emit() instead of emitGameUpdate() to avoid unnecessary DB writes
     io.to(gameId).emit('game_updated', game);
-    console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
     // Small delay to ensure clients render the 4-card state before resolution
     setTimeout(() => {
-      console.log(`   ⏰ 100ms setTimeout fired, calling resolveTrick()`);
-      const resolveStart = Date.now();
       resolveTrick(gameId);
-      const resolveDuration = Date.now() - resolveStart;
-      console.log(`   ⏰ resolveTrick() returned after ${resolveDuration}ms`);
     }, 100);
     // Note: timeout will be started by resolveTrick after 2-second delay
   } else {
@@ -989,7 +948,6 @@ io.use((socket, next) => {
       if (payload && payload.username) {
         // Set playerName from authenticated user
         socket.data.playerName = payload.username;
-        console.log(`Socket ${socket.id} authenticated as ${payload.username}`);
       }
     }
 
@@ -1004,8 +962,6 @@ io.use((socket, next) => {
 
 // Socket.io event handlers
 io.on('connection', (socket) => {
-  console.log('Client connected:', socket.id, socket.data.playerName ? `(authenticated as ${socket.data.playerName})` : '(guest)');
-
   // Register connection with ConnectionManager
   connectionManager.registerConnection(socket);
 
@@ -1259,7 +1215,6 @@ function startNewRound(gameId: string) {
 
     // Schedule bot action if first player is a bot
     if (currentPlayer.isBot) {
-      console.log(`   🤖 Scheduling bot action for ${currentPlayer.name} in 2 seconds (new round)`);
       setTimeout(() => {
         const currentGame = games.get(gameId);
         if (!currentGame || currentGame.phase !== 'betting') return;
@@ -1267,7 +1222,6 @@ function startNewRound(gameId: string) {
         const currentBot = currentGame.players[currentGame.currentPlayerIndex];
         if (!currentBot || currentBot.name !== currentPlayer.name) return;
 
-        console.log(`   🤖 Bot ${currentPlayer.name} taking automatic action (start of round)`);
         handleBettingTimeout(gameId, currentPlayer.name);
       }, 2000); // 2 second delay for bot actions
     }
@@ -1294,33 +1248,26 @@ function schedulePostTrickActions(
   isRoundOver: boolean,
   delayMs: number = 2000
 ) {
-  console.log(`⏰ schedulePostTrickActions: Scheduling post-trick actions in ${delayMs}ms (roundOver: ${isRoundOver})`);
   setTimeout(() => {
-    console.log(`⏰ schedulePostTrickActions: Timeout fired! Processing post-trick actions...`);
     const game = games.get(gameId);
     if (!game) {
-      console.log(`⏰ schedulePostTrickActions: Game ${gameId} not found, aborting`);
       return;
     }
 
     // Clear trick after frontend has shown the animation
-    console.log(`⏰ schedulePostTrickActions: Clearing trick (had ${game.currentTrick.length} cards)`);
     game.currentTrick = [];
 
     if (isRoundOver) {
       // All hands empty - proceed to round end
-      console.log(`⏰ schedulePostTrickActions: Round is over, calling endRound()`);
       endRound(gameId);
     } else {
       // Continue playing - emit update and start timeout for next card
-      console.log(`⏰ schedulePostTrickActions: Round continues, emitting game update and starting player timeout for ${winnerName}`);
       emitGameUpdate(gameId, game);
       startPlayerTimeout(gameId, winnerName, 'playing');
 
       // Schedule bot action if winner is a bot
       const winner = game.players.find(p => p.name === winnerName);
       if (winner?.isBot) {
-        console.log(`   🤖 Scheduling bot action for ${winnerName} in 2 seconds`);
         setTimeout(() => {
           const currentGame = games.get(gameId);
           if (!currentGame || currentGame.phase !== 'playing') return;
@@ -1333,27 +1280,18 @@ function schedulePostTrickActions(
           const hasPlayed = currentGame.currentTrick.some(tc => tc.playerName === winnerName);
           if (hasPlayed) return;
 
-          console.log(`   🤖 Bot ${winnerName} taking automatic action (post-trick)`);
           handlePlayingTimeout(gameId, winnerName);
         }, 2000); // 2 second delay for bot actions
       }
     }
-    console.log(`⏰ schedulePostTrickActions: Post-trick actions complete`);
   }, delayMs);
 }
 
 function resolveTrick(gameId: string) {
-  console.log(`\n🎯 ===== resolveTrick START for game ${gameId} =====`);
   const game = games.get(gameId);
   if (!game) {
-    console.log(`   ❌ Game not found!`);
     return;
   }
-
-  console.log(`   📊 currentTrick.length = ${game.currentTrick.length}`);
-  game.currentTrick.forEach((tc, idx) => {
-    console.log(`      ${idx + 1}. ${tc.playerName}: ${tc.card.color} ${tc.card.value}`);
-  });
 
   // 1. PURE CALCULATION - Determine winner and points
   const winnerId = determineWinner(game.currentTrick, game.trump);
@@ -1372,31 +1310,14 @@ function resolveTrick(gameId: string) {
   // applyTrickResolution now keeps currentTrick visible (doesn't clear it)
   const result = applyTrickResolution(game, winnerName, totalPoints);
 
-  // DEBUG: Log current trick state before emitting
-  console.log(`   📤 About to emit trick_resolved`);
-  console.log(`   📤 game object currentTrick.length = ${game.currentTrick.length}`);
-  console.log(`   📤 games.get('${gameId}')?.currentTrick.length = ${games.get(gameId)?.currentTrick.length}`);
-
   const gameToSend = games.get(gameId);
-  if (gameToSend) {
-    console.log(`   📤 Sending gameState with currentTrick.length = ${gameToSend.currentTrick.length}`);
-    gameToSend.currentTrick.forEach((tc, idx) => {
-      console.log(`      ${idx + 1}. ${tc.playerName}: ${tc.card.color} ${tc.card.value}`);
-    });
-  }
 
   // 4. I/O - Emit trick resolution event with trick still visible
-  console.log(`   📤 BEFORE broadcastGameUpdate (trick_resolved)`);
-  const emitStart = Date.now();
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: gameToSend || game });
-  const emitDuration = Date.now() - emitStart;
-  console.log(`   📤 AFTER broadcastGameUpdate (took ${emitDuration}ms)`);
 
   // 5. ORCHESTRATION - Handle round completion or continue playing
   // Sprint 5 Phase 2.3: Extracted setTimeout logic to schedulePostTrickActions()
-  console.log(`   🔜 Calling schedulePostTrickActions (isRoundOver: ${result.isRoundOver})`);
   schedulePostTrickActions(gameId, winnerName, result.isRoundOver);
-  console.log(`   ✅ resolveTrick function complete, returning to caller`);
 }
 
 
@@ -1432,18 +1353,12 @@ async function endRound(gameId: string) {
 
   // DON'T delete stats yet - we need them for database updates below!
 
-  // Log scoring results
-  console.log(`Offensive Team ${scoring.offensiveTeamId} ${scoring.betMade ? 'made' : 'failed'} bet (${scoring.offensiveTeamPoints}/${scoring.betAmount}): ${scoring.offensiveScore > 0 ? '+' : ''}${scoring.offensiveScore}`);
-  console.log(`Defensive Team ${scoring.defensiveTeamId}: +${scoring.defensiveScore}`);
-  console.log(`Round ${game.roundNumber} Scores - Team 1: ${game.teamScores.team1}, Team 2: ${game.teamScores.team2}`);
-
   // Save game state incrementally after each round (conditional on persistence mode)
   try {
     const createdAtMs = gameCreationTimes.get(gameId) || Date.now();
     const createdAt = new Date(createdAtMs);
     await PersistenceManager.saveOrUpdateGame(game, createdAt);
     await PersistenceManager.saveGameParticipants(gameId, game.players, game.persistenceMode);
-    console.log(`[${game.persistenceMode.toUpperCase()}] Game ${gameId} saved after round ${game.roundNumber}`);
 
     // Update round-level stats for NON-BOT players (conditional on persistence mode)
     const humanPlayers = game.players.filter(p => !p.isBot);
@@ -1466,8 +1381,6 @@ async function endRound(gameId: string) {
         brownZerosReceived: stats?.brownZerosReceived.get(player.name) || 0,
         trumpsPlayed: stats?.trumpsPlayed.get(player.name) || 0,
       }, game.persistenceMode);
-
-      console.log(`[${game.persistenceMode.toUpperCase()}] Updated round stats for ${player.name}: ${roundWon ? 'WIN' : 'LOSS'}`);
     }
   } catch (error) {
     console.error('Error saving game progress:', error);
@@ -1481,7 +1394,6 @@ async function endRound(gameId: string) {
     try {
       // Mark game as finished in database (conditional on persistence mode)
       await PersistenceManager.markGameFinished(gameId, winningTeam, game.persistenceMode);
-      console.log(`[${game.persistenceMode.toUpperCase()}] Game ${gameId} marked as finished, Team ${winningTeam} won`);
 
       // Update game-level stats for NON-BOT players only (conditional on persistence mode)
       const humanPlayers = game.players.filter(p => !p.isBot);
@@ -1510,8 +1422,6 @@ async function endRound(gameId: string) {
           eloChange,
           game.persistenceMode
         );
-
-        console.log(`[${game.persistenceMode.toUpperCase()}] Updated game stats for ${player.name}: ${won ? 'WIN' : 'LOSS'}, ELO ${eloChange > 0 ? '+' : ''}${eloChange}`);
       }
     } catch (error) {
       console.error('Error finalizing game:', error);
@@ -1530,17 +1440,12 @@ async function endRound(gameId: string) {
     // MEMORY OPTIMIZATION: Remove finished games from memory immediately
     // Game is already saved to database, so we only need DB reference for replays
     // ============================================================================
-    console.log(`[Memory] Removing finished game ${gameId} from memory (saved to database)`);
 
     // Remove from all tracking Maps
     games.delete(gameId);
     gameFinishTimes.delete(gameId);
     gameCreationTimes.delete(gameId);
     previousGameStates.delete(gameId);
-
-    // Log memory freed
-    const memUsage = memoryManager.getMemoryUsage();
-    console.log(`[Memory] Current usage: ${memUsage.heapUsedPercent}% (${memUsage.heapUsedMB}MB / ${memUsage.heapTotalMB}MB)`);
   } else {
     // Initialize player ready tracking and round end timestamp
     game.playersReady = [];
@@ -1591,7 +1496,6 @@ httpServer.listen(PORT, HOST, async () => {
   // ============= GAME STATE RECOVERY =============
   // Load and restore game snapshots on server startup
   try {
-    console.log('🔄 Attempting to restore game snapshots...');
     const snapshots = await loadGameSnapshots();
 
     for (const snapshot of snapshots) {
@@ -1600,7 +1504,6 @@ httpServer.listen(PORT, HOST, async () => {
         // Restore the game state
         games.set(snapshot.id, snapshot);
         gameCreationTimes.set(snapshot.id, Date.now());
-        console.log(`✅ Restored game ${snapshot.id} with ${snapshot.players.length} players`);
 
         // Re-establish bot timeouts if needed
         if (snapshot.phase === 'betting' || snapshot.phase === 'playing') {
@@ -1611,21 +1514,14 @@ httpServer.listen(PORT, HOST, async () => {
               const game = games.get(snapshot.id);
               if (game && game.phase === snapshot.phase && game.currentPlayerIndex === snapshot.currentPlayerIndex) {
                 // Bot will be handled by existing bot logic
-                console.log(`Bot ${currentPlayer.name} will take action when ready`);
               }
             }, 5000);
           }
         }
       }
     }
-
-    if (snapshots.length > 0) {
-      console.log(`🎮 Recovered ${snapshots.length} game(s) from previous session`);
-    } else {
-      console.log('💭 No games to recover');
-    }
   } catch (error) {
-    console.error('⚠️ Failed to restore game snapshots:', error);
+    console.error('Failed to restore game snapshots:', error);
   }
 
   // ============= PERIODIC CLEANUP =============
@@ -1654,14 +1550,9 @@ httpServer.listen(PORT, HOST, async () => {
             previousGameStates.delete(gameId);
             roundStats.delete(gameId);
             cleanedCount++;
-            console.log(`[Cleanup] Removed finished game from memory: ${gameId} (finished ${Math.round(timeSinceFinish / 60000)}min ago)`);
           }
         }
       }
-    }
-
-    if (cleanedCount > 0) {
-      console.log(`[Cleanup] Removed ${cleanedCount} finished game(s) from memory. Active games: ${games.size}`);
     }
   }, 900000); // Run every 15 minutes
 
@@ -1673,7 +1564,6 @@ httpServer.listen(PORT, HOST, async () => {
     }
 
     try {
-      console.log('[Cleanup] Running stale game cleanup...');
       const staleGames = await cleanupStaleGames();
 
       // Remove from memory if exists
@@ -1683,12 +1573,7 @@ httpServer.listen(PORT, HOST, async () => {
           gameCreationTimes.delete(staleGame.game_id);
           previousGameStates.delete(staleGame.game_id);
           roundStats.delete(staleGame.game_id);
-          console.log(`[Cleanup] Removed stale game from memory: ${staleGame.game_id}`);
         }
-      }
-
-      if (staleGames.length > 0) {
-        console.log(`[Cleanup] Cleaned up ${staleGames.length} stale game(s)`);
       }
     } catch (error) {
       console.error('[Cleanup] Error during cleanup:', error);
@@ -1711,17 +1596,14 @@ httpServer.listen(PORT, HOST, async () => {
     const rssMB = Math.round(memUsage.rss / 1024 / 1024);
     const heapPercent = Math.round((memUsage.heapUsed / memUsage.heapTotal) * 100);
 
-    // Log basic info
-    console.log(`[RAM] Heap: ${heapUsedMB}MB / ${heapTotalMB}MB (${heapPercent}%) | RSS: ${rssMB}MB | Games: ${games.size}`);
-
     // Warn if memory is high
     if (heapPercent > 80) {
-      console.warn(`⚠️ [RAM] High memory usage: ${heapPercent}% (${heapUsedMB}MB / ${heapTotalMB}MB)`);
+      console.warn(`[RAM] High memory usage: ${heapPercent}% (${heapUsedMB}MB / ${heapTotalMB}MB)`);
     }
 
     // Critical warning if memory is very high
     if (heapPercent > 90) {
-      console.error(`🚨 [RAM] CRITICAL memory usage: ${heapPercent}% (${heapUsedMB}MB / ${heapTotalMB}MB)`);
+      console.error(`[RAM] CRITICAL memory usage: ${heapPercent}% (${heapUsedMB}MB / ${heapTotalMB}MB)`);
       logger.error('Critical memory usage detected', {
         heapUsedMB,
         heapTotalMB,
@@ -1754,10 +1636,6 @@ httpServer.listen(PORT, HOST, async () => {
         }
       }
 
-      // Only log if we're actually saving snapshots
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[Snapshot] Saved ${eloGames.length} ELO game snapshot(s)`);
-      }
     }
   }, 30000); // Save every 30 seconds
 
@@ -1765,11 +1643,7 @@ httpServer.listen(PORT, HOST, async () => {
   // Run an initial cleanup on startup
   setTimeout(async () => {
     try {
-      console.log('[Startup] Running initial cleanup...');
-      const staleGames = await cleanupStaleGames();
-      if (staleGames.length > 0) {
-        console.log(`[Startup] Cleaned up ${staleGames.length} stale game(s) from previous sessions`);
-      }
+      await cleanupStaleGames();
     } catch (error) {
       console.error('[Startup] Initial cleanup failed:', error);
     }
@@ -1790,8 +1664,8 @@ httpServer.listen(PORT, HOST, async () => {
       }
     }
   );
-  console.log('[MemoryManager] Active memory monitoring enabled');
+  logger.info('Memory monitoring enabled');
 }).on('error', (error: NodeJS.ErrnoException) => {
-  console.error('❌ Server failed to start:', error.message);
+  console.error('Server failed to start:', error.message);
   process.exit(1);
 });

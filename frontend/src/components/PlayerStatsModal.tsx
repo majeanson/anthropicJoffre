@@ -114,11 +114,9 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     if (!isOpen || !playerName) return;
 
     setLoading(true);
-    console.log('[PlayerStatsModal] Requesting stats for:', playerName);
     socket.emit('get_player_stats', { playerName });
 
     const handleStatsResponse = ({ stats: receivedStats, playerName: responseName }: { stats: PlayerStats | null; playerName: string }) => {
-      console.log('[PlayerStatsModal] Received stats response for:', responseName, 'stats:', receivedStats ? 'Found' : 'Not found');
       if (responseName === playerName) {
         setStats(receivedStats);
         setError(null);
@@ -156,11 +154,9 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     if (!isOpen || activeTab !== 'history' || !playerName) return;
 
     setHistoryLoading(true);
-    console.log('[PlayerStatsModal] Requesting history for:', playerName);
     socket.emit('get_player_history', { playerName, limit: 20 });
 
     const handleHistoryResponse = ({ games, playerName: responseName }: { games: GameHistoryEntry[]; playerName: string }) => {
-      console.log('[PlayerStatsModal] Received history response for:', responseName, 'games:', games?.length || 0);
       if (responseName === playerName) {
         setGameHistory(games);
         setHistoryError(null);
@@ -191,12 +187,10 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     setProfileLoading(true);
     setProfileError(null);
     try {
-      console.log('[PlayerStatsModal] Loading profile data');
       const data = await getUserProfile();
       if (data) {
         setProfile(data.profile);
         // setPreferences(data.preferences);
-        console.log('[PlayerStatsModal] Profile loaded:', data);
       }
     } catch (error) {
       console.error('[PlayerStatsModal] Error loading profile:', error);
@@ -834,10 +828,8 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                       onSave={async (data: ProfileData) => {
                         try {
                           await updateProfile(data);
-                          console.log('[PlayerStatsModal] Profile saved successfully');
                           // Refresh the profile data to show updated information
                           await loadProfile();
-                          console.log('[PlayerStatsModal] Profile display refreshed');
                         } catch (error) {
                           console.error('[PlayerStatsModal] Error saving profile:', error);
                           // Optionally show error message to user

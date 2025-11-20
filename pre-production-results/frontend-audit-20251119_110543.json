@@ -1,0 +1,566 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@vitest/ui": {
+      "name": "@vitest/ui",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "vitest"
+      ],
+      "effects": [
+        "vitest"
+      ],
+      "range": "<=0.0.122 || 0.31.0 - 2.2.0-beta.2",
+      "nodes": [
+        "node_modules/@vitest/ui"
+      ],
+      "fixAvailable": {
+        "name": "@vitest/ui",
+        "version": "4.0.10",
+        "isSemVerMajor": true
+      }
+    },
+    "bin-build": {
+      "name": "bin-build",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "download",
+        "execa"
+      ],
+      "effects": [
+        "mozjpeg",
+        "pngquant-bin"
+      ],
+      "range": ">=2.1.2",
+      "nodes": [
+        "node_modules/bin-build"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "bin-check": {
+      "name": "bin-check",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "execa"
+      ],
+      "effects": [
+        "bin-wrapper"
+      ],
+      "range": ">=4.1.0",
+      "nodes": [
+        "node_modules/bin-check"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "bin-version": {
+      "name": "bin-version",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "find-versions"
+      ],
+      "effects": [
+        "bin-version-check"
+      ],
+      "range": "<=4.0.0",
+      "nodes": [
+        "node_modules/bin-version"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "bin-version-check": {
+      "name": "bin-version-check",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "bin-version"
+      ],
+      "effects": [
+        "bin-wrapper"
+      ],
+      "range": "<=4.0.0",
+      "nodes": [
+        "node_modules/bin-version-check"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "bin-wrapper": {
+      "name": "bin-wrapper",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "bin-check",
+        "bin-version-check",
+        "download"
+      ],
+      "effects": [
+        "mozjpeg",
+        "pngquant-bin"
+      ],
+      "range": ">=0.4.0",
+      "nodes": [
+        "node_modules/bin-wrapper"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "cacheable-request": {
+      "name": "cacheable-request",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "http-cache-semantics"
+      ],
+      "effects": [
+        "got"
+      ],
+      "range": "0.1.0 - 2.1.4",
+      "nodes": [
+        "node_modules/cacheable-request"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "cross-spawn": {
+      "name": "cross-spawn",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1104663,
+          "name": "cross-spawn",
+          "dependency": "cross-spawn",
+          "title": "Regular Expression Denial of Service (ReDoS) in cross-spawn",
+          "url": "https://github.com/advisories/GHSA-3xgq-45jj-v275",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<6.0.6"
+        }
+      ],
+      "effects": [
+        "execa"
+      ],
+      "range": "<6.0.6",
+      "nodes": [
+        "node_modules/bin-build/node_modules/cross-spawn",
+        "node_modules/bin-check/node_modules/cross-spawn"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "download": {
+      "name": "download",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "got"
+      ],
+      "effects": [
+        "bin-build",
+        "bin-wrapper"
+      ],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/bin-wrapper/node_modules/download",
+        "node_modules/download"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "esbuild": {
+      "name": "esbuild",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1102341,
+          "name": "esbuild",
+          "dependency": "esbuild",
+          "title": "esbuild enables any website to send any requests to the development server and read the response",
+          "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+          "severity": "moderate",
+          "cwe": [
+            "CWE-346"
+          ],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N"
+          },
+          "range": "<=0.24.2"
+        }
+      ],
+      "effects": [
+        "vite"
+      ],
+      "range": "<=0.24.2",
+      "nodes": [
+        "node_modules/esbuild"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "7.2.2",
+        "isSemVerMajor": true
+      }
+    },
+    "execa": {
+      "name": "execa",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "cross-spawn"
+      ],
+      "effects": [
+        "bin-build",
+        "bin-check"
+      ],
+      "range": "0.5.0 - 0.9.0",
+      "nodes": [
+        "node_modules/bin-build/node_modules/execa",
+        "node_modules/bin-check/node_modules/execa"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "find-versions": {
+      "name": "find-versions",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "semver-regex"
+      ],
+      "effects": [
+        "bin-version"
+      ],
+      "range": "<=3.2.0",
+      "nodes": [
+        "node_modules/find-versions"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "got": {
+      "name": "got",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1088948,
+          "name": "got",
+          "dependency": "got",
+          "title": "Got allows a redirect to a UNIX socket",
+          "url": "https://github.com/advisories/GHSA-pfrx-2q88-qq97",
+          "severity": "moderate",
+          "cwe": [],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:L/A:N"
+          },
+          "range": "<11.8.5"
+        },
+        "cacheable-request"
+      ],
+      "effects": [
+        "download"
+      ],
+      "range": "<=11.8.3",
+      "nodes": [
+        "node_modules/bin-wrapper/node_modules/got",
+        "node_modules/got"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "http-cache-semantics": {
+      "name": "http-cache-semantics",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1102456,
+          "name": "http-cache-semantics",
+          "dependency": "http-cache-semantics",
+          "title": "http-cache-semantics vulnerable to Regular Expression Denial of Service",
+          "url": "https://github.com/advisories/GHSA-rc47-6667-2j5j",
+          "severity": "high",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<4.1.1"
+        }
+      ],
+      "effects": [
+        "cacheable-request"
+      ],
+      "range": "<4.1.1",
+      "nodes": [
+        "node_modules/http-cache-semantics"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "imagemin-mozjpeg": {
+      "name": "imagemin-mozjpeg",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "mozjpeg"
+      ],
+      "effects": [],
+      "range": ">=8.0.0",
+      "nodes": [
+        "node_modules/imagemin-mozjpeg"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-mozjpeg",
+        "version": "7.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "imagemin-pngquant": {
+      "name": "imagemin-pngquant",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        "pngquant-bin"
+      ],
+      "effects": [],
+      "range": ">=5.1.0",
+      "nodes": [
+        "node_modules/imagemin-pngquant"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "mozjpeg": {
+      "name": "mozjpeg",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "bin-build",
+        "bin-wrapper"
+      ],
+      "effects": [
+        "imagemin-mozjpeg"
+      ],
+      "range": ">=4.0.0",
+      "nodes": [
+        "node_modules/mozjpeg"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-mozjpeg",
+        "version": "7.0.0",
+        "isSemVerMajor": true
+      }
+    },
+    "pngquant-bin": {
+      "name": "pngquant-bin",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        "bin-build",
+        "bin-wrapper"
+      ],
+      "effects": [
+        "imagemin-pngquant"
+      ],
+      "range": ">=3.0.0",
+      "nodes": [
+        "node_modules/pngquant-bin"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "semver-regex": {
+      "name": "semver-regex",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1092475,
+          "name": "semver-regex",
+          "dependency": "semver-regex",
+          "title": "semver-regex Regular Expression Denial of Service (ReDOS)",
+          "url": "https://github.com/advisories/GHSA-44c6-4v22-4mhx",
+          "severity": "high",
+          "cwe": [
+            "CWE-400",
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 7.5,
+            "vectorString": "CVSS:3.0/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+          },
+          "range": "<3.1.3"
+        },
+        {
+          "source": 1092605,
+          "name": "semver-regex",
+          "dependency": "semver-regex",
+          "title": "Regular expression denial of service in semver-regex",
+          "url": "https://github.com/advisories/GHSA-4x5v-gmq8-25ch",
+          "severity": "low",
+          "cwe": [
+            "CWE-1333"
+          ],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<3.1.4"
+        }
+      ],
+      "effects": [
+        "find-versions"
+      ],
+      "range": "<=3.1.3",
+      "nodes": [
+        "node_modules/semver-regex"
+      ],
+      "fixAvailable": {
+        "name": "imagemin-pngquant",
+        "version": "5.0.1",
+        "isSemVerMajor": true
+      }
+    },
+    "vite": {
+      "name": "vite",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "esbuild"
+      ],
+      "effects": [
+        "vite-node",
+        "vitest"
+      ],
+      "range": "0.11.0 - 6.1.6",
+      "nodes": [
+        "node_modules/vite"
+      ],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "7.2.2",
+        "isSemVerMajor": true
+      }
+    },
+    "vite-node": {
+      "name": "vite-node",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "vite"
+      ],
+      "effects": [
+        "vitest"
+      ],
+      "range": "<=2.2.0-beta.2",
+      "nodes": [
+        "node_modules/vite-node"
+      ],
+      "fixAvailable": {
+        "name": "vitest",
+        "version": "4.0.10",
+        "isSemVerMajor": true
+      }
+    },
+    "vitest": {
+      "name": "vitest",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": [
+        "@vitest/ui",
+        "vite",
+        "vite-node"
+      ],
+      "effects": [
+        "@vitest/ui"
+      ],
+      "range": "0.0.1 - 0.0.12 || 0.0.29 - 0.0.122 || 0.3.3 - 2.2.0-beta.2 || 4.0.0-beta.1 - 4.0.0-beta.14",
+      "nodes": [
+        "node_modules/vitest"
+      ],
+      "fixAvailable": {
+        "name": "vitest",
+        "version": "4.0.10",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 6,
+      "high": 16,
+      "critical": 0,
+      "total": 22
+    },
+    "dependencies": {
+      "prod": 24,
+      "dev": 859,
+      "optional": 73,
+      "peer": 22,
+      "peerOptional": 0,
+      "total": 884
+    }
+  }
+}

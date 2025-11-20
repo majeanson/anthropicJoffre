@@ -65,8 +65,9 @@ class Logger {
       this.storeErrorInLocalStorage(errorLog);
 
       // Send to backend (fire and forget)
-      const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
-      fetch(`${SOCKET_URL}/api/errors`, {
+      // Import at function level to avoid circular dependencies
+      const { CONFIG } = await import('../config/constants');
+      fetch(`${CONFIG.API_BASE_URL}/api/errors`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(errorLog),

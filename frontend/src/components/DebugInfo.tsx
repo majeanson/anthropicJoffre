@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 import buildInfoJson from '../buildInfo.json';
 import { BuildInfo, CleanupResult } from '../types/buildInfo';
+import { CONFIG } from '../config/constants';
 
 // Type the imported JSON
 const buildInfo = buildInfoJson as BuildInfo;
-
-// Use environment-aware API URL (same as Socket.io connection)
-const API_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 interface DebugInfoProps {
   isOpen: boolean;
@@ -67,7 +65,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
     setHealthLoading(true);
     setHealthError(null);
     try {
-      const response = await fetch(`${API_URL}/api/health/detailed`);
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/health/detailed`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -90,7 +88,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
     setCleanupError(null);
     setCleanupResult(null);
     try {
-      const response = await fetch(`${API_URL}/api/admin/cleanup-obsolete-games`, {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/admin/cleanup-obsolete-games`, {
         method: 'POST',
       });
       if (!response.ok) {

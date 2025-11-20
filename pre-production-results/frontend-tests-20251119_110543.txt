@@ -1,0 +1,1646 @@
+
+> trick-card-game-frontend@2.3.0 test
+> vitest --run
+
+
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/Users/marc_/Documents/WebApp/anthropicJoffre/frontend[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mLoading State[2m > [22m[2mshould show loading spinner on mount[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mLoading State[2m > [22m[2mshould emit get_game_replay on mount[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mLoading State[2m > [22m[2mshould register socket event handlers[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould display replay data when loaded successfully[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle 404 errors with correlation ID[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle 404 errors with correlation ID[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Game not found'[39m, correlationId: [32m'abc-123-def'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle network errors[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould handle network errors[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Network connection failed'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould show warning when replay has no rounds[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m0[39m
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mData Loading[2m > [22m[2mshould show warning when replay has no rounds[22m[39m
+[GameReplay] round_history is empty for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have play/pause button[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould start auto-playback when play clicked[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have step forward button[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have step backward button[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould have speed control[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+ [32m✓[39m src/components/BettingPhase.test.tsx [2m ([22m[2m19 tests[22m[2m)[22m[90m 159[2mms[22m[39m
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mPlayback Controls[2m > [22m[2mshould change playback speed[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+ [32m✓[39m src/components/TeamSelection.test.tsx [2m ([22m[2m18 tests[22m[2m)[22m[90m 207[2mms[22m[39m
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mrenders all stat buttons[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens player stats when My Stats button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould display current round number[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould navigate to next round[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mrenders with all difficulty buttons[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mhighlights the selected difficulty[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mshows correct description for each difficulty level[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onBotDifficultyChange when difficulty button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mRendering and Basic UI[2m > [22m[2mshould render player hand[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 3
+🎴 Rendering hand for TestPlayer: red-5, blue-3, green-7
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 3
+🎴 Rendering hand for TestPlayer: red-5, blue-3, green-7
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mRendering and Basic UI[2m > [22m[2mshould show error state when player not found[22m[39m
+🎮 PlayingPhase render - currentPlayerId: non-existent-player, found player: undefined at index -1, hand size: undefined
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mRendering and Basic UI[2m > [22m[2mshould render spectator view[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mCard Play Functionality[2m > [22m[2mshould disable unplayable cards[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 2
+🎴 Rendering hand for TestPlayer: red-5, blue-3
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 2
+🎴 Rendering hand for TestPlayer: red-5, blue-3
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mCard Play Functionality[2m > [22m[2mshould enable all cards when leading trick[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 3
+🎴 Rendering hand for TestPlayer: red-5, blue-3, green-7
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 3
+🎴 Rendering hand for TestPlayer: red-5, blue-3, green-7
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mCard Play Functionality[2m > [22m[2mshould call onPlayCard when card clicked[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: red-5
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: red-5
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: red-5
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mCard Play Functionality[2m > [22m[2mshould prevent double-clicking same card[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: red-5
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: red-5
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: red-5
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mTrick Display[2m > [22m[2mshould show current trick cards[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mTrick Display[2m > [22m[2mshould highlight current player turn[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mTrick Display[2m > [22m[2mshould show empty trick at round start[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mLed Suit Indicator[2m > [22m[2mshould show led suit when trick started[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: blue-5
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎴 Rendering hand for TestPlayer: blue-5
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mLed Suit Indicator[2m > [22m[2mshould not show led suit when leading[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mGame State Display[2m > [22m[2mshould show current scores[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mGame State Display[2m > [22m[2mshould show trump color[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mGame State Display[2m > [22m[2mshould show round number[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mError States[2m > [22m[2mshould handle missing player gracefully[22m[39m
+🎮 PlayingPhase render - currentPlayerId: invalid-id, found player: undefined at index -1, hand size: undefined
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mError States[2m > [22m[2mshould handle empty hand gracefully[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mError States[2m > [22m[2mshould handle invalid game state gracefully[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mAutoplay Feature[2m > [22m[2mshould show autoplay toggle when enabled[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: Player 1 at index 0, hand size: 0
+
+[90mstdout[2m | src/components/PlayingPhase.test.tsx[2m > [22m[2mPlayingPhase[2m > [22m[2mSpectator Mode[2m > [22m[2mshould not allow card play in spectator mode[22m[39m
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+🎮 PlayingPhase render - currentPlayerId: player-1, found player: TestPlayer at index 0, hand size: 1
+
+ [32m✓[39m src/components/PlayingPhase.test.tsx [2m ([22m[2m20 tests[22m[2m)[22m[90m 239[2mms[22m[39m
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mrenders create game form with all elements[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows player name input with placeholder for guests[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mdisables player name input for authenticated users[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mdefaults to ranked mode (ELO)[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mtoggles between ranked and casual mode[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mrenders join game form with all elements[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows join type selection with player and spectator options[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mdefaults to player join type[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mswitches to spectator join type when clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould navigate to previous round[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mNavigation[2m > [22m[2mshould jump to specific round[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m3[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould show game scores[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould display trick history[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould show trump suit[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mState Visualization[2m > [22m[2mshould display winning team[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+[GameReplay] Received replay data for game: test-game-123 rounds: [33m5[39m
+[GameReplay] Replay data validated successfully. Rounds: [33m2[39m
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens player stats when My Stats button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens player stats when My Stats button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould have Try Again button on error[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould have Try Again button on error[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Connection failed'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould retry fetching on Try Again click[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould retry fetching on Try Again click[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Connection failed'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould close on Close button click[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+[90mstderr[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mError Recovery[2m > [22m[2mshould close on Close button click[22m[39m
+[GameReplay] Error loading replay: { message: [32m'Connection failed'[39m } for game: test-game-123
+
+[90mstdout[2m | src/components/GameReplay.test.tsx[2m > [22m[2mGameReplay[2m > [22m[2mCleanup[2m > [22m[2mshould unregister socket handlers on unmount[22m[39m
+[GameReplay] Requesting replay for game: test-game-123
+
+ [32m✓[39m src/components/GameReplay.test.tsx [2m ([22m[2m25 tests[22m[2m)[22m[33m 423[2mms[22m[39m
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onBotDifficultyChange when difficulty button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onBotDifficultyChange when difficulty button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens leaderboard when Global Leaderboard button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens leaderboard when Global Leaderboard button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens leaderboard when Global Leaderboard button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mtoggles between ranked and casual mode[22m[39m
+<empty line>
+[90mstderr[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mtoggles between ranked and casual mode[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens browser when Recent Games button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens browser when Recent Games button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mopens browser when Recent Games button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mswitches to spectator join type when clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mswitches to spectator join type when clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows spectator info message when spectator type is selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows (Optional) for player name when spectator type is selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onJoinGame with correct parameters when joining as player[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mdisables My Stats and Leaderboard buttons when socket is null[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mshows warning message when socket is null[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mRecent Games button is always enabled[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/StatsPanel.test.tsx[2m > [22m[2mStatsPanel[2m > [22m[2mdisplays player statistics title[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+ [32m✓[39m src/components/StatsPanel.test.tsx [2m ([22m[2m8 tests[22m[2m)[22m[33m 347[2mms[22m[39m
+[90mstderr[2m | src\utils\csrf.ts:43:15[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstderr[2m | Module.initializeCsrf (C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\src\utils\csrf.ts:148:13)[22m[39m
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mrenders online and recent tab buttons[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mswitches tabs when tab buttons are clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mdisplays persistence mode toggle[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mtoggles persistence mode when checkbox is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onJoinGame with correct parameters when joining as player[22m[39m
+<empty line>
+[90mstderr[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onJoinGame with correct parameters when joining as player[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mtoggles persistence mode when checkbox is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mtoggles persistence mode when checkbox is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onSpectateGame when joining as spectator[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mswitches tabs when tab buttons are clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mswitches tabs when tab buttons are clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onSpectateGame when joining as spectator[22m[39m
+<empty line>
+[90mstderr[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onSpectateGame when joining as spectator[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows appropriate info message for ranked mode[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows appropriate info message for casual mode[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows appropriate info message for casual mode[22m[39m
+<empty line>
+[90mstderr[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mshows appropriate info message for casual mode[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows auto-join message when autoJoinGameId is provided[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows back to homepage button when autoJoinGameId is provided[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows regular back button when autoJoinGameId is not provided[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with player name and ranked mode on submit[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays online players when on online tab[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mshows join button for players in game[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdoes not show join button for players in lobby[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays message when no online players[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays recent players when on recent tab[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mfilters out bot players from recent list[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mshows game count for recent players[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mdisplays message when no recent players[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/SocialPanel.test.tsx[2m > [22m[2mSocialPanel[2m > [22m[2mshows player status labels correctly[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+ [32m✓[39m src/components/SocialPanel.test.tsx [2m ([22m[2m11 tests[22m[2m)[22m[33m 386[2mms[22m[39m
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstderr[2m | src\utils\csrf.ts:43:15[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBackToHomepage when back to homepage button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mdisables ranked mode checkbox when user is not authenticated[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mshows ranked badge when persistence is elo[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onQuickPlay with correct parameters when button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstderr[2m | Module.initializeCsrf (C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\src\utils\csrf.ts:148:13)[22m[39m
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with player name and ranked mode on submit[22m[39m
+<empty line>
+[90mstderr[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with player name and ranked mode on submit[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onQuickPlay with correct parameters when button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mcalls onQuickPlay with correct parameters when button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with casual mode when checkbox is unchecked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBackToHomepage when back to homepage button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mcalls onBackToHomepage when back to homepage button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with casual mode when checkbox is unchecked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onCreateGame with casual mode when checkbox is unchecked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/QuickPlayPanel.test.tsx[2m > [22m[2mQuickPlayPanel[2m > [22m[2mrenders Quick Play button with correct text[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+ [32m✓[39m src/components/QuickPlayPanel.test.tsx [2m ([22m[2m10 tests[22m[2m)[22m[33m 508[2mms[22m[39m
+[90mstderr[2m | src\utils\csrf.ts:43:15[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mdisables player name input for authenticated users[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mrequires game ID to submit[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mrequires player name when joining as player[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mdoes not require player name when joining as spectator[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows Join as Player button text when player type selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/JoinGameForm.test.tsx[2m > [22m[2mJoinGameForm[2m > [22m[2mshows Join as Guest button text when spectator type selected[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+ [32m✓[39m src/components/JoinGameForm.test.tsx [2m ([22m[2m19 tests[22m[2m)[22m[33m 528[2mms[22m[39m
+[90mstderr[2m | src\utils\csrf.ts:43:15[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24 {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+<empty line>
+[90mstderr[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mcalls onBack when back button is clicked[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mupdates player name when typing in input[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mupdates player name when typing in input[22m[39m
+<empty line>
+[90mstderr[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mupdates player name when typing in input[22m[39m
+Error fetching CSRF token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+[CSRF] Failed to initialize token: TypeError: fetch failed
+[90m    at node:internal/deps/undici/undici:13510:13[39m
+[90m    at processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at [90mC:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:31:24
+    at Module.initializeCsrf [90m(C:\Users\marc_\Documents\WebApp\anthropicJoffre\frontend\[39msrc\utils\csrf.ts:145:5[90m)[39m {
+  [cause]: AggregateError: 
+  [90m    at internalConnectMultiple (node:net:1139:18)[39m
+  [90m    at afterConnectMultiple (node:net:1714:7)[39m {
+    code: [32m'ECONNREFUSED'[39m,
+    [errors]: [ [36m[Error][39m, [36m[Error][39m ]
+  }
+}
+
+[90mstdout[2m | src/components/GameCreationForm.test.tsx[2m > [22m[2mGameCreationForm[2m > [22m[2mrequires player name to submit[22m[39m
+[ModalProvider] Render, states: {
+  showLoginModal: [33mfalse[39m,
+  showRegisterModal: [33mfalse[39m,
+  showPasswordResetModal: [33mfalse[39m
+}
+[AuthContext] Initial load - initializing CSRF and fetching current user
+
+ [32m✓[39m src/components/GameCreationForm.test.tsx [2m ([22m[2m12 tests[22m[2m)[22m[33m 807[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m      Tests [22m [1m[32m142 passed[39m[22m[90m (142)[39m
+[2m   Start at [22m 11:05:52
+[2m   Duration [22m 3.29s[2m (transform 1.48s, setup 1.50s, collect 4.20s, tests 3.60s, environment 9.81s, prepare 1.57s)[22m
+

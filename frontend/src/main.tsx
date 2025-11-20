@@ -8,25 +8,17 @@ import { GameProvider } from './contexts/GameContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { AuthProvider } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ErrorBoundary } from './components/ErrorBoundary';
+import logger from './utils/logger';
 
 // Initialize Sentry for error tracking
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 
-console.log('🔍 Environment check:', {
-  hasEnvVar: !!import.meta.env.VITE_SENTRY_DSN,
-  envVarValue: import.meta.env.VITE_SENTRY_DSN ? import.meta.env.VITE_SENTRY_DSN.substring(0, 30) + '...' : 'NOT SET',
-  usingDSN: SENTRY_DSN.substring(0, 30) + '...'
-});
-
 if (SENTRY_DSN) {
   const sentryEnvironment = import.meta.env.VITE_SENTRY_ENVIRONMENT || 'production';
-  console.log('🚨 Initializing Sentry with DSN:', SENTRY_DSN.substring(0, 30) + '...');
-  console.log('🌍 Sentry environment:', sentryEnvironment);
-
-  // Get backend URL for tunnel (use production URL or local dev)
   const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://anthropicjoffre-production.up.railway.app';
   const tunnelUrl = `${BACKEND_URL}/api/sentry-tunnel`;
-  console.log('🚇 Sentry tunnel:', tunnelUrl);
+
+  logger.info('Initializing Sentry', { environment: sentryEnvironment, tunnel: tunnelUrl });
 
   Sentry.init({
     dsn: SENTRY_DSN,
@@ -48,21 +40,10 @@ if (SENTRY_DSN) {
     replaysSessionSampleRate: 0.1, // 10% of sessions
     replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
     // Debug mode for troubleshooting
-    debug: true,
-    // Ensure errors are sent
-    beforeSend(event) {
-      console.log('📤 Sentry sending event:', event.event_id, event.message || event.exception);
-      return event; // Always send the event
-    },
-    // Track transport errors
-    beforeSendTransaction(transaction) {
-      console.log('📤 Sentry sending transaction:', transaction.transaction);
-      return transaction;
-    },
+    debug: import.meta.env.DEV,
   });
-  console.log('✅ Sentry initialized successfully');
 } else {
-  console.warn('⚠️ Sentry DSN not found. Error tracking disabled.');
+  logger.warn('Sentry DSN not found. Error tracking disabled.');
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

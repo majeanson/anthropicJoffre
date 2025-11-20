@@ -6,10 +6,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { User, AuthContextType, LoginData, RegisterData, ProfileUpdateData } from '../types/auth';
 import { fetchWithCsrf, initializeCsrf, clearCsrfToken } from '../utils/csrf';
+import { API_ENDPOINTS } from '../config/constants';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -36,7 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      const response = await fetch(API_ENDPOINTS.authProfile(), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -66,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sprint 18: Refresh token rotation with httpOnly cookies
   const refreshToken = useCallback(async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
+      const response = await fetch(API_ENDPOINTS.authRefresh(), {
         method: 'POST',
         credentials: 'include', // Send httpOnly cookies
         headers: {
@@ -90,7 +89,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await fetchCurrentUser();
       return true;
     } catch (err) {
-      console.error('Error refreshing token:', err);
       clearTokens();
       setUser(null);
       setIsLoading(false);
@@ -105,7 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
 
     try {
-      const response = await fetchWithCsrf(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetchWithCsrf(API_ENDPOINTS.authLogin(), {
         method: 'POST',
         body: JSON.stringify(data)
       });
@@ -135,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
 
     try {
-      const response = await fetchWithCsrf(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetchWithCsrf(API_ENDPOINTS.authRegister(), {
         method: 'POST',
         body: JSON.stringify(data)
       });
@@ -165,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearCsrfToken(); // Clear CSRF token cache
 
     // Call logout endpoint to revoke refresh token
-    fetchWithCsrf(`${API_BASE_URL}/api/auth/logout`, {
+    fetchWithCsrf(API_ENDPOINTS.authLogout(), {
       method: 'POST'
     }).catch(console.error);
   }, []);
@@ -181,7 +179,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!token) return null;
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/profiles/me`, {
+      const response = await fetch(API_ENDPOINTS.authProfile(), {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -207,7 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setError(null);
     try {
-      const response = await fetchWithCsrf(`${API_BASE_URL}/api/profiles/me`, {
+      const response = await fetchWithCsrf(API_ENDPOINTS.authProfile(), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -232,8 +230,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Load user on mount and initialize CSRF
   // Sprint 18: Initialize CSRF token cache on app load
   useEffect(() => {
-    console.log('[AuthContext] Initial load - initializing CSRF and fetching current user');
-
     // Initialize CSRF token in parallel with user fetch
     initializeCsrf().catch(console.error);
 
@@ -260,16 +256,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Refresh 5 minutes before expiration (or immediately if < 5 min left)
         const refreshIn = Math.max(0, timeUntilExpiry - 5 * 60 * 1000);
 
-        console.log(`[AuthContext] Token expires in ${Math.floor(timeUntilExpiry / 1000 / 60)} minutes, refreshing in ${Math.floor(refreshIn / 1000 / 60)} minutes`);
-
         const timeout = setTimeout(() => {
-          console.log('[AuthContext] Auto-refreshing token...');
           refreshToken();
         }, refreshIn);
 
         return timeout;
       } catch (err) {
-        console.error('[AuthContext] Error decoding token for auto-refresh:', err);
         return null;
       }
     };

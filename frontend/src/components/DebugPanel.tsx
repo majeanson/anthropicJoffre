@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { GameState } from '../types/game';
 import { Socket } from 'socket.io-client';
+import { CONFIG } from '../config/constants';
 
 interface DebugPanelProps {
   gameState: GameState | null;
@@ -53,8 +54,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
   // Fetch server health function (extracted for reuse)
   const fetchHealthNow = async () => {
     try {
-      const apiUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
-      const response = await fetch(`${apiUrl}/api/ping`);
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/ping`);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);

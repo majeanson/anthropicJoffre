@@ -3,12 +3,10 @@ import { Socket } from 'socket.io-client';
 import * as Sentry from '@sentry/react';
 import buildInfoJson from '../buildInfo.json';
 import { BuildInfo, CleanupResult } from '../types/buildInfo';
+import { CONFIG } from '../config/constants';
 
 // Type the imported JSON
 const buildInfo = buildInfoJson as BuildInfo;
-
-// Use environment-aware API URL (same as Socket.io connection)
-const API_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 interface UnifiedDebugModalProps {
   isOpen: boolean;
@@ -86,7 +84,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
     setHealthLoading(true);
     setHealthError(null);
     try {
-      const response = await fetch(`${API_URL}/api/health/detailed`);
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/health/detailed`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -102,7 +100,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
   const fetchGamesData = async () => {
     try {
-      const gamesResponse = await fetch(`${API_URL}/api/debug/games`);
+      const gamesResponse = await fetch(`${CONFIG.API_BASE_URL}/api/debug/games`);
       if (gamesResponse.ok) {
         const data = await gamesResponse.json();
         setGames(data.games || []);
@@ -121,7 +119,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
     setCleanupError(null);
     setCleanupResult(null);
     try {
-      const response = await fetch(`${API_URL}/api/admin/cleanup-obsolete-games`, {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/admin/cleanup-obsolete-games`, {
         method: 'POST',
       });
       if (!response.ok) {

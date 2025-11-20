@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import * as Sentry from '@sentry/react';
 import buildInfo from '../buildInfo.json';
+import { CONFIG } from '../config/constants';
 
 interface GlobalDebugModalProps {
   isOpen: boolean;
@@ -41,11 +42,10 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
 
     const fetchData = async () => {
       try {
-        const apiUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
-        console.log('[GlobalDebug] Fetching from:', apiUrl);
+        console.log('[GlobalDebug] Fetching from:', CONFIG.API_BASE_URL);
 
         // Fetch server health
-        const healthResponse = await fetch(`${apiUrl}/api/ping`);
+        const healthResponse = await fetch(`${CONFIG.API_BASE_URL}/api/ping`);
         console.log('[GlobalDebug] Health response status:', healthResponse.status);
         if (healthResponse.ok) {
           const healthData = await healthResponse.json();
@@ -56,7 +56,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
         }
 
         // Fetch games list
-        const gamesResponse = await fetch(`${apiUrl}/api/debug/games`);
+        const gamesResponse = await fetch(`${CONFIG.API_BASE_URL}/api/debug/games`);
         console.log('[GlobalDebug] Games response status:', gamesResponse.status);
         if (gamesResponse.ok) {
           const data = await gamesResponse.json();

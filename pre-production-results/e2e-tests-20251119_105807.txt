@@ -1,0 +1,669 @@
+
+Running 25 tests using 1 worker
+
+  x   1 [chromium] › tests\01-lobby.spec.ts:12:7 › Lobby and Player Joining › should display lobby with create and join options (5.9s)
+  x   2 [chromium] › tests\01-lobby.spec.ts:12:7 › Lobby and Player Joining › should display lobby with create and join options (retry #1) (5.7s)
+  ok  3 [chromium] › tests\01-lobby.spec.ts:24:7 › Lobby and Player Joining › should allow player to create a game (1.4s)
+  x   4 [chromium] › tests\01-lobby.spec.ts:50:7 › Lobby and Player Joining › should allow multiple players to join a game (21.0s)
+  x   5 [chromium] › tests\01-lobby.spec.ts:50:7 › Lobby and Player Joining › should allow multiple players to join a game (retry #1) (21.5s)
+  x   6 [chromium] › tests\01-lobby.spec.ts:111:7 › Lobby and Player Joining › should show error for invalid game ID (20.4s)
+  x   7 [chromium] › tests\01-lobby.spec.ts:111:7 › Lobby and Player Joining › should show error for invalid game ID (retry #1) (20.7s)
+  x   8 [chromium] › tests\01-lobby.spec.ts:123:7 › Lobby and Player Joining › should not allow 5th player to join (21.6s)
+  x   9 [chromium] › tests\01-lobby.spec.ts:123:7 › Lobby and Player Joining › should not allow 5th player to join (retry #1) (21.6s)
+  x  10 [chromium] › tests\02-betting.spec.ts:12:7 › Betting Phase › should show betting phase after 4 players join (21.1s)
+  x  11 [chromium] › tests\02-betting.spec.ts:12:7 › Betting Phase › should show betting phase after 4 players join (retry #1) (21.3s)
+  x  12 [chromium] › tests\02-betting.spec.ts:23:7 › Betting Phase › should display bet amount selector (7-12) (21.1s)
+  x  13 [chromium] › tests\02-betting.spec.ts:23:7 › Betting Phase › should display bet amount selector (7-12) (retry #1) (21.3s)
+  x  14 [chromium] › tests\02-betting.spec.ts:40:7 › Betting Phase › should allow selecting different bet amounts (21.1s)
+  x  15 [chromium] › tests\02-betting.spec.ts:40:7 › Betting Phase › should allow selecting different bet amounts (retry #1) (21.3s)
+  x  16 [chromium] › tests\02-betting.spec.ts:60:7 › Betting Phase › should allow selecting "without trump" option (21.1s)
+  x  17 [chromium] › tests\02-betting.spec.ts:60:7 › Betting Phase › should allow selecting "without trump" option (retry #1) (21.3s)
+  x  18 [chromium] › tests\02-betting.spec.ts:73:7 › Betting Phase › should show all players and their bet status (21.1s)
+  x  19 [chromium] › tests\02-betting.spec.ts:73:7 › Betting Phase › should show all players and their bet status (retry #1) (21.3s)
+  x  20 [chromium] › tests\02-betting.spec.ts:91:7 › Betting Phase › should submit bet and show waiting state (21.6s)
+  x  21 [chromium] › tests\02-betting.spec.ts:91:7 › Betting Phase › should submit bet and show waiting state (retry #1) (12.9s)
+
+
+  1) [chromium] › tests\01-lobby.spec.ts:12:7 › Lobby and Player Joining › should display lobby with create and join options 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('join-game-button')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      18 |     // Check for create and join buttons using test IDs
+      19 |     await expect(page.getByTestId('create-game-button')).toBeVisible();
+    > 20 |     await expect(page.getByTestId('join-game-button')).toBeVisible();
+         |                                                        ^
+      21 |     await expect(page.getByTestId('quick-play-button')).toBeVisible();
+      22 |   });
+      23 |
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:20:56
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--fe7f3-ith-create-and-join-options-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--fe7f3-ith-create-and-join-options-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('join-game-button')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      18 |     // Check for create and join buttons using test IDs
+      19 |     await expect(page.getByTestId('create-game-button')).toBeVisible();
+    > 20 |     await expect(page.getByTestId('join-game-button')).toBeVisible();
+         |                                                        ^
+      21 |     await expect(page.getByTestId('quick-play-button')).toBeVisible();
+      22 |   });
+      23 |
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:20:56
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--fe7f3-ith-create-and-join-options-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--fe7f3-ith-create-and-join-options-chromium-retry1\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--fe7f3-ith-create-and-join-options-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\01-lobby-Lobby-and-Player--fe7f3-ith-create-and-join-options-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests\01-lobby.spec.ts:50:7 › Lobby and Player Joining › should allow multiple players to join a game 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      70 |     const page2 = await context.newPage();
+      71 |     await page2.goto('/');
+    > 72 |     await page2.getByTestId('join-game-button').click();
+         |                                                 ^
+      73 |     await page2.getByTestId('game-id-input').fill(gameId!);
+      74 |     await page2.getByTestId('player-name-input').fill('Player 2');
+      75 |     await page2.getByTestId('submit-join-button').click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:72:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      70 |     const page2 = await context.newPage();
+      71 |     await page2.goto('/');
+    > 72 |     await page2.getByTestId('join-game-button').click();
+         |                                                 ^
+      73 |     await page2.getByTestId('game-id-input').fill(gameId!);
+      74 |     await page2.getByTestId('player-name-input').fill('Player 2');
+      75 |     await page2.getByTestId('submit-join-button').click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:72:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium-retry1\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\01-lobby-Lobby-and-Player--4e397-iple-players-to-join-a-game-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests\01-lobby.spec.ts:111:7 › Lobby and Player Joining › should show error for invalid game ID 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      112 |     await page.goto('/');
+      113 |
+    > 114 |     await page.getByTestId('join-game-button').click();
+          |                                                ^
+      115 |     await page.getByTestId('game-id-input').fill('invalid123');
+      116 |     await page.getByTestId('player-name-input').fill('Player 1');
+      117 |     await page.getByTestId('submit-join-button').click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:114:48
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--6fcb3-w-error-for-invalid-game-ID-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--6fcb3-w-error-for-invalid-game-ID-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      112 |     await page.goto('/');
+      113 |
+    > 114 |     await page.getByTestId('join-game-button').click();
+          |                                                ^
+      115 |     await page.getByTestId('game-id-input').fill('invalid123');
+      116 |     await page.getByTestId('player-name-input').fill('Player 1');
+      117 |     await page.getByTestId('submit-join-button').click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:114:48
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--6fcb3-w-error-for-invalid-game-ID-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--6fcb3-w-error-for-invalid-game-ID-chromium-retry1\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--6fcb3-w-error-for-invalid-game-ID-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\01-lobby-Lobby-and-Player--6fcb3-w-error-for-invalid-game-ID-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests\01-lobby.spec.ts:123:7 › Lobby and Player Joining › should not allow 5th player to join 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      139 |         gameId = await page.getByTestId('game-id').textContent();
+      140 |       } else {
+    > 141 |         await page.getByTestId('join-game-button').click();
+          |                                                    ^
+      142 |         await page.getByTestId('game-id-input').fill(gameId!);
+      143 |         await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      144 |         await page.getByTestId('submit-join-button').click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:141:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+      139 |         gameId = await page.getByTestId('game-id').textContent();
+      140 |       } else {
+    > 141 |         await page.getByTestId('join-game-button').click();
+          |                                                    ^
+      142 |         await page.getByTestId('game-id-input').fill(gameId!);
+      143 |         await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      144 |         await page.getByTestId('submit-join-button').click();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\01-lobby.spec.ts:141:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium-retry1\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\01-lobby-Lobby-and-Player--e12ec-ot-allow-5th-player-to-join-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests\02-betting.spec.ts:12:7 › Betting Phase › should show betting phase after 4 players join 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:13:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:13:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium-retry1\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\02-betting-Betting-Phase-s-8db18--phase-after-4-players-join-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests\02-betting.spec.ts:23:7 › Betting Phase › should display bet amount selector (7-12) 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:24:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:24:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium-retry1\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\02-betting-Betting-Phase-s-fdb2a-y-bet-amount-selector-7-12--chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests\02-betting.spec.ts:40:7 › Betting Phase › should allow selecting different bet amounts 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:41:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:41:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium-retry1\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\02-betting-Betting-Phase-s-92883-cting-different-bet-amounts-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests\02-betting.spec.ts:60:7 › Betting Phase › should allow selecting "without trump" option 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:61:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:61:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium-retry1\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\02-betting-Betting-Phase-s-c6e71-ecting-without-trump-option-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests\02-betting.spec.ts:73:7 › Betting Phase › should show all players and their bet status 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:74:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:74:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium-retry1\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\02-betting-Betting-Phase-s-7bee5-layers-and-their-bet-status-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests\02-betting.spec.ts:91:7 › Betting Phase › should submit bet and show waiting state 
+
+    TimeoutError: locator.click: Timeout 20000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:92:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-a8c69--bet-and-show-waiting-state-chromium\test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-a8c69--bet-and-show-waiting-state-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-a8c69--bet-and-show-waiting-state-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: locator.click: Page crashed
+    Call log:
+    [2m  - waiting for getByTestId('join-game-button')[22m
+
+
+       at helpers.ts:34
+
+      32 |     } else {
+      33 |       // Use test IDs for reliable selectors
+    > 34 |       await page.getByTestId('join-game-button').click();
+         |                                                  ^
+      35 |       await page.getByTestId('game-id-input').fill(gameId!);
+      36 |       await page.getByTestId('player-name-input').fill(`Player ${i}`);
+      37 |       await page.getByTestId('submit-join-button').click();
+        at createGameWith4Players (C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\helpers.ts:34:50)
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\02-betting.spec.ts:92:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-a8c69--bet-and-show-waiting-state-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\02-betting-Betting-Phase-s-a8c69--bet-and-show-waiting-state-chromium-retry1\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\02-betting-Betting-Phase-s-a8c69--bet-and-show-waiting-state-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\02-betting-Betting-Phase-s-a8c69--bet-and-show-waiting-state-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10 failed
+    [chromium] › tests\01-lobby.spec.ts:12:7 › Lobby and Player Joining › should display lobby with create and join options 
+    [chromium] › tests\01-lobby.spec.ts:50:7 › Lobby and Player Joining › should allow multiple players to join a game 
+    [chromium] › tests\01-lobby.spec.ts:111:7 › Lobby and Player Joining › should show error for invalid game ID 
+    [chromium] › tests\01-lobby.spec.ts:123:7 › Lobby and Player Joining › should not allow 5th player to join 
+    [chromium] › tests\02-betting.spec.ts:12:7 › Betting Phase › should show betting phase after 4 players join 
+    [chromium] › tests\02-betting.spec.ts:23:7 › Betting Phase › should display bet amount selector (7-12) 
+    [chromium] › tests\02-betting.spec.ts:40:7 › Betting Phase › should allow selecting different bet amounts 
+    [chromium] › tests\02-betting.spec.ts:60:7 › Betting Phase › should allow selecting "without trump" option 
+    [chromium] › tests\02-betting.spec.ts:73:7 › Betting Phase › should show all players and their bet status 
+    [chromium] › tests\02-betting.spec.ts:91:7 › Betting Phase › should submit bet and show waiting state 
+  14 did not run
+  1 passed (6.8m)

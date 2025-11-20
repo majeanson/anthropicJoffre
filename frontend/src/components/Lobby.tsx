@@ -294,13 +294,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <LobbyBrowser
               socket={socket}
               onJoinGame={(gameId) => {
-                console.log('[Lobby] Joining game from browser:', gameId, 'playerName:', playerName);
                 // Close browser and directly join the game (don't show join form)
                 setShowBrowser(false);
 
                 // If playerName is empty, prompt user to enter name first
                 if (!playerName.trim()) {
-                  console.warn('[Lobby] No player name set, showing join form');
                   setGameId(gameId);
                   setMode('join');
                   return;
@@ -309,7 +307,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 onJoinGame(gameId, playerName);
               }}
               onSpectateGame={(gameId) => {
-                console.log('[Lobby] Spectating game from browser:', gameId);
                 setShowBrowser(false);
                 onSpectateGame(gameId, playerName);
               }}

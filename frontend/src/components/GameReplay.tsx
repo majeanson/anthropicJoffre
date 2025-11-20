@@ -43,11 +43,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       return;
     }
 
-    console.log('[GameReplay] Requesting replay for game:', gameId);
-
     const handleReplayData = ({ replayData }: { replayData: ReplayData }) => {
-      console.log('[GameReplay] Received replay data for game:', replayData?.game_id, 'rounds:', replayData?.rounds);
-
       // Validate replay data structure
       if (!replayData) {
         console.error('[GameReplay] Replay data is null or undefined');
@@ -64,11 +60,9 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       }
 
       if (replayData.round_history.length === 0) {
-        console.warn('[GameReplay] round_history is empty for game:', replayData.game_id);
         // Don't set error here - let the validation check below handle it with better UX
       }
 
-      console.log('[GameReplay] Replay data validated successfully. Rounds:', replayData.round_history.length);
       setReplayData(replayData);
       setError(null);
       setCorrelationId(null);

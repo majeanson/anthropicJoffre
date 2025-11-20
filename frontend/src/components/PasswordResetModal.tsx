@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+import { API_ENDPOINTS } from '../config/constants';
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -11,7 +12,6 @@ interface PasswordResetModalProps {
   onSwitchToLogin: () => void;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
 
 export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }: PasswordResetModalProps) {
   // All hooks MUST be called before any conditional returns (Rules of Hooks)
@@ -31,7 +31,7 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
 
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/request-password-reset`, {
+      const response = await fetch(API_ENDPOINTS.authForgotPassword(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

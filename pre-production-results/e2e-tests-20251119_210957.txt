@@ -1,0 +1,188 @@
+
+Running 22 tests using 1 worker
+
+  ok  1 [chromium] › tests\01-lobby.spec.ts:12:7 › Lobby and Player Joining › should display lobby with create and join options (549ms)
+  ok  2 [chromium] › tests\01-lobby.spec.ts:24:7 › Lobby and Player Joining › should allow player to create a game (834ms)
+  ok  3 [chromium] › tests\02-betting.spec.ts:13:7 › Betting Phase › should show betting phase after 4 players join (2.8s)
+  ok  4 [chromium] › tests\02-betting.spec.ts:22:7 › Betting Phase › should display bet amount selector (7-12) (6.8s)
+  ok  5 [chromium] › tests\02-betting.spec.ts:36:7 › Betting Phase › should allow selecting different bet amounts (6.7s)
+  ok  6 [chromium] › tests\02-betting.spec.ts:54:7 › Betting Phase › should allow selecting "without trump" option (6.9s)
+  ok  7 [chromium] › tests\02-betting.spec.ts:75:7 › Betting Phase › should show all players and their bet status (2.9s)
+  ok  8 [chromium] › tests\02-betting.spec.ts:92:7 › Betting Phase › should submit bet and show waiting state (10.9s)
+  ok  9 [chromium] › tests\02-betting.spec.ts:119:7 › Betting Phase › should show "No Trump" indicator for without-trump bets (9.3s)
+  ok 10 [chromium] › tests\02-betting.spec.ts:142:7 › Betting Phase › should transition to playing phase when all bets are placed (7.8s)
+  ok 11 [chromium] › tests\02-betting.spec.ts:161:7 › Betting Phase › should correctly identify highest bidder (8.8s)
+  ok 12 [chromium] › tests\03-playing.spec.ts:13:7 › Card Playing Phase › should display player hands after betting (9.3s)
+  ok 13 [chromium] › tests\03-playing.spec.ts:36:7 › Card Playing Phase › should show current trick area (9.3s)
+  ok 14 [chromium] › tests\03-playing.spec.ts:56:7 › Card Playing Phase › should show score board with team scores (7.3s)
+  ok 15 [chromium] › tests\03-playing.spec.ts:87:7 › Card Playing Phase › should indicate whose turn it is (7.8s)
+  ok 16 [chromium] › tests\03-playing.spec.ts:111:7 › Card Playing Phase › should disable cards when not player turn (9.3s)
+  -  17 [chromium] › tests\03-playing.spec.ts:135:8 › Card Playing Phase › should allow current player to play a card
+  ok 18 [chromium] › tests\03-playing.spec.ts:171:7 › Card Playing Phase › should set trump suit from first card played (12.8s)
+  ok 19 [chromium] › tests\03-playing.spec.ts:193:7 › Card Playing Phase › should complete a full trick with 4 cards (13.3s)
+  ok 20 [chromium] › tests\03-playing.spec.ts:230:7 › Card Playing Phase › should show special card indicators (+5 for Red 0, -2 for Brown 0) (8.3s)
+=== PHASE 1: Game Setup with QuickPlay + Autoplay ===
+Creating automated marathon game (difficulty: easy)
+Target: 15 rounds (estimated 8 minutes)
+Game created with ID: 7WLI6SN6
+Autoplay enabled - game will progress automatically
+
+=== PHASE 2: Monitoring Automated Game Progress ===
+Initial Scores - Team 1: 0, Team 2: 0
+
+📊 Starting automated game monitoring...
+
+--- Round 1 Complete ---
+   Team 1: 0 → 0 (+0)
+   Team 2: 0 → 0 (+0)
+
+=== PHASE 3: Verification ===
+  x  21 [chromium] › tests\07-full-game.spec.ts:19:7 › @marathon Full Game Flow › should play through a complete game with predetermined actions (1.1m)
+=== PHASE 1: Game Setup with QuickPlay + Autoplay ===
+Creating automated marathon game (difficulty: easy)
+Target: 15 rounds (estimated 8 minutes)
+Game created with ID: 4OYRVRI8
+Autoplay enabled - game will progress automatically
+
+=== PHASE 2: Monitoring Automated Game Progress ===
+Initial Scores - Team 1: 0, Team 2: 0
+
+📊 Starting automated game monitoring...
+
+--- Round 1 Complete ---
+   Team 1: 0 → 0 (+0)
+   Team 2: 0 → 0 (+0)
+
+=== PHASE 3: Verification ===
+  x  22 [chromium] › tests\07-full-game.spec.ts:19:7 › @marathon Full Game Flow › should play through a complete game with predetermined actions (retry #1) (1.1m)
+=== Testing Game State Display ===
+Creating automated marathon game (difficulty: medium)
+Verifying game UI elements...
+  x  23 [chromium] › tests\07-full-game.spec.ts:149:7 › @marathon Full Game Flow › should display game state correctly during automated play (8.0s)
+=== Testing Game State Display ===
+Creating automated marathon game (difficulty: medium)
+Verifying game UI elements...
+  x  24 [chromium] › tests\07-full-game.spec.ts:149:7 › @marathon Full Game Flow › should display game state correctly during automated play (retry #1) (8.3s)
+
+
+  1) [chromium] › tests\07-full-game.spec.ts:19:7 › @marathon Full Game Flow › should play through a complete game with predetermined actions 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mfalse[39m
+
+      136 |     // Verify game completed
+      137 |     const gameOver = await isGameOver();
+    > 138 |     expect(gameOver).toBeTruthy();
+          |                      ^
+      139 |
+      140 |     // Verify one team reached 41+
+      141 |     const finalScores = await getScores();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\07-full-game.spec.ts:138:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\07-full-game--marathon-Ful-96155--with-predetermined-actions-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\07-full-game--marathon-Ful-96155--with-predetermined-actions-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBeTruthy[2m()[22m
+
+    Received: [31mfalse[39m
+
+      136 |     // Verify game completed
+      137 |     const gameOver = await isGameOver();
+    > 138 |     expect(gameOver).toBeTruthy();
+          |                      ^
+      139 |
+      140 |     // Verify one team reached 41+
+      141 |     const finalScores = await getScores();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\07-full-game.spec.ts:138:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\07-full-game--marathon-Ful-96155--with-predetermined-actions-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\07-full-game--marathon-Ful-96155--with-predetermined-actions-chromium-retry1\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\07-full-game--marathon-Ful-96155--with-predetermined-actions-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\07-full-game--marathon-Ful-96155--with-predetermined-actions-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests\07-full-game.spec.ts:149:7 › @marathon Full Game Flow › should display game state correctly during automated play 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('score-board')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('score-board')[22m
+
+
+      162 |
+      163 |     // Verify score board is visible
+    > 164 |     await expect(page.getByTestId('score-board')).toBeVisible();
+          |                                                   ^
+      165 |
+      166 |     // Verify round indicator
+      167 |     await expect(page.getByTestId('round-number')).toBeVisible();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\07-full-game.spec.ts:164:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\07-full-game--marathon-Ful-b8a35-ectly-during-automated-play-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\07-full-game--marathon-Ful-b8a35-ectly-during-automated-play-chromium\error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('score-board')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByTestId('score-board')[22m
+
+
+      162 |
+      163 |     // Verify score board is visible
+    > 164 |     await expect(page.getByTestId('score-board')).toBeVisible();
+          |                                                   ^
+      165 |
+      166 |     // Verify round indicator
+      167 |     await expect(page.getByTestId('round-number')).toBeVisible();
+        at C:\Users\marc_\Documents\WebApp\anthropicJoffre\e2e\tests\07-full-game.spec.ts:164:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\07-full-game--marathon-Ful-b8a35-ectly-during-automated-play-chromium-retry1\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\07-full-game--marathon-Ful-b8a35-ectly-during-automated-play-chromium-retry1\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\07-full-game--marathon-Ful-b8a35-ectly-during-automated-play-chromium-retry1\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\07-full-game--marathon-Ful-b8a35-ectly-during-automated-play-chromium-retry1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium] › tests\07-full-game.spec.ts:19:7 › @marathon Full Game Flow › should play through a complete game with predetermined actions 
+    [chromium] › tests\07-full-game.spec.ts:149:7 › @marathon Full Game Flow › should display game state correctly during automated play 
+  1 skipped
+  19 passed (4.8m)

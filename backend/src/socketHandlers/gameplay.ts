@@ -136,7 +136,6 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     if (!game) return;
 
     const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
-    console.log(`\n[PLACE_BET] Player: ${playerName}, Amount: ${amount}, WithoutTrump: ${withoutTrump}, Skipped: ${skipped}`);
 
     // Rate limiting: Check per-player rate limit (Sprint 2)
     const ipAddress = getSocketIP(socket);
@@ -155,14 +154,11 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     rateLimiters.gameActions.recordRequest(playerName, ipAddress);
 
     // VALIDATION - Use pure validation function
-    console.log(`[PLACE_BET] Validating bet - amount: ${amount}, withoutTrump: ${withoutTrump}, skipped: ${skipped}`);
     const betValidation = validateBet(game, socket.id, amount, withoutTrump, skipped);
     if (!betValidation.success) {
-      console.log(`[PLACE_BET] ❌ Validation failed: ${betValidation.error}`);
       socket.emit('invalid_bet', { message: betValidation.error });
       return;
     }
-    console.log(`[PLACE_BET] ✅ Validation passed`);
 
 
     // Clear timeout for current player (side effect)
@@ -199,10 +195,7 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     }
 
     // STATE TRANSFORMATION - Use pure state function
-    console.log(`[PLACE_BET] Applying bet to game state...`);
     const result = applyBet(game, socket.id, amount, withoutTrump, skipped);
-    console.log(`[PLACE_BET] Result: bettingComplete=${result.bettingComplete}, allPlayersSkipped=${result.allPlayersSkipped}`);
-    console.log(`[PLACE_BET] Current player index: ${game.currentPlayerIndex}, Current player: ${game.players[game.currentPlayerIndex]?.name}`);
 
     // Save bet to round stats for end-of-round display
     const stats = roundStats.get(gameId);
@@ -228,7 +221,6 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
 
     // Handle betting completion - transition to playing phase
     if (result.bettingComplete) {
-      console.log(`[PLACE_BET] 🎯 Betting complete! Transitioning to playing phase...`);
       const dealerPlayerId = game.players[game.dealerIndex].id;
       game.highestBet = getHighestBet(game.currentBets, dealerPlayerId);
       game.phase = 'playing';
@@ -236,14 +228,12 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
         (p) => p.id === game.highestBet?.playerId
       );
       game.currentPlayerIndex = highestBidderIndex;
-      console.log(`[PLACE_BET] 📡 Emitting game_updated (phase transition to playing)...`);
       emitGameUpdate(gameId, game);
       const firstPlayer = game.players[game.currentPlayerIndex];
       startPlayerTimeout(gameId, firstPlayer.id, 'playing');
 
       // Schedule bot action if first player is a bot
       if (firstPlayer?.isBot) {
-        console.log(`   🤖 Scheduling bot action for ${firstPlayer.name} in 2 seconds (playing phase)`);
         setTimeout(() => {
           const currentGame = games.get(gameId);
           if (!currentGame || currentGame.phase !== 'playing') return;
@@ -251,21 +241,17 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
           const currentBot = currentGame.players[currentGame.currentPlayerIndex];
           if (!currentBot || currentBot.name !== firstPlayer.name) return;
 
-          console.log(`   🤖 Bot ${firstPlayer.name} taking automatic action (start of playing)`);
           deps.handlePlayingTimeout(gameId, firstPlayer.name);
         }, 2000);
       }
     } else {
       // Betting continues - emit update and start next player's timeout
-      console.log(`[PLACE_BET] ➡️  Betting continues. Next player: ${game.players[game.currentPlayerIndex]?.name}`);
-      console.log(`[PLACE_BET] 📡 Emitting game_updated (betting continues)...`);
       emitGameUpdate(gameId, game);
       const nextPlayer = game.players[game.currentPlayerIndex];
       startPlayerTimeout(gameId, nextPlayer.id, 'betting');
 
       // Schedule bot action if next player is a bot
       if (nextPlayer?.isBot) {
-        console.log(`   🤖 Scheduling bot action for ${nextPlayer.name} in 2 seconds (betting)`);
         setTimeout(() => {
           const currentGame = games.get(gameId);
           if (!currentGame || currentGame.phase !== 'betting') return;
@@ -273,7 +259,6 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
           const currentBot = currentGame.players[currentGame.currentPlayerIndex];
           if (!currentBot || currentBot.name !== nextPlayer.name) return;
 
-          console.log(`   🤖 Bot ${nextPlayer.name} taking automatic action (betting)`);
           deps.handleBettingTimeout(gameId, nextPlayer.name);
         }, 2000);
       }
@@ -317,24 +302,9 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     }
     rateLimiters.gameActions.recordRequest(playerName, ipAddress);
 
-    // Log current trick state and player's hand (debugging)
-    console.log(`\n🃏 PLAY_CARD - Player: ${playerName} (${socket.id})`);
-    console.log(`   Current Trick (${game.currentTrick.length}/4):`);
-    game.currentTrick.forEach((tc, idx) => {
-      const player = game.players.find(p => p.id === tc.playerId);
-      console.log(`     ${idx + 1}. ${player?.name || tc.playerId}: ${tc.card.color} ${tc.card.value}`);
-    });
-    console.log(`   Player's Hand (${currentPlayer.hand.length} cards):`);
-    currentPlayer.hand.forEach((c, idx) => {
-      console.log(`     ${idx + 1}. ${c.color} ${c.value}`);
-    });
-    console.log(`   Card being played: ${card.color} ${card.value}`);
-    console.log(`   Current turn index: ${game.currentPlayerIndex} (${currentPlayer.name})`);
-
     // VALIDATION - Use pure validation function
     const playValidation = validateCardPlay(game, socket.id, card);
     if (!playValidation.success) {
-      console.log(`   ❌ REJECTED: ${playValidation.error}`);
       socket.emit('invalid_move', { message: playValidation.error });
       return;
     }
@@ -366,29 +336,11 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     // STATE TRANSFORMATION - Use pure state function
     const result = applyCardPlay(game, socket.id, card);
 
-    console.log(`   ✅ ACCEPTED: Card added to trick (now ${game.currentTrick.length}/4 cards)`);
-    console.log(`   Updated hand (${currentPlayer.hand.length} cards remaining):`);
-    currentPlayer.hand.forEach((c, idx) => {
-      console.log(`     ${idx + 1}. ${c.color} ${c.value}`);
-    });
-
     // I/O - Emit updates and handle trick resolution
     if (result.trickComplete) {
-      // Emit state with all 4 cards visible before trick resolution
-      const prevPlayer = game.players[result.previousPlayerIndex];
-      const currPlayer = game.players[game.currentPlayerIndex];
-      if (prevPlayer && currPlayer) {
-        console.log(`   🎯 Trick complete! Turn advanced: ${prevPlayer.name} → ${currPlayer.name}`);
-      }
-      console.log(`   Final trick state before resolution:`);
-      game.currentTrick.forEach((tc, idx) => {
-        const player = game.players.find(p => p.id === tc.playerId);
-        console.log(`     ${idx + 1}. ${player?.name}: ${tc.card.color} ${tc.card.value}`);
-      });
       // HOT PATH: Emit immediately for client rendering, skip DB save (trick will be saved after resolution)
       // Using direct emit() instead of emitGameUpdate() to avoid unnecessary DB writes
       io.to(gameId).emit('game_updated', game);
-      console.log(`   ⏳ Resolving trick in 100ms to allow clients to render...\n`);
       // Small delay to ensure clients render the 4-card state before resolution
       setTimeout(() => {
         resolveTrick(gameId);
@@ -397,11 +349,6 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
       // Database save will happen after trick is cleared
     } else {
       // Emit updated state with turn advanced
-      const prevPlayer = game.players[result.previousPlayerIndex];
-      const currPlayer = game.players[game.currentPlayerIndex];
-      if (prevPlayer && currPlayer) {
-        console.log(`   ➡️  Turn advanced: ${prevPlayer.name} → ${currPlayer.name} (${game.currentTrick.length}/4 cards played)\n`);
-      }
       emitGameUpdate(gameId, game);
       // Start timeout for next player
       const nextPlayer = game.players[game.currentPlayerIndex];
@@ -410,7 +357,6 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
 
         // Schedule bot action if next player is a bot
         if (nextPlayer.isBot) {
-          console.log(`   🤖 Scheduling bot action for ${nextPlayer.name} in 2 seconds`);
           setTimeout(() => {
             const currentGame = games.get(gameId);
             if (!currentGame || currentGame.phase !== 'playing') return;
@@ -423,7 +369,6 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
             const hasPlayed = currentGame.currentTrick.some(tc => tc.playerName === nextPlayer.name);
             if (hasPlayed) return;
 
-            console.log(`   🤖 Bot ${nextPlayer.name} taking automatic action`);
             // Trigger the playing timeout handler which has bot logic
             deps.handlePlayingTimeout(gameId, nextPlayer.name);
           }, 2000); // 2 second delay for bot actions
@@ -461,7 +406,6 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     // Use player name for stability across reconnections
     if (!game.playersReady.includes(player.name)) {
       game.playersReady.push(player.name);
-      console.log(`Player ${player.name} is ready (${game.playersReady.length}/4)`);
 
       // Broadcast updated game state
       broadcastGameUpdate(gameId, 'game_updated', game);

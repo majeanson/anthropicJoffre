@@ -27,9 +27,9 @@ import { GameState } from '../types/game';
 import buildInfoJson from '../buildInfo.json';
 import { BuildInfo, CleanupResult } from '../types/buildInfo';
 import * as Sentry from '@sentry/react';
+import { CONFIG } from '../config/constants';
 
 const buildInfo = buildInfoJson as BuildInfo;
-const API_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
 
 type TabType = 'build' | 'gameState' | 'automation' | 'serverHealth' | 'testControls';
 
@@ -97,7 +97,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
   // Fetch basic server health (for game state tab)
   const fetchHealthNow = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/ping`);
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/ping`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       await response.json();
       setHealthError(null);
@@ -111,7 +111,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
     setHealthLoading(true);
     setHealthError(null);
     try {
-      const response = await fetch(`${API_URL}/api/health/detailed`);
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/health/detailed`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       setDetailedHealth(data);
@@ -132,7 +132,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
     setCleanupError(null);
     setCleanupResult(null);
     try {
-      const response = await fetch(`${API_URL}/api/admin/cleanup-obsolete-games`, { method: 'POST' });
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/admin/cleanup-obsolete-games`, { method: 'POST' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       setCleanupResult(data);

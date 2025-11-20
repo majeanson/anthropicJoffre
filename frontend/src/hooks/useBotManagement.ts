@@ -14,8 +14,9 @@ import { Socket, io } from 'socket.io-client';
 import { GameState, Player, PlayerSession } from '../types/game';
 import { EnhancedBotPlayer as BotPlayer, BotDifficulty } from '../utils/botPlayerEnhanced';
 import { applyStateDelta, GameStateDelta } from '../utils/stateDelta';
+import { CONFIG } from '../config/constants';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001';
+const SOCKET_URL = CONFIG.SOCKET_URL;
 
 // Socket.IO configuration for bot sockets - must match main socket configuration
 // to prevent connection timeouts (server has 10s pingTimeout)
@@ -74,7 +75,6 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     // Don't act if trick is being resolved (4 cards played, waiting for resolution)
     if (state.phase === 'playing' && state.currentTrick.length >= 4) {
-      console.log(`Bot ${botId} waiting for trick resolution...`);
       return;
     }
 
@@ -113,27 +113,15 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     // For other phases, only act when it's the bot's turn
     const currentPlayer = state.players[state.currentPlayerIndex];
 
-    // Debug logging for bot turn detection
-    console.log('[Bot Action] Current player check:', {
-      botId,
-      currentPlayerId: currentPlayer?.id,
-      currentPlayerName: currentPlayer?.name,
-      currentPlayerIndex: state.currentPlayerIndex,
-      phase: state.phase,
-      matches: currentPlayer?.id === botId
-    });
-
     if (!currentPlayer || currentPlayer.id !== botId) return;
 
     // Betting phase: Check if bot has already placed a bet OR has pending action
     if (state.phase === 'betting') {
       if (state.currentBets?.some(bet => bet.playerId === botId)) {
-        console.log(`[Bot Action] ${currentPlayer.name} has already placed a bet, skipping`);
         return;
       }
       // Check if bot already has a pending bet action
       if (botTimeoutsRef.current.has(botId)) {
-        console.log(`[Bot Action] ${currentPlayer.name} already has pending bet action, skipping reschedule`);
         return;
       }
     }
@@ -142,25 +130,19 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     if (state.phase === 'playing') {
       const hasAlreadyPlayed = state.currentTrick.some(play => play.playerId === botId);
       if (hasAlreadyPlayed) {
-        console.log(`[Bot Action] ${currentPlayer.name} has already played in this trick, skipping`);
         return;
       }
       // Check if bot already has a pending play action
       if (botTimeoutsRef.current.has(botId)) {
-        console.log(`[Bot Action] ${currentPlayer.name} already has pending play action, skipping reschedule`);
         return;
       }
     }
-
-    console.log(`[Bot Action] ${currentPlayer.name} taking action in ${state.phase} phase`);
 
     // Schedule bot action with delay
     const timeout = setTimeout(() => {
       // Betting phase
       if (state.phase === 'betting') {
-        console.log(`[Bot Action] ${currentPlayer.name} making bet...`);
         const bet = BotPlayer.makeBet(state, botId);
-        console.log(`[Bot Action] ${currentPlayer.name} bet:`, bet);
         botSocket.emit('place_bet', {
           gameId: state.id,
           amount: bet.amount,
@@ -206,19 +188,16 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
       // Skip if bot socket already exists and is connected (using name as stable key)
       const existingBotSocket = botSocketsRef.current.get(botName);
       if (existingBotSocket && existingBotSocket.connected) {
-        console.log(`Bot ${botName} already connected, skipping spawn`);
         return;
       }
 
       // Disconnect existing socket if any
       if (existingBotSocket) {
-        console.log(`Disconnecting stale bot socket for ${botName}`);
         existingBotSocket.disconnect();
         botSocketsRef.current.delete(botName);
       }
 
       // Create new socket for the bot
-      console.log(`Spawning new bot socket for ${botName}`);
       const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
 
       // Store the bot socket reference using NAME as key (stable across reconnects)
@@ -251,7 +230,6 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
         // Get the last known state for this bot
         const lastState = botStatesRef.current.get(botName);
         if (!lastState) {
-          console.warn(`[spawnBotsForGame] ${botName} has no previous state, cannot apply delta`);
           return;
         }
 
@@ -336,7 +314,6 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
       // Get the last known state for this bot
       const lastState = botStatesRef.current.get(botName);
       if (!lastState) {
-        console.warn(`[handleAddBot] ${botName} has no previous state, cannot apply delta`);
         return;
       }
 
@@ -386,22 +363,14 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     // Listen for game creation to spawn bots
     const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string }) => {
-      console.log('[Quick Play] Game created, spawning bots for game:', createdGameId);
       // Spawn 3 bot players after game is created
       setTimeout(() => {
-        console.log('[Quick Play] Spawning 3 bots...');
         for (let i = 0; i < 3; i++) {
           const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
           const botName = `Bot ${i + 1}`;
-          console.log(`[Quick Play] Creating bot socket for ${botName}, SOCKET_URL:`, SOCKET_URL);
 
           botSocket.on('connect', () => {
-            console.log(`[Quick Play] ${botName} connected, joining game ${createdGameId}`);
             botSocket.emit('join_game', { gameId: createdGameId, playerName: botName, isBot: true, botDifficulty: difficulty });
-          });
-
-          botSocket.on('error', (error: { message: string }) => {
-            console.error(`[Quick Play] ${botName} error:`, error);
           });
 
           // Listen to all game state updates
@@ -415,29 +384,21 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
           });
 
           botSocket.on('game_updated', (state: GameState) => {
-            console.log(`[Quick Play] ${botName} received game_updated - Current turn: ${state.players[state.currentPlayerIndex]?.name} (index ${state.currentPlayerIndex}), phase: ${state.phase}`);
             const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
             if (botPlayerId) {
               handleBotAction(botSocket, state, botPlayerId);
-            } else {
-              console.warn(`[Quick Play] ${botName} not found in game state on game_updated`, {
-                players: state.players.map(p => ({ name: p.name, id: p.id, isBot: p.isBot }))
-              });
             }
           });
 
           botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
-            console.log(`[Quick Play] ${botName} received game_updated_delta`);
             // Get the last known state for this bot
             const lastState = botStatesRef.current.get(botName);
             if (!lastState) {
-              console.warn(`[Quick Play] ${botName} has no previous state, cannot apply delta`);
               return;
             }
 
             // Apply delta to get new state
             const newState = applyStateDelta(lastState, delta);
-            console.log(`[Quick Play] ${botName} applied delta - Current turn: ${newState.players[newState.currentPlayerIndex]?.name} (index ${newState.currentPlayerIndex}), phase: ${newState.phase}`);
 
             // Store the new state for next delta (CRITICAL: prevents state drift)
             botStatesRef.current.set(botName, newState);

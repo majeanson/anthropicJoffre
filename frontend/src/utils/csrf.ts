@@ -5,7 +5,7 @@
  * Handles fetching and including CSRF tokens in requests
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+import { API_ENDPOINTS } from '../config/constants';
 
 let csrfToken: string | null = null;
 let tokenPromise: Promise<string> | null = null;
@@ -28,7 +28,7 @@ export async function fetchCsrfToken(): Promise<string> {
   // Fetch new token
   tokenPromise = (async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/csrf-token`, {
+      const response = await fetch(API_ENDPOINTS.csrfToken(), {
         credentials: 'include', // Include cookies
       });
 
@@ -143,7 +143,6 @@ export async function fetchWithCsrf(
 export async function initializeCsrf(): Promise<void> {
   try {
     await fetchCsrfToken();
-    console.log('[CSRF] Token initialized successfully');
   } catch (error) {
     console.error('[CSRF] Failed to initialize token:', error);
     // Don't throw - app should still work, requests will fail with clear error
