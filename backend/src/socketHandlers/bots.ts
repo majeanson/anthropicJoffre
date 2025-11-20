@@ -14,6 +14,12 @@ import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
 import { migratePlayerIdentity } from '../utils/playerMigrationHelpers';
 import { RoundStatsData } from '../game/roundStatistics';
+import {
+  validateInput,
+  takeOverBotPayloadSchema,
+  replacePlayerWithBotPayloadSchema,
+  changeBotDifficultyPayloadSchema,
+} from '../validation/schemas';
 
 /**
  * Online player tracking data
@@ -199,15 +205,22 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
   // ============================================================================
   // replace_with_bot - Replace a human player with a bot
   // ============================================================================
-  socket.on('replace_with_bot', errorBoundaries.gameAction('replace_with_bot')(async ({
-    gameId,
-    playerNameToReplace,
-    requestingPlayerName
-  }: {
-    gameId: string;
-    playerNameToReplace: string;
-    requestingPlayerName: string;
-  }) => {
+  socket.on('replace_with_bot', errorBoundaries.gameAction('replace_with_bot')(async (payload: unknown) => {
+    // Validate input with Zod schema
+    const validation = validateInput(replacePlayerWithBotPayloadSchema, payload);
+    if (!validation.success) {
+      console.error('[VALIDATION ERROR] replace_with_bot failed:', {
+        payload: JSON.stringify(payload),
+        error: validation.error,
+        socketId: socket.id
+      });
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid replace_with_bot payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, playerNameToReplace, requestingPlayerName } = validation.data;
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -322,15 +335,22 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
   // ============================================================================
   // take_over_bot - Take over a bot with a human player
   // ============================================================================
-  socket.on('take_over_bot', errorBoundaries.gameAction('take_over_bot')(async ({
-    gameId,
-    botNameToReplace,
-    newPlayerName
-  }: {
-    gameId: string;
-    botNameToReplace: string;
-    newPlayerName: string;
-  }) => {
+  socket.on('take_over_bot', errorBoundaries.gameAction('take_over_bot')(async (payload: unknown) => {
+    // Validate input with Zod schema
+    const validation = validateInput(takeOverBotPayloadSchema, payload);
+    if (!validation.success) {
+      console.error('[VALIDATION ERROR] take_over_bot failed:', {
+        payload: JSON.stringify(payload),
+        error: validation.error,
+        socketId: socket.id
+      });
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid take_over_bot payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, botNameToReplace, newPlayerName } = validation.data;
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });
@@ -504,15 +524,22 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
   // ============================================================================
   // change_bot_difficulty - Change bot difficulty level
   // ============================================================================
-  socket.on('change_bot_difficulty', errorBoundaries.gameAction('change_bot_difficulty')(async ({
-    gameId,
-    botName,
-    difficulty
-  }: {
-    gameId: string;
-    botName: string;
-    difficulty: 'easy' | 'medium' | 'hard';
-  }) => {
+  socket.on('change_bot_difficulty', errorBoundaries.gameAction('change_bot_difficulty')(async (payload: unknown) => {
+    // Validate input with Zod schema
+    const validation = validateInput(changeBotDifficultyPayloadSchema, payload);
+    if (!validation.success) {
+      console.error('[VALIDATION ERROR] change_bot_difficulty failed:', {
+        payload: JSON.stringify(payload),
+        error: validation.error,
+        socketId: socket.id
+      });
+      socket.emit('error', { message: `Invalid input: ${validation.error}` });
+      logger.warn('Invalid change_bot_difficulty payload', { payload, error: validation.error });
+      return;
+    }
+
+    const { gameId, botName, difficulty } = validation.data;
+
     const game = games.get(gameId);
     if (!game) {
       socket.emit('error', { message: 'Game not found' });

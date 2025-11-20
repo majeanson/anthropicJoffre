@@ -271,6 +271,46 @@ export const leaveSpectatePayloadSchema = z.object({
   gameId: gameIdSchema,
 }).strict();
 
+// ============= BOT MANAGEMENT SCHEMAS =============
+
+/**
+ * Take over bot payload
+ * Used when a human player takes over a bot's position
+ */
+export const takeOverBotPayloadSchema = z.object({
+  gameId: gameIdSchema,
+  botNameToReplace: playerNameSchema,
+  newPlayerName: playerNameSchema,
+}).strict();
+
+/**
+ * Replace player with bot payload
+ * Used when replacing a human player with a bot (requested by another player)
+ */
+export const replacePlayerWithBotPayloadSchema = z.object({
+  gameId: gameIdSchema,
+  playerNameToReplace: playerNameSchema,
+  requestingPlayerName: playerNameSchema,
+}).strict();
+
+/**
+ * Change bot difficulty payload
+ */
+export const changeBotDifficultyPayloadSchema = z.object({
+  gameId: gameIdSchema,
+  botName: playerNameSchema,
+  difficulty: botDifficultySchema,
+}).strict();
+
+/**
+ * Add bot payload
+ * Used when adding a bot to fill an empty seat
+ */
+export const addBotPayloadSchema = z.object({
+  gameId: gameIdSchema,
+  botDifficulty: botDifficultySchema.default('medium').optional(),
+}).strict();
+
 // ============= HELPER FUNCTIONS =============
 
 /**
