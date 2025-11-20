@@ -21,7 +21,7 @@
  * - Beautiful tabbed interface
  */
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
 import buildInfoJson from '../buildInfo.json';
@@ -39,18 +39,6 @@ interface UnifiedDebugPanelProps {
   gameState: GameState | null;
   gameId: string;
   socket: Socket | null;
-}
-
-interface ServerHealth {
-  status: string;
-  memory: {
-    heapUsedMB: number;
-    heapTotalMB: number;
-    rssMB: number;
-  };
-  activeGames: number;
-  uptime: number;
-  timestamp: number;
 }
 
 interface HealthData {
@@ -91,7 +79,6 @@ interface HealthData {
 
 export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }: UnifiedDebugPanelProps) {
   const [activeTab, setActiveTab] = useState<TabType>('build');
-  const [serverHealth, setServerHealth] = useState<ServerHealth | null>(null);
   const [detailedHealth, setDetailedHealth] = useState<HealthData | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
   const [healthLoading, setHealthLoading] = useState(false);
@@ -104,7 +91,6 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
   const [cleanupLoading, setCleanupLoading] = useState(false);
   const [cleanupResult, setCleanupResult] = useState<CleanupResult | null>(null);
   const [cleanupError, setCleanupError] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const SHOW_CLEANUP_BUTTON = true;
 
@@ -113,8 +99,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
     try {
       const response = await fetch(`${API_URL}/api/ping`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      setServerHealth(data);
+      await response.json();
       setHealthError(null);
     } catch (error) {
       setHealthError(error instanceof Error ? error.message : 'Failed to fetch');

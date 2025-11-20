@@ -5,6 +5,7 @@
 export interface BuildInfo {
   buildDate: string;
   version: string;
+  environment?: string;
   git?: {
     commitMessage: string;
     commitHash: string;
@@ -15,8 +16,9 @@ export interface BuildInfo {
   buildStatus?: string;
   testsStatus?: {
     backend: string;
-    frontend: string;
+    frontend?: string;
     e2e: string;
+    overall?: string;
   };
   sprint?: string;
   currentPhases?: string[];
@@ -35,6 +37,8 @@ export interface BuildInfo {
   upcomingFeatures?: string[];
   latestDoneFeatures?: FeatureGroup[];
   futureTodos?: string[];
+  features?: Record<string, string>;
+  changes?: string[];
 }
 
 export interface PhaseInfo {
