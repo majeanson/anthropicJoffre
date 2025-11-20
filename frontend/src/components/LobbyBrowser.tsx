@@ -108,8 +108,8 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
     }
 
     // Valid - proceed with join
+    console.log('[LobbyBrowser] Joining game:', game.gameId);
     onJoinGame(game.gameId);
-    onClose();
   };
 
   const fetchGames = async (isInitialLoad = false, retryCount = 0) => {

@@ -297,13 +297,15 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <LobbyBrowser
               socket={socket}
               onJoinGame={(gameId) => {
-                setGameId(gameId);
-                setMode('join');
+                console.log('[Lobby] Joining game from browser:', gameId, playerName);
+                // Close browser and directly join the game (don't show join form)
+                setShowBrowser(false);
+                onJoinGame(gameId, playerName);
               }}
               onSpectateGame={(gameId) => {
-                setGameId(gameId);
-                setMode('join');
-                setJoinType('spectator');
+                console.log('[Lobby] Spectating game from browser:', gameId);
+                setShowBrowser(false);
+                onSpectateGame(gameId, playerName);
               }}
               onClose={() => setShowBrowser(false)}
             />
