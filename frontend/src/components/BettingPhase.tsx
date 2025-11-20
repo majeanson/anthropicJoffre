@@ -11,6 +11,7 @@ import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { sounds } from '../utils/sounds';
 import { InlineBetStatus } from './InlineBetStatus';
 import { SmartValidationMessage } from './SmartValidationMessage';
+import { useChatNotifications } from '../hooks/useChatNotifications';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -68,35 +69,14 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   const [withoutTrump, setWithoutTrump] = useState<boolean>(false);
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [chatOpen, setChatOpen] = useState<boolean>(false);
-  const [unreadChatCount, setUnreadChatCount] = useState<number>(0);
 
-  // Listen for chat messages and update unread count
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleChatMessage = (msg: ChatMessage) => {
-      if (!chatOpen) {
-        setUnreadChatCount(prev => prev + 1);
-        // Play notification sound if message is from another player
-        if (msg.playerId !== currentPlayerId) {
-          sounds.chatNotification();
-        }
-      }
-    };
-
-    socket.on('game_chat_message', handleChatMessage);
-
-    return () => {
-      socket.off('game_chat_message', handleChatMessage);
-    };
-  }, [socket, chatOpen]);
-
-  // Reset unread count when chat is opened
-  useEffect(() => {
-    if (chatOpen) {
-      setUnreadChatCount(0);
-    }
-  }, [chatOpen]);
+  // Use chat notifications hook
+  const { unreadChatCount } = useChatNotifications({
+    socket,
+    currentPlayerId,
+    chatOpen,
+    onNewChatMessage
+  });
 
   // Get highest valid bet (excluding skipped bets) - memoized
   const highestBet = useMemo((): Bet | null => {

@@ -20,6 +20,7 @@ import { GameState, Card as CardType } from '../../types/game';
 import { sounds } from '../../utils/sounds';
 import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useChatNotifications } from '../../hooks/useChatNotifications';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';
@@ -104,7 +105,14 @@ function PlayingPhaseComponent({
   const { animationsEnabled } = useSettings();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [unreadChatCount, setUnreadChatCount] = useState(0);
+
+  // Use chat notifications hook
+  const { unreadChatCount } = useChatNotifications({
+    socket,
+    currentPlayerId,
+    chatOpen,
+    onNewChatMessage
+  });
 
   // Sprint 1 Phase 2: Card play effect state
   const [playEffect, setPlayEffect] = useState<{
@@ -143,25 +151,6 @@ function PlayingPhaseComponent({
       onAutoplayToggle();
     }
   }, [isCurrentTurn, onAutoplayToggle]);
-
-  // Chat message listener
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleChatMessage = (msg: ChatMessage) => {
-      if (!chatOpen && msg.playerId !== currentPlayerId) {
-        setUnreadChatCount(prev => prev + 1);
-        sounds.chatNotification();
-      }
-      onNewChatMessage?.(msg);
-    };
-
-    socket.on('game_chat_message', handleChatMessage);
-
-    return () => {
-      socket.off('game_chat_message', handleChatMessage);
-    };
-  }, [socket, chatOpen, currentPlayerId, onNewChatMessage]);
 
   // Trick winner listener
   useEffect(() => {
@@ -202,11 +191,6 @@ function PlayingPhaseComponent({
       socket.off('trick_resolved', handleTrickResolved);
     };
   }, [socket, currentPlayerIndex]);
-
-  // Reset unread count when chat opens
-  useEffect(() => {
-    if (chatOpen) setUnreadChatCount(0);
-  }, [chatOpen]);
 
   // Win/loss sound effects
   useEffect(() => {

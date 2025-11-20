@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext'; // Sprint 3 Phase 2
 import { ProfileEditor, ProfileData } from './ProfileEditor'; // Sprint 3 Phase 3.2
 import { UserProfile } from '../types/auth'; // Sprint 3 Phase 3.2
 import { MatchCard } from './MatchCard'; // Sprint 3 Phase 3.3
+import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 
 // Lazy load heavy modal
 const MatchStatsModal = lazy(() => import('./MatchStatsModal').then(m => ({ default: m.MatchStatsModal })));
@@ -135,7 +136,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       }
 
       // Set user-friendly error message
-      const errorMessage = errorData?.message || 'Failed to load player statistics';
+      const errorMessage = errorData?.message || ERROR_MESSAGES.PLAYER_STATS_FAILED;
       setError(errorMessage);
       setLoading(false);
     };
@@ -168,7 +169,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       console.error('[PlayerStatsModal] Socket error while loading history:', errorData);
 
       // Set user-friendly error message
-      const errorMessage = errorData?.message || 'Failed to load game history';
+      const errorMessage = errorData?.message || ERROR_MESSAGES.GAME_HISTORY_FAILED;
       setHistoryError(errorMessage);
       setHistoryLoading(false);
     };
@@ -194,7 +195,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       }
     } catch (error) {
       console.error('[PlayerStatsModal] Error loading profile:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to load profile data';
+      const errorMessage = getErrorMessage(error, 'PROFILE_DATA_FAILED');
       setProfileError(errorMessage);
     } finally {
       setProfileLoading(false);

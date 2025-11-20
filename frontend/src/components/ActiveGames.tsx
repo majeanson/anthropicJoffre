@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
 import { CONFIG } from '../config/constants';
+import { ERROR_MESSAGES } from '../config/errorMessages';
 
 interface ActiveGame {
   gameId: string;
@@ -44,7 +45,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
         const response = await fetch(`${CONFIG.API_BASE_URL}/api/players/${encodeURIComponent(playerName)}/active-games`);
 
         if (!response.ok) {
-          throw new Error('Failed to fetch active games');
+          throw new Error(ERROR_MESSAGES.ACTIVE_GAMES_LOAD_FAILED);
         }
 
         const data = await response.json();
@@ -53,9 +54,9 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
         console.error('Error fetching active games:', err);
         // More specific error message for CORS/network failures
         if (err instanceof TypeError) {
-          setError('Cannot connect to server. Is the backend running?');
+          setError(ERROR_MESSAGES.CONNECTION_FAILED);
         } else {
-          setError('Failed to load active games');
+          setError(ERROR_MESSAGES.ACTIVE_GAMES_LOAD_FAILED);
         }
       } finally {
         setLoading(false);

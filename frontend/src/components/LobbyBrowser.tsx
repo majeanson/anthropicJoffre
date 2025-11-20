@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/constants';
+import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -159,9 +160,8 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
     } catch (err) {
       // Network errors (fetch failed)
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        const errorMessage = 'Network error. Please check your connection.';
         console.error('[LobbyBrowser] Network error:', err);
-        setError(errorMessage);
+        setError(ERROR_MESSAGES.NETWORK_ERROR);
 
         // Retry on network errors
         if (retryCount < 2) {
@@ -169,9 +169,9 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           return fetchGames(isInitialLoad, retryCount + 1);
         }
       } else {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
         console.error('[LobbyBrowser] Failed to load games:', errorMessage, err);
-        setError(`Failed to load games: ${errorMessage}`);
+        setError(`${ERROR_MESSAGES.GAMES_LOAD_FAILED}: ${errorMessage}`);
       }
     } finally {
       setLoading(false);
@@ -237,9 +237,9 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           return fetchRecentGames(isInitialLoad, retryCount + 1);
         }
       } else {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
         console.error('[LobbyBrowser] Failed to load recent games:', errorMessage, err);
-        setError(`Failed to load recent games: ${errorMessage}`);
+        setError(`${ERROR_MESSAGES.RECENT_GAMES_LOAD_FAILED}: ${errorMessage}`);
       }
     } finally {
       setLoading(false);

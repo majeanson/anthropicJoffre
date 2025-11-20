@@ -6,6 +6,7 @@ import { ChatMessage } from '../types/game';
 import { sounds } from '../utils/sounds';
 import { GameHeader } from './GameHeader';
 import { TrickHistory } from './TrickHistory';
+import { useChatNotifications } from '../hooks/useChatNotifications';
 
 interface ScoringPhaseProps {
   gameState: GameState;
@@ -35,9 +36,16 @@ export function ScoringPhase({
   isSpectator = false
 }: ScoringPhaseProps) {
   const [chatOpen, setChatOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(60);
   const [dataReady, setDataReady] = useState(false);
+
+  // Use chat notifications hook
+  const { unreadChatCount } = useChatNotifications({
+    socket,
+    currentPlayerId,
+    chatOpen,
+    onNewChatMessage
+  });
 
   // Find current player to get their name (playersReady now stores names, not IDs)
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
@@ -80,34 +88,6 @@ export function ScoringPhase({
     return () => clearInterval(interval);
   }, [gameState.roundEndTimestamp]);
 
-  // Track unread messages when chat is closed
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleChatMessage = (msg: ChatMessage) => {
-      if (!chatOpen) {
-        setUnreadCount(prev => prev + 1);
-        // Play notification sound if message is from another player
-        if (msg.playerId !== currentPlayerId) {
-          sounds.chatNotification();
-        }
-      }
-    };
-
-    socket.on('game_chat_message', handleChatMessage);
-
-    return () => {
-      socket.off('game_chat_message', handleChatMessage);
-    };
-  }, [socket, chatOpen]);
-
-  // Reset unread count when chat opens
-  useEffect(() => {
-    if (chatOpen) {
-      setUnreadCount(0);
-    }
-  }, [chatOpen]);
-
   const handleReady = () => {
     if (!socket || isReady) return;
     socket.emit('player_ready', { gameId });
@@ -132,7 +112,7 @@ export function ScoringPhase({
         onOpenFriends={onOpenFriends}
         botCount={gameState.players.filter(p => p.isBot).length}
         isSpectator={isSpectator}
-        unreadChatCount={unreadCount}
+        unreadChatCount={unreadChatCount}
       />
 
       {/* Chat Panel */}
