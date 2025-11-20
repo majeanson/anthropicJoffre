@@ -30,9 +30,10 @@ const csrfUtilities = doubleCsrf({
   cookieOptions: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    // Use 'lax' in development to allow cross-port requests (localhost:3000 to localhost:3001)
-    // Use 'strict' in production for maximum security
-    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+    // Use 'lax' for both dev and production
+    // 'lax' provides good security while allowing cookies to be sent on navigation
+    // 'strict' would block cookies even on same-site navigation in some cases
+    sameSite: 'lax',
     path: '/',
   },
   size: 64,
