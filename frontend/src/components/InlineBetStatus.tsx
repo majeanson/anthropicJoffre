@@ -72,7 +72,7 @@ export function InlineBetStatus({
             >
               <div className="flex items-center gap-2">
                 <span className="text-base">{display.icon}</span>
-                <span className="font-bold">{player.name}</span>
+                <span className="font-bold" data-testid={`player-name-${player.name}`}>{player.name}</span>
               </div>
               <span className="font-black text-lg">{display.text}</span>
             </div>

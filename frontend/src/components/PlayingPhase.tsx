@@ -1033,13 +1033,13 @@ function PlayingPhaseComponent({ gameState, currentPlayerId, onPlayCard, isSpect
                     isCurrentTurn
                       ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse'
                       : 'border-2 border-parchment-400 dark:border-gray-600'
-                  }`} data-testid="waiting-first-card">
+                  }`} data-testid="turn-indicator">
                     {isCurrentTurn && (
                       <div className="mb-2">
                         <span className="text-4xl motion-safe:animate-arrow-bounce motion-reduce:inline">👇</span>
                       </div>
                     )}
-                    <p className="text-parchment-50 text-lg md:text-2xl lg:text-3xl font-semibold">
+                    <p className="text-parchment-50 text-lg md:text-2xl lg:text-3xl font-semibold" data-testid="current-turn-player">
                       {isCurrentTurn
                         ? 'Your Turn - Play a card!'
                         : `Waiting for first card from ${gameState.players[gameState.currentPlayerIndex]?.name}...`}
