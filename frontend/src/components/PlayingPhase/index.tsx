@@ -10,7 +10,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { CardPlayEffect } from '../CardPlayEffect';
-import { ConfettiEffect } from '../ConfettiEffect';
 import { TrickWinnerBanner } from '../TrickWinnerBanner';
 import { Leaderboard } from '../Leaderboard';
 import { UnifiedChat } from '../UnifiedChat';
@@ -221,7 +220,7 @@ function PlayingPhaseComponent({
     if (gameState.currentTrick.length > 0) return null;
 
     return (
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50">
         {/* Spotlight effect for current player's turn */}
         {isCurrentTurn && (
           <div className="absolute inset-0 -m-12 rounded-full bg-gradient-radial from-blue-400/30 via-blue-400/10 to-transparent motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" />
@@ -306,6 +305,7 @@ function PlayingPhaseComponent({
               currentTrickWinnerId={currentTrickWinnerId}
               isSpectator={isSpectator}
               onSwapPosition={onSwapPosition}
+              trickWinner={trickWinner}
             />
           </div>
         </div>
@@ -359,20 +359,14 @@ function PlayingPhaseComponent({
         />
       )}
 
+      {/* Winner Banner - fixed at bottom */}
       {trickWinner && (
-        <>
-          <ConfettiEffect
-            position={trickWinner.position}
-            teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
-            duration={2000}
-          />
-          <TrickWinnerBanner
-            playerName={trickWinner.playerName}
-            points={trickWinner.points}
-            position={trickWinner.position}
-            teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
-          />
-        </>
+        <TrickWinnerBanner
+          playerName={trickWinner.playerName}
+          points={trickWinner.points}
+          position={trickWinner.position}
+          teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
+        />
       )}
     </div>
   );

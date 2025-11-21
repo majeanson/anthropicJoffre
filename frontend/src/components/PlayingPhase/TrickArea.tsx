@@ -10,8 +10,16 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { PlayerPosition } from './PlayerPosition';
+import { ConfettiEffect } from '../ConfettiEffect';
 import { GameState, TrickCard, Player } from '../../types/game';
 import logger from '../../utils/logger';
+
+interface TrickWinnerInfo {
+  playerName: string;
+  points: number;
+  teamId: 1 | 2;
+  position: 'bottom' | 'left' | 'top' | 'right';
+}
 
 export interface TrickAreaProps {
   gameState: GameState;
@@ -20,6 +28,7 @@ export interface TrickAreaProps {
   currentTrickWinnerId: string | null;
   isSpectator: boolean;
   onSwapPosition?: (targetPlayerId: string) => void;
+  trickWinner?: TrickWinnerInfo | null;
 }
 
 export function TrickArea({
@@ -29,6 +38,7 @@ export function TrickArea({
   currentTrickWinnerId,
   isSpectator,
   onSwapPosition,
+  trickWinner,
 }: TrickAreaProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState(false);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState(false);
@@ -284,6 +294,15 @@ export function TrickArea({
               {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
               {renderPlayerPosition(3)}
             </div>
+
+            {/* Confetti Effect - positioned relative to this container */}
+            {trickWinner && (
+              <ConfettiEffect
+                position={trickWinner.position}
+                teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
+                duration={2000}
+              />
+            )}
           </div>
         </>
       )}
