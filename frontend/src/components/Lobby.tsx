@@ -189,60 +189,32 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   const getActiveTabButtons = (): HTMLButtonElement[] => {
     const buttons: HTMLButtonElement[] = [];
 
+    // Always include Login/Register buttons if user is not logged in
+    if (!user) {
+      const loginBtn = document.querySelector('[data-keyboard-nav="login-btn"]') as HTMLButtonElement;
+      const registerBtn = document.querySelector('[data-keyboard-nav="register-btn"]') as HTMLButtonElement;
+      if (loginBtn) buttons.push(loginBtn);
+      if (registerBtn) buttons.push(registerBtn);
+    }
+
+    // Get all buttons with data-keyboard-nav attribute in the current tab content
+    // This is more maintainable than hardcoding each button
+    const tabContentArea = document.querySelector('[data-tab-content]');
+    if (tabContentArea) {
+      const navButtons = Array.from(tabContentArea.querySelectorAll('[data-keyboard-nav]')) as HTMLButtonElement[];
+      buttons.push(...navButtons);
+    }
+
+    // Also get buttons with data-testid for Play tab (legacy support)
     if (mainTab === 'play') {
-      // Rejoin button (if available)
       if (hasValidSession && onRejoinGame) {
         const rejoinBtn = document.querySelector('[data-testid="rejoin-game-button"]') as HTMLButtonElement;
-        if (rejoinBtn) buttons.push(rejoinBtn);
+        if (rejoinBtn && !buttons.includes(rejoinBtn)) buttons.push(rejoinBtn);
       }
-
-      // Create Game, Browse Games, Quick Play buttons
       const createBtn = document.querySelector('[data-testid="create-game-button"]') as HTMLButtonElement;
-      const browseBtn = document.querySelector('[data-keyboard-nav="browse-games"]') as HTMLButtonElement;
       const quickPlayBtn = document.querySelector('[data-testid="quick-play-button"]') as HTMLButtonElement;
-
-      if (createBtn) buttons.push(createBtn);
-      if (browseBtn) buttons.push(browseBtn);
-      if (quickPlayBtn) buttons.push(quickPlayBtn);
-    } else if (mainTab === 'social') {
-      // Social sub-tabs (order: Messages, Friends, Online, Profile, Chat)
-      const messagesTabBtn = document.querySelector('[data-keyboard-nav="social-messages"]') as HTMLButtonElement;
-      const friendsTabBtn = document.querySelector('[data-keyboard-nav="social-friends"]') as HTMLButtonElement;
-      const onlineTabBtn = document.querySelector('[data-keyboard-nav="social-online"]') as HTMLButtonElement;
-      const profileTabBtn = document.querySelector('[data-keyboard-nav="social-profile"]') as HTMLButtonElement;
-      const chatTabBtn = document.querySelector('[data-keyboard-nav="social-chat"]') as HTMLButtonElement;
-
-      if (messagesTabBtn) buttons.push(messagesTabBtn);
-      if (friendsTabBtn) buttons.push(friendsTabBtn);
-      if (onlineTabBtn) buttons.push(onlineTabBtn);
-      if (profileTabBtn) buttons.push(profileTabBtn);
-      if (chatTabBtn) buttons.push(chatTabBtn);
-
-      // Join buttons for online players
-      if (socialTab === 'online') {
-        const joinButtons = Array.from(document.querySelectorAll('[data-keyboard-nav^="join-player-"]')) as HTMLButtonElement[];
-        buttons.push(...joinButtons);
-      }
-
-      // Join buttons for friends
-      if (socialTab === 'friends') {
-        const joinFriendButtons = Array.from(document.querySelectorAll('[data-keyboard-nav^="join-friend-"]')) as HTMLButtonElement[];
-        buttons.push(...joinFriendButtons);
-      }
-    } else if (mainTab === 'stats') {
-      const myStatsBtn = document.querySelector('[data-keyboard-nav="my-stats"]') as HTMLButtonElement;
-      const leaderboardBtn = document.querySelector('[data-keyboard-nav="leaderboard"]') as HTMLButtonElement;
-      const recentGamesBtn = document.querySelector('[data-keyboard-nav="recent-games"]') as HTMLButtonElement;
-
-      if (myStatsBtn) buttons.push(myStatsBtn);
-      if (leaderboardBtn) buttons.push(leaderboardBtn);
-      if (recentGamesBtn) buttons.push(recentGamesBtn);
-    } else if (mainTab === 'settings') {
-      const rulesBtn = document.querySelector('[data-keyboard-nav="how-to-play"]') as HTMLButtonElement;
-      const debugBtn = document.querySelector('[data-keyboard-nav="debug-fun"]') as HTMLButtonElement;
-
-      if (rulesBtn) buttons.push(rulesBtn);
-      if (debugBtn) buttons.push(debugBtn);
+      if (createBtn && !buttons.includes(createBtn)) buttons.push(createBtn);
+      if (quickPlayBtn && !buttons.includes(quickPlayBtn)) buttons.push(quickPlayBtn);
     }
 
     return buttons;
@@ -367,14 +339,16 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     )}
                     <div className="flex items-center justify-center gap-2">
                       <button
+                        data-keyboard-nav="login-btn"
                         onClick={onShowLogin}
-                        className="text-sm px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
+                        className="text-sm px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                       >
                         Login
                       </button>
                       <button
+                        data-keyboard-nav="register-btn"
                         onClick={onShowRegister}
-                        className="text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold transition-all duration-200 shadow"
+                        className="text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold transition-all duration-200 shadow focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
                       >
                         Register
                       </button>
@@ -435,7 +409,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               </div>
 
               {/* Tab Content */}
-              <div className="min-h-[400px]">
+              <div className="min-h-[400px]" data-tab-content>
                 {/* PLAY TAB */}
                 {mainTab === 'play' && (
                   <PlayContent
