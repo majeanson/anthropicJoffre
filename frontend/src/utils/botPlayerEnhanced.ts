@@ -1,4 +1,4 @@
-import { Card, GameState, CardColor, CardValue } from '../types/game';
+import { Card, GameState, CardColor, CardValue, Player, Bet } from '../types/game';
 
 /**
  * Enhanced Bot AI with Advanced Strategic Concepts

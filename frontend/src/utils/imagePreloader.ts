@@ -2,6 +2,8 @@
  * Preload card images to prevent flickering/missing images during gameplay
  */
 
+import logger from './logger';
+
 const CARD_IMAGES = [
   // Emblems for regular cards (production: <95KB each, 37% smaller)
   '/cards/production/red_emblem.jpg',

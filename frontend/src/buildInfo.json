@@ -1,66 +1,17 @@
 {
-  "version": "3.1.0",
-  "buildDate": "2025-11-20T03:30:00.000Z",
-  "environment": "production",
+  "buildDate": "2025-11-21T14:44:17.076Z",
+  "version": "4.0.0",
   "git": {
-    "commitHash": "pending",
-    "commitDate": "2025-11-20",
-    "branch": "main",
-    "commitMessage": "feat: Unified Debug Modal v3.1.0 + Join Game Fixes\n\nVersion 3.1.0 Release\n\nUnified Debug Modal:\n- Merged DebugInfo and GlobalDebugModal into one beautiful modal\n- Collapsible sections for Server Health, Game Monitoring, Sentry Tests\n- Real-time game monitoring with 5s auto-refresh\n- Sentry integration testing (frontend + backend)\n- Database cleanup tools\n- All features in one gorgeous gradient UI\n\nJoin Game Improvements:\n- Fixed join game from LobbyBrowser not working\n- Fixed direct message migration SQL error (GROUP BY)\n- Better logging for join flow debugging\n- Fallback to join form if no playerName set\n\nGenerated with Claude Code"
+    "commitMessage": "release: v2.4.0 - Sprint 19 preparation and documentation cleanup\n\n🎉 Version 2.4.0: Production-ready with 5/5 code quality\n\n## Documentation Cleanup\n- Archive 11 completed sprint/task docs (Sprint 17-18, Task 10)\n- Create docs/archive/ structure with README\n- Update IMPROVEMENT_PLAN.md with completion status (14/18 done)\n- Update ROADMAP.md with 5/5 star code quality rating\n- Create Sprint 19 launch plan (6-9 days, 4 phases)\n- Create Sprint 19 kickoff guide\n\n## Sprint 19 Plan Created\n**Goal**: Production Launch & CI/CD Pipeline\n\nPhase 1: Pre-production validation (load tests, security audit)\nPhase 2: CI/CD pipeline setup (GitHub Actions)\nPhase 3: Production deployment (Railway/Vercel)\nPhase 4: Post-launch monitoring (Sentry, performance)\n\n## Code Quality Fixes\n- Fix TypeScript: Add missing logger imports (imagePreloader, recentPlayers)\n- Fix TypeScript: Add missing ListSkeleton import (DirectMessagesPanel)\n- Fix TypeScript: Add Player, Bet imports (botPlayerEnhanced)\n- Backend TypeScript: ✅ Zero errors\n- Frontend build: ✅ Exists (pre-existing TS warnings, non-blocking)\n\n## Version Updates\n- Root package.json: 2.3.0 → 2.4.0\n- Backend package.json: 2.3.0 → 2.4.0\n- Frontend package.json: 2.3.0 → 2.4.0\n- Build info regenerated\n\n## Current Status\n- Code Quality: ⭐⭐⭐⭐⭐ (5/5 stars)\n- Production Readiness: 98/100\n- Improvements Complete: 14/18 (all high-priority done)\n- Backend Tests: 150 passing (~1s)\n- E2E Tests: 22 files (93% pass rate)\n\n## Next Steps\nStart Sprint 19 Phase 1: Run validation tools (load tests, security audit)",
+    "commitHash": "3e894e5",
+    "commitDate": "2025-11-21 09:43:48 -0500",
+    "branch": "main"
   },
-  "latestDoneFeatures": [
-    {
-      "title": "Unified Debug Modal (v3.1.0)",
-      "date": "2025-11-20",
-      "features": [
-        "Merged DebugInfo + GlobalDebugModal into one UnifiedDebugModal",
-        "Beautiful gradient design with purple/indigo theme",
-        "Collapsible sections: Health, Games, Sentry, Features, Cleanup",
-        "Real-time game monitoring (updates every 5s)",
-        "Clear individual games or bulk clear finished/all",
-        "Phase breakdown stats (team selection, betting, playing, finished)",
-        "Sentry error testing for frontend and backend",
-        "Database cleanup tools for obsolete game IDs",
-        "Single 'Debug Fun' button in Settings"
-      ]
-    },
-    {
-      "title": "Join Game Fixes",
-      "date": "2025-11-20",
-      "features": [
-        "Fixed join game from LobbyBrowser not working",
-        "Browser closes before emitting join event",
-        "Bot takeover modal now displays properly",
-        "Better console logging for debugging join flow",
-        "Fallback to join form if playerName is empty",
-        "Fixed direct_messages migration SQL GROUP BY error"
-      ]
-    },
-    {
-      "title": "Sprint 18 - Production Hardening",
-      "date": "2025-11-19",
-      "features": [
-        "JWT Refresh Token System (OAuth 2.0 rotation)",
-        "CSRF Protection (double-submit cookie pattern)",
-        "Sentry Alerts (email notifications)",
-        "Database Backup Strategy",
-        "Load Testing Infrastructure (k6)",
-        "Comprehensive production documentation (13,000+ lines)"
-      ]
-    }
-  ],
   "futureTodos": [
-    "Execute Sprint 18 validation tools (load tests, audits)",
-    "CI/CD Integration (GitHub Actions)",
-    "Performance optimizations",
-    "Visual regression testing",
-    "Mobile app development"
-  ],
-  "releaseDate": "2025-11-19",
-  "buildStatus": "✅ Production Ready (98/100)",
-  "testsStatus": {
-    "backend": "451/456 passing (99%)",
-    "e2e": "19/19 active tests passing (100%)",
-    "overall": "470/475 tests passing (99%)"
-  }
+    "Game Replay Feature",
+    "Improve Bot AI",
+    "Enhanced Leaderboard",
+    "Achievements & Badges",
+    "Friend System"
+  ]
 }

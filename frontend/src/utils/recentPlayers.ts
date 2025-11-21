@@ -1,6 +1,8 @@
 // Recent Players Management
 // Tracks players you've recently played with in localStorage
 
+import logger from './logger';
+
 export interface RecentPlayer {
   name: string;
   lastPlayed: number;

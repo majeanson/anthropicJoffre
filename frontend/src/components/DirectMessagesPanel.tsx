@@ -1,5 +1,4 @@
 /**
-import { ListSkeleton } from './ui/Skeleton';
  * DirectMessagesPanel Component
  * Sprint 16 Day 4
  *
@@ -28,6 +27,7 @@ import { ListSkeleton } from './ui/Skeleton';
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import Avatar from './Avatar';
+import { ListSkeleton } from './ui/Skeleton';
 
 interface DirectMessage {
   message_id: number;
