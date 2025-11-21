@@ -3,9 +3,10 @@
  * Sprint 4 Phase 4.3: Lobby Component Splitting
  *
  * Handles game joining UI for both players and spectators
+ * Keyboard Navigation: Grid-based GameBoy style
  */
 
-import { Suspense, lazy, useEffect } from 'react';
+import { Suspense, lazy, useEffect, useState, useRef, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
@@ -57,23 +58,159 @@ export function JoinGameForm({
   selectedPlayerName,
   setSelectedPlayerName,
 }: JoinGameFormProps) {
-  // Escape key to go back
+  // Keyboard navigation state - grid-based like GameBoy
+  // Row 0: Join type radios (Player | Spectator)
+  // Row 1: Game ID input
+  // Row 2: Player name input (skip if authenticated)
+  // Row 3: Back | Join buttons
+  const [navRow, setNavRow] = useState(0);
+  const [navCol, setNavCol] = useState(0);
+
+  // Refs for focusable elements
+  const playerRadioRef = useRef<HTMLInputElement>(null);
+  const spectatorRadioRef = useRef<HTMLInputElement>(null);
+  const gameIdInputRef = useRef<HTMLInputElement>(null);
+  const playerNameInputRef = useRef<HTMLInputElement>(null);
+  const backButtonRef = useRef<HTMLButtonElement>(null);
+  const joinButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Get focusable element for current position
+  const getFocusableElement = useCallback((row: number, col: number): HTMLElement | null => {
+    // Adjust row if user is authenticated (skip name input)
+    const effectiveRow = user && row >= 2 ? row + 1 : row;
+
+    switch (effectiveRow) {
+      case 0: // Join type radios
+        return col === 0 ? playerRadioRef.current : spectatorRadioRef.current;
+      case 1: // Game ID input
+        return gameIdInputRef.current;
+      case 2: // Player name input
+        return playerNameInputRef.current;
+      case 3: // Back/Join buttons
+        return col === 0 ? backButtonRef.current : joinButtonRef.current;
+      default:
+        return null;
+    }
+  }, [user]);
+
+  // Focus current element
+  const focusCurrentElement = useCallback(() => {
+    const element = getFocusableElement(navRow, navCol);
+    element?.focus();
+  }, [navRow, navCol, getFocusableElement]);
+
+  // Get max columns for a row
+  const getMaxCols = useCallback((row: number): number => {
+    const effectiveRow = user && row >= 2 ? row + 1 : row;
+    switch (effectiveRow) {
+      case 0: return 2; // Player/Spectator
+      case 1: return 1; // Game ID
+      case 2: return 1; // Player name
+      case 3: return 2; // Back/Join
+      default: return 1;
+    }
+  }, [user]);
+
+  // Get max rows
+  const getMaxRows = useCallback((): number => {
+    return user ? 3 : 4; // Skip name input row if authenticated
+  }, [user]);
+
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        sounds.buttonClick();
-        if (autoJoinGameId) {
-          onBackToHomepage();
-        } else {
-          onBack();
-        }
+      // Don't intercept when typing in inputs (except for navigation keys)
+      const isInInput = document.activeElement === gameIdInputRef.current ||
+                        document.activeElement === playerNameInputRef.current;
+      if (isInInput && !['ArrowUp', 'ArrowDown', 'Escape'].includes(e.key)) {
+        return;
+      }
+
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          sounds.buttonClick();
+          if (autoJoinGameId) {
+            onBackToHomepage();
+          } else {
+            onBack();
+          }
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          setNavRow(prev => {
+            const newRow = prev > 0 ? prev - 1 : getMaxRows() - 1;
+            setNavCol(c => Math.min(c, getMaxCols(newRow) - 1));
+            return newRow;
+          });
+          sounds.buttonClick();
+          break;
+
+        case 'ArrowDown':
+          e.preventDefault();
+          setNavRow(prev => {
+            const newRow = prev < getMaxRows() - 1 ? prev + 1 : 0;
+            setNavCol(c => Math.min(c, getMaxCols(newRow) - 1));
+            return newRow;
+          });
+          sounds.buttonClick();
+          break;
+
+        case 'ArrowLeft':
+          e.preventDefault();
+          setNavCol(prev => {
+            const maxCols = getMaxCols(navRow);
+            const newCol = prev > 0 ? prev - 1 : maxCols - 1;
+            // Handle radio button toggle
+            const effectiveRow = user && navRow >= 2 ? navRow + 1 : navRow;
+            if (effectiveRow === 0) {
+              setJoinType(newCol === 0 ? 'player' : 'spectator');
+            }
+            return newCol;
+          });
+          sounds.buttonClick();
+          break;
+
+        case 'ArrowRight':
+          e.preventDefault();
+          setNavCol(prev => {
+            const maxCols = getMaxCols(navRow);
+            const newCol = prev < maxCols - 1 ? prev + 1 : 0;
+            // Handle radio button toggle
+            const effectiveRow = user && navRow >= 2 ? navRow + 1 : navRow;
+            if (effectiveRow === 0) {
+              setJoinType(newCol === 0 ? 'player' : 'spectator');
+            }
+            return newCol;
+          });
+          sounds.buttonClick();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onBack, onBackToHomepage, autoJoinGameId]);
+  }, [onBack, onBackToHomepage, autoJoinGameId, navRow, user, getMaxRows, getMaxCols, setJoinType]);
+
+  // Focus element when navigation changes
+  useEffect(() => {
+    focusCurrentElement();
+  }, [navRow, navCol, focusCurrentElement]);
+
+  // Auto-focus first element on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Focus player name input if from auto-join URL, otherwise first element
+      if (autoJoinGameId && playerNameInputRef.current) {
+        setNavRow(user ? 2 : 2);
+        playerNameInputRef.current.focus();
+      } else {
+        focusCurrentElement();
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [autoJoinGameId, user, focusCurrentElement]);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,28 +267,30 @@ export function JoinGameForm({
               <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3">
                 Join as:
               </label>
-              <div className="space-y-2">
-                <label className="flex items-center cursor-pointer">
+              <div className="flex gap-4">
+                <label className="flex items-center cursor-pointer flex-1">
                   <input
+                    ref={playerRadioRef}
                     type="radio"
                     name="joinType"
                     value="player"
                     checked={joinType === 'player'}
                     onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
-                    className="w-4 h-4 text-umber-600 focus:ring-umber-500"
+                    className="w-4 h-4 text-umber-600 focus:ring-umber-500 focus:ring-2 focus:ring-offset-2"
                   />
                   <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Player</span>
                 </label>
-                <label className="flex items-center cursor-pointer">
+                <label className="flex items-center cursor-pointer flex-1">
                   <input
+                    ref={spectatorRadioRef}
                     type="radio"
                     name="joinType"
                     value="spectator"
                     checked={joinType === 'spectator'}
                     onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
-                    className="w-4 h-4 text-umber-600 focus:ring-umber-500"
+                    className="w-4 h-4 text-umber-600 focus:ring-umber-500 focus:ring-2 focus:ring-offset-2"
                   />
-                  <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Guest (Spectator)</span>
+                  <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Spectator</span>
                 </label>
               </div>
             </div>
@@ -161,11 +300,12 @@ export function JoinGameForm({
                 Game ID
               </label>
               <input
+                ref={gameIdInputRef}
                 data-testid="game-id-input"
                 type="text"
                 value={gameId}
                 onChange={(e) => setGameId(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
+                className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 focus:outline-none focus:ring-offset-2 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
                 placeholder="Enter game ID"
                 required
               />
@@ -175,13 +315,14 @@ export function JoinGameForm({
                 Your Name {joinType === 'spectator' && '(Optional)'}
               </label>
               <input
+                ref={playerNameInputRef}
                 data-testid="player-name-input"
                 type="text"
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 disabled={!!user}
                 placeholder={user ? "Using authenticated username" : "Enter your name"}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 ${
+                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 focus:outline-none focus:ring-offset-2 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 ${
                   user ? 'opacity-60 cursor-not-allowed' : ''
                 } ${
                   autoJoinGameId
@@ -205,33 +346,36 @@ export function JoinGameForm({
               {/* Show appropriate back button based on context */}
               {autoJoinGameId ? (
                 <button
+                  ref={backButtonRef}
                   data-testid="back-to-homepage-button"
                   type="button"
                   onClick={onBackToHomepage}
-                  className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
+                  className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                 >
                   🏠 Back to Homepage
                 </button>
               ) : (
                 <button
+                  ref={backButtonRef}
                   data-testid="back-button"
                   type="button"
                   onClick={() => { sounds.buttonClick(); onBack(); }}
-                  className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
+                  className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                 >
                   Back
                 </button>
               )}
               <button
+                ref={joinButtonRef}
                 data-testid="submit-join-button"
                 type="submit"
-                className={`flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
+                className={`flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   joinType === 'player'
-                    ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-purple-800'
-                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-blue-800'
+                    ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-purple-800 focus:ring-purple-400'
+                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-blue-800 focus:ring-blue-400'
                 }`}
               >
-                {joinType === 'player' ? 'Join as Player' : 'Join as Guest'}
+                {joinType === 'player' ? 'Join as Player' : 'Join as Spectator'}
               </button>
             </div>
           </form>

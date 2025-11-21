@@ -1,5 +1,5 @@
 import { Player, ChatMessage } from '../types/game';
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { useSettings } from '../contexts/SettingsContext';
 import { HowToPlay } from './HowToPlay';
@@ -7,6 +7,9 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 import { UnifiedChat } from './UnifiedChat';
 import { sounds } from '../utils/sounds';
+
+// Keyboard navigation type for team selection
+type NavSection = 'header' | 'teams' | 'difficulty' | 'actions' | 'rules';
 
 interface TeamSelectionProps {
   players: Player[];
@@ -43,6 +46,26 @@ export function TeamSelection({
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showRules, setShowRules] = useState(false);
+
+  // Keyboard navigation state - grid-based like GameBoy
+  // Sections: header -> teams -> difficulty -> actions -> rules
+  const [navSection, setNavSection] = useState<NavSection>('actions');
+  const [navCol, setNavCol] = useState(0);
+  const [teamNavRow, setTeamNavRow] = useState(0); // 0-1 for team positions
+  const [teamNavTeam, setTeamNavTeam] = useState<1 | 2>(1); // Which team
+
+  // Refs for focusable elements
+  const leaveButtonRef = useRef<HTMLButtonElement>(null);
+  const darkModeButtonRef = useRef<HTMLButtonElement>(null);
+  const copyLinkButtonRef = useRef<HTMLButtonElement>(null);
+  const easyButtonRef = useRef<HTMLButtonElement>(null);
+  const mediumButtonRef = useRef<HTMLButtonElement>(null);
+  const hardButtonRef = useRef<HTMLButtonElement>(null);
+  const addBotButtonRef = useRef<HTMLButtonElement>(null);
+  const startGameButtonRef = useRef<HTMLButtonElement>(null);
+  const rulesButtonRef = useRef<HTMLButtonElement>(null);
+  const team1SwapRefs = useRef<(HTMLButtonElement | null)[]>([null, null]);
+  const team2SwapRefs = useRef<(HTMLButtonElement | null)[]>([null, null]);
 
   // Sprint 8 Task 2: Memoize expensive computations for performance
   const currentPlayer = useMemo(() =>
@@ -85,6 +108,144 @@ export function TeamSelection({
     }
   }, [gameId]);
 
+  // Check if difficulty section is visible
+  const showDifficulty = players.filter(p => !p.isEmpty).length < 4 && onAddBot && onBotDifficultyChange;
+  const showAddBot = players.filter(p => !p.isEmpty).length < 4 && onAddBot;
+
+  // Get sections in order (some may be hidden)
+  const getSections = useCallback((): NavSection[] => {
+    const sections: NavSection[] = ['header', 'teams'];
+    if (showDifficulty) sections.push('difficulty');
+    sections.push('actions', 'rules');
+    return sections;
+  }, [showDifficulty]);
+
+  // Get max columns for a section
+  const getMaxCols = useCallback((section: NavSection): number => {
+    switch (section) {
+      case 'header': return onLeaveGame ? 2 : 1;
+      case 'teams': return 2; // Team 1 | Team 2
+      case 'difficulty': return 3; // Easy | Medium | Hard
+      case 'actions': return showAddBot ? 2 : 1; // Add Bot | Start Game
+      case 'rules': return 1;
+      default: return 1;
+    }
+  }, [onLeaveGame, showAddBot]);
+
+  // Focus current element based on section and column
+  const focusCurrentElement = useCallback(() => {
+    switch (navSection) {
+      case 'header':
+        if (navCol === 0 && leaveButtonRef.current) leaveButtonRef.current.focus();
+        else if (navCol === 1 && darkModeButtonRef.current) darkModeButtonRef.current.focus();
+        else if (!onLeaveGame && darkModeButtonRef.current) darkModeButtonRef.current.focus();
+        break;
+      case 'teams':
+        const teamRefs = teamNavTeam === 1 ? team1SwapRefs.current : team2SwapRefs.current;
+        teamRefs[teamNavRow]?.focus();
+        break;
+      case 'difficulty':
+        if (navCol === 0 && easyButtonRef.current) easyButtonRef.current.focus();
+        else if (navCol === 1 && mediumButtonRef.current) mediumButtonRef.current.focus();
+        else if (navCol === 2 && hardButtonRef.current) hardButtonRef.current.focus();
+        break;
+      case 'actions':
+        if (showAddBot && navCol === 0 && addBotButtonRef.current) addBotButtonRef.current.focus();
+        else if (startGameButtonRef.current) startGameButtonRef.current.focus();
+        break;
+      case 'rules':
+        rulesButtonRef.current?.focus();
+        break;
+    }
+  }, [navSection, navCol, teamNavTeam, teamNavRow, onLeaveGame, showAddBot]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (showRules) return; // Don't navigate when modal is open
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const sections = getSections();
+      const currentIndex = sections.indexOf(navSection);
+
+      switch (e.key) {
+        case 'Escape':
+          if (onLeaveGame) {
+            e.preventDefault();
+            sounds.buttonClick();
+            onLeaveGame();
+          }
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          if (navSection === 'teams') {
+            // Navigate within team positions
+            setTeamNavRow(prev => prev > 0 ? prev - 1 : 1);
+          } else {
+            // Move to previous section
+            const newIndex = currentIndex > 0 ? currentIndex - 1 : sections.length - 1;
+            setNavSection(sections[newIndex]);
+            setNavCol(0);
+          }
+          sounds.buttonClick();
+          break;
+
+        case 'ArrowDown':
+          e.preventDefault();
+          if (navSection === 'teams') {
+            // Navigate within team positions
+            setTeamNavRow(prev => prev < 1 ? prev + 1 : 0);
+          } else {
+            // Move to next section
+            const newIndex = currentIndex < sections.length - 1 ? currentIndex + 1 : 0;
+            setNavSection(sections[newIndex]);
+            setNavCol(0);
+          }
+          sounds.buttonClick();
+          break;
+
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (navSection === 'teams') {
+            // Switch between teams
+            setTeamNavTeam(prev => prev === 1 ? 2 : 1);
+          } else {
+            const maxCols = getMaxCols(navSection);
+            setNavCol(prev => prev > 0 ? prev - 1 : maxCols - 1);
+          }
+          sounds.buttonClick();
+          break;
+
+        case 'ArrowRight':
+          e.preventDefault();
+          if (navSection === 'teams') {
+            // Switch between teams
+            setTeamNavTeam(prev => prev === 1 ? 2 : 1);
+          } else {
+            const maxCols = getMaxCols(navSection);
+            setNavCol(prev => prev < maxCols - 1 ? prev + 1 : 0);
+          }
+          sounds.buttonClick();
+          break;
+
+        case 'Enter':
+        case ' ':
+          // Let buttons handle their own clicks
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [navSection, navCol, teamNavRow, teamNavTeam, showRules, onLeaveGame, getSections, getMaxCols]);
+
+  // Focus element when navigation changes
+  useEffect(() => {
+    if (!showRules) {
+      focusCurrentElement();
+    }
+  }, [navSection, navCol, teamNavRow, teamNavTeam, showRules, focusCurrentElement]);
+
   // Validation for starting game (memoized to avoid recalculation on every render)
   const canStartGame = useMemo(() => {
     // Must have 4 players (including real players, bots, but NOT empty seats)
@@ -126,16 +287,18 @@ export function TeamSelection({
         <div className="absolute top-4 left-4 flex gap-2 z-10">
           {onLeaveGame && (
             <button
+              ref={leaveButtonRef}
               onClick={onLeaveGame}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-red-800 shadow-lg transform hover:scale-105"
+              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-red-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
               title="Leave Game"
             >
               🚪 Leave
             </button>
           )}
           <button
+            ref={darkModeButtonRef}
             onClick={() => setDarkMode(!darkMode)}
-            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-gray-900 shadow-lg transform hover:scale-105"
+            className="bg-gray-700 hover:bg-gray-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-gray-900 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
             title={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
           >
             {darkMode ? '☀️' : '🌙'}
@@ -150,8 +313,9 @@ export function TeamSelection({
 
           {/* Copy Game Link Button */}
           <button
+            ref={copyLinkButtonRef}
             onClick={handleCopyGameLink}
-            className="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-lg font-bold transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
+            className="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-lg font-bold transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
             title="Copy shareable game link"
           >
             <span>🔗</span>
@@ -403,8 +567,9 @@ export function TeamSelection({
               </label>
               <div className="grid grid-cols-3 gap-2">
                 <button
+                  ref={easyButtonRef}
                   onClick={() => onBotDifficultyChange('easy')}
-                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs ${
+                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs focus:outline-none focus:ring-2 focus:ring-umber-400 focus:ring-offset-2 ${
                     botDifficulty === 'easy'
                       ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
                       : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
@@ -413,8 +578,9 @@ export function TeamSelection({
                   Easy
                 </button>
                 <button
+                  ref={mediumButtonRef}
                   onClick={() => onBotDifficultyChange('medium')}
-                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs ${
+                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs focus:outline-none focus:ring-2 focus:ring-umber-400 focus:ring-offset-2 ${
                     botDifficulty === 'medium'
                       ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
                       : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
@@ -423,8 +589,9 @@ export function TeamSelection({
                   Medium
                 </button>
                 <button
+                  ref={hardButtonRef}
                   onClick={() => onBotDifficultyChange('hard')}
-                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs ${
+                  className={`py-2 px-2 rounded font-bold transition-all duration-200 text-xs focus:outline-none focus:ring-2 focus:ring-umber-400 focus:ring-offset-2 ${
                     botDifficulty === 'hard'
                       ? 'bg-umber-600 dark:bg-gray-600 text-white shadow-md scale-105 border border-umber-800 dark:border-gray-500'
                       : 'bg-parchment-100 dark:bg-gray-600 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-500'
@@ -440,8 +607,9 @@ export function TeamSelection({
             {/* Add Bot Button - only show if less than 4 real players (excluding empty seats) */}
             {players.filter(p => !p.isEmpty).length < 4 && onAddBot && (
               <button
+                ref={addBotButtonRef}
                 onClick={onAddBot}
-                className="bg-gradient-to-r from-umber-600 to-amber-700 dark:from-gray-600 dark:to-gray-700 hover:from-umber-700 hover:to-amber-800 dark:hover:from-gray-700 dark:hover:to-gray-800 text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-200 border border-umber-800 dark:border-gray-600 shadow flex items-center gap-2"
+                className="bg-gradient-to-r from-umber-600 to-amber-700 dark:from-gray-600 dark:to-gray-700 hover:from-umber-700 hover:to-amber-800 dark:hover:from-gray-700 dark:hover:to-gray-800 text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-200 border border-umber-800 dark:border-gray-600 shadow flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
                 title="Add a bot player"
               >
                 🤖 Add Bot
@@ -450,20 +618,22 @@ export function TeamSelection({
 
             {canStartGame ? (
               <button
+                ref={startGameButtonRef}
                 data-testid="start-game-button"
                 onClick={() => {
                   sounds.gameStart(); // Sprint 1 Phase 6
                   onStartGame();
                 }}
-                className="bg-forest-600 text-parchment-50 px-8 py-3 rounded-lg text-lg font-bold hover:bg-forest-700 shadow-lg transition-colors border-2 border-forest-700"
+                className="bg-forest-600 text-parchment-50 px-8 py-3 rounded-lg text-lg font-bold hover:bg-forest-700 shadow-lg transition-colors border-2 border-forest-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
               >
                 Start Game
               </button>
             ) : (
               <button
+                ref={startGameButtonRef}
                 data-testid="start-game-button-disabled"
                 disabled
-                className="bg-parchment-300 text-umber-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed border-2 border-parchment-400 dark:border-gray-600"
+                className="bg-parchment-300 text-umber-500 px-8 py-3 rounded-lg text-lg font-bold cursor-not-allowed border-2 border-parchment-400 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
               >
                 Start Game
               </button>
@@ -479,8 +649,9 @@ export function TeamSelection({
 
         <div className="mt-6">
           <button
+            ref={rulesButtonRef}
             onClick={() => setShowRules(true)}
-            className="w-full bg-gradient-to-r from-amber-600 to-amber-700 dark:from-amber-700 dark:to-amber-800 text-white py-3 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 dark:hover:from-amber-800 dark:hover:to-amber-900 transition-all duration-300 border-2 border-amber-800 dark:border-amber-900 shadow-lg transform hover:scale-105"
+            className="w-full bg-gradient-to-r from-amber-600 to-amber-700 dark:from-amber-700 dark:to-amber-800 text-white py-3 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 dark:hover:from-amber-800 dark:hover:to-amber-900 transition-all duration-300 border-2 border-amber-800 dark:border-amber-900 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
           >
             📖 Game Rules
           </button>
