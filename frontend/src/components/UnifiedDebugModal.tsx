@@ -692,7 +692,8 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="w-full mt-8 bg-indigo-600 dark:bg-indigo-700 text-white py-4 rounded-lg font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors border-2 border-indigo-700 dark:border-indigo-600 text-lg"
+          autoFocus
+          className="w-full mt-8 bg-indigo-600 dark:bg-indigo-700 text-white py-4 rounded-lg font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors border-2 border-indigo-700 dark:border-indigo-600 text-lg focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:ring-offset-2"
         >
           Got it!
         </button>

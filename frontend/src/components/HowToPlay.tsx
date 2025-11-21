@@ -113,7 +113,8 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
 
           <button
             onClick={onClose}
-            className="w-full mt-8 bg-umber-600 text-parchment-50 py-4 rounded-lg font-bold hover:bg-umber-700 transition-colors border-2 border-umber-700 text-lg"
+            autoFocus
+            className="w-full mt-8 bg-umber-600 text-parchment-50 py-4 rounded-lg font-bold hover:bg-umber-700 transition-colors border-2 border-umber-700 text-lg focus:outline-none focus:ring-4 focus:ring-amber-400 focus:ring-offset-2"
           >
             Got it!
           </button>
