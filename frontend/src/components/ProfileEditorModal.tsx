@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { User, UserProfile, ProfileUpdateData } from '../types/auth';
+import { User, UserProfile, UserPreferences, ProfileUpdateData } from '../types/auth';
 import { ProfileEditor, ProfileData } from './ProfileEditor';
 import logger from '../utils/logger';
 
@@ -13,7 +13,7 @@ interface ProfileEditorModalProps {
   user: User;
   onClose: () => void;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;
-  getUserProfile: () => Promise<{ profile: UserProfile | null; preferences: Record<string, unknown> | null } | null>;
+  getUserProfile: () => Promise<{ profile: UserProfile | null; preferences: UserPreferences | null } | null>;
 }
 
 export function ProfileEditorModal({

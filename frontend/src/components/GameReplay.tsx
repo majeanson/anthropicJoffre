@@ -71,7 +71,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     };
 
     const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
-      logger.error('[GameReplay] Error loading replay:', errorData, 'for game:', gameId);
+      logger.error('[GameReplay] Error loading replay', undefined, { errorData, gameId });
 
       // Extract correlation ID if available
       const corrId = errorData?.correlationId || errorData?.correlation_id || null;
@@ -164,7 +164,13 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
           // Defensive check: ensure player exists in hands before pushing
           // This handles cases where player names changed (e.g., bot replacement)
           if (!hands[trickCard.playerName]) {
-            logger.warn('[GameReplay] Calculating starting hands: Player not found. Action: Building hand from trick history. PlayerName from trick:', trickCard.playerName, 'Available players:', Object.keys(hands), 'Round:', currentRoundIndex, 'Trick:', currentTrickIndex);
+            logger.warn('[GameReplay] Calculating starting hands: Player not found', {
+              action: 'Building hand from trick history',
+              playerNameFromTrick: trickCard.playerName,
+              availablePlayers: Object.keys(hands),
+              round: currentRoundIndex,
+              trick: currentTrickIndex
+            });
             hands[trickCard.playerName] = [];
           }
           hands[trickCard.playerName].push(trickCard.card);
@@ -588,8 +594,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                                         ? 'bg-red-500 text-white'
                                         : card.color === 'blue'
                                         ? 'bg-blue-500 text-white'
-                                        : card.color === 'yellow'
-                                        ? 'bg-yellow-400 text-gray-800'
+                                        : card.color === 'green'
+                                        ? 'bg-green-500 text-white'
                                         : 'bg-amber-800 text-white'
                                     }
                                   `}

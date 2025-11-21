@@ -1108,8 +1108,10 @@ function AppContent() {
         <ErrorBoundary componentName="KeyboardShortcutsModal">
           <Suspense fallback={<div />}>
             {(() => {
-              const phase = gameState?.phase;
-              const currentPhase = phase === 'team_selection' ? 'team_selection'
+              // Cast to string to avoid TypeScript control flow narrowing issues
+              const phase = gameState?.phase as string | undefined;
+              const currentPhase: 'lobby' | 'team_selection' | 'betting' | 'playing' =
+                phase === 'team_selection' ? 'team_selection'
                 : phase === 'betting' ? 'betting'
                 : phase === 'playing' ? 'playing'
                 : 'lobby';

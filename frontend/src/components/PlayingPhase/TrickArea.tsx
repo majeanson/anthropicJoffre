@@ -48,7 +48,7 @@ export function TrickArea({
       );
 
       if (playerIndex === -1) {
-        logger.warn(`[TrickArea] Player not found for card:`, tc);
+        logger.warn(`[TrickArea] Player not found for card:`, { playerId: tc.playerId, playerName: tc.playerName });
         return;
       }
 

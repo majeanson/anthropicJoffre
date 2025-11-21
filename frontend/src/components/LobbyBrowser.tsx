@@ -171,7 +171,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         }
       } else {
         const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
-        logger.error('[LobbyBrowser] Failed to load games:', errorMessage, err);
+        logger.error('[LobbyBrowser] Failed to load games:', errorMessage, { error: String(err) });
         setError(`${ERROR_MESSAGES.GAMES_LOAD_FAILED}: ${errorMessage}`);
       }
     } finally {
@@ -239,7 +239,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         }
       } else {
         const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
-        logger.error('[LobbyBrowser] Failed to load recent games:', errorMessage, err);
+        logger.error('[LobbyBrowser] Failed to load recent games:', errorMessage, { error: String(err) });
         setError(`${ERROR_MESSAGES.RECENT_GAMES_LOAD_FAILED}: ${errorMessage}`);
       }
     } finally {

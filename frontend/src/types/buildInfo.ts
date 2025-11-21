@@ -6,7 +6,7 @@ export interface BuildInfo {
   buildDate: string;
   version: string;
   environment?: string;
-  git?: {
+  git: {
     commitMessage: string;
     commitHash: string;
     commitDate: string;
@@ -45,7 +45,13 @@ export interface PhaseInfo {
   name: string;
   status: string;
   duration: string;
-  features: string[];
+  dateCompleted?: string;
+  features?: string[];
+  tasks?: string[];
+  improvements?: string[];
+  deletedFiles?: string[];
+  modifiedFiles?: string[];
+  newFiles?: string[];
 }
 
 export interface FeatureGroup {
