@@ -29,8 +29,23 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
   if (!achievement) return null;
 
+  // Map tier to rarity for backwards compatibility
+  const getRarity = () => {
+    if (achievement.rarity) return achievement.rarity;
+    // Map tier to rarity
+    switch (achievement.tier) {
+      case 'bronze': return 'common';
+      case 'silver': return 'rare';
+      case 'gold': return 'epic';
+      case 'platinum': return 'legendary';
+      default: return 'common';
+    }
+  };
+
+  const rarity = getRarity();
+
   const getRarityColor = () => {
-    switch (achievement.rarity) {
+    switch (rarity) {
       case 'common': return 'from-gray-600 to-gray-700';
       case 'rare': return 'from-blue-600 to-blue-700';
       case 'epic': return 'from-purple-600 to-purple-700';
@@ -40,13 +55,16 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
   };
 
   const getRarityGlow = () => {
-    switch (achievement.rarity) {
+    switch (rarity) {
       case 'legendary': return 'shadow-[0_0_30px_rgba(251,191,36,0.5)]';
       case 'epic': return 'shadow-[0_0_25px_rgba(147,51,234,0.4)]';
       case 'rare': return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
       default: return 'shadow-2xl';
     }
   };
+
+  // Get name with fallback to achievement_name
+  const name = achievement.name || achievement.achievement_name;
 
   return (
     <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-500 ${
@@ -62,10 +80,10 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
           {/* Content */}
           <div className="text-white">
             <div className="text-xs uppercase tracking-wider mb-1 opacity-90">
-              Achievement Unlocked!
+              {achievement.is_secret ? '🔓 Secret Achievement Unlocked!' : 'Achievement Unlocked!'}
             </div>
             <div className="font-bold text-xl mb-1">
-              {achievement.name}
+              {name}
             </div>
             <div className="text-sm opacity-90">
               {achievement.description}
