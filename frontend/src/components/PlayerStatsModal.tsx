@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
+import { StatsGridSkeleton, CardSkeleton, TableSkeleton } from './ui/Skeleton';
 import { GameHistoryEntry } from '../types/game';
 import Avatar from './Avatar'; // Sprint 3 Phase 2
 import { useAuth } from '../contexts/AuthContext'; // Sprint 3 Phase 2
@@ -279,9 +280,10 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
         {/* Content */}
         <div className="p-6 space-y-6">
           {loading && (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-amber-700"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading stats...</p>
+            <div className="space-y-6">
+              <CardSkeleton count={1} hasAvatar={false} />
+              <StatsGridSkeleton columns={2} rows={3} />
+              <TableSkeleton rows={5} columns={5} showHeader={true} />
             </div>
           )}
 

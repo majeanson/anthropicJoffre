@@ -27,6 +27,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { Socket } from 'socket.io-client';
+import { CardSkeleton } from './ui/Skeleton';
 import { useAuth } from '../contexts/AuthContext';
 import Avatar from './Avatar';
 import { PlayerNameButton } from './PlayerNameButton';
@@ -211,9 +212,7 @@ export function SocialHub({
           {activeTab === 'recent' && (
             <div className="p-6">
               {loading && (
-                <div className="text-center py-8 text-gray-400">
-                  Loading recent players...
-                </div>
+                <CardSkeleton count={5} hasAvatar={true} />
               )}
               {!loading && recentPlayers.length === 0 && (
                 <div className="text-center py-8 text-gray-400">

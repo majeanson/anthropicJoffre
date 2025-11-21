@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon, getRankMedal } from '../utils/tierBadge';
+import { TableSkeleton } from './ui/Skeleton';
 
 interface LeaderboardPlayer {
   player_name: string;
@@ -79,9 +80,8 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
         {/* Content */}
         <div className="p-6">
           {loading && (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-purple-700"></div>
-              <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading leaderboard...</p>
+            <div className="space-y-4">
+              <TableSkeleton rows={10} columns={7} showHeader={true} />
             </div>
           )}
 

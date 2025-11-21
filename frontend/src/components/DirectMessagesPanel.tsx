@@ -1,4 +1,5 @@
 /**
+import { ListSkeleton } from './ui/Skeleton';
  * DirectMessagesPanel Component
  * Sprint 16 Day 4
  *
@@ -275,8 +276,8 @@ export function DirectMessagesPanel({
           {/* Conversations List */}
           <div className="w-80 border-r border-gray-700 overflow-y-auto">
             {loading && (
-              <div className="text-center py-8 text-gray-400">
-                Loading conversations...
+              <div className="p-4">
+                <ListSkeleton count={8} hasAvatar={true} hasSecondaryText={true} />
               </div>
             )}
             {!loading && conversations.length === 0 && (
