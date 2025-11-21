@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -48,18 +49,30 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
     onClose();
   };
 
+  // Focus trap for keyboard navigation
+  const { containerRef } = useFocusTrap({
+    isActive: isOpen,
+    onEscape: handleClose,
+  });
+
   // Early return AFTER all hooks (Rules of Hooks)
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-blue-500/30 w-full max-w-md animate-scale-in">
+      <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="login-modal-title"
+        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-blue-500/30 w-full max-w-md animate-scale-in"
+      >
 
         {/* Header */}
         <div className="p-6 border-b border-gray-700 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <span className="text-3xl">🔐</span>
-            <h2 className="text-2xl font-bold text-white">Login</h2>
+            <h2 id="login-modal-title" className="text-2xl font-bold text-white">Login</h2>
           </div>
           <button
             onClick={handleClose}

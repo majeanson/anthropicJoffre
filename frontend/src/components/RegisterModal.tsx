@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import logger from '../utils/logger';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -135,18 +136,30 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     password.length >= 8 &&
     password === confirmPassword;
 
+  // Focus trap for keyboard navigation
+  const { containerRef } = useFocusTrap({
+    isActive: isOpen,
+    onEscape: handleClose,
+  });
+
   // Early return AFTER all hooks (Rules of Hooks)
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4">
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-purple-500/30 w-full max-w-md max-h-[90vh] overflow-y-auto animate-scale-in">
+      <div
+        ref={containerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="register-modal-title"
+        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-purple-500/30 w-full max-w-md max-h-[90vh] overflow-y-auto animate-scale-in"
+      >
 
         {/* Header */}
         <div className="p-6 border-b border-gray-700 flex justify-between items-center sticky top-0 bg-gray-900 z-10">
           <div className="flex items-center gap-3">
             <span className="text-3xl">📝</span>
-            <h2 className="text-2xl font-bold text-white">Create Account</h2>
+            <h2 id="register-modal-title" className="text-2xl font-bold text-white">Create Account</h2>
           </div>
           <button
             onClick={handleClose}

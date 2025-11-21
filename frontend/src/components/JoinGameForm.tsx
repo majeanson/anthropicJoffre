@@ -5,7 +5,7 @@
  * Handles game joining UI for both players and spectators
  */
 
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
@@ -57,6 +57,24 @@ export function JoinGameForm({
   selectedPlayerName,
   setSelectedPlayerName,
 }: JoinGameFormProps) {
+  // Escape key to go back
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        sounds.buttonClick();
+        if (autoJoinGameId) {
+          onBackToHomepage();
+        } else {
+          onBack();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onBack, onBackToHomepage, autoJoinGameId]);
+
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     if (joinType === 'player') {

@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/constants';
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
+import { sounds } from '../utils/sounds';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -94,6 +95,9 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   const [filterInProgress, setFilterInProgress] = useState(false);
   const [filterGameMode, setFilterGameMode] = useState<'all' | 'ranked' | 'casual'>('all');
   const [sortBy, setSortBy] = useState<'newest' | 'players' | 'score'>('newest');
+
+  // Keyboard navigation state
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   // Track if we've done the initial load for each tab
   const hasLoadedActiveGames = useRef(false);
@@ -299,6 +303,100 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
     return filtered;
   }, [games, filterWithBots, filterNeedsPlayers, filterInProgress, filterGameMode, sortBy]);
+
+  // Get current list for keyboard navigation
+  const currentList = activeTab === 'active' ? filteredAndSortedGames : recentGames;
+  const currentListLength = currentList.length;
+
+  // Reset selection when tab or list changes
+  useEffect(() => {
+    setSelectedIndex(0);
+  }, [activeTab, currentListLength]);
+
+  // Keyboard navigation handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't handle if in input/select
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+        return;
+      }
+
+      switch (e.key) {
+        case 'Escape':
+          e.preventDefault();
+          onClose();
+          break;
+
+        case 'ArrowUp':
+          e.preventDefault();
+          if (currentListLength > 0) {
+            setSelectedIndex(prev => (prev - 1 + currentListLength) % currentListLength);
+            sounds.buttonClick();
+          }
+          break;
+
+        case 'ArrowDown':
+          e.preventDefault();
+          if (currentListLength > 0) {
+            setSelectedIndex(prev => (prev + 1) % currentListLength);
+            sounds.buttonClick();
+          }
+          break;
+
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (activeTab === 'recent') {
+            setActiveTab('active');
+            sounds.buttonClick();
+          }
+          break;
+
+        case 'ArrowRight':
+          e.preventDefault();
+          if (activeTab === 'active') {
+            setActiveTab('recent');
+            sounds.buttonClick();
+          }
+          break;
+
+        case 'Enter':
+        case ' ':
+          e.preventDefault();
+          if (currentListLength > 0 && selectedIndex < currentListLength) {
+            if (activeTab === 'active') {
+              const game = filteredAndSortedGames[selectedIndex];
+              if (game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) {
+                handleJoinGameClick(game);
+              } else if (game.isInProgress) {
+                onSpectateGame(game.gameId);
+                onClose();
+              }
+            } else {
+              // Recent games - open replay
+              const game = recentGames[selectedIndex];
+              setReplayGameId(game.game_id);
+            }
+          }
+          break;
+
+        case 'Home':
+          e.preventDefault();
+          setSelectedIndex(0);
+          break;
+
+        case 'End':
+          e.preventDefault();
+          if (currentListLength > 0) {
+            setSelectedIndex(currentListLength - 1);
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, currentListLength, selectedIndex, filteredAndSortedGames, recentGames, onClose, onSpectateGame, handleJoinGameClick]);
 
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {
@@ -580,10 +678,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   </p>
                 </div>
               ) : (
-                filteredAndSortedGames.map(game => (
+                filteredAndSortedGames.map((game, index) => (
                   <div
                     key={game.gameId}
-                    className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow-md"
+                    className={`bg-white dark:bg-gray-700 rounded-xl p-4 border-2 transition-all shadow-sm hover:shadow-md ${
+                      selectedIndex === index
+                        ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/20'
+                        : 'border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500'
+                    }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -665,7 +767,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   </p>
                 </div>
               ) : (
-                recentGames.map(game => {
+                recentGames.map((game, index) => {
                   const durationMinutes = Math.floor(game.game_duration_seconds / 60);
                   const finishedDate = new Date(game.finished_at);
                   const timeAgo = getTimeAgo(finishedDate);
@@ -673,7 +775,11 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   return (
                     <div
                       key={game.game_id}
-                      className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500 transition-all shadow-sm hover:shadow-md"
+                      className={`bg-white dark:bg-gray-700 rounded-xl p-4 border-2 transition-all shadow-sm hover:shadow-md ${
+                        selectedIndex === index
+                          ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/20'
+                          : 'border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500'
+                      }`}
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">

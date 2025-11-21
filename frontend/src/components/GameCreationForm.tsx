@@ -5,7 +5,7 @@
  * Handles game creation UI with player name input and persistence mode selection
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 
@@ -25,6 +25,20 @@ export function GameCreationForm({
   user,
 }: GameCreationFormProps) {
   const [createGamePersistence, setCreateGamePersistence] = useState<'elo' | 'casual'>('elo');
+
+  // Escape key to go back
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        sounds.buttonClick();
+        onBack();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onBack]);
 
   const handleCreate = (e: React.FormEvent) => {
     e.preventDefault();
