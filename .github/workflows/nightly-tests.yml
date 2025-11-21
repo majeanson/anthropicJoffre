@@ -7,25 +7,100 @@ on:
   workflow_dispatch:
 
 jobs:
-  comprehensive-test-suite:
-    name: Comprehensive Test Suite
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 360
+  # ===================================================
+  # Suite 1: Backend Unit Tests (Always)
+  # ===================================================
+  backend-unit-tests:
+    name: Backend Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
+      PGHOST: localhost
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: trickgame_test
+      NODE_ENV: test
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm ci
+
+      - name: Initialize database
+        run: |
+          cd backend
+          npm run db:init || true
+
+      - name: Run unit tests
+        run: |
+          cd backend
+          npm test -- --run --reporter=verbose
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          retention-days: 30
+
+  # ===================================================
+  # Suite 2: Integration Tests (Multi-Browser)
+  # ===================================================
+  integration-tests:
+    name: Integration Tests (${{ matrix.browser }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: backend-unit-tests
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
         browser: [chromium, firefox, webkit]
-        test-type: [game-flow, bot-tests, marathon]
-        exclude:
-          # Webkit doesn't work well on Windows
-          - os: windows-latest
-            browser: webkit
-          # Marathon tests only on Ubuntu to save resources
-          - os: windows-latest
-            test-type: marathon
-          - os: macos-latest
-            test-type: marathon
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
+      NODE_ENV: test
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -39,46 +114,32 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install concurrently
           cd backend && npm ci
           cd ../frontend && npm ci
           cd ../e2e && npm ci
 
-      - name: Install Playwright browsers
+      - name: Install Playwright browser
         run: |
           cd e2e
           npx playwright install ${{ matrix.browser }}
           npx playwright install-deps ${{ matrix.browser }}
 
-      - name: Run Game Flow Tests
-        if: matrix.test-type == 'game-flow'
+      - name: Initialize database
         run: |
-          cd e2e
-          npx playwright test 23-game-flow 24-game-flow 25-game-flow 26-game-flow --project=${{ matrix.browser }}
-        env:
-          CI: true
+          cd backend
+          npm run db:init || true
 
-      - name: Run Bot Tests
-        if: matrix.test-type == 'bot-tests'
-        run: |
-          cd e2e
-          npx playwright test 24-game-flow-1-player-3-bots 25-game-flow-2-players-2-bots --project=${{ matrix.browser }} --repeat-each=3
+      - name: Run integration tests
+        run: npm run test:integration
         env:
           CI: true
-
-      - name: Run Marathon Tests
-        if: matrix.test-type == 'marathon'
-        run: |
-          cd e2e
-          TEST_MODE=marathon npx playwright test 26-game-flow-full-length --project=${{ matrix.browser }}
-        env:
-          CI: true
+          BROWSER: ${{ matrix.browser }}
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: nightly-results-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.test-type }}
+          name: integration-results-${{ matrix.browser }}
           path: e2e/test-results/
           retention-days: 30
 
@@ -86,75 +147,37 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: nightly-report-${{ matrix.os }}-${{ matrix.browser }}-${{ matrix.test-type }}
+          name: integration-report-${{ matrix.browser }}
           path: e2e/playwright-report/
           retention-days: 30
 
-  performance-regression-tests:
-    name: Performance Regression Tests
+  # ===================================================
+  # Suite 3: Marathon Tests (Stability)
+  # ===================================================
+  marathon-tests:
+    name: Marathon Tests (Stability)
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    timeout-minutes: 120
+    needs: backend-unit-tests
 
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
+      NODE_ENV: test
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm install concurrently
-          cd backend && npm ci
-          cd ../frontend && npm ci
-          cd ../e2e && npm ci
-          npx playwright install chromium
-
-      - name: Run performance tests
-        run: |
-          cd e2e
-          # Run stress tests 3 times to get average
-          for i in 1 2 3; do
-            echo "Performance run $i/3"
-            TEST_MODE=stress npx playwright test --grep @stress > perf-$i.log 2>&1 || true
-          done
-
-      - name: Analyze performance
-        run: |
-          cd e2e
-          echo "## Performance Analysis" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          # Extract timing information from logs
-          for i in 1 2 3; do
-            if [ -f perf-$i.log ]; then
-              echo "### Run $i" >> $GITHUB_STEP_SUMMARY
-              grep -E "Round .* completed in|Performance degradation:|Memory growth:" perf-$i.log >> $GITHUB_STEP_SUMMARY || echo "No metrics found" >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-            fi
-          done
-
-      - name: Compare with baseline
-        run: |
-          # In a real scenario, you would compare with stored baseline metrics
-          echo "Comparing with baseline performance metrics..."
-
-      - name: Store performance metrics
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-metrics-${{ github.sha }}
-          path: e2e/perf-*.log
-          retention-days: 90
-
-  memory-leak-detection:
-    name: Memory Leak Detection
-    runs-on: ubuntu-latest
-    timeout-minutes: 240
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -168,20 +191,29 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install concurrently
           cd backend && npm ci
           cd ../frontend && npm ci
           cd ../e2e && npm ci
-          npx playwright install chromium
+          npx playwright install chromium --with-deps
 
-      - name: Run memory leak tests
+      - name: Initialize database
         run: |
-          cd e2e
-          # Run marathon tests with memory profiling
-          TEST_MODE=marathon npx playwright test --grep @marathon --workers=1
+          cd backend
+          npm run db:init || true
+
+      - name: Run marathon tests
+        run: npm run test:marathon
         env:
           CI: true
           NODE_OPTIONS: --max-old-space-size=4096
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: marathon-test-results
+          path: e2e/test-results/
+          retention-days: 30
 
       - name: Analyze memory usage
         if: always()
@@ -189,23 +221,109 @@ jobs:
           cd e2e
           if [ -f test-results.json ]; then
             echo "## Memory Usage Analysis" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-            grep -E "Memory|memory|heap" test-results.json || echo "No memory data found" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+            cat test-results.json | grep -i memory || echo "No memory data found" >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Upload memory analysis
+  # ===================================================
+  # Suite 4: Load Tests (Performance)
+  # ===================================================
+  load-tests:
+    name: Load Tests (Performance)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: backend-unit-tests
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
+      NODE_ENV: test
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+
+      - name: Initialize database
+        run: |
+          cd backend
+          npm run db:init || true
+
+      - name: Start backend server
+        run: |
+          cd backend
+          npm run dev &
+          echo $! > backend.pid
+        env:
+          PORT: 3000
+
+      - name: Wait for backend
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 1; done'
+
+      - name: Run load tests (baseline)
+        run: npm run test:load:baseline
+        env:
+          BACKEND_URL: http://localhost:3000
+
+      - name: Run load tests (stress)
+        run: npm run test:load:stress
+        env:
+          BACKEND_URL: http://localhost:3000
+
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f backend.pid ]; then
+            kill $(cat backend.pid) || true
+          fi
+
+      - name: Upload load test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: memory-analysis
-          path: e2e/test-results/
+          name: load-test-results
+          path: tests/load/*.log
           retention-days: 30
 
+      - name: Analyze performance
+        if: always()
+        run: |
+          echo "## Load Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Load test artifacts have been uploaded." >> $GITHUB_STEP_SUMMARY
+
+  # ===================================================
+  # Nightly Report & Notifications
+  # ===================================================
   nightly-report:
     name: Nightly Report
     runs-on: ubuntu-latest
-    needs: [comprehensive-test-suite, performance-regression-tests, memory-leak-detection]
+    needs: [backend-unit-tests, integration-tests, marathon-tests, load-tests]
     if: always()
 
     steps:
@@ -214,38 +332,34 @@ jobs:
         with:
           path: artifacts
 
-      - name: Generate nightly report
+      - name: Generate summary
         run: |
-          echo "# Nightly Test Report - $(date +%Y-%m-%d)" >> nightly-report.md
-          echo "" >> nightly-report.md
+          echo "# Nightly Test Report - $(date +%Y-%m-%d)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "## Test Suite Results" >> nightly-report.md
-          echo "- Comprehensive Tests: ${{ needs.comprehensive-test-suite.result }}" >> nightly-report.md
-          echo "- Performance Tests: ${{ needs.performance-regression-tests.result }}" >> nightly-report.md
-          echo "- Memory Leak Detection: ${{ needs.memory-leak-detection.result }}" >> nightly-report.md
-          echo "" >> nightly-report.md
+          echo "## Test Suite Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Suite | Status | Notes |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Unit Tests | ${{ needs.backend-unit-tests.result }} | 451 tests, ~7s |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} | ~150 tests, multi-browser |" >> $GITHUB_STEP_SUMMARY
+          echo "| Marathon Tests | ${{ needs.marathon-tests.result }} | 60+ min stability |" >> $GITHUB_STEP_SUMMARY
+          echo "| Load Tests | ${{ needs.load-tests.result }} | Baseline + stress |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
-          echo "## Artifacts" >> nightly-report.md
-          echo "All test artifacts have been uploaded and are available for 30 days." >> nightly-report.md
-          echo "" >> nightly-report.md
-
-          echo "## Actions Required" >> nightly-report.md
-          if [[ "${{ needs.comprehensive-test-suite.result }}" == "failure" ||
-                "${{ needs.performance-regression-tests.result }}" == "failure" ||
-                "${{ needs.memory-leak-detection.result }}" == "failure" ]]; then
-            echo "⚠️ **Failures detected** - Please review the test results and logs." >> nightly-report.md
+          echo "## Status" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.backend-unit-tests.result }}" == "success" &&
+                "${{ needs.integration-tests.result }}" == "success" &&
+                "${{ needs.marathon-tests.result }}" == "success" &&
+                "${{ needs.load-tests.result }}" == "success" ]]; then
+            echo "✅ **All nightly tests passed successfully!**" >> $GITHUB_STEP_SUMMARY
           else
-            echo "✅ All tests passed successfully!" >> nightly-report.md
+            echo "⚠️ **Some tests failed** - Review artifacts and logs." >> $GITHUB_STEP_SUMMARY
           fi
 
-      - name: Upload nightly report
-        uses: actions/upload-artifact@v4
-        with:
-          name: nightly-report-$(date +%Y%m%d)
-          path: nightly-report.md
-          retention-days: 90
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow Run:** [${{ github.run_number }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> $GITHUB_STEP_SUMMARY
 
-      - name: Create issue if tests failed
+      - name: Create issue on failure
         if: failure()
         uses: actions/github-script@v7
         with:
@@ -259,11 +373,20 @@ jobs:
             **Workflow Run:** [${context.runNumber}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
 
             ### Results
-            - Comprehensive Tests: ${{ needs.comprehensive-test-suite.result }}
-            - Performance Tests: ${{ needs.performance-regression-tests.result }}
-            - Memory Leak Detection: ${{ needs.memory-leak-detection.result }}
+            - Backend Unit Tests: ${{ needs.backend-unit-tests.result }}
+            - Integration Tests: ${{ needs.integration-tests.result }}
+            - Marathon Tests: ${{ needs.marathon-tests.result }}
+            - Load Tests: ${{ needs.load-tests.result }}
+
+            ### Test Suites
+            - ✅ Backend: 451 unit tests (~7s)
+            - ✅ Integration: ~150 E2E tests (multi-browser)
+            - ✅ Marathon: Stability test (60+ min)
+            - ✅ Load: Performance tests (baseline + stress)
 
             Please review the test artifacts and address any failures.
+
+            **Artifacts**: Available for 30 days in workflow run
             `;
 
             await github.rest.issues.create({

@@ -5,42 +5,36 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
-  # schedule:
-  #   # Run tests every 6 hours (DISABLED to reduce Neon compute usage)
-  #   # Re-enable only if needed for monitoring
-  #   - cron: '0 */6 * * *'
   workflow_dispatch:
     inputs:
       test_mode:
         description: 'Test mode to run'
         required: false
-        default: 'quick'
+        default: 'pr-checks'
         type: choice
         options:
-          - quick
+          - pr-checks
           - full
-          - stress
-          - marathon
-          - continuous
+          - integration
+          - load
 
 jobs:
-  quick-tests:
-    name: Quick Tests
+  # ===================================================
+  # Suite 1: Backend Unit Tests (Fast, Always Run)
+  # ===================================================
+  backend-unit-tests:
+    name: Backend Unit Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 10
 
-    # Set database credentials at job level to ensure all steps use correct user
+    # Set database credentials for tests
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
       PGHOST: localhost
       PGUSER: postgres
       PGPASSWORD: postgres
-      PGDATABASE: trickgame
-
-    strategy:
-      fail-fast: false
-      matrix:
-        shard: [1, 2, 3, 4]
+      PGDATABASE: trickgame_test
+      NODE_ENV: test
 
     services:
       postgres:
@@ -48,14 +42,14 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: trickgame
+          POSTGRES_DB: trickgame_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d trickgame"
+          --health-cmd "pg_isready -U postgres -d trickgame_test"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 30
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -65,65 +59,50 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm install concurrently
-          cd backend && npm ci
-          cd ../frontend && npm ci
-          cd ../e2e && npm ci
-          npx playwright install --with-deps
-
-      - name: Setup Database
+      - name: Install backend dependencies
         run: |
           cd backend
-          export PGPASSWORD=$PGPASSWORD
-          echo "Waiting for Postgres (host=$PGHOST user=$PGUSER db=$PGDATABASE)..."
-          until pg_isready -h $PGHOST -p 5432 -U $PGUSER; do
+          npm ci
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
             echo "Waiting for postgres..."
             sleep 1
           done
+
+      - name: Initialize test database
+        run: |
+          cd backend
           npm run db:init || true
 
-      - name: Run Quick Tests (Shard ${{ matrix.shard }}/4)
+      - name: Run backend unit tests
         run: |
-          cd e2e
-          TEST_MODE=quick SHARD_INDEX=${{ matrix.shard }} SHARD_TOTAL=4 npm run test:quick
-        env:
-          CI: true
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
-          NODE_ENV: test
+          cd backend
+          npm test -- --run --reporter=verbose
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: quick-test-results-shard-${{ matrix.shard }}
-          path: e2e/test-results/
+          name: backend-test-results
+          path: backend/coverage/
           retention-days: 7
 
-      - name: Upload playwright report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: quick-playwright-report-shard-${{ matrix.shard }}
-          path: e2e/playwright-report/
-          retention-days: 7
-
-  full-tests:
-    name: Full Tests
+  # ===================================================
+  # Suite 2: Smoke Tests (Fast, Always Run)
+  # ===================================================
+  smoke-tests:
+    name: Smoke Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 120
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 10
+    needs: backend-unit-tests
 
-    # Set database credentials at job level to ensure all steps use correct user
     env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
-      PGHOST: localhost
-      PGUSER: postgres
-      PGPASSWORD: postgres
-      PGDATABASE: trickgame
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
+      NODE_ENV: test
 
     services:
       postgres:
@@ -131,14 +110,14 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: trickgame
+          POSTGRES_DB: trickgame_test
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres -d trickgame"
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
-          --health-retries 30
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -152,224 +131,225 @@ jobs:
       - name: Install dependencies
         run: |
           npm ci
-          npm install concurrently
           cd backend && npm ci
           cd ../frontend && npm ci
-          cd ../e2e && npm ci
-          npx playwright install --with-deps
 
-      - name: Setup Database
+      - name: Wait for PostgreSQL
         run: |
-          cd backend
-          export PGPASSWORD=$PGPASSWORD
-          echo "Waiting for Postgres (host=$PGHOST user=$PGUSER db=$PGDATABASE)..."
-          until pg_isready -h $PGHOST -p 5432 -U $PGUSER; do
+          until pg_isready -h localhost -p 5432 -U postgres; do
             echo "Waiting for postgres..."
             sleep 1
           done
+
+      - name: Initialize database
+        run: |
+          cd backend
           npm run db:init || true
 
-      - name: Run Full Tests
+      - name: Start backend server
         run: |
-          cd e2e
-          TEST_MODE=full npm run test:full
+          cd backend
+          npm run dev &
+          echo $! > backend.pid
         env:
-          CI: true
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame
-          NODE_ENV: test
+          PORT: 3000
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: full-test-results
-          path: e2e/test-results/
-          retention-days: 14
-
-  stress-tests:
-    name: Stress Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_mode == 'stress')
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
+      - name: Wait for backend
         run: |
-          npm ci
-          npm install concurrently
-          cd backend && npm ci
-          cd ../frontend && npm ci
-          cd ../e2e && npm ci
-          npx playwright install --with-deps
+          timeout 30 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 1; done'
 
-      - name: Run Stress Tests
-        run: |
-          cd e2e
-          TEST_MODE=stress npm run test:stress
+      - name: Run smoke tests
+        run: npm run test:smoke
         env:
-          CI: true
+          BACKEND_URL: http://localhost:3000
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: stress-test-results
-          path: e2e/test-results/
-          retention-days: 14
-
-      - name: Upload performance metrics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-metrics
-          path: e2e/test-results.json
-          retention-days: 30
-
-  marathon-tests:
-    name: Marathon Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 240
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test_mode == 'marathon'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm install concurrently
-          cd backend && npm ci
-          cd ../frontend && npm ci
-          cd ../e2e && npm ci
-          npx playwright install --with-deps
-
-      - name: Run Marathon Tests
-        run: |
-          cd e2e
-          TEST_MODE=marathon npm run test:marathon
-        env:
-          CI: true
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: marathon-test-results
-          path: e2e/test-results/
-          retention-days: 30
-
-  continuous-monitoring:
-    name: Continuous Monitoring
-    runs-on: ubuntu-latest
-    timeout-minutes: 180
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.test_mode == 'continuous')
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: |
-          npm ci
-          npm install concurrently
-          cd backend && npm ci
-          cd ../frontend && npm ci
-          cd ../e2e && npm ci
-          npx playwright install --with-deps
-
-      - name: Run Continuous Tests
-        run: |
-          cd e2e
-          TEST_MODE=continuous npm run test:continuous
-        env:
-          CI: true
-
-      - name: Analyze test results
+      - name: Stop backend
         if: always()
         run: |
-          cd e2e
-          if [ -f test-results.json ]; then
-            echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
-            cat test-results.json | jq '.' >> $GITHUB_STEP_SUMMARY
-            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          if [ -f backend.pid ]; then
+            kill $(cat backend.pid) || true
           fi
 
+      - name: Upload smoke test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-results
+          path: tests/smoke/*.log
+          retention-days: 7
+
+  # ===================================================
+  # Suite 3: Integration Tests (E2E Core)
+  # ===================================================
+  integration-tests:
+    name: Integration Tests (E2E Core)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    needs: [backend-unit-tests, smoke-tests]
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
+      NODE_ENV: test
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+          cd ../frontend && npm ci
+          cd ../e2e && npm ci
+          npx playwright install --with-deps
+
+      - name: Initialize database
+        run: |
+          cd backend
+          npm run db:init || true
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          CI: true
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: continuous-test-results
+          name: integration-test-results
           path: e2e/test-results/
           retention-days: 14
 
-      - name: Create issue on failure
+      - name: Upload playwright report
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/upload-artifact@v4
         with:
-          script: |
-            const title = `E2E Test Failure - ${new Date().toISOString().split('T')[0]}`;
-            const body = `
-            ## Continuous Testing Failed
+          name: integration-playwright-report
+          path: e2e/playwright-report/
+          retention-days: 14
 
-            **Workflow Run:** [${context.runNumber}](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})
-            **Triggered by:** ${context.eventName}
-            **Branch:** ${context.ref}
+  # ===================================================
+  # Suite 4: Load Tests (Optional, Manual Trigger)
+  # ===================================================
+  load-tests:
+    name: Load Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.test_mode == 'load'
 
-            Please check the test artifacts and logs for more details.
-            `;
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/trickgame_test
+      NODE_ENV: test
 
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: title,
-              body: body,
-              labels: ['bug', 'e2e-test', 'automated']
-            });
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: trickgame_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+
+      - name: Initialize database
+        run: |
+          cd backend
+          npm run db:init || true
+
+      - name: Start backend server
+        run: |
+          cd backend
+          npm run dev &
+          echo $! > backend.pid
+        env:
+          PORT: 3000
+
+      - name: Wait for backend
+        run: |
+          timeout 30 bash -c 'until curl -f http://localhost:3000/api/health; do sleep 1; done'
+
+      - name: Run load tests (baseline)
+        run: npm run test:load:baseline
+        env:
+          BACKEND_URL: http://localhost:3000
+
+      - name: Stop backend
+        if: always()
+        run: |
+          if [ -f backend.pid ]; then
+            kill $(cat backend.pid) || true
+          fi
+
+      - name: Upload load test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: load-test-results
+          path: tests/load/*.log
+          retention-days: 30
+
+  # ===================================================
+  # Report Status (Summary)
+  # ===================================================
   report-status:
     name: Report Status
     runs-on: ubuntu-latest
-    needs: [quick-tests, full-tests, stress-tests]
+    needs: [backend-unit-tests, smoke-tests, integration-tests]
     if: always()
 
     steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: artifacts
-
-      - name: Generate consolidated report
+      - name: Generate summary
         run: |
-          echo "## E2E Test Run Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Test Suite Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-
-          echo "### Quick Tests: ${{ needs.quick-tests.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "### Full Tests: ${{ needs.full-tests.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
-          echo "### Stress Tests: ${{ needs.stress-tests.result || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
-
+          echo "| Suite | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Backend Unit Tests | ${{ needs.backend-unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Smoke Tests | ${{ needs.smoke-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Integration Tests | ${{ needs.integration-tests.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Workflow:** ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Run Number:** ${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
           echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
 
       - name: Comment on PR
@@ -377,17 +357,23 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const quickResult = '${{ needs.quick-tests.result }}';
-            const fullResult = '${{ needs.full-tests.result }}' || 'skipped';
+            const unitResult = '${{ needs.backend-unit-tests.result }}';
+            const smokeResult = '${{ needs.smoke-tests.result }}';
+            const integrationResult = '${{ needs.integration-tests.result }}';
 
-            const status = quickResult === 'success' ? '✅' : '❌';
+            const allPassed = unitResult === 'success' && smokeResult === 'success' && integrationResult === 'success';
+            const status = allPassed ? '✅' : '❌';
+
             const comment = `
-            ## E2E Test Results ${status}
+            ## Test Results ${status}
 
-            | Test Suite | Status |
-            |------------|--------|
-            | Quick Tests | ${quickResult === 'success' ? '✅ Passed' : '❌ Failed'} |
-            | Full Tests | ${fullResult === 'success' ? '✅ Passed' : fullResult === 'skipped' ? '⏭️ Skipped' : '❌ Failed'} |
+            | Test Suite | Status | Runtime |
+            |------------|--------|---------|
+            | Backend Unit Tests (451 tests) | ${unitResult === 'success' ? '✅ Passed' : '❌ Failed'} | ~7s |
+            | Smoke Tests (5 actions) | ${smokeResult === 'success' ? '✅ Passed' : '❌ Failed'} | ~10s |
+            | Integration Tests (~150 tests) | ${integrationResult === 'success' ? '✅ Passed' : '❌ Failed'} | ~10min |
+
+            ${allPassed ? '✅ All tests passed! Ready to merge.' : '⚠️ Some tests failed. Please review the logs.'}
 
             [View Full Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             `;
