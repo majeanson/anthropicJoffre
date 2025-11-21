@@ -210,34 +210,54 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
         sounds.buttonClick();
       }
 
-      // Down: Move to next row
+      // Down: Move to next row OR next item in single-column content
       else if (e.key === 'ArrowDown') {
         e.preventDefault();
 
-        const maxRow = getMaxRow();
-        if (navRow < maxRow - 1) {
-          const nextRow = navRow + 1;
-          setNavRow(nextRow);
+        const effectiveRow = user ? navRow + 1 : navRow;
+        const contentRow = hasSubTabs() ? 3 : 2;
 
-          // Clamp column to new row's item count
-          setTimeout(() => {
-            const newItems = getItemsForRow(nextRow);
-            const newCol = Math.min(navCol, newItems.length - 1);
-            setNavCol(Math.max(0, newCol));
-            if (newItems.length > 0) {
-              newItems[Math.max(0, newCol)]?.focus();
-            }
-          }, 50);
+        // If we're in content row with single column layout, navigate within items
+        if (effectiveRow >= contentRow && items.length > 1) {
+          const newCol = (navCol + 1) % items.length;
+          setNavCol(newCol);
+          items[newCol]?.focus();
+        } else {
+          // Move to next row
+          const maxRow = getMaxRow();
+          if (navRow < maxRow - 1) {
+            const nextRow = navRow + 1;
+            setNavRow(nextRow);
+
+            // Clamp column to new row's item count
+            setTimeout(() => {
+              const newItems = getItemsForRow(nextRow);
+              const newCol = Math.min(navCol, newItems.length - 1);
+              setNavCol(Math.max(0, newCol));
+              if (newItems.length > 0) {
+                newItems[Math.max(0, newCol)]?.focus();
+              }
+            }, 50);
+          }
         }
 
         sounds.buttonClick();
       }
 
-      // Up: Move to previous row
+      // Up: Move to previous row OR previous item in single-column content
       else if (e.key === 'ArrowUp') {
         e.preventDefault();
 
-        if (navRow > 0) {
+        const effectiveRow = user ? navRow + 1 : navRow;
+        const contentRow = hasSubTabs() ? 3 : 2;
+
+        // If we're in content row and not at first item, navigate within items
+        if (effectiveRow >= contentRow && navCol > 0) {
+          const newCol = navCol - 1;
+          setNavCol(newCol);
+          items[newCol]?.focus();
+        } else if (navRow > 0) {
+          // Move to previous row
           const prevRow = navRow - 1;
           setNavRow(prevRow);
 
