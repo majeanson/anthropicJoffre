@@ -163,6 +163,7 @@ export function SocialPanel({
       <div className="grid grid-cols-5 gap-1.5">
         <button
           data-keyboard-nav="social-messages"
+          data-nav-subtab="messages"
           onClick={() => {
             sounds.buttonClick();
             if (!user) {
@@ -186,6 +187,7 @@ export function SocialPanel({
         </button>
         <button
           data-keyboard-nav="social-friends"
+          data-nav-subtab="friends"
           onClick={() => {
             sounds.buttonClick();
             if (!user) {
@@ -204,6 +206,7 @@ export function SocialPanel({
         </button>
         <button
           data-keyboard-nav="social-online"
+          data-nav-subtab="online"
           onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
           className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 ${
             socialTab === 'online'
@@ -215,6 +218,7 @@ export function SocialPanel({
         </button>
         <button
           data-keyboard-nav="social-profile"
+          data-nav-subtab="profile"
           onClick={() => {
             sounds.buttonClick();
             if (!user) {
@@ -233,6 +237,7 @@ export function SocialPanel({
         </button>
         <button
           data-keyboard-nav="social-chat"
+          data-nav-subtab="chat"
           onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
           className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 ${
             socialTab === 'chat'
