@@ -76,6 +76,22 @@ export async function getHeadersWithCsrf(additionalHeaders: HeadersInit = {}): P
   };
 }
 
+// Auth endpoints exempt from CSRF (rate-limited, mobile Safari blocks cross-origin cookies)
+const CSRF_EXEMPT_PATHS = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/request-password-reset',
+  '/api/auth/reset-password',
+  '/api/auth/verify-email',
+];
+
+/**
+ * Check if URL is exempt from CSRF protection
+ */
+function isCsrfExempt(url: string): boolean {
+  return CSRF_EXEMPT_PATHS.some(path => url.includes(path));
+}
+
 /**
  * Wrapper for fetch that automatically includes CSRF token
  * Use this for state-changing requests (POST/PUT/DELETE)
@@ -94,8 +110,16 @@ export async function fetchWithCsrf(
   // Only add CSRF for state-changing methods
   const needsCsrf = ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method);
 
-  if (!needsCsrf) {
-    return fetch(url, options);
+  // Skip CSRF for exempt endpoints (login, register, etc.)
+  if (!needsCsrf || isCsrfExempt(url)) {
+    return fetch(url, {
+      ...options,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
   }
 
   // Ensure credentials are included for cookie-based auth

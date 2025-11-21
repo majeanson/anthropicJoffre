@@ -992,8 +992,19 @@ import { getCsrfToken, csrfProtection, csrfErrorHandler } from './middleware/csr
 // CSRF token endpoint (GET request, no protection needed)
 app.get('/api/csrf-token', getCsrfToken);
 
-// Sprint 3 Phase 1: Authentication routes (with CSRF protection)
-app.use('/api/auth', csrfProtection, authRoutes);
+// Sprint 3 Phase 1: Authentication routes
+// Note: Public auth endpoints (login, register, forgot-password) are exempt from CSRF
+// because mobile Safari blocks cross-origin cookies (ITP), and these endpoints are
+// already protected by rate limiting. Authenticated endpoints still require CSRF.
+const authCsrfExemptPaths = ['/login', '/register', '/request-password-reset', '/reset-password', '/verify-email'];
+app.use('/api/auth', (req, res, next) => {
+  // Exempt public auth endpoints from CSRF (rate-limited already)
+  if (authCsrfExemptPaths.some(path => req.path === path)) {
+    return next();
+  }
+  // All other auth endpoints (logout, logout-all, refresh, me, profile) need CSRF
+  return csrfProtection(req, res, next);
+}, authRoutes);
 
 // Sprint 3 Phase 3.2: Profile routes (with CSRF protection)
 app.use('/api/profiles', csrfProtection, profileRoutes);
