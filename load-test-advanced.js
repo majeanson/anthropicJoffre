@@ -185,10 +185,10 @@ async function simulateGame(gameIndex) {
   console.log(`\n[Game ${gameIndex}] Starting simulation...`);
 
   const players = [
-    { name: `LT_P1_G${gameIndex}`, socket: null, gameId: null },
-    { name: `LT_P2_G${gameIndex}`, socket: null, gameId: null },
-    { name: `LT_P3_G${gameIndex}`, socket: null, gameId: null },
-    { name: `LT_P4_G${gameIndex}`, socket: null, gameId: null },
+    { name: `LT P1 G${gameIndex}`, socket: null, gameId: null },
+    { name: `LT P2 G${gameIndex}`, socket: null, gameId: null },
+    { name: `LT P3 G${gameIndex}`, socket: null, gameId: null },
+    { name: `LT P4 G${gameIndex}`, socket: null, gameId: null },
   ];
 
   return new Promise((resolve) => {
@@ -202,25 +202,32 @@ async function simulateGame(gameIndex) {
       }
     }, 60000); // 60 second timeout for entire game setup
 
+    // Store sessions for all players (for reconnection tests)
+    const playerSessions = {};
+
     // Player 1 creates the game
     const p1 = players[0];
     p1.socket = createSocket(p1.name, gameIndex);
 
-    p1.socket.on('game_created', ({ gameId, gameState }) => {
+    p1.socket.on('game_created', ({ gameId, gameState, session }) => {
       gameCreatedSuccessfully = true;
       p1.gameId = gameId;
       metrics.gamesCreated++;
       console.log(`[Game ${gameIndex}] Created: ${gameId}`);
 
-      // Player 1 joins Team 1
-      p1.socket.emit('select_team', { gameId, teamId: 1 });
+      // Store P1's session
+      if (session) {
+        playerSessions[p1.name] = session;
+      }
+
+      // Player 1 is already on Team 1 by default, no need to select team
 
       // Other players join (staggered by 500ms)
-      setTimeout(() => joinPlayers(gameIndex, players, gameId, resolve, gameTimeout), 500);
+      setTimeout(() => joinPlayers(gameIndex, players, gameId, resolve, gameTimeout, playerSessions), 500);
     });
 
     p1.socket.on('connect', () => {
-      p1.socket.emit('create_game', p1.name);
+      p1.socket.emit('create_game', { playerName: p1.name });
     });
 
     p1.socket.on('error', (error) => {
@@ -240,10 +247,58 @@ async function simulateGame(gameIndex) {
 
 /**
  * Join remaining players to the game
+ * Uses shared counter and flag to coordinate game start
  */
-function joinPlayers(gameIndex, players, gameId, resolve, gameTimeout) {
+function joinPlayers(gameIndex, players, gameId, resolve, gameTimeout, playerSessions) {
   let joinedCount = 1; // P1 already in
+  let gameStartInitiated = false; // Flag to prevent duplicate game start
   const joinTimeouts = [];
+
+  // Helper to start game (called by last joiner)
+  const startGameSequence = () => {
+    if (gameStartInitiated) return; // Already started
+    gameStartInitiated = true;
+
+    console.log(`[Game ${gameIndex}] All 4 players joined. Starting game sequence...`);
+
+    // Clear all join timeouts
+    joinTimeouts.forEach(t => clearTimeout(t));
+
+    // Assign teams
+    setTimeout(() => {
+      // Team 1: P1 (already on team 1), P3
+      // Team 2: P2, P4
+      players[1].socket.emit('select_team', { gameId, teamId: 2 }); // P2 → Team 2
+      players[2].socket.emit('select_team', { gameId, teamId: 1 }); // P3 → Team 1
+      players[3].socket.emit('select_team', { gameId, teamId: 2 }); // P4 → Team 2
+    }, 500);
+
+    // Start game after team selection
+    setTimeout(() => {
+      players[0].socket.emit('start_game', { gameId });
+
+      // Test reconnection for one random player per 5 games
+      if (RECONNECT_TEST_ENABLED && gameIndex % 5 === 1) {
+        const reconnectPlayerIndex = Math.floor(Math.random() * 4);
+        const reconnectPlayer = players[reconnectPlayerIndex];
+        const session = playerSessions[reconnectPlayer.name];
+        setTimeout(() => {
+          testReconnection(reconnectPlayer, gameId, gameIndex, session);
+        }, 5000);
+      }
+
+      // Take memory snapshot mid-test
+      takeMemorySnapshot();
+
+      // Cleanup after game duration
+      setTimeout(() => {
+        console.log(`[Game ${gameIndex}] Simulation complete.`);
+        clearTimeout(gameTimeout);
+        cleanup(players);
+        resolve();
+      }, GAME_DURATION_MS);
+    }, 1500); // 1.5s after team selection (which happens at 0.5s)
+  };
 
   // Players 2-4 join
   for (let i = 1; i < 4; i++) {
@@ -264,45 +319,21 @@ function joinPlayers(gameIndex, players, gameId, resolve, gameTimeout) {
 
     joinTimeouts.push(joinTimeout);
 
-    player.socket.on('player_joined', ({ gameState }) => {
+    // Each player tracks their OWN successful join with .once()
+    player.socket.once('player_joined', ({ gameState, session }) => {
       clearTimeout(joinTimeout);
       joinedCount++;
       metrics.gamesJoined++;
-      console.log(`[Game ${gameIndex}] ${player.name} joined (${joinedCount}/4)`);
+      console.log(`[Game ${gameIndex}] ${player.name} joined successfully (${joinedCount}/4)`);
 
-      // Assign to teams (Team 1: P1, P3; Team 2: P2, P4)
-      const teamId = i % 2 === 0 ? 1 : 2;
-      player.socket.emit('select_team', { gameId, teamId });
+      // Store real session for reconnection tests
+      if (session) {
+        playerSessions[player.name] = session;
+      }
 
-      // When all 4 players joined, start the game
+      // Last player to join triggers game start
       if (joinedCount === 4) {
-        console.log(`[Game ${gameIndex}] All players joined. Starting game...`);
-
-        // Clear all join timeouts
-        joinTimeouts.forEach(t => clearTimeout(t));
-
-        setTimeout(() => {
-          players[0].socket.emit('start_game', { gameId });
-
-          // Test reconnection for one random player per 5 games
-          if (RECONNECT_TEST_ENABLED && gameIndex % 5 === 1) {
-            const reconnectPlayerIndex = Math.floor(Math.random() * 4);
-            setTimeout(() => {
-              testReconnection(players[reconnectPlayerIndex], gameId, gameIndex);
-            }, 5000);
-          }
-
-          // Take memory snapshot mid-test
-          takeMemorySnapshot();
-
-          // Cleanup after game duration
-          setTimeout(() => {
-            console.log(`[Game ${gameIndex}] Simulation complete.`);
-            clearTimeout(gameTimeout);
-            cleanup(players);
-            resolve();
-          }, GAME_DURATION_MS);
-        }, 2000);
+        startGameSequence();
       }
     });
 
@@ -323,24 +354,29 @@ function joinPlayers(gameIndex, players, gameId, resolve, gameTimeout) {
 }
 
 /**
- * Test reconnection scenario
+ * Test reconnection scenario with real session
  */
-function testReconnection(player, gameId, gameIndex) {
+function testReconnection(player, gameId, gameIndex, session) {
   console.log(`[Reconnection] [G${gameIndex}] Disconnecting ${player.name}...`);
   metrics.reconnectAttempts++;
 
-  // Store session for reconnection
-  const session = {
-    token: `mock_token_${Date.now()}`,
-    gameId,
-    playerId: player.name,
-    playerName: player.name
-  };
+  // Check if we have a real session
+  if (!session || !session.token) {
+    console.error(`✗ [Reconnection] [G${gameIndex}] ${player.name} no session available - skipping test`);
+    metrics.reconnectFailures++;
+    metrics.errors.reconnection.push({
+      player: player.name,
+      game: gameIndex,
+      error: 'No session available',
+      timestamp: Date.now(),
+    });
+    return;
+  }
 
   player.socket.disconnect();
 
   setTimeout(() => {
-    console.log(`[Reconnection] [G${gameIndex}] Reconnecting ${player.name}...`);
+    console.log(`[Reconnection] [G${gameIndex}] Reconnecting ${player.name} with real session...`);
     player.socket.connect();
 
     const reconnectTimeout = setTimeout(() => {
@@ -355,12 +391,13 @@ function testReconnection(player, gameId, gameIndex) {
     }, 10000);
 
     player.socket.once('connect', () => {
-      player.socket.emit('reconnect_to_game', { token: session.token });
+      // Use real session token from backend
+      player.socket.emit('reconnect_to_game', { gameId, session });
 
       player.socket.once('reconnection_successful', ({ gameState }) => {
         clearTimeout(reconnectTimeout);
         metrics.reconnectSuccesses++;
-        console.log(`✓ [Reconnection] [G${gameIndex}] ${player.name} successfully reconnected`);
+        console.log(`✓ [Reconnection] [G${gameIndex}] ${player.name} successfully reconnected with real session`);
       });
 
       player.socket.once('reconnection_failed', ({ message }) => {
