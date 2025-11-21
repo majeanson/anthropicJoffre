@@ -190,10 +190,13 @@ router.post('/login', authLimiter, async (req: Request, res: Response) => {
     }
 
     // Set refresh token in httpOnly cookie (secure, not accessible to JavaScript)
+    // Note: sameSite: 'none' required for cross-origin (Vercel frontend + Railway backend)
+    // Safari/mobile blocks 'strict' cookies on cross-origin requests entirely
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('refresh_token', refreshToken, {
       httpOnly: true, // Prevents XSS attacks
-      secure: process.env.NODE_ENV === 'production', // Only HTTPS in production
-      sameSite: 'strict', // CSRF protection
+      secure: isProduction, // Only HTTPS in production (required when sameSite: 'none')
+      sameSite: isProduction ? 'none' : 'lax', // Cross-origin in prod, lax in dev
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/api/auth/refresh' // Only sent to refresh endpoint
     });
@@ -288,10 +291,12 @@ router.post('/refresh', refreshLimiter, async (req: Request, res: Response) => {
     const tokens = generateTokens(user.user_id, user.username);
 
     // Set new refresh token in httpOnly cookie
+    // Note: sameSite: 'none' required for cross-origin (Vercel frontend + Railway backend)
+    const isProduction = process.env.NODE_ENV === 'production';
     res.cookie('refresh_token', newToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: isProduction, // Required when sameSite: 'none'
+      sameSite: isProduction ? 'none' : 'lax', // Cross-origin in prod, lax in dev
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       path: '/api/auth/refresh'
     });

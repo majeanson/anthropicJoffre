@@ -83,7 +83,8 @@ describe('POST /api/auth/refresh', () => {
       expect(cookies).toBeDefined();
       expect(cookies[0]).toContain('refresh_token=new-refresh-token');
       expect(cookies[0]).toContain('HttpOnly');
-      expect(cookies[0]).toContain('SameSite=Strict');
+      // In development, sameSite is 'lax'; in production it's 'none' for cross-origin
+      expect(cookies[0]).toContain('SameSite=Lax');
     });
 
     it('should set secure cookie in production', async () => {
