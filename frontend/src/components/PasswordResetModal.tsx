@@ -71,7 +71,7 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onKeyDown={(e) => e.stopPropagation()}>
       <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-yellow-500/30 w-full max-w-md animate-scale-in">
 
         {/* Header */}

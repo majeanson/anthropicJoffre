@@ -39,7 +39,7 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
   }[gameState.phase];
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn" onKeyDown={(e) => e.stopPropagation()}>
       <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 max-w-md w-full mx-4 border-4 border-amber-600 shadow-2xl animate-slideUp">
         {/* Header */}
         <div className="text-center mb-6">

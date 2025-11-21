@@ -64,10 +64,16 @@ export function UnifiedModal({
     }
   };
 
+  // Stop all keyboard events from propagating to underlying components
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    e.stopPropagation();
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn"
       data-testid="unified-modal-backdrop"
+      onKeyDown={handleKeyDown}
     >
       {/* Backdrop */}
       <div

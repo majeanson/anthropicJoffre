@@ -152,6 +152,7 @@ export function PlayerProfileModal({
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <div
         className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-orange-500/30 p-6 w-full max-w-md shadow-2xl"

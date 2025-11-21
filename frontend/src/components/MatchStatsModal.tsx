@@ -128,6 +128,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
     <div
       className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <div
         className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600"

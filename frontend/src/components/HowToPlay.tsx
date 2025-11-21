@@ -97,7 +97,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
   // If it's a modal, wrap in modal container
   if (isModal) {
     return (
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
         <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-umber-600 dark:border-gray-600" onClick={(e) => e.stopPropagation()}>
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-4xl font-bold text-umber-900 dark:text-gray-100 font-serif">Game Rules</h2>

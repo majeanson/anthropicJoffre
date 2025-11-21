@@ -108,6 +108,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
     <div
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
       role="dialog"
       aria-labelledby="debug-panel-title"
       aria-modal="true"

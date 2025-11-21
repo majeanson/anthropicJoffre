@@ -58,7 +58,7 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
   }, [isOpen, socket]);
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" onKeyDown={(e) => e.stopPropagation()}>
       <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-purple-700 to-blue-700 dark:from-purple-800 dark:to-blue-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-purple-950 dark:border-gray-900 z-10">

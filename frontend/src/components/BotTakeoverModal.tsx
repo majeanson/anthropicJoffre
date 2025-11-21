@@ -33,7 +33,7 @@ export function BotTakeoverModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onKeyDown={(e) => e.stopPropagation()}>
       <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 max-w-md w-full mx-4 border-4 border-blue-600 dark:border-blue-500 shadow-2xl">
         {/* Header */}
         <div className="mb-6">

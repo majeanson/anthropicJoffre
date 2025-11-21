@@ -58,6 +58,7 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
     <div
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
       role="dialog"
       aria-labelledby="test-panel-title"
       aria-modal="true"

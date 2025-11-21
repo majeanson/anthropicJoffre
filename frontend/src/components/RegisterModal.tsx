@@ -146,7 +146,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in p-4" onKeyDown={(e) => e.stopPropagation()}>
       <div
         ref={containerRef}
         role="dialog"

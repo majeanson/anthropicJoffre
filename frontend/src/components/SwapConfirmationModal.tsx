@@ -58,6 +58,7 @@ export function SwapConfirmationModal({
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
       onClick={onReject}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <div
         className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl"

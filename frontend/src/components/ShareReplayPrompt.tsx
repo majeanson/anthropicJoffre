@@ -74,6 +74,7 @@ export function ShareReplayPrompt({
     <div
       className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 animate-fade-in"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <div
         className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-emerald-500/50 p-8 max-w-md w-full shadow-2xl animate-scale-in"

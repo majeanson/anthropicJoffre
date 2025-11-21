@@ -36,6 +36,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
     <div
       className="fixed inset-0 bg-umber-900 bg-opacity-60 z-50 flex items-center justify-center p-4"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
       role="dialog"
       aria-labelledby="leaderboard-title"
       aria-modal="true"

@@ -252,6 +252,7 @@ export function DirectMessagesPanel({
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <div
         className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-blue-500/30 w-full max-w-5xl h-[600px] shadow-2xl flex flex-col"

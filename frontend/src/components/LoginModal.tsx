@@ -59,7 +59,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onKeyDown={(e) => e.stopPropagation()}>
       <div
         ref={containerRef}
         role="dialog"

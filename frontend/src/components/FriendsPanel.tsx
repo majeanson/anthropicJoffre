@@ -162,7 +162,7 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
   const pendingRequestsCount = pendingRequests.length;
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
       <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-purple-500/30 w-full max-w-2xl max-h-[80vh] flex flex-col animate-scale-in" onClick={(e) => e.stopPropagation()}>
 
         {/* Header */}

@@ -239,7 +239,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   // Early returns AFTER all hooks
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onKeyDown={(e) => e.stopPropagation()}>
         <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md">
           <div className="text-center">
             <div className="animate-spin text-4xl mb-4">🔄</div>
@@ -254,7 +254,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
   if (error || !replayData) {
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
         <div
           className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md w-full"
           onClick={(e) => e.stopPropagation()}
@@ -307,7 +307,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   // Validate replay data has rounds
   if (!replayData.round_history || replayData.round_history.length === 0) {
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
         <div
           className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md"
           onClick={(e) => e.stopPropagation()}
@@ -338,7 +338,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   const dealerName = 'Unknown'; // TODO: Add dealerName to RoundHistory type if needed
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
       <div
         className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto border-4 border-emerald-600 dark:border-emerald-500"
         onClick={(e) => e.stopPropagation()}

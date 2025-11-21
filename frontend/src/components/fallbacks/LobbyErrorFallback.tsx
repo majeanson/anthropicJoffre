@@ -11,7 +11,7 @@ interface LobbyErrorFallbackProps {
 
 export function LobbyErrorFallback({ onClose }: LobbyErrorFallbackProps) {
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onKeyDown={(e) => e.stopPropagation()}>
       <div className="bg-gray-800 rounded-lg shadow-2xl border-2 border-red-500 p-8 max-w-md text-center">
         <div className="text-6xl mb-4">🎲</div>
         <h2 className="text-2xl font-bold text-white mb-4">

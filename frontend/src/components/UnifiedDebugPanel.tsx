@@ -261,6 +261,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
     <div
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-2 sm:p-4"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
       role="dialog"
       aria-modal="true"
     >

@@ -39,6 +39,7 @@ export function KeyboardShortcutsModal({
     <div
       className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
       onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
     >
       <div
         className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-blue-500/30 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
