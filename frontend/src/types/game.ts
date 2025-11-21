@@ -244,6 +244,7 @@ export interface GameHistoryEntry {
   team1_score: number;
   team2_score: number;
   rounds: number;
+  player_names?: string[]; // For recent players feature
   is_finished: boolean;
   created_at: Date | string;
   finished_at: Date | string | null;

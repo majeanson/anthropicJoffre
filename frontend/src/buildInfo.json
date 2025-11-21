@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-21T17:28:01.687Z",
+  "buildDate": "2025-11-21T17:36:13.610Z",
   "version": "2.3.1",
   "git": {
-    "commitMessage": "feat: Update GitHub Actions workflows for new test suite architecture\n\n🔄 Continuous Testing Workflow (PR/Push):\n- Added backend unit tests job (451 tests, ~7s)\n- Added smoke tests job (5 actions, ~10s)\n- Added integration tests job (~150 tests, ~10min)\n- Added optional load tests (manual trigger)\n- Improved PR comments with detailed test results\n\n🌙 Nightly Testing Workflow (2 AM UTC):\n- Backend unit tests (always)\n- Integration tests (multi-browser: chromium, firefox, webkit)\n- Marathon tests (60+ min stability testing)\n- Load tests (baseline + stress)\n- Comprehensive reporting with auto-issue creation on failure\n\n✅ Key Improvements:\n- All test suites use new npm scripts (test:unit, test:smoke, test:integration, etc.)\n- Proper dependencies between jobs (fail-fast where appropriate)\n- Better artifact retention (7-30 days based on importance)\n- Enhanced GitHub summaries and PR comments\n- Auto-create issues on nightly failures\n\n🎯 Test Suite Alignment:\n- Suite 1: Backend Unit Tests (100% pass rate, 451/451)\n- Suite 2: Smoke Tests (100% core metrics)\n- Suite 3: Integration Tests (100% reliable tests only)\n- Suite 4: Load Tests (100% core metrics)\n- Suite 5: Marathon Tests (stability testing)\n\n📊 Runtime Estimates:\n- PR Checks: ~20 minutes (unit + smoke + integration)\n- Nightly: ~90 minutes (all suites, multi-browser)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "9c9b11e",
-    "commitDate": "2025-11-21 12:01:46 -0500",
+    "commitMessage": "fix: Resolve TypeScript errors - Remove unused imports and add missing types\n\n- Remove unused 'React' import from App.tsx\n- Remove unused 'sounds' import from ScoringPhase.tsx\n- Remove unused 'response' variable from useSocketConnection.ts\n- Add missing GameHistoryEntry import to SocialHub.tsx\n\nNote: Remaining TypeScript errors are pre-existing issues in components not\nrelated to test suite organization work (RoundSummary, GameReplay, etc.)",
+    "commitHash": "b6c79bb",
+    "commitDate": "2025-11-21 12:28:14 -0500",
     "branch": "main"
   },
   "futureTodos": [

@@ -396,16 +396,6 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                 <span className="text-sm text-gray-600 dark:text-gray-400 block mb-2">Latest Commit:</span>
                 <p className="text-sm italic text-gray-700 dark:text-gray-300">{buildInfo.git.commitMessage}</p>
               </div>
-              {buildInfo.latestDoneFeatures && buildInfo.latestDoneFeatures.length > 0 && (
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400 block mb-2">Recent Features:</span>
-                  <ul className="list-disc list-inside text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                    {buildInfo.latestDoneFeatures[0]?.features.slice(0, 5).map((feature, idx) => (
-                      <li key={idx}>{feature}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
             </div>
           </section>
 

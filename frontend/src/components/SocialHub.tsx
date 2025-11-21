@@ -102,7 +102,7 @@ export function SocialHub({
             } else {
               playersMap.set(name, {
                 playerName: name,
-                lastPlayed: game.finished_at,
+                lastPlayed: game.finished_at?.toString() || new Date().toISOString(),
                 gamesPlayed: 1,
                 isFriend: false // Will be updated with friend status
               });

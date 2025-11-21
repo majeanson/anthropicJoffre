@@ -53,7 +53,8 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
         onSwitchToLogin();
       }, 5000);
     } catch (err: unknown) {
-      setErrorMessage(err.message || 'Failed to request password reset');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to request password reset';
+      setErrorMessage(errorMessage);
     } finally {
       setIsLoading(false);
     }

@@ -1107,11 +1107,21 @@ function AppContent() {
         {/* Task 10 Phase 2: Keyboard Shortcuts Help Modal (press ?) */}
         <ErrorBoundary componentName="KeyboardShortcutsModal">
           <Suspense fallback={<div />}>
-            <KeyboardShortcutsModal
-              isOpen={showKeyboardShortcuts}
-              onClose={() => setShowKeyboardShortcuts(false)}
-              currentPhase={gameState.phase === 'team_selection' ? 'team_selection' : gameState.phase === 'betting' ? 'betting' : gameState.phase === 'playing' ? 'playing' : 'lobby'}
-            />
+            {(() => {
+              const phase = gameState?.phase;
+              const currentPhase = phase === 'team_selection' ? 'team_selection'
+                : phase === 'betting' ? 'betting'
+                : phase === 'playing' ? 'playing'
+                : 'lobby';
+
+              return (
+                <KeyboardShortcutsModal
+                  isOpen={showKeyboardShortcuts}
+                  onClose={() => setShowKeyboardShortcuts(false)}
+                  currentPhase={currentPhase}
+                />
+              );
+            })()}
           </Suspense>
         </ErrorBoundary>
       </>

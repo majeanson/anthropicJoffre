@@ -52,6 +52,51 @@ type StatValue =
   | RoundStatistics['highRoller']
   | RoundStatistics['trumpHeavy'];
 
+// Type guards for stat values
+function hasContribution(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['teamMVP']> {
+  return !!stat && 'contribution' in stat;
+}
+
+function hasRedZeros(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['luckyPlayer']> {
+  return !!stat && 'redZeros' in stat;
+}
+
+function hasPointsEarned(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['pointLeader']> {
+  return !!stat && 'pointsEarned' in stat;
+}
+
+function hasTricksWon(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['trickMaster']> {
+  return !!stat && 'tricksWon' in stat;
+}
+
+function hasSevensCount(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['luckySevens']> {
+  return !!stat && 'sevensCount' in stat;
+}
+
+function hasCount(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['suitedUp']> {
+  return !!stat && 'count' in stat;
+}
+
+function hasTrumpCount(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['trumpHeavy']> {
+  return !!stat && 'trumpCount' in stat;
+}
+
+function hasTrumpsPlayed(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['trumpMaster']> {
+  return !!stat && 'trumpsPlayed' in stat;
+}
+
+function hasAvgValue(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['highRoller']> | NonNullable<RoundStatistics['lowball']> {
+  return !!stat && 'avgValue' in stat;
+}
+
+function hasSuit(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['suitedUp']> {
+  return !!stat && 'suit' in stat;
+}
+
+function hasBetAmount(stat: StatValue | undefined): stat is NonNullable<RoundStatistics['perfectBet']> {
+  return !!stat && 'betAmount' in stat;
+}
+
 interface RoundSummaryProps {
   gameState: GameState;
   onReady: () => void;
@@ -113,33 +158,64 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
 
   // ✅ Helper function for calculating stat scores (not a hook, can be defined here)
   const getStatScore = (title: string, stat: StatValue): number => {
+    if (!stat) return 30;
     switch (title) {
       case 'Perfect Bet':
         return 100;
       case 'Team MVP':
-        return stat.contribution >= 70 ? 90 : stat.contribution >= 60 ? 60 : 50;
+        if (hasContribution(stat)) {
+          return stat.contribution >= 70 ? 90 : stat.contribution >= 60 ? 60 : 50;
+        }
+        return 50;
       case 'Lucky Player':
-        return stat.redZeros >= 2 ? 85 : 70;
+        if (hasRedZeros(stat)) {
+          return stat.redZeros >= 2 ? 85 : 70;
+        }
+        return 70;
       case 'Point Leader':
-        return stat.pointsEarned >= 10 ? 80 : stat.pointsEarned >= 8 ? 65 : 50;
+        if (hasPointsEarned(stat)) {
+          return stat.pointsEarned >= 10 ? 80 : stat.pointsEarned >= 8 ? 65 : 50;
+        }
+        return 50;
       case 'Trick Master':
-        return stat.tricksWon >= 5 ? 75 : stat.tricksWon >= 4 ? 60 : 45;
+        if (hasTricksWon(stat)) {
+          return stat.tricksWon >= 5 ? 75 : stat.tricksWon >= 4 ? 60 : 45;
+        }
+        return 45;
       case 'Monochrome':
         return 70;
       case 'Lucky Sevens':
-        return stat.sevensCount >= 3 ? 70 : 55;
+        if (hasSevensCount(stat)) {
+          return stat.sevensCount >= 3 ? 70 : 55;
+        }
+        return 55;
       case 'Suited Up':
-        return stat.count >= 5 ? 65 : 50;
+        if (hasCount(stat)) {
+          return stat.count >= 5 ? 65 : 50;
+        }
+        return 50;
       case 'Trump Heavy':
-        return stat.trumpCount >= 4 ? 60 : 45;
+        if (hasTrumpCount(stat)) {
+          return stat.trumpCount >= 4 ? 60 : 45;
+        }
+        return 45;
       case 'Rainbow':
         return 55;
       case 'Trump Master':
-        return stat.trumpsPlayed >= 4 ? 55 : 40;
+        if (hasTrumpsPlayed(stat)) {
+          return stat.trumpsPlayed >= 4 ? 55 : 40;
+        }
+        return 40;
       case 'High Roller':
-        return stat.avgValue >= 5 ? 45 : 35;
+        if (hasAvgValue(stat)) {
+          return stat.avgValue >= 5 ? 45 : 35;
+        }
+        return 35;
       case 'Lowball':
-        return stat.avgValue <= 2 ? 45 : 35;
+        if (hasAvgValue(stat)) {
+          return stat.avgValue <= 2 ? 45 : 35;
+        }
+        return 35;
       default:
         return 30;
     }
@@ -232,16 +308,16 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     if (!stat) return null;
 
     let description = '';
-    if (stat.tricksWon !== undefined) description = `${stat.tricksWon} tricks`;
-    else if (stat.pointsEarned !== undefined) description = `${stat.pointsEarned} points`;
-    else if (stat.betAmount !== undefined) description = `Exact ${stat.betAmount}`;
-    else if (stat.contribution !== undefined) description = `${stat.contribution}% of team`;
-    else if (stat.trumpsPlayed !== undefined) description = `${stat.trumpsPlayed} trumps`;
-    else if (stat.redZeros !== undefined) description = `${stat.redZeros} red 0${stat.redZeros > 1 ? 's' : ''}`;
-    else if (stat.suit !== undefined) description = `${stat.count} ${stat.suit}`;
-    else if (stat.sevensCount !== undefined) description = `${stat.sevensCount}× 7s`;
-    else if (stat.avgValue !== undefined) description = `Avg: ${stat.avgValue}`;
-    else if (stat.trumpCount !== undefined) description = `${stat.trumpCount} trumps`;
+    if (hasTricksWon(stat)) description = `${stat.tricksWon} tricks`;
+    else if (hasPointsEarned(stat)) description = `${stat.pointsEarned} points`;
+    else if (hasBetAmount(stat)) description = `Exact ${stat.betAmount}`;
+    else if (hasContribution(stat)) description = `${stat.contribution}% of team`;
+    else if (hasTrumpsPlayed(stat)) description = `${stat.trumpsPlayed} trumps`;
+    else if (hasRedZeros(stat)) description = `${stat.redZeros} red 0${stat.redZeros > 1 ? 's' : ''}`;
+    else if (hasSuit(stat) && hasCount(stat)) description = `${stat.count} ${stat.suit}`;
+    else if (hasSevensCount(stat)) description = `${stat.sevensCount}× 7s`;
+    else if (hasAvgValue(stat)) description = `Avg: ${stat.avgValue}`;
+    else if (hasTrumpCount(stat)) description = `${stat.trumpCount} trumps`;
     else if (title === 'Monochrome') description = 'No red cards';
     else if (title === 'Rainbow') description = 'All 4 suits';
 
