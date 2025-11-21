@@ -287,7 +287,7 @@ function PlayingPhaseComponent({
         connectionStats={connectionStats}
       />
 
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="flex flex-col flex-1 overflow-visible">
         <ScoreBoard
           gameState={gameState}
           isCurrentTurn={isCurrentTurn}

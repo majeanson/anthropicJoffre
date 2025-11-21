@@ -150,6 +150,15 @@ export function KeyboardShortcutsModal({
               <li>• Number keys (1-8) provide instant card selection during play</li>
             </ul>
           </div>
+
+          {/* Got it button for keyboard navigation */}
+          <button
+            onClick={onClose}
+            autoFocus
+            className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+          >
+            Got it!
+          </button>
         </div>
       </div>
     </div>

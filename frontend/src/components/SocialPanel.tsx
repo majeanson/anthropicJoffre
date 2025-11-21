@@ -172,9 +172,9 @@ export function SocialPanel({
             }
             setSocialTab('messages');
           }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs relative focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 ${
+          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs relative focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
             socialTab === 'messages'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400'
+              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
               : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
           }`}
         >
@@ -196,9 +196,9 @@ export function SocialPanel({
             }
             setSocialTab('friends');
           }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 ${
+          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
             socialTab === 'friends'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400'
+              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
               : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
           }`}
         >
@@ -208,9 +208,9 @@ export function SocialPanel({
           data-keyboard-nav="social-online"
           data-nav-subtab="online"
           onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 ${
+          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
             socialTab === 'online'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400'
+              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
               : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
           }`}
         >
@@ -227,9 +227,9 @@ export function SocialPanel({
             }
             setSocialTab('profile');
           }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 ${
+          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
             socialTab === 'profile'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400'
+              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
               : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
           }`}
         >
@@ -239,9 +239,9 @@ export function SocialPanel({
           data-keyboard-nav="social-chat"
           data-nav-subtab="chat"
           onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1 ${
+          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
             socialTab === 'chat'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400'
+              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
               : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
           }`}
         >

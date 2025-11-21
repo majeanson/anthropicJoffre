@@ -7,7 +7,7 @@
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Card as CardComponent } from '../Card';
 import { Card as CardType, TrickCard } from '../../types/game';
 import { sounds } from '../../utils/sounds';
@@ -40,6 +40,7 @@ export function PlayerHand({
   const [cardInTransition, setCardInTransition] = useState<CardType | null>(null);
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
   const [isPlayingCard, setIsPlayingCard] = useState(false);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Calculate playable cards (suit-following rules)
   const playableCards = useMemo(() => {
@@ -227,6 +228,17 @@ export function PlayerHand({
     setSelectedCardIndex(null);
   }, [currentPlayerIndex]);
 
+  // Scroll selected card into view (for keyboard navigation on mobile)
+  useEffect(() => {
+    if (selectedCardIndex !== null && cardRefs.current[selectedCardIndex]) {
+      cardRefs.current[selectedCardIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }, [selectedCardIndex]);
+
   if (isSpectator) {
     return (
       <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-10">
@@ -281,6 +293,7 @@ export function PlayerHand({
               return (
                 <div
                   key={`${card.color}-${card.value}-${index}`}
+                  ref={(el) => { cardRefs.current[index] = el; }}
                   className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
                     showDealingAnimation && !isCardDealt
                       ? 'opacity-0 scale-50'

@@ -467,9 +467,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 <button
                   data-nav-tab="play"
                   onClick={() => { sounds.buttonClick(); setMainTab('play'); setNavCol(0); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
                     mainTab === 'play'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -478,9 +478,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 <button
                   data-nav-tab="social"
                   onClick={() => { sounds.buttonClick(); setMainTab('social'); setNavCol(1); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
                     mainTab === 'social'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -494,9 +494,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 <button
                   data-nav-tab="stats"
                   onClick={() => { sounds.buttonClick(); setMainTab('stats'); setNavCol(2); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
                     mainTab === 'stats'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -505,9 +505,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 <button
                   data-nav-tab="settings"
                   onClick={() => { sounds.buttonClick(); setMainTab('settings'); setNavCol(3); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
+                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
                     mainTab === 'settings'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
+                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
                       : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
                   }`}
                 >

@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useEffect, useCallback } from 'react';
 import { GameState } from '../types/game';
 
 interface CatchUpModalProps {
@@ -9,6 +9,20 @@ interface CatchUpModalProps {
 }
 
 export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlayerId, isOpen, onClose }: CatchUpModalProps) {
+  // Handle keyboard: Escape or Enter to close
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape' || e.key === 'Enter') {
+      e.preventDefault();
+      onClose();
+    }
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, handleKeyDown]);
+
   if (!isOpen) return null;
 
   const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
@@ -124,7 +138,8 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
         {/* Continue Button */}
         <button
           onClick={onClose}
-          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl font-black text-lg shadow-lg transition-all transform hover:scale-105"
+          autoFocus
+          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl font-black text-lg shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-offset-2"
         >
           Continue Playing
         </button>
