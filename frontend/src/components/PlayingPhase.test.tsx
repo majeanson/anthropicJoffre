@@ -64,8 +64,8 @@ vi.mock('./TimeoutIndicator', () => ({
   TimeoutIndicator: () => <div data-testid="timeout-indicator">Timeout</div>,
 }));
 
-vi.mock('./ChatPanel', () => ({
-  ChatPanel: () => <div data-testid="chat-panel">Chat</div>,
+vi.mock('./UnifiedChat', () => ({
+  UnifiedChat: () => <div data-testid="unified-chat">Chat</div>,
 }));
 
 vi.mock('./GameHeader', () => ({

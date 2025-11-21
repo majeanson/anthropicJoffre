@@ -38,8 +38,8 @@ vi.mock('./Leaderboard', () => ({
   Leaderboard: () => <div data-testid="leaderboard">Leaderboard</div>,
 }));
 
-vi.mock('./ChatPanel', () => ({
-  ChatPanel: () => <div data-testid="chat-panel">Chat</div>,
+vi.mock('./UnifiedChat', () => ({
+  UnifiedChat: () => <div data-testid="unified-chat">Chat</div>,
 }));
 
 vi.mock('./GameHeader', () => ({
