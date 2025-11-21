@@ -205,19 +205,29 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
       if (browseBtn) buttons.push(browseBtn);
       if (quickPlayBtn) buttons.push(quickPlayBtn);
     } else if (mainTab === 'social') {
-      // Social sub-tabs
+      // Social sub-tabs (order: Messages, Friends, Online, Profile, Chat)
+      const messagesTabBtn = document.querySelector('[data-keyboard-nav="social-messages"]') as HTMLButtonElement;
+      const friendsTabBtn = document.querySelector('[data-keyboard-nav="social-friends"]') as HTMLButtonElement;
       const onlineTabBtn = document.querySelector('[data-keyboard-nav="social-online"]') as HTMLButtonElement;
+      const profileTabBtn = document.querySelector('[data-keyboard-nav="social-profile"]') as HTMLButtonElement;
       const chatTabBtn = document.querySelector('[data-keyboard-nav="social-chat"]') as HTMLButtonElement;
-      const recentTabBtn = document.querySelector('[data-keyboard-nav="social-recent"]') as HTMLButtonElement;
 
+      if (messagesTabBtn) buttons.push(messagesTabBtn);
+      if (friendsTabBtn) buttons.push(friendsTabBtn);
       if (onlineTabBtn) buttons.push(onlineTabBtn);
+      if (profileTabBtn) buttons.push(profileTabBtn);
       if (chatTabBtn) buttons.push(chatTabBtn);
-      if (recentTabBtn) buttons.push(recentTabBtn);
 
       // Join buttons for online players
       if (socialTab === 'online') {
         const joinButtons = Array.from(document.querySelectorAll('[data-keyboard-nav^="join-player-"]')) as HTMLButtonElement[];
         buttons.push(...joinButtons);
+      }
+
+      // Join buttons for friends
+      if (socialTab === 'friends') {
+        const joinFriendButtons = Array.from(document.querySelectorAll('[data-keyboard-nav^="join-friend-"]')) as HTMLButtonElement[];
+        buttons.push(...joinFriendButtons);
       }
     } else if (mainTab === 'stats') {
       const myStatsBtn = document.querySelector('[data-keyboard-nav="my-stats"]') as HTMLButtonElement;
