@@ -216,6 +216,7 @@ export function TeamSelection({
                               onClick={() => onSwapPosition(playerAtPosition.id)}
                               className="text-xs bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0"
                               title={currentPlayer.teamId !== 1 ? 'Swap with this player (changes teams!)' : 'Swap positions'}
+                              aria-label={`Swap positions with ${playerAtPosition.name}${currentPlayer.teamId !== 1 ? ' (this will change your team)' : ''}`}
                             >
                               Swap
                             </button>
@@ -225,6 +226,7 @@ export function TeamSelection({
                               onClick={() => onKickPlayer(playerAtPosition.id)}
                               className="text-xs bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0"
                               title="Remove player from game"
+                              aria-label={`Remove ${playerAtPosition.name} from game`}
                             >
                               ✕
                             </button>

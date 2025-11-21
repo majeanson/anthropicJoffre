@@ -19,6 +19,8 @@ const SwapConfirmationModal = lazy(() => import('./components/SwapConfirmationMo
 // Debug components (only loaded in debug mode)
 const DebugControls = lazy(() => import('./components/DebugControls'));
 const DebugPanel = lazy(() => import('./components/DebugPanel').then(m => ({ default: m.DebugPanel })));
+// Task 10 Phase 2: Keyboard navigation help
+const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcutsModal').then(m => ({ default: m.KeyboardShortcutsModal })));
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
@@ -122,6 +124,9 @@ function AppContent() {
 
   // Sprint 16: Swap request state
   const [swapRequest, setSwapRequest] = useState<{ fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean } | null>(null);
+
+  // Task 10 Phase 2: Keyboard shortcuts help modal
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
 
   // Missing state variables for GlobalUI and DebugControls
   const [missedActions, setMissedActions] = useState<unknown[]>([]);
@@ -249,6 +254,30 @@ function AppContent() {
       socket.off('swap_rejected', handleSwapRejected);
     };
   }, [socket, gameId, showToast]);
+
+  // Task 10 Phase 2: Global keyboard shortcuts (? for help)
+  useEffect(() => {
+    const handleGlobalKeyboard = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      ) {
+        return;
+      }
+
+      // ? - Show keyboard shortcuts help
+      if (e.key === '?' && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        setShowKeyboardShortcuts(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyboard);
+    return () => window.removeEventListener('keydown', handleGlobalKeyboard);
+  }, []);
 
   // Sprint 5 Phase 2: Handle bot spawning on reconnection
   // This ensures bots continue playing after human player reconnects
@@ -1074,6 +1103,17 @@ function AppContent() {
             </Suspense>
           </ErrorBoundary>
         )}
+
+        {/* Task 10 Phase 2: Keyboard Shortcuts Help Modal (press ?) */}
+        <ErrorBoundary componentName="KeyboardShortcutsModal">
+          <Suspense fallback={<div />}>
+            <KeyboardShortcutsModal
+              isOpen={showKeyboardShortcuts}
+              onClose={() => setShowKeyboardShortcuts(false)}
+              currentPhase={gameState.phase === 'team_selection' ? 'team_selection' : gameState.phase === 'betting' ? 'betting' : gameState.phase === 'playing' ? 'playing' : 'lobby'}
+            />
+          </Suspense>
+        </ErrorBoundary>
       </>
     );
   }
