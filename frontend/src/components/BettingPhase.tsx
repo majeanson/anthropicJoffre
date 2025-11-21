@@ -118,6 +118,15 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
     onPlaceBet(-1, false, true);
   };
 
+  // Scroll to the active navigation level
+  const scrollToLevel = (level: number) => {
+    const levelIds = ['bet-level-amount', 'bet-level-trump', 'bet-level-action'];
+    const element = document.getElementById(levelIds[level]);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
   // Keyboard accessibility for betting - 3 level navigation
   useEffect(() => {
     if (!isMyTurn || hasPlacedBet) return;
@@ -126,12 +135,16 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
       // Up/Down - Navigate between levels
       if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setNavLevel(prev => Math.max(0, prev - 1));
+        const newLevel = Math.max(0, navLevel - 1);
+        setNavLevel(newLevel);
+        scrollToLevel(newLevel);
         sounds.buttonClick();
       }
       else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setNavLevel(prev => Math.min(2, prev + 1));
+        const newLevel = Math.min(2, navLevel + 1);
+        setNavLevel(newLevel);
+        scrollToLevel(newLevel);
         sounds.buttonClick();
       }
       // Left/Right - Adjust value within current level
@@ -314,7 +327,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
             <>
               <div className="space-y-4">
                 {/* Level 0: Bet Amount */}
-                <div className={`p-3 rounded-lg transition-all ${navLevel === 0 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
+                <div id="bet-level-amount" className={`p-3 rounded-lg transition-all ${navLevel === 0 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
                   <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                     {navLevel === 0 && <span className="text-orange-500">▶</span>}
                     Select Bet Amount: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to adjust)</span>
@@ -343,7 +356,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                 </div>
 
                 {/* Level 1: Trump Option */}
-                <div className={`p-3 rounded-lg transition-all ${navLevel === 1 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
+                <div id="bet-level-trump" className={`p-3 rounded-lg transition-all ${navLevel === 1 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
                   <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                     {navLevel === 1 && <span className="text-orange-500">▶</span>}
                     Trump Option: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to toggle)</span>
@@ -377,7 +390,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                 </div>
 
                 {/* Level 2: Action Buttons */}
-                <div className={`p-3 rounded-lg transition-all ${navLevel === 2 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
+                <div id="bet-level-action" className={`p-3 rounded-lg transition-all ${navLevel === 2 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
                   <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                     {navLevel === 2 && <span className="text-orange-500">▶</span>}
                     Action: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to select, Enter to confirm)</span>
