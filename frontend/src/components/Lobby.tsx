@@ -71,8 +71,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   });
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
   const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual'); // Default to casual for Quick Play
-  const [focusedTabIndex, setFocusedTabIndex] = useState<number | null>(null); // 0=PLAY, 1=SOCIAL, 2=STATS, 3=SETTINGS
-  const [focusedButtonIndex, setFocusedButtonIndex] = useState<number>(0); // Index within active tab
+  // Keyboard navigation state - layered like GameBoy menu
+  // Level 0: Login/Register (if not logged in)
+  // Level 1: Main tabs (PLAY, SOCIAL, STATS, SETTINGS)
+  // Level 2: Tab content buttons
+  // Level 3: Sub-content (if any)
+  const [navLevel, setNavLevel] = useState<number>(0);
+  const [navIndex, setNavIndex] = useState<number>(0); // Index within current level
 
 
   // Load recent players on mount
@@ -111,125 +116,172 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     }
   }, [autoJoinGameId, mode]);
 
-  // Keyboard navigation for lobby menu
+  // Get items for current navigation level
+  const getItemsForLevel = (level: number): HTMLElement[] => {
+    if (level === 0 && !user) {
+      // Level 0: Login/Register buttons
+      const items: HTMLElement[] = [];
+      const loginBtn = document.querySelector('[data-keyboard-nav="login-btn"]') as HTMLElement;
+      const registerBtn = document.querySelector('[data-keyboard-nav="register-btn"]') as HTMLElement;
+      if (loginBtn) items.push(loginBtn);
+      if (registerBtn) items.push(registerBtn);
+      return items;
+    } else if (level === 1 || (level === 0 && user)) {
+      // Level 1: Main tabs (PLAY, SOCIAL, STATS, SETTINGS)
+      return Array.from(document.querySelectorAll('[data-nav-tab]')) as HTMLElement[];
+    } else if (level === 2) {
+      // Level 2: Tab content buttons
+      const tabContent = document.querySelector('[data-tab-content]');
+      if (tabContent) {
+        return Array.from(tabContent.querySelectorAll('[data-keyboard-nav]')) as HTMLElement[];
+      }
+    }
+    return [];
+  };
+
+  // Get max level based on current state
+  const getMaxLevel = (): number => {
+    if (!user) return 2; // Login/Register -> Tabs -> Content
+    return 1; // Tabs -> Content (no login level)
+  };
+
+  // Keyboard navigation for lobby menu - layered like GameBoy
   useEffect(() => {
     if (mode !== 'menu') return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Tab navigation with Arrow Left/Right
+      const items = getItemsForLevel(navLevel);
+
+      // Left/Right: Navigate within current level
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
-        const tabs = ['play', 'social', 'stats', 'settings'];
-        const currentIndex = tabs.indexOf(mainTab);
 
-        if (e.key === 'ArrowRight') {
-          const nextIndex = (currentIndex + 1) % tabs.length;
-          setMainTab(tabs[nextIndex] as typeof mainTab);
-          setFocusedTabIndex(nextIndex);
-          setFocusedButtonIndex(0);
-        } else {
-          const prevIndex = currentIndex === 0 ? tabs.length - 1 : currentIndex - 1;
-          setMainTab(tabs[prevIndex] as typeof mainTab);
-          setFocusedTabIndex(prevIndex);
-          setFocusedButtonIndex(0);
-        }
-        sounds.buttonClick();
-        // Focus first button in new tab after React re-renders
-        setTimeout(() => {
-          const buttons = document.querySelectorAll('[data-tab-content] [data-keyboard-nav]');
-          if (buttons.length > 0) {
-            (buttons[0] as HTMLButtonElement).focus();
-          }
-        }, 50);
-      }
-
-      // Button navigation within tab with Arrow Up/Down
-      else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.preventDefault();
-
-        // Get all interactive buttons in current tab
-        const buttons = getActiveTabButtons();
-
-        if (buttons.length === 0) return;
-
-        // Initialize focus if not set
-        if (focusedTabIndex === null) {
-          const tabs = ['play', 'social', 'stats', 'settings'];
-          setFocusedTabIndex(tabs.indexOf(mainTab));
-          setFocusedButtonIndex(0);
-          buttons[0]?.focus();
-          sounds.buttonClick();
-          return;
-        }
+        if (items.length === 0) return;
 
         let newIndex: number;
-        if (e.key === 'ArrowDown') {
-          newIndex = (focusedButtonIndex + 1) % buttons.length;
+        if (e.key === 'ArrowRight') {
+          newIndex = (navIndex + 1) % items.length;
         } else {
-          newIndex = focusedButtonIndex === 0 ? buttons.length - 1 : focusedButtonIndex - 1;
+          newIndex = navIndex === 0 ? items.length - 1 : navIndex - 1;
         }
-        setFocusedButtonIndex(newIndex);
-        buttons[newIndex]?.focus();
+
+        setNavIndex(newIndex);
+        items[newIndex]?.focus();
+
+        // If on tab level, also switch the tab
+        if ((navLevel === 1) || (navLevel === 0 && user)) {
+          const tabs = ['play', 'social', 'stats', 'settings'];
+          if (tabs[newIndex]) {
+            setMainTab(tabs[newIndex] as typeof mainTab);
+          }
+        }
+
         sounds.buttonClick();
       }
 
-      // Activate focused button with Enter
-      else if (e.key === 'Enter') {
-        if (focusedTabIndex !== null) {
-          e.preventDefault();
-          const buttons = getActiveTabButtons();
-          const button = buttons[focusedButtonIndex];
-          if (button) {
-            button.click();
+      // Down: Go deeper into menu OR navigate within content level
+      else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+
+        const effectiveLevel = user ? navLevel + 1 : navLevel; // Adjust for logged in users
+        const contentLevel = user ? 1 : 2;
+
+        if (effectiveLevel < contentLevel) {
+          // Move to next level
+          const nextLevel = navLevel + 1;
+          const nextItems = getItemsForLevel(nextLevel);
+
+          setNavLevel(nextLevel);
+          setNavIndex(0);
+
+          // Focus first item in new level after React re-renders
+          setTimeout(() => {
+            const newItems = getItemsForLevel(nextLevel);
+            if (newItems.length > 0) {
+              newItems[0]?.focus();
+            }
+          }, 50);
+        } else {
+          // Already at content level - navigate within content
+          if (items.length === 0) return;
+          const newIndex = (navIndex + 1) % items.length;
+          setNavIndex(newIndex);
+          items[newIndex]?.focus();
+        }
+
+        sounds.buttonClick();
+      }
+
+      // Up: Go back up in menu OR navigate within content level
+      else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+
+        const effectiveLevel = user ? navLevel + 1 : navLevel;
+        const contentLevel = user ? 1 : 2;
+
+        if (effectiveLevel === contentLevel && navIndex > 0) {
+          // Navigate up within content level
+          const newIndex = navIndex - 1;
+          setNavIndex(newIndex);
+          items[newIndex]?.focus();
+        } else if (navLevel > 0) {
+          // Go back to previous level
+          const prevLevel = navLevel - 1;
+          const prevItems = getItemsForLevel(prevLevel);
+
+          // Find the index of current tab in prev level
+          let prevIndex = 0;
+          if ((prevLevel === 1) || (prevLevel === 0 && user)) {
+            const tabs = ['play', 'social', 'stats', 'settings'];
+            prevIndex = tabs.indexOf(mainTab);
           }
+
+          setNavLevel(prevLevel);
+          setNavIndex(prevIndex >= 0 ? prevIndex : 0);
+
+          setTimeout(() => {
+            const newItems = getItemsForLevel(prevLevel);
+            if (newItems.length > 0) {
+              newItems[prevIndex >= 0 ? prevIndex : 0]?.focus();
+            }
+          }, 50);
+        }
+
+        sounds.buttonClick();
+      }
+
+      // Enter: Activate focused item
+      else if (e.key === 'Enter') {
+        e.preventDefault();
+        const item = items[navIndex];
+        if (item) {
+          item.click();
         }
       }
 
-      // Clear focus with Escape
+      // Escape: Go back one level (or clear focus at top)
       else if (e.key === 'Escape') {
-        setFocusedTabIndex(null);
-        setFocusedButtonIndex(0);
+        if (navLevel > 0) {
+          const prevLevel = navLevel - 1;
+          setNavLevel(prevLevel);
+          setNavIndex(0);
+          setTimeout(() => {
+            const newItems = getItemsForLevel(prevLevel);
+            if (newItems.length > 0) {
+              newItems[0]?.focus();
+            }
+          }, 50);
+        } else {
+          // At top level, blur everything
+          (document.activeElement as HTMLElement)?.blur();
+        }
+        sounds.buttonClick();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mode, mainTab, socialTab, focusedTabIndex, focusedButtonIndex, playerName, socket, hasValidSession, onlinePlayers]);
-
-  // Helper function to get all interactive buttons in the current tab
-  const getActiveTabButtons = (): HTMLButtonElement[] => {
-    const buttons: HTMLButtonElement[] = [];
-
-    // Always include Login/Register buttons if user is not logged in
-    if (!user) {
-      const loginBtn = document.querySelector('[data-keyboard-nav="login-btn"]') as HTMLButtonElement;
-      const registerBtn = document.querySelector('[data-keyboard-nav="register-btn"]') as HTMLButtonElement;
-      if (loginBtn) buttons.push(loginBtn);
-      if (registerBtn) buttons.push(registerBtn);
-    }
-
-    // Get all buttons with data-keyboard-nav attribute in the current tab content
-    // This is more maintainable than hardcoding each button
-    const tabContentArea = document.querySelector('[data-tab-content]');
-    if (tabContentArea) {
-      const navButtons = Array.from(tabContentArea.querySelectorAll('[data-keyboard-nav]')) as HTMLButtonElement[];
-      buttons.push(...navButtons);
-    }
-
-    // Also get buttons with data-testid for Play tab (legacy support)
-    if (mainTab === 'play') {
-      if (hasValidSession && onRejoinGame) {
-        const rejoinBtn = document.querySelector('[data-testid="rejoin-game-button"]') as HTMLButtonElement;
-        if (rejoinBtn && !buttons.includes(rejoinBtn)) buttons.push(rejoinBtn);
-      }
-      const createBtn = document.querySelector('[data-testid="create-game-button"]') as HTMLButtonElement;
-      const quickPlayBtn = document.querySelector('[data-testid="quick-play-button"]') as HTMLButtonElement;
-      if (createBtn && !buttons.includes(createBtn)) buttons.push(createBtn);
-      if (quickPlayBtn && !buttons.includes(quickPlayBtn)) buttons.push(quickPlayBtn);
-    }
-
-    return buttons;
-  };
+  }, [mode, mainTab, socialTab, navLevel, navIndex, user, playerName, socket, hasValidSession, onlinePlayers]);
 
   if (mode === 'create') {
     return (
@@ -373,7 +425,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <div className="mb-6">
               <div className="grid grid-cols-4 gap-2 mb-4">
                 <button
-                  onClick={() => { sounds.buttonClick(); setMainTab('play'); }}
+                  data-nav-tab="play"
+                  onClick={() => { sounds.buttonClick(); setMainTab('play'); setNavIndex(0); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'play'
                       ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
@@ -383,7 +436,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   PLAY
                 </button>
                 <button
-                  onClick={() => { sounds.buttonClick(); setMainTab('social'); }}
+                  data-nav-tab="social"
+                  onClick={() => { sounds.buttonClick(); setMainTab('social'); setNavIndex(1); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'social'
                       ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
@@ -398,7 +452,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   )}
                 </button>
                 <button
-                  onClick={() => { sounds.buttonClick(); setMainTab('stats'); }}
+                  data-nav-tab="stats"
+                  onClick={() => { sounds.buttonClick(); setMainTab('stats'); setNavIndex(2); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'stats'
                       ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
@@ -408,7 +463,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                   STATS
                 </button>
                 <button
-                  onClick={() => { sounds.buttonClick(); setMainTab('settings'); }}
+                  data-nav-tab="settings"
+                  onClick={() => { sounds.buttonClick(); setMainTab('settings'); setNavIndex(3); }}
                   className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 ${
                     mainTab === 'settings'
                       ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500'
