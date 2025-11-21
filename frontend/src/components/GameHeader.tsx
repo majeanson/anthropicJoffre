@@ -3,6 +3,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { CardColor } from '../types/game';
 import { useCountUp } from '../hooks/useCountUp';
+import logger from '../utils/logger';
 
 interface GameHeaderProps {
   gameId: string;
@@ -124,7 +125,7 @@ export function GameHeader({
       setLinkCopied(true);
       setTimeout(() => setLinkCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy link:', error);
+      logger.error('Failed to copy link:', error);
     }
   };
 

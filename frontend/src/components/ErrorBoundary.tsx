@@ -6,6 +6,7 @@
  */
 
 import { Component, ErrorInfo, ReactNode } from 'react';
+import logger from '../utils/logger';
 
 declare global {
   interface Window {
@@ -50,9 +51,9 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to console in development
     if (import.meta.env.DEV) {
-      console.error('ErrorBoundary caught an error:', error);
-      console.error('Error info:', errorInfo);
-      console.error('Component stack:', errorInfo.componentStack);
+      logger.error('ErrorBoundary caught an error:', error);
+      logger.error('Error info:', errorInfo);
+      logger.error('Component stack:', errorInfo.componentStack);
     }
 
     // Update state with error details
@@ -98,7 +99,7 @@ export class ErrorBoundary extends Component<Props, State> {
       }
       localStorage.setItem('errorLog', JSON.stringify(errorLog));
     } catch (e) {
-      console.error('Failed to store error in localStorage:', e);
+      logger.error('Failed to store error in localStorage:', e);
     }
   };
 

@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import logger from '../utils/logger';
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -31,21 +32,21 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
 
   React.useEffect(() => {
     if (prevUsernameRef.current && !username) {
-      console.error('[RegisterModal] USERNAME WAS CLEARED!', {
+      logger.error('[RegisterModal] USERNAME WAS CLEARED!', {
         prev: prevUsernameRef.current,
         current: username,
         stack: new Error().stack
       });
     }
     if (prevEmailRef.current && !email) {
-      console.error('[RegisterModal] EMAIL WAS CLEARED!', {
+      logger.error('[RegisterModal] EMAIL WAS CLEARED!', {
         prev: prevEmailRef.current,
         current: email,
         stack: new Error().stack
       });
     }
     if (prevPasswordRef.current && !password) {
-      console.error('[RegisterModal] PASSWORD WAS CLEARED!', {
+      logger.error('[RegisterModal] PASSWORD WAS CLEARED!', {
         prev: prevPasswordRef.current.length + ' chars',
         current: password.length + ' chars',
         stack: new Error().stack

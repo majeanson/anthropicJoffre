@@ -23,7 +23,7 @@ export function getRecentPlayers(): RecentPlayer[] {
     // Sort by most recent first
     return players.sort((a, b) => b.lastPlayed - a.lastPlayed);
   } catch (e) {
-    console.error('Failed to load recent players:', e);
+    logger.error('Failed to load recent players:', e);
     return [];
   }
 }
@@ -59,7 +59,7 @@ export function addRecentPlayer(playerName: string): void {
   try {
     localStorage.setItem(RECENT_PLAYERS_KEY, JSON.stringify(trimmed));
   } catch (e) {
-    console.error('Failed to save recent players:', e);
+    logger.error('Failed to save recent players:', e);
   }
 }
 
@@ -82,6 +82,6 @@ export function clearRecentPlayers(): void {
   try {
     localStorage.removeItem(RECENT_PLAYERS_KEY);
   } catch (e) {
-    console.error('Failed to clear recent players:', e);
+    logger.error('Failed to clear recent players:', e);
   }
 }

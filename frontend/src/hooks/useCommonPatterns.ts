@@ -13,6 +13,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
+import logger from '../utils/logger';
 
 /**
  * Debounced value hook - delays state updates
@@ -45,7 +46,7 @@ export function useLocalStorage<T>(
       const item = window.localStorage.getItem(key);
       return item ? JSON.parse(item) : initialValue;
     } catch (error) {
-      console.error(`Error loading localStorage key "${key}":`, error);
+      logger.error('Error loading localStorage key', error, { key });
       return initialValue;
     }
   });
@@ -60,7 +61,7 @@ export function useLocalStorage<T>(
           return valueToStore;
         });
       } catch (error) {
-        console.error(`Error saving to localStorage key "${key}":`, error);
+        logger.error('Error saving to localStorage key', error, { key });
       }
     },
     [key]
@@ -72,7 +73,7 @@ export function useLocalStorage<T>(
       window.localStorage.removeItem(key);
       setStoredValue(initialValue);
     } catch (error) {
-      console.error(`Error clearing localStorage key "${key}":`, error);
+      logger.error('Error clearing localStorage key', error, { key });
     }
   }, [key, initialValue]);
 
@@ -362,7 +363,7 @@ export function useCopyToClipboard(): {
       // Clear copied text after 2 seconds
       setTimeout(() => setCopiedText(null), 2000);
     } catch (error) {
-      console.error('Failed to copy text:', error);
+      logger.error('Failed to copy text:', error);
       throw error;
     }
   }, []);

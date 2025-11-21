@@ -11,6 +11,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { PlayerPosition } from './PlayerPosition';
 import { GameState, TrickCard, Player } from '../../types/game';
+import logger from '../../utils/logger';
 
 export interface TrickAreaProps {
   gameState: GameState;
@@ -47,7 +48,7 @@ export function TrickArea({
       );
 
       if (playerIndex === -1) {
-        console.warn(`[TrickArea] Player not found for card:`, tc);
+        logger.warn(`[TrickArea] Player not found for card:`, tc);
         return;
       }
 

@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
-import { RoundHistory } from '../types/game';
+import { RoundHistory, Card } from '../types/game';
 import { sounds } from '../utils/sounds';
 import { TrickHistory } from './TrickHistory';
+import logger from '../utils/logger';
 
 interface ReplayData {
   game_id: string;
@@ -39,21 +40,21 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   // Fetch replay data on mount
   useEffect(() => {
     if (!socket) {
-      console.error('[GameReplay] Socket is null');
+      logger.error('[GameReplay] Socket is null');
       return;
     }
 
     const handleReplayData = ({ replayData }: { replayData: ReplayData }) => {
       // Validate replay data structure
       if (!replayData) {
-        console.error('[GameReplay] Replay data is null or undefined');
+        logger.error('[GameReplay] Replay data is null or undefined');
         setError('Replay data is missing');
         setLoading(false);
         return;
       }
 
       if (!replayData.round_history || !Array.isArray(replayData.round_history)) {
-        console.error('[GameReplay] round_history is missing or not an array:', replayData.round_history);
+        logger.error('[GameReplay] round_history is missing or not an array:', replayData.round_history);
         setError('Replay data is malformed (missing round history)');
         setLoading(false);
         return;
@@ -70,7 +71,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     };
 
     const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
-      console.error('[GameReplay] Error loading replay:', errorData, 'for game:', gameId);
+      logger.error('[GameReplay] Error loading replay:', errorData, 'for game:', gameId);
 
       // Extract correlation ID if available
       const corrId = errorData?.correlationId || errorData?.correlation_id || null;
@@ -154,7 +155,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   const startingHands = useMemo(() => {
     if (!currentRound?.tricks || currentRound.tricks.length === 0) return {};
 
-    const hands: Record<string, any[]> = {};
+    const hands: Record<string, Card[]> = {};
     if (replayData) {
       replayData.player_names.forEach(name => hands[name] = []);
 
@@ -163,7 +164,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
           // Defensive check: ensure player exists in hands before pushing
           // This handles cases where player names changed (e.g., bot replacement)
           if (!hands[trickCard.playerName]) {
-            console.warn('[GameReplay] Calculating starting hands: Player not found. Action: Building hand from trick history. PlayerName from trick:', trickCard.playerName, 'Available players:', Object.keys(hands), 'Round:', currentRoundIndex, 'Trick:', currentTrickIndex);
+            logger.warn('[GameReplay] Calculating starting hands: Player not found. Action: Building hand from trick history. PlayerName from trick:', trickCard.playerName, 'Available players:', Object.keys(hands), 'Round:', currentRoundIndex, 'Trick:', currentTrickIndex);
             hands[trickCard.playerName] = [];
           }
           hands[trickCard.playerName].push(trickCard.card);

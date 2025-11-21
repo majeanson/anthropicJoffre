@@ -24,7 +24,7 @@ export function preloadCardImages(): Promise<void[]> {
       const img = new Image();
       img.onload = () => resolve();
       img.onerror = () => {
-        console.warn(`Failed to preload image: ${src}`);
+        logger.warn(`Failed to preload image: ${src}`);
         resolve(); // Resolve anyway to not block the app
       };
       img.src = src;

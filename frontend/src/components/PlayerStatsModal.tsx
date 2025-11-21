@@ -9,6 +9,7 @@ import { ProfileEditor, ProfileData } from './ProfileEditor'; // Sprint 3 Phase 
 import { UserProfile } from '../types/auth'; // Sprint 3 Phase 3.2
 import { MatchCard } from './MatchCard'; // Sprint 3 Phase 3.3
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
+import logger from '../utils/logger';
 
 // Lazy load heavy modal
 const MatchStatsModal = lazy(() => import('./MatchStatsModal').then(m => ({ default: m.MatchStatsModal })));
@@ -128,7 +129,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     };
 
     const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
-      console.error('[PlayerStatsModal] Socket error:', errorData);
+      logger.error('[PlayerStatsModal] Socket error:', errorData);
 
       // Extract correlation ID if available
       const corrId = errorData?.correlationId || errorData?.correlation_id || null;
@@ -167,7 +168,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
     };
 
     const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
-      console.error('[PlayerStatsModal] Socket error while loading history:', errorData);
+      logger.error('[PlayerStatsModal] Socket error while loading history:', errorData);
 
       // Set user-friendly error message
       const errorMessage = errorData?.message || ERROR_MESSAGES.GAME_HISTORY_FAILED;
@@ -195,7 +196,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
         // setPreferences(data.preferences);
       }
     } catch (error) {
-      console.error('[PlayerStatsModal] Error loading profile:', error);
+      logger.error('[PlayerStatsModal] Error loading profile:', error);
       const errorMessage = getErrorMessage(error, 'PROFILE_DATA_FAILED');
       setProfileError(errorMessage);
     } finally {
@@ -834,7 +835,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                           // Refresh the profile data to show updated information
                           await loadProfile();
                         } catch (error) {
-                          console.error('[PlayerStatsModal] Error saving profile:', error);
+                          logger.error('[PlayerStatsModal] Error saving profile:', error);
                           // Optionally show error message to user
                         }
                       }}

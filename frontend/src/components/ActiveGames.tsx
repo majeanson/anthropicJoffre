@@ -10,6 +10,7 @@ import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
 import { CONFIG } from '../config/constants';
 import { ERROR_MESSAGES } from '../config/errorMessages';
+import logger from '../utils/logger';
 
 interface ActiveGame {
   gameId: string;
@@ -51,7 +52,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
         const data = await response.json();
         setActiveGames(data.games || []);
       } catch (err) {
-        console.error('Error fetching active games:', err);
+        logger.error('Error fetching active games:', err);
         // More specific error message for CORS/network failures
         if (err instanceof TypeError) {
           setError(ERROR_MESSAGES.CONNECTION_FAILED);

@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import { User, UserProfile, ProfileUpdateData } from '../types/auth';
 import { ProfileEditor, ProfileData } from './ProfileEditor';
+import logger from '../utils/logger';
 
 interface ProfileEditorModalProps {
   user: User;
@@ -48,7 +49,7 @@ export function ProfileEditorModal({
           });
         }
       } catch (error) {
-        console.error('Failed to fetch profile:', error);
+        logger.error('Failed to fetch profile:', error);
         // Use defaults on error
         setProfileData({
           visibility: 'public',
@@ -99,7 +100,7 @@ export function ProfileEditorModal({
                 await updateProfile(data);
                 onClose();
               } catch (error) {
-                console.error('Failed to update profile:', error);
+                logger.error('Failed to update profile:', error);
               }
             }}
             onCancel={onClose}

@@ -6,6 +6,7 @@
  */
 
 import { API_ENDPOINTS } from '../config/constants';
+import logger from '../utils/logger';
 
 let csrfToken: string | null = null;
 let tokenPromise: Promise<string> | null = null;
@@ -40,7 +41,7 @@ export async function fetchCsrfToken(): Promise<string> {
       csrfToken = data.csrfToken;
       return csrfToken!;
     } catch (error) {
-      console.error('Error fetching CSRF token:', error);
+      logger.error('Error fetching CSRF token:', error);
       throw error;
     } finally {
       tokenPromise = null;
@@ -108,7 +109,7 @@ export async function fetchWithCsrf(
     const csrfHeaders = await getHeadersWithCsrf(options.headers);
     fetchOptions.headers = csrfHeaders;
   } catch (error) {
-    console.error('Failed to get CSRF token:', error);
+    logger.error('Failed to get CSRF token:', error);
     // Continue without CSRF token (will fail on server, but provides better error)
   }
 
@@ -124,7 +125,7 @@ export async function fetchWithCsrf(
     try {
       const data = await response.clone().json();
       if (data.code === 'CSRF_VALIDATION_FAILED') {
-        console.warn('CSRF validation failed, retrying with new token...');
+        logger.warn('CSRF validation failed, retrying with new token...');
         clearCsrfToken();
         return fetchWithCsrf(url, options, false); // Retry without further retries
       }
@@ -144,7 +145,7 @@ export async function initializeCsrf(): Promise<void> {
   try {
     await fetchCsrfToken();
   } catch (error) {
-    console.error('[CSRF] Failed to initialize token:', error);
+    logger.error('[CSRF] Failed to initialize token:', error);
     // Don't throw - app should still work, requests will fail with clear error
   }
 }

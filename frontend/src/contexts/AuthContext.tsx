@@ -7,6 +7,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { User, AuthContextType, LoginData, RegisterData, ProfileUpdateData } from '../types/auth';
 import { fetchWithCsrf, initializeCsrf, clearCsrfToken } from '../utils/csrf';
 import { API_ENDPOINTS } from '../config/constants';
+import logger from '../utils/logger';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -53,7 +54,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setUser(data.user);
     } catch (err) {
-      console.error('Error fetching current user:', err);
+      logger.error('Error fetching current user', err);
       clearTokens();
       setUser(null);
     } finally {
@@ -77,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Security violation or invalid token
         const data = await response.json().catch(() => ({}));
         if (data.code === 'TOKEN_THEFT_DETECTED') {
-          console.warn('🚨 Token theft detected! User must re-login.');
+          logger.warn('Token theft detected! User must re-login', { code: data.code });
         }
         throw new Error('Failed to refresh token');
       }
@@ -165,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Call logout endpoint to revoke refresh token
     fetchWithCsrf(API_ENDPOINTS.authLogout(), {
       method: 'POST'
-    }).catch(console.error);
+    }).catch(err => logger.error('Failed to revoke refresh token on logout', err));
   }, []);
 
   // Clear error
@@ -192,7 +193,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       return data;
     } catch (err) {
-      console.error('Error fetching profile:', err);
+      logger.error('Error fetching profile', err);
       return null;
     }
   }, []);
@@ -231,7 +232,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sprint 18: Initialize CSRF token cache on app load
   useEffect(() => {
     // Initialize CSRF token in parallel with user fetch
-    initializeCsrf().catch(console.error);
+    initializeCsrf().catch(err => logger.error('Failed to initialize CSRF token', err));
 
     fetchCurrentUser();
   }, [fetchCurrentUser]);

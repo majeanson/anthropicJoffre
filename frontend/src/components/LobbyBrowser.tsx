@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
 import { API_ENDPOINTS } from '../config/constants';
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
+import logger from '../utils/logger';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -135,7 +136,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           errorData = { message: await response.text() };
         }
 
-        console.error('[LobbyBrowser] Server error:', errorData);
+        logger.error('[LobbyBrowser] Server error:', errorData);
 
         // Extract correlation ID if available
         const corrId = errorData.correlationId || errorData.correlation_id || null;
@@ -160,7 +161,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
     } catch (err) {
       // Network errors (fetch failed)
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        console.error('[LobbyBrowser] Network error:', err);
+        logger.error('[LobbyBrowser] Network error:', err);
         setError(ERROR_MESSAGES.NETWORK_ERROR);
 
         // Retry on network errors
@@ -170,7 +171,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         }
       } else {
         const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
-        console.error('[LobbyBrowser] Failed to load games:', errorMessage, err);
+        logger.error('[LobbyBrowser] Failed to load games:', errorMessage, err);
         setError(`${ERROR_MESSAGES.GAMES_LOAD_FAILED}: ${errorMessage}`);
       }
     } finally {
@@ -202,7 +203,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           errorData = { message: await response.text() };
         }
 
-        console.error('[LobbyBrowser] Server error:', errorData);
+        logger.error('[LobbyBrowser] Server error:', errorData);
 
         // Extract correlation ID if available
         const corrId = errorData.correlationId || errorData.correlation_id || null;
@@ -228,7 +229,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
       // Network errors (fetch failed)
       if (err instanceof TypeError && err.message.includes('fetch')) {
         const errorMessage = 'Network error. Please check your connection.';
-        console.error('[LobbyBrowser] Network error:', err);
+        logger.error('[LobbyBrowser] Network error:', err);
         setError(errorMessage);
 
         // Retry on network errors
@@ -238,7 +239,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         }
       } else {
         const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
-        console.error('[LobbyBrowser] Failed to load recent games:', errorMessage, err);
+        logger.error('[LobbyBrowser] Failed to load recent games:', errorMessage, err);
         setError(`${ERROR_MESSAGES.RECENT_GAMES_LOAD_FAILED}: ${errorMessage}`);
       }
     } finally {
