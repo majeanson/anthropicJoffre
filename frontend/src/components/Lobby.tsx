@@ -134,6 +134,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           setFocusedButtonIndex(0);
         }
         sounds.buttonClick();
+        // Focus first button in new tab after React re-renders
+        setTimeout(() => {
+          const buttons = document.querySelectorAll('[data-tab-content] [data-keyboard-nav]');
+          if (buttons.length > 0) {
+            (buttons[0] as HTMLButtonElement).focus();
+          }
+        }, 50);
       }
 
       // Button navigation within tab with Arrow Up/Down
@@ -150,15 +157,19 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           const tabs = ['play', 'social', 'stats', 'settings'];
           setFocusedTabIndex(tabs.indexOf(mainTab));
           setFocusedButtonIndex(0);
+          buttons[0]?.focus();
           sounds.buttonClick();
           return;
         }
 
+        let newIndex: number;
         if (e.key === 'ArrowDown') {
-          setFocusedButtonIndex((prev) => (prev + 1) % buttons.length);
+          newIndex = (focusedButtonIndex + 1) % buttons.length;
         } else {
-          setFocusedButtonIndex((prev) => prev === 0 ? buttons.length - 1 : prev - 1);
+          newIndex = focusedButtonIndex === 0 ? buttons.length - 1 : focusedButtonIndex - 1;
         }
+        setFocusedButtonIndex(newIndex);
+        buttons[newIndex]?.focus();
         sounds.buttonClick();
       }
 
