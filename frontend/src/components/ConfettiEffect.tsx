@@ -42,9 +42,9 @@ export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom'
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Small canvas size to cover trick area only
-    const canvasWidth = 250;
-    const canvasHeight = 200;
+    // Small canvas size centered on winning card
+    const canvasWidth = 200;
+    const canvasHeight = 160;
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
 
@@ -55,7 +55,7 @@ export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom'
 
     // Create confetti particles spreading from the center (where the winning card is)
     const particles: ConfettiParticle[] = [];
-    const particleCount = 20; // Increased for more visible effect
+    const particleCount = 15; // Reduced for better performance
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
 
@@ -124,17 +124,18 @@ export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom'
   }, [teamColor, duration]);
 
   // Position the confetti canvas at the winning card's location in the circular layout
+  // Using absolute positioning relative to the trick area container
   const positionClasses = {
-    bottom: 'top-[55%] left-1/2 -translate-x-1/2 -translate-y-1/2', // At bottom card
-    left: 'top-1/2 left-[20%] -translate-x-1/2 -translate-y-1/2', // At left card
-    top: 'top-[30%] left-1/2 -translate-x-1/2 -translate-y-1/2', // At top card
-    right: 'top-1/2 right-[20%] translate-x-1/2 -translate-y-1/2', // At right card
+    bottom: 'bottom-8 left-1/2 -translate-x-1/2', // At bottom card
+    left: 'top-1/2 left-8 -translate-y-1/2', // At left card
+    top: 'top-8 left-1/2 -translate-x-1/2', // At top card
+    right: 'top-1/2 right-8 -translate-y-1/2', // At right card
   };
 
   return (
     <canvas
       ref={canvasRef}
-      className={`fixed ${positionClasses[position]} pointer-events-none z-[9998] motion-reduce:hidden w-[250px] h-[200px]`}
+      className={`absolute ${positionClasses[position]} pointer-events-none z-[60] motion-reduce:hidden w-[200px] h-[160px]`}
       style={{ opacity: 0.9, backgroundColor: 'transparent' }}
     />
   );

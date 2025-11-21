@@ -190,11 +190,11 @@ export function TrickArea({
 
   return (
     <div className="flex-1 flex items-center justify-center mb-4 md:mb-6 relative">
-      {/* Previous Trick Button */}
+      {/* Previous Trick Button - Top Left Corner */}
       {gameState.previousTrick && (
         <button
           onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-          className={`absolute top-2 md:top-4 left-1/2 -translate-x-1/2 z-50 ${
+          className={`absolute top-2 md:top-4 left-2 md:left-4 z-50 ${
             showPreviousTrick
               ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
               : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700'
