@@ -70,6 +70,13 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [chatOpen, setChatOpen] = useState<boolean>(false);
 
+  // Keyboard navigation state - 3 levels
+  // Level 0: Bet amount (7-12)
+  // Level 1: Trump option (With/Without)
+  // Level 2: Action buttons (Skip/Place)
+  const [navLevel, setNavLevel] = useState<number>(0);
+  const [actionIndex, setActionIndex] = useState<number>(0); // 0=Skip, 1=Place (for level 2)
+
   // Use chat notifications hook
   const { unreadChatCount } = useChatNotifications({
     socket,
@@ -111,46 +118,77 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
     onPlaceBet(-1, false, true);
   };
 
-  // Keyboard accessibility for betting
+  // Keyboard accessibility for betting - 3 level navigation
   useEffect(() => {
     if (!isMyTurn || hasPlacedBet) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Arrow Up - Increase bet
+      // Up/Down - Navigate between levels
       if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSelectedAmount(prev => Math.min(12, prev + 1));
+        setNavLevel(prev => Math.max(0, prev - 1));
         sounds.buttonClick();
       }
-      // Arrow Down - Decrease bet
       else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedAmount(prev => Math.max(7, prev - 1));
+        setNavLevel(prev => Math.min(2, prev + 1));
         sounds.buttonClick();
       }
-      // Arrow Right/Left - Toggle without trump
-      else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+      // Left/Right - Adjust value within current level
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
-        setWithoutTrump(prev => !prev);
+        if (navLevel === 0) {
+          // Level 0: Bet amount
+          if (e.key === 'ArrowRight') {
+            setSelectedAmount(prev => Math.min(12, prev + 1));
+          } else {
+            setSelectedAmount(prev => Math.max(7, prev - 1));
+          }
+        } else if (navLevel === 1) {
+          // Level 1: Trump option toggle
+          setWithoutTrump(prev => !prev);
+        } else if (navLevel === 2) {
+          // Level 2: Action buttons (Skip/Place)
+          const hasSkip = canSkip();
+          if (hasSkip) {
+            setActionIndex(prev => prev === 0 ? 1 : 0);
+          }
+        }
         sounds.buttonClick();
       }
-      // Enter - Place bet (if valid)
+      // Enter - Activate current selection
       else if (e.key === 'Enter') {
         e.preventDefault();
-        if (!hasPlacedBet && isCurrentBetValid()) {
-          handlePlaceBet();
+        if (navLevel === 2) {
+          // Action level - execute selected action
+          if (actionIndex === 0 && canSkip()) {
+            handleSkip();
+          } else if (actionIndex === 1 || !canSkip()) {
+            if (isCurrentBetValid()) {
+              handlePlaceBet();
+            }
+          }
+        } else {
+          // On other levels, Enter moves to action level
+          setNavLevel(2);
         }
+        sounds.buttonClick();
       }
-      // S or Escape - Skip (if allowed)
-      else if ((e.key === 's' || e.key === 'S' || e.key === 'Escape') && canSkip()) {
+      // Escape - Go back one level or skip
+      else if (e.key === 'Escape') {
         e.preventDefault();
-        handleSkip();
+        if (navLevel > 0) {
+          setNavLevel(prev => prev - 1);
+        } else if (canSkip()) {
+          handleSkip();
+        }
+        sounds.buttonClick();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMyTurn, hasPlacedBet, selectedAmount, withoutTrump]);
+  }, [isMyTurn, hasPlacedBet, selectedAmount, withoutTrump, navLevel, actionIndex]);
 
   // Check if a specific bet amount is valid (for button disabling)
   const isBetAmountValid = (amount: number): boolean => {
@@ -275,9 +313,11 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
           {isMyTurn ? (
             <>
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3">
-                    Select Bet Amount:
+                {/* Level 0: Bet Amount */}
+                <div className={`p-3 rounded-lg transition-all ${navLevel === 0 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
+                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                    {navLevel === 0 && <span className="text-orange-500">▶</span>}
+                    Select Bet Amount: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to adjust)</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[7, 8, 9, 10, 11, 12].map((amount) => {
@@ -302,9 +342,11 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3">
-                    Trump Option:
+                {/* Level 1: Trump Option */}
+                <div className={`p-3 rounded-lg transition-all ${navLevel === 1 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
+                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                    {navLevel === 1 && <span className="text-orange-500">▶</span>}
+                    Trump Option: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to toggle)</span>
                   </label>
                   <div className="space-y-2">
                     <label className="flex items-center p-3 bg-parchment-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-parchment-200 dark:bg-gray-600 transition-colors border border-parchment-300 dark:border-gray-600">
@@ -334,27 +376,36 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                   </div>
                 </div>
 
-                <div className="flex gap-3">
-                  {canSkip() && (
+                {/* Level 2: Action Buttons */}
+                <div className={`p-3 rounded-lg transition-all ${navLevel === 2 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
+                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                    {navLevel === 2 && <span className="text-orange-500">▶</span>}
+                    Action: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to select, Enter to confirm)</span>
+                  </label>
+                  <div className="flex gap-3">
+                    {canSkip() && (
+                      <button
+                        data-testid="skip-bet-button"
+                        onClick={handleSkip}
+                        className={`flex-1 py-4 px-6 rounded-xl font-black text-base bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
+                          navLevel === 2 && actionIndex === 0 ? 'ring-4 ring-orange-500 border-orange-500' : 'border-gray-700'
+                        }`}
+                      >
+                        SKIP
+                      </button>
+                    )}
                     <button
-                      data-testid="skip-bet-button"
-                      onClick={handleSkip}
-                      className="flex-1 py-4 px-6 rounded-xl font-black text-base bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105"
+                      onClick={handlePlaceBet}
+                      disabled={!isCurrentBetValid()}
+                      className={`flex-1 py-4 px-6 rounded-xl font-black text-base transition-all duration-300 border-2 shadow-lg transform ${
+                        isCurrentBetValid()
+                          ? 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 hover:scale-105'
+                          : 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed border-gray-400 opacity-60'
+                      } ${navLevel === 2 && (actionIndex === 1 || !canSkip()) ? 'ring-4 ring-orange-500 border-orange-500' : 'border-green-800'}`}
                     >
-                      SKIP
+                      Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
                     </button>
-                  )}
-                  <button
-                    onClick={handlePlaceBet}
-                    disabled={!isCurrentBetValid()}
-                    className={`flex-1 py-4 px-6 rounded-xl font-black text-base transition-all duration-300 border-2 shadow-lg transform ${
-                      isCurrentBetValid()
-                        ? 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 border-green-800 hover:scale-105'
-                        : 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed border-gray-400 opacity-60'
-                    }`}
-                  >
-                    Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
-                  </button>
+                  </div>
                 </div>
               </div>
 
