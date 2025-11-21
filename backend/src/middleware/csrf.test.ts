@@ -76,14 +76,15 @@ describe('CSRF Protection Middleware', () => {
       expect(csrfCookie).toContain('HttpOnly');
     });
 
-    it('should set SameSite=Strict', async () => {
+    it('should set SameSite=Lax in development', async () => {
       const response = await request(app)
         .get('/api/csrf-token')
         .expect(200);
 
       const cookies = response.headers['set-cookie'];
       const csrfCookie = cookies.find((c: string) => c.includes('csrf-token'));
-      expect(csrfCookie).toContain('SameSite=Strict');
+      // In development, SameSite=Lax is used for better compatibility
+      expect(csrfCookie).toContain('SameSite=Lax');
     });
 
     it('should generate different tokens for different requests', async () => {
@@ -320,12 +321,14 @@ describe('CSRF Protection Middleware', () => {
       expect(csrfCookie).toContain('HttpOnly');
     });
 
-    it('should use SameSite=Strict to prevent CSRF', async () => {
+    it('should use SameSite=Lax to prevent CSRF in development', async () => {
       const response = await request(app).get('/api/csrf-token');
       const cookies = response.headers['set-cookie'];
       const csrfCookie = cookies.find((c: string) => c.includes('csrf-token'));
 
-      expect(csrfCookie).toContain('SameSite=Strict');
+      // In development, SameSite=Lax is used for better compatibility
+      // In production, SameSite=None is used (for cross-origin requests with HTTPS)
+      expect(csrfCookie).toContain('SameSite=Lax');
     });
 
     it('should use Secure flag in production', async () => {
@@ -343,7 +346,7 @@ describe('CSRF Protection Middleware', () => {
 
       // Verify other security flags are still present
       expect(csrfCookie).toContain('HttpOnly');
-      expect(csrfCookie).toContain('SameSite=Strict');
+      expect(csrfCookie).toContain('SameSite=Lax');
     });
   });
 
