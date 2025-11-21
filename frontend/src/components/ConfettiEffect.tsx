@@ -1,9 +1,10 @@
 /**
- * ConfettiEffect Component
+ * WinnerEffect Component (formerly ConfettiEffect)
  * Sprint 1 Phase 3: Trick Winner Celebrations
  *
- * CSS-based confetti animation for trick winner celebration
- * GPU-accelerated for better performance
+ * Sparkle burst animation for trick winner celebration
+ * Special effects for Red 0 (+6 pts) and Brown 0 (-1 pts)
+ * GPU-accelerated CSS animations
  */
 
 import { useMemo } from 'react';
@@ -15,92 +16,256 @@ interface ConfettiEffectProps {
   teamColor: 'orange' | 'purple';
   duration?: number;
   position?: PlayerPosition;
+  points?: number;
 }
 
-interface ConfettiPiece {
+interface Sparkle {
   id: number;
-  color: string;
-  left: number;
+  angle: number;
   delay: number;
-  rotation: number;
-  scale: number;
+  size: number;
+  type: 'star' | 'circle' | 'diamond';
 }
 
-export function ConfettiEffect({ teamColor, duration = 2000, position = 'bottom' }: ConfettiEffectProps) {
+export function ConfettiEffect({ teamColor, duration = 1500, position = 'bottom', points = 1 }: ConfettiEffectProps) {
   const { animationsEnabled } = useSettings();
 
   // Don't render if animations are disabled
   if (!animationsEnabled) return null;
 
-  // Team colors
-  const colors = teamColor === 'orange'
-    ? ['#ea580c', '#fb923c', '#fdba74', '#fed7aa', '#ffedd5']
-    : ['#9333ea', '#c084fc', '#d8b4fe', '#e9d5ff', '#f3e8ff'];
+  // Determine effect type based on points
+  // Red 0: +6 points (5 bonus + 1 trick)
+  // Brown 0: -1 points (-2 penalty + 1 trick)
+  const isRedZero = points >= 6;
+  const isBrownZero = points < 0;
+  const isSpecialCard = isRedZero || isBrownZero;
 
-  // Generate confetti pieces (memoized to avoid re-renders)
-  const confettiPieces: ConfettiPiece[] = useMemo(() => {
-    const pieces: ConfettiPiece[] = [];
-    const count = 12; // Reduced count for performance
+  // Colors based on card type
+  let primaryColor: string;
+  let accentColor: string;
+
+  if (isRedZero) {
+    // Red 0 - golden/red celebration
+    primaryColor = '#ef4444'; // red
+    accentColor = '#fbbf24'; // gold
+  } else if (isBrownZero) {
+    // Brown 0 - brown/dark effect
+    primaryColor = '#78350f'; // brown
+    accentColor = '#92400e'; // amber-brown
+  } else {
+    // Normal - team colors
+    primaryColor = teamColor === 'orange' ? '#f97316' : '#a855f7';
+    accentColor = teamColor === 'orange' ? '#fbbf24' : '#c084fc';
+  }
+
+  // Generate sparkles - more for special cards
+  const sparkles: Sparkle[] = useMemo(() => {
+    const items: Sparkle[] = [];
+    const count = isSpecialCard ? 12 : 8;
 
     for (let i = 0; i < count; i++) {
-      pieces.push({
+      items.push({
         id: i,
-        color: colors[i % colors.length],
-        left: 20 + (i * 60 / count), // Spread across container
-        delay: i * 0.05, // Stagger animation
-        rotation: Math.random() * 360,
-        scale: 0.8 + Math.random() * 0.4,
+        angle: (360 / count) * i,
+        delay: i * 0.02,
+        size: isSpecialCard ? 10 + Math.random() * 8 : 8 + Math.random() * 6,
+        type: i % 3 === 0 ? 'star' : i % 3 === 1 ? 'diamond' : 'circle',
       });
     }
-    return pieces;
-  }, [teamColor]);
+    return items;
+  }, [isSpecialCard]);
 
-  // Position the confetti at the winning card's location
+  // Position at the winning card's location
   const positionClasses = {
-    bottom: 'bottom-12 left-1/2 -translate-x-1/2',
-    left: 'top-1/2 left-12 -translate-y-1/2',
-    top: 'top-12 left-1/2 -translate-x-1/2',
-    right: 'top-1/2 right-12 -translate-y-1/2',
+    bottom: 'bottom-16 left-1/2 -translate-x-1/2',
+    left: 'top-1/2 left-16 -translate-y-1/2',
+    top: 'top-16 left-1/2 -translate-x-1/2',
+    right: 'top-1/2 right-16 -translate-y-1/2',
   };
+
+  const renderShape = (type: string, size: number, color: string) => {
+    if (type === 'star') {
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+      );
+    }
+    if (type === 'diamond') {
+      return (
+        <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+          <path d="M12 2L2 12l10 10 10-10L12 2z" />
+        </svg>
+      );
+    }
+    // circle
+    return (
+      <div
+        style={{
+          width: size,
+          height: size,
+          borderRadius: '50%',
+          backgroundColor: color,
+        }}
+      />
+    );
+  };
+
+  // Special icon for red/brown 0
+  const renderSpecialIcon = () => {
+    if (isRedZero) {
+      return (
+        <div className="text-2xl animate-bounce">
+          💎
+        </div>
+      );
+    }
+    if (isBrownZero) {
+      return (
+        <div className="text-2xl">
+          💩
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const effectDuration = isSpecialCard ? duration * 1.2 : duration;
 
   return (
     <div
-      className={`absolute ${positionClasses[position]} pointer-events-none z-[60] w-24 h-24`}
-      style={{
-        animation: `confetti-container ${duration}ms ease-out forwards`,
-      }}
+      className={`absolute ${positionClasses[position]} pointer-events-none z-[60]`}
+      style={{ width: 140, height: 140 }}
     >
-      {confettiPieces.map((piece) => (
+      {/* Special card icon */}
+      {isSpecialCard && (
         <div
-          key={piece.id}
-          className="absolute w-2 h-2 rounded-sm"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10"
           style={{
-            backgroundColor: piece.color,
-            left: `${piece.left}%`,
-            top: '50%',
-            transform: `rotate(${piece.rotation}deg) scale(${piece.scale})`,
-            animation: `confetti-fall ${duration}ms ease-out ${piece.delay}s forwards`,
-            opacity: 0.9,
+            animation: `special-icon ${effectDuration}ms ease-out forwards`,
           }}
-        />
+        >
+          {renderSpecialIcon()}
+        </div>
+      )}
+
+      {/* Center glow - bigger for special cards */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          width: isSpecialCard ? 60 : 40,
+          height: isSpecialCard ? 60 : 40,
+          background: isRedZero
+            ? `radial-gradient(circle, #fbbf2480 0%, #ef444440 50%, transparent 70%)`
+            : isBrownZero
+            ? `radial-gradient(circle, #92400e60 0%, #78350f40 50%, transparent 70%)`
+            : `radial-gradient(circle, ${primaryColor}80 0%, transparent 70%)`,
+          animation: `pulse-glow ${effectDuration}ms ease-out forwards`,
+        }}
+      />
+
+      {/* Radiating sparkles */}
+      {sparkles.map((sparkle) => (
+        <div
+          key={sparkle.id}
+          className="absolute top-1/2 left-1/2"
+          style={{
+            transform: `translate(-50%, -50%) rotate(${sparkle.angle}deg)`,
+          }}
+        >
+          <div
+            style={{
+              animation: `sparkle-burst ${effectDuration}ms ease-out ${sparkle.delay}s forwards`,
+              opacity: 0,
+            }}
+          >
+            {renderShape(
+              sparkle.type,
+              sparkle.size,
+              sparkle.id % 2 === 0 ? primaryColor : accentColor
+            )}
+          </div>
+        </div>
       ))}
 
-      {/* Inline keyframes for the animation */}
+      {/* Ring burst - double ring for special cards */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+        style={{
+          borderColor: primaryColor,
+          animation: `ring-expand ${effectDuration}ms ease-out forwards`,
+          width: 20,
+          height: 20,
+        }}
+      />
+
+      {isSpecialCard && (
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
+          style={{
+            borderColor: accentColor,
+            animation: `ring-expand ${effectDuration}ms ease-out 0.1s forwards`,
+            width: 20,
+            height: 20,
+          }}
+        />
+      )}
+
       <style>{`
-        @keyframes confetti-fall {
+        @keyframes sparkle-burst {
           0% {
-            transform: translateY(0) rotate(0deg) scale(1);
+            transform: translateY(0);
+            opacity: 0;
+          }
+          20% {
             opacity: 1;
           }
           100% {
-            transform: translateY(80px) rotate(720deg) scale(0.5);
+            transform: translateY(-60px);
             opacity: 0;
           }
         }
-        @keyframes confetti-container {
-          0% { opacity: 1; }
-          80% { opacity: 1; }
-          100% { opacity: 0; }
+        @keyframes pulse-glow {
+          0% {
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 1;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0.8;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 0;
+          }
+        }
+        @keyframes ring-expand {
+          0% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(5);
+            opacity: 0;
+          }
+        }
+        @keyframes special-icon {
+          0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+          }
+          30% {
+            transform: translate(-50%, -50%) scale(1.3);
+            opacity: 1;
+          }
+          60% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0;
+          }
         }
       `}</style>
     </div>

@@ -295,12 +295,13 @@ export function TrickArea({
               {renderPlayerPosition(3)}
             </div>
 
-            {/* Confetti Effect - positioned relative to this container */}
+            {/* Winner Effect - positioned relative to this container */}
             {trickWinner && (
               <ConfettiEffect
                 position={trickWinner.position}
                 teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
                 duration={2000}
+                points={trickWinner.points}
               />
             )}
           </div>
