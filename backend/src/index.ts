@@ -197,7 +197,8 @@ import { registerBotHandlers } from './socketHandlers/bots';
 import { registerStatsHandlers } from './socketHandlers/stats';
 import { registerConnectionHandlers } from './socketHandlers/connection';
 import { registerAdminHandlers } from './socketHandlers/admin';
-import { registerAchievementHandlers } from './socketHandlers/achievements'; // Sprint 2 Phase 1
+import { registerAchievementHandlers, triggerAchievementCheck, emitAchievementUnlocked } from './socketHandlers/achievements'; // Sprint 2 Phase 1
+import { checkSecretAchievements } from './utils/achievementChecker'; // Achievement integration
 import { registerFriendHandlers } from './socketHandlers/friends'; // Sprint 2 Phase 2
 import { registerNotificationHandlers } from './socketHandlers/notifications'; // Sprint 3 Phase 5
 import { registerDirectMessageHandlers } from './socketHandlers/directMessages'; // Sprint 16 Day 4
@@ -539,6 +540,71 @@ function broadcastGameUpdate(
 
 // Round statistics tracking (imported types from game/roundStatistics.ts)
 const roundStats = new Map<string, RoundStatsData>(); // gameId -> stats data
+
+// ============================================================================
+// ACHIEVEMENT HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Check if the game was a comeback (opponent was 30+ points ahead at some point)
+ */
+function checkIfComeback(game: GameState, playerTeamId: 1 | 2): boolean {
+  // Check round history for point differentials
+  for (const round of game.roundHistory || []) {
+    const playerTeamScore = playerTeamId === 1 ? round.cumulativeScore.team1 : round.cumulativeScore.team2;
+    const opponentScore = playerTeamId === 1 ? round.cumulativeScore.team2 : round.cumulativeScore.team1;
+
+    // If opponent was ever 30+ points ahead
+    if (opponentScore - playerTeamScore >= 30) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Check if the game was a perfect game (won every bet as the betting team)
+ */
+function checkIfPerfectGame(game: GameState, playerTeamId: 1 | 2): boolean {
+  // Check if player's team won all rounds where they were the betting team
+  for (const round of game.roundHistory || []) {
+    // offensiveTeam is the team that made the highest bet
+    const biddingTeamId = round.offensiveTeam;
+
+    if (biddingTeamId === playerTeamId) {
+      // This team was betting - did they make their bet?
+      if (!round.betMade) {
+        return false; // Lost a bet they made
+      }
+    }
+  }
+
+  // Need at least one round where they were betting to count
+  const roundsAsBettingTeam = (game.roundHistory || []).filter(r => r.offensiveTeam === playerTeamId);
+  return roundsAsBettingTeam.length > 0;
+}
+
+/**
+ * Count how many rounds a player's team was the lowest scorer
+ */
+function countRoundsAsLowestScorer(game: GameState, playerName: string): number {
+  const player = game.players.find(p => p.name === playerName);
+  if (!player) return 0;
+
+  const playerTeamId = player.teamId;
+  let lowestScorerRounds = 0;
+
+  for (const round of game.roundHistory || []) {
+    const playerTeamScore = playerTeamId === 1 ? round.cumulativeScore.team1 : round.cumulativeScore.team2;
+    const opponentScore = playerTeamId === 1 ? round.cumulativeScore.team2 : round.cumulativeScore.team1;
+
+    if (playerTeamScore < opponentScore) {
+      lowestScorerRounds++;
+    }
+  }
+
+  return lowestScorerRounds;
+}
 
 // Timeout configuration
 const BETTING_TIMEOUT = 60000; // 60 seconds
@@ -1381,6 +1447,51 @@ async function endRound(gameId: string) {
         brownZerosReceived: stats?.brownZerosReceived.get(player.name) || 0,
         trumpsPlayed: stats?.trumpsPlayed.get(player.name) || 0,
       }, game.persistenceMode);
+
+      // ========================================================================
+      // ACHIEVEMENT INTEGRATION - Check round-level achievements
+      // ========================================================================
+
+      // Check bet_won achievements (for bidder whose team made the bet)
+      if (wasBidder && scoring.betMade) {
+        await triggerAchievementCheck(io, gameId, {
+          playerName: player.name,
+          gameId,
+          eventType: 'bet_won',
+          eventData: {
+            hadTrump: !game.highestBet?.withoutTrump,
+          },
+        });
+
+        // Check for perfect bet (exact prediction)
+        // offensiveTeamPoints is the points earned by the betting team
+        if (scoring.offensiveTeamPoints === scoring.betAmount) {
+          await triggerAchievementCheck(io, gameId, {
+            playerName: player.name,
+            gameId,
+            eventType: 'perfect_bet',
+          });
+        }
+
+        // Check for no-trump bet won
+        if (game.highestBet?.withoutTrump) {
+          await triggerAchievementCheck(io, gameId, {
+            playerName: player.name,
+            gameId,
+            eventType: 'no_trump_bet_won',
+          });
+        }
+      }
+
+      // Check red zero achievements
+      const redZeros = stats?.redZerosCollected.get(player.name) || 0;
+      if (redZeros > 0) {
+        await triggerAchievementCheck(io, gameId, {
+          playerName: player.name,
+          gameId,
+          eventType: 'red_zero_collected',
+        });
+      }
     }
   } catch (error) {
     console.error('Error saving game progress:', error);
@@ -1422,6 +1533,59 @@ async function endRound(gameId: string) {
           eloChange,
           game.persistenceMode
         );
+      }
+
+      // ============================================================================
+      // ACHIEVEMENT INTEGRATION - Check game-end achievements for human players
+      // ============================================================================
+      const stats = roundStats.get(gameId);
+
+      for (const player of humanPlayers) {
+        const won = player.teamId === winningTeam;
+        const playerStats = await getPlayerStats(player.name);
+
+        // Check if this was a comeback (opponent was 30+ points ahead at some point)
+        const wasComeback = won && checkIfComeback(game, player.teamId);
+
+        // Check if this was a perfect game (won all bets as betting team)
+        const perfectGame = won && checkIfPerfectGame(game, player.teamId);
+
+        if (won) {
+          // Trigger game_won achievements
+          await triggerAchievementCheck(io, gameId, {
+            playerName: player.name,
+            gameId,
+            eventType: 'game_won',
+            eventData: {
+              wasComeback,
+              perfectGame,
+              winStreak: playerStats.current_win_streak || 0,
+            },
+          });
+        }
+
+        // Trigger game_completed achievement (for games played milestone)
+        await triggerAchievementCheck(io, gameId, {
+          playerName: player.name,
+          gameId,
+          eventType: 'game_completed',
+        });
+
+        // Check secret achievements
+        const brownZerosCollected = stats?.brownZerosReceived.get(player.name) || 0;
+        // Calculate rounds as lowest scorer (simplified - check round history)
+        const roundsAsLowestScorer = countRoundsAsLowestScorer(game, player.name);
+
+        const secretUnlocked = await checkSecretAchievements(player.name, {
+          won,
+          brownZerosCollected,
+          roundsAsLowestScorer,
+        });
+
+        // Emit secret achievement unlocks
+        for (const achievement of secretUnlocked) {
+          await emitAchievementUnlocked(io, gameId, player.name, achievement);
+        }
       }
     } catch (error) {
       console.error('Error finalizing game:', error);
