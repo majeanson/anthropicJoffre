@@ -43,14 +43,10 @@ interface LobbyProps {
 
 
 export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister }: LobbyProps) {
-  const { user, updateProfile, getUserProfile } = useAuth();
+  const { user, updateProfile, getUserProfile, isLoading: authLoading } = useAuth();
   // Use authenticated username if available, otherwise use stored playerName for guests
-  const [playerName, setPlayerName] = useState(() => {
-    if (user?.username) {
-      return user.username;
-    }
-    return localStorage.getItem('playerName') || '';
-  });
+  // Initialize empty - will be set by useEffect once auth state is known
+  const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
   const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
@@ -85,15 +81,26 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     setRecentPlayers(getRecentPlayers());
   }, []);
 
-  // Sync playerName with auth and localStorage
+  // Sync playerName with auth state - runs when auth loading completes or user changes
   useEffect(() => {
-    // If user is authenticated, use their username
+    // Wait for auth to finish loading before setting playerName
+    if (authLoading) return;
+
+    // If user is authenticated, always use their username
     if (user?.username) {
       setPlayerName(user.username);
       localStorage.setItem('playerName', user.username);
     }
-    // For guests, save to localStorage
-    else if (playerName.trim()) {
+    // For guests (no user), use localStorage value
+    else if (!playerName) {
+      const storedName = localStorage.getItem('playerName') || '';
+      setPlayerName(storedName);
+    }
+  }, [authLoading, user]);
+
+  // Save guest playerName changes to localStorage (only for guests)
+  useEffect(() => {
+    if (!user && playerName.trim()) {
       localStorage.setItem('playerName', playerName.trim());
     }
   }, [playerName, user]);
