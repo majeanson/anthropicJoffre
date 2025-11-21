@@ -52,7 +52,7 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
       setTimeout(() => {
         onSwitchToLogin();
       }, 5000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setErrorMessage(err.message || 'Failed to request password reset');
     } finally {
       setIsLoading(false);

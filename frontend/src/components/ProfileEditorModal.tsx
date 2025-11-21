@@ -12,7 +12,7 @@ interface ProfileEditorModalProps {
   user: User;
   onClose: () => void;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;
-  getUserProfile: () => Promise<{ profile: UserProfile | null; preferences: any | null } | null>;
+  getUserProfile: () => Promise<{ profile: UserProfile | null; preferences: Record<string, unknown> | null } | null>;
 }
 
 export function ProfileEditorModal({

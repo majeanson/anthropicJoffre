@@ -6,7 +6,17 @@
  */
 
 interface LogData {
-  [key: string]: any;
+  [key: string]: unknown;
+}
+
+interface ErrorLog {
+  message: string;
+  error?: string;
+  stack?: string;
+  data?: LogData;
+  timestamp: number;
+  url: string;
+  userAgent: string;
 }
 
 class Logger {
@@ -39,7 +49,7 @@ class Logger {
   /**
    * Error logs (always logged + sent to backend)
    */
-  error(message: string, error?: any, data?: LogData) {
+  error(message: string, error?: Error | unknown, data?: LogData) {
     console.error(`[ERROR] ${message}`, error || '', data || '');
 
     // Send to backend for aggregation
@@ -49,12 +59,12 @@ class Logger {
   /**
    * Report error to backend error tracking
    */
-  private async reportError(message: string, error: any, data?: LogData) {
+  private async reportError(message: string, error: Error | unknown, data?: LogData) {
     try {
-      const errorLog = {
+      const errorLog: ErrorLog = {
         message,
-        error: error?.toString(),
-        stack: error?.stack,
+        error: error instanceof Error ? error.message : String(error ?? ''),
+        stack: error instanceof Error ? error.stack : undefined,
         data,
         timestamp: Date.now(),
         url: window.location.href,
@@ -82,9 +92,9 @@ class Logger {
   /**
    * Store error in localStorage for debugging
    */
-  private storeErrorInLocalStorage(errorLog: any) {
+  private storeErrorInLocalStorage(errorLog: ErrorLog) {
     try {
-      const storedErrors = JSON.parse(localStorage.getItem('errorLog') || '[]');
+      const storedErrors: ErrorLog[] = JSON.parse(localStorage.getItem('errorLog') || '[]');
       storedErrors.push(errorLog);
 
       // Keep only last N errors
@@ -101,9 +111,9 @@ class Logger {
   /**
    * Get stored errors from localStorage
    */
-  getStoredErrors(): any[] {
+  getStoredErrors(): ErrorLog[] {
     try {
-      return JSON.parse(localStorage.getItem('errorLog') || '[]');
+      return JSON.parse(localStorage.getItem('errorLog') || '[]') as ErrorLog[];
     } catch (e) {
       return [];
     }

@@ -128,7 +128,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
       if (!response.ok) {
         // Try to parse error as JSON to extract correlation ID
-        let errorData: any;
+        let errorData: { message?: string; correlationId?: string; correlation_id?: string };
         try {
           errorData = await response.json();
         } catch {
@@ -195,7 +195,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
       if (!response.ok) {
         // Try to parse error as JSON to extract correlation ID
-        let errorData: any;
+        let errorData: { message?: string; correlationId?: string; correlation_id?: string };
         try {
           errorData = await response.json();
         } catch {

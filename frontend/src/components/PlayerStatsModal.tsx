@@ -126,7 +126,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       }
     };
 
-    const handleError = (errorData: any) => {
+    const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
       console.error('[PlayerStatsModal] Socket error:', errorData);
 
       // Extract correlation ID if available
@@ -165,7 +165,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
       }
     };
 
-    const handleError = (errorData: any) => {
+    const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
       console.error('[PlayerStatsModal] Socket error while loading history:', errorData);
 
       // Set user-friendly error message

@@ -77,7 +77,7 @@ export function PlayerProfileModal({
       }
     };
 
-    const handleError = (errorData: any) => {
+    const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
       if (errorData?.context === 'get_player_stats') {
         setError(errorData.message || 'Failed to load player profile');
         setLoading(false);

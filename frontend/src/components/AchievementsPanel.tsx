@@ -35,7 +35,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
     if (!socket) return;
 
     setLoading(true);
-    socket.emit('get_player_achievements', { playerName }, (response: any) => {
+    socket.emit('get_player_achievements', { playerName }, (response: { success: boolean; achievements?: unknown[]; error?: string }) => {
       if (response.success) {
         setAchievements(response.achievements);
         setTotalPoints(response.points || 0);

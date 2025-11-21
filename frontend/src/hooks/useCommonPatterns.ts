@@ -82,7 +82,7 @@ export function useLocalStorage<T>(
 /**
  * Socket event listener hook with automatic cleanup
  */
-export function useSocketListener<T = any>(
+export function useSocketListener<T = unknown>(
   socket: Socket | null,
   eventName: string,
   handler: (data: T) => void,
@@ -370,6 +370,20 @@ export function useCopyToClipboard(): {
   return { copiedText, copy };
 }
 
+// Type for experimental Network Information API
+interface NetworkInformation extends EventTarget {
+  effectiveType?: string;
+  downlink?: number;
+  addEventListener(type: 'change', listener: () => void): void;
+  removeEventListener(type: 'change', listener: () => void): void;
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation;
+  mozConnection?: NetworkInformation;
+  webkitConnection?: NetworkInformation;
+}
+
 /**
  * Network status hook
  */
@@ -395,9 +409,8 @@ export function useNetworkStatus(): {
     window.addEventListener('offline', handleOffline);
 
     // Get network information if available
-    const connection = (navigator as any).connection ||
-                      (navigator as any).mozConnection ||
-                      (navigator as any).webkitConnection;
+    const nav = navigator as NavigatorWithConnection;
+    const connection = nav.connection || nav.mozConnection || nav.webkitConnection;
 
     if (connection) {
       const updateNetworkInfo = () => {
