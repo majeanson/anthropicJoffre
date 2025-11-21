@@ -231,7 +231,7 @@ export function TrickArea({
           </div>
 
           {/* Circular Layout - Previous Trick */}
-          <div className="relative h-[340px] md:h-[380px] z-40">
+          <div className="relative h-[340px] md:h-[380px] w-full min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-40">
             {/* Bottom (position 0) */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
@@ -239,7 +239,7 @@ export function TrickArea({
             </div>
 
             {/* Left (position 1) */}
-            <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId, 1)}
               {renderPlayerPosition(1)}
             </div>
@@ -251,7 +251,7 @@ export function TrickArea({
             </div>
 
             {/* Right (position 3) */}
-            <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId, 3)}
               {renderPlayerPosition(3)}
             </div>
@@ -260,7 +260,7 @@ export function TrickArea({
       ) : (
         // Current Trick View
         <>
-          <div className="relative h-[340px] md:h-[380px]" data-testid="trick-area">
+          <div className="relative h-[340px] md:h-[380px] w-full min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto" data-testid="trick-area">
             {/* Bottom (position 0) - You */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
@@ -268,7 +268,7 @@ export function TrickArea({
             </div>
 
             {/* Left (position 1) */}
-            <div className="absolute top-1/2 left-2 md:left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
               {renderPlayerPosition(1)}
             </div>
@@ -280,7 +280,7 @@ export function TrickArea({
             </div>
 
             {/* Right (position 3) */}
-            <div className="absolute top-1/2 right-2 md:right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
               {renderPlayerPosition(3)}
             </div>
