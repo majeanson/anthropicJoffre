@@ -175,9 +175,15 @@ async function testPlayersJoining() {
 async function testTeamSelection() {
   logAction('Team Selection', 'info', 'Assigning teams...');
 
+  // Remove error listeners from join phase to avoid catching team selection "already on team" messages
+  testState.players.forEach(player => {
+    player.socket.removeAllListeners('error');
+  });
+
   return new Promise((resolve) => {
     // Assign teams: Team 1 (P1, P3), Team 2 (P2, P4)
     // P1 is already on Team 1 by default, so assign P2, P3, P4
+    // Note: "You are already on this team" is expected if player is already on correct team
     setTimeout(() => {
       testState.players[1].socket.emit('select_team', { gameId: testState.gameId, teamId: 2 });
     }, 200);
