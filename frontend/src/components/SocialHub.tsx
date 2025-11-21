@@ -31,6 +31,7 @@ import { CardSkeleton } from './ui/Skeleton';
 import { useAuth } from '../contexts/AuthContext';
 import Avatar from './Avatar';
 import { PlayerNameButton } from './PlayerNameButton';
+import { GameHistoryEntry } from '../types/game';
 
 type SocialTab = 'friends' | 'achievements' | 'recent' | 'suggestions';
 

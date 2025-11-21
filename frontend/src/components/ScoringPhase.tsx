@@ -3,7 +3,6 @@ import { Socket } from 'socket.io-client';
 import { GameState, RoundStatistics } from '../types/game';
 import { UnifiedChat } from './UnifiedChat';
 import { ChatMessage } from '../types/game';
-import { sounds } from '../utils/sounds';
 import { GameHeader } from './GameHeader';
 import { TrickHistory } from './TrickHistory';
 import { useChatNotifications } from '../hooks/useChatNotifications';

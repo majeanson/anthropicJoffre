@@ -67,7 +67,7 @@ export function useSocketConnection() {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
-        const response = await fetch(`${CONFIG.API_BASE_URL}/api/ping`, {
+        await fetch(`${CONFIG.API_BASE_URL}/api/ping`, {
           signal: controller.signal,
         });
         clearTimeout(timeoutId);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, Suspense, lazy } from 'react';
+import { useEffect, useState, useCallback, Suspense, lazy } from 'react';
 import { Card, PlayerSession, ChatMessage } from './types/game';
 import { Lobby } from './components/Lobby';
 import GlobalUI from './components/GlobalUI';
