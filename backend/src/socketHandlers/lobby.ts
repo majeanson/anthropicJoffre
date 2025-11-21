@@ -1,19 +1,23 @@
 /**
  * Lobby Socket.io Handlers
  * Sprint 3 Refactoring: Extracted from index.ts
+ * Improvement Plan Task 12: Further split into modular handlers
  *
- * Handles all lobby-related socket events:
+ * Handles core lobby events:
  * - create_game: Create new game
  * - join_game: Join existing game
- * - select_team: Select team during team selection
- * - swap_position: Swap positions with another player
- * - start_game: Start the game from team selection
- * - leave_game: Leave the game
+ * - fill_empty_seat: Fill an empty seat with new player
+ *
+ * Delegates to:
+ * - teamSelection.ts: Team selection and position swapping
+ * - gameLifecycle.ts: Game start and leave
  */
 
 import { Socket, Server } from 'socket.io';
 import { GameState, Player, PlayerSession, BotDifficulty } from '../types/game';
 import { Logger } from 'winston';
+import { registerTeamSelectionHandlers, TeamSelectionHandlersDependencies, SwapRequest } from './teamSelection';
+import { registerGameLifecycleHandlers, GameLifecycleHandlersDependencies } from './gameLifecycle';
 
 // Import validation schemas and functions
 import {
@@ -32,16 +36,8 @@ import { logValidationError } from '../utils/logger';
 // Import conditional persistence manager
 import * as PersistenceManager from '../db/persistenceManager';
 
-/**
- * Swap request tracking interface
- */
-export interface SwapRequest {
-  gameId: string;
-  requesterId: string;
-  requesterName: string;
-  targetId: string;
-  timeout: NodeJS.Timeout;
-}
+// Re-export SwapRequest interface from teamSelection for backwards compatibility
+export type { SwapRequest };
 
 /**
  * Dependencies needed by the lobby handlers
@@ -132,6 +128,36 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     logger,
     errorBoundaries,
   } = deps;
+
+  // ============================================================================
+  // Register split handlers (Task 12: Handler Splitting)
+  // ============================================================================
+
+  // Team selection handlers (select_team, swap_position, request_swap, respond_to_swap)
+  registerTeamSelectionHandlers(socket, {
+    games,
+    pendingSwapRequests,
+    io,
+    emitGameUpdate,
+    validateTeamSelection,
+    validatePositionSwap,
+    applyTeamSelection,
+    applyPositionSwap,
+    logger,
+    errorBoundaries,
+  } as TeamSelectionHandlersDependencies);
+
+  // Game lifecycle handlers (start_game, leave_game)
+  registerGameLifecycleHandlers(socket, {
+    games,
+    gameDeletionTimeouts,
+    io,
+    updateOnlinePlayer,
+    startNewRound,
+    validateGameStart,
+    logger,
+    errorBoundaries,
+  } as GameLifecycleHandlersDependencies);
 
   // ============================================================================
   // create_game - Create new game
@@ -504,303 +530,6 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       totalPlayers: game.players.length,
       gamePhase: game.phase
     });
-  }));
-
-  // ============================================================================
-  // select_team - Select team during team selection
-  // ============================================================================
-  socket.on('select_team', errorBoundaries.gameAction('select_team')(({ gameId, teamId }: { gameId: string; teamId: 1 | 2 }) => {
-    // Basic validation: game exists
-    const game = games.get(gameId);
-    if (!game) {
-      socket.emit('error', { message: 'Game not found' });
-      return;
-    }
-
-    // VALIDATION - Use pure validation function
-    const validation = validateTeamSelection(game, socket.id, teamId);
-    if (!validation.success) {
-      socket.emit('error', { message: validation.error });
-      return;
-    }
-
-    // STATE TRANSFORMATION - Use pure state function
-    applyTeamSelection(game, socket.id, teamId);
-
-    // I/O - Emit updates
-    emitGameUpdate(gameId, game);
-  }));
-
-  // ============================================================================
-  // swap_position - Swap positions with another player (immediate, for bots)
-  // ============================================================================
-  socket.on('swap_position', errorBoundaries.gameAction('swap_position')(({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
-    // Basic validation: game exists
-    const game = games.get(gameId);
-    if (!game) {
-      socket.emit('error', { message: 'Game not found' });
-      return;
-    }
-
-    // VALIDATION - Use pure validation function
-    const validation = validatePositionSwap(game, socket.id, targetPlayerId);
-    if (!validation.success) {
-      socket.emit('error', { message: validation.error });
-      return;
-    }
-
-    // STATE TRANSFORMATION - Use pure state function
-    applyPositionSwap(game, socket.id, targetPlayerId);
-
-    // I/O - Emit updates (force full update to ensure hands are synced)
-    emitGameUpdate(gameId, game, true);
-  }));
-
-  // ============================================================================
-  // request_swap - Request position swap (for human players)
-  // ============================================================================
-  socket.on('request_swap', errorBoundaries.gameAction('request_swap')(({ gameId, targetPlayerId }: { gameId: string; targetPlayerId: string }) => {
-    const game = games.get(gameId);
-    if (!game) {
-      socket.emit('error', { message: 'Game not found' });
-      return;
-    }
-
-    // VALIDATION
-    const validation = validatePositionSwap(game, socket.id, targetPlayerId);
-    if (!validation.success) {
-      socket.emit('error', { message: validation.error });
-      return;
-    }
-
-    const requester = game.players.find(p => p.id === socket.id);
-    const target = game.players.find(p => p.id === targetPlayerId);
-
-    if (!requester || !target) {
-      socket.emit('error', { message: 'Player not found' });
-      return;
-    }
-
-    // If target is a bot, execute swap immediately
-    if (target.isBot) {
-      applyPositionSwap(game, socket.id, targetPlayerId);
-      emitGameUpdate(gameId, game);
-      return;
-    }
-
-    // Cancel any existing request from this requester (1 request per player limit)
-    const existingRequestKey = Array.from(pendingSwapRequests.keys()).find(key => {
-      const request = pendingSwapRequests.get(key);
-      return request && request.requesterId === socket.id;
-    });
-    if (existingRequestKey) {
-      const existingRequest = pendingSwapRequests.get(existingRequestKey);
-      if (existingRequest) {
-        clearTimeout(existingRequest.timeout);
-        pendingSwapRequests.delete(existingRequestKey);
-      }
-    }
-
-    // Determine if swap will change teams
-    const requesterIndex = game.players.findIndex(p => p.id === socket.id);
-    const targetIndex = game.players.findIndex(p => p.id === targetPlayerId);
-    const requesterTeam = requesterIndex % 2 === 0 ? 1 : 2;
-    const targetTeam = targetIndex % 2 === 0 ? 1 : 2;
-    const willChangeTeams = requesterTeam !== targetTeam;
-
-    // Create timeout for auto-rejection (30 seconds)
-    const timeout = setTimeout(() => {
-      const requestKey = `${gameId}-${targetPlayerId}`;
-      pendingSwapRequests.delete(requestKey);
-
-      // Notify requester that request expired
-      io.to(socket.id).emit('swap_rejected', {
-        message: `${target.name} didn't respond to your swap request`
-      });
-    }, 30000);
-
-    // Store pending request
-    const requestKey = `${gameId}-${targetPlayerId}`;
-    pendingSwapRequests.set(requestKey, {
-      gameId,
-      requesterId: socket.id,
-      requesterName: requester.name,
-      targetId: targetPlayerId,
-      timeout
-    });
-
-    // Notify target player
-    io.to(targetPlayerId).emit('swap_request_received', {
-      fromPlayerId: socket.id,
-      fromPlayerName: requester.name,
-      willChangeTeams
-    });
-  }));
-
-  // ============================================================================
-  // respond_to_swap - Accept or reject swap request
-  // ============================================================================
-  socket.on('respond_to_swap', errorBoundaries.gameAction('respond_to_swap')(({ gameId, requesterId, accepted }: { gameId: string; requesterId: string; accepted: boolean }) => {
-    const game = games.get(gameId);
-    if (!game) {
-      socket.emit('error', { message: 'Game not found' });
-      return;
-    }
-
-    // Find and validate pending request
-    const requestKey = `${gameId}-${socket.id}`;
-    const swapRequest = pendingSwapRequests.get(requestKey);
-
-    if (!swapRequest || swapRequest.requesterId !== requesterId) {
-      socket.emit('error', { message: 'No pending swap request found' });
-      return;
-    }
-
-    // Clear timeout and remove request
-    clearTimeout(swapRequest.timeout);
-    pendingSwapRequests.delete(requestKey);
-
-    const requester = game.players.find(p => p.id === requesterId);
-    const target = game.players.find(p => p.id === socket.id);
-
-    if (!requester || !target) {
-      socket.emit('error', { message: 'Player not found' });
-      return;
-    }
-
-    if (accepted) {
-      // Execute the swap
-      applyPositionSwap(game, requesterId, socket.id);
-
-      // Notify both players
-      io.to(requesterId).emit('swap_accepted', {
-        message: `${target.name} accepted your swap request`
-      });
-      io.to(socket.id).emit('swap_accepted', {
-        message: `You swapped positions with ${requester.name}`
-      });
-
-      // Update all players with new game state (force full update to ensure hands are synced)
-      emitGameUpdate(gameId, game, true);
-    } else {
-      // Notify requester of rejection
-      io.to(requesterId).emit('swap_rejected', {
-        message: `${target.name} rejected your swap request`
-      });
-    }
-  }));
-
-  // ============================================================================
-  // start_game - Start the game from team selection
-  // ============================================================================
-  socket.on('start_game', errorBoundaries.gameAction('start_game')(({ gameId }: { gameId: string }) => {
-    // Basic validation: game exists
-    const game = games.get(gameId);
-    if (!game) {
-      socket.emit('error', { message: 'Game not found' });
-      return;
-    }
-
-    // VALIDATION - Use pure validation function
-    const validation = validateGameStart(game);
-    if (!validation.success) {
-      socket.emit('error', { message: validation.error });
-      return;
-    }
-
-    // Side effects - Update online player statuses
-    game.players.forEach(player => {
-      updateOnlinePlayer(player.id, player.name, 'in_game', gameId);
-    });
-
-    // Start the game (handles state transitions and I/O)
-    startNewRound(gameId);
-  }));
-
-  // ============================================================================
-  // leave_game - Leave the game
-  // ============================================================================
-  socket.on('leave_game', errorBoundaries.gameAction('leave_game')(async (payload: LeaveGamePayload) => {
-    // Validate input with Zod schema
-    const validation = validateInput(leaveGamePayloadSchema, payload);
-    if (!validation.success) {
-      logValidationError('leave_game', validation.error, payload, socket.id);
-      socket.emit('error', { message: `Invalid input: ${validation.error}` });
-      return;
-    }
-
-    const { gameId } = validation.data;
-
-    const game = games.get(gameId);
-    if (!game) {
-      socket.emit('error', { message: 'Game not found' });
-      return;
-    }
-
-    const player = game.players.find(p => p.id === socket.id);
-    if (!player) {
-      socket.emit('error', { message: 'You are not in this game' });
-      return;
-    }
-
-    // Clean up player sessions from database (conditional on persistence mode)
-    await PersistenceManager.deletePlayerSessions(player.name, gameId, game.persistenceMode);
-
-    // Instead of removing player, convert to empty seat
-    const playerIndex = game.players.findIndex(p => p.id === socket.id);
-    if (playerIndex !== -1) {
-      console.log(`Player ${player.name} (${socket.id}) leaving game ${gameId} - converting to empty seat`);
-
-      // Convert player to empty seat (preserve team and position)
-      game.players[playerIndex] = {
-        ...player,
-        id: `empty_${playerIndex}_${Date.now()}`, // Unique ID for empty seat
-        name: `Empty Seat (${player.name})`, // Show who left
-        hand: [], // Clear hand
-        isEmpty: true,
-        emptySlotName: `Empty Seat`,
-        isBot: false,
-        botDifficulty: undefined,
-        connectionStatus: 'disconnected',
-        tricksWon: 0, // Reset stats for new player
-        pointsWon: 0,
-      };
-
-      // Leave the game room
-      socket.leave(gameId);
-
-      // Notify remaining players
-      io.to(gameId).emit('player_left', { playerId: socket.id, gameState: game });
-
-      // Check if all seats are empty - if so, schedule game deletion
-      const allEmpty = game.players.every(p => p.isEmpty);
-      if (allEmpty) {
-        // For Quick Play games or games that had multiple human players, give more time for reconnection
-        // Check if game ever had multiple human players (not counting bots)
-        const hadMultipleHumans = game.isBotGame || game.players.filter(p => !p.isBot).length >= 2;
-        const deletionDelay = hadMultipleHumans ? 15 * 60 * 1000 : 5 * 60 * 1000; // 15 min for multiplayer, 5 min for solo
-        const deletionMinutes = hadMultipleHumans ? 15 : 5;
-
-        console.log(`Game ${gameId} - all seats are now empty, scheduling deletion in ${deletionMinutes} minutes${hadMultipleHumans ? ' (multiplayer/Quick Play)' : ''}`);
-
-        const deletionTimeout = setTimeout(() => {
-          if (games.has(gameId)) {
-            const currentGame = games.get(gameId);
-            // Only delete if all seats still empty
-            if (currentGame && currentGame.players.every(p => p.isEmpty)) {
-              games.delete(gameId);
-              gameDeletionTimeouts.delete(gameId);
-              console.log(`Game ${gameId} deleted after timeout (all seats empty)`);
-            }
-          }
-        }, deletionDelay);
-
-        gameDeletionTimeouts.set(gameId, deletionTimeout);
-      }
-
-      // Confirm to the leaving player
-      socket.emit('leave_game_success', { success: true });
-    }
   }));
 
   // ============================================================================
