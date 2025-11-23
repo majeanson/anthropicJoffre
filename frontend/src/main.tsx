@@ -9,6 +9,7 @@ import { SettingsProvider } from './contexts/SettingsContext';
 import { AuthProvider } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ErrorBoundary } from './components/ErrorBoundary';
 import logger from './utils/logger';
+import { initWebVitals } from './utils/webVitals';
 
 // Initialize Sentry for error tracking
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
@@ -45,6 +46,9 @@ if (SENTRY_DSN) {
 } else {
   logger.warn('Sentry DSN not found. Error tracking disabled.');
 }
+
+// Initialize Web Vitals tracking (LCP, FID, CLS, TTFB, INP)
+initWebVitals();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

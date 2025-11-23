@@ -78,10 +78,16 @@ function CardComponent({
   }, [isSpecial, card.color]);
 
 
+  // Generate aria-label for accessibility
+  const ariaLabel = isSpecial
+    ? `${card.color} special card (${card.color === 'red' ? '+5 points' : '-2 points'})`
+    : `${card.color} ${card.value}`;
+
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      aria-label={ariaLabel}
       data-testid={`card-${card.color}-${card.value}`}
       data-card-value={card.value}
       data-card-color={card.color}
@@ -110,6 +116,8 @@ function CardComponent({
       <img
         src={cardImage}
         alt={`${card.color} ${isSpecial ? 'bon' : 'emblem'}`}
+        loading="lazy"
+        decoding="async"
         className={`${emblemSizeStyles[size]} object-contain ${isSpecial ? '' : 'opacity-90'}`}
       />
 

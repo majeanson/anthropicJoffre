@@ -7,7 +7,7 @@
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { Card as CardType, TrickCard } from '../../types/game';
 import { sounds } from '../../utils/sounds';
@@ -24,7 +24,7 @@ export interface PlayerHandProps {
   onSetPlayEffect?: (effect: { card: CardType; position: { x: number; y: number } } | null) => void;
 }
 
-export function PlayerHand({
+export const PlayerHand = memo(function PlayerHand({
   hand,
   isCurrentTurn,
   currentTrick,
@@ -328,4 +328,4 @@ export function PlayerHand({
       </div>
     </div>
   );
-}
+});

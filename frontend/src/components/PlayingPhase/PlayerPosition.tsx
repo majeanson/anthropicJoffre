@@ -6,6 +6,7 @@
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
+import { memo } from 'react';
 import { Player } from '../../types/game';
 
 export interface PlayerPositionProps {
@@ -18,7 +19,7 @@ export interface PlayerPositionProps {
   currentPlayerTeamId?: number | null;
 }
 
-export function PlayerPosition({
+export const PlayerPosition = memo(function PlayerPosition({
   player,
   isYou,
   isWinner,
@@ -121,4 +122,4 @@ export function PlayerPosition({
       )}
     </div>
   );
-}
+});

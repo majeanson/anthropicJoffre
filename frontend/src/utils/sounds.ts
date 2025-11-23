@@ -455,6 +455,33 @@ class SoundManager {
     });
   }
 
+  // Tap feedback - ultra-quick haptic-like sound for mobile
+  playTap() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    // Very quick tap - almost haptic-like
+    osc.frequency.setValueAtTime(1500, now);
+    osc.frequency.exponentialRampToValueAtTime(800, now + 0.015);
+
+    gain.gain.setValueAtTime(this.masterVolume * 0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
+
+    osc.type = 'sine';
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.015);
+  }
+
   // Error - descending error tone
   playError() {
     if (!this.enabled) return;
@@ -497,6 +524,7 @@ export const sounds = {
   trickCollect: () => soundManager.playTrickCollect(),
   roundStart: () => soundManager.playRoundStart(),
   buttonClick: () => soundManager.playButtonClick(),
+  tap: () => soundManager.playTap(), // Sprint 20: Mobile tap feedback
   yourTurn: () => soundManager.playYourTurn(),
   chatNotification: () => soundManager.playChatNotification(),
   // Sprint 1 Phase 6: Additional sounds

@@ -7,7 +7,7 @@
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { ContextualGameInfo } from '../ContextualGameInfo';
 import { TimeoutIndicator } from '../TimeoutIndicator';
 import { GameState, CardColor, Player } from '../../types/game';
@@ -18,7 +18,7 @@ export interface ScoreBoardProps {
   onAutoplayTimeout: () => void;
 }
 
-export function ScoreBoard({ gameState, isCurrentTurn, onAutoplayTimeout }: ScoreBoardProps) {
+export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, onAutoplayTimeout }: ScoreBoardProps) {
   const [floatingPoints, setFloatingPoints] = useState<{
     team1: number | null;
     team2: number | null;
@@ -231,4 +231,4 @@ export function ScoreBoard({ gameState, isCurrentTurn, onAutoplayTimeout }: Scor
       </div>
     </div>
   );
-}
+});

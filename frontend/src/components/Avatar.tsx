@@ -83,6 +83,8 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
           <img
             src={avatarUrl}
             alt={`${username}'s avatar`}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
             onError={(e) => {
               // Fallback to initials if image fails to load

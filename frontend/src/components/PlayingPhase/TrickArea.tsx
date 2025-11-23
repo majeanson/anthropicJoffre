@@ -7,7 +7,7 @@
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, memo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { PlayerPosition } from './PlayerPosition';
 import { ConfettiEffect } from '../ConfettiEffect';
@@ -31,7 +31,7 @@ export interface TrickAreaProps {
   trickWinner?: TrickWinnerInfo | null;
 }
 
-export function TrickArea({
+export const TrickArea = memo(function TrickArea({
   gameState,
   currentPlayerId,
   currentPlayerIndex,
@@ -241,7 +241,7 @@ export function TrickArea({
           </div>
 
           {/* Circular Layout - Previous Trick */}
-          <div className="relative h-[340px] md:h-[380px] w-full min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-40">
+          <div className="relative h-[280px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-40">
             {/* Bottom (position 0) */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
@@ -270,7 +270,7 @@ export function TrickArea({
       ) : (
         // Current Trick View
         <>
-          <div className="relative h-[340px] md:h-[380px] w-full min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto" data-testid="trick-area">
+          <div className="relative h-[280px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto" data-testid="trick-area">
             {/* Bottom (position 0) - You */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
@@ -309,4 +309,4 @@ export function TrickArea({
       )}
     </div>
   );
-}
+});

@@ -1,19 +1,24 @@
 {
-  "version": "3.0.0",
-  "buildDate": "2025-11-19T22:00:00.000Z",
+  "version": "3.1.0",
+  "buildDate": "2025-11-23T12:00:00.000Z",
   "environment": "production",
   "features": {
-    "testingImprovements": "E2E tests at 100% pass rate - all core tests passing",
-    "testArchitecture": "QuickPlay pattern with stable bet amount strategy",
-    "marathonTests": "Removed unreliable marathon tests, documented coverage"
+    "performanceOptimizations": "Image lazy loading, React.memo, Web Vitals tracking",
+    "uiImprovements": "Mobile-friendly modals, hover animations, accessibility labels",
+    "mobileResponsive": "Safe viewport heights, safe-area insets, tap feedback, theme-color"
   },
   "changes": [
-    "Fixed all E2E betting tests - changed bet amounts from 7/8 to 12 (always valid)",
-    "Fixed all E2E playing phase tests - proper waiting for player turn",
-    "Removed unreliable autoplay-dependent tests with comprehensive documentation",
-    "Achieved 100% pass rate on active E2E tests (19/19 passing)",
-    "Backend unit tests: 451/456 passing (99%)",
-    "Updated E2E QuickPlay documentation with critical betting patterns"
+    "Sprint 20: Performance, UI & Mobile improvements",
+    "Added image lazy loading to Card and Avatar components",
+    "Added React.memo to PlayingPhase sub-components (PlayerPosition, TrickArea, ScoreBoard, PlayerHand)",
+    "Added Web Vitals tracking (LCP, FCP, CLS, TTFB, INP) reporting to Sentry",
+    "Enhanced UnifiedModal with mobile full-screen support",
+    "Added aria-labels to Card and DarkModeToggle components",
+    "Added button press and tap animations",
+    "Added dvh viewport units for mobile browsers",
+    "Added safe-area-inset utilities for notched devices",
+    "Added theme-color meta tags for light/dark modes",
+    "Added tap sound feedback function"
   ],
   "testStatus": {
     "backend": "451/456 passing (99%)",
