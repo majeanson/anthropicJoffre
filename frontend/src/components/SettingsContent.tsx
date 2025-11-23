@@ -17,8 +17,8 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
         <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 text-center">⚙️ Settings</h3>
 
         <div className="space-y-4">
-          {/* Keyboard Navigation Hint */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-3 mb-4">
+          {/* Keyboard Navigation Hint - hidden on mobile */}
+          <div className="hidden sm:block bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-3 mb-4">
             <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
               <span>⌨️</span>
               <span>Keyboard Navigation</span>

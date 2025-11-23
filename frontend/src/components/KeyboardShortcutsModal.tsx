@@ -36,8 +36,9 @@ export function KeyboardShortcutsModal({
   if (!isOpen) return null;
 
   return (
+    // Hidden on mobile - keyboard shortcuts aren't relevant for touch devices
     <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] p-4"
+      className="hidden sm:flex fixed inset-0 bg-black/70 backdrop-blur-sm items-center justify-center z-[100] p-4"
       onClick={onClose}
       onKeyDown={(e) => e.stopPropagation()}
     >

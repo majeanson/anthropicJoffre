@@ -330,7 +330,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                 <div id="bet-level-amount" className={`p-3 rounded-lg transition-all ${navLevel === 0 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
                   <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                     {navLevel === 0 && <span className="text-orange-500">▶</span>}
-                    Select Bet Amount: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to adjust)</span>
+                    Select Bet Amount: <span className="hidden sm:inline text-xs text-umber-600 dark:text-gray-400">(← → to adjust)</span>
                   </label>
                   <div className="grid grid-cols-3 gap-2">
                     {[7, 8, 9, 10, 11, 12].map((amount) => {
@@ -359,7 +359,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                 <div id="bet-level-trump" className={`p-3 rounded-lg transition-all ${navLevel === 1 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
                   <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                     {navLevel === 1 && <span className="text-orange-500">▶</span>}
-                    Trump Option: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to toggle)</span>
+                    Trump Option: <span className="hidden sm:inline text-xs text-umber-600 dark:text-gray-400">(← → to toggle)</span>
                   </label>
                   <div className="space-y-2">
                     <label className="flex items-center p-3 bg-parchment-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-parchment-200 dark:bg-gray-600 transition-colors border border-parchment-300 dark:border-gray-600">
@@ -393,7 +393,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                 <div id="bet-level-action" className={`p-3 rounded-lg transition-all ${navLevel === 2 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
                   <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
                     {navLevel === 2 && <span className="text-orange-500">▶</span>}
-                    Action: <span className="text-xs text-umber-600 dark:text-gray-400">(← → to select, Enter to confirm)</span>
+                    Action: <span className="hidden sm:inline text-xs text-umber-600 dark:text-gray-400">(← → to select, Enter to confirm)</span>
                   </label>
                   <div className="flex gap-3">
                     {canSkip() && (
