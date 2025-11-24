@@ -66,7 +66,7 @@ export const API_ENDPOINTS = {
   authForgotPassword: () => `${CONFIG.API_BASE_URL}/api/auth/forgot-password`,
   authResetPassword: (token: string) => `${CONFIG.API_BASE_URL}/api/auth/reset-password?token=${token}`,
   authRefresh: () => `${CONFIG.API_BASE_URL}/api/auth/refresh`,
-  authProfile: () => `${CONFIG.API_BASE_URL}/api/auth/profile`,
+  authProfile: () => `${CONFIG.API_BASE_URL}/api/auth/me`,
 
   // CSRF
   csrfToken: () => `${CONFIG.API_BASE_URL}/api/csrf-token`,
