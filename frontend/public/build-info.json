@@ -1,22 +1,23 @@
 {
-  "version": "3.2.0",
-  "buildDate": "2025-11-23T14:00:00.000Z",
+  "version": "3.3.0",
+  "buildDate": "2025-11-23T15:00:00.000Z",
   "environment": "production",
   "features": {
     "performanceOptimizations": "Image lazy loading, React.memo, Web Vitals tracking",
     "uiImprovements": "Mobile-friendly modals, hover animations, accessibility labels",
     "mobileResponsive": "Safe viewport heights, safe-area insets, tap feedback, theme-color",
-    "userTierSystem": "3-tier user system (Guest, LocalStorage, Authenticated) with permission-based UI"
+    "userTierSystem": "3-tier user system (Guest, LocalStorage, Authenticated) with permission-based UI",
+    "cardDisplay": "Optimized card display with larger cards in trick area and player hand"
   },
   "changes": [
-    "Sprint 21: User Tier System",
-    "Added 3-tier user system: Guest (spectate only), LocalStorage (casual games), Authenticated (full access)",
-    "Guest tier: Can only spectate games, prompted to login/register to play",
-    "LocalStorage tier: Can create/join casual games, ranked mode disabled",
-    "Authenticated tier: Full access to ranked games, ELO tracking, and stats",
-    "Added upgrade prompts for guests in PlayContent",
-    "Fixed auth persistence bug - improved token refresh logic",
-    "Updated QuickPlayPanel to use tier-based permissions for ranked mode"
+    "Sprint 21.1: Card Display & GameReplay Improvements",
+    "Increased card sizes in TrickArea from 'small' to 'medium' for better visibility",
+    "Increased card sizes in PlayerHand from 'small' to 'medium'",
+    "Expanded trick area container dimensions for larger cards (320px-480px heights)",
+    "Improved card spacing and gaps throughout playing phase",
+    "GameReplay: Replaced bright colored divs with actual Card component",
+    "GameReplay: Made entire interface mobile-responsive with adaptive layouts",
+    "GameReplay: Mobile-friendly header, info bar, controls, and playback buttons"
   ],
   "testStatus": {
     "backend": "451/456 passing (99%)",

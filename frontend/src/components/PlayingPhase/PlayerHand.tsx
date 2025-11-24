@@ -275,11 +275,11 @@ export const PlayerHand = memo(function PlayerHand({
   return (
     <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-10">
       <div
-        className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600"
+        className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-3 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600"
         data-testid="player-hand"
       >
         <div className="overflow-x-auto md:overflow-x-visible -mx-2 md:mx-0 px-2 md:px-0">
-          <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min">
+          <div className="flex gap-3 md:gap-4 lg:gap-5 md:flex-wrap justify-center min-w-min py-1">
             {displayHand.map((card, index) => {
               const playable = isCardPlayable(card);
               const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
@@ -314,7 +314,7 @@ export const PlayerHand = memo(function PlayerHand({
                   )}
                   <CardComponent
                     card={card}
-                    size="small"
+                    size="medium"
                     onClick={e => handleCardClick(card, e)}
                     disabled={!isCurrentTurn || !playable || !!isTransitioning}
                     isPlayable={playable && isCurrentTurn}
