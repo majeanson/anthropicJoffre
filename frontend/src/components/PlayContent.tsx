@@ -4,6 +4,7 @@ import { Socket } from 'socket.io-client';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
+import { getUserTierInfo } from '../utils/userTier';
 
 interface PlayContentProps {
   hasValidSession?: boolean;
@@ -19,6 +20,8 @@ interface PlayContentProps {
   setQuickPlayPersistence: (mode: 'elo' | 'casual') => void;
   onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') => void;
   user: User | null;
+  onShowLogin?: () => void;
+  onShowRegister?: () => void;
 }
 
 export function PlayContent({
@@ -35,9 +38,41 @@ export function PlayContent({
   setQuickPlayPersistence,
   onQuickPlay,
   user,
+  onShowLogin,
+  onShowRegister,
 }: PlayContentProps) {
+  const tierInfo = getUserTierInfo(user, playerName);
+  const isGuest = tierInfo.tier === 'guest';
+
   return (
     <div className="space-y-4">
+      {/* Guest Tier Banner - Prompt to create account */}
+      {isGuest && (
+        <div className="bg-amber-100 dark:bg-amber-900/30 border-2 border-amber-400 dark:border-amber-600 rounded-lg p-3">
+          <p className="text-sm text-amber-800 dark:text-amber-200 text-center mb-2">
+            Enter a player name or create an account to play games
+          </p>
+          <div className="flex gap-2 justify-center">
+            {onShowLogin && (
+              <button
+                onClick={() => { sounds.buttonClick(); onShowLogin(); }}
+                className="px-4 py-2 bg-amber-600 dark:bg-amber-700 text-white text-sm font-semibold rounded hover:bg-amber-700 dark:hover:bg-amber-600 transition-colors"
+              >
+                Login
+              </button>
+            )}
+            {onShowRegister && (
+              <button
+                onClick={() => { sounds.buttonClick(); onShowRegister(); }}
+                className="px-4 py-2 bg-umber-600 dark:bg-purple-700 text-white text-sm font-semibold rounded hover:bg-umber-700 dark:hover:bg-purple-600 transition-colors"
+              >
+                Register
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Rejoin Game (if available) */}
       {hasValidSession && onRejoinGame && (
         <button
@@ -68,9 +103,14 @@ export function PlayContent({
             data-testid="create-game-button"
             data-keyboard-nav="create-game"
             onClick={() => { sounds.buttonClick(); onCreateGame(); }}
-            className="w-full bg-gradient-to-r from-amber-700 to-orange-700 dark:from-purple-700 dark:to-purple-800 text-white py-3 rounded-lg font-bold hover:from-amber-800 hover:to-orange-800 dark:hover:from-purple-600 dark:hover:to-purple-700 transition-all duration-200 border border-amber-900 dark:border-purple-600 shadow focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+            disabled={!tierInfo.canCreateGame}
+            className={`w-full py-3 rounded-lg font-bold transition-all duration-200 border shadow focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+              tierInfo.canCreateGame
+                ? 'bg-gradient-to-r from-amber-700 to-orange-700 dark:from-purple-700 dark:to-purple-800 text-white hover:from-amber-800 hover:to-orange-800 dark:hover:from-purple-600 dark:hover:to-purple-700 border-amber-900 dark:border-purple-600'
+                : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed border-gray-400 dark:border-gray-500'
+            }`}
           >
-            ➕ Create Game
+            {tierInfo.canCreateGame ? '➕ Create Game' : '🔒 Create Game (Login Required)'}
           </button>
 
           <button
@@ -85,15 +125,27 @@ export function PlayContent({
         </div>
       </div>
 
-      {/* Quick Play Section - Extracted to QuickPlayPanel */}
-      <QuickPlayPanel
-        botDifficulty={botDifficulty}
-        onBotDifficultyChange={onBotDifficultyChange}
-        quickPlayPersistence={quickPlayPersistence}
-        setQuickPlayPersistence={setQuickPlayPersistence}
-        onQuickPlay={onQuickPlay}
-        user={user}
-      />
+      {/* Quick Play Section - Only for non-guests */}
+      {tierInfo.canCreateGame ? (
+        <QuickPlayPanel
+          botDifficulty={botDifficulty}
+          onBotDifficultyChange={onBotDifficultyChange}
+          quickPlayPersistence={quickPlayPersistence}
+          setQuickPlayPersistence={setQuickPlayPersistence}
+          onQuickPlay={onQuickPlay}
+          user={user}
+          playerName={playerName}
+        />
+      ) : (
+        <div className="bg-parchment-200 dark:bg-gray-700/50 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600 opacity-60">
+          <h3 className="text-sm font-bold text-umber-800 dark:text-gray-200 mb-2 text-center">
+            Practice with Bots
+          </h3>
+          <p className="text-xs text-umber-600 dark:text-gray-400 text-center">
+            Enter a player name or login to access Quick Play
+          </p>
+        </div>
+      )}
     </div>
   );
 }

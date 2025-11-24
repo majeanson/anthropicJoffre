@@ -28,33 +28,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Fetch current user info
-  const fetchCurrentUser = useCallback(async () => {
+  const fetchCurrentUser = useCallback(async (isRetry = false) => {
     const token = getAccessToken();
     if (!token) {
+      logger.debug('[Auth] No access token found, user is guest');
       setIsLoading(false);
       return;
     }
 
     try {
+      logger.debug('[Auth] Fetching current user with token');
       const response = await fetch(API_ENDPOINTS.authProfile(), {
         headers: {
           'Authorization': `Bearer ${token}`
-        }
+        },
+        credentials: 'include' // Ensure cookies are sent
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
+        if (response.status === 401 && !isRetry) {
           // Token expired, try to refresh
-          await refreshToken();
+          logger.debug('[Auth] Access token expired, attempting refresh');
+          const refreshed = await refreshTokenInternal();
+          if (refreshed) {
+            // Retry with new token
+            await fetchCurrentUser(true);
+          }
           return;
         }
         throw new Error('Failed to fetch user info');
       }
 
       const data = await response.json();
+      logger.debug('[Auth] User authenticated:', data.user?.username);
       setUser(data.user);
     } catch (err) {
-      logger.error('Error fetching current user', err);
+      logger.error('[Auth] Error fetching current user', err);
       clearTokens();
       setUser(null);
     } finally {
@@ -62,10 +71,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Refresh access token
-  // Sprint 18: Refresh token rotation with httpOnly cookies
-  const refreshToken = useCallback(async () => {
+  // Internal refresh function (no circular dependency)
+  const refreshTokenInternal = useCallback(async (): Promise<boolean> => {
     try {
+      logger.debug('[Auth] Attempting to refresh access token');
       const response = await fetch(API_ENDPOINTS.authRefresh(), {
         method: 'POST',
         credentials: 'include', // Send httpOnly cookies
@@ -78,24 +87,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Security violation or invalid token
         const data = await response.json().catch(() => ({}));
         if (data.code === 'TOKEN_THEFT_DETECTED') {
-          logger.warn('Token theft detected! User must re-login', { code: data.code });
+          logger.warn('[Auth] Token theft detected! User must re-login', { code: data.code });
         }
+        logger.debug('[Auth] Refresh failed:', { status: response.status, error: data.error || 'Unknown error' });
         throw new Error('Failed to refresh token');
       }
 
       const data = await response.json();
+      logger.debug('[Auth] Token refreshed successfully');
       setAccessToken(data.access_token);
-
-      // Fetch user info with new token
-      await fetchCurrentUser();
       return true;
     } catch (err) {
+      logger.error('[Auth] Refresh token error', err);
       clearTokens();
       setUser(null);
       setIsLoading(false);
       return false;
     }
-  }, [fetchCurrentUser]);
+  }, []);
+
+  // Public refresh function that also fetches user
+  const refreshToken = useCallback(async () => {
+    const success = await refreshTokenInternal();
+    if (success) {
+      await fetchCurrentUser(true);
+    }
+    return success;
+  }, [refreshTokenInternal, fetchCurrentUser]);
 
   // Login
   // Sprint 18: Refresh token in httpOnly cookie + CSRF protection

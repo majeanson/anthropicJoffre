@@ -536,6 +536,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     setQuickPlayPersistence={setQuickPlayPersistence}
                     onQuickPlay={onQuickPlay}
                     user={user}
+                    onShowLogin={onShowLogin}
+                    onShowRegister={onShowRegister}
                   />
                 )}
 

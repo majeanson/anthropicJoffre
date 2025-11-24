@@ -1,16 +1,23 @@
 /**
  * QuickPlayPanel Component
  * Sprint 4 Phase 4.2: Extracted from Lobby.tsx
+ * Sprint 21: Updated for 3-tier user system
  *
  * Handles Quick Play functionality:
  * - Bot difficulty selection
  * - Persistence mode (ranked/casual) toggle
  * - Quick Play button
+ *
+ * Tier restrictions:
+ * - Guest: Cannot access (hidden in PlayContent)
+ * - LocalStorage: Can only play casual (ranked disabled)
+ * - Authenticated: Full access to ranked mode
  */
 
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
+import { getUserTierInfo } from '../utils/userTier';
 
 interface QuickPlayPanelProps {
   botDifficulty: BotDifficulty;
@@ -19,6 +26,7 @@ interface QuickPlayPanelProps {
   setQuickPlayPersistence: (mode: 'elo' | 'casual') => void;
   onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') => void;
   user: User | null;
+  playerName?: string;
 }
 
 export function QuickPlayPanel({
@@ -28,7 +36,10 @@ export function QuickPlayPanel({
   setQuickPlayPersistence,
   onQuickPlay,
   user,
+  playerName = '',
 }: QuickPlayPanelProps) {
+  const tierInfo = getUserTierInfo(user, playerName);
+
   return (
     <div className="bg-parchment-200 dark:bg-gray-700/50 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600">
       <h3 className="text-sm font-bold text-umber-800 dark:text-gray-200 mb-3 text-center">
@@ -80,14 +91,14 @@ export function QuickPlayPanel({
       </div>
 
       {/* Persistence Mode Selector */}
-      <div className={`bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3 ${!user ? 'opacity-60' : ''}`}>
+      <div className={`bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3 ${!tierInfo.canPlayRanked ? 'opacity-60' : ''}`}>
         <div className="flex items-center justify-between gap-3">
-          <label className={`flex items-center gap-2 flex-1 ${user ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
+          <label className={`flex items-center gap-2 flex-1 ${tierInfo.canPlayRanked ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
             <input
               type="checkbox"
               checked={quickPlayPersistence === 'elo'}
               onChange={(e) => setQuickPlayPersistence(e.target.checked ? 'elo' : 'casual')}
-              disabled={!user}
+              disabled={!tierInfo.canPlayRanked}
               className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed"
             />
             <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
@@ -95,16 +106,16 @@ export function QuickPlayPanel({
             </span>
           </label>
           <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-            quickPlayPersistence === 'elo'
+            quickPlayPersistence === 'elo' && tierInfo.canPlayRanked
               ? 'bg-amber-200 dark:bg-purple-900 text-amber-900 dark:text-purple-200'
               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
           }`}>
-            {quickPlayPersistence === 'elo' ? '🏆 Ranked' : '🎮 Casual'}
+            {quickPlayPersistence === 'elo' && tierInfo.canPlayRanked ? '🏆 Ranked' : '🎮 Casual'}
           </span>
         </div>
         <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
-          {!user
-            ? '🔒 Available when registered - Register to enable ranked mode'
+          {!tierInfo.canPlayRanked
+            ? '🔒 Register an account to enable ranked mode and stats tracking'
             : quickPlayPersistence === 'elo'
             ? 'Game will be saved to your profile and affect your ranking'
             : 'No stats saved - play without affecting your ELO rating'}
