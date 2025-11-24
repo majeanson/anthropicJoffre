@@ -121,6 +121,9 @@ function PlayingPhaseComponent({
     position: { x: number; y: number };
   } | null>(null);
 
+  // Card queue state - allows pre-selecting a card to auto-play when turn comes
+  const [queuedCard, setQueuedCard] = useState<CardType | null>(null);
+
   // Sprint 1 Phase 3: Trick winner celebration state
   const [trickWinner, setTrickWinner] = useState<{
     playerName: string;
@@ -225,6 +228,65 @@ function PlayingPhaseComponent({
     const timeoutId = setTimeout(() => sounds.yourTurn(), 10000);
     return () => clearTimeout(timeoutId);
   }, [isCurrentTurn, gameState.currentPlayerIndex]);
+
+  // Auto-play queued card when turn comes
+  useEffect(() => {
+    if (!isCurrentTurn || !queuedCard || !currentPlayer) return;
+
+    // Check if queued card is still in hand
+    const cardInHand = currentPlayer.hand.some(
+      c => c.color === queuedCard.color && c.value === queuedCard.value
+    );
+    if (!cardInHand) {
+      setQueuedCard(null);
+      return;
+    }
+
+    // Check if queued card is valid to play (suit-following rules)
+    let isValidToPlay = true;
+    if (gameState.currentTrick.length > 0) {
+      const ledSuit = gameState.currentTrick[0].card.color;
+      const hasLedSuit = currentPlayer.hand.some(c => c.color === ledSuit);
+      if (hasLedSuit && queuedCard.color !== ledSuit) {
+        // Must follow suit but queued card doesn't match
+        isValidToPlay = false;
+      }
+    }
+
+    if (!isValidToPlay) {
+      setQueuedCard(null);
+      return;
+    }
+
+    // Auto-play the queued card with a small delay for UX
+    const timeoutId = setTimeout(() => {
+      sounds.cardConfirm(queuedCard.value);
+      onPlayCard(queuedCard);
+      setQueuedCard(null);
+    }, 150);
+
+    return () => clearTimeout(timeoutId);
+  }, [isCurrentTurn, queuedCard, currentPlayer, gameState.currentTrick, onPlayCard]);
+
+  // Clear queue on new round
+  useEffect(() => {
+    setQueuedCard(null);
+  }, [gameState.roundNumber]);
+
+  // Handler to queue/unqueue a card
+  const handleQueueCard = useCallback((card: CardType | null) => {
+    if (!card) {
+      setQueuedCard(null);
+      return;
+    }
+    // Toggle queue if same card clicked
+    if (queuedCard && queuedCard.color === card.color && queuedCard.value === card.value) {
+      setQueuedCard(null);
+    } else {
+      setQueuedCard(card);
+      sounds.cardDeal(); // Subtle feedback sound
+    }
+  }, [queuedCard]);
 
   // Empty state message when no trick
   const EmptyTrickMessage = () => {
@@ -332,6 +394,8 @@ function PlayingPhaseComponent({
           isSpectator={isSpectator}
           onPlayCard={onPlayCard}
           onSetPlayEffect={setPlayEffect}
+          queuedCard={queuedCard}
+          onQueueCard={handleQueueCard}
         />
       </div>
 

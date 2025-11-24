@@ -22,6 +22,8 @@ export interface PlayerHandProps {
   isSpectator: boolean;
   onPlayCard: (card: CardType) => void;
   onSetPlayEffect?: (effect: { card: CardType; position: { x: number; y: number } } | null) => void;
+  queuedCard?: CardType | null;
+  onQueueCard?: (card: CardType | null) => void;
 }
 
 export const PlayerHand = memo(function PlayerHand({
@@ -34,6 +36,8 @@ export const PlayerHand = memo(function PlayerHand({
   isSpectator,
   onPlayCard,
   onSetPlayEffect,
+  queuedCard,
+  onQueueCard,
 }: PlayerHandProps) {
   const [showDealingAnimation, setShowDealingAnimation] = useState(false);
   const [dealingCardIndex, setDealingCardIndex] = useState(0);
@@ -65,14 +69,30 @@ export const PlayerHand = memo(function PlayerHand({
     [playableCards]
   );
 
+  // Check if a card is queued
+  const isCardQueued = useCallback(
+    (card: CardType) => {
+      return queuedCard?.color === card.color && queuedCard?.value === card.value;
+    },
+    [queuedCard]
+  );
+
   // Handle card click with debouncing and validation
   const handleCardClick = useCallback(
     (card: CardType, event?: React.MouseEvent) => {
       // Debounce: prevent rapid clicks
       if (isPlayingCard) return;
 
-      // Validation
-      if (!isCurrentTurn || !isCardPlayable(card)) return;
+      // If NOT current turn, handle queue logic
+      if (!isCurrentTurn) {
+        if (onQueueCard) {
+          onQueueCard(card);
+        }
+        return;
+      }
+
+      // Validation for playing
+      if (!isCardPlayable(card)) return;
 
       // Set transition state
       setIsPlayingCard(true);
@@ -102,7 +122,7 @@ export const PlayerHand = memo(function PlayerHand({
         setIsPlayingCard(false);
       }, 450);
     },
-    [isPlayingCard, isCurrentTurn, isCardPlayable, onPlayCard, onSetPlayEffect]
+    [isPlayingCard, isCurrentTurn, isCardPlayable, onPlayCard, onSetPlayEffect, onQueueCard]
   );
 
   // Dealing animation on new round
@@ -289,6 +309,7 @@ export const PlayerHand = memo(function PlayerHand({
                 card.color === cardInTransition.color &&
                 card.value === cardInTransition.value;
               const isSelected = selectedCardIndex === index;
+              const isQueued = isCardQueued(card);
 
               return (
                 <div
@@ -301,7 +322,7 @@ export const PlayerHand = memo(function PlayerHand({
                       ? 'opacity-0 motion-safe:animate-card-play-arc'
                       : 'opacity-100 scale-100'
                   }
-                            ${isSelected ? '-translate-y-4 scale-110' : ''}`}
+                            ${isSelected || isQueued ? '-translate-y-4 scale-110' : ''}`}
                   style={{
                     transition: isTransitioning
                       ? 'opacity 400ms ease-out, transform 400ms ease-out'
@@ -312,12 +333,21 @@ export const PlayerHand = memo(function PlayerHand({
                   {isSelected && (
                     <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none" />
                   )}
+                  {/* Queued indicator - pulsing gold ring and badge */}
+                  {isQueued && (
+                    <>
+                      <div className="absolute -inset-2 rounded-lg ring-4 ring-yellow-400 dark:ring-yellow-500 animate-pulse pointer-events-none z-10" />
+                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg z-20 whitespace-nowrap">
+                        QUEUED
+                      </div>
+                    </>
+                  )}
                   <CardComponent
                     card={card}
                     size="small"
                     onClick={e => handleCardClick(card, e)}
-                    disabled={!isCurrentTurn || !playable || !!isTransitioning}
-                    isPlayable={playable && isCurrentTurn}
+                    disabled={isCurrentTurn ? (!playable || !!isTransitioning) : false}
+                    isPlayable={isCurrentTurn ? (playable && isCurrentTurn) : !isQueued}
                     isKeyboardSelected={isSelected}
                   />
                 </div>
