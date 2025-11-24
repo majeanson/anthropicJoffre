@@ -7,6 +7,7 @@
  *
  * Features:
  * - Quick stats summary (ELO, tier, win rate, games played)
+ * - Achievements showcase (unlocked achievements)
  * - Friend actions (add/remove friend, send message)
  * - "View Full Stats" button to open PlayerStatsModal
  * - Works for both authenticated and guest players
@@ -17,6 +18,7 @@ import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
 import Avatar from './Avatar';
 import { useAuth } from '../contexts/AuthContext';
+import { AchievementProgress } from '../types/achievements';
 
 interface QuickStats {
   player_name: string;
@@ -51,6 +53,8 @@ export function PlayerProfileModal({
   const [error, setError] = useState<string | null>(null);
   const [friendStatus, setFriendStatus] = useState<'none' | 'pending' | 'friends'>('none');
   const [sendingRequest, setSendingRequest] = useState(false);
+  const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
+  const [achievementPoints, setAchievementPoints] = useState(0);
 
   const { user, isAuthenticated } = useAuth();
   const isOwnProfile = isAuthenticated && user?.username === playerName;
@@ -91,6 +95,22 @@ export function PlayerProfileModal({
       socket.off('player_stats_response', handleStatsResponse);
       socket.off('error', handleError);
     };
+  }, [socket, isOpen, playerName]);
+
+  // Fetch achievements
+  useEffect(() => {
+    if (!socket || !isOpen || !playerName) return;
+
+    socket.emit('get_player_achievements', { playerName }, (response: {
+      success: boolean;
+      achievements?: AchievementProgress[];
+      points?: number;
+    }) => {
+      if (response.success && response.achievements) {
+        setAchievements(response.achievements);
+        setAchievementPoints(response.points || 0);
+      }
+    });
   }, [socket, isOpen, playerName]);
 
   // Check friend status
@@ -231,6 +251,56 @@ export function PlayerProfileModal({
                 <div className="text-sm text-gray-400">Win Rate</div>
               </div>
             </div>
+
+            {/* Achievements Showcase */}
+            {achievements.length > 0 && (
+              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-yellow-400 flex items-center gap-2">
+                    🏆 Achievements
+                  </h4>
+                  <span className="text-xs text-gray-400">
+                    {achievements.filter(a => a.is_unlocked).length}/{achievements.length} • {achievementPoints} pts
+                  </span>
+                </div>
+                {/* Show unlocked achievements as icons */}
+                <div className="flex flex-wrap gap-2">
+                  {achievements
+                    .filter(a => a.is_unlocked)
+                    .slice(0, 8)
+                    .map(achievement => (
+                      <div
+                        key={achievement.achievement_key}
+                        className="relative group"
+                        title={`${achievement.achievement_name}: ${achievement.description}`}
+                      >
+                        <div className={`
+                          w-10 h-10 rounded-lg flex items-center justify-center text-xl
+                          ${achievement.tier === 'platinum' ? 'bg-gradient-to-br from-purple-500 to-pink-500 ring-2 ring-purple-300' :
+                            achievement.tier === 'gold' ? 'bg-gradient-to-br from-yellow-500 to-amber-600 ring-2 ring-yellow-300' :
+                            achievement.tier === 'silver' ? 'bg-gradient-to-br from-gray-300 to-gray-500 ring-2 ring-gray-200' :
+                            'bg-gradient-to-br from-amber-600 to-amber-800 ring-2 ring-amber-400'}
+                          shadow-lg transform transition-transform hover:scale-110
+                        `}>
+                          {achievement.icon}
+                        </div>
+                        {/* Tooltip */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                          {achievement.achievement_name}
+                        </div>
+                      </div>
+                    ))}
+                  {achievements.filter(a => a.is_unlocked).length > 8 && (
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold bg-gray-700 text-gray-300">
+                      +{achievements.filter(a => a.is_unlocked).length - 8}
+                    </div>
+                  )}
+                  {achievements.filter(a => a.is_unlocked).length === 0 && (
+                    <p className="text-sm text-gray-500 italic">No achievements yet</p>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="space-y-2">

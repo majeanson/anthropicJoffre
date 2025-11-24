@@ -17,6 +17,7 @@ export interface PlayerPositionProps {
   isThinking: boolean;
   onSwap: () => void;
   currentPlayerTeamId?: number | null;
+  onClickPlayer?: (playerName: string) => void;
 }
 
 export const PlayerPosition = memo(function PlayerPosition({
@@ -27,6 +28,7 @@ export const PlayerPosition = memo(function PlayerPosition({
   isThinking,
   onSwap,
   currentPlayerTeamId,
+  onClickPlayer,
 }: PlayerPositionProps) {
   // Helper: Get bot difficulty badge
   const getBotDifficultyBadge = (): JSX.Element | null => {
@@ -101,12 +103,31 @@ export const PlayerPosition = memo(function PlayerPosition({
     return `Swap positions with ${player.name}${changesTeams ? ' (changes teams!)' : ''}`;
   };
 
+  // Handle player name click
+  const handleNameClick = () => {
+    if (player && !player.isEmpty && !player.isBot && onClickPlayer) {
+      onClickPlayer(player.name);
+    }
+  };
+
+  const isClickable = player && !player.isEmpty && !player.isBot && onClickPlayer;
+
   return (
     <div className="flex items-center">
       <div className={getBadgeClasses()}>
         <span className="flex items-center justify-center">
           {player?.isEmpty && '💺 '}
-          {getDisplayName()}
+          {isClickable ? (
+            <button
+              onClick={handleNameClick}
+              className="hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
+              title={`View ${player.name}'s profile`}
+            >
+              {getDisplayName()}
+            </button>
+          ) : (
+            getDisplayName()
+          )}
           {isYou && ' (You)'}
           {getBotDifficultyBadge()}
         </span>

@@ -21,6 +21,8 @@ const DebugControls = lazy(() => import('./components/DebugControls'));
 const DebugPanel = lazy(() => import('./components/DebugPanel').then(m => ({ default: m.DebugPanel })));
 // Task 10 Phase 2: Keyboard navigation help
 const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcutsModal').then(m => ({ default: m.KeyboardShortcutsModal })));
+// Player profile modal (lazy loaded)
+const PlayerProfileModal = lazy(() => import('./components/PlayerProfileModal').then(m => ({ default: m.PlayerProfileModal })));
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
@@ -128,6 +130,9 @@ function AppContent() {
   // Task 10 Phase 2: Keyboard shortcuts help modal
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
 
+  // Player profile modal state
+  const [profilePlayerName, setProfilePlayerName] = useState<string | null>(null);
+
   // Missing state variables for GlobalUI and DebugControls
   const [missedActions, setMissedActions] = useState<unknown[]>([]);
 
@@ -154,6 +159,11 @@ function AppContent() {
     }
     setShowFriendsPanel(true);
   }, [auth.isAuthenticated, showToast, setShowFriendsPanel]);
+
+  // Handler to open player profile modal
+  const handleClickPlayer = useCallback((playerName: string) => {
+    setProfilePlayerName(playerName);
+  }, []);
 
   // Online players tracking
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
@@ -795,6 +805,7 @@ function AppContent() {
           onOpenAchievements={handleOpenAchievements}
           onOpenFriends={handleOpenFriends}
           onSwapPosition={handleSwapPosition}
+          onClickPlayer={handleClickPlayer}
           socket={socket}
           gameId={gameId}
           chatMessages={chatMessages}
@@ -1124,6 +1135,20 @@ function AppContent() {
                 />
               );
             })()}
+          </Suspense>
+        </ErrorBoundary>
+
+        {/* Player Profile Modal - shows when clicking on player names */}
+        <ErrorBoundary componentName="PlayerProfileModal">
+          <Suspense fallback={null}>
+            {profilePlayerName && (
+              <PlayerProfileModal
+                playerName={profilePlayerName}
+                socket={socket}
+                isOpen={!!profilePlayerName}
+                onClose={() => setProfilePlayerName(null)}
+              />
+            )}
           </Suspense>
         </ErrorBoundary>
       </>

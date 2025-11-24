@@ -41,6 +41,7 @@ interface PlayingPhaseProps {
   onOpenAchievements?: () => void;
   onOpenFriends?: () => void;
   onSwapPosition?: (targetPlayerId: string) => void;
+  onClickPlayer?: (playerName: string) => void;
   socket?: Socket | null;
   gameId?: string;
   chatMessages?: ChatMessage[];
@@ -63,6 +64,7 @@ function PlayingPhaseComponent({
   onOpenAchievements,
   onOpenFriends,
   onSwapPosition,
+  onClickPlayer,
   socket,
   gameId,
   chatMessages = [],
@@ -315,6 +317,7 @@ function PlayingPhaseComponent({
               isSpectator={isSpectator}
               onSwapPosition={onSwapPosition}
               trickWinner={trickWinner}
+              onClickPlayer={onClickPlayer}
             />
           </div>
         </div>

@@ -29,6 +29,7 @@ export interface TrickAreaProps {
   isSpectator: boolean;
   onSwapPosition?: (targetPlayerId: string) => void;
   trickWinner?: TrickWinnerInfo | null;
+  onClickPlayer?: (playerName: string) => void;
 }
 
 export const TrickArea = memo(function TrickArea({
@@ -39,6 +40,7 @@ export const TrickArea = memo(function TrickArea({
   isSpectator,
   onSwapPosition,
   trickWinner,
+  onClickPlayer,
 }: TrickAreaProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState(false);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState(false);
@@ -194,6 +196,7 @@ export const TrickArea = memo(function TrickArea({
         isThinking={isPlayerThinking(positionIndex)}
         onSwap={() => player && onSwapPosition?.(player.id)}
         currentPlayerTeamId={currentPlayer?.teamId}
+        onClickPlayer={onClickPlayer}
       />
     );
   };
