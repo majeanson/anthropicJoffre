@@ -133,6 +133,9 @@ function PlayingPhaseComponent({
     autoplayEnabledRef.current = autoplayEnabled;
   }, [autoplayEnabled]);
 
+  // Track which trick we've already played sound for (prevents duplicate sounds)
+  const lastSoundedTrickWinnerRef = useRef<string | null>(null);
+
   // Get current player
   const currentPlayer = useMemo(() => playerLookup, [playerLookup]);
   const isCurrentTurn = useMemo(
@@ -191,12 +194,18 @@ function PlayingPhaseComponent({
     };
   }, [socket, currentPlayerIndex]);
 
-  // Win/loss sound effects
+  // Win/loss sound effects - use ref to prevent duplicate sounds
   useEffect(() => {
     if (!gameState.previousTrick) return;
 
+    const winnerId = gameState.previousTrick.winnerId;
+
+    // Skip if we already played sound for this trick winner
+    if (lastSoundedTrickWinnerRef.current === winnerId) return;
+    lastSoundedTrickWinnerRef.current = winnerId;
+
     const winnerTeamId = gameState.players.find(
-      p => p.id === gameState.previousTrick?.winnerId
+      p => p.id === winnerId
     )?.teamId;
     const currentPlayerTeamId = currentPlayer?.teamId;
 
@@ -205,7 +214,7 @@ function PlayingPhaseComponent({
     } else {
       sounds.trickCollect();
     }
-  }, [gameState.previousTrick?.winnerId, currentPlayer?.teamId, gameState.players]);
+  }, [gameState.previousTrick, currentPlayer?.teamId, gameState.players]);
 
   // "Your turn" notification
   useEffect(() => {
