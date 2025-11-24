@@ -130,9 +130,9 @@ export const TrickArea = memo(function TrickArea({
   ) => {
     if (!tc) {
       return (
-        <div className="w-20 h-32 md:w-24 md:h-36 lg:w-28 lg:h-40 border-2 border-dashed border-parchment-400 dark:border-gray-600/40 rounded-xl flex items-center justify-center bg-parchment-300/50 dark:bg-gray-600/20 backdrop-blur">
-          <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-2 border-dashed border-parchment-400 dark:border-gray-600/50 flex items-center justify-center">
-            <div className="w-3 h-3 rounded-full bg-parchment-500/40 dark:bg-parchment-400/30"></div>
+        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400 dark:border-gray-600/40 rounded-xl flex items-center justify-center bg-parchment-300/50 dark:bg-gray-600/20 backdrop-blur">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-parchment-400 dark:border-gray-600/50 flex items-center justify-center">
+            <div className="w-2 h-2 rounded-full bg-parchment-500/40 dark:bg-parchment-400/30"></div>
           </div>
         </div>
       );
@@ -169,7 +169,7 @@ export const TrickArea = memo(function TrickArea({
             : ''
         } ${animationClass}`}
       >
-        <CardComponent card={tc.card} size="medium" />
+        <CardComponent card={tc.card} size="small" />
       </div>
     );
   };
@@ -241,27 +241,27 @@ export const TrickArea = memo(function TrickArea({
           </div>
 
           {/* Circular Layout - Previous Trick */}
-          <div className="relative h-[320px] sm:h-[380px] md:h-[420px] lg:h-[480px] w-full min-w-[320px] sm:min-w-[380px] md:min-w-[480px] lg:min-w-[560px] max-w-[640px] mx-auto z-40">
+          <div className="relative h-[280px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-40">
             {/* Bottom (position 0) */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
               {renderPlayerPosition(0)}
             </div>
 
             {/* Left (position 1) */}
-            <div className="absolute top-1/2 left-2 md:left-4 lg:left-6 -translate-y-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId, 1)}
               {renderPlayerPosition(1)}
             </div>
 
             {/* Top (position 2) */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderPlayerPosition(2)}
               {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId, 2)}
             </div>
 
             {/* Right (position 3) */}
-            <div className="absolute top-1/2 right-2 md:right-4 lg:right-6 -translate-y-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId, 3)}
               {renderPlayerPosition(3)}
             </div>
@@ -270,27 +270,27 @@ export const TrickArea = memo(function TrickArea({
       ) : (
         // Current Trick View
         <>
-          <div className="relative h-[320px] sm:h-[380px] md:h-[420px] lg:h-[480px] w-full min-w-[320px] sm:min-w-[380px] md:min-w-[480px] lg:min-w-[560px] max-w-[640px] mx-auto" data-testid="trick-area">
+          <div className="relative h-[280px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto" data-testid="trick-area">
             {/* Bottom (position 0) - You */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
               {renderPlayerPosition(0)}
             </div>
 
             {/* Left (position 1) */}
-            <div className="absolute top-1/2 left-2 md:left-4 lg:left-6 -translate-y-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute top-1/2 left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
               {renderPlayerPosition(1)}
             </div>
 
             {/* Top (position 2) */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderPlayerPosition(2)}
               {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId, 2)}
             </div>
 
             {/* Right (position 3) */}
-            <div className="absolute top-1/2 right-2 md:right-4 lg:right-6 -translate-y-1/2 flex flex-col items-center gap-2 md:gap-3">
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
               {renderPlayerPosition(3)}
             </div>
