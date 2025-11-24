@@ -116,7 +116,6 @@ function CardComponent({
       <img
         src={cardImage}
         alt={`${card.color} ${isSpecial ? 'bon' : 'emblem'}`}
-        loading="lazy"
         decoding="async"
         className={`${emblemSizeStyles[size]} object-contain ${isSpecial ? '' : 'opacity-90'}`}
       />
