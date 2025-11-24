@@ -18,7 +18,7 @@ interface PlayContentProps {
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
   quickPlayPersistence: 'elo' | 'casual';
   setQuickPlayPersistence: (mode: 'elo' | 'casual') => void;
-  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') => void;
+  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual', playerName?: string) => void;
   user: User | null;
   onShowLogin?: () => void;
   onShowRegister?: () => void;
@@ -125,27 +125,16 @@ export function PlayContent({
         </div>
       </div>
 
-      {/* Quick Play Section - Only for non-guests */}
-      {tierInfo.canCreateGame ? (
-        <QuickPlayPanel
-          botDifficulty={botDifficulty}
-          onBotDifficultyChange={onBotDifficultyChange}
-          quickPlayPersistence={quickPlayPersistence}
-          setQuickPlayPersistence={setQuickPlayPersistence}
-          onQuickPlay={onQuickPlay}
-          user={user}
-          playerName={playerName}
-        />
-      ) : (
-        <div className="bg-parchment-200 dark:bg-gray-700/50 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600 opacity-60">
-          <h3 className="text-sm font-bold text-umber-800 dark:text-gray-200 mb-2 text-center">
-            Practice with Bots
-          </h3>
-          <p className="text-xs text-umber-600 dark:text-gray-400 text-center">
-            Enter a player name or login to access Quick Play
-          </p>
-        </div>
-      )}
+      {/* Quick Play Section - Available for all users including guests */}
+      <QuickPlayPanel
+        botDifficulty={botDifficulty}
+        onBotDifficultyChange={onBotDifficultyChange}
+        quickPlayPersistence={quickPlayPersistence}
+        setQuickPlayPersistence={setQuickPlayPersistence}
+        onQuickPlay={onQuickPlay}
+        user={user}
+        playerName={playerName}
+      />
     </div>
   );
 }

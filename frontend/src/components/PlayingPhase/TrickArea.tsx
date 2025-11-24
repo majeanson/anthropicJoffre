@@ -270,7 +270,7 @@ export const TrickArea = memo(function TrickArea({
       ) : (
         // Current Trick View
         <>
-          <div className="relative h-[280px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto" data-testid="trick-area">
+          <div className="relative h-[330px] sm:h-[330px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto" data-testid="trick-area">
             {/* Bottom (position 0) - You */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}

@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-21T17:36:13.610Z",
-  "version": "2.3.1",
+  "buildDate": "2025-11-23T12:00:00.000Z",
+  "version": "2.3.2",
   "git": {
-    "commitMessage": "fix: Resolve TypeScript errors - Remove unused imports and add missing types\n\n- Remove unused 'React' import from App.tsx\n- Remove unused 'sounds' import from ScoringPhase.tsx\n- Remove unused 'response' variable from useSocketConnection.ts\n- Add missing GameHistoryEntry import to SocialHub.tsx\n\nNote: Remaining TypeScript errors are pre-existing issues in components not\nrelated to test suite organization work (RoundSummary, GameReplay, etc.)",
-    "commitHash": "b6c79bb",
-    "commitDate": "2025-11-21 12:28:14 -0500",
+    "commitMessage": "fix: Resolve infinite loop in ScoreBoard component caused by useEffect dependencies",
+    "commitHash": "e8eb83d",
+    "commitDate": "2025-11-23",
     "branch": "main"
   },
   "futureTodos": [
@@ -14,14 +14,14 @@
     "Achievements & Badges",
     "Friend System"
   ],
-  "releaseDate": "2025-11-18",
+  "releaseDate": "2025-11-23",
   "buildStatus": "✅ Production Ready",
   "testsStatus": {
     "backend": "✅ 368 tests passing (100%)",
     "frontend": "✅ 142 tests passing (100%)",
     "e2e": "✅ 29 test files (social + position swap)"
   },
-  "sprint": "Sprint 17 - Completion & Stabilization",
+  "sprint": "Sprint 17 - Hotfix",
   "phases": {
     "sprint16": {
       "name": "Social Features Enhancement",
@@ -79,6 +79,17 @@
       "newFiles": [
         "e2e/tests/29-position-swap.spec.ts (comprehensive swap tests)"
       ]
+    },
+    "hotfix-2025-11-23": {
+      "name": "ScoreBoard Infinite Loop Fix",
+      "status": "✅ Completed",
+      "duration": "1 hour",
+      "dateCompleted": "2025-11-23",
+      "fixes": [
+        "Fixed maximum update depth exceeded error in ScoreBoard component",
+        "Replaced useState with useRef for tracking previous score values",
+        "Removed circular dependencies from useEffect hooks"
+      ]
     }
   },
   "totalDuration": "8 days",
@@ -95,13 +106,9 @@
     "Enhanced type safety with dealerName tracking"
   ],
   "notes": [
-    "Sprint 17 completed - Completion & Stabilization",
-    "All deprecated chat components removed",
-    "Code documentation improved",
-    "Security enhanced (no hardcoded secrets)",
-    "Type system expanded with dealerName",
-    "Position swap test coverage complete",
+    "Hotfix: ScoreBoard infinite loop fixed",
+    "Changed useState to useRef for previous value tracking",
     "All 510 tests passing (368 backend + 142 frontend)",
-    "Ready for v2.3.1 release"
+    "Ready for v2.3.2 release"
   ]
 }

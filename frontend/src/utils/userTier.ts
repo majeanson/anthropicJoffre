@@ -14,6 +14,7 @@ export type UserTier = 'guest' | 'local' | 'authenticated';
 export interface UserTierInfo {
   tier: UserTier;
   canCreateGame: boolean;
+  canQuickPlay: boolean;
   canPlayRanked: boolean;
   canTrackStats: boolean;
   canSpectate: boolean;
@@ -48,6 +49,7 @@ export function getUserTierInfo(user: User | null, playerName: string): UserTier
       return {
         tier: 'authenticated',
         canCreateGame: true,
+        canQuickPlay: true,
         canPlayRanked: true,
         canTrackStats: true,
         canSpectate: true,
@@ -58,6 +60,7 @@ export function getUserTierInfo(user: User | null, playerName: string): UserTier
       return {
         tier: 'local',
         canCreateGame: true,
+        canQuickPlay: true,
         canPlayRanked: false, // Can only play casual
         canTrackStats: false, // No stats for localStorage players
         canSpectate: true,
@@ -68,7 +71,8 @@ export function getUserTierInfo(user: User | null, playerName: string): UserTier
     default:
       return {
         tier: 'guest',
-        canCreateGame: false, // Guests cannot create games
+        canCreateGame: false, // Guests cannot create multiplayer games
+        canQuickPlay: true, // Guests CAN play Quick Play with bots
         canPlayRanked: false,
         canTrackStats: false,
         canSpectate: true, // Guests can spectate

@@ -102,7 +102,7 @@ export const PlayerPosition = memo(function PlayerPosition({
   };
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center">
       <div className={getBadgeClasses()}>
         <span className="flex items-center justify-center">
           {player?.isEmpty && '💺 '}

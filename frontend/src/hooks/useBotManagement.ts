@@ -355,8 +355,11 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
   /**
    * Quick Play: Create game with 3 bots
    */
-  const handleQuickPlay = useCallback((difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual' = 'casual') => {
+  const handleQuickPlay = useCallback((difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual' = 'casual', playerName?: string) => {
     if (!socket) return;
+
+    // Use provided playerName or fallback to 'You'
+    const effectivePlayerName = playerName?.trim() || 'You';
 
     // Set the bot difficulty globally
     BotPlayer.setDifficulty(difficulty);
@@ -440,7 +443,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     socket.on('game_created', gameCreatedHandler);
 
     // Create game with player and persistence mode
-    socket.emit('create_game', { playerName: 'You', persistenceMode });
+    socket.emit('create_game', { playerName: effectivePlayerName, persistenceMode });
   }, [socket, handleBotAction]);
 
   /**

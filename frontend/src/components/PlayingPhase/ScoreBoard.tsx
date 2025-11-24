@@ -7,7 +7,7 @@
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import { ContextualGameInfo } from '../ContextualGameInfo';
 import { TimeoutIndicator } from '../TimeoutIndicator';
 import { GameState, CardColor, Player } from '../../types/game';
@@ -23,14 +23,14 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
     team1: number | null;
     team2: number | null;
   }>({ team1: null, team2: null });
-  const [previousRoundScores, setPreviousRoundScores] = useState<{
-    team1: number;
-    team2: number;
-  } | null>(null);
   const [floatingTrickPoints, setFloatingTrickPoints] = useState<{
     team1: number | null;
     team2: number | null;
   }>({ team1: null, team2: null });
+
+  // Use refs to track previous values (avoids re-renders and infinite loops)
+  const prevTeamScoresRef = useRef<{ team1: number; team2: number } | null>(null);
+  const prevRoundScoresRef = useRef<{ team1: number; team2: number } | null>(null);
 
   // Calculate round scores (points earned this round)
   const { team1RoundScore, team2RoundScore } = useMemo(() => {
@@ -48,8 +48,14 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
 
   // Cumulative score change animation (round-end)
   useEffect(() => {
-    const team1Delta = gameState.teamScores.team1 - (floatingPoints.team1 || 0);
-    const team2Delta = gameState.teamScores.team2 - (floatingPoints.team2 || 0);
+    // Initialize on first render
+    if (prevTeamScoresRef.current === null) {
+      prevTeamScoresRef.current = { team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 };
+      return;
+    }
+
+    const team1Delta = gameState.teamScores.team1 - prevTeamScoresRef.current.team1;
+    const team2Delta = gameState.teamScores.team2 - prevTeamScoresRef.current.team2;
 
     if (team1Delta !== 0) {
       setFloatingPoints(prev => ({ ...prev, team1: team1Delta }));
@@ -60,18 +66,21 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
       setFloatingPoints(prev => ({ ...prev, team2: team2Delta }));
       setTimeout(() => setFloatingPoints(prev => ({ ...prev, team2: null })), 2500);
     }
+
+    // Update ref after processing deltas
+    prevTeamScoresRef.current = { team1: gameState.teamScores.team1, team2: gameState.teamScores.team2 };
   }, [gameState.teamScores.team1, gameState.teamScores.team2]);
 
   // Round score change animation (trick-by-trick)
   useEffect(() => {
-    // Initialize previousRoundScores on first render
-    if (previousRoundScores === null) {
-      setPreviousRoundScores({ team1: team1RoundScore, team2: team2RoundScore });
+    // Initialize on first render
+    if (prevRoundScoresRef.current === null) {
+      prevRoundScoresRef.current = { team1: team1RoundScore, team2: team2RoundScore };
       return;
     }
 
-    const team1Delta = team1RoundScore - previousRoundScores.team1;
-    const team2Delta = team2RoundScore - previousRoundScores.team2;
+    const team1Delta = team1RoundScore - prevRoundScoresRef.current.team1;
+    const team2Delta = team2RoundScore - prevRoundScoresRef.current.team2;
 
     if (team1Delta !== 0) {
       setFloatingTrickPoints(prev => ({ ...prev, team1: team1Delta }));
@@ -87,8 +96,9 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
       }, 2000);
     }
 
-    setPreviousRoundScores({ team1: team1RoundScore, team2: team2RoundScore });
-  }, [gameState.players, team1RoundScore, team2RoundScore, previousRoundScores]);
+    // Update ref after processing deltas
+    prevRoundScoresRef.current = { team1: team1RoundScore, team2: team2RoundScore };
+  }, [team1RoundScore, team2RoundScore]);
 
   return (
     <div className="w-full mb-2 md:mb-4 lg:mb-6 flex-shrink-0 px-2 md:px-4 lg:px-6 pt-2 md:pt-4 lg:pt-6">

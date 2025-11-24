@@ -7,13 +7,15 @@
  * - Bot difficulty selection
  * - Persistence mode (ranked/casual) toggle
  * - Quick Play button
+ * - Guest player name input (for users without a name)
  *
  * Tier restrictions:
- * - Guest: Cannot access (hidden in PlayContent)
+ * - Guest: Can play but must enter a name first
  * - LocalStorage: Can only play casual (ranked disabled)
  * - Authenticated: Full access to ranked mode
  */
 
+import { useState } from 'react';
 import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
@@ -24,9 +26,10 @@ interface QuickPlayPanelProps {
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
   quickPlayPersistence: 'elo' | 'casual';
   setQuickPlayPersistence: (mode: 'elo' | 'casual') => void;
-  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') => void;
+  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual', playerName?: string) => void;
   user: User | null;
   playerName?: string;
+  onPlayerNameChange?: (name: string) => void;
 }
 
 export function QuickPlayPanel({
@@ -37,14 +40,54 @@ export function QuickPlayPanel({
   onQuickPlay,
   user,
   playerName = '',
+  onPlayerNameChange,
 }: QuickPlayPanelProps) {
   const tierInfo = getUserTierInfo(user, playerName);
+  const isGuest = tierInfo.tier === 'guest';
+  const [localName, setLocalName] = useState('');
+
+  // Use provided playerName or local state for guests
+  const effectiveName = playerName || localName;
+  const canPlay = effectiveName.trim().length > 0;
+
+  const handleNameChange = (name: string) => {
+    setLocalName(name);
+    if (onPlayerNameChange) {
+      onPlayerNameChange(name);
+    }
+  };
+
+  const handleQuickPlay = () => {
+    sounds.buttonClick();
+    // Save to localStorage if guest enters a name
+    if (isGuest && localName.trim()) {
+      localStorage.setItem('playerName', localName.trim());
+    }
+    onQuickPlay(botDifficulty, quickPlayPersistence, effectiveName);
+  };
 
   return (
     <div className="bg-parchment-200 dark:bg-gray-700/50 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600">
       <h3 className="text-sm font-bold text-umber-800 dark:text-gray-200 mb-3 text-center">
         Practice with Bots
       </h3>
+
+      {/* Guest Name Input */}
+      {isGuest && (
+        <div className="mb-3">
+          <label className="block text-xs font-semibold text-umber-700 dark:text-gray-300 mb-2">
+            Enter your name to play
+          </label>
+          <input
+            type="text"
+            value={localName}
+            onChange={(e) => handleNameChange(e.target.value)}
+            placeholder="Your name"
+            maxLength={20}
+            className="w-full px-3 py-2 rounded-lg border-2 border-umber-300 dark:border-gray-600 bg-parchment-50 dark:bg-gray-800 text-umber-800 dark:text-gray-200 placeholder-umber-400 dark:placeholder-gray-500 focus:border-umber-500 dark:focus:border-purple-500 focus:outline-none text-sm"
+          />
+        </div>
+      )}
 
       {/* Bot Difficulty Selector */}
       <div className="mb-3">
@@ -125,11 +168,16 @@ export function QuickPlayPanel({
       <button
         data-testid="quick-play-button"
         data-keyboard-nav="quick-play"
-        onClick={() => { sounds.buttonClick(); onQuickPlay(botDifficulty, quickPlayPersistence); }}
-        className="w-full bg-gradient-to-r from-umber-700 to-amber-800 dark:from-violet-700 dark:to-violet-800 text-white py-4 rounded-lg font-bold hover:from-umber-800 hover:to-amber-900 dark:hover:from-violet-600 dark:hover:to-violet-700 transition-all duration-200 flex items-center justify-center gap-2 border border-umber-900 dark:border-violet-600 shadow focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+        onClick={handleQuickPlay}
+        disabled={!canPlay}
+        className={`w-full mt-3 py-4 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 border shadow focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+          canPlay
+            ? 'bg-gradient-to-r from-umber-700 to-amber-800 dark:from-violet-700 dark:to-violet-800 text-white hover:from-umber-800 hover:to-amber-900 dark:hover:from-violet-600 dark:hover:to-violet-700 border-umber-900 dark:border-violet-600'
+            : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed border-gray-400 dark:border-gray-500'
+        }`}
       >
         <span>⚡</span>
-        <span>Quick Play (1P + 3 Bots)</span>
+        <span>{canPlay ? 'Quick Play (1P + 3 Bots)' : 'Enter name to play'}</span>
       </button>
     </div>
   );

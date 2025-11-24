@@ -29,7 +29,7 @@ interface LobbyProps {
   onCreateGame: (playerName: string, persistenceMode?: 'elo' | 'casual') => void;
   onJoinGame: (gameId: string, playerName: string) => void;
   onSpectateGame: (gameId: string, spectatorName?: string) => void;
-  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual') => void;
+  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual', playerName?: string) => void;
   onRejoinGame?: () => void;
   hasValidSession?: boolean;
   autoJoinGameId?: string;
