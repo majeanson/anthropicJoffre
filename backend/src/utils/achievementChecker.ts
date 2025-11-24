@@ -72,24 +72,24 @@ async function checkGameWonAchievements(
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
-  // First win
-  if (stats.games_won === 1) {
+  // First win - use >= to catch players who had wins before achievement system
+  if (stats.games_won >= 1) {
     const result = await achievementDb.unlockAchievement(playerName, 'first_win');
     if (result.isNewUnlock) unlocked.push(result.achievement);
   }
 
-  // Win milestones
-  if (stats.games_won === 10) {
+  // Win milestones - use >= to catch players who passed milestones before achievement system
+  if (stats.games_won >= 10) {
     const result = await achievementDb.unlockAchievement(playerName, 'games_won_10');
     if (result.isNewUnlock) unlocked.push(result.achievement);
   }
 
-  if (stats.games_won === 50) {
+  if (stats.games_won >= 50) {
     const result = await achievementDb.unlockAchievement(playerName, 'games_won_50');
     if (result.isNewUnlock) unlocked.push(result.achievement);
   }
 
-  if (stats.games_won === 100) {
+  if (stats.games_won >= 100) {
     const result = await achievementDb.unlockAchievement(playerName, 'games_won_100');
     if (result.isNewUnlock) unlocked.push(result.achievement);
   }
@@ -123,8 +123,8 @@ async function checkBetWonAchievements(
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
-  // First bet won
-  if (stats.bets_won === 1) {
+  // First bet won - use >= to catch players who had bets won before achievement system
+  if (stats.bets_won >= 1) {
     const result = await achievementDb.unlockAchievement(playerName, 'first_bet_won');
     if (result.isNewUnlock) unlocked.push(result.achievement);
   }
@@ -213,8 +213,8 @@ async function checkGameCompletedAchievements(
   unlocked: Achievement[],
   progress: Array<{ achievement: Achievement; progress: number; max_progress: number }>
 ) {
-  // Games played milestone
-  if (stats.games_played === 10) {
+  // Games played milestone - use >= to catch players who passed milestone before achievement system
+  if (stats.games_played >= 10) {
     const result = await achievementDb.unlockAchievement(playerName, 'games_played_10');
     if (result.isNewUnlock) unlocked.push(result.achievement);
   }

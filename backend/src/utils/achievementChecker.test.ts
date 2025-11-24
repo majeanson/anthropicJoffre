@@ -77,15 +77,21 @@ describe('Achievement Checker', () => {
       expect(result.unlocked[0].achievement_key).toBe('first_win');
     });
 
-    it('should NOT unlock first_win on second victory', async () => {
+    it('should still attempt to unlock first_win on second victory (idempotent)', async () => {
+      // With >= check, we always try to unlock but the DB handles idempotency
       vi.mocked(db.getPlayerStats).mockResolvedValue(createMockStats({ games_won: 2 }));
+      vi.mocked(achievementDb.unlockAchievement).mockResolvedValue({
+        achievement: createMockAchievement('first_win', 'First Victory'),
+        isNewUnlock: false, // Already unlocked, so not a new unlock
+      });
 
       const result = await checkAchievements({
         playerName: 'TestPlayer',
         eventType: 'game_won',
       });
 
-      expect(achievementDb.unlockAchievement).not.toHaveBeenCalledWith('TestPlayer', 'first_win');
+      // Achievement is attempted but isNewUnlock is false, so not added to unlocked array
+      expect(achievementDb.unlockAchievement).toHaveBeenCalledWith('TestPlayer', 'first_win');
       expect(result.unlocked).toHaveLength(0);
     });
 
