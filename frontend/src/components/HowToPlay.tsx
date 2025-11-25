@@ -50,6 +50,33 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         </ul>
       </section>
 
+      {/* Keyboard Navigation - Desktop only */}
+      <section className="hidden md:block bg-indigo-50 dark:bg-indigo-900/40 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-600">
+        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+          ⌨️ Keyboard Shortcuts
+        </h3>
+        <div className="space-y-3 text-lg">
+          <div>
+            <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-1">Card Navigation:</p>
+            <ul className="space-y-1 ml-4">
+              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">←</kbd> <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">→</kbd> Navigate between cards</li>
+              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Tab</kbd> / <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Shift+Tab</kbd> Cycle through cards</li>
+              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">1</kbd>-<kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">9</kbd> Quick select by position</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-1">Card Actions:</p>
+            <ul className="space-y-1 ml-4">
+              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Enter</kbd> / <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Space</kbd> Play selected card (or queue if not your turn)</li>
+              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Esc</kbd> Clear selection</li>
+            </ul>
+          </div>
+          <p className="text-sm text-indigo-700 dark:text-indigo-300 italic mt-2">
+            💡 Tip: You can queue a card before your turn for instant auto-play!
+          </p>
+        </div>
+      </section>
+
       {/* Special Cards */}
       <section className="bg-green-50 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
