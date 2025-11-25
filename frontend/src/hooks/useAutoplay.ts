@@ -53,13 +53,17 @@ export function useAutoplay({
     if (!autoplayEnabled || !gameState || !socket) return;
     if (phase !== 'betting' && phase !== 'playing' && phase !== 'scoring') return;
 
-    const myPlayerId = socket.id || '';
+    // CRITICAL: Use player name as stable identifier (socket.id changes on reconnect)
+    const myPlayerName = localStorage.getItem('playerName') || '';
+    const me = gameState.players.find(p => p.name === myPlayerName);
+    if (!me) return; // Player not found in game
+
+    const myPlayerId = me.id; // Get socket ID from player object
 
     // For scoring phase, auto-ready
     if (phase === 'scoring') {
       // playersReady now stores names, not IDs
-      const me = gameState.players.find(p => p.id === myPlayerId);
-      const isAlreadyReady = me ? (playersReadyList?.includes(me.name) || false) : false;
+      const isAlreadyReady = playersReadyList?.includes(me.name) || false;
       if (!isAlreadyReady) {
         // Clear any existing autoplay timeout
         if (autoplayTimeoutRef.current) {

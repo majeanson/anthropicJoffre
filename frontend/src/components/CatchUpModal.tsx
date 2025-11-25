@@ -25,8 +25,9 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
 
   if (!isOpen) return null;
 
-  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
-  const isCurrentTurn = gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId;
+  const currentPlayer = gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
+  const turnPlayer = gameState.players[gameState.currentPlayerIndex];
+  const isCurrentTurn = turnPlayer?.name === currentPlayerId || turnPlayer?.id === currentPlayerId;
   const leadingTeam = gameState.teamScores.team1 > gameState.teamScores.team2 ? 1 :
                       gameState.teamScores.team2 > gameState.teamScores.team1 ? 2 : null;
 

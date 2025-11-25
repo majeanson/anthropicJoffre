@@ -47,7 +47,7 @@ export function ScoringPhase({
   });
 
   // Find current player to get their name (playersReady now stores names, not IDs)
-  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+  const currentPlayer = gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
   const currentPlayerName = currentPlayer?.name || '';
   const isReady = gameState.playersReady?.includes(currentPlayerName) || false;
   const readyCount = gameState.playersReady?.length || 0;

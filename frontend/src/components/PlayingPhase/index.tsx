@@ -72,9 +72,10 @@ function PlayingPhaseComponent({
   connectionStats,
 }: PlayingPhaseProps) {
   // ✅ CRITICAL: Check player existence BEFORE any hooks
+  // Use player NAME as stable identifier (socket.id changes on reconnect)
   const playerLookup = isSpectator
     ? gameState.players[0]
-    : gameState.players.find(p => p.id === currentPlayerId);
+    : gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
 
 
   // Safety check: If player not found and not spectator, show error BEFORE calling any hooks
@@ -144,11 +145,14 @@ function PlayingPhaseComponent({
   // Get current player
   const currentPlayer = useMemo(() => playerLookup, [playerLookup]);
   const isCurrentTurn = useMemo(
-    () => gameState.players[gameState.currentPlayerIndex]?.id === currentPlayerId,
+    () => {
+      const turnPlayer = gameState.players[gameState.currentPlayerIndex];
+      return turnPlayer?.name === currentPlayerId || turnPlayer?.id === currentPlayerId;
+    },
     [gameState.players, gameState.currentPlayerIndex, currentPlayerId]
   );
   const currentPlayerIndex = useMemo(
-    () => gameState.players.findIndex(p => p.id === currentPlayerId),
+    () => gameState.players.findIndex(p => p.name === currentPlayerId || p.id === currentPlayerId),
     [gameState.players, currentPlayerId]
   );
 

@@ -12,7 +12,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
   const rematchVotes = gameState.rematchVotes || [];
 
   // Find current player to get their name (rematchVotes now stores names, not IDs)
-  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+  const currentPlayer = gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
   const currentPlayerName = currentPlayer?.name || '';
   const hasVoted = rematchVotes.includes(currentPlayerName);
   const votesNeeded = 4 - rematchVotes.length;

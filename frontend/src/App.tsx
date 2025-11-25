@@ -118,6 +118,11 @@ function AppContent() {
   const [hasValidSession, setHasValidSession] = useState<boolean>(false);
   const [autoJoinGameId, setAutoJoinGameId] = useState<string>(''); // URL parameter for auto-join from shared links
 
+  // CRITICAL: Stable player identifier (use player name, NOT socket.id which changes on reconnect)
+  const [currentPlayerName, setCurrentPlayerName] = useState<string>(() => {
+    return localStorage.getItem('playerName') || '';
+  });
+
   // Sprint 2 Phase 1: Achievement state
   const [achievementNotification, setAchievementNotification] = useState<{ achievement: Achievement; playerName: string } | null>(null);
 
@@ -327,6 +332,7 @@ function AppContent() {
     if (socket) {
       // Store player name in localStorage for persistence
       localStorage.setItem('playerName', playerName);
+      setCurrentPlayerName(playerName); // Update stable identifier
       socket.emit('create_game', { playerName, persistenceMode });
     }
   };
@@ -338,6 +344,7 @@ function AppContent() {
 
     // Store player name in localStorage for persistence
     localStorage.setItem('playerName', playerName);
+    setCurrentPlayerName(playerName); // Update stable identifier
 
     socket.emit('join_game', { gameId, playerName });
     setGameId(gameId);
@@ -680,7 +687,7 @@ function AppContent() {
             <TeamSelection
               players={gameState.players}
               gameId={gameId}
-              currentPlayerId={socket?.id || ''}
+              currentPlayerId={currentPlayerName}
               creatorId={gameState.creatorId}
               onSelectTeam={handleSelectTeam}
               onSwapPosition={handleSwapPosition}
@@ -1044,7 +1051,7 @@ function AppContent() {
                     socket={socket}
                     gameId={gameId}
                     gameState={gameState}
-                    currentPlayerId={socket?.id || ''}
+                    currentPlayerId={currentPlayerName}
                   />
                 </Suspense>
               </ErrorBoundary>

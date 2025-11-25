@@ -55,7 +55,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
 
   // Get current player's hand
   const currentPlayer = useMemo(
-    () => players.find(p => p.id === currentPlayerId),
+    () => players.find(p => p.name === currentPlayerId || p.id === currentPlayerId),
     [players, currentPlayerId]
   );
 

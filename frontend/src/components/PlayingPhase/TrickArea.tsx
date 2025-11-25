@@ -47,7 +47,7 @@ export const TrickArea = memo(function TrickArea({
   const [lastTrickLength, setLastTrickLength] = useState(0);
 
   // Find current player
-  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+  const currentPlayer = gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
 
   // Get card positions in circular layout (bottom, left, top, right)
   const getCardPositions = (trick: TrickCard[]): (TrickCard | null)[] => {

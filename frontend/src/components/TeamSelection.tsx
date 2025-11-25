@@ -69,7 +69,7 @@ export function TeamSelection({
 
   // Sprint 8 Task 2: Memoize expensive computations for performance
   const currentPlayer = useMemo(() =>
-    players.find(p => p.id === currentPlayerId),
+    players.find(p => p.name === currentPlayerId || p.id === currentPlayerId),
     [players, currentPlayerId]
   );
 

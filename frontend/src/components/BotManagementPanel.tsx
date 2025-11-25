@@ -27,7 +27,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
   // Early return BEFORE any logic to prevent flickering
   if (!isOpen || !gameState) return null;
 
-  const currentPlayer = gameState.players.find(p => p.id === currentPlayerId);
+  const currentPlayer = gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
   const botCount = gameState.players.filter(p => p.isBot).length;
   const canAddMoreBots = botCount < 3;
   const isCreator = creatorId && currentPlayerId === creatorId;
