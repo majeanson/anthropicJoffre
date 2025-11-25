@@ -333,11 +333,11 @@ export const PlayerHand = memo(function PlayerHand({
                   {isSelected && (
                     <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none" />
                   )}
-                  {/* Queued indicator - pulsing gold ring and badge */}
+                  {/* Queued indicator - pulsing gold ring and centered badge */}
                   {isQueued && (
                     <>
-                      <div className="absolute -inset-2 rounded-lg ring-4 ring-yellow-400 dark:ring-yellow-500 animate-pulse pointer-events-none z-10" />
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-500 text-yellow-900 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-lg z-20 whitespace-nowrap">
+                      <div className="absolute -inset-2 rounded-lg ring-4 ring-yellow-400 dark:ring-yellow-500 animate-pulse pointer-events-none z-[100]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-yellow-900 text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-[101] whitespace-nowrap border-2 border-yellow-300">
                         QUEUED
                       </div>
                     </>

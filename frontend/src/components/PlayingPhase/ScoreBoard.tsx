@@ -108,7 +108,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
       >
         <div className="flex justify-between items-center gap-2 md:gap-8">
           {/* Team 1 */}
-          <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible z-50">
+          <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative z-50">
             <h3 className="text-xs md:text-sm font-semibold text-orange-600/70 uppercase tracking-wider mb-1 flex items-center justify-start gap-1">
               <span>Team 1</span>
               {gameState.highestBet &&
@@ -124,7 +124,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
               {team1RoundScore >= 0 ? '+' : ''}
               {team1RoundScore} pts
               {floatingTrickPoints.team1 !== null && (
-                <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[6000]">
+                <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[9999]">
                   <span
                     className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team1 >= 0
@@ -139,7 +139,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
               )}
             </p>
             {floatingPoints.team1 !== null && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[6000]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[9999]">
                 <div
                   className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
                     floatingPoints.team1 >= 0
@@ -190,7 +190,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
           </div>
 
           {/* Team 2 */}
-          <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible z-50">
+          <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative z-50">
             <h3 className="text-xs md:text-sm font-semibold text-purple-600/70 uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
               {gameState.highestBet &&
                 gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId ===
@@ -206,7 +206,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
               {team2RoundScore >= 0 ? '+' : ''}
               {team2RoundScore} pts
               {floatingTrickPoints.team2 !== null && (
-                <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[6000]">
+                <span className="absolute left-1/2 -translate-x-1/2 -top-8 animate-points-float-up z-[9999]">
                   <span
                     className={`px-2 py-1 rounded-full font-black text-white shadow-2xl border-2 text-xs ${
                       floatingTrickPoints.team2 >= 0
@@ -221,7 +221,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
               )}
             </p>
             {floatingPoints.team2 !== null && (
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[6000]">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 animate-points-float-up z-[9999]">
                 <div
                   className={`px-3 py-1.5 rounded-full font-black text-white shadow-2xl border-2 ${
                     floatingPoints.team2 >= 0

@@ -15,12 +15,16 @@ interface AchievementUnlockedProps {
 export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnlockedProps) {
   const [isVisible, setIsVisible] = useState(false);
 
+  const handleClose = () => {
+    setIsVisible(false);
+    setTimeout(onDismiss, 500); // Wait for fade-out animation
+  };
+
   useEffect(() => {
     if (achievement) {
       setIsVisible(true);
       const timer = setTimeout(() => {
-        setIsVisible(false);
-        setTimeout(onDismiss, 500); // Wait for fade-out animation
+        handleClose();
       }, 5000);
 
       return () => clearTimeout(timer);
@@ -70,7 +74,16 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
     <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-500 ${
       isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
     }`}>
-      <div className={`bg-gradient-to-r ${getRarityColor()} rounded-lg p-6 ${getRarityGlow()} animate-bounce-once`}>
+      <div className={`bg-gradient-to-r ${getRarityColor()} rounded-lg p-6 ${getRarityGlow()} animate-bounce-once relative`}>
+        {/* Close Button */}
+        <button
+          onClick={handleClose}
+          className="absolute top-2 right-2 text-white/70 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+          aria-label="Close achievement notification"
+        >
+          ×
+        </button>
+
         <div className="flex items-center gap-4">
           {/* Trophy Icon */}
           <div className="text-5xl animate-spin-slow">
