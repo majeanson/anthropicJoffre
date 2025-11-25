@@ -293,7 +293,7 @@ export const PlayerHand = memo(function PlayerHand({
   }
 
   return (
-    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-[100] overflow-visible">
+    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-[45] overflow-visible">
       <div
         className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600 overflow-visible"
         data-testid="player-hand"

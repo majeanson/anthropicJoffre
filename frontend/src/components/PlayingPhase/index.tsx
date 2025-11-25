@@ -344,7 +344,7 @@ function PlayingPhaseComponent({
   };
 
   return (
-    <div className="h-screen-safe md:min-h-screen-safe bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-hidden md:overflow-visible">
+    <div className="h-screen-safe md:min-h-screen-safe bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-y-auto overflow-x-hidden md:overflow-visible">
       <GameHeader
         gameId={gameId || ''}
         roundNumber={gameState.roundNumber}
@@ -364,7 +364,7 @@ function PlayingPhaseComponent({
         connectionStats={connectionStats}
       />
 
-      <div className="flex flex-col flex-1 overflow-visible">
+      <div className="flex flex-col flex-1 overflow-visible relative">
         <ScoreBoard
           gameState={gameState}
           isCurrentTurn={isCurrentTurn}
