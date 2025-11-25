@@ -130,7 +130,7 @@ export function GameHeader({
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg min-h-[60px] z-10 relative">
+    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg min-h-[60px] z-10 relative overflow-visible">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1 sm:py-1.5">
         {/* Desktop: Single row - All items on same horizontal line */}
         <div className="hidden md:flex items-center gap-3">
@@ -212,7 +212,7 @@ export function GameHeader({
                 <span className="text-base md:text-lg">💬</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Chat</span>
                 {unreadChatCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
                     {unreadChatCount}
                   </span>
                 )}
@@ -269,7 +269,7 @@ export function GameHeader({
                 <span className="text-base md:text-lg">🔔</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Notifications</span>
                 {unreadNotificationsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
                     {unreadNotificationsCount}
                   </span>
                 )}
@@ -358,7 +358,7 @@ export function GameHeader({
               >
                 <span className="text-base">💬</span>
                 {unreadChatCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse">
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
                     {unreadChatCount}
                   </span>
                 )}

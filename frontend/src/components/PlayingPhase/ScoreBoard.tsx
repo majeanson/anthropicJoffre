@@ -101,14 +101,14 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
   }, [team1RoundScore, team2RoundScore]);
 
   return (
-    <div className="w-full mb-2 md:mb-4 lg:mb-6 flex-shrink-0 px-2 md:px-4 lg:px-6 pt-2 md:pt-4 lg:pt-6">
+    <div className="w-full mb-2 md:mb-4 lg:mb-6 flex-shrink-0 px-2 md:px-4 lg:px-6 pt-2 md:pt-4 lg:pt-6 overflow-visible">
       <div
-        className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600"
+        className="bg-umber-900/40 backdrop-blur-md rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600 overflow-visible"
         data-testid="score-board"
       >
         <div className="flex justify-between items-center gap-2 md:gap-8">
           {/* Team 1 */}
-          <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative z-50">
+          <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible">
             <h3 className="text-xs md:text-sm font-semibold text-orange-600/70 uppercase tracking-wider mb-1 flex items-center justify-start gap-1">
               <span>Team 1</span>
               {gameState.highestBet &&
@@ -190,7 +190,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
           </div>
 
           {/* Team 2 */}
-          <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative z-50">
+          <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible">
             <h3 className="text-xs md:text-sm font-semibold text-purple-600/70 uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
               {gameState.highestBet &&
                 gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId ===

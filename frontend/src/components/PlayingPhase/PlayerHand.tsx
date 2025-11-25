@@ -293,12 +293,12 @@ export const PlayerHand = memo(function PlayerHand({
   }
 
   return (
-    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-[100]">
+    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 pb-2 md:pb-6 lg:pb-8 z-[100] overflow-visible">
       <div
-        className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600"
+        className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600 overflow-visible"
         data-testid="player-hand"
       >
-        <div className="overflow-x-auto md:overflow-visible -mx-2 md:mx-0 px-2 md:px-0">
+        <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-2 md:mx-0 px-2 md:px-0">
           <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min">
             {displayHand.map((card, index) => {
               const playable = isCardPlayable(card);
@@ -315,7 +315,7 @@ export const PlayerHand = memo(function PlayerHand({
                 <div
                   key={`${card.color}-${card.value}-${index}`}
                   ref={(el) => { cardRefs.current[index] = el; }}
-                  className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 ${
+                  className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 overflow-visible ${
                     showDealingAnimation && !isCardDealt
                       ? 'opacity-0 scale-50'
                       : isTransitioning
@@ -327,17 +327,18 @@ export const PlayerHand = memo(function PlayerHand({
                     transition: isTransitioning
                       ? 'opacity 400ms ease-out, transform 400ms ease-out'
                       : `opacity 300ms ease-out ${dealDelay}ms, transform 300ms ease-out ${dealDelay}ms`,
+                    zIndex: isQueued ? 9999 : 'auto',
                   }}
                 >
                   {/* Selection indicator ring */}
                   {isSelected && (
-                    <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none" />
+                    <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none z-10" />
                   )}
                   {/* Queued indicator - pulsing gold ring and centered badge */}
                   {isQueued && (
                     <>
-                      <div className="absolute -inset-2 rounded-lg ring-4 ring-yellow-400 dark:ring-yellow-500 animate-pulse pointer-events-none z-[9998]" />
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-yellow-900 text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-[9999] whitespace-nowrap border-2 border-yellow-300 pointer-events-none">
+                      <div className="absolute -inset-2 rounded-lg ring-4 ring-yellow-400 dark:ring-yellow-500 animate-pulse pointer-events-none z-20" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-yellow-900 text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 border-yellow-300 pointer-events-none">
                         QUEUED
                       </div>
                     </>
