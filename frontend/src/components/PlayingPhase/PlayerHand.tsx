@@ -322,7 +322,7 @@ export const PlayerHand = memo(function PlayerHand({
                       ? 'opacity-0 motion-safe:animate-card-play-arc'
                       : 'opacity-100 scale-100'
                   }
-                            ${isSelected || isQueued ? '-translate-y-4 scale-110' : ''}`}
+                            ${isSelected || isQueued ? '-translate-y-2 scale-110' : ''}`}
                   style={{
                     transition: isTransitioning
                       ? 'opacity 400ms ease-out, transform 400ms ease-out'
