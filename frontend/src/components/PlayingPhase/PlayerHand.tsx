@@ -298,8 +298,8 @@ export const PlayerHand = memo(function PlayerHand({
         className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600 overflow-visible"
         data-testid="player-hand"
       >
-        <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-2 md:mx-0 px-2 md:px-0">
-          <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min">
+        <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-2 md:mx-0 px-2 md:px-0 pt-6 -mt-4 pb-2">
+          <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min px-2">
             {displayHand.map((card, index) => {
               const playable = isCardPlayable(card);
               const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
