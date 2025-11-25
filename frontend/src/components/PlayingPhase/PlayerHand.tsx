@@ -168,65 +168,79 @@ export const PlayerHand = memo(function PlayerHand({
 
   // Keyboard navigation
   useEffect(() => {
-    if (!isCurrentTurn || hand.length === 0) return;
+    if (hand.length === 0) return;
 
     const handleKeyPress = (e: KeyboardEvent) => {
-      const playableCardsIndexes = hand
-        .map((card, index) => ({ card, index }))
-        .filter(({ card }) => isCardPlayable(card))
-        .map(({ index }) => index);
+      // When it's your turn: only navigate playable cards
+      // When it's NOT your turn: navigate all cards (for queuing)
+      const navigableCardsIndexes = isCurrentTurn
+        ? hand
+            .map((card, index) => ({ card, index }))
+            .filter(({ card }) => isCardPlayable(card))
+            .map(({ index }) => index)
+        : hand.map((_, index) => index);
 
-      if (playableCardsIndexes.length === 0) return;
+      if (navigableCardsIndexes.length === 0) return;
 
-      // Arrow keys: navigate through playable cards
+      // Arrow keys: navigate through cards
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
         sounds.cardDeal();
 
         if (selectedCardIndex === null) {
-          setSelectedCardIndex(playableCardsIndexes[0]);
+          setSelectedCardIndex(navigableCardsIndexes[0]);
         } else {
-          const currentPos = playableCardsIndexes.indexOf(selectedCardIndex);
+          const currentPos = navigableCardsIndexes.indexOf(selectedCardIndex);
 
           if (e.key === 'ArrowRight') {
-            const nextPos = (currentPos + 1) % playableCardsIndexes.length;
-            setSelectedCardIndex(playableCardsIndexes[nextPos]);
+            const nextPos = (currentPos + 1) % navigableCardsIndexes.length;
+            setSelectedCardIndex(navigableCardsIndexes[nextPos]);
           } else {
             const prevPos =
-              (currentPos - 1 + playableCardsIndexes.length) % playableCardsIndexes.length;
-            setSelectedCardIndex(playableCardsIndexes[prevPos]);
+              (currentPos - 1 + navigableCardsIndexes.length) % navigableCardsIndexes.length;
+            setSelectedCardIndex(navigableCardsIndexes[prevPos]);
           }
         }
       }
-      // Tab: cycle through playable cards
+      // Tab: cycle through cards
       else if (e.key === 'Tab') {
         e.preventDefault();
         sounds.cardDeal();
 
-        if (selectedCardIndex === null || playableCardsIndexes.length === 0) {
-          setSelectedCardIndex(playableCardsIndexes[0]);
+        if (selectedCardIndex === null || navigableCardsIndexes.length === 0) {
+          setSelectedCardIndex(navigableCardsIndexes[0]);
         } else {
-          const currentPos = playableCardsIndexes.indexOf(selectedCardIndex);
+          const currentPos = navigableCardsIndexes.indexOf(selectedCardIndex);
           const nextPos = e.shiftKey
-            ? (currentPos - 1 + playableCardsIndexes.length) % playableCardsIndexes.length
-            : (currentPos + 1) % playableCardsIndexes.length;
-          setSelectedCardIndex(playableCardsIndexes[nextPos]);
+            ? (currentPos - 1 + navigableCardsIndexes.length) % navigableCardsIndexes.length
+            : (currentPos + 1) % navigableCardsIndexes.length;
+          setSelectedCardIndex(navigableCardsIndexes[nextPos]);
         }
       }
-      // Enter or Space: play selected card
+      // Enter or Space: play/queue selected card
       else if ((e.key === 'Enter' || e.key === ' ') && selectedCardIndex !== null) {
         e.preventDefault();
         const card = hand[selectedCardIndex];
-        if (card && playableCardsIndexes.includes(selectedCardIndex)) {
-          sounds.cardPlay();
-          handleCardClick(card);
-          setSelectedCardIndex(null);
+        if (!card) return;
+
+        // If it's your turn: play the card (if playable)
+        if (isCurrentTurn) {
+          if (isCardPlayable(card)) {
+            sounds.cardPlay();
+            handleCardClick(card);
+            setSelectedCardIndex(null);
+          }
+        } else {
+          // If NOT your turn: queue the card
+          sounds.cardDeal();
+          handleCardClick(card); // This will trigger queue logic
+          // Keep selection for visual feedback
         }
       }
       // Number keys 1-9: quick select card by position
       else if (e.key >= '1' && e.key <= '9') {
         const cardIndex = parseInt(e.key) - 1;
-        if (cardIndex < hand.length && playableCardsIndexes.includes(cardIndex)) {
+        if (cardIndex < hand.length && navigableCardsIndexes.includes(cardIndex)) {
           e.preventDefault();
           sounds.cardDeal();
           setSelectedCardIndex(cardIndex);
