@@ -48,14 +48,10 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
     if (card.value === 0 && card.color === 'brown') hasBrownZero = true;
   });
 
-  // Estimate tricks: high cards, trump cards, special cards
-  estimatedTricks += highCards * 0.3;
-  estimatedTricks += trumpCount * 0.5;
-
   return {
     trumpCount,
     highCards,
-    estimatedTricks: Math.round(estimatedTricks),
+    estimatedTricks,
     hasRedZero,
     hasBrownZero,
   };
@@ -100,84 +96,115 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
 
   // Strong hand - suggest aggressive bet
   if (strength.estimatedTricks >= 8) {
-    const amount = Math.min(12, strength.estimatedTricks + 2);
-    const conservativeAmount = Math.max(7, strength.estimatedTricks);
+    const suggestedAmount = Math.min(12, Math.max(10, Math.floor(strength.estimatedTricks) + 2));
+    const shouldRaise = highestBet ? suggestedAmount > highestBet.amount : true;
+
     return {
-      amount,
+      amount: shouldRaise ? suggestedAmount : (highestBet?.amount || 10) + 1,
       withoutTrump: false,
       skip: false,
-      reason: `You have a strong hand with ${strength.trumpCount} trump cards and ${strength.highCards} high cards. Bet ${amount} points to maximize your score!`,
-      alternatives: `Alternative: Bet ${conservativeAmount} (more conservative) to play it safer, but you're leaving points on the table. With your strong hand, betting high is worth the risk.`,
+      reason: `Strong hand! You have ${strength.trumpCount} trump cards and ${strength.highCards} high cards. Bid aggressively!`,
+      alternatives: highestBet
+        ? `Alternative: Match the current bet (${highestBet.amount}) to play it safer, but you're likely leaving points on the table with this strong hand.`
+        : `Alternative: Bet lower (8-9) if you want to play conservatively, but your hand can likely win more tricks than that.`,
     };
   }
 
-  // Medium hand - conservative bet
-  const baseBet = Math.max(7, Math.min(10, strength.estimatedTricks));
-  const amount = highestBet ? Math.max(baseBet, highestBet.amount + 1) : baseBet;
-  const aggressiveAmount = Math.min(12, amount + 2);
-
+  // Medium hand - suggest moderate bet
+  const suggestedAmount = Math.max(7, Math.min(9, Math.floor(strength.estimatedTricks) + 1));
   return {
-    amount,
+    amount: suggestedAmount,
     withoutTrump: false,
     skip: false,
-    reason: `Your hand is decent. Bet ${amount} points - not too risky, not too safe. You have ${strength.trumpCount} trump cards.`,
-    alternatives: `Alternatives: Skip to avoid risk (but miss potential points), or bet ${aggressiveAmount} (aggressive) to win big if you get lucky tricks. The middle ground (${amount}) balances risk and reward.`,
+    reason: `Moderate hand with ${strength.trumpCount} trump cards. Bet ${suggestedAmount} for a balanced approach.`,
+    alternatives: `Alternative: ${isDealer ? 'As dealer, you must bet or raise.' : 'You could skip to avoid risk, but your hand has potential.'}`,
   };
 }
 
 /**
- * Determine which cards can legally be played
+ * Get all playable cards based on suit-following rules
  */
 function getPlayableCards(hand: Card[], currentTrick: { card: Card; playerId: string }[]): Card[] {
   if (currentTrick.length === 0) {
-    // Leading the trick - all cards are playable
-    return hand;
+    return hand; // Leading - can play any card
   }
 
   const ledSuit = currentTrick[0].card.color;
-  const hasSuit = hand.some((card) => card.color === ledSuit);
+  const cardsInSuit = hand.filter((c) => c.color === ledSuit);
 
-  if (hasSuit) {
-    // Must follow suit
-    return hand.filter((card) => card.color === ledSuit);
+  // Must follow suit if possible
+  if (cardsInSuit.length > 0) {
+    return cardsInSuit;
   }
 
-  // Can't follow suit - all cards playable
+  // No cards in led suit - can play any card
   return hand;
 }
 
 /**
- * Determine if teammate is currently winning the trick
+ * Determine who is currently winning the trick
  */
-function isTeammateWinning(gameState: GameState, playerName: string, trump: CardColor | null): boolean {
-  if (gameState.currentTrick.length === 0) return false;
-
-  const player = gameState.players.find(p => p.name === playerName);
-  if (!player) return false;
-
-  const playerTeam = player.teamId;
-
-  // Find current winning player
-  const currentWinningPlay = gameState.currentTrick.reduce((winning, play) => {
+function getTrickWinner(currentTrick: { card: Card; playerName: string }[], trump: CardColor | null): { card: Card; playerName: string } {
+  return currentTrick.reduce((winning, play) => {
     const winningCard = winning.card;
     const playCard = play.card;
 
+    // Trump beats non-trump
     if (playCard.color === trump && winningCard.color !== trump) return play;
     if (winningCard.color === trump && playCard.color !== trump) return winning;
 
+    // Same suit - higher value wins
     if (playCard.color === winningCard.color) {
       return playCard.value > winningCard.value ? play : winning;
     }
 
     return winning;
   });
-
-  const winningPlayer = gameState.players.find(p => p.name === currentWinningPlay.playerName);
-  return winningPlayer?.teamId === playerTeam;
 }
 
 /**
- * Suggest the best card to play
+ * Check if a card can beat the current winning card
+ */
+function canBeatCard(myCard: Card, winningCard: Card, _ledSuit: CardColor, trump: CardColor | null): boolean {
+  // My card is trump, winning card is not
+  if (myCard.color === trump && winningCard.color !== trump) return true;
+
+  // Winning card is trump, my card is not
+  if (winningCard.color === trump && myCard.color !== trump) return false;
+
+  // Both same color (either both trump or both led suit)
+  if (myCard.color === winningCard.color) {
+    return myCard.value > winningCard.value;
+  }
+
+  // Different non-trump colors - can't beat
+  return false;
+}
+
+// Note: This function is kept for future enhancements but not currently used
+// It could be useful for more sophisticated probability calculations
+// function countBetterCards(myCard: Card, _ledSuit: CardColor, trump: CardColor | null, trickSoFar: { card: Card }[]): number {
+//   const playedCards = trickSoFar.map(t => t.card);
+//   let betterCount = 0;
+//
+//   // Count cards that could beat mine
+//   for (let val = myCard.value + 1; val <= 7; val++) {
+//     // Check if this card has been played
+//     const alreadyPlayed = playedCards.some(c => c.color === myCard.color && c.value === val);
+//     if (!alreadyPlayed) betterCount++;
+//   }
+//
+//   // If my card is not trump and trump hasn't been played, count trump cards as better
+//   if (myCard.color !== trump && trump) {
+//     const trumpPlayed = playedCards.some(c => c.color === trump);
+//     if (!trumpPlayed) betterCount += 3; // Conservative estimate
+//   }
+//
+//   return betterCount;
+// }
+
+/**
+ * Suggest the best card to play - with full team awareness
  */
 export function suggestMove(gameState: GameState, playerName: string): MoveSuggestion | null {
   const player = gameState.players.find((p) => p.name === playerName);
@@ -199,214 +226,171 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
 
   const currentTrick = gameState.currentTrick;
   const trump = gameState.trump;
-  const teammateWinning = isTeammateWinning(gameState, playerName, trump);
+  const myTeamId = player.teamId;
+
+  // Find teammate
+  const teammate = gameState.players.find(p => p.teamId === myTeamId && p.name !== playerName);
+  const teammateInTrick = currentTrick.find(t => t.playerName === teammate?.name);
+
+  // Determine current winner and if it's teammate
+  let currentWinner: { card: Card; playerName: string } | null = null;
+  let teammateWinning = false;
+
+  if (currentTrick.length > 0) {
+    currentWinner = getTrickWinner(currentTrick, trump);
+    teammateWinning = currentWinner.playerName === teammate?.name;
+  }
 
   // CASE 1: Leading the trick (first to play)
   if (currentTrick.length === 0) {
     const trumpCards = playableCards.filter((c) => c.color === trump);
     const nonTrumpCards = playableCards.filter((c) => c.color !== trump);
-    const redZero = playableCards.find((c) => c.value === 0 && c.color === 'red');
 
-    // Play high trump if you have it
+    // Priority: Lead with high trump to win
     if (trumpCards.length > 0) {
-      const highestTrump = trumpCards.reduce((max, card) =>
-        card.value > max.value ? card : max
-      );
-      const lowestNonTrump = nonTrumpCards.length > 0
-        ? nonTrumpCards.reduce((min, card) => card.value < min.value ? card : min)
-        : null;
+      const highestTrump = trumpCards.reduce((max, card) => card.value > max.value ? card : max);
 
       return {
         card: highestTrump,
         priority: 'high',
-        reason: 'Lead with a high trump',
-        explanation: `Leading with a high trump card (${highestTrump.value}) puts pressure on other players and gives you a strong chance to win the trick!`,
-        alternatives: lowestNonTrump
-          ? `Alternative: Lead with low non-trump (${lowestNonTrump.value} ${lowestNonTrump.color}) to save trump for later, but you risk losing the trick. Leading trump is more aggressive and guarantees you control.`
-          : `No other options - you only have trump cards.`,
+        reason: 'Lead with high trump to control',
+        explanation: `Leading with ${highestTrump.value} ${highestTrump.color} (trump) gives you the best chance to win this trick!`,
+        alternatives: nonTrumpCards.length > 0
+          ? `You could save trump by leading non-trump, but you'd risk losing the trick.`
+          : undefined,
       };
     }
 
-    // Play red 0 to win bonus points
-    if (redZero && nonTrumpCards.length > 1) {
-      const otherNonTrump = nonTrumpCards.filter(c => !(c.value === 0 && c.color === 'red'));
-      const lowestOther = otherNonTrump.reduce((min, card) => card.value < min.value ? card : min, otherNonTrump[0]);
-
-      return {
-        card: redZero,
-        priority: 'medium',
-        reason: 'Try to win the Red 0 (+5 points)',
-        explanation: `Leading with Red 0 allows you to control the trick and potentially win the +5 bonus points!`,
-        alternatives: lowestOther
-          ? `Alternative: Lead with ${lowestOther.value} ${lowestOther.color} to save Red 0 for a trick you're sure to win, but you might miss the bonus if you don't draw it out now.`
-          : 'Red 0 is your best option for potential bonus points.',
-      };
-    }
-
-    // Play lowest non-trump card
+    // Play highest non-trump to try winning
     if (nonTrumpCards.length > 0) {
-      const lowestCard = nonTrumpCards.reduce((min, card) =>
-        card.value < min.value ? card : min
-      );
       const highestNonTrump = nonTrumpCards.reduce((max, card) => card.value > max.value ? card : max);
 
       return {
-        card: lowestCard,
-        priority: 'low',
-        reason: 'Save high cards for later',
-        explanation: `Leading with a low card (${lowestCard.value} ${lowestCard.color}) saves your powerful cards for more important tricks.`,
-        alternatives: highestNonTrump.value > lowestCard.value
-          ? `Alternative: Lead high (${highestNonTrump.value} ${highestNonTrump.color}) to try winning the trick, but you're using your best card early. Low card strategy plays it safe.`
-          : 'This is your only non-trump option.',
+        card: highestNonTrump,
+        priority: 'medium',
+        reason: 'Lead with high card',
+        explanation: `Leading with ${highestNonTrump.value} ${highestNonTrump.color} gives you a good chance to win, especially if others don't have trump.`,
       };
     }
   }
 
-  // CASE 2: Following suit
-  const ledSuit = currentTrick[0].card.color;
-  const followSuitCards = playableCards.filter((c) => c.color === ledSuit);
+  // CASE 2: Teammate is winning - ADD RED 0 IF SAFE
+  if (teammateWinning && currentWinner) {
+    const redZero = playableCards.find(c => c.value === 0 && c.color === 'red');
+    const ledSuit = currentTrick[0].card.color;
 
-  if (followSuitCards.length > 0) {
-    // Check if we can win the trick
-    const currentWinningCard = currentTrick.reduce((winning, play) => {
-      const winningCard = winning.card;
-      const playCard = play.card;
+    // Check if red 0 can be beaten
+    if (redZero) {
+      const canBeBeaten = playableCards.some(c =>
+        c !== redZero && canBeatCard(c, currentWinner.card, ledSuit, trump)
+      );
 
-      // Trump beats non-trump
-      if (playCard.color === trump && winningCard.color !== trump) return play;
-      if (winningCard.color === trump && playCard.color !== trump) return winning;
-
-      // Same suit - higher value wins
-      if (playCard.color === winningCard.color) {
-        return playCard.value > winningCard.value ? play : winning;
-      }
-
-      return winning;
-    });
-
-    const canWin = followSuitCards.some((card) => {
-      if (trump && currentWinningCard.card.color === trump && card.color !== trump) {
-        return false; // Can't beat trump with non-trump
-      }
-      return card.value > currentWinningCard.card.value;
-    });
-
-    if (canWin) {
-      // Check if teammate is winning
-      if (teammateWinning) {
-        // Teammate winning - play lowest to support
-        const lowestCard = followSuitCards.reduce((min, card) =>
-          card.value < min.value ? card : min
-        );
+      // If red 0 won't risk the trick, ALWAYS play it for bonus points!
+      if (!canBeBeaten || redZero.color === trump) {
         return {
-          card: lowestCard,
-          priority: 'low',
-          reason: 'Teammate winning - play low',
-          explanation: `Your teammate is winning! Play your lowest card (${lowestCard.value} ${lowestCard.color}) to let them take the trick.`,
-          alternatives: `You could overtake with a higher card, but that wastes your team's high cards unnecessarily.`,
+          card: redZero,
+          priority: 'high',
+          reason: '🎯 ADD RED 0 BONUS (+5 points)!',
+          explanation: `Your teammate is winning with ${currentWinner.card.value} ${currentWinner.card.color}. Play Red 0 to add +5 bonus points to your team's trick! This is the #1 priority when safe.`,
         };
       }
-
-      // Win the trick with lowest winning card
-      const winningCards = followSuitCards.filter(
-        (card) => card.value > currentWinningCard.card.value
-      );
-      const lowestWinner = winningCards.reduce((min, card) =>
-        card.value < min.value ? card : min
-      );
-
-      return {
-        card: lowestWinner,
-        priority: 'high',
-        reason: 'Win this trick!',
-        explanation: `Your ${lowestWinner.value} ${lowestWinner.color} can win the trick. Playing the lowest winning card saves your higher cards for later.`,
-      };
-    } else {
-      // Can't win - play lowest card
-      const lowestCard = followSuitCards.reduce((min, card) =>
-        card.value < min.value ? card : min
-      );
-
-      return {
-        card: lowestCard,
-        priority: 'low',
-        reason: "Can't win - play lowest",
-        explanation: `You can't win this trick, so play your lowest card (${lowestCard.value} ${lowestCard.color}) to save better cards.`,
-      };
-    }
-  }
-
-  // CASE 3: Can't follow suit - use trump or dump
-  const trumpCards = playableCards.filter((c) => c.color === trump);
-
-  if (trumpCards.length > 0) {
-    // Check if worth winning with trump
-    const hasRedZero = currentTrick.some((p) => p.card.value === 0 && p.card.color === 'red');
-    const hasBrownZero = currentTrick.some((p) => p.card.value === 0 && p.card.color === 'brown');
-
-    if (hasRedZero) {
-      // Win the red zero!
-      const lowestTrump = trumpCards.reduce((min, card) =>
-        card.value < min.value ? card : min
-      );
-      return {
-        card: lowestTrump,
-        priority: 'high',
-        reason: 'Win the Red 0 (+5 points)!',
-        explanation: `Use your lowest trump (${lowestTrump.value}) to win the trick with Red 0 for a +5 point bonus!`,
-      };
     }
 
-    if (!hasBrownZero && currentTrick.length >= 2) {
-      // Worth trumping a normal trick
-      const lowestTrump = trumpCards.reduce((min, card) =>
-        card.value < min.value ? card : min
-      );
-      return {
-        card: lowestTrump,
-        priority: 'medium',
-        reason: 'Use trump to win',
-        explanation: `Play your lowest trump (${lowestTrump.value}) to win this trick.`,
-      };
-    }
-  }
+    // Otherwise, play lowest card to save high cards
+    const lowestCard = playableCards.reduce((min, card) => {
+      // Never waste red 0 if we have it
+      if (card.value === 0 && card.color === 'red') return min;
+      // Avoid brown 0 if possible
+      if (card.value === 0 && card.color === 'brown') return min.value === 0 && min.color === 'brown' ? min : card;
+      return card.value < min.value ? card : min;
+    });
 
-  // CASE 4: Dump worst card (but NOT if teammate is winning!)
-  const brownZero = playableCards.find((c) => c.value === 0 && c.color === 'brown');
-  if (brownZero && !teammateWinning) {
-    // Only dump Brown 0 if opponent is winning
     return {
-      card: brownZero,
-      priority: 'high',
-      reason: 'Dump the Brown 0 (-2 points)',
-      explanation: `Get rid of the Brown 0 now! It's worth -2 points, so let the opponent take that penalty.`,
-      alternatives: `Don't dump if your teammate is winning - you'd give them the penalty!`,
+      card: lowestCard,
+      priority: 'low',
+      reason: 'Teammate winning - save high cards',
+      explanation: `Your teammate is winning with ${currentWinner.card.value} ${currentWinner.card.color}. Play your lowest card (${lowestCard.value} ${lowestCard.color}) to save powerful cards for later tricks.`,
+      alternatives: redZero ? `Red 0 would add bonus points but might risk the trick if beaten.` : undefined,
     };
   }
 
-  // If teammate is winning and we have Brown 0, play something else
-  if (teammateWinning && brownZero) {
-    const otherCards = playableCards.filter(c => !(c.value === 0 && c.color === 'brown'));
-    if (otherCards.length > 0) {
-      const lowestOther = otherCards.reduce((min, card) => card.value < min.value ? card : min);
+  // CASE 3: Teammate is LOSING or not in trick - TRY TO WIN
+  const ledSuit = currentTrick[0].card.color;
+  const winningCard = currentWinner ? currentWinner.card : currentTrick[0].card;
+
+  // Find cards that can win
+  const winningCards = playableCards.filter(c => canBeatCard(c, winningCard, ledSuit, trump));
+
+  if (winningCards.length > 0) {
+    // Check if trick has red 0 (high value)
+    const trickHasRedZero = currentTrick.some(t => t.card.value === 0 && t.card.color === 'red');
+    const redZeroInHand = winningCards.find(c => c.value === 0 && c.color === 'red');
+
+    // If trick has red 0, try to win it!
+    if (trickHasRedZero) {
+      const lowestWinningCard = winningCards.reduce((min, card) => card.value < min.value ? card : min);
+
       return {
-        card: lowestOther,
-        priority: 'medium',
-        reason: 'Teammate winning - avoid Brown 0',
-        explanation: `Your teammate is winning! Play ${lowestOther.value} ${lowestOther.color} instead of Brown 0 to avoid giving them the -2 penalty.`,
+        card: lowestWinningCard,
+        priority: 'high',
+        reason: '🔴 WIN RED 0 TRICK (+5 points)!',
+        explanation: `Opponent has Red 0 in this trick! Play ${lowestWinningCard.value} ${lowestWinningCard.color} to win it and get the +5 bonus points for your team. Always prevent opponents from getting red 0!`,
       };
     }
+
+    // Play red 0 if we have it and can win
+    if (redZeroInHand) {
+      return {
+        card: redZeroInHand,
+        priority: 'high',
+        reason: 'WIN with Red 0 (+5 points)',
+        explanation: `Play Red 0 to win this trick AND get the +5 bonus points! This is a high-value trick worth fighting for.`,
+      };
+    }
+
+    // Otherwise play lowest winning card
+    const lowestWinningCard = winningCards.reduce((min, card) => card.value < min.value ? card : min);
+
+    return {
+      card: lowestWinningCard,
+      priority: 'high',
+      reason: 'Win the trick',
+      explanation: `${teammateInTrick ? 'Your teammate couldn\'t win' : 'You can win this trick'}. Play ${lowestWinningCard.value} ${lowestWinningCard.color} to take it!`,
+    };
   }
 
-  // Play lowest card
-  const lowestCard = playableCards.reduce((min, card) =>
-    card.value < min.value ? card : min
-  );
+  // CASE 4: Can't win - throw away lowest (avoid brown 0 if possible)
+  const brownZero = playableCards.find(c => c.value === 0 && c.color === 'brown');
+  const nonBrownCards = playableCards.filter(c => !(c.value === 0 && c.color === 'brown'));
 
+  if (nonBrownCards.length > 0) {
+    const lowestNonBrown = nonBrownCards.reduce((min, card) => card.value < min.value ? card : min);
+
+    return {
+      card: lowestNonBrown,
+      priority: 'low',
+      reason: 'Can\'t win - throw lowest',
+      explanation: `You can't win this trick. Play ${lowestNonBrown.value} ${lowestNonBrown.color} (your lowest non-brown-0) to save better cards.`,
+      alternatives: brownZero ? `Avoid Brown 0 to not give -2 points to opponents if they win.` : undefined,
+    };
+  }
+
+  // Last resort: must play brown 0
+  if (brownZero) {
+    return {
+      card: brownZero,
+      priority: 'low',
+      reason: 'Only option left',
+      explanation: `You can't win and only have Brown 0 left. This will give -2 points to whoever wins the trick, but you have no choice.`,
+    };
+  }
+
+  // Fallback: play lowest card
+  const lowestCard = playableCards.reduce((min, card) => card.value < min.value ? card : min);
   return {
     card: lowestCard,
     priority: 'low',
-    reason: 'Dump lowest card',
-    explanation: `You can't follow suit, so dump your lowest card (${lowestCard.value} ${lowestCard.color}).`,
+    reason: 'Throw away low card',
+    explanation: `Play ${lowestCard.value} ${lowestCard.color} to minimize the value you're giving up.`,
   };
 }
