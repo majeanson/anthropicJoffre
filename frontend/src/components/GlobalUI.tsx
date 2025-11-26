@@ -124,12 +124,6 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
             onSwapPosition={handleSwapPosition}
             creatorId={gameState.creatorId}
           />
-          <FriendsPanel
-            isOpen={showFriendsPanel}
-            onClose={() => setShowFriendsPanel(false)}
-            socket={socket}
-            currentPlayer={gameState.players.find(p => p.id === socket?.id)?.name || ''}
-          />
           <AchievementsPanel
             isOpen={showAchievementsPanel}
             onClose={() => setShowAchievementsPanel(false)}
@@ -138,6 +132,16 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
           />
         </Suspense>
       )}
+
+      {/* Friends & Social UI - Available everywhere (Lobby and Game) */}
+      <Suspense fallback={<div />}>
+        <FriendsPanel
+          isOpen={showFriendsPanel}
+          onClose={() => setShowFriendsPanel(false)}
+          socket={socket}
+          currentPlayer={auth.user?.username || gameState?.players.find(p => p.id === socket?.id)?.name || ''}
+        />
+      </Suspense>
 
       {/* Achievement & Social UI */}
       {achievementNotification && (
