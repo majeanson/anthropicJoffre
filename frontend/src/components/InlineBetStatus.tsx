@@ -67,11 +67,6 @@ export function InlineBetStatus({
           const display = getBetDisplay(player);
           const isClickable = !player.isEmpty && !player.isBot && onClickPlayer;
 
-          // Debug logging
-          if (player.name) {
-            console.log(`[InlineBetStatus] Player: ${player.name}, isEmpty: ${player.isEmpty}, isBot: ${player.isBot}, onClickPlayer: ${!!onClickPlayer}, isClickable: ${isClickable}`);
-          }
-
           return (
             <div
               key={player.id}
