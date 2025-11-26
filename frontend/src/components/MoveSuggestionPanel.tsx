@@ -22,6 +22,12 @@ export function MoveSuggestionPanel({
 
   if (!isMyTurn) return null;
 
+  // Check if there's a suggestion to show
+  const hasSuggestion = gameState.phase === 'betting' ||
+    (gameState.phase === 'playing' && suggestMove(gameState, currentPlayerId) !== null);
+
+  if (!hasSuggestion) return null;
+
   const renderBettingSuggestion = () => {
     const suggestion = suggestBet(gameState, currentPlayerId);
 
