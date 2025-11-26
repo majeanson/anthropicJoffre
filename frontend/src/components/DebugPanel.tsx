@@ -422,7 +422,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
               {gameState.players.map((player, index) => {
                 const isCurrentTurn = index === gameState.currentPlayerIndex;
                 const isDealer = index === gameState.dealerIndex;
-                const bet = gameState.currentBets.find(b => b.playerId === player.id);
+                const bet = gameState.currentBets.find(b => b.playerName === player.name);
 
                 return (
                   <div

@@ -1,6 +1,6 @@
 # Build Information
 
-**Last Updated**: 2025-11-25
+**Last Updated**: 2025-11-26
 **Build Status**: Development
 **Version**: 1.0.0-dev
 
@@ -319,63 +319,44 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 
 ---
 
-## 📝 Recent Changes (2025-11-25)
+## 📝 Recent Changes (2025-11-26)
 
 ### Completed
-1. ✅ Sprint 9 Task 4 (Remove Technical Debt)
-   - Removed @ts-ignore directives
-   - Migrated .then()/.catch() to async/await
-   - Implemented TODOs
+1. ✅ playerName Migration (Complete)
+   - Migrated all code from volatile `playerId` to stable `playerName` identifiers
+   - Updated all bet lookups to use playerName instead of playerId
+   - Fixed duplicate bet checks across backend and frontend
+   - Updated type comments to warn against using playerId for comparisons
+   - All 485 backend tests passing
+   - Fixed frontend test files (BettingPhase.test.tsx, GameReplay.test.tsx)
 
-2. ✅ Documentation Cleanup
-   - Reduced from ~200 .md files to ~30
-   - Consolidated Sprints 1-5 into SPRINT_HISTORY.md
-   - Created FUTURE_WORK.md
-   - Created FUTURE_WORK_PROGRESS.md
+2. ✅ Beginner Mode UI Enhancements
+   - Added Tutorial Progress modal accessible from game header
+   - Shows all 9 tutorial phases with completion status
+   - Progress bar with percentage and checkmarks
+   - Only visible when beginner mode is enabled
+   - Modal shows "Master Student" achievement completion status
 
-3. ✅ TypeScript Error Fixes
-   - Fixed critical type errors in 11 files
-   - GameReplay.tsx JSX error resolved
-   - Database type assertions fixed
-   - Request type augmentation added
+3. ✅ Move Suggestion Panel UX Improvement
+   - Changed from vertical layout to overlay positioning
+   - Now appears above PlayerHand area (no layout shift)
+   - 95% opacity for better visual integration
+   - Only shows when player has cards in hand
+   - Prevents vertical stack changes during gameplay
 
-4. ✅ Build Configuration
-   - Created tsconfig.build.json for Socket.io compatibility
-   - Updated build script to use separate build config
-   - Fixed RemoteSocket type casting in notifications.ts
-   - Build now succeeds without TypeScript errors
-   - Solution: strictFunctionTypes disabled for build only
+4. ✅ Clickable Player Profiles (Gaming Phases)
+   - Added clickable profiles in BettingPhase (InlineBetStatus component)
+   - Added clickable profiles in PlayingPhase (PlayerPosition component)
+   - Players can click their own profile to view profile modal
+   - Players can click other real players (not bots) to view profiles
+   - Consistent with existing profile click functionality
+   - Hover underline on clickable names
 
-5. ✅ Frontend TypeScript Error Fixes
-   - Resolved all remaining TypeScript errors in 11 files
-   - Fixed unused imports and variables in test files
-   - Corrected type definitions and property names
-   - Frontend build now succeeds without errors
-
-6. ✅ Rules of Hooks Compliance
-   - Fixed critical "Rendered more hooks than during the previous render" violations
-   - RoundSummary.tsx: Moved early return before hooks
-   - PlayerStatsModal.tsx: Moved isOpen check before hooks
-   - GlobalLeaderboard.tsx: Moved isOpen check before hooks
-   - All components now follow React Rules of Hooks correctly
-   - Prevents runtime errors during conditional rendering
-
-7. ✅ Beginner Mode Feature (Complete)
-   - Comprehensive beginner mode with tutorial system
-   - Settings toggle for "Beginner mode" with persistence
-   - 9 contextual tutorial phases with progress tracking
-   - Move suggestion system with AI explanations
-   - Extended timeouts (2x multiplier: 120s playing, 60s betting)
-   - "Master Student" achievement for tutorial completion
-   - Full integration across all game phases
-   - See: BEGINNER_MODE_IMPLEMENTATION.md
-
-8. ✅ Beginner Mode TypeScript Fixes
-   - Removed unused getTutorialProgress import
-   - Changed tricksPlayed to currentRoundTricks.length (5 instances)
-   - Added optional chaining for socket.id (4 instances)
-   - Removed unused variables in moveSuggestion.ts
+5. ✅ TypeScript Error Fixes
+   - Fixed TutorialProgressModal import error (re-exported TutorialPhase)
+   - Fixed test file Bet objects missing playerName field
    - Both backend and frontend builds pass successfully
+   - No TypeScript compilation errors
 
 ### In Progress
 - None (ready for Sprint 10)

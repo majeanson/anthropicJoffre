@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { SettingsPanel } from './SettingsPanel';
+import { TutorialProgressModal } from './TutorialProgressModal';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { CardColor } from '../types/game';
 import { useCountUp } from '../hooks/useCountUp';
+import { useSettings } from '../contexts/SettingsContext';
 import logger from '../utils/logger';
 
 interface GameHeaderProps {
@@ -60,8 +62,10 @@ export function GameHeader({
   trump,
   bettingTeamId
 }: GameHeaderProps) {
+  const { beginnerMode } = useSettings();
   const [linkCopied, setLinkCopied] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [tutorialProgressOpen, setTutorialProgressOpen] = useState(false);
 
   // Score change animation state
   const prevTeam1ScoreRef = useRef(team1Score);
@@ -283,6 +287,19 @@ export function GameHeader({
               </button>
             )}
 
+            {/* Tutorial Progress Button - Only in beginner mode */}
+            {beginnerMode && (
+              <button
+                onClick={() => setTutorialProgressOpen(true)}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                title="Tutorial Progress"
+                data-testid="header-tutorial-button"
+              >
+                <span className="text-base md:text-lg">📚</span>
+                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Tutorials</span>
+              </button>
+            )}
+
             {/* Settings Button - Opens unified settings panel */}
             <button
               onClick={() => setSettingsOpen(true)}
@@ -405,6 +422,17 @@ export function GameHeader({
               </button>
             )}
 
+            {/* Tutorial Progress Button - Only in beginner mode */}
+            {beginnerMode && (
+              <button
+                onClick={() => setTutorialProgressOpen(true)}
+                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                title="Tutorial Progress"
+              >
+                <span className="text-base">📚</span>
+              </button>
+            )}
+
             {/* Settings Button */}
             <button
               onClick={() => setSettingsOpen(true)}
@@ -432,6 +460,14 @@ export function GameHeader({
         isSpectator={isSpectator}
         connectionStats={connectionStats}
       />
+
+      {/* Tutorial Progress Modal - Only shown in beginner mode */}
+      {beginnerMode && (
+        <TutorialProgressModal
+          isOpen={tutorialProgressOpen}
+          onClose={() => setTutorialProgressOpen(false)}
+        />
+      )}
     </div>
   );
 }

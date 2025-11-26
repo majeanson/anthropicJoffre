@@ -100,13 +100,15 @@ export function placeBet(
     throw new Error('Player not found');
   }
 
+  const player = game.players[playerIndex];
+
   // Verify it's player's turn
   if (game.currentPlayerIndex !== playerIndex) {
     throw new Error('Not your turn to bet');
   }
 
-  // Check if player already bet this round
-  const hasAlreadyBet = game.currentBets.some(bet => bet.playerId === playerId);
+  // Check if player already bet this round (use playerName for stable comparison)
+  const hasAlreadyBet = game.currentBets.some(bet => bet.playerName === player.name);
   if (hasAlreadyBet) {
     throw new Error('You have already placed a bet this round');
   }
@@ -138,6 +140,7 @@ export function placeBet(
   // Create new bet
   const newBet: Bet = {
     playerId,
+    playerName: player.name,
     amount: skipped ? 0 : amount,
     withoutTrump,
     skipped,

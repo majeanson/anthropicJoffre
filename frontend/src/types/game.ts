@@ -28,7 +28,8 @@ export interface Player {
 }
 
 export interface Bet {
-  playerId: string;
+  playerId: string; // Socket ID - volatile, changes on reconnect. DO NOT use for comparisons/lookups
+  playerName: string; // STABLE player identifier - ALWAYS use this for comparisons and lookups
   amount: number; // 7-12, or -1 for skip
   withoutTrump: boolean;
   skipped?: boolean; // True if player skipped their bet
@@ -42,15 +43,15 @@ export type GamePhase =
   | 'game_over';
 
 export interface TrickCard {
-  playerId: string; // Socket ID (changes on reconnect) - kept for backwards compat
-  playerName: string; // STABLE identifier - use this for lookups
+  playerId: string; // Socket ID - volatile, changes on reconnect. DO NOT use for comparisons/lookups
+  playerName: string; // STABLE player identifier - ALWAYS use this for comparisons and lookups
   card: Card;
 }
 
 export interface TrickResult {
   trick: TrickCard[];
-  winnerId: string; // Socket ID (changes on reconnect) - kept for backwards compat
-  winnerName: string; // STABLE identifier - use this for lookups
+  winnerId: string; // Socket ID - volatile, changes on reconnect. DO NOT use for comparisons/lookups
+  winnerName: string; // STABLE player identifier - ALWAYS use this for comparisons and lookups
   points: number;
 }
 

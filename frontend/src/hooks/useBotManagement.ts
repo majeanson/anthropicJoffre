@@ -117,7 +117,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     // Betting phase: Check if bot has already placed a bet OR has pending action
     if (state.phase === 'betting') {
-      if (state.currentBets?.some(bet => bet.playerId === botId)) {
+      if (state.currentBets?.some(bet => bet.playerName === currentPlayer.name)) {
         return;
       }
       // Check if bot already has a pending bet action

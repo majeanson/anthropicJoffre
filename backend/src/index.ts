@@ -836,7 +836,7 @@ function handleBettingTimeout(gameId: string, playerName: string) {
   const currentPlayer = game.players[game.currentPlayerIndex];
   if (currentPlayer.name !== playerName) return; // Not their turn anymore
 
-  const hasAlreadyBet = game.currentBets.some(b => b.playerId === player.id);
+  const hasAlreadyBet = game.currentBets.some(b => b.playerName === playerName);
   if (hasAlreadyBet) return; // Already bet
 
   const isDealer = game.currentPlayerIndex === game.dealerIndex;
@@ -846,6 +846,7 @@ function handleBettingTimeout(gameId: string, playerName: string) {
   if (isDealer && !hasValidBets) {
     const bet: Bet = {
       playerId: player.id,
+      playerName: player.name,
       amount: 7,
       withoutTrump: false,
       skipped: false,
@@ -855,6 +856,7 @@ function handleBettingTimeout(gameId: string, playerName: string) {
     // Skip the bet
     const bet: Bet = {
       playerId: player.id,
+      playerName: player.name,
       amount: -1,
       withoutTrump: false,
       skipped: true,
@@ -1444,7 +1446,7 @@ async function endRound(gameId: string) {
     for (const player of humanPlayers) {
       const playerTeamId = player.teamId;
       const roundWon = playerTeamId === scoring.offensiveTeamId && scoring.betMade;
-      const wasBidder = game.highestBet?.playerId === player.id;
+      const wasBidder = game.highestBet?.playerName === player.name;
 
       await PersistenceManager.updateRoundStats(player.name, {
         roundWon,

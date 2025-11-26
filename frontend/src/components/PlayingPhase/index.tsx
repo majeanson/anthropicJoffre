@@ -395,30 +395,35 @@ function PlayingPhaseComponent({
           </div>
         </div>
 
-        {/* Beginner Mode: Move Suggestion */}
-        {beginnerMode && !isSpectator && isCurrentTurn && (
-          <div className="max-w-4xl mx-auto px-4 mb-6">
-            <MoveSuggestionPanel
-              gameState={gameState}
-              currentPlayerId={currentPlayerId}
-              isMyTurn={isCurrentTurn}
-            />
-          </div>
-        )}
+        {/* Player Hand with overlaid Move Suggestion */}
+        <div className="relative">
+          <PlayerHand
+            hand={currentPlayer?.hand || []}
+            isCurrentTurn={isCurrentTurn}
+            currentTrick={gameState.currentTrick}
+            currentPlayerIndex={gameState.currentPlayerIndex}
+            roundNumber={gameState.roundNumber}
+            animationsEnabled={animationsEnabled}
+            isSpectator={isSpectator}
+            onPlayCard={onPlayCard}
+            onSetPlayEffect={setPlayEffect}
+            queuedCard={queuedCard}
+            onQueueCard={handleQueueCard}
+          />
 
-        <PlayerHand
-          hand={currentPlayer?.hand || []}
-          isCurrentTurn={isCurrentTurn}
-          currentTrick={gameState.currentTrick}
-          currentPlayerIndex={gameState.currentPlayerIndex}
-          roundNumber={gameState.roundNumber}
-          animationsEnabled={animationsEnabled}
-          isSpectator={isSpectator}
-          onPlayCard={onPlayCard}
-          onSetPlayEffect={setPlayEffect}
-          queuedCard={queuedCard}
-          onQueueCard={handleQueueCard}
-        />
+          {/* Beginner Mode: Move Suggestion - Overlaid above hand */}
+          {beginnerMode && !isSpectator && isCurrentTurn && (currentPlayer?.hand || []).length > 0 && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4 pointer-events-none">
+              <div className="opacity-95 pointer-events-auto">
+                <MoveSuggestionPanel
+                  gameState={gameState}
+                  currentPlayerId={currentPlayerId}
+                  isMyTurn={isCurrentTurn}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Leaderboard Modal */}

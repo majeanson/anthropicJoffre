@@ -125,12 +125,14 @@ export interface BetPlaceResult {
 export function applyBet(
   game: GameState,
   playerId: string,
+  playerName: string,
   amount: number,
   withoutTrump: boolean,
   skipped?: boolean
 ): BetPlaceResult {
   const bet: Bet = {
     playerId,
+    playerName,
     amount: skipped ? 0 : amount,
     withoutTrump: skipped ? false : withoutTrump,
     skipped: skipped || false,

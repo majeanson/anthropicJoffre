@@ -5,16 +5,18 @@ interface InlineBetStatusProps {
   currentBets: Map<string, { amount: number; withoutTrump: boolean }>;
   skippedPlayers: Set<string>;
   currentPlayerIndex: number;
+  onClickPlayer?: (playerName: string) => void;
 }
 
 export function InlineBetStatus({
   players,
   currentBets,
   skippedPlayers,
-  currentPlayerIndex
+  currentPlayerIndex,
+  onClickPlayer
 }: InlineBetStatusProps) {
   const getBetDisplay = (player: Player): { icon: string; text: string; color: string } => {
-    const bet = currentBets.get(player.id);
+    const bet = currentBets.get(player.name);
     const isCurrentPlayer = players[currentPlayerIndex]?.id === player.id;
 
     if (bet) {
@@ -27,7 +29,7 @@ export function InlineBetStatus({
       };
     }
 
-    if (skippedPlayers.has(player.id)) {
+    if (skippedPlayers.has(player.name)) {
       return {
         icon: '⊗',
         text: 'skip',
@@ -63,6 +65,8 @@ export function InlineBetStatus({
       <div className="space-y-2">
         {players.map((player) => {
           const display = getBetDisplay(player);
+          const isClickable = !player.isEmpty && !player.isBot && onClickPlayer;
+
           return (
             <div
               key={player.id}
@@ -72,7 +76,18 @@ export function InlineBetStatus({
             >
               <div className="flex items-center gap-2">
                 <span className="text-base">{display.icon}</span>
-                <span className="font-bold" data-testid={`player-name-${player.name}`}>{player.name}</span>
+                {isClickable ? (
+                  <button
+                    onClick={() => onClickPlayer(player.name)}
+                    className="font-bold hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
+                    data-testid={`player-name-${player.name}`}
+                    title={`View ${player.name}'s profile`}
+                  >
+                    {player.name}
+                  </button>
+                ) : (
+                  <span className="font-bold" data-testid={`player-name-${player.name}`}>{player.name}</span>
+                )}
               </div>
               <span className="font-black text-lg">{display.text}</span>
             </div>

@@ -745,7 +745,7 @@ function AppContent() {
             <Suspense fallback={<div />}>
               <BeginnerTutorial
                 gameState={gameState}
-                currentPlayerId={socket.id}
+                currentPlayerId={currentPlayerName}
               />
             </Suspense>
           </ErrorBoundary>
@@ -789,7 +789,7 @@ function AppContent() {
             <BettingPhase
             players={gameState.players}
             currentBets={gameState.currentBets}
-            currentPlayerId={socket?.id || ''}
+            currentPlayerId={currentPlayerName}
             currentPlayerIndex={gameState.currentPlayerIndex}
             dealerIndex={gameState.dealerIndex}
             onPlaceBet={handlePlaceBet}
@@ -804,6 +804,7 @@ function AppContent() {
             onOpenAchievements={handleOpenAchievements}
             onOpenFriends={handleOpenFriends}
             pendingFriendRequestsCount={pendingFriendRequestsCount}
+            onClickPlayer={handleClickPlayer}
             socket={socket}
             gameId={gameId}
             chatMessages={chatMessages}
@@ -818,7 +819,7 @@ function AppContent() {
             <Suspense fallback={<div />}>
               <BeginnerTutorial
                 gameState={gameState}
-                currentPlayerId={socket.id}
+                currentPlayerId={currentPlayerName}
               />
             </Suspense>
           </ErrorBoundary>
@@ -861,7 +862,7 @@ function AppContent() {
           <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-green-900 via-teal-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
             <PlayingPhase
           gameState={gameState}
-          currentPlayerId={socket?.id || ''}
+          currentPlayerId={currentPlayerName}
           onPlayCard={handlePlayCard}
           isSpectator={isSpectator}
           currentTrickWinnerId={currentTrickWinnerId}
@@ -891,7 +892,7 @@ function AppContent() {
             <Suspense fallback={<div />}>
               <BeginnerTutorial
                 gameState={gameState}
-                currentPlayerId={socket.id}
+                currentPlayerId={currentPlayerName}
               />
             </Suspense>
           </ErrorBoundary>
@@ -954,7 +955,7 @@ function AppContent() {
             <Suspense fallback={<div />}>
               <BeginnerTutorial
                 gameState={gameState}
-                currentPlayerId={socket.id}
+                currentPlayerId={currentPlayerName}
               />
             </Suspense>
           </ErrorBoundary>

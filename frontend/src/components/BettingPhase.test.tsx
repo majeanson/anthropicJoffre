@@ -88,6 +88,7 @@ function createTestCard(color: CardColor, value: CardValue): Card {
 function createTestBet(overrides: Partial<Bet> = {}): Bet {
   return {
     playerId: 'player-1',
+    playerName: 'Player 1',
     amount: 8,
     withoutTrump: false,
     skipped: false,

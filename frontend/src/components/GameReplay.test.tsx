@@ -43,6 +43,7 @@ function createMockSocket(): MockSocket {
 function createTestRound(roundNumber: number): RoundHistory {
   const mockBet: Bet = {
     playerId: 'player-1',
+    playerName: 'Player 1',
     amount: 9,
     withoutTrump: false,
     skipped: false,

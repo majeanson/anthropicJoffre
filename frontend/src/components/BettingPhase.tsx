@@ -37,32 +37,33 @@ interface BettingPhaseProps {
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
+  onClickPlayer?: (playerName: string) => void; // Click player to view profile
 }
 
-function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage, onClickPlayer }: BettingPhaseProps) {
   // Get beginner mode setting
   const { beginnerMode } = useSettings();
 
   // Memoize expensive computations
+  // Find current player by name (stable identifier)
+  const currentPlayer = useMemo(
+    () => players.find(p => p.name === currentPlayerId),
+    [players, currentPlayerId]
+  );
+
   const hasPlacedBet = useMemo(
-    () => currentBets.some(b => b.playerId === currentPlayerId),
-    [currentBets, currentPlayerId]
+    () => currentPlayer ? currentBets.some(b => b.playerName === currentPlayer.name) : false,
+    [currentBets, currentPlayer]
   );
 
   const isMyTurn = useMemo(
-    () => players[currentPlayerIndex]?.id === currentPlayerId,
-    [players, currentPlayerIndex, currentPlayerId]
+    () => currentPlayer ? players[currentPlayerIndex]?.id === currentPlayer.id : false,
+    [players, currentPlayerIndex, currentPlayer]
   );
 
   const isDealer = useMemo(
     () => currentPlayerIndex === dealerIndex,
     [currentPlayerIndex, dealerIndex]
-  );
-
-  // Get current player's hand
-  const currentPlayer = useMemo(
-    () => players.find(p => p.name === currentPlayerId || p.id === currentPlayerId),
-    [players, currentPlayerId]
   );
 
   const playerHand = useMemo(
@@ -302,9 +303,10 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
       <div className="mb-6">
         <InlineBetStatus
           players={players}
-          currentBets={new Map(currentBets.map(b => [b.playerId, { amount: b.amount, withoutTrump: b.withoutTrump }]))}
-          skippedPlayers={new Set(currentBets.filter(b => b.skipped).map(b => b.playerId))}
+          currentBets={new Map(currentBets.map(b => [b.playerName, { amount: b.amount, withoutTrump: b.withoutTrump }]))}
+          skippedPlayers={new Set(currentBets.filter(b => b.skipped).map(b => b.playerName))}
           currentPlayerIndex={currentPlayerIndex}
+          onClickPlayer={onClickPlayer}
         />
       </div>
 

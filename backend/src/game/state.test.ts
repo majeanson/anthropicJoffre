@@ -175,11 +175,12 @@ describe('applyBet', () => {
   it('should add bet to currentBets', () => {
     const game = createTestGame({ phase: 'betting' });
 
-    const result = applyBet(game, 'p1', 8, false);
+    const result = applyBet(game, 'p1', 'Player1', 8, false);
 
     expect(game.currentBets.length).toBe(1);
     expect(game.currentBets[0]).toEqual({
       playerId: 'p1',
+      playerName: 'Player1',
       amount: 8,
       withoutTrump: false,
       skipped: false,
@@ -190,10 +191,11 @@ describe('applyBet', () => {
   it('should handle skipped bet', () => {
     const game = createTestGame({ phase: 'betting' });
 
-    const result = applyBet(game, 'p1', 0, false, true);
+    const result = applyBet(game, 'p1', 'Player1', 0, false, true);
 
     expect(game.currentBets[0]).toEqual({
       playerId: 'p1',
+      playerName: 'Player1',
       amount: 0,
       withoutTrump: false,
       skipped: true,
@@ -203,7 +205,7 @@ describe('applyBet', () => {
   it('should advance to next player', () => {
     const game = createTestGame({ phase: 'betting', currentPlayerIndex: 0 });
 
-    applyBet(game, 'p1', 8, false);
+    applyBet(game, 'p1', 'Player1', 8, false);
 
     expect(game.currentPlayerIndex).toBe(1);
   });
@@ -213,13 +215,13 @@ describe('applyBet', () => {
       phase: 'betting',
       currentPlayerIndex: 3,
       currentBets: [
-        { playerId: 'p1', amount: 8, withoutTrump: false, skipped: false },
-        { playerId: 'p2', amount: 9, withoutTrump: false, skipped: false },
-        { playerId: 'p3', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false, skipped: false },
+        { playerId: 'p2', playerName: 'Player 2', amount: 9, withoutTrump: false, skipped: false },
+        { playerId: 'p3', playerName: 'Player 3', amount: 0, withoutTrump: false, skipped: true },
       ],
     });
 
-    const result = applyBet(game, 'p4', 10, false);
+    const result = applyBet(game, 'p4', 'Player4', 10, false);
 
     expect(result.bettingComplete).toBe(true);
   });
@@ -229,13 +231,13 @@ describe('applyBet', () => {
       phase: 'betting',
       currentPlayerIndex: 3,
       currentBets: [
-        { playerId: 'p1', amount: 0, withoutTrump: false, skipped: true },
-        { playerId: 'p2', amount: 0, withoutTrump: false, skipped: true },
-        { playerId: 'p3', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p1', playerName: 'Player 1', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p2', playerName: 'Player 2', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p3', playerName: 'Player 3', amount: 0, withoutTrump: false, skipped: true },
       ],
     });
 
-    const result = applyBet(game, 'p4', 0, false, true);
+    const result = applyBet(game, 'p4', 'Player4', 0, false, true);
 
     expect(result.allPlayersSkipped).toBe(true);
     expect(result.bettingComplete).toBe(true);
@@ -247,7 +249,7 @@ describe('resetBetting', () => {
     const game = createTestGame({
       phase: 'betting',
       currentBets: [
-        { playerId: 'p1', amount: 8, withoutTrump: false, skipped: false },
+        { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false, skipped: false },
       ],
     });
 
@@ -452,8 +454,8 @@ describe('applyPositionSwap', () => {
         { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
       ],
       currentBets: [
-        { playerId: 'p1', amount: 8, withoutTrump: false },
-        { playerId: 'p3', amount: 9, withoutTrump: true },
+        { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false },
+        { playerId: 'p3', playerName: 'Player 3', amount: 9, withoutTrump: true },
       ],
     });
 
@@ -473,7 +475,7 @@ describe('applyPositionSwap', () => {
         { id: 'p3', name: 'P3', hand: [], teamId: 1, tricksWon: 0, pointsWon: 0 },
         { id: 'p4', name: 'P4', hand: [], teamId: 2, tricksWon: 0, pointsWon: 0 },
       ],
-      highestBet: { playerId: 'p1', amount: 10, withoutTrump: true },
+      highestBet: { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: true },
     });
 
     applyPositionSwap(game, 'p1', 'p2');
@@ -531,7 +533,7 @@ describe('initializeRound', () => {
   it('should reset round state', () => {
     const game = createTestGame({
       phase: 'playing',
-      currentBets: [{ playerId: 'p1', amount: 8, withoutTrump: false, skipped: false }],
+      currentBets: [{ playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false, skipped: false }],
       currentTrick: [{ playerId: 'p1', card: { color: 'red', value: 5 } }],
       trump: 'red',
     });
@@ -800,7 +802,7 @@ describe('calculateRoundScoring', () => {
   it('should calculate offensive team wins bet', () => {
     const game = createTestGame({
       phase: 'scoring',
-      highestBet: { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+      highestBet: { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false, skipped: false },
       teamScores: { team1: 20, team2: 15 },
     });
 
@@ -829,7 +831,7 @@ describe('calculateRoundScoring', () => {
   it('should calculate offensive team fails bet', () => {
     const game = createTestGame({
       phase: 'scoring',
-      highestBet: { playerId: 'p2', amount: 11, withoutTrump: false, skipped: false },
+      highestBet: { playerId: 'p2', playerName: 'Player 2', amount: 11, withoutTrump: false, skipped: false },
       teamScores: { team1: 20, team2: 15 },
     });
 
@@ -854,7 +856,7 @@ describe('calculateRoundScoring', () => {
   it('should apply without-trump multiplier', () => {
     const game = createTestGame({
       phase: 'scoring',
-      highestBet: { playerId: 'p1', amount: 10, withoutTrump: true, skipped: false },
+      highestBet: { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: true, skipped: false },
       teamScores: { team1: 20, team2: 15 },
     });
 
@@ -873,7 +875,7 @@ describe('calculateRoundScoring', () => {
   it('should detect game over at 41 points', () => {
     const game = createTestGame({
       phase: 'scoring',
-      highestBet: { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+      highestBet: { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false, skipped: false },
       teamScores: { team1: 35, team2: 20 },
     });
 
@@ -890,7 +892,7 @@ describe('calculateRoundScoring', () => {
   it('should detect game over for team 2', () => {
     const game = createTestGame({
       phase: 'scoring',
-      highestBet: { playerId: 'p2', amount: 10, withoutTrump: false, skipped: false },
+      highestBet: { playerId: 'p2', playerName: 'Player 2', amount: 10, withoutTrump: false, skipped: false },
       teamScores: { team1: 20, team2: 35 },
     });
 
@@ -936,10 +938,10 @@ describe('applyRoundScoring', () => {
     const game = createTestGame({
       phase: 'scoring',
       roundNumber: 3,
-      highestBet: { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
+      highestBet: { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false, skipped: false },
       currentBets: [
-        { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
-        { playerId: 'p2', amount: 8, withoutTrump: false, skipped: false },
+        { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false, skipped: false },
+        { playerId: 'p2', playerName: 'Player 2', amount: 8, withoutTrump: false, skipped: false },
       ],
       currentRoundTricks: [],
       trump: 'red',

@@ -209,16 +209,16 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
  *
  * @example
  * const bets = [
- *   { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
- *   { playerId: 'p2', amount: 11, withoutTrump: false, skipped: false },
- *   { playerId: 'p3', amount: 0, withoutTrump: false, skipped: true }
+ *   { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false, skipped: false },
+ *   { playerId: 'p2', playerName: 'Player 2', amount: 11, withoutTrump: false, skipped: false },
+ *   { playerId: 'p3', playerName: 'Player 3', amount: 0, withoutTrump: false, skipped: true }
  * ];
  * getHighestBet(bets); // returns p2's bet (11 points)
  *
  * // Dealer tie-breaker
  * const equalBets = [
- *   { playerId: 'p1', amount: 10, withoutTrump: false, skipped: false },
- *   { playerId: 'p2', amount: 10, withoutTrump: false, skipped: false } // dealer
+ *   { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false, skipped: false },
+ *   { playerId: 'p2', playerName: 'Player 2', amount: 10, withoutTrump: false, skipped: false } // dealer
  * ];
  * getHighestBet(equalBets, 'p2'); // returns p2's bet (dealer wins tie)
  */

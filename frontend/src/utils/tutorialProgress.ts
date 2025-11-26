@@ -5,6 +5,9 @@
 
 import { TutorialPhase } from '../components/BeginnerTutorial';
 
+// Re-export TutorialPhase for convenience
+export type { TutorialPhase };
+
 const STORAGE_KEY = 'tutorialProgress';
 const COMPLETION_STORAGE_KEY = 'tutorialCompletedPhases';
 

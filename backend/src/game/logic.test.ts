@@ -200,32 +200,32 @@ describe('Game Logic', () => {
 
   describe('isBetHigher', () => {
     it('should return true when bet1 has higher amount', () => {
-      const bet1: Bet = { playerId: 'p1', amount: 10, withoutTrump: false };
-      const bet2: Bet = { playerId: 'p2', amount: 8, withoutTrump: false };
+      const bet1: Bet = { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false };
+      const bet2: Bet = { playerId: 'p2', playerName: 'Player 2', amount: 8, withoutTrump: false };
       expect(isBetHigher(bet1, bet2)).toBe(true);
     });
 
     it('should return false when bet1 has lower amount', () => {
-      const bet1: Bet = { playerId: 'p1', amount: 7, withoutTrump: false };
-      const bet2: Bet = { playerId: 'p2', amount: 9, withoutTrump: false };
+      const bet1: Bet = { playerId: 'p1', playerName: 'Player 1', amount: 7, withoutTrump: false };
+      const bet2: Bet = { playerId: 'p2', playerName: 'Player 2', amount: 9, withoutTrump: false };
       expect(isBetHigher(bet1, bet2)).toBe(false);
     });
 
     it('should prioritize without trump when amounts are equal', () => {
-      const bet1: Bet = { playerId: 'p1', amount: 8, withoutTrump: true };
-      const bet2: Bet = { playerId: 'p2', amount: 8, withoutTrump: false };
+      const bet1: Bet = { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: true };
+      const bet2: Bet = { playerId: 'p2', playerName: 'Player 2', amount: 8, withoutTrump: false };
       expect(isBetHigher(bet1, bet2)).toBe(true);
     });
 
     it('should return false when both bets are identical', () => {
-      const bet1: Bet = { playerId: 'p1', amount: 8, withoutTrump: false };
-      const bet2: Bet = { playerId: 'p2', amount: 8, withoutTrump: false };
+      const bet1: Bet = { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false };
+      const bet2: Bet = { playerId: 'p2', playerName: 'Player 2', amount: 8, withoutTrump: false };
       expect(isBetHigher(bet1, bet2)).toBe(false);
     });
 
     it('should return false when withoutTrump is reversed but amounts equal', () => {
-      const bet1: Bet = { playerId: 'p1', amount: 8, withoutTrump: false };
-      const bet2: Bet = { playerId: 'p2', amount: 8, withoutTrump: true };
+      const bet1: Bet = { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false };
+      const bet2: Bet = { playerId: 'p2', playerName: 'Player 2', amount: 8, withoutTrump: true };
       expect(isBetHigher(bet1, bet2)).toBe(false);
     });
   });
@@ -233,9 +233,9 @@ describe('Game Logic', () => {
   describe('getHighestBet', () => {
     it('should return the highest bet by amount', () => {
       const bets: Bet[] = [
-        { playerId: 'p1', amount: 7, withoutTrump: false },
-        { playerId: 'p2', amount: 10, withoutTrump: false },
-        { playerId: 'p3', amount: 8, withoutTrump: false },
+        { playerId: 'p1', playerName: 'Player 1', amount: 7, withoutTrump: false },
+        { playerId: 'p2', playerName: 'Player 2', amount: 10, withoutTrump: false },
+        { playerId: 'p3', playerName: 'Player 3', amount: 8, withoutTrump: false },
       ];
 
       const highest = getHighestBet(bets);
@@ -244,8 +244,8 @@ describe('Game Logic', () => {
 
     it('should prioritize without trump when amounts are equal', () => {
       const bets: Bet[] = [
-        { playerId: 'p1', amount: 8, withoutTrump: false },
-        { playerId: 'p2', amount: 8, withoutTrump: true },
+        { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false },
+        { playerId: 'p2', playerName: 'Player 2', amount: 8, withoutTrump: true },
       ];
 
       const highest = getHighestBet(bets);
@@ -259,9 +259,9 @@ describe('Game Logic', () => {
 
     it('should filter out skipped bets', () => {
       const bets: Bet[] = [
-        { playerId: 'p1', amount: 0, withoutTrump: false, skipped: true },
-        { playerId: 'p2', amount: 8, withoutTrump: false },
-        { playerId: 'p3', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p1', playerName: 'Player 1', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p2', playerName: 'Player 2', amount: 8, withoutTrump: false },
+        { playerId: 'p3', playerName: 'Player 3', amount: 0, withoutTrump: false, skipped: true },
       ];
 
       const highest = getHighestBet(bets);
@@ -270,8 +270,8 @@ describe('Game Logic', () => {
 
     it('should return null when all bets are skipped', () => {
       const bets: Bet[] = [
-        { playerId: 'p1', amount: 0, withoutTrump: false, skipped: true },
-        { playerId: 'p2', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p1', playerName: 'Player 1', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p2', playerName: 'Player 2', amount: 0, withoutTrump: false, skipped: true },
       ];
 
       const highest = getHighestBet(bets);
@@ -280,8 +280,8 @@ describe('Game Logic', () => {
 
     it('should give dealer priority when bets are exactly equal', () => {
       const bets: Bet[] = [
-        { playerId: 'p1', amount: 8, withoutTrump: false },
-        { playerId: 'dealer', amount: 8, withoutTrump: false },
+        { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false },
+        { playerId: 'dealer', playerName: 'Dealer', amount: 8, withoutTrump: false },
       ];
 
       const highest = getHighestBet(bets, 'dealer');
@@ -290,8 +290,8 @@ describe('Game Logic', () => {
 
     it('should not give dealer priority when without trump differs', () => {
       const bets: Bet[] = [
-        { playerId: 'p1', amount: 8, withoutTrump: true },
-        { playerId: 'dealer', amount: 8, withoutTrump: false },
+        { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: true },
+        { playerId: 'dealer', playerName: 'Dealer', amount: 8, withoutTrump: false },
       ];
 
       const highest = getHighestBet(bets, 'dealer');
@@ -300,9 +300,9 @@ describe('Game Logic', () => {
 
     it('should handle multiple equal bets with dealer in middle', () => {
       const bets: Bet[] = [
-        { playerId: 'p1', amount: 9, withoutTrump: false },
-        { playerId: 'dealer', amount: 9, withoutTrump: false },
-        { playerId: 'p3', amount: 9, withoutTrump: false },
+        { playerId: 'p1', playerName: 'Player 1', amount: 9, withoutTrump: false },
+        { playerId: 'dealer', playerName: 'Dealer', amount: 9, withoutTrump: false },
+        { playerId: 'p3', playerName: 'Player 3', amount: 9, withoutTrump: false },
       ];
 
       const highest = getHighestBet(bets, 'dealer');

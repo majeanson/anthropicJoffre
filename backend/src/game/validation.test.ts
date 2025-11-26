@@ -211,7 +211,7 @@ describe('validateBet', () => {
   it('should reject duplicate bet', () => {
     const game = createTestGame({
       phase: 'betting',
-      currentBets: [{ playerId: 'p1', amount: 8, withoutTrump: false, skipped: false }],
+      currentBets: [{ playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false, skipped: false }],
     });
     const result = validateBet(game, 'p1', 9, false);
 

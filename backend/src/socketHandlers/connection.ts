@@ -201,13 +201,16 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     }
 
     // 2. Migrate bets (NOT handled by migratePlayerIdentity)
+    // Note: Only update playerId on reconnection; playerName stays the same
     game.currentBets.forEach(bet => {
       if (bet.playerId === oldSocketId) {
         bet.playerId = socket.id;
+        // playerName remains unchanged - same player reconnecting
       }
     });
     if (game.highestBet && game.highestBet.playerId === oldSocketId) {
       game.highestBet.playerId = socket.id;
+      // playerName remains unchanged - same player reconnecting
     }
 
     // 3. Migrate ALL other player identity data

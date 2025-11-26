@@ -537,8 +537,8 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
       return;
     }
 
-    // Check if player already bet
-    const existingBet = game.currentBets.find(b => b.playerId === currentPlayer.id);
+    // Check if player already bet (use playerName for stable comparison)
+    const existingBet = game.currentBets.find(b => b.playerName === currentPlayer.name);
     if (existingBet) {
       socket.emit('error', { message: 'Player already placed a bet' });
       return;
@@ -637,8 +637,8 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
         return;
       }
 
-      // Check if player already bet
-      const existingBet = currentGame.currentBets.find(b => b.playerId === currentPlayer.id);
+      // Check if player already bet (use playerName for stable comparison)
+      const existingBet = currentGame.currentBets.find(b => b.playerName === currentPlayer.name);
       if (existingBet) {
         clearInterval(interval);
         return;

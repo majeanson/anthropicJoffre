@@ -153,14 +153,16 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
       }
     });
 
-    // Update player ID in bets
+    // Update player ID in bets (update both playerId and playerName for bot replacement)
     game.currentBets.forEach(bet => {
       if (bet.playerId === oldSocketId) {
         bet.playerId = newBotId;
+        bet.playerName = botName;
       }
     });
     if (game.highestBet && game.highestBet.playerId === oldSocketId) {
       game.highestBet.playerId = newBotId;
+      game.highestBet.playerName = botName;
     }
 
     // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
@@ -278,14 +280,16 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
       }
     });
 
-    // IMPORTANT: Update player ID in bets to fix round scoring
+    // IMPORTANT: Update player ID in bets to fix round scoring (update both playerId and playerName)
     game.currentBets.forEach(bet => {
       if (bet.playerId === oldSocketId) {
         bet.playerId = newBotId;
+        bet.playerName = botName;
       }
     });
     if (game.highestBet && game.highestBet.playerId === oldSocketId) {
       game.highestBet.playerId = newBotId;
+      game.highestBet.playerName = botName;
     }
 
     // CRITICAL: Migrate ALL player identity data (roundStats, currentTrick, currentRoundTricks, afkWarnings)
@@ -386,14 +390,16 @@ export function registerBotHandlers(socket: Socket, deps: BotHandlersDependencie
       }
     });
 
-    // IMPORTANT: Update player ID in bets to ensure correct round scoring
+    // IMPORTANT: Update player ID in bets to ensure correct round scoring (update both playerId and playerName)
     game.currentBets.forEach(bet => {
       if (bet.playerId === oldBotId) {
         bet.playerId = socket.id;
+        bet.playerName = newPlayerName;
       }
     });
     if (game.highestBet && game.highestBet.playerId === oldBotId) {
       game.highestBet.playerId = socket.id;
+      game.highestBet.playerName = newPlayerName;
     }
 
     // CRITICAL: Update previousTrick to prevent "Player data not found" errors

@@ -103,13 +103,14 @@ export const PlayerPosition = memo(function PlayerPosition({
     return `Swap positions with ${player.name}${changesTeams ? ' (changes teams!)' : ''}`;
   };
 
-  // Handle player name click
+  // Handle player name click (allow clicking on own profile and other real players, not bots)
   const handleNameClick = () => {
     if (player && !player.isEmpty && !player.isBot && onClickPlayer) {
       onClickPlayer(player.name);
     }
   };
 
+  // Players can click on their own profile and other real players (not bots or empty seats)
   const isClickable = player && !player.isEmpty && !player.isBot && onClickPlayer;
 
   return (

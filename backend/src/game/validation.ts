@@ -134,8 +134,8 @@ export function validateBet(
     return err('It is not your turn to bet');
   }
 
-  // Check if player has already bet
-  const hasAlreadyBet = game.currentBets.some(b => b.playerId === playerId);
+  // Check if player has already bet (use playerName for stable comparison)
+  const hasAlreadyBet = game.currentBets.some(b => b.playerName === currentPlayer.name);
   if (hasAlreadyBet) {
     return err('You have already placed your bet');
   }

@@ -66,7 +66,7 @@ export interface GameplayHandlersDependencies {
   validateCardPlay: (game: GameState, playerId: string, card: Card) => { success: boolean; error?: string };
 
   // State transformation functions
-  applyBet: (game: GameState, playerId: string, amount: number, withoutTrump: boolean, skipped?: boolean) => {
+  applyBet: (game: GameState, playerId: string, playerName: string, amount: number, withoutTrump: boolean, skipped?: boolean) => {
     bettingComplete: boolean;
     allPlayersSkipped: boolean;
   };
@@ -171,7 +171,7 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
       const dealerPlayerId = game.players[game.dealerIndex].id;
       const currentHighest = getHighestBet(game.currentBets, dealerPlayerId);
       if (currentHighest) {
-        const newBet: Bet = { playerId: socket.id, amount, withoutTrump };
+        const newBet: Bet = { playerId: socket.id, playerName, amount, withoutTrump };
 
         // Dealer can equalize the bet
         if (isDealer) {
@@ -195,7 +195,7 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     }
 
     // STATE TRANSFORMATION - Use pure state function
-    const result = applyBet(game, socket.id, amount, withoutTrump, skipped);
+    const result = applyBet(game, socket.id, playerName, amount, withoutTrump, skipped);
 
     // Save bet to round stats for end-of-round display
     const stats = roundStats.get(gameId);
