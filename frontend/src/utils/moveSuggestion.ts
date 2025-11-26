@@ -64,8 +64,8 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
 /**
  * Suggest a bet for the current player
  */
-export function suggestBet(gameState: GameState, playerId: string): BetSuggestion {
-  const player = gameState.players.find((p) => p.id === playerId);
+export function suggestBet(gameState: GameState, playerName: string): BetSuggestion {
+  const player = gameState.players.find((p) => p.name === playerName);
   if (!player) {
     return {
       amount: 7,
@@ -75,7 +75,7 @@ export function suggestBet(gameState: GameState, playerId: string): BetSuggestio
     };
   }
 
-  const playerIndex = gameState.players.findIndex((p) => p.id === playerId);
+  const playerIndex = gameState.players.findIndex((p) => p.name === playerName);
   const isDealer = playerIndex === gameState.dealerIndex;
 
   // Evaluate hand strength
@@ -149,10 +149,10 @@ function getPlayableCards(hand: Card[], currentTrick: { card: Card; playerId: st
 /**
  * Determine if teammate is currently winning the trick
  */
-function isTeammateWinning(gameState: GameState, playerId: string, trump: CardColor | null): boolean {
+function isTeammateWinning(gameState: GameState, playerName: string, trump: CardColor | null): boolean {
   if (gameState.currentTrick.length === 0) return false;
 
-  const player = gameState.players.find(p => p.id === playerId);
+  const player = gameState.players.find(p => p.name === playerName);
   if (!player) return false;
 
   const playerTeam = player.teamId;
@@ -172,15 +172,15 @@ function isTeammateWinning(gameState: GameState, playerId: string, trump: CardCo
     return winning;
   });
 
-  const winningPlayer = gameState.players.find(p => p.id === currentWinningPlay.playerId);
+  const winningPlayer = gameState.players.find(p => p.name === currentWinningPlay.playerName);
   return winningPlayer?.teamId === playerTeam;
 }
 
 /**
  * Suggest the best card to play
  */
-export function suggestMove(gameState: GameState, playerId: string): MoveSuggestion | null {
-  const player = gameState.players.find((p) => p.id === playerId);
+export function suggestMove(gameState: GameState, playerName: string): MoveSuggestion | null {
+  const player = gameState.players.find((p) => p.name === playerName);
   if (!player || gameState.phase !== 'playing') return null;
 
   const playableCards = getPlayableCards(player.hand, gameState.currentTrick);
@@ -199,7 +199,7 @@ export function suggestMove(gameState: GameState, playerId: string): MoveSuggest
 
   const currentTrick = gameState.currentTrick;
   const trump = gameState.trump;
-  const teammateWinning = isTeammateWinning(gameState, playerId, trump);
+  const teammateWinning = isTeammateWinning(gameState, playerName, trump);
 
   // CASE 1: Leading the trick (first to play)
   if (currentTrick.length === 0) {
