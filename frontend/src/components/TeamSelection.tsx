@@ -6,6 +6,7 @@ import { HowToPlay } from './HowToPlay';
 import { BotDifficulty } from '../utils/botPlayer';
 import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 import { UnifiedChat } from './UnifiedChat';
+import { TeamSelectionSocialSidebar } from './TeamSelectionSocialSidebar';
 import { sounds } from '../utils/sounds';
 
 // Keyboard navigation type for team selection
@@ -46,6 +47,7 @@ export function TeamSelection({
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showRules, setShowRules] = useState(false);
+  const [showSocialSidebar, setShowSocialSidebar] = useState(false);
 
   // Keyboard navigation state - grid-based like GameBoy
   // Sections: header -> teams -> difficulty -> actions -> rules
@@ -295,6 +297,13 @@ export function TeamSelection({
               🚪 Leave
             </button>
           )}
+          <button
+            onClick={() => setShowSocialSidebar(!showSocialSidebar)}
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-green-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+            title="Find players to invite"
+          >
+            👥 Find Players
+          </button>
           <button
             ref={darkModeButtonRef}
             onClick={() => setDarkMode(!darkMode)}
@@ -660,6 +669,16 @@ export function TeamSelection({
 
       {/* Game Rules Modal */}
       <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
+
+      {/* Social Sidebar - Find Players */}
+      {socket && (
+        <TeamSelectionSocialSidebar
+          socket={socket}
+          gameId={gameId}
+          isOpen={showSocialSidebar}
+          onClose={() => setShowSocialSidebar(false)}
+        />
+      )}
 
       {/* Floating Team Chat */}
       {socket && (
