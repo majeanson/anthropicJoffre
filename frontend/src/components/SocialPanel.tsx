@@ -21,7 +21,7 @@ import { OnlinePlayer } from '../types/game';
 import { RecentPlayer } from '../utils/recentPlayers';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
-import { FriendWithStatus } from '../types/friends';
+import { FriendWithStatus, FriendRequest } from '../types/friends';
 import { DirectMessagesPanel } from './DirectMessagesPanel';
 import { PlayerNameButton } from './PlayerNameButton';
 import { PlayerProfileModal } from './PlayerProfileModal';
@@ -61,12 +61,16 @@ export function SocialPanel({
   const [unreadDMCount, setUnreadDMCount] = useState(0);
   const [friendSuggestions, setFriendSuggestions] = useState<string[]>([]);
   const [selectedPlayerProfile, setSelectedPlayerProfile] = useState<string | null>(null);
+  const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
+  const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
 
-  // Fetch friends list when friends or online tab is active
+  // Fetch friends list and requests when friends or online tab is active
   useEffect(() => {
     if ((socialTab === 'friends' || socialTab === 'online') && socket && user) {
       setIsLoadingFriends(true);
       socket.emit('get_friends_list');
+      socket.emit('get_friend_requests');
+      socket.emit('get_sent_friend_requests');
     }
   }, [socialTab, socket, user]);
 
@@ -92,10 +96,20 @@ export function SocialPanel({
       setIsLoadingFriends(false);
     };
 
+    const handleFriendRequests = ({ requests }: { requests: FriendRequest[] }) => {
+      setPendingRequests(requests);
+    };
+
+    const handleSentFriendRequests = ({ requests }: { requests: FriendRequest[] }) => {
+      setSentRequests(requests);
+    };
+
     const handleFriendAdded = () => {
       // Refresh friends list when a new friend is added
       if (socialTab === 'friends') {
         socket.emit('get_friends_list');
+        socket.emit('get_friend_requests');
+        socket.emit('get_sent_friend_requests');
       }
     };
 
@@ -106,14 +120,36 @@ export function SocialPanel({
       }
     };
 
+    const handleFriendRequestReceived = () => {
+      // Refresh requests when a new one is received
+      if (socialTab === 'friends') {
+        socket.emit('get_friend_requests');
+      }
+    };
+
+    const handleFriendRequestSent = () => {
+      // Refresh sent requests
+      if (socialTab === 'friends') {
+        socket.emit('get_sent_friend_requests');
+      }
+    };
+
     socket.on('friends_list', handleFriendsList);
+    socket.on('friend_requests', handleFriendRequests);
+    socket.on('sent_friend_requests', handleSentFriendRequests);
     socket.on('friend_added', handleFriendAdded);
     socket.on('friend_removed', handleFriendRemoved);
+    socket.on('friend_request_received', handleFriendRequestReceived);
+    socket.on('friend_request_sent', handleFriendRequestSent);
 
     return () => {
       socket.off('friends_list', handleFriendsList);
+      socket.off('friend_requests', handleFriendRequests);
+      socket.off('sent_friend_requests', handleSentFriendRequests);
       socket.off('friend_added', handleFriendAdded);
       socket.off('friend_removed', handleFriendRemoved);
+      socket.off('friend_request_received', handleFriendRequestReceived);
+      socket.off('friend_request_sent', handleFriendRequestSent);
     };
   }, [socket, socialTab]);
 
@@ -146,6 +182,18 @@ export function SocialPanel({
   const handleSendFriendRequest = (friendName: string) => {
     if (!socket || !user) return;
     socket.emit('send_friend_request', { toPlayer: friendName });
+    sounds.buttonClick();
+  };
+
+  const handleAcceptRequest = (requestId: number) => {
+    if (!socket || !user) return;
+    socket.emit('accept_friend_request', { requestId });
+    sounds.buttonClick();
+  };
+
+  const handleRejectRequest = (requestId: number) => {
+    if (!socket || !user) return;
+    socket.emit('reject_friend_request', { requestId });
     sounds.buttonClick();
   };
 
@@ -414,6 +462,79 @@ export function SocialPanel({
               </div>
             ) : (
               <>
+                {/* Pending Friend Requests */}
+                {pendingRequests.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                      Friend Requests ({pendingRequests.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {pendingRequests.map(request => (
+                        <div
+                          key={request.id}
+                          className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-3 border-2 border-blue-300 dark:border-blue-600"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div>
+                              <p className="font-semibold text-umber-900 dark:text-gray-100">
+                                {request.from_player}
+                              </p>
+                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                                {new Date(request.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => handleAcceptRequest(request.id)}
+                                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-bold transition-colors"
+                              >
+                                ✓ Accept
+                              </button>
+                              <button
+                                onClick={() => handleRejectRequest(request.id)}
+                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-bold transition-colors"
+                              >
+                                × Reject
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Sent Friend Requests */}
+                {sentRequests.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                      Sent Requests ({sentRequests.length})
+                    </h4>
+                    <div className="space-y-2">
+                      {sentRequests.map(request => (
+                        <div
+                          key={request.id}
+                          className="bg-yellow-100 dark:bg-yellow-900/40 rounded-lg p-3 border-2 border-yellow-300 dark:border-yellow-600"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div>
+                              <p className="font-semibold text-umber-900 dark:text-gray-100">
+                                {request.to_player}
+                              </p>
+                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                                Sent {new Date(request.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <span className="px-3 py-1 bg-yellow-600 text-white text-xs rounded font-bold">
+                              Pending
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Friends List */}
                 {friends.length > 0 && (
                   <div>
