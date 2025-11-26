@@ -64,6 +64,34 @@ export function SocialPanel({
   const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
 
+  // Profile editing state
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileBio, setProfileBio] = useState('');
+  const [profileCountry, setProfileCountry] = useState('');
+  const [profileFavoriteTeam, setProfileFavoriteTeam] = useState<1 | 2 | null>(null);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+  // Fetch user's own profile when profile tab is opened
+  useEffect(() => {
+    if (socialTab === 'profile' && socket && user) {
+      socket.emit('get_user_profile', { username: user.username });
+
+      const handleProfileResponse = ({ username, profile }: { username: string; profile: any }) => {
+        if (username === user.username && profile) {
+          setProfileBio(profile.bio || '');
+          setProfileCountry(profile.country || '');
+          setProfileFavoriteTeam(profile.favorite_team);
+        }
+      };
+
+      socket.on('user_profile_response', handleProfileResponse);
+
+      return () => {
+        socket.off('user_profile_response', handleProfileResponse);
+      };
+    }
+  }, [socialTab, socket, user]);
+
   // Fetch friends list and requests when friends or online tab is active
   useEffect(() => {
     if ((socialTab === 'friends' || socialTab === 'online') && socket && user) {
@@ -203,6 +231,39 @@ export function SocialPanel({
       socket.emit('remove_friend', { friendName });
       sounds.buttonClick();
     }
+  };
+
+  const handleSaveProfile = () => {
+    if (!socket || !user) return;
+
+    setIsSavingProfile(true);
+
+    const updates = {
+      bio: profileBio.trim() || null,
+      country: profileCountry || null,
+      favorite_team: profileFavoriteTeam
+    };
+
+    socket.emit('update_user_profile', updates);
+
+    const handleProfileUpdated = ({ success }: { success: boolean }) => {
+      setIsSavingProfile(false);
+      if (success) {
+        setIsEditingProfile(false);
+        sounds.buttonClick();
+        alert('Profile updated successfully!');
+      }
+    };
+
+    socket.once('user_profile_updated', handleProfileUpdated);
+
+    // Timeout fallback
+    setTimeout(() => {
+      if (isSavingProfile) {
+        setIsSavingProfile(false);
+        socket.off('user_profile_updated', handleProfileUpdated);
+      }
+    }, 5000);
   };
 
   return (
@@ -760,6 +821,157 @@ export function SocialPanel({
                       </span>
                     </div>
                   </div>
+                </div>
+
+                {/* Profile Editor */}
+                <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border border-parchment-400 dark:border-gray-500">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 uppercase">
+                      Profile
+                    </h4>
+                    {!isEditingProfile ? (
+                      <button
+                        onClick={() => {
+                          sounds.buttonClick();
+                          setIsEditingProfile(true);
+                        }}
+                        className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded font-semibold transition-colors"
+                      >
+                        ✏️ Edit
+                      </button>
+                    ) : (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => {
+                            sounds.buttonClick();
+                            setIsEditingProfile(false);
+                            // Reset to original values
+                            if (socket && user) {
+                              socket.emit('get_user_profile', { username: user.username });
+                            }
+                          }}
+                          className="text-xs bg-gray-500 hover:bg-gray-400 text-white px-3 py-1 rounded font-semibold transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={handleSaveProfile}
+                          disabled={isSavingProfile}
+                          className="text-xs bg-green-600 hover:bg-green-500 disabled:bg-gray-400 text-white px-3 py-1 rounded font-semibold transition-colors"
+                        >
+                          {isSavingProfile ? '⏳ Saving...' : '💾 Save'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {!isEditingProfile ? (
+                    // View Mode
+                    <div className="space-y-2 text-sm">
+                      <div>
+                        <span className="text-umber-600 dark:text-gray-400 block text-xs mb-1">Bio:</span>
+                        <p className="text-umber-900 dark:text-gray-100">
+                          {profileBio || <span className="text-gray-400 italic">Not set</span>}
+                        </p>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-umber-600 dark:text-gray-400">Country:</span>
+                        <span className="text-umber-900 dark:text-gray-100 font-medium">
+                          {profileCountry || <span className="text-gray-400 italic">Not set</span>}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-umber-600 dark:text-gray-400">Favorite Team:</span>
+                        <span className={`font-medium ${profileFavoriteTeam === 1 ? 'text-orange-600' : profileFavoriteTeam === 2 ? 'text-purple-600' : 'text-gray-400'}`}>
+                          {profileFavoriteTeam ? `Team ${profileFavoriteTeam}` : <span className="text-gray-400 italic">Not set</span>}
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    // Edit Mode
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-xs font-semibold text-umber-700 dark:text-gray-300 block mb-1">
+                          Bio (max 200 characters)
+                        </label>
+                        <textarea
+                          value={profileBio}
+                          onChange={(e) => setProfileBio(e.target.value.slice(0, 200))}
+                          placeholder="Tell others about yourself..."
+                          className="w-full px-2 py-1.5 text-sm rounded border border-parchment-400 dark:border-gray-500 bg-white dark:bg-gray-700 text-umber-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          rows={3}
+                          maxLength={200}
+                        />
+                        <div className="text-xs text-gray-500 mt-1">{profileBio.length}/200</div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold text-umber-700 dark:text-gray-300 block mb-1">
+                          Country
+                        </label>
+                        <select
+                          value={profileCountry}
+                          onChange={(e) => setProfileCountry(e.target.value)}
+                          className="w-full px-2 py-1.5 text-sm rounded border border-parchment-400 dark:border-gray-500 bg-white dark:bg-gray-700 text-umber-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                          <option value="">Select a country...</option>
+                          <option value="US">🇺🇸 United States</option>
+                          <option value="CA">🇨🇦 Canada</option>
+                          <option value="GB">🇬🇧 United Kingdom</option>
+                          <option value="FR">🇫🇷 France</option>
+                          <option value="DE">🇩🇪 Germany</option>
+                          <option value="ES">🇪🇸 Spain</option>
+                          <option value="IT">🇮🇹 Italy</option>
+                          <option value="JP">🇯🇵 Japan</option>
+                          <option value="AU">🇦🇺 Australia</option>
+                          <option value="BR">🇧🇷 Brazil</option>
+                          <option value="MX">🇲🇽 Mexico</option>
+                          <option value="IN">🇮🇳 India</option>
+                          <option value="CN">🇨🇳 China</option>
+                          <option value="KR">🇰🇷 South Korea</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-semibold text-umber-700 dark:text-gray-300 block mb-1">
+                          Favorite Team
+                        </label>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setProfileFavoriteTeam(1)}
+                            className={`flex-1 py-2 px-3 rounded font-semibold transition-all ${
+                              profileFavoriteTeam === 1
+                                ? 'bg-orange-600 text-white ring-2 ring-orange-400'
+                                : 'bg-white dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            Team 1
+                          </button>
+                          <button
+                            onClick={() => setProfileFavoriteTeam(2)}
+                            className={`flex-1 py-2 px-3 rounded font-semibold transition-all ${
+                              profileFavoriteTeam === 2
+                                ? 'bg-purple-600 text-white ring-2 ring-purple-400'
+                                : 'bg-white dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-gray-600'
+                            }`}
+                          >
+                            Team 2
+                          </button>
+                          <button
+                            onClick={() => setProfileFavoriteTeam(null)}
+                            className={`px-3 rounded font-semibold transition-all ${
+                              profileFavoriteTeam === null
+                                ? 'bg-gray-500 text-white ring-2 ring-gray-400'
+                                : 'bg-white dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            }`}
+                            title="Clear selection"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
