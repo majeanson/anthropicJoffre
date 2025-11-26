@@ -29,6 +29,15 @@ interface QuickStats {
   ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
 }
 
+interface UserProfile {
+  bio: string | null;
+  country: string | null;
+  favorite_team: 1 | 2 | null;
+  visibility: 'public' | 'friends_only' | 'private';
+  show_online_status: boolean;
+  allow_friend_requests: boolean;
+}
+
 interface PlayerProfileModalProps {
   playerName: string;
   socket: Socket | null;
@@ -49,6 +58,7 @@ export function PlayerProfileModal({
 
   // ✅ NOW safe to call hooks
   const [stats, setStats] = useState<QuickStats | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [friendStatus, setFriendStatus] = useState<'none' | 'pending' | 'friends'>('none');
@@ -111,6 +121,31 @@ export function PlayerProfileModal({
         setAchievementPoints(response.points || 0);
       }
     });
+  }, [socket, isOpen, playerName]);
+
+  // Fetch user profile
+  useEffect(() => {
+    if (!socket || !isOpen || !playerName) return;
+
+    socket.emit('get_user_profile', { username: playerName });
+
+    const handleProfileResponse = ({
+      username,
+      profile: receivedProfile
+    }: {
+      username: string;
+      profile: UserProfile | null;
+    }) => {
+      if (username === playerName) {
+        setProfile(receivedProfile);
+      }
+    };
+
+    socket.on('user_profile_response', handleProfileResponse);
+
+    return () => {
+      socket.off('user_profile_response', handleProfileResponse);
+    };
   }, [socket, isOpen, playerName]);
 
   // Check friend status
@@ -229,6 +264,53 @@ export function PlayerProfileModal({
                 </div>
               </div>
             </div>
+
+            {/* Profile Information */}
+            {profile && (
+              <div className="space-y-3">
+                {/* Bio */}
+                {profile.bio && (
+                  <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                    <div className="text-xs font-semibold text-gray-400 mb-1">BIO</div>
+                    <p className="text-sm text-gray-200">{profile.bio}</p>
+                  </div>
+                )}
+
+                {/* Country and Favorite Team */}
+                <div className="flex gap-3">
+                  {profile.country && (
+                    <div className="flex-1 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                      <div className="text-xs font-semibold text-gray-400 mb-1">COUNTRY</div>
+                      <div className="text-sm text-gray-200">
+                        {profile.country === 'US' && '🇺🇸 United States'}
+                        {profile.country === 'CA' && '🇨🇦 Canada'}
+                        {profile.country === 'GB' && '🇬🇧 United Kingdom'}
+                        {profile.country === 'FR' && '🇫🇷 France'}
+                        {profile.country === 'DE' && '🇩🇪 Germany'}
+                        {profile.country === 'ES' && '🇪🇸 Spain'}
+                        {profile.country === 'IT' && '🇮🇹 Italy'}
+                        {profile.country === 'JP' && '🇯🇵 Japan'}
+                        {profile.country === 'AU' && '🇦🇺 Australia'}
+                        {profile.country === 'BR' && '🇧🇷 Brazil'}
+                        {profile.country === 'MX' && '🇲🇽 Mexico'}
+                        {profile.country === 'IN' && '🇮🇳 India'}
+                        {profile.country === 'CN' && '🇨🇳 China'}
+                        {profile.country === 'KR' && '🇰🇷 South Korea'}
+                        {!['US', 'CA', 'GB', 'FR', 'DE', 'ES', 'IT', 'JP', 'AU', 'BR', 'MX', 'IN', 'CN', 'KR'].includes(profile.country) && profile.country}
+                      </div>
+                    </div>
+                  )}
+                  {profile.favorite_team && (
+                    <div className="flex-1 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                      <div className="text-xs font-semibold text-gray-400 mb-1">FAVORITE TEAM</div>
+                      <div className={`text-sm font-semibold ${profile.favorite_team === 1 ? 'text-orange-400' : 'text-purple-400'}`}>
+                        Team {profile.favorite_team}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
