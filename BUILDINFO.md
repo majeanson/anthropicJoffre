@@ -1,6 +1,6 @@
 # Build Information
 
-**Last Updated**: 2025-11-07
+**Last Updated**: 2025-11-25
 **Build Status**: Development
 **Version**: 1.0.0-dev
 
@@ -319,7 +319,7 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 
 ---
 
-## 📝 Recent Changes (2025-11-07)
+## 📝 Recent Changes (2025-11-25)
 
 ### Completed
 1. ✅ Sprint 9 Task 4 (Remove Technical Debt)
@@ -359,6 +359,23 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
    - GlobalLeaderboard.tsx: Moved isOpen check before hooks
    - All components now follow React Rules of Hooks correctly
    - Prevents runtime errors during conditional rendering
+
+7. ✅ Beginner Mode Feature (Complete)
+   - Comprehensive beginner mode with tutorial system
+   - Settings toggle for "Beginner mode" with persistence
+   - 9 contextual tutorial phases with progress tracking
+   - Move suggestion system with AI explanations
+   - Extended timeouts (2x multiplier: 120s playing, 60s betting)
+   - "Master Student" achievement for tutorial completion
+   - Full integration across all game phases
+   - See: BEGINNER_MODE_IMPLEMENTATION.md
+
+8. ✅ Beginner Mode TypeScript Fixes
+   - Removed unused getTutorialProgress import
+   - Changed tricksPlayed to currentRoundTricks.length (5 instances)
+   - Added optional chaining for socket.id (4 instances)
+   - Removed unused variables in moveSuggestion.ts
+   - Both backend and frontend builds pass successfully
 
 ### In Progress
 - None (ready for Sprint 10)
@@ -421,4 +438,4 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 
 ---
 
-*This buildinfo is automatically updated with each major change. Last update: 2025-11-07*
+*This buildinfo is automatically updated with each major change. Last update: 2025-11-25*
