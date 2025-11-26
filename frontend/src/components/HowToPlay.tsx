@@ -50,6 +50,29 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         </ul>
       </section>
 
+      {/* Card Queuing */}
+      <section className="bg-cyan-50 dark:bg-cyan-900/40 rounded-lg p-4 border-2 border-cyan-300 dark:border-cyan-600">
+        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+          🎯 Card Queuing
+        </h3>
+        <div className="space-y-2 text-lg">
+          <p>
+            <strong>Pre-select your next card</strong> while waiting for your turn!
+            Click any card in your hand when it's <em>not</em> your turn to queue it.
+          </p>
+          <ul className="space-y-2 ml-4">
+            <li>• <strong>Queued cards</strong> are marked with a gold "QUEUED" badge</li>
+            <li>• The card will <strong>auto-play instantly</strong> when your turn arrives</li>
+            <li>• Click the same card again to <strong>unqueue</strong> it</li>
+            <li>• Only one card can be queued at a time</li>
+            <li>• Great for fast-paced gameplay and quick decision-making!</li>
+          </ul>
+          <p className="text-sm text-cyan-700 dark:text-cyan-300 italic mt-3 bg-cyan-100 dark:bg-cyan-800/50 p-2 rounded">
+            💡 Pro tip: Queue your card early to think ahead while others play!
+          </p>
+        </div>
+      </section>
+
       {/* Keyboard Navigation - Desktop only */}
       <section className="hidden md:block bg-indigo-50 dark:bg-indigo-900/40 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-600">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">

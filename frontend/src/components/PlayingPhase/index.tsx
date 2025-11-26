@@ -14,6 +14,7 @@ import { TrickWinnerBanner } from '../TrickWinnerBanner';
 import { Leaderboard } from '../Leaderboard';
 import { UnifiedChat } from '../UnifiedChat';
 import { GameHeader } from '../GameHeader';
+import { HowToPlay } from '../HowToPlay';
 import { ChatMessage } from '../../types/game';
 import { GameState, Card as CardType } from '../../types/game';
 import { sounds } from '../../utils/sounds';
@@ -107,6 +108,7 @@ function PlayingPhaseComponent({
   const { animationsEnabled } = useSettings();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Use chat notifications hook
   const { unreadChatCount } = useChatNotifications({
@@ -359,6 +361,7 @@ function PlayingPhaseComponent({
         onOpenBotManagement={onOpenBotManagement}
         onOpenAchievements={onOpenAchievements}
         onOpenFriends={onOpenFriends}
+        onOpenRules={() => setShowHowToPlay(true)}
         onOpenChat={() => setChatOpen(!chatOpen)}
         unreadChatCount={unreadChatCount}
         connectionStats={connectionStats}
@@ -408,6 +411,13 @@ function PlayingPhaseComponent({
         gameState={gameState}
         isOpen={showLeaderboard}
         onClose={() => setShowLeaderboard(false)}
+      />
+
+      {/* How to Play Modal */}
+      <HowToPlay
+        isModal={true}
+        isOpen={showHowToPlay}
+        onClose={() => setShowHowToPlay(false)}
       />
 
       {/* Chat Panel */}
