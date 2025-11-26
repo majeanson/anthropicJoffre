@@ -200,7 +200,7 @@ export function GameHeader({
           <div className="flex-1"></div>
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {/* Chat Button */}
             {onOpenChat && (
               <button

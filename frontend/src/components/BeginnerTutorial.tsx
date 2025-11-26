@@ -193,10 +193,12 @@ export function BeginnerTutorial({
         setAccumulatedSteps(prev => [...prev, highestPriority]);
       }
 
-      setCurrentStep(highestPriority);
-    } else {
-      setCurrentStep(null);
+      // Only set current step if we don't have one yet (prevent auto-closing)
+      if (!currentStep) {
+        setCurrentStep(highestPriority);
+      }
     }
+    // Don't set currentStep to null when no applicable steps - let user dismiss explicitly
   }, [gameState, currentPlayerId, dismissedPhases, accumulatedSteps]);
 
   const handleDismiss = () => {

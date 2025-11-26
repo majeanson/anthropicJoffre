@@ -393,7 +393,7 @@ function PlayingPhaseComponent({
         </div>
 
         {/* Beginner Mode: Move Suggestion */}
-        {beginnerMode && !isSpectator && (
+        {beginnerMode && !isSpectator && isCurrentTurn && (
           <div className="max-w-4xl mx-auto px-4 mb-6">
             <MoveSuggestionPanel
               gameState={gameState}

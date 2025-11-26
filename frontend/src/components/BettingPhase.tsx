@@ -327,7 +327,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
       )}
 
       {/* Beginner Mode: Move Suggestion */}
-      {beginnerMode && !hasPlacedBet && (
+      {beginnerMode && !hasPlacedBet && isMyTurn && (
         <div className="mb-6">
           <MoveSuggestionPanel
             gameState={gameState}
