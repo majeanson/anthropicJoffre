@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { GameState } from '../types/game';
-import { getTutorialProgress, markTutorialCompleted, getTutorialStats } from '../utils/tutorialProgress';
+import { markTutorialCompleted, getTutorialStats } from '../utils/tutorialProgress';
 
 export type TutorialPhase =
   | 'team_selection'
@@ -142,28 +142,28 @@ export function BeginnerTutorial({
           return (
             gameState.phase === 'playing' &&
             gameState.currentTrick.length === 0 &&
-            gameState.tricksPlayed === 0
+            gameState.currentRoundTricks.length === 0
           );
 
         case 'playing_suit':
           return (
             gameState.phase === 'playing' &&
             gameState.currentTrick.length > 0 &&
-            gameState.tricksPlayed <= 1
+            gameState.currentRoundTricks.length <= 1
           );
 
         case 'playing_trump':
           return (
             gameState.phase === 'playing' &&
             gameState.trump !== null &&
-            gameState.tricksPlayed === 1
+            gameState.currentRoundTricks.length === 1
           );
 
         case 'trick_complete':
           return (
             gameState.phase === 'playing' &&
             gameState.currentTrick.length === 4 &&
-            gameState.tricksPlayed === 1
+            gameState.currentRoundTricks.length === 1
           );
 
         case 'special_cards':
@@ -171,7 +171,7 @@ export function BeginnerTutorial({
           const hasSpecialCard = currentPlayer?.hand.some(
             (card) => card.value === 0 && (card.color === 'red' || card.color === 'brown')
           );
-          return gameState.phase === 'playing' && hasSpecialCard && gameState.tricksPlayed <= 2;
+          return gameState.phase === 'playing' && hasSpecialCard && gameState.currentRoundTricks.length <= 2;
 
         case 'round_summary':
           return gameState.phase === 'scoring';

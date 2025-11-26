@@ -714,7 +714,7 @@ function AppContent() {
         </ErrorBoundary>
 
         {/* Beginner Mode Tutorial */}
-        {beginnerMode && socket && (
+        {beginnerMode && socket?.id && (
           <ErrorBoundary componentName="BeginnerTutorial">
             <Suspense fallback={<div />}>
               <BeginnerTutorial
@@ -786,7 +786,7 @@ function AppContent() {
         </ErrorBoundary>
 
         {/* Beginner Mode Tutorial */}
-        {beginnerMode && socket && (
+        {beginnerMode && socket?.id && (
           <ErrorBoundary componentName="BeginnerTutorial">
             <Suspense fallback={<div />}>
               <BeginnerTutorial
@@ -858,7 +858,7 @@ function AppContent() {
         </ErrorBoundary>
 
         {/* Beginner Mode Tutorial */}
-        {beginnerMode && socket && (
+        {beginnerMode && socket?.id && (
           <ErrorBoundary componentName="BeginnerTutorial">
             <Suspense fallback={<div />}>
               <BeginnerTutorial
@@ -921,7 +921,7 @@ function AppContent() {
         </ErrorBoundary>
 
         {/* Beginner Mode Tutorial */}
-        {beginnerMode && socket && (
+        {beginnerMode && socket?.id && (
           <ErrorBoundary componentName="BeginnerTutorial">
             <Suspense fallback={<div />}>
               <BeginnerTutorial

@@ -75,7 +75,6 @@ export function suggestBet(gameState: GameState, playerId: string): BetSuggestio
 
   const playerIndex = gameState.players.findIndex((p) => p.id === playerId);
   const isDealer = playerIndex === gameState.dealerIndex;
-  const hasValidBets = gameState.currentBets.some((b) => !b.skipped);
 
   // Evaluate hand strength
   const strength = evaluateHandStrength(player.hand, gameState.trump);
@@ -122,7 +121,7 @@ export function suggestBet(gameState: GameState, playerId: string): BetSuggestio
 /**
  * Determine which cards can legally be played
  */
-function getPlayableCards(hand: Card[], currentTrick: { card: Card; playerId: string }[], trump: CardColor | null): Card[] {
+function getPlayableCards(hand: Card[], currentTrick: { card: Card; playerId: string }[]): Card[] {
   if (currentTrick.length === 0) {
     // Leading the trick - all cards are playable
     return hand;
@@ -147,7 +146,7 @@ export function suggestMove(gameState: GameState, playerId: string): MoveSuggest
   const player = gameState.players.find((p) => p.id === playerId);
   if (!player || gameState.phase !== 'playing') return null;
 
-  const playableCards = getPlayableCards(player.hand, gameState.currentTrick, gameState.trump);
+  const playableCards = getPlayableCards(player.hand, gameState.currentTrick);
   if (playableCards.length === 0) return null;
 
   const currentTrick = gameState.currentTrick;
