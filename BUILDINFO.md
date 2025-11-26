@@ -322,7 +322,17 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 ## 📝 Recent Changes (2025-11-26)
 
 ### Completed
-1. ✅ playerName Migration (Complete)
+1. ✅ Move Suggestion Algorithm - Major Rewrite
+   - Complete rewrite with full team awareness
+   - Strategic priority system: Red 0 bonus > Win Red 0 from opponents > Win tricks > Avoid Brown 0
+   - Detects teammate winning and suggests adding Red 0 for +5 bonus
+   - Always tries to win Red 0 tricks from opponents
+   - Avoids giving Brown 0 (-2 points) to opponents
+   - Proper trump vs non-trump mechanics
+   - New helper functions: getTrickWinner(), canBeatCard()
+   - Smart card suggestions based on game state
+
+2. ✅ playerName Migration (Complete)
    - Migrated all code from volatile `playerId` to stable `playerName` identifiers
    - Updated all bet lookups to use playerName instead of playerId
    - Fixed duplicate bet checks across backend and frontend
