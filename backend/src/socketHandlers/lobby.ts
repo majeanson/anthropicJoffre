@@ -36,6 +36,9 @@ import { logValidationError } from '../utils/logger';
 // Import conditional persistence manager
 import * as PersistenceManager from '../db/persistenceManager';
 
+// Import user database functions for duplicate name validation
+import { usernameExists } from '../db/users';
+
 // Re-export SwapRequest interface from teamSelection for backwards compatibility
 export type { SwapRequest };
 
@@ -180,6 +183,34 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     // Player name is already validated and sanitized by Zod schema
     const sanitizedName = validatedPlayerName;
 
+    // SECURITY: Prevent duplicate usernames
+    // For registered users: Check if the username exists in the database
+    // For guest users: Only allow if not authenticated or if authenticated username matches
+    const authenticatedUsername = socket.data.playerName;
+    const isAuthenticated = !!authenticatedUsername;
+
+    // Check if this username belongs to a registered user
+    const isRegisteredUsername = await usernameExists(sanitizedName);
+
+    if (isRegisteredUsername) {
+      // If this is a registered username, only allow if the current socket is authenticated as that user
+      if (!isAuthenticated || authenticatedUsername !== sanitizedName) {
+        socket.emit('error', {
+          message: `Username "${sanitizedName}" is already registered. Please sign in or choose a different name.`
+        });
+        return;
+      }
+      // Authenticated user creating game with their own username - allow
+    } else {
+      // Guest username - check if authenticated user is trying to use a different name
+      if (isAuthenticated && authenticatedUsername !== sanitizedName) {
+        socket.emit('error', {
+          message: `Please use your registered username "${authenticatedUsername}" or sign out to play as a guest.`
+        });
+        return;
+      }
+    }
+
     // Generate 8-character game ID (matches validation schema minimum)
     const gameId = Math.random().toString(36).substring(2, 10).toUpperCase();
     const player: Player = {
@@ -322,6 +353,27 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
     const existingPlayer = game.players.find(p => p.name === sanitizedName);
     if (existingPlayer) {
       console.log(`Player ${sanitizedName} attempting to rejoin game ${gameId} (isBot: ${existingPlayer.isBot})`);
+
+      // SECURITY: Verify this is actually the same player rejoining, not an impersonator
+      // For registered users, verify authentication
+      const authenticatedUsername = socket.data.playerName;
+      const isAuthenticated = !!authenticatedUsername;
+
+      // If the existing player is a registered user (has matching username in DB)
+      // only allow rejoin if the current socket is authenticated as that user
+      if (!existingPlayer.isBot && isAuthenticated) {
+        if (authenticatedUsername !== sanitizedName) {
+          socket.emit('error', {
+            message: `Username "${sanitizedName}" is already taken by another player. Please choose a different name.`
+          });
+          return;
+        }
+      } else if (!existingPlayer.isBot && !isAuthenticated) {
+        // Guest trying to rejoin - this is risky as anyone could impersonate
+        // For now, we'll allow it but log a warning
+        // TODO: Add session tokens for guest players
+        console.warn(`SECURITY: Unauthenticated user rejoining as ${sanitizedName} - potential impersonation risk`);
+      }
 
       // Allow rejoin - update socket ID
       const oldSocketId = existingPlayer.id;
