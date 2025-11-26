@@ -27,8 +27,8 @@ export async function createUser(
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Auto-verify users when email service is not configured (development mode)
-    const autoVerify = !process.env.RESEND_API_KEY;
+    // Auto-verify all new users
+    const autoVerify = true;
 
     // Create user
     const userResult = await client.query(

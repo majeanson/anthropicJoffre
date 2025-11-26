@@ -97,17 +97,17 @@ export class BotPlayer {
     // Calculate bet amount based on hand strength
     const baseBet = handStrength.estimatedTricks;
 
-    // Adjust for difficulty
+    // Adjust for difficulty - limit to skip, 7, or 8 for all bots
     let betAmount: number;
     if (this.difficulty === 'easy') {
-      // Easy: Random bet, not strategic
-      betAmount = Math.floor(Math.random() * 4) + 7; // 7-10
+      // Easy: Random bet from limited options
+      betAmount = Math.random() < 0.5 ? 7 : 8;
     } else if (this.difficulty === 'medium') {
-      // Medium: Hand strength with some randomness
-      betAmount = Math.min(12, Math.max(7, baseBet + Math.floor(Math.random() * 2) - 1));
+      // Medium: Hand strength with limited options
+      betAmount = baseBet >= 8 ? 8 : 7;
     } else {
-      // Hard: Precise hand evaluation
-      betAmount = Math.min(12, Math.max(7, baseBet));
+      // Hard: Precise evaluation but still limited
+      betAmount = baseBet >= 8 ? 8 : 7;
     }
 
     // If there's a highest bet, must raise (or dealer can match)

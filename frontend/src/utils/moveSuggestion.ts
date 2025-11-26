@@ -147,6 +147,36 @@ function getPlayableCards(hand: Card[], currentTrick: { card: Card; playerId: st
 }
 
 /**
+ * Determine if teammate is currently winning the trick
+ */
+function isTeammateWinning(gameState: GameState, playerId: string, trump: CardColor | null): boolean {
+  if (gameState.currentTrick.length === 0) return false;
+
+  const player = gameState.players.find(p => p.id === playerId);
+  if (!player) return false;
+
+  const playerTeam = player.teamId;
+
+  // Find current winning player
+  const currentWinningPlay = gameState.currentTrick.reduce((winning, play) => {
+    const winningCard = winning.card;
+    const playCard = play.card;
+
+    if (playCard.color === trump && winningCard.color !== trump) return play;
+    if (winningCard.color === trump && playCard.color !== trump) return winning;
+
+    if (playCard.color === winningCard.color) {
+      return playCard.value > winningCard.value ? play : winning;
+    }
+
+    return winning;
+  });
+
+  const winningPlayer = gameState.players.find(p => p.id === currentWinningPlay.playerId);
+  return winningPlayer?.teamId === playerTeam;
+}
+
+/**
  * Suggest the best card to play
  */
 export function suggestMove(gameState: GameState, playerId: string): MoveSuggestion | null {
@@ -156,8 +186,20 @@ export function suggestMove(gameState: GameState, playerId: string): MoveSuggest
   const playableCards = getPlayableCards(player.hand, gameState.currentTrick);
   if (playableCards.length === 0) return null;
 
+  // Check if only one playable card
+  if (playableCards.length === 1) {
+    const onlyCard = playableCards[0];
+    return {
+      card: onlyCard,
+      priority: 'high',
+      reason: 'Only playable card',
+      explanation: `You can only play ${onlyCard.value} ${onlyCard.color} - it's your only legal option!`,
+    };
+  }
+
   const currentTrick = gameState.currentTrick;
   const trump = gameState.trump;
+  const teammateWinning = isTeammateWinning(gameState, playerId, trump);
 
   // CASE 1: Leading the trick (first to play)
   if (currentTrick.length === 0) {
@@ -250,6 +292,21 @@ export function suggestMove(gameState: GameState, playerId: string): MoveSuggest
     });
 
     if (canWin) {
+      // Check if teammate is winning
+      if (teammateWinning) {
+        // Teammate winning - play lowest to support
+        const lowestCard = followSuitCards.reduce((min, card) =>
+          card.value < min.value ? card : min
+        );
+        return {
+          card: lowestCard,
+          priority: 'low',
+          reason: 'Teammate winning - play low',
+          explanation: `Your teammate is winning! Play your lowest card (${lowestCard.value} ${lowestCard.color}) to let them take the trick.`,
+          alternatives: `You could overtake with a higher card, but that wastes your team's high cards unnecessarily.`,
+        };
+      }
+
       // Win the trick with lowest winning card
       const winningCards = followSuitCards.filter(
         (card) => card.value > currentWinningCard.card.value
@@ -314,15 +371,31 @@ export function suggestMove(gameState: GameState, playerId: string): MoveSuggest
     }
   }
 
-  // CASE 4: Dump worst card
+  // CASE 4: Dump worst card (but NOT if teammate is winning!)
   const brownZero = playableCards.find((c) => c.value === 0 && c.color === 'brown');
-  if (brownZero) {
+  if (brownZero && !teammateWinning) {
+    // Only dump Brown 0 if opponent is winning
     return {
       card: brownZero,
       priority: 'high',
       reason: 'Dump the Brown 0 (-2 points)',
-      explanation: `Get rid of the Brown 0 now! It's worth -2 points, so let someone else take that penalty.`,
+      explanation: `Get rid of the Brown 0 now! It's worth -2 points, so let the opponent take that penalty.`,
+      alternatives: `Don't dump if your teammate is winning - you'd give them the penalty!`,
     };
+  }
+
+  // If teammate is winning and we have Brown 0, play something else
+  if (teammateWinning && brownZero) {
+    const otherCards = playableCards.filter(c => !(c.value === 0 && c.color === 'brown'));
+    if (otherCards.length > 0) {
+      const lowestOther = otherCards.reduce((min, card) => card.value < min.value ? card : min);
+      return {
+        card: lowestOther,
+        priority: 'medium',
+        reason: 'Teammate winning - avoid Brown 0',
+        explanation: `Your teammate is winning! Play ${lowestOther.value} ${lowestOther.color} instead of Brown 0 to avoid giving them the -2 penalty.`,
+      };
+    }
   }
 
   // Play lowest card
