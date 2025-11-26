@@ -12,6 +12,8 @@ import { sounds } from '../utils/sounds';
 import { InlineBetStatus } from './InlineBetStatus';
 import { SmartValidationMessage } from './SmartValidationMessage';
 import { useChatNotifications } from '../hooks/useChatNotifications';
+import { MoveSuggestionPanel } from './MoveSuggestionPanel';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -37,6 +39,9 @@ interface BettingPhaseProps {
 }
 
 function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+  // Get beginner mode setting
+  const { beginnerMode } = useSettings();
+
   // Memoize expensive computations
   const hasPlacedBet = useMemo(
     () => currentBets.some(b => b.playerId === currentPlayerId),
@@ -318,6 +323,17 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Beginner Mode: Move Suggestion */}
+      {beginnerMode && !hasPlacedBet && (
+        <div className="mb-6">
+          <MoveSuggestionPanel
+            gameState={gameState}
+            currentPlayerId={currentPlayerId}
+            isMyTurn={isMyTurn}
+          />
         </div>
       )}
 

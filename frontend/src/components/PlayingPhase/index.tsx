@@ -21,6 +21,7 @@ import { sounds } from '../../utils/sounds';
 import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
+import { MoveSuggestionPanel } from '../MoveSuggestionPanel';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';
@@ -105,7 +106,7 @@ function PlayingPhaseComponent({
   }
 
   // ✅ NOW it's safe to call hooks
-  const { animationsEnabled } = useSettings();
+  const { animationsEnabled, beginnerMode } = useSettings();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
@@ -390,6 +391,17 @@ function PlayingPhaseComponent({
             />
           </div>
         </div>
+
+        {/* Beginner Mode: Move Suggestion */}
+        {beginnerMode && !isSpectator && (
+          <div className="max-w-4xl mx-auto px-4 mb-6">
+            <MoveSuggestionPanel
+              gameState={gameState}
+              currentPlayerId={currentPlayerId}
+              isMyTurn={isCurrentTurn}
+            />
+          </div>
+        )}
 
         <PlayerHand
           hand={currentPlayer?.hand || []}

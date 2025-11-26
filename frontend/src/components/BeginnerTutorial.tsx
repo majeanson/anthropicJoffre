@@ -1,11 +1,13 @@
 /**
  * Beginner Tutorial Component
  * Displays step-by-step tutorial tips during gameplay for beginners
+ * Now with progress tracking!
  */
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { GameState } from '../types/game';
+import { getTutorialProgress, markTutorialCompleted, getTutorialStats } from '../utils/tutorialProgress';
 
 export type TutorialPhase =
   | 'team_selection'
@@ -193,6 +195,9 @@ export function BeginnerTutorial({
   const handleDismiss = (permanent: boolean) => {
     if (currentStep) {
       if (permanent) {
+        // Mark tutorial as completed in progress tracking
+        markTutorialCompleted(currentStep.phase);
+
         const newDismissed = new Set(dismissedPhases);
         newDismissed.add(currentStep.phase);
         setDismissedPhases(newDismissed);
@@ -206,25 +211,43 @@ export function BeginnerTutorial({
 
   if (!currentStep) return null;
 
+  // Get tutorial progress
+  const tutorialStats = getTutorialStats();
+
   return createPortal(
     <div
       className="fixed top-20 right-4 md:right-6 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 border-4 border-blue-400 dark:border-blue-600 rounded-xl shadow-2xl z-[9999] w-[380px] max-w-[calc(100vw-2rem)] animate-slide-in"
       data-testid="beginner-tutorial"
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 px-4 py-3 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800 flex items-center justify-between">
-        <h3 className="text-white font-bold text-lg flex items-center gap-2">
-          <span className="text-2xl">{currentStep.icon}</span>
-          <span>{currentStep.title}</span>
-        </h3>
-        <button
-          onClick={() => handleDismiss(false)}
-          className="text-white hover:text-red-300 transition-colors text-xl font-bold"
-          title="Close Tutorial"
-          data-testid="tutorial-close-button"
-        >
-          ✕
-        </button>
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 px-4 py-3 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-white font-bold text-lg flex items-center gap-2">
+            <span className="text-2xl">{currentStep.icon}</span>
+            <span>{currentStep.title}</span>
+          </h3>
+          <button
+            onClick={() => handleDismiss(false)}
+            className="text-white hover:text-red-300 transition-colors text-xl font-bold"
+            title="Close Tutorial"
+            data-testid="tutorial-close-button"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 bg-blue-800/50 rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-green-400 h-full transition-all duration-500 rounded-full"
+              style={{ width: `${tutorialStats.percentage}%` }}
+            />
+          </div>
+          <span className="text-white text-xs font-semibold whitespace-nowrap">
+            {tutorialStats.completed}/{tutorialStats.total} ({tutorialStats.percentage}%)
+          </span>
+        </div>
       </div>
 
       {/* Content */}

@@ -23,6 +23,8 @@ const DebugPanel = lazy(() => import('./components/DebugPanel').then(m => ({ def
 const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcutsModal').then(m => ({ default: m.KeyboardShortcutsModal })));
 // Player profile modal (lazy loaded)
 const PlayerProfileModal = lazy(() => import('./components/PlayerProfileModal').then(m => ({ default: m.PlayerProfileModal })));
+// Beginner mode components
+const BeginnerTutorial = lazy(() => import('./components/BeginnerTutorial').then(m => ({ default: m.BeginnerTutorial })));
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
@@ -705,6 +707,18 @@ function AppContent() {
             />
           </Suspense>
         </ErrorBoundary>
+
+        {/* Beginner Mode Tutorial */}
+        {beginnerMode && socket && (
+          <ErrorBoundary componentName="BeginnerTutorial">
+            <Suspense fallback={<div />}>
+              <BeginnerTutorial
+                gameState={gameState}
+                currentPlayerId={socket.id}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
       </>
     );
   }
@@ -765,6 +779,18 @@ function AppContent() {
           />
           </Suspense>
         </ErrorBoundary>
+
+        {/* Beginner Mode Tutorial */}
+        {beginnerMode && socket && (
+          <ErrorBoundary componentName="BeginnerTutorial">
+            <Suspense fallback={<div />}>
+              <BeginnerTutorial
+                gameState={gameState}
+                currentPlayerId={socket.id}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
       </>
     );
   }
@@ -825,6 +851,18 @@ function AppContent() {
         />
           </Suspense>
         </ErrorBoundary>
+
+        {/* Beginner Mode Tutorial */}
+        {beginnerMode && socket && (
+          <ErrorBoundary componentName="BeginnerTutorial">
+            <Suspense fallback={<div />}>
+              <BeginnerTutorial
+                gameState={gameState}
+                currentPlayerId={socket.id}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
       </>
     );
   }
@@ -876,6 +914,18 @@ function AppContent() {
             </div>
           </Suspense>
         </ErrorBoundary>
+
+        {/* Beginner Mode Tutorial */}
+        {beginnerMode && socket && (
+          <ErrorBoundary componentName="BeginnerTutorial">
+            <Suspense fallback={<div />}>
+              <BeginnerTutorial
+                gameState={gameState}
+                currentPlayerId={socket.id}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
       </>
     );
   }
