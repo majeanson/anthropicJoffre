@@ -46,7 +46,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const [beginnerMode, setBeginnerModeState] = useState<boolean>(() => {
     const saved = localStorage.getItem('beginnerMode');
-    return saved !== null ? JSON.parse(saved) : false;
+    return saved !== null ? JSON.parse(saved) : true; // Default to true for new users
   });
 
   // Sync sound settings

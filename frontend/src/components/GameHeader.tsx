@@ -348,7 +348,7 @@ export function GameHeader({
           </div>
 
           {/* Row 2: Action Buttons */}
-          <div className="flex items-center justify-center gap-1">
+          <div className="flex items-center justify-center gap-1 flex-wrap">
             {/* Chat Button */}
             {onOpenChat && (
               <button

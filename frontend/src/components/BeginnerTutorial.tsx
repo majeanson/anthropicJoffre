@@ -107,14 +107,14 @@ export function BeginnerTutorial({
   onClose,
   onDismiss,
 }: BeginnerTutorialProps) {
-  const [dismissedPhases, setDismissedPhases] = useState<Set<TutorialPhase>>(
-    () => {
-      const saved = localStorage.getItem('tutorialDismissed');
-      return saved ? new Set(JSON.parse(saved)) : new Set();
-    }
-  );
+  // Use centralized tutorial progress system instead of separate localStorage key
+  const [dismissedPhases, setDismissedPhases] = useState<Set<TutorialPhase>>(() => {
+    const progress = getTutorialStats();
+    return new Set(progress.completedPhases as TutorialPhase[]);
+  });
 
   const [currentStep, setCurrentStep] = useState<TutorialStep | null>(null);
+  const [accumulatedSteps, setAccumulatedSteps] = useState<TutorialStep[]>([]);
 
   useEffect(() => {
     // Determine which tutorial step to show based on game state
@@ -186,30 +186,37 @@ export function BeginnerTutorial({
       const highestPriority = applicableSteps.reduce((max, step) =>
         step.priority > max.priority ? step : max
       );
+
+      // Check if this is a new step (not already in accumulated steps)
+      const isNewStep = !accumulatedSteps.some(s => s.phase === highestPriority.phase);
+      if (isNewStep) {
+        setAccumulatedSteps(prev => [...prev, highestPriority]);
+      }
+
       setCurrentStep(highestPriority);
     } else {
       setCurrentStep(null);
     }
-  }, [gameState, currentPlayerId, dismissedPhases]);
+  }, [gameState, currentPlayerId, dismissedPhases, accumulatedSteps]);
 
-  const handleDismiss = (permanent: boolean) => {
+  const handleDismiss = () => {
     if (currentStep) {
-      if (permanent) {
-        // Mark tutorial as completed in progress tracking
-        markTutorialCompleted(currentStep.phase);
+      // Always mark tutorial as completed (both "Got It!" and "Don't Show Again")
+      // This prevents repetitive messages, especially for special_cards phase
+      markTutorialCompleted(currentStep.phase);
 
-        const newDismissed = new Set(dismissedPhases);
-        newDismissed.add(currentStep.phase);
-        setDismissedPhases(newDismissed);
-        localStorage.setItem('tutorialDismissed', JSON.stringify([...newDismissed]));
-        onDismiss?.(currentStep.phase);
+      // Update local dismissed phases state
+      const newDismissed = new Set(dismissedPhases);
+      newDismissed.add(currentStep.phase);
+      setDismissedPhases(newDismissed);
+      onDismiss?.(currentStep.phase);
 
-        // Check if this was the last tutorial
-        const stats = getTutorialStats();
-        if (stats.allCompleted) {
-          console.log('🎉 All tutorials completed! Achievement will be unlocked on next socket connection.');
-        }
+      // Check if this was the last tutorial
+      const stats = getTutorialStats();
+      if (stats.allCompleted) {
+        console.log('🎉 All tutorials completed! Achievement will be unlocked on next socket connection.');
       }
+
       setCurrentStep(null);
       onClose?.();
     }
@@ -233,7 +240,7 @@ export function BeginnerTutorial({
             <span>{currentStep.title}</span>
           </h3>
           <button
-            onClick={() => handleDismiss(false)}
+            onClick={handleDismiss}
             className="text-white hover:text-red-300 transition-colors text-xl font-bold"
             title="Close Tutorial"
             data-testid="tutorial-close-button"
@@ -258,23 +265,30 @@ export function BeginnerTutorial({
 
       {/* Content */}
       <div className="p-4 max-h-[400px] overflow-y-auto">
-        <p className="text-blue-900 dark:text-blue-100 text-sm whitespace-pre-line leading-relaxed">
-          {currentStep.content}
-        </p>
+        {/* Show all accumulated steps */}
+        {accumulatedSteps.map((step, index) => (
+          <div key={step.phase} className={index > 0 ? 'mt-4 pt-4 border-t border-blue-300 dark:border-blue-700' : ''}>
+            {/* Step header */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">{step.icon}</span>
+              <span className="text-blue-900 dark:text-blue-100 text-sm font-bold">{step.title}</span>
+              {step.phase === currentStep?.phase && (
+                <span className="ml-auto text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">NEW</span>
+              )}
+            </div>
+            {/* Step content */}
+            <p className="text-blue-900 dark:text-blue-100 text-sm whitespace-pre-line leading-relaxed">
+              {step.content}
+            </p>
+          </div>
+        ))}
       </div>
 
       {/* Actions */}
-      <div className="px-4 pb-4 flex gap-2">
+      <div className="px-4 pb-4">
         <button
-          onClick={() => handleDismiss(true)}
-          className="flex-1 bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-800 dark:text-gray-100 font-semibold py-2 px-3 rounded transition-colors text-sm"
-          data-testid="tutorial-dismiss-button"
-        >
-          Don't Show Again
-        </button>
-        <button
-          onClick={() => handleDismiss(false)}
-          className="flex-1 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-3 rounded transition-colors text-sm"
+          onClick={handleDismiss}
+          className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-3 rounded transition-colors text-sm"
           data-testid="tutorial-got-it-button"
         >
           Got It! ✓

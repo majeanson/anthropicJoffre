@@ -10,6 +10,7 @@ interface MoveSuggestion {
   reason: string;
   priority: 'high' | 'medium' | 'low';
   explanation: string;
+  alternatives?: string; // Explanation of other options and why this is better
 }
 
 interface BetSuggestion {
@@ -17,6 +18,7 @@ interface BetSuggestion {
   withoutTrump: boolean;
   reason: string;
   skip: boolean;
+  alternatives?: string; // Explanation of other betting options
 }
 
 /**
@@ -92,29 +94,34 @@ export function suggestBet(gameState: GameState, playerId: string): BetSuggestio
       withoutTrump: false,
       skip: true,
       reason: `Your hand is weak (estimated ${strength.estimatedTricks} tricks). Skipping is safer unless you're feeling lucky!`,
+      alternatives: `Alternative: Bet 7 (minimum) if you're feeling confident, but with only ${strength.trumpCount} trump cards and ${strength.highCards} high cards, you'll likely lose points if you don't meet the bet.`,
     };
   }
 
   // Strong hand - suggest aggressive bet
   if (strength.estimatedTricks >= 8) {
     const amount = Math.min(12, strength.estimatedTricks + 2);
+    const conservativeAmount = Math.max(7, strength.estimatedTricks);
     return {
       amount,
       withoutTrump: false,
       skip: false,
       reason: `You have a strong hand with ${strength.trumpCount} trump cards and ${strength.highCards} high cards. Bet ${amount} points to maximize your score!`,
+      alternatives: `Alternative: Bet ${conservativeAmount} (more conservative) to play it safer, but you're leaving points on the table. With your strong hand, betting high is worth the risk.`,
     };
   }
 
   // Medium hand - conservative bet
   const baseBet = Math.max(7, Math.min(10, strength.estimatedTricks));
   const amount = highestBet ? Math.max(baseBet, highestBet.amount + 1) : baseBet;
+  const aggressiveAmount = Math.min(12, amount + 2);
 
   return {
     amount,
     withoutTrump: false,
     skip: false,
     reason: `Your hand is decent. Bet ${amount} points - not too risky, not too safe. You have ${strength.trumpCount} trump cards.`,
+    alternatives: `Alternatives: Skip to avoid risk (but miss potential points), or bet ${aggressiveAmount} (aggressive) to win big if you get lucky tricks. The middle ground (${amount}) balances risk and reward.`,
   };
 }
 
@@ -154,42 +161,61 @@ export function suggestMove(gameState: GameState, playerId: string): MoveSuggest
 
   // CASE 1: Leading the trick (first to play)
   if (currentTrick.length === 0) {
-    // Play high trump if you have it
     const trumpCards = playableCards.filter((c) => c.color === trump);
+    const nonTrumpCards = playableCards.filter((c) => c.color !== trump);
+    const redZero = playableCards.find((c) => c.value === 0 && c.color === 'red');
+
+    // Play high trump if you have it
     if (trumpCards.length > 0) {
       const highestTrump = trumpCards.reduce((max, card) =>
         card.value > max.value ? card : max
       );
+      const lowestNonTrump = nonTrumpCards.length > 0
+        ? nonTrumpCards.reduce((min, card) => card.value < min.value ? card : min)
+        : null;
+
       return {
         card: highestTrump,
         priority: 'high',
         reason: 'Lead with a high trump',
         explanation: `Leading with a high trump card (${highestTrump.value}) puts pressure on other players and gives you a strong chance to win the trick!`,
+        alternatives: lowestNonTrump
+          ? `Alternative: Lead with low non-trump (${lowestNonTrump.value} ${lowestNonTrump.color}) to save trump for later, but you risk losing the trick. Leading trump is more aggressive and guarantees you control.`
+          : `No other options - you only have trump cards.`,
       };
     }
 
     // Play red 0 to win bonus points
-    const redZero = playableCards.find((c) => c.value === 0 && c.color === 'red');
-    if (redZero) {
+    if (redZero && nonTrumpCards.length > 1) {
+      const otherNonTrump = nonTrumpCards.filter(c => !(c.value === 0 && c.color === 'red'));
+      const lowestOther = otherNonTrump.reduce((min, card) => card.value < min.value ? card : min, otherNonTrump[0]);
+
       return {
         card: redZero,
         priority: 'medium',
         reason: 'Try to win the Red 0 (+5 points)',
         explanation: `Leading with Red 0 allows you to control the trick and potentially win the +5 bonus points!`,
+        alternatives: lowestOther
+          ? `Alternative: Lead with ${lowestOther.value} ${lowestOther.color} to save Red 0 for a trick you're sure to win, but you might miss the bonus if you don't draw it out now.`
+          : 'Red 0 is your best option for potential bonus points.',
       };
     }
 
     // Play lowest non-trump card
-    const nonTrumpCards = playableCards.filter((c) => c.color !== trump);
     if (nonTrumpCards.length > 0) {
       const lowestCard = nonTrumpCards.reduce((min, card) =>
         card.value < min.value ? card : min
       );
+      const highestNonTrump = nonTrumpCards.reduce((max, card) => card.value > max.value ? card : max);
+
       return {
         card: lowestCard,
         priority: 'low',
         reason: 'Save high cards for later',
         explanation: `Leading with a low card (${lowestCard.value} ${lowestCard.color}) saves your powerful cards for more important tricks.`,
+        alternatives: highestNonTrump.value > lowestCard.value
+          ? `Alternative: Lead high (${highestNonTrump.value} ${highestNonTrump.color}) to try winning the trick, but you're using your best card early. Low card strategy plays it safe.`
+          : 'This is your only non-trump option.',
       };
     }
   }

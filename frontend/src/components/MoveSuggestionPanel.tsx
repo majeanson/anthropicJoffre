@@ -33,9 +33,12 @@ export function MoveSuggestionPanel({
             <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
               {suggestion.skip ? 'Consider Skipping' : `Suggested Bet: ${suggestion.amount} points`}
             </p>
-            {isExpanded && (
-              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                {suggestion.reason}
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+              {suggestion.reason}
+            </p>
+            {isExpanded && suggestion.alternatives && (
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
+                {suggestion.alternatives}
               </p>
             )}
           </div>
@@ -82,9 +85,16 @@ export function MoveSuggestionPanel({
               {suggestion.reason}
             </p>
             {isExpanded && (
-              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                {suggestion.explanation}
-              </p>
+              <>
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                  {suggestion.explanation}
+                </p>
+                {suggestion.alternatives && (
+                  <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
+                    {suggestion.alternatives}
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
@@ -110,12 +120,6 @@ export function MoveSuggestionPanel({
         </button>
       </div>
 
-      {/* Additional Help Text */}
-      {!isExpanded && (
-        <p className="text-xs text-blue-500 dark:text-blue-400 mt-2">
-          Click ▼ for detailed explanation
-        </p>
-      )}
     </div>
   );
 }

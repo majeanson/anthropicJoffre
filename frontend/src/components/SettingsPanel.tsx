@@ -86,15 +86,6 @@ export function SettingsPanel({
       case 'settings':
         return (
           <div className="space-y-3">
-            {/* Dark Mode Toggle */}
-            <div className="flex items-center justify-between" data-testid="settings-dark-mode">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{darkMode ? '🌙' : '☀️'}</span>
-                <span className="text-umber-900 dark:text-gray-100 font-semibold">Dark Mode</span>
-              </div>
-              <ToggleSwitch enabled={darkMode} onChange={() => setDarkMode(!darkMode)} label="Dark Mode" />
-            </div>
-
             {/* Sound Toggle */}
             {onSoundToggle && (
               <div className="flex items-center justify-between" data-testid="settings-sound">
@@ -105,15 +96,6 @@ export function SettingsPanel({
                 <ToggleSwitch enabled={soundEnabled} onChange={onSoundToggle} label="Sound" />
               </div>
             )}
-
-            {/* Animations Toggle */}
-            <div className="flex items-center justify-between" data-testid="settings-animations">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">✨</span>
-                <span className="text-umber-900 dark:text-gray-100 font-semibold">Animations</span>
-              </div>
-              <ToggleSwitch enabled={animationsEnabled} onChange={() => setAnimationsEnabled(!animationsEnabled)} label="Animations" />
-            </div>
 
             {/* Beginner Mode Toggle */}
             <div className="flex items-center justify-between" data-testid="settings-beginner-mode">
@@ -140,17 +122,6 @@ export function SettingsPanel({
               </div>
             )}
 
-            {/* Connection Quality */}
-            {connectionStats && (
-              <div className="flex items-center justify-between" data-testid="settings-connection">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">📡</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Connection</span>
-                </div>
-                <ConnectionQualityBadge stats={connectionStats} />
-              </div>
-            )}
-
             {/* Divider */}
             <div className="border-t border-amber-700/30 dark:border-gray-600"></div>
 
@@ -163,21 +134,6 @@ export function SettingsPanel({
               >
                 <span className="text-2xl">📖</span>
                 <span className="text-umber-900 dark:text-gray-100 font-semibold">How to Play</span>
-              </button>
-            )}
-
-            {/* Bot Management Button */}
-            {!isSpectator && onOpenBotManagement && (
-              <button
-                onClick={handleBotManagement}
-                className="w-full bg-parchment-200 dark:bg-gray-700 hover:bg-parchment-300 dark:hover:bg-gray-600 border border-amber-700 dark:border-gray-600 rounded px-3 py-2 transition-colors flex items-center justify-between"
-                data-testid="settings-bot-management"
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">🤖</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Bot Management</span>
-                </div>
-                <span className="text-umber-700 dark:text-gray-300 text-sm">({botCount}/3)</span>
               </button>
             )}
 
@@ -204,6 +160,53 @@ export function SettingsPanel({
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
               Advanced settings for power users
             </p>
+
+            {/* Dark Mode Toggle */}
+            <div className="flex items-center justify-between" data-testid="settings-dark-mode">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{darkMode ? '🌙' : '☀️'}</span>
+                <span className="text-umber-900 dark:text-gray-100 font-semibold">Dark Mode</span>
+              </div>
+              <ToggleSwitch enabled={darkMode} onChange={() => setDarkMode(!darkMode)} label="Dark Mode" />
+            </div>
+
+            {/* Animations Toggle */}
+            <div className="flex items-center justify-between" data-testid="settings-animations">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">✨</span>
+                <span className="text-umber-900 dark:text-gray-100 font-semibold">Animations</span>
+              </div>
+              <ToggleSwitch enabled={animationsEnabled} onChange={() => setAnimationsEnabled(!animationsEnabled)} label="Animations" />
+            </div>
+
+            {/* Connection Quality */}
+            {connectionStats && (
+              <div className="flex items-center justify-between" data-testid="settings-connection">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">📡</span>
+                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Connection</span>
+                </div>
+                <ConnectionQualityBadge stats={connectionStats} />
+              </div>
+            )}
+
+            {/* Bot Management Button */}
+            {!isSpectator && onOpenBotManagement && (
+              <button
+                onClick={handleBotManagement}
+                className="w-full bg-parchment-200 dark:bg-gray-700 hover:bg-parchment-300 dark:hover:bg-gray-600 border border-amber-700 dark:border-gray-600 rounded px-3 py-2 transition-colors flex items-center justify-between"
+                data-testid="settings-bot-management"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🤖</span>
+                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Bot Management</span>
+                </div>
+                <span className="text-umber-700 dark:text-gray-300 text-sm">({botCount}/3)</span>
+              </button>
+            )}
+
+            {/* Divider */}
+            <div className="border-t border-amber-700/30 dark:border-gray-600"></div>
 
             {/* Clear Cache Button */}
             <button
