@@ -78,7 +78,10 @@ export function InlineBetStatus({
                 <span className="text-base">{display.icon}</span>
                 {isClickable ? (
                   <button
-                    onClick={() => onClickPlayer(player.name)}
+                    onClick={() => {
+                      console.log(`[InlineBetStatus] Clicked on ${player.name}, calling onClickPlayer`);
+                      onClickPlayer(player.name);
+                    }}
                     className="font-bold hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
                     data-testid={`player-name-${player.name}`}
                     title={`View ${player.name}'s profile`}

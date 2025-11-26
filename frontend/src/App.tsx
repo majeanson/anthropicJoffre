@@ -179,6 +179,8 @@ function AppContent() {
 
   // Handler to open player profile modal
   const handleClickPlayer = useCallback((playerName: string) => {
+    console.log(`[App.tsx] handleClickPlayer called with: ${playerName}`);
+    console.log(`[App.tsx] Setting profilePlayerName to: ${playerName}`);
     setProfilePlayerName(playerName);
   }, []);
 
@@ -1237,12 +1239,15 @@ function AppContent() {
         <ErrorBoundary componentName="PlayerProfileModal">
           <Suspense fallback={null}>
             {profilePlayerName && (
-              <PlayerProfileModal
-                playerName={profilePlayerName}
-                socket={socket}
-                isOpen={!!profilePlayerName}
-                onClose={() => setProfilePlayerName(null)}
-              />
+              <>
+                {console.log(`[App.tsx] Rendering PlayerProfileModal for: ${profilePlayerName}`)}
+                <PlayerProfileModal
+                  playerName={profilePlayerName}
+                  socket={socket}
+                  isOpen={!!profilePlayerName}
+                  onClose={() => setProfilePlayerName(null)}
+                />
+              </>
             )}
           </Suspense>
         </ErrorBoundary>
