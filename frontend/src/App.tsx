@@ -139,6 +139,7 @@ function AppContent() {
 
   // Sprint 2 Phase 2: Friends state
   const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
+  const [pendingFriendRequestsCount, setPendingFriendRequestsCount] = useState<number>(0);
 
   // Sprint 16: Swap request state
   const [swapRequest, setSwapRequest] = useState<{ fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean } | null>(null);
@@ -222,19 +223,44 @@ function AppContent() {
 
   // Sprint 2 Phase 2: Friend request notifications
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !auth.isAuthenticated) return;
+
+    // Fetch initial count when authenticated
+    socket.emit('get_friend_requests');
 
     const handleFriendRequestReceived = (notification: FriendRequestNotification) => {
       // Show toast notification
       setFriendRequestNotification(notification);
+      // Increment count
+      setPendingFriendRequestsCount(prev => prev + 1);
+    };
+
+    const handleFriendRequests = ({ requests }: { requests: unknown[] }) => {
+      setPendingFriendRequestsCount(requests.length);
+    };
+
+    const handleFriendRequestAccepted = () => {
+      // Decrement count when a request is accepted
+      setPendingFriendRequestsCount(prev => Math.max(0, prev - 1));
+    };
+
+    const handleFriendRequestRejected = () => {
+      // Decrement count when a request is rejected
+      setPendingFriendRequestsCount(prev => Math.max(0, prev - 1));
     };
 
     socket.on('friend_request_received', handleFriendRequestReceived);
+    socket.on('friend_requests', handleFriendRequests);
+    socket.on('friend_request_accepted_confirm', handleFriendRequestAccepted);
+    socket.on('friend_request_rejected', handleFriendRequestRejected);
 
     return () => {
       socket.off('friend_request_received', handleFriendRequestReceived);
+      socket.off('friend_requests', handleFriendRequests);
+      socket.off('friend_request_accepted_confirm', handleFriendRequestAccepted);
+      socket.off('friend_request_rejected', handleFriendRequestRejected);
     };
-  }, [socket])
+  }, [socket, auth.isAuthenticated])
 
   // Sprint 4 Phase 4.4: Game event listeners extracted to custom hook
   useGameEventListeners({
@@ -777,6 +803,7 @@ function AppContent() {
             onOpenBotManagement={() => setShowBotManagement(true)}
             onOpenAchievements={handleOpenAchievements}
             onOpenFriends={handleOpenFriends}
+            pendingFriendRequestsCount={pendingFriendRequestsCount}
             socket={socket}
             gameId={gameId}
             chatMessages={chatMessages}
@@ -846,6 +873,7 @@ function AppContent() {
           onOpenBotManagement={() => setShowBotManagement(true)}
           onOpenAchievements={handleOpenAchievements}
           onOpenFriends={handleOpenFriends}
+          pendingFriendRequestsCount={pendingFriendRequestsCount}
           onSwapPosition={handleSwapPosition}
           onClickPlayer={handleClickPlayer}
           socket={socket}

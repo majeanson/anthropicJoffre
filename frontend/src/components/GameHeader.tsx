@@ -19,6 +19,7 @@ interface GameHeaderProps {
   onOpenFriends?: () => void; // Sprint 2 Phase 2
   onOpenNotifications?: () => void; // Sprint 3 Phase 5
   unreadNotificationsCount?: number; // Sprint 3 Phase 5
+  pendingFriendRequestsCount?: number; // Sprint 16 - Friend requests badge
   botCount?: number;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
@@ -46,6 +47,7 @@ export function GameHeader({
   onOpenFriends,
   onOpenNotifications,
   unreadNotificationsCount = 0,
+  pendingFriendRequestsCount = 0,
   botCount = 0,
   autoplayEnabled = false,
   onAutoplayToggle,
@@ -249,12 +251,17 @@ export function GameHeader({
             {onOpenFriends && (
               <button
                 onClick={onOpenFriends}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
                 title="Friends"
                 data-testid="header-friends-button"
               >
                 <span className="text-base md:text-lg">👥</span>
                 <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Friends</span>
+                {pendingFriendRequestsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
+                    {pendingFriendRequestsCount}
+                  </span>
+                )}
               </button>
             )}
 

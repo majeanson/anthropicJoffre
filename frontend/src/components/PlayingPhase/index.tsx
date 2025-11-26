@@ -42,6 +42,7 @@ interface PlayingPhaseProps {
   onOpenBotManagement?: () => void;
   onOpenAchievements?: () => void;
   onOpenFriends?: () => void;
+  pendingFriendRequestsCount?: number; // Sprint 16 - Friend requests badge
   onSwapPosition?: (targetPlayerId: string) => void;
   onClickPlayer?: (playerName: string) => void;
   socket?: Socket | null;
@@ -65,6 +66,7 @@ function PlayingPhaseComponent({
   onOpenBotManagement,
   onOpenAchievements,
   onOpenFriends,
+  pendingFriendRequestsCount = 0,
   onSwapPosition,
   onClickPlayer,
   socket,
@@ -362,6 +364,7 @@ function PlayingPhaseComponent({
         onOpenBotManagement={onOpenBotManagement}
         onOpenAchievements={onOpenAchievements}
         onOpenFriends={onOpenFriends}
+        pendingFriendRequestsCount={pendingFriendRequestsCount}
         onOpenRules={() => setShowHowToPlay(true)}
         onOpenChat={() => setChatOpen(!chatOpen)}
         unreadChatCount={unreadChatCount}

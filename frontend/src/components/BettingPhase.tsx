@@ -29,6 +29,7 @@ interface BettingPhaseProps {
   onOpenBotManagement?: () => void;
   onOpenAchievements?: () => void; // Sprint 2 Phase 1
   onOpenFriends?: () => void; // Sprint 2 Phase 2
+  pendingFriendRequestsCount?: number; // Sprint 16 - Friend requests badge
   soundEnabled?: boolean;
   onSoundToggle?: () => void;
   connectionStats?: ConnectionStats;
@@ -38,7 +39,7 @@ interface BettingPhaseProps {
   onNewChatMessage?: (message: ChatMessage) => void;
 }
 
-function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
   // Get beginner mode setting
   const { beginnerMode } = useSettings();
 
@@ -249,6 +250,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
         onOpenBotManagement={onOpenBotManagement}
         onOpenAchievements={onOpenAchievements}
         onOpenFriends={onOpenFriends}
+        pendingFriendRequestsCount={pendingFriendRequestsCount}
         botCount={gameState.players.filter(p => p.isBot).length}
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
