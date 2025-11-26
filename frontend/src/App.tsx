@@ -53,6 +53,8 @@ import { useUIState } from './hooks/useUIState';
 import { useAutoplay } from './hooks/useAutoplay';
 // Sprint 4 Phase 4.4: Game event listeners hook
 import { useGameEventListeners } from './hooks/useGameEventListeners';
+// Tutorial achievement hook
+import { useTutorialAchievement } from './hooks/useTutorialAchievement';
 
 function AppContent() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
@@ -91,6 +93,9 @@ function AppContent() {
 
   // Settings context (includes beginner mode)
   const { beginnerMode } = useSettings();
+
+  // Tutorial achievement check (runs when all tutorials completed)
+  useTutorialAchievement({ socket });
 
   // Sprint 3 Refactoring: Audio management hook
   const { soundEnabled, toggleSound, playErrorSound } = useAudioManager({ gameState });

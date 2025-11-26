@@ -203,6 +203,12 @@ export function BeginnerTutorial({
         setDismissedPhases(newDismissed);
         localStorage.setItem('tutorialDismissed', JSON.stringify([...newDismissed]));
         onDismiss?.(currentStep.phase);
+
+        // Check if this was the last tutorial
+        const stats = getTutorialStats();
+        if (stats.allCompleted) {
+          console.log('🎉 All tutorials completed! Achievement will be unlocked on next socket connection.');
+        }
       }
       setCurrentStep(null);
       onClose?.();

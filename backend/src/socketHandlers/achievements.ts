@@ -53,6 +53,58 @@ export function registerAchievementHandlers(
       callback({ success: true, leaderboard });
     })
   );
+
+  // Check tutorial completion achievement
+  socket.on(
+    'check_tutorial_achievement',
+    errorBoundaries.gameAction('check_tutorial_achievement')(async ({ playerName }: { playerName: string }) => {
+      try {
+        // Unlock tutorial completion achievement
+        const result = await achievementDb.unlockAchievement(playerName, 'tutorial_complete');
+
+        if (result.isNewUnlock) {
+          console.log(`🎓 Tutorial achievement unlocked for ${playerName}`);
+
+          // Emit achievement unlocked event to player
+          socket.emit('achievement_unlocked', {
+            playerName,
+            achievement: result.achievement,
+            isNewUnlock: true,
+          });
+
+          // Create notification for authenticated users
+          try {
+            const { createNotification } = await import('../db/notifications.js');
+            const { getUserByUsername } = await import('../db/users.js');
+
+            const user = await getUserByUsername(playerName);
+            if (user) {
+              await createNotification({
+                user_id: user.user_id,
+                notification_type: 'achievement_unlocked',
+                title: `Achievement Unlocked: ${result.achievement.achievement_name}`,
+                message: result.achievement.description,
+                data: {
+                  achievement_id: result.achievement.achievement_id,
+                  achievement_name: result.achievement.achievement_name,
+                  achievement_icon: result.achievement.icon,
+                  achievement_tier: result.achievement.tier,
+                  points: result.achievement.points,
+                },
+                expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+              });
+            }
+          } catch (error) {
+            // Silently fail for guest users
+            console.log(`Achievement notification skipped for guest player: ${playerName}`);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking tutorial achievement:', error);
+        socket.emit('error', { message: 'Failed to check tutorial achievement' });
+      }
+    })
+  );
 }
 
 /**
