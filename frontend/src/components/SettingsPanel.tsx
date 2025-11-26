@@ -40,7 +40,7 @@ export function SettingsPanel({
   isSpectator = false,
   connectionStats
 }: SettingsPanelProps) {
-  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled } = useSettings();
+  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled, beginnerMode, setBeginnerMode } = useSettings();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
   if (!isOpen) return null;
@@ -113,6 +113,20 @@ export function SettingsPanel({
                 <span className="text-umber-900 dark:text-gray-100 font-semibold">Animations</span>
               </div>
               <ToggleSwitch enabled={animationsEnabled} onChange={() => setAnimationsEnabled(!animationsEnabled)} label="Animations" />
+            </div>
+
+            {/* Beginner Mode Toggle */}
+            <div className="flex items-center justify-between" data-testid="settings-beginner-mode">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">🎓</span>
+                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Beginner Mode</span>
+                </div>
+                <span className="text-xs text-umber-600 dark:text-gray-400 ml-8">
+                  Tutorial tips + 2x timeout (120s)
+                </span>
+              </div>
+              <ToggleSwitch enabled={beginnerMode} onChange={() => setBeginnerMode(!beginnerMode)} label="Beginner Mode" />
             </div>
 
             {/* Autoplay Toggle */}

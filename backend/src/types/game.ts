@@ -24,6 +24,7 @@ export interface Player {
   reconnectTimeLeft?: number; // Seconds left to reconnect (countdown)
   isEmpty?: boolean; // True if this is an empty seat waiting to be filled
   emptySlotName?: string; // Display name for empty slot (e.g., "Empty Seat" or previous player name)
+  beginnerMode?: boolean; // True if player has beginner mode enabled (2x timeout + tutorial tips)
 }
 
 export interface Bet {

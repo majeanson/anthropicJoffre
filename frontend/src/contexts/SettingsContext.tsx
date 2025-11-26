@@ -16,6 +16,8 @@ interface SettingsContextType {
   setDebugPanelOpen: (open: boolean) => void;
   testPanelOpen: boolean;
   setTestPanelOpen: (open: boolean) => void;
+  beginnerMode: boolean;
+  setBeginnerMode: (enabled: boolean) => void;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -42,6 +44,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
   const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
 
+  const [beginnerMode, setBeginnerModeState] = useState<boolean>(() => {
+    const saved = localStorage.getItem('beginnerMode');
+    return saved !== null ? JSON.parse(saved) : false;
+  });
+
   // Sync sound settings
   useEffect(() => {
     sounds.setEnabled(soundEnabled);
@@ -63,6 +70,11 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('animationsEnabled', JSON.stringify(animationsEnabled));
   }, [animationsEnabled]);
 
+  // Sync beginner mode settings
+  useEffect(() => {
+    localStorage.setItem('beginnerMode', JSON.stringify(beginnerMode));
+  }, [beginnerMode]);
+
   const setSoundEnabled = (enabled: boolean) => {
     setSoundEnabledState(enabled);
     sounds.setEnabled(enabled);
@@ -77,6 +89,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const setAnimationsEnabled = (enabled: boolean) => {
     setAnimationsEnabledState(enabled);
+  };
+
+  const setBeginnerMode = (enabled: boolean) => {
+    setBeginnerModeState(enabled);
   };
 
   return (
@@ -96,6 +112,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         setDebugPanelOpen,
         testPanelOpen,
         setTestPanelOpen,
+        beginnerMode,
+        setBeginnerMode,
       }}
     >
       {children}

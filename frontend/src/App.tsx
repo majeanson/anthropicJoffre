@@ -28,6 +28,7 @@ import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
 import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal state management
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
+import { useSettings } from './contexts/SettingsContext'; // Settings including beginner mode
 import { preloadCardImages } from './utils/imagePreloader';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ReplayErrorFallback } from './components/fallbacks/ReplayErrorFallback';
@@ -85,6 +86,9 @@ function AppContent() {
 
   // Sprint 6: Connection quality monitoring
   const connectionStats = useConnectionQuality(socket);
+
+  // Settings context (includes beginner mode)
+  const { beginnerMode } = useSettings();
 
   // Sprint 3 Refactoring: Audio management hook
   const { soundEnabled, toggleSound, playErrorSound } = useAudioManager({ gameState });
@@ -333,7 +337,7 @@ function AppContent() {
       // Store player name in localStorage for persistence
       localStorage.setItem('playerName', playerName);
       setCurrentPlayerName(playerName); // Update stable identifier
-      socket.emit('create_game', { playerName, persistenceMode });
+      socket.emit('create_game', { playerName, persistenceMode, beginnerMode });
     }
   };
 
@@ -346,7 +350,7 @@ function AppContent() {
     localStorage.setItem('playerName', playerName);
     setCurrentPlayerName(playerName); // Update stable identifier
 
-    socket.emit('join_game', { gameId, playerName });
+    socket.emit('join_game', { gameId, playerName, beginnerMode });
     setGameId(gameId);
   };
 

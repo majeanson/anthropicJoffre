@@ -139,6 +139,7 @@ export const persistenceModeSchema = z.enum(['elo', 'casual']);
 export const createGamePayloadSchema = z.object({
   playerName: playerNameSchema,
   persistenceMode: persistenceModeSchema.default('elo').optional(),
+  beginnerMode: booleanSchema.optional(),
 }).strict();
 
 /**
@@ -151,6 +152,7 @@ export const joinGamePayloadSchema = z.object({
   playerName: playerNameSchema,
   isBot: booleanSchema.optional(),
   botDifficulty: botDifficultySchema.optional(),
+  beginnerMode: booleanSchema.optional(),
 }).strict();
 
 /**

@@ -14,7 +14,8 @@ import { GameState } from '../types/game';
 
 // Timeout durations
 const BETTING_TIMEOUT = 30000; // 30 seconds for betting
-const PLAYING_TIMEOUT = 45000; // 45 seconds for playing a card
+const PLAYING_TIMEOUT = 60000; // 60 seconds for playing a card
+const BEGINNER_MULTIPLIER = 2; // Beginners get 2x timeout (120s for playing, 60s for betting)
 
 /**
  * Clear timeout for a specific player
@@ -83,7 +84,12 @@ export function startPlayerTimeout(
   // Clear any existing timeout for this player
   clearPlayerTimeout(gameId, playerName, activeTimeouts);
 
-  const timeoutDuration = phase === 'betting' ? BETTING_TIMEOUT : PLAYING_TIMEOUT;
+  // Calculate timeout duration (2x for beginner mode)
+  let timeoutDuration = phase === 'betting' ? BETTING_TIMEOUT : PLAYING_TIMEOUT;
+  if (player.beginnerMode) {
+    timeoutDuration *= BEGINNER_MULTIPLIER;
+  }
+
   const startTime = Date.now();
 
   // Send countdown updates every second

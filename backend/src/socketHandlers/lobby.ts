@@ -171,7 +171,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       return;
     }
 
-    const { playerName: validatedPlayerName, persistenceMode = 'elo' } = validation.data;
+    const { playerName: validatedPlayerName, persistenceMode = 'elo', beginnerMode = false } = validation.data;
 
     // Apply game creation rate limiting
     // Access remote address via socket.handshake (standard Socket.IO API)
@@ -190,6 +190,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       tricksWon: 0,
       pointsWon: 0,
       isBot: false, // Game creator is always human
+      beginnerMode, // Pass through beginner mode setting
     };
 
     const gameState: GameState = {
@@ -292,7 +293,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       botDifficulty: validation.data.botDifficulty
     });
 
-    const { gameId, playerName: validatedPlayerName, isBot, botDifficulty } = validation.data;
+    const { gameId, playerName: validatedPlayerName, isBot, botDifficulty, beginnerMode = false } = validation.data;
 
     // Player name is already validated and sanitized by Zod schema
     const sanitizedName = validatedPlayerName;
@@ -412,6 +413,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
           isBot: isBot || false,
           botDifficulty: isBot ? (botDifficulty || 'medium') : undefined,
           connectionStatus: 'connected',
+          beginnerMode: isBot ? false : beginnerMode, // Only humans can have beginner mode
         };
 
         socket.join(gameId);
@@ -470,6 +472,7 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       isBot: isBot || false,
       botDifficulty: isBot ? (botDifficulty || 'medium') : undefined,
       connectionStatus: 'connected',
+      beginnerMode: isBot ? false : beginnerMode, // Only humans can have beginner mode
     };
 
     game.players.push(player);

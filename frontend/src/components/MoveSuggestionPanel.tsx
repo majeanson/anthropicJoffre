@@ -1,0 +1,121 @@
+/**
+ * Move Suggestion Panel for Beginner Mode
+ * Shows suggested moves with explanations
+ */
+
+import { useState } from 'react';
+import { GameState, Card } from '../types/game';
+import { suggestMove, suggestBet } from '../utils/moveSuggestion';
+
+interface MoveSuggestionPanelProps {
+  gameState: GameState;
+  currentPlayerId: string;
+  isMyTurn: boolean;
+}
+
+export function MoveSuggestionPanel({
+  gameState,
+  currentPlayerId,
+  isMyTurn,
+}: MoveSuggestionPanelProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  if (!isMyTurn) return null;
+
+  const renderBettingSuggestion = () => {
+    const suggestion = suggestBet(gameState, currentPlayerId);
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">💡</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              {suggestion.skip ? 'Consider Skipping' : `Suggested Bet: ${suggestion.amount} points`}
+            </p>
+            {isExpanded && (
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                {suggestion.reason}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPlayingSuggestion = () => {
+    const suggestion = suggestMove(gameState, currentPlayerId);
+    if (!suggestion) return null;
+
+    const getPriorityColor = () => {
+      switch (suggestion.priority) {
+        case 'high':
+          return 'text-green-600 dark:text-green-400';
+        case 'medium':
+          return 'text-yellow-600 dark:text-yellow-400';
+        case 'low':
+          return 'text-gray-600 dark:text-gray-400';
+      }
+    };
+
+    const getCardDisplay = (card: Card) => {
+      const colorEmoji: Record<string, string> = {
+        red: '🔴',
+        blue: '🔵',
+        green: '🟢',
+        brown: '🟤',
+      };
+
+      return `${card.value} ${colorEmoji[card.color]}`;
+    };
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">🎯</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+              Suggested: <span className={getPriorityColor()}>{getCardDisplay(suggestion.card)}</span>
+            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-400">
+              {suggestion.reason}
+            </p>
+            {isExpanded && (
+              <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
+                {suggestion.explanation}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-3 shadow-md">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1">
+          {gameState.phase === 'betting' && renderBettingSuggestion()}
+          {gameState.phase === 'playing' && renderPlayingSuggestion()}
+        </div>
+
+        {/* Expand/Collapse Button */}
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors text-lg"
+          title={isExpanded ? 'Show less' : 'Show more'}
+        >
+          {isExpanded ? '▲' : '▼'}
+        </button>
+      </div>
+
+      {/* Additional Help Text */}
+      {!isExpanded && (
+        <p className="text-xs text-blue-500 dark:text-blue-400 mt-2">
+          Click ▼ for detailed explanation
+        </p>
+      )}
+    </div>
+  );
+}
