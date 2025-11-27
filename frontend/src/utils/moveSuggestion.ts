@@ -616,8 +616,21 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
     };
   }
 
-  // CASE 4: Can't win - throw away lowest (avoid brown 0 if possible)
+  // CASE 4: Can't win - DEFENSIVE PLAY based on who's winning
   const brownZero = playableCards.find(c => c.value === 0 && c.color === 'brown');
+  const opponentWinning = currentWinner && currentWinner.playerName !== teammate?.name && currentWinner.playerName !== playerName;
+
+  // If OPPONENT is winning and we have brown 0, POISON their trick!
+  if (opponentWinning && brownZero) {
+    return {
+      card: brownZero,
+      priority: 'high',
+      reason: '💀 POISON opponent\'s trick!',
+      explanation: `Opponent is winning. Play Brown 0 to give them -2 points! This turns their winning trick into a penalty. Defensive play at its best!`,
+    };
+  }
+
+  // If TEAMMATE is winning, avoid brown 0
   const nonBrownCards = playableCards.filter(c => !(c.value === 0 && c.color === 'brown'));
 
   if (nonBrownCards.length > 0) {
@@ -626,9 +639,9 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
     return {
       card: lowestNonBrown,
       priority: 'low',
-      reason: 'Can\'t win - throw lowest',
-      explanation: `You can't win this trick. Play ${lowestNonBrown.value} ${lowestNonBrown.color} (your lowest non-brown-0) to save better cards.`,
-      alternatives: brownZero ? `Avoid Brown 0 to not give -2 points to opponents if they win.` : undefined,
+      reason: teammateWinning ? 'Teammate winning - save cards' : 'Can\'t win - throw lowest',
+      explanation: `You can't win this trick. Play ${lowestNonBrown.value} ${lowestNonBrown.color} (your lowest non-brown-0) to ${teammateWinning ? 'help your teammate' : 'save better cards'}.`,
+      alternatives: brownZero && !teammateWinning ? `Brown 0 would poison the trick if opponent wins, but save it if uncertain.` : undefined,
     };
   }
 
@@ -637,8 +650,10 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
     return {
       card: brownZero,
       priority: 'low',
-      reason: 'Only option left',
-      explanation: `You can't win and only have Brown 0 left. This will give -2 points to whoever wins the trick, but you have no choice.`,
+      reason: opponentWinning ? '💀 POISON opponent\'s trick!' : 'Only option left',
+      explanation: opponentWinning
+        ? `Opponent is winning. Brown 0 will give them -2 points! Turn their win into a penalty.`
+        : `You can't win and only have Brown 0 left. This will give -2 points to whoever wins the trick, but you have no choice.`,
     };
   }
 

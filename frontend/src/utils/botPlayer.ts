@@ -486,28 +486,26 @@ export class BotPlayer {
     const tricksRemaining = player ? player.hand.length : 0;
     const isEndgame = tricksRemaining <= 2;
 
-    // IMPROVEMENT #10: Better brown 0 disposal timing
+    // IMPROVEMENT #10: Better brown 0 disposal timing - DEFENSIVE POISON STRATEGY
     const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
     if (brownZero) {
-      // ENDGAME: Keep brown 0 if we're behind in bet (force opponent to take -2)
-      if (isEndgame && partner) {
-        const ourTeam = gameState.players.filter(p => p.teamId === player!.teamId);
-        const opponentTeam = gameState.players.filter(p => p.teamId !== player!.teamId);
-        const ourPoints = ourTeam.reduce((sum, p) => sum + p.pointsWon, 0);
-        const theirPoints = opponentTeam.reduce((sum, p) => sum + p.pointsWon, 0);
+      // Determine who's winning the trick
+      const opponentWinning = currentWinner && partner && currentWinner !== playerId && currentWinner !== partner.id;
+      const partnerWinning = currentWinner && partner && currentWinner === partner.id;
+      const canWinTrick = impacts.some(i => i.canWinTrick);
 
-        // If behind, keep brown 0 to minimize their points
-        if (ourPoints < theirPoints) {
-          // Don't play brown 0 in endgame when behind
-        } else {
-          // If ahead or tied, dump brown 0 when safe
-          if (position > 1 && (!currentWinner || currentWinner !== playerId) && (!partner || currentWinner !== partner.id)) {
-            return brownZero.card;
-          }
-        }
-      } else {
-        // EARLY/MID GAME: Dump brown 0 when opponent leading weak suits
-        if (position > 1 && (!currentWinner || currentWinner !== playerId) && (!partner || currentWinner !== partner.id)) {
+      // PRIORITY 1: POISON opponent's trick if they're winning and we can't win
+      if (opponentWinning && !canWinTrick) {
+        return brownZero.card; // Give them -2 points! Defensive masterclass
+      }
+
+      // PRIORITY 2: Avoid brown 0 if partner is winning (don't hurt your own team!)
+      if (partnerWinning) {
+        // Skip brown 0 disposal - keep it for later
+      } else if (!canWinTrick) {
+        // PRIORITY 3: Uncertain who wins, but we can't win - dump it strategically
+        // In mid/late game when we can't win, dump it on opponents
+        if (position > 1 && (!currentWinner || currentWinner !== playerId)) {
           return brownZero.card;
         }
       }
