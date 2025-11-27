@@ -21,7 +21,6 @@ import { sounds } from '../../utils/sounds';
 import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
-import { MoveSuggestionPanel } from '../MoveSuggestionPanel';
 import { suggestMove } from '../../utils/moveSuggestion';
 
 // Extracted components
@@ -473,19 +472,6 @@ function PlayingPhaseComponent({
               beginnerMode={beginnerMode}
               isCurrentTurn={isCurrentTurn}
             />
-
-            {/* Beginner Mode: Move Suggestion - Overlaid above bottom of playing field */}
-            {beginnerMode && !isSpectator && isCurrentTurn && (
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-md w-full px-4 pointer-events-none">
-                <div className="opacity-95 pointer-events-auto">
-                  <MoveSuggestionPanel
-                    gameState={gameState}
-                    currentPlayerId={currentPlayerId}
-                    isMyTurn={isCurrentTurn}
-                  />
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

@@ -205,7 +205,8 @@ export const TrickArea = memo(function TrickArea({
     );
 
     // Check if bot has thinking reason in current trick
-    const botThinking = player?.isBot && player.name && botThinkingMap.has(player.name)
+    // ONLY show in beginner mode
+    const botThinking = beginnerMode && player?.isBot && player.name && botThinkingMap.has(player.name)
       ? botThinkingMap.get(player.name)!
       : null;
     const botThinkingOpen = player?.name ? openThinkingButtons.has(player.name) : false;

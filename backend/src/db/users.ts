@@ -405,3 +405,112 @@ export async function emailExists(email: string): Promise<boolean> {
     return false;
   }
 }
+
+/**
+ * Get user preferences
+ */
+export async function getUserPreferences(userId: number): Promise<{
+  theme?: string;
+  sound_enabled?: boolean;
+  sound_volume?: number;
+  notifications_enabled?: boolean;
+  email_notifications?: boolean;
+  language?: string;
+  autoplay_enabled?: boolean;
+  beginner_mode?: boolean;
+} | null> {
+  try {
+    const result = await query(
+      `SELECT theme, sound_enabled, sound_volume, notifications_enabled,
+              email_notifications, language, autoplay_enabled, beginner_mode
+       FROM user_preferences
+       WHERE user_id = $1`,
+      [userId]
+    );
+
+    return result.rows[0] || null;
+  } catch (error) {
+    console.error('Error getting user preferences:', error);
+    return null;
+  }
+}
+
+/**
+ * Update user preferences
+ */
+export async function updateUserPreferences(
+  userId: number,
+  updates: {
+    theme?: string;
+    sound_enabled?: boolean;
+    sound_volume?: number;
+    notifications_enabled?: boolean;
+    email_notifications?: boolean;
+    language?: string;
+    autoplay_enabled?: boolean;
+    beginner_mode?: boolean;
+  }
+): Promise<boolean> {
+  try {
+    const setClauses: string[] = [];
+    const values: unknown[] = [];
+    let paramIndex = 1;
+
+    if (updates.theme !== undefined) {
+      setClauses.push(`theme = $${paramIndex++}`);
+      values.push(updates.theme);
+    }
+
+    if (updates.sound_enabled !== undefined) {
+      setClauses.push(`sound_enabled = $${paramIndex++}`);
+      values.push(updates.sound_enabled);
+    }
+
+    if (updates.sound_volume !== undefined) {
+      setClauses.push(`sound_volume = $${paramIndex++}`);
+      values.push(updates.sound_volume);
+    }
+
+    if (updates.notifications_enabled !== undefined) {
+      setClauses.push(`notifications_enabled = $${paramIndex++}`);
+      values.push(updates.notifications_enabled);
+    }
+
+    if (updates.email_notifications !== undefined) {
+      setClauses.push(`email_notifications = $${paramIndex++}`);
+      values.push(updates.email_notifications);
+    }
+
+    if (updates.language !== undefined) {
+      setClauses.push(`language = $${paramIndex++}`);
+      values.push(updates.language);
+    }
+
+    if (updates.autoplay_enabled !== undefined) {
+      setClauses.push(`autoplay_enabled = $${paramIndex++}`);
+      values.push(updates.autoplay_enabled);
+    }
+
+    if (updates.beginner_mode !== undefined) {
+      setClauses.push(`beginner_mode = $${paramIndex++}`);
+      values.push(updates.beginner_mode);
+    }
+
+    if (setClauses.length === 0) {
+      return true; // Nothing to update
+    }
+
+    values.push(userId);
+
+    await query(
+      `UPDATE user_preferences SET ${setClauses.join(', ')}
+       WHERE user_id = $${paramIndex}`,
+      values
+    );
+
+    return true;
+  } catch (error) {
+    console.error('Error updating user preferences:', error);
+    return false;
+  }
+}

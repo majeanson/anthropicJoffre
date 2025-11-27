@@ -23,11 +23,10 @@ export interface BetSuggestion {
 
 /**
  * Find the best trump color for this hand
- * During betting, assume you'll choose the best trump if you win
+ * During betting, assume you'll choose the trump with the MOST cards if you win
  *
- * IMPROVEMENT #1: Void suit trump selection
- * Void in a suit is HUGE advantage - you can cut every time that suit is led!
- * Especially powerful if void is in RED (can capture all Red 0 tricks for +5 points)
+ * IMPORTANT: Void suits are NOT chosen during betting - they only help if opponents choose them!
+ * During betting, you want the suit where you have the most control (most cards + high cards)
  */
 function findBestTrump(hand: Card[]): CardColor {
   const colorDistribution = new Map<CardColor, number>();
@@ -47,51 +46,8 @@ function findBestTrump(hand: Card[]): CardColor {
     }
   });
 
-  // Check for void suits (0 cards in a color)
-  const voidSuits = colors.filter(color => colorDistribution.get(color) === 0);
-
-  // STRATEGY: If void in red, strongly prefer making red trump
-  // This allows cutting all Red 0 tricks for +5 bonus points!
-  if (voidSuits.includes('red')) {
-    // Find the suit with the most cards that ISN'T red
-    let bestNonRedScore = 0;
-
-    (['brown', 'green', 'blue'] as CardColor[]).forEach(color => {
-      const count = colorDistribution.get(color) || 0;
-      const highCards = colorHighCards.get(color) || 0;
-      const score = count + (highCards * 2);
-      if (score > bestNonRedScore) {
-        bestNonRedScore = score;
-      }
-    });
-
-    // Make red trump (which we're void in) if we have decent cards in another suit
-    if (bestNonRedScore >= 3) {
-      return 'red';
-    }
-  }
-
-  // Check for ANY void suit - major advantage
-  if (voidSuits.length > 0) {
-    // Prefer void in non-red suits (less critical but still powerful)
-    const nonRedVoids = voidSuits.filter(v => v !== 'red');
-    if (nonRedVoids.length > 0) {
-      // Make the void suit trump if we have at least 3 cards in another suit
-      const voidToConsider = nonRedVoids[0];
-      const otherSuits = colors.filter(c => c !== voidToConsider);
-      const bestOtherSuit = otherSuits.reduce((best, color) => {
-        const score = (colorDistribution.get(color) || 0) + ((colorHighCards.get(color) || 0) * 2);
-        const bestScore = (colorDistribution.get(best) || 0) + ((colorHighCards.get(best) || 0) * 2);
-        return score > bestScore ? color : best;
-      });
-
-      if ((colorDistribution.get(bestOtherSuit) || 0) >= 3) {
-        return voidToConsider;
-      }
-    }
-  }
-
-  // No void advantage - find color with best combination of quantity and quality
+  // Find color with best combination of quantity and quality
+  // Prioritize suits where we have the most cards (trump control)
   let bestTrump: CardColor = 'red';
   let bestScore = 0;
 
@@ -136,6 +92,9 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
   let hasSevenInColor = false;
   let noRedCards = true;
 
+  // Track trump high cards separately
+  let trumpHighCards = 0;
+
   hand.forEach((card) => {
     // Count cards by color
     colorDistribution.set(card.color, (colorDistribution.get(card.color) || 0) + 1);
@@ -148,6 +107,9 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
     // Count trump cards (using optimal trump if betting)
     if (card.color === optimalTrump) {
       trumpCount++;
+      if (card.value >= 6) {
+        trumpHighCards++;
+      }
       if (card.value >= 5) estimatedTricks += 1;
       if (card.value === 7) {
         estimatedTricks += 0.5;
@@ -175,6 +137,37 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
       dominantColor = color;
     }
   });
+
+  // IMPROVEMENT: Long trump suit bonus (5+ trump = trump bleed strategy)
+  // With 5+ trump, you can:
+  // 1. Bleed out opponents' trump (force them to use all their trump)
+  // 2. Then your high non-trump cards (like 7 red) become unbeatable
+  // 3. Control the game flow and win high-value tricks
+  if (trumpCount >= 5) {
+    // Base bonus for having 5+ trump (can control trump flow)
+    estimatedTricks += 1.5;
+
+    // Additional bonus if you have high trump (6 or 7)
+    // With high trump + many trump, you can guarantee winning key tricks
+    if (trumpHighCards >= 1) {
+      estimatedTricks += 1.0;
+    }
+
+    // Extra bonus for 6+ or 7+ trump (overwhelming trump control)
+    if (trumpCount >= 6) estimatedTricks += 1.0;
+    if (trumpCount >= 7) estimatedTricks += 1.5;
+  }
+
+  // IMPROVEMENT: Non-trump 7 bonus when you have trump control
+  // If you have 5+ trump AND a 7 in another suit, that 7 is almost guaranteed to win
+  // because you can bleed trump first, then play your 7 (nobody can cut it)
+  if (trumpCount >= 5) {
+    hand.forEach(card => {
+      if (card.value === 7 && card.color !== optimalTrump) {
+        estimatedTricks += 1.5; // High-value guaranteed win after trump bleed
+      }
+    });
+  }
 
   return {
     trumpCount,
@@ -282,14 +275,21 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
     };
   }
 
-  // CASE 4: Good hand with no red cards (can cut with trump for Red 0) - Suggest 8-9
+  // CASE 4: Good hand with no red cards (void suit advantage) - Suggest 8-9
   if (strength.noRedCards && strength.trumpCount >= 3) {
+    // Check if optimal trump is red (void in red)
+    const isVoidRed = strength.optimalTrump === 'red';
+
     return {
-      amount: 8,
+      amount: isVoidRed ? 9 : 8,
       withoutTrump: false,
       skip: false,
-      reason: `✂️ MEDIUM - No red cards! Cut Red 0 with ${strength.optimalTrump} trump (${strength.trumpCount} cards)`,
-      alternatives: `Alternative: Bet 7 to play safe, or 9 if you're confident in controlling Red 0 tricks.`,
+      reason: isVoidRed
+        ? `✂️ FUNKY - Void in red! Make red trump to cut all red tricks for +5 points (${strength.trumpCount} ${strength.optimalTrump} cards)`
+        : `✂️ MEDIUM - No red cards! Cut Red 0 with ${strength.optimalTrump} trump (${strength.trumpCount} cards)`,
+      alternatives: isVoidRed
+        ? `Void suits are powerful! Every time red is led, you cut with ${strength.optimalTrump} trump. Alternative: Bet 8 for less risk.`
+        : `Alternative: Bet 7 to play safe, or 9 if you're confident in controlling Red 0 tricks.`,
     };
   }
 

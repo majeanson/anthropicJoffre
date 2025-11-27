@@ -1,9 +1,9 @@
 /**
  * BotThinkingIndicator Component
- * IMPROVEMENT #11: Bot thinking tooltips UI (Mobile-Friendly Toggle Version)
+ * Press-to-show button for bot thinking insights
  *
- * Small floating button that toggles tooltip showing what the bot is thinking
- * Mobile-friendly: User controls when to see the information
+ * Hold button to peek at what the bot is thinking, release to hide
+ * User controls when to see bot decision-making process
  */
 
 interface BotThinkingIndicatorProps {
@@ -24,27 +24,31 @@ export function BotThinkingIndicator({ botName, action, isOpen, onToggle, positi
   }[position];
 
   return (
-    <div className="relative inline-flex">
-      {/* Toggle Button - Small, mobile-friendly */}
+    <div className="relative inline-flex z-[60]">
+      {/* Press-to-Show Button - Hold to peek */}
       <button
-        onClick={onToggle}
-        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center ${
+        onMouseDown={onToggle}
+        onMouseUp={onToggle}
+        onMouseLeave={isOpen ? onToggle : undefined}
+        onTouchStart={onToggle}
+        onTouchEnd={onToggle}
+        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[60] ${
           isOpen
             ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white scale-110'
             : 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 hover:scale-105'
         }`}
-        aria-label={`${isOpen ? 'Hide' : 'Show'} ${botName}'s thinking`}
-        title={`${isOpen ? 'Hide' : 'Show'} what ${botName} is thinking`}
+        aria-label="Press to show bot thinking"
+        title="Press and hold to see what the bot is thinking"
       >
         <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`}>
           🤖
         </span>
       </button>
 
-      {/* Tooltip - Appears on toggle */}
+      {/* Tooltip - Appears while pressed */}
       {isOpen && (
         <div
-          className={`absolute z-50 ${tooltipPosition} whitespace-nowrap pointer-events-none`}
+          className={`absolute z-[70] ${tooltipPosition} whitespace-nowrap pointer-events-none`}
           style={{ maxWidth: '90vw' }}
         >
           <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300">
