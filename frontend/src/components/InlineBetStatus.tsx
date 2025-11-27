@@ -15,6 +15,10 @@ export function InlineBetStatus({
   currentPlayerIndex,
   onClickPlayer
 }: InlineBetStatusProps) {
+  console.log('[InlineBetStatus] Component rendering');
+  console.log('[InlineBetStatus] onClickPlayer prop:', onClickPlayer ? 'EXISTS' : 'MISSING');
+  console.log('[InlineBetStatus] Players:', players.map(p => ({ name: p.name, isBot: p.isBot, isEmpty: p.isEmpty })));
+
   const getBetDisplay = (player: Player): { icon: string; text: string; color: string } => {
     const bet = currentBets.get(player.name);
     const isCurrentPlayer = players[currentPlayerIndex]?.id === player.id;
@@ -66,6 +70,13 @@ export function InlineBetStatus({
         {players.map((player) => {
           const display = getBetDisplay(player);
           const isClickable = !player.isEmpty && !player.isBot && onClickPlayer;
+
+          // Debug: Log all conditions
+          console.log(`[InlineBetStatus] Player: ${player.name}`);
+          console.log(`  - isEmpty: ${player.isEmpty}`);
+          console.log(`  - isBot: ${player.isBot}`);
+          console.log(`  - onClickPlayer exists: ${!!onClickPlayer}`);
+          console.log(`  - isClickable: ${isClickable}`);
 
           return (
             <div
