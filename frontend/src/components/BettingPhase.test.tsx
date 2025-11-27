@@ -130,9 +130,11 @@ function renderWithSettings(component: React.ReactElement) {
 
 describe('BettingPhase', () => {
   let mockOnPlaceBet: ReturnType<typeof vi.fn>;
+  let mockOnClickPlayer: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     mockOnPlaceBet = vi.fn();
+    mockOnClickPlayer = vi.fn();
   });
 
   describe('Rendering and Basic UI', () => {
@@ -147,6 +149,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={0}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -173,6 +176,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={0}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -196,6 +200,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -218,6 +223,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -237,6 +243,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -261,6 +268,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1} // Not dealer
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -281,6 +289,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={0} // Is dealer
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -303,6 +312,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -329,6 +339,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -353,6 +364,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -377,6 +389,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={3}
           dealerIndex={0}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -401,6 +414,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={0} // Current player IS dealer
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -422,6 +436,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1} // Current player is NOT dealer
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -443,6 +458,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0} // Player 1's turn (index 0)
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -461,6 +477,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={1} // Player 2's turn, not player 1
           dealerIndex={0}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -481,6 +498,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -500,6 +518,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -520,6 +539,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={1}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );
@@ -539,6 +559,7 @@ describe('BettingPhase', () => {
           currentPlayerIndex={0}
           dealerIndex={0}
           onPlaceBet={mockOnPlaceBet}
+          onClickPlayer={mockOnClickPlayer}
           gameState={game}
         />
       );

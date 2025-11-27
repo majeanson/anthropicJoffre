@@ -37,10 +37,14 @@ interface BettingPhaseProps {
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
-  onClickPlayer?: (playerName: string) => void; // Click player to view profile
+  onClickPlayer: (playerName: string) => void; // Click player to view profile (REQUIRED)
 }
 
 function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage, onClickPlayer }: BettingPhaseProps) {
+  console.log('[BettingPhase] Received onClickPlayer:', onClickPlayer);
+  console.log('[BettingPhase] onClickPlayer type:', typeof onClickPlayer);
+  console.log('[BettingPhase] onClickPlayer stringified:', onClickPlayer?.toString());
+
   // Get beginner mode setting
   const { beginnerMode } = useSettings();
 

@@ -5,7 +5,7 @@ interface InlineBetStatusProps {
   currentBets: Map<string, { amount: number; withoutTrump: boolean }>;
   skippedPlayers: Set<string>;
   currentPlayerIndex: number;
-  onClickPlayer?: (playerName: string) => void;
+  onClickPlayer: (playerName: string) => void; // REQUIRED - Click player to view profile
 }
 
 export function InlineBetStatus({
@@ -16,7 +16,9 @@ export function InlineBetStatus({
   onClickPlayer
 }: InlineBetStatusProps) {
   console.log('[InlineBetStatus] Component rendering');
-  console.log('[InlineBetStatus] onClickPlayer prop:', onClickPlayer ? 'EXISTS' : 'MISSING');
+  console.log('[InlineBetStatus] onClickPlayer (required):', onClickPlayer);
+  console.log('[InlineBetStatus] onClickPlayer type:', typeof onClickPlayer);
+  console.log('[InlineBetStatus] onClickPlayer stringified:', onClickPlayer.toString());
   console.log('[InlineBetStatus] Players:', players.map(p => ({ name: p.name, isBot: p.isBot, isEmpty: p.isEmpty })));
 
   const getBetDisplay = (player: Player): { icon: string; text: string; color: string } => {
@@ -69,13 +71,13 @@ export function InlineBetStatus({
       <div className="space-y-2">
         {players.map((player) => {
           const display = getBetDisplay(player);
-          const isClickable = !player.isEmpty && !player.isBot && onClickPlayer;
+          // Real players (not bots or empty seats) are clickable to view profiles
+          const isClickable = !player.isEmpty && !player.isBot;
 
           // Debug: Log all conditions
           console.log(`[InlineBetStatus] Player: ${player.name}`);
           console.log(`  - isEmpty: ${player.isEmpty}`);
           console.log(`  - isBot: ${player.isBot}`);
-          console.log(`  - onClickPlayer exists: ${!!onClickPlayer}`);
           console.log(`  - isClickable: ${isClickable}`);
 
           return (
