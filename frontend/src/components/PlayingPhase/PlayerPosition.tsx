@@ -105,13 +105,19 @@ export const PlayerPosition = memo(function PlayerPosition({
 
   // Handle player name click (allow clicking on own profile and other real players, not bots)
   const handleNameClick = () => {
+    console.log(`[PlayerPosition] handleNameClick called for ${player?.name}`);
     if (player && !player.isEmpty && !player.isBot && onClickPlayer) {
+      console.log(`[PlayerPosition] Calling onClickPlayer with ${player.name}`);
       onClickPlayer(player.name);
+    } else {
+      console.log(`[PlayerPosition] Click blocked - isEmpty:${player?.isEmpty}, isBot:${player?.isBot}, onClickPlayer:${!!onClickPlayer}`);
     }
   };
 
   // Players can click on their own profile and other real players (not bots or empty seats)
   const isClickable = player && !player.isEmpty && !player.isBot && onClickPlayer;
+
+  console.log(`[PlayerPosition] ${player?.name} - isClickable:${isClickable}, isEmpty:${player?.isEmpty}, isBot:${player?.isBot}, onClickPlayer:${!!onClickPlayer}`);
 
   return (
     <div className="flex items-center">

@@ -181,6 +181,52 @@ function canBeatCard(myCard: Card, winningCard: Card, _ledSuit: CardColor, trump
   return false;
 }
 
+/**
+ * Check if this card is GUARANTEED to win (no unplayed cards can beat it)
+ * This accounts for cards already played in the trick and ensures we play high enough to win
+ */
+function isGuaranteedWin(myCard: Card, currentTrick: { card: Card }[], trump: CardColor | null): boolean {
+  const ledSuit = currentTrick.length > 0 ? currentTrick[0].card.color : myCard.color;
+  const playedCards = currentTrick.map(t => t.card);
+
+  // If my card is trump
+  if (myCard.color === trump) {
+    // Check if any higher trump values could still be unplayed
+    for (let val = myCard.value + 1; val <= 7; val++) {
+      const alreadyPlayed = playedCards.some(c => c.color === trump && c.value === val);
+      if (!alreadyPlayed) {
+        // A higher trump could still beat us
+        return false;
+      }
+    }
+    return true; // All higher trumps have been played
+  }
+
+  // If my card is led suit (not trump)
+  if (myCard.color === ledSuit) {
+    // Check if any higher cards in led suit could beat us
+    for (let val = myCard.value + 1; val <= 7; val++) {
+      const alreadyPlayed = playedCards.some(c => c.color === ledSuit && c.value === val);
+      if (!alreadyPlayed) {
+        return false; // A higher led suit card could beat us
+      }
+    }
+
+    // Check if trump could still beat us
+    if (trump && trump !== ledSuit) {
+      const trumpPlayed = playedCards.some(c => c.color === trump);
+      if (!trumpPlayed) {
+        return false; // Trump could still beat us
+      }
+    }
+
+    return true; // Safe - no higher led suit cards and no trump
+  }
+
+  // My card is neither trump nor led suit - can't win
+  return false;
+}
+
 // Note: This function is kept for future enhancements but not currently used
 // It could be useful for more sophisticated probability calculations
 // function countBetterCards(myCard: Card, _ledSuit: CardColor, trump: CardColor | null, trickSoFar: { card: Card }[]): number {
@@ -318,28 +364,36 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
   const ledSuit = currentTrick[0].card.color;
   const winningCard = currentWinner ? currentWinner.card : currentTrick[0].card;
 
-  // Find cards that can win
-  const winningCards = playableCards.filter(c => canBeatCard(c, winningCard, ledSuit, trump));
+  // Find cards that can win CURRENTLY
+  const potentialWinningCards = playableCards.filter(c => canBeatCard(c, winningCard, ledSuit, trump));
 
-  if (winningCards.length > 0) {
+  if (potentialWinningCards.length > 0) {
+    // Find cards that are GUARANTEED to win (accounting for unplayed cards)
+    const guaranteedWinningCards = potentialWinningCards.filter(c => isGuaranteedWin(c, currentTrick, trump));
+
+    // Prefer guaranteed wins
+    const cardsToConsider = guaranteedWinningCards.length > 0 ? guaranteedWinningCards : potentialWinningCards;
+
     // Check if trick has red 0 (high value)
     const trickHasRedZero = currentTrick.some(t => t.card.value === 0 && t.card.color === 'red');
-    const redZeroInHand = winningCards.find(c => c.value === 0 && c.color === 'red');
+    const redZeroInHand = cardsToConsider.find(c => c.value === 0 && c.color === 'red');
 
-    // If trick has red 0, try to win it!
+    // If trick has red 0, try to win it with GUARANTEED win!
     if (trickHasRedZero) {
-      const lowestWinningCard = winningCards.reduce((min, card) => card.value < min.value ? card : min);
+      const bestCard = guaranteedWinningCards.length > 0
+        ? guaranteedWinningCards.reduce((min, card) => card.value < min.value ? card : min)
+        : potentialWinningCards.reduce((max, card) => card.value > max.value ? card : max); // Play highest if no guaranteed win
 
       return {
-        card: lowestWinningCard,
+        card: bestCard,
         priority: 'high',
         reason: '🔴 WIN RED 0 TRICK (+5 points)!',
-        explanation: `Opponent has Red 0 in this trick! Play ${lowestWinningCard.value} ${lowestWinningCard.color} to win it and get the +5 bonus points for your team. Always prevent opponents from getting red 0!`,
+        explanation: `Opponent has Red 0 in this trick! Play ${bestCard.value} ${bestCard.color} to ${guaranteedWinningCards.length > 0 ? 'GUARANTEE the win' : 'try to win it'} and get the +5 bonus points for your team.`,
       };
     }
 
     // Play red 0 if we have it and can win
-    if (redZeroInHand) {
+    if (redZeroInHand && guaranteedWinningCards.includes(redZeroInHand)) {
       return {
         card: redZeroInHand,
         priority: 'high',
@@ -348,14 +402,18 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
       };
     }
 
-    // Otherwise play lowest winning card
-    const lowestWinningCard = winningCards.reduce((min, card) => card.value < min.value ? card : min);
+    // Otherwise play lowest GUARANTEED winning card (or highest if no guarantee)
+    const bestCard = guaranteedWinningCards.length > 0
+      ? guaranteedWinningCards.reduce((min, card) => card.value < min.value ? card : min)
+      : potentialWinningCards.reduce((max, card) => card.value > max.value ? card : max);
+
+    const isGuaranteed = guaranteedWinningCards.includes(bestCard);
 
     return {
-      card: lowestWinningCard,
+      card: bestCard,
       priority: 'high',
-      reason: 'Win the trick',
-      explanation: `${teammateInTrick ? 'Your teammate couldn\'t win' : 'You can win this trick'}. Play ${lowestWinningCard.value} ${lowestWinningCard.color} to take it!`,
+      reason: isGuaranteed ? 'GUARANTEE the win' : 'Try to win',
+      explanation: `${teammateInTrick ? 'Your teammate couldn\'t win' : 'You can win this trick'}. Play ${bestCard.value} ${bestCard.color} to ${isGuaranteed ? 'GUARANTEE the win (higher cards already played)' : 'try to take it (but watch out for higher cards)'}!`,
     };
   }
 
