@@ -142,11 +142,48 @@ export class BotPlayer {
   }
 
   /**
+   * Find the best trump color for this hand
+   * During betting, bots should assume they'll choose the best trump if they win
+   */
+  private static findBestTrump(hand: Card[]): CardColor {
+    const suitCounts: Record<CardColor, number> = { red: 0, brown: 0, green: 0, blue: 0 };
+    const suitHighCards: Record<CardColor, number> = { red: 0, brown: 0, green: 0, blue: 0 };
+
+    hand.forEach(card => {
+      suitCounts[card.color]++;
+      if (card.value >= 6) {
+        suitHighCards[card.color]++;
+      }
+    });
+
+    // Find color with best combination of quantity and quality
+    let bestTrump: CardColor = 'red';
+    let bestScore = 0;
+
+    (Object.keys(suitCounts) as CardColor[]).forEach(color => {
+      const count = suitCounts[color];
+      const highCards = suitHighCards[color];
+      // Score = number of cards + 2x high cards (value quality matters more)
+      const score = count + (highCards * 2);
+      if (score > bestScore) {
+        bestScore = score;
+        bestTrump = color;
+      }
+    });
+
+    return bestTrump;
+  }
+
+  /**
    * Evaluate hand strength for betting decisions
+   * If trump is null (betting phase), evaluate with the BEST possible trump choice
    */
   private static evaluateHandStrength(hand: Card[], trump: CardColor | null): HandStrength {
-    const trumpCount = trump ? hand.filter(c => c.color === trump).length : 0;
-    const trumpStrength = trump ? hand.filter(c => c.color === trump).reduce((sum, c) => sum + c.value, 0) : 0;
+    // During betting, choose the best trump for this hand
+    const optimalTrump = trump || this.findBestTrump(hand);
+
+    const trumpCount = hand.filter(c => c.color === optimalTrump).length;
+    const trumpStrength = hand.filter(c => c.color === optimalTrump).reduce((sum, c) => sum + c.value, 0);
     const highCards = hand.filter(c => c.value >= 5).length;
     const redZero = hand.some(c => c.color === 'red' && c.value === 0);
     const brownZero = hand.some(c => c.color === 'brown' && c.value === 0);
@@ -161,11 +198,9 @@ export class BotPlayer {
     // Estimate tricks bot can win
     let estimatedTricks = 0;
 
-    // Trump cards contribute significantly
-    if (trump) {
-      estimatedTricks += Math.min(trumpCount, 3); // Each trump likely wins
-      estimatedTricks += trumpStrength / 10; // High trump cards add value
-    }
+    // Trump cards contribute significantly (using optimal trump if betting)
+    estimatedTricks += Math.min(trumpCount, 3); // Each trump likely wins
+    estimatedTricks += trumpStrength / 10; // High trump cards add value
 
     // High value cards in strong suits
     estimatedTricks += highCards * 0.8;
@@ -247,40 +282,50 @@ export class BotPlayer {
     position: number
   ): Card {
     const currentTrick = gameState.currentTrick;
+    const partner = this.getPartner(gameState, playerId);
+    const currentWinner = this.getCurrentTrickWinner(gameState);
 
-    // FIX: Check if partner is winning FIRST (before dumping brown 0)
-    // This prevents dumping brown 0 on partner when they're winning
-    if (position >= 3) {
-      const partner = this.getPartner(gameState, playerId);
-      const currentWinner = this.getCurrentTrickWinner(gameState);
-      if (partner && currentWinner === partner.id) {
-        // Partner is winning - play low card (avoid brown 0!)
-        const lowImpactCards = impacts.filter(i =>
-          i.impact === 'low' &&
-          !(i.card.color === 'brown' && i.card.value === 0) // Don't dump brown 0 on partner!
+    // PRIORITY 1: Partner is winning - ADD RED 0 IF SAFE (+5 bonus points!)
+    if (position >= 2 && partner && currentWinner === partner.id) {
+      const redZero = impacts.find(i => i.card.color === 'red' && i.card.value === 0);
+      if (redZero) {
+        // Check if any other card we have could beat partner's winning card
+        const couldBeatPartner = impacts.some(i =>
+          i !== redZero && i.canWinTrick
         );
-        if (lowImpactCards.length > 0) {
-          return lowImpactCards[0].card;
+
+        // If red 0 won't risk the trick (or is trump), ALWAYS play it!
+        if (!couldBeatPartner || redZero.card.color === gameState.trump) {
+          return redZero.card;
         }
+      }
+
+      // Otherwise play lowest card (avoid brown 0!)
+      const lowImpactCards = impacts.filter(i =>
+        i.impact === 'low' &&
+        !(i.card.color === 'brown' && i.card.value === 0)
+      );
+      if (lowImpactCards.length > 0) {
+        return lowImpactCards[0].card;
       }
     }
 
-    // Rule: Get rid of brown 0 when safe (only if partner not winning)
-    const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
-    if (brownZero && position > 1 && Math.random() < 0.6) {
-      return brownZero.card;
-    }
-
-    // Rule: Try to win red 0
+    // PRIORITY 2: Try to win red 0 trick (opponent has Red 0)
     const redZeroInTrick = currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
     if (redZeroInTrick && position > 1) {
       const winningCards = impacts.filter(i => i.canWinTrick);
       if (winningCards.length > 0) {
-        // Use lowest winning card
+        // Use lowest winning card to win the +5 bonus
         return winningCards.reduce((lowest, curr) =>
           curr.card.value < lowest.card.value ? curr : lowest
         ).card;
       }
+    }
+
+    // PRIORITY 3: Get rid of brown 0 when safe (only if partner not winning)
+    const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
+    if (brownZero && position > 1 && (!partner || currentWinner !== partner.id) && Math.random() < 0.6) {
+      return brownZero.card;
     }
 
     // Position 1: Lead with medium cards
@@ -320,30 +365,48 @@ export class BotPlayer {
     const partner = this.getPartner(gameState, playerId);
     const currentWinner = this.getCurrentTrickWinner(gameState);
 
-    // Priority 1: Get rid of brown 0 strategically
-    const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
-    if (brownZero) {
-      // Play it if we're not winning or if it's safe
-      if (position > 1 && (!currentWinner || currentWinner !== playerId)) {
-        return brownZero.card;
+    // PRIORITY 1: Partner is winning - ADD RED 0 IF SAFE (+5 bonus points!)
+    if (position >= 2 && partner && currentWinner === partner.id) {
+      const redZero = impacts.find(i => i.card.color === 'red' && i.card.value === 0);
+      if (redZero) {
+        // Check if any other card we have could beat partner's winning card
+        const couldBeatPartner = impacts.some(i =>
+          i !== redZero && i.canWinTrick
+        );
+
+        // If red 0 won't risk the trick (or is trump), ALWAYS play it!
+        if (!couldBeatPartner || redZero.card.color === gameState.trump) {
+          return redZero.card;
+        }
+      }
+
+      // Otherwise dump low cards (avoid brown 0 on partner!)
+      const lowCards = impacts.filter(i =>
+        i.impact === 'low' &&
+        !i.isSpecial &&
+        !(i.card.color === 'brown' && i.card.value === 0)
+      ).sort((a, b) => a.card.value - b.card.value);
+      if (lowCards.length > 0) {
+        return lowCards[0].card;
       }
     }
 
-    // Priority 2: Win red 0 at minimal cost
+    // PRIORITY 2: Win red 0 at minimal cost (opponent has Red 0)
     const redZeroInTrick = currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
     if (redZeroInTrick && position > 1) {
       const winningCards = impacts.filter(i => i.canWinTrick).sort((a, b) => a.card.value - b.card.value);
       if (winningCards.length > 0) {
-        // Use the lowest card that can win
+        // Use the lowest card that can win the +5 bonus
         return winningCards[0].card;
       }
     }
 
-    // Priority 3: Partner is winning - dump low cards or valuable cards to give points
-    if (position >= 3 && partner && currentWinner === partner.id) {
-      const lowCards = impacts.filter(i => i.impact === 'low' && !i.isSpecial).sort((a, b) => a.card.value - b.card.value);
-      if (lowCards.length > 0) {
-        return lowCards[0].card;
+    // PRIORITY 3: Get rid of brown 0 strategically (only if partner NOT winning)
+    const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
+    if (brownZero) {
+      // Play it if we're not winning or if it's safe (but NOT on partner!)
+      if (position > 1 && (!currentWinner || currentWinner !== playerId) && (!partner || currentWinner !== partner.id)) {
+        return brownZero.card;
       }
     }
 
