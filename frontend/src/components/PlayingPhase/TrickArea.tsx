@@ -24,11 +24,9 @@ interface TrickWinnerInfo {
 
 export interface TrickAreaProps {
   gameState: GameState;
-  currentPlayerId: string;
   currentPlayerIndex: number;
   currentTrickWinnerId: string | null;
   isSpectator: boolean;
-  onSwapPosition?: (targetPlayerId: string) => void;
   trickWinner?: TrickWinnerInfo | null;
   onClickPlayer?: (playerName: string) => void;
   botThinkingMap: Map<string, string>;
@@ -43,11 +41,9 @@ export interface TrickAreaProps {
 
 export const TrickArea = memo(function TrickArea({
   gameState,
-  currentPlayerId,
   currentPlayerIndex,
   currentTrickWinnerId,
   isSpectator,
-  onSwapPosition,
   trickWinner,
   onClickPlayer,
   botThinkingMap,
@@ -62,9 +58,6 @@ export const TrickArea = memo(function TrickArea({
   const [showPreviousTrick, setShowPreviousTrick] = useState(false);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState(false);
   const [lastTrickLength, setLastTrickLength] = useState(0);
-
-  // Find current player
-  const currentPlayer = gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
 
   // Get card positions in circular layout (bottom, left, top, right)
   const getCardPositions = (trick: TrickCard[]): (TrickCard | null)[] => {
@@ -124,21 +117,6 @@ export const TrickArea = memo(function TrickArea({
       gameState.currentPlayerIndex === playerIndex &&
       !gameState.currentTrick.some(tc => tc.playerId === player.id)
     );
-  };
-
-  // Helper: Check if swap is allowed
-  const canSwapWithPlayer = (positionIndex: number): boolean => {
-    if (!currentPlayer || !onSwapPosition || isSpectator) return false;
-
-    // Only during active gameplay
-    if (gameState.phase === 'team_selection' || gameState.phase === 'game_over') return false;
-
-    const player = getPlayer(positionIndex);
-
-    // Can't swap with yourself
-    if (!player || player.id === currentPlayerId) return false;
-
-    return true;
   };
 
   // Render individual card with animations
@@ -223,10 +201,7 @@ export const TrickArea = memo(function TrickArea({
         player={player}
         isYou={isYou}
         isWinner={isWinner}
-        canSwap={canSwapWithPlayer(positionIndex)}
         isThinking={isPlayerThinking(positionIndex)}
-        onSwap={() => player && onSwapPosition?.(player.id)}
-        currentPlayerTeamId={currentPlayer?.teamId}
         onClickPlayer={onClickPlayer}
         botThinking={botThinking}
         botThinkingOpen={botThinkingOpen}

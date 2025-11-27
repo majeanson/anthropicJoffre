@@ -43,7 +43,6 @@ interface PlayingPhaseProps {
   onOpenAchievements?: () => void;
   onOpenFriends?: () => void;
   pendingFriendRequestsCount?: number; // Sprint 16 - Friend requests badge
-  onSwapPosition?: (targetPlayerId: string) => void;
   onClickPlayer?: (playerName: string) => void;
   socket?: Socket | null;
   gameId?: string;
@@ -67,7 +66,6 @@ function PlayingPhaseComponent({
   onOpenAchievements,
   onOpenFriends,
   pendingFriendRequestsCount = 0,
-  onSwapPosition,
   onClickPlayer,
   socket,
   gameId,
@@ -456,11 +454,9 @@ function PlayingPhaseComponent({
 
             <TrickArea
               gameState={gameState}
-              currentPlayerId={currentPlayerId}
               currentPlayerIndex={currentPlayerIndex}
               currentTrickWinnerId={currentTrickWinnerId}
               isSpectator={isSpectator}
-              onSwapPosition={onSwapPosition}
               trickWinner={trickWinner}
               onClickPlayer={onClickPlayer}
               botThinkingMap={botThinkingMap}

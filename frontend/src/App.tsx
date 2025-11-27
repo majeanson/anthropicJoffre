@@ -903,7 +903,6 @@ function AppContent() {
           onOpenAchievements={handleOpenAchievements}
           onOpenFriends={handleOpenFriends}
           pendingFriendRequestsCount={pendingFriendRequestsCount}
-          onSwapPosition={handleSwapPosition}
           onClickPlayer={handleClickPlayer}
           socket={socket}
           gameId={gameId}

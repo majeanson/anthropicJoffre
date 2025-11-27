@@ -1,6 +1,6 @@
 /**
  * PlayerPosition Component
- * Renders player name badge, bot difficulty indicator, and swap button
+ * Renders player name badge and bot difficulty indicator (with press-to-show thinking)
  *
  * Extracted from PlayingPhase.tsx (lines 517-599, 908-1014)
  * Part of Sprint: PlayingPhase.tsx split into focused components
@@ -8,7 +8,6 @@
 
 import { memo } from 'react';
 import { Player } from '../../types/game';
-import { BotThinkingIndicator } from '../BotThinkingIndicator';
 import { MoveSuggestionButton } from '../MoveSuggestionButton';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
 
@@ -16,10 +15,7 @@ export interface PlayerPositionProps {
   player: Player | null;
   isYou: boolean;
   isWinner: boolean;
-  canSwap: boolean;
   isThinking: boolean;
-  onSwap: () => void;
-  currentPlayerTeamId?: number | null;
   onClickPlayer?: (playerName: string) => void;
   botThinking: string | null;
   botThinkingOpen: boolean;
@@ -35,10 +31,7 @@ export const PlayerPosition = memo(function PlayerPosition({
   player,
   isYou,
   isWinner,
-  canSwap,
   isThinking,
-  onSwap,
-  currentPlayerTeamId,
   onClickPlayer,
   botThinking,
   botThinkingOpen,
@@ -49,7 +42,7 @@ export const PlayerPosition = memo(function PlayerPosition({
   suggestionOpen,
   onToggleSuggestion,
 }: PlayerPositionProps) {
-  // Helper: Get bot difficulty badge
+  // Helper: Get bot difficulty badge (now with bot thinking on click/press)
   const getBotDifficultyBadge = (): JSX.Element | null => {
     if (!player?.isBot || !player.botDifficulty) return null;
 
@@ -61,6 +54,67 @@ export const PlayerPosition = memo(function PlayerPosition({
 
     const badge = badges[player.botDifficulty];
 
+    // If bot has thinking info, make badge pressable
+    if (botThinking) {
+      return (
+        <button
+          onMouseDown={onToggleBotThinking}
+          onMouseUp={onToggleBotThinking}
+          onMouseLeave={botThinkingOpen ? onToggleBotThinking : undefined}
+          onTouchStart={onToggleBotThinking}
+          onTouchEnd={onToggleBotThinking}
+          className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg transition-all active:scale-95 cursor-pointer hover:brightness-110 ${
+            botThinkingOpen ? 'ring-2 ring-white scale-105' : ''
+          }`}
+          title={`Press to see what ${player.name} is thinking`}
+        >
+          <span className={isThinking ? 'animate-pulse' : ''}>{badge.icon}</span>
+          <span className="hidden md:inline">{badge.label}</span>
+          {isThinking && (
+            <span className="flex gap-0.5 text-base md:text-xs">
+              <span className="animate-bounce" style={{ animationDelay: '0ms' }}>
+                .
+              </span>
+              <span className="animate-bounce" style={{ animationDelay: '150ms' }}>
+                .
+              </span>
+              <span className="animate-bounce" style={{ animationDelay: '300ms' }}>
+                .
+              </span>
+            </span>
+          )}
+          {/* Tooltip shown while pressed */}
+          {botThinkingOpen && (
+            <div
+              className={`absolute z-[70] ${
+                tooltipPosition === 'top'
+                  ? 'bottom-full left-1/2 -translate-x-1/2 mb-2'
+                  : tooltipPosition === 'bottom'
+                  ? 'top-full left-1/2 -translate-x-1/2 mt-2'
+                  : tooltipPosition === 'left'
+                  ? 'right-full top-1/2 -translate-y-1/2 mr-2'
+                  : 'left-full top-1/2 -translate-y-1/2 ml-2'
+              } whitespace-nowrap pointer-events-none`}
+              style={{ maxWidth: '90vw' }}
+            >
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300">
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex-shrink-0">
+                    <span className="text-sm md:text-lg">🤖</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-semibold opacity-90 truncate">{player.name}</div>
+                    <div className="text-xs md:text-sm font-bold mt-0.5">{botThinking}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </button>
+      );
+    }
+
+    // No bot thinking - just show static badge
     return (
       <span
         className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg`}
@@ -112,16 +166,6 @@ export const PlayerPosition = memo(function PlayerPosition({
     return `${baseClasses} ${colorClasses} ${winnerRing}`;
   };
 
-  // Helper: Get swap button title
-  const getSwapTitle = (): string => {
-    if (!player) return '';
-    const changesTeams =
-      currentPlayerTeamId !== null &&
-      currentPlayerTeamId !== undefined &&
-      player.teamId !== currentPlayerTeamId;
-    return `Swap positions with ${player.name}${changesTeams ? ' (changes teams!)' : ''}`;
-  };
-
   // Handle player name click (allow clicking on own profile and other real players, not bots)
   const handleNameClick = () => {
     if (player && !player.isEmpty && !player.isBot && onClickPlayer) {
@@ -151,17 +195,6 @@ export const PlayerPosition = memo(function PlayerPosition({
 
   return (
     <div className="flex items-center gap-1">
-      {/* Bot Thinking Button - Show for bots who have played in current trick */}
-      {botThinking && player?.isBot && (
-        <BotThinkingIndicator
-          botName={player.name}
-          action={botThinking}
-          isOpen={botThinkingOpen}
-          onToggle={onToggleBotThinking}
-          position={tooltipPosition}
-        />
-      )}
-
       {/* Move Suggestion Button - Show for human player when it's their turn */}
       {showSuggestion && suggestion && (
         <MoveSuggestionButton
@@ -174,7 +207,7 @@ export const PlayerPosition = memo(function PlayerPosition({
       )}
 
       <div className={getBadgeClasses()}>
-        <span className="flex items-center justify-center">
+        <span className="flex items-center justify-center relative">
           {player?.isEmpty && '💺 '}
           {isClickable ? (
             <button
@@ -191,15 +224,6 @@ export const PlayerPosition = memo(function PlayerPosition({
           {getBotDifficultyBadge()}
         </span>
       </div>
-      {canSwap && player && (
-        <button
-          onClick={onSwap}
-          className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-2 py-1 rounded text-xs font-bold transition-all shadow-lg hover:shadow-xl active:scale-95"
-          title={getSwapTitle()}
-        >
-          ↔
-        </button>
-      )}
     </div>
   );
 });
