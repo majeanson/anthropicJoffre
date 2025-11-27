@@ -24,7 +24,7 @@ export function MoveSuggestionButton({ suggestion, details, isOpen, onToggle, po
   }[position];
 
   return (
-    <div className="relative inline-flex z-[60]">
+    <div className="relative inline-flex z-[100]">
       {/* Press-to-Show Button - Hold to peek */}
       <button
         onMouseDown={onToggle}
@@ -32,7 +32,7 @@ export function MoveSuggestionButton({ suggestion, details, isOpen, onToggle, po
         onMouseLeave={isOpen ? onToggle : undefined}
         onTouchStart={onToggle}
         onTouchEnd={onToggle}
-        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[60] ${
+        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[100] ${
           isOpen
             ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white scale-110'
             : 'bg-white dark:bg-gray-700 text-green-600 dark:text-green-400 hover:scale-105'
@@ -48,7 +48,7 @@ export function MoveSuggestionButton({ suggestion, details, isOpen, onToggle, po
       {/* Tooltip - Appears on toggle */}
       {isOpen && (
         <div
-          className={`absolute z-[70] ${tooltipPosition} pointer-events-none`}
+          className={`fixed z-[9999] ${tooltipPosition} pointer-events-none`}
           style={{ maxWidth: '90vw', minWidth: '200px' }}
         >
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-green-300">

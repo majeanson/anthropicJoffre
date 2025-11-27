@@ -86,7 +86,7 @@ export const PlayerPosition = memo(function PlayerPosition({
           {/* Tooltip shown while pressed */}
           {botThinkingOpen && (
             <div
-              className={`absolute z-[70] ${
+              className={`fixed z-[9999] ${
                 tooltipPosition === 'top'
                   ? 'bottom-full left-1/2 -translate-x-1/2 mb-2'
                   : tooltipPosition === 'bottom'
