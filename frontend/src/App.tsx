@@ -832,6 +832,33 @@ function AppContent() {
             </Suspense>
           </ErrorBoundary>
         )}
+
+        {/* Player Profile Modal - shows when clicking on player names */}
+        <ErrorBoundary componentName="PlayerProfileModal">
+          <Suspense fallback={<div>Loading profile...</div>}>
+            {(() => {
+              console.log(`[App.tsx BETTING] Checking profilePlayerName for modal render:`, profilePlayerName);
+              return null;
+            })()}
+            {profilePlayerName && (
+              <>
+                {(() => {
+                  console.log(`[App.tsx BETTING] Rendering PlayerProfileModal for: ${profilePlayerName}`);
+                  return null;
+                })()}
+                <PlayerProfileModal
+                  playerName={profilePlayerName}
+                  socket={socket}
+                  isOpen={!!profilePlayerName}
+                  onClose={() => {
+                    console.log(`[App.tsx BETTING] Closing PlayerProfileModal`);
+                    setProfilePlayerName(null);
+                  }}
+                />
+              </>
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </>
     );
   }
@@ -905,6 +932,33 @@ function AppContent() {
             </Suspense>
           </ErrorBoundary>
         )}
+
+        {/* Player Profile Modal - shows when clicking on player names */}
+        <ErrorBoundary componentName="PlayerProfileModal">
+          <Suspense fallback={<div>Loading profile...</div>}>
+            {(() => {
+              console.log(`[App.tsx PLAYING] Checking profilePlayerName for modal render:`, profilePlayerName);
+              return null;
+            })()}
+            {profilePlayerName && (
+              <>
+                {(() => {
+                  console.log(`[App.tsx PLAYING] Rendering PlayerProfileModal for: ${profilePlayerName}`);
+                  return null;
+                })()}
+                <PlayerProfileModal
+                  playerName={profilePlayerName}
+                  socket={socket}
+                  isOpen={!!profilePlayerName}
+                  onClose={() => {
+                    console.log(`[App.tsx PLAYING] Closing PlayerProfileModal`);
+                    setProfilePlayerName(null);
+                  }}
+                />
+              </>
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </>
     );
   }
