@@ -179,16 +179,8 @@ function AppContent() {
 
   // Handler to open player profile modal
   const handleClickPlayer = useCallback((playerName: string) => {
-    console.log(`[App.tsx] handleClickPlayer called with: ${playerName}`);
-    console.log(`[App.tsx] Setting profilePlayerName to: ${playerName}`);
     setProfilePlayerName(playerName);
   }, []);
-
-  // Debug: Log when profilePlayerName changes
-  useEffect(() => {
-    console.log(`[App.tsx] profilePlayerName state changed to:`, profilePlayerName);
-    console.log(`[App.tsx] Should render modal:`, !!profilePlayerName);
-  }, [profilePlayerName]);
 
   // Online players tracking
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
@@ -758,6 +750,20 @@ function AppContent() {
             </Suspense>
           </ErrorBoundary>
         )}
+
+        {/* Player Profile Modal - shows when clicking on player names */}
+        <ErrorBoundary componentName="PlayerProfileModal">
+          <Suspense fallback={<div>Loading profile...</div>}>
+            {profilePlayerName && (
+              <PlayerProfileModal
+                playerName={profilePlayerName}
+                socket={socket}
+                isOpen={!!profilePlayerName}
+                onClose={() => setProfilePlayerName(null)}
+              />
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </>
     );
   }
@@ -836,26 +842,13 @@ function AppContent() {
         {/* Player Profile Modal - shows when clicking on player names */}
         <ErrorBoundary componentName="PlayerProfileModal">
           <Suspense fallback={<div>Loading profile...</div>}>
-            {(() => {
-              console.log(`[App.tsx BETTING] Checking profilePlayerName for modal render:`, profilePlayerName);
-              return null;
-            })()}
             {profilePlayerName && (
-              <>
-                {(() => {
-                  console.log(`[App.tsx BETTING] Rendering PlayerProfileModal for: ${profilePlayerName}`);
-                  return null;
-                })()}
-                <PlayerProfileModal
-                  playerName={profilePlayerName}
-                  socket={socket}
-                  isOpen={!!profilePlayerName}
-                  onClose={() => {
-                    console.log(`[App.tsx BETTING] Closing PlayerProfileModal`);
-                    setProfilePlayerName(null);
-                  }}
-                />
-              </>
+              <PlayerProfileModal
+                playerName={profilePlayerName}
+                socket={socket}
+                isOpen={!!profilePlayerName}
+                onClose={() => setProfilePlayerName(null)}
+              />
             )}
           </Suspense>
         </ErrorBoundary>
@@ -936,26 +929,13 @@ function AppContent() {
         {/* Player Profile Modal - shows when clicking on player names */}
         <ErrorBoundary componentName="PlayerProfileModal">
           <Suspense fallback={<div>Loading profile...</div>}>
-            {(() => {
-              console.log(`[App.tsx PLAYING] Checking profilePlayerName for modal render:`, profilePlayerName);
-              return null;
-            })()}
             {profilePlayerName && (
-              <>
-                {(() => {
-                  console.log(`[App.tsx PLAYING] Rendering PlayerProfileModal for: ${profilePlayerName}`);
-                  return null;
-                })()}
-                <PlayerProfileModal
-                  playerName={profilePlayerName}
-                  socket={socket}
-                  isOpen={!!profilePlayerName}
-                  onClose={() => {
-                    console.log(`[App.tsx PLAYING] Closing PlayerProfileModal`);
-                    setProfilePlayerName(null);
-                  }}
-                />
-              </>
+              <PlayerProfileModal
+                playerName={profilePlayerName}
+                socket={socket}
+                isOpen={!!profilePlayerName}
+                onClose={() => setProfilePlayerName(null)}
+              />
             )}
           </Suspense>
         </ErrorBoundary>
@@ -1022,6 +1002,20 @@ function AppContent() {
             </Suspense>
           </ErrorBoundary>
         )}
+
+        {/* Player Profile Modal - shows when clicking on player names */}
+        <ErrorBoundary componentName="PlayerProfileModal">
+          <Suspense fallback={<div>Loading profile...</div>}>
+            {profilePlayerName && (
+              <PlayerProfileModal
+                playerName={profilePlayerName}
+                socket={socket}
+                isOpen={!!profilePlayerName}
+                onClose={() => setProfilePlayerName(null)}
+              />
+            )}
+          </Suspense>
+        </ErrorBoundary>
       </>
     );
   }
@@ -1298,26 +1292,13 @@ function AppContent() {
         {/* Player Profile Modal - shows when clicking on player names */}
         <ErrorBoundary componentName="PlayerProfileModal">
           <Suspense fallback={<div>Loading profile...</div>}>
-            {(() => {
-              console.log(`[App.tsx] Checking profilePlayerName for modal render:`, profilePlayerName);
-              return null;
-            })()}
             {profilePlayerName && (
-              <>
-                {(() => {
-                  console.log(`[App.tsx] Rendering PlayerProfileModal for: ${profilePlayerName}`);
-                  return null;
-                })()}
-                <PlayerProfileModal
-                  playerName={profilePlayerName}
-                  socket={socket}
-                  isOpen={!!profilePlayerName}
-                  onClose={() => {
-                    console.log(`[App.tsx] Closing PlayerProfileModal`);
-                    setProfilePlayerName(null);
-                  }}
-                />
-              </>
+              <PlayerProfileModal
+                playerName={profilePlayerName}
+                socket={socket}
+                isOpen={!!profilePlayerName}
+                onClose={() => setProfilePlayerName(null)}
+              />
             )}
           </Suspense>
         </ErrorBoundary>

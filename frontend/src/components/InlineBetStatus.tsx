@@ -15,11 +15,6 @@ export function InlineBetStatus({
   currentPlayerIndex,
   onClickPlayer
 }: InlineBetStatusProps) {
-  console.log('[InlineBetStatus] Component rendering');
-  console.log('[InlineBetStatus] onClickPlayer (required):', onClickPlayer);
-  console.log('[InlineBetStatus] onClickPlayer type:', typeof onClickPlayer);
-  console.log('[InlineBetStatus] onClickPlayer stringified:', onClickPlayer.toString());
-  console.log('[InlineBetStatus] Players:', players.map(p => ({ name: p.name, isBot: p.isBot, isEmpty: p.isEmpty })));
 
   const getBetDisplay = (player: Player): { icon: string; text: string; color: string } => {
     const bet = currentBets.get(player.name);
@@ -74,12 +69,6 @@ export function InlineBetStatus({
           // Real players (not bots or empty seats) are clickable to view profiles
           const isClickable = !player.isEmpty && !player.isBot;
 
-          // Debug: Log all conditions
-          console.log(`[InlineBetStatus] Player: ${player.name}`);
-          console.log(`  - isEmpty: ${player.isEmpty}`);
-          console.log(`  - isBot: ${player.isBot}`);
-          console.log(`  - isClickable: ${isClickable}`);
-
           return (
             <div
               key={player.id}
@@ -91,10 +80,7 @@ export function InlineBetStatus({
                 <span className="text-base">{display.icon}</span>
                 {isClickable ? (
                   <button
-                    onClick={() => {
-                      console.log(`[InlineBetStatus] Clicked on ${player.name}, calling onClickPlayer`);
-                      onClickPlayer(player.name);
-                    }}
+                    onClick={() => onClickPlayer(player.name)}
                     className="font-bold hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
                     data-testid={`player-name-${player.name}`}
                     title={`View ${player.name}'s profile`}

@@ -57,9 +57,9 @@ export default defineConfig({
     minify: 'terser',
     terserOptions: {
       compress: {
-        // TEMPORARILY DISABLED: Keep console.logs for debugging profile modal click issue
-        drop_console: false,
-        // pure_funcs: ['console.log', 'console.debug', 'console.info'],
+        // Remove console.log but keep console.error/warn for production debugging
+        drop_console: true,
+        pure_funcs: ['console.log', 'console.debug', 'console.info'],
         drop_debugger: true,
       },
     },
