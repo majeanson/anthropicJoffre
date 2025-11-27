@@ -22,7 +22,40 @@ interface BetSuggestion {
 }
 
 /**
+ * Find the best trump color for this hand
+ * During betting, assume you'll choose the best trump if you win
+ */
+function findBestTrump(hand: Card[]): CardColor {
+  const colorDistribution = new Map<CardColor, number>();
+  const colorHighCards = new Map<CardColor, number>();
+
+  hand.forEach((card) => {
+    colorDistribution.set(card.color, (colorDistribution.get(card.color) || 0) + 1);
+    if (card.value >= 6) {
+      colorHighCards.set(card.color, (colorHighCards.get(card.color) || 0) + 1);
+    }
+  });
+
+  // Find color with best combination of quantity and quality
+  let bestTrump: CardColor = 'red';
+  let bestScore = 0;
+
+  colorDistribution.forEach((count, color) => {
+    const highCards = colorHighCards.get(color) || 0;
+    // Score = number of cards + 2x high cards (value quality matters more)
+    const score = count + (highCards * 2);
+    if (score > bestScore) {
+      bestScore = score;
+      bestTrump = color;
+    }
+  });
+
+  return bestTrump;
+}
+
+/**
  * Evaluate hand strength for betting
+ * If trump is null (betting phase), evaluate with the BEST possible trump choice
  */
 function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
   trumpCount: number;
@@ -34,7 +67,11 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
   dominantColor: CardColor | null;
   hasSevenInColor: boolean;
   noRedCards: boolean;
+  optimalTrump: CardColor;
 } {
+  // During betting, choose the best trump for this hand
+  const optimalTrump = trump || findBestTrump(hand);
+
   let trumpCount = 0;
   let highCards = 0;
   let estimatedTricks = 0;
@@ -53,8 +90,8 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
       noRedCards = false;
     }
 
-    // Count trump cards
-    if (trump && card.color === trump) {
+    // Count trump cards (using optimal trump if betting)
+    if (card.color === optimalTrump) {
       trumpCount++;
       if (card.value >= 5) estimatedTricks += 1;
       if (card.value === 7) {
@@ -94,6 +131,7 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
     dominantColor,
     hasSevenInColor,
     noRedCards,
+    optimalTrump,
   };
 }
 
@@ -134,7 +172,7 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
       amount: 7,
       withoutTrump: false,
       skip: true,
-      reason: `Weak hand - Skip is safest (${strength.trumpCount} trump, ${strength.highCards} high cards)`,
+      reason: `Weak hand - Skip is safest (${strength.trumpCount} ${strength.optimalTrump} if you choose trump, ${strength.highCards} high cards)`,
       alternatives: `Alternative: Bet 7 (normal difficulty) if you're feeling lucky, but you'll likely lose points.`,
     };
   }
@@ -158,7 +196,7 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
       amount: suggestedAmount,
       withoutTrump: false,
       skip: false,
-      reason: `🔥 VERY HARD - Excellent hand! (${strength.trumpCount} trump, ${strength.highCards} high cards)`,
+      reason: `🔥 VERY HARD - Excellent hand! (${strength.trumpCount} ${strength.optimalTrump} trump, ${strength.highCards} high cards)`,
       alternatives: highestBet
         ? `Alternative: Match current bet (${highestBet.amount}) to play safer, but you're leaving points on the table.`
         : `Alternative: Bet 9-10 (hard) for less risk.`,
@@ -176,7 +214,7 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
         withoutTrump: true,
         skip: false,
         reason: `⚡ HARD BET with "Without Trump" (doubles points!) - ${dominantColorCount} ${strength.dominantColor} cards with control`,
-        alternatives: `Alternative: Bet ${suggestedAmount} with trump for normal play. Without trump is risky but doubles your points if you win with your ${strength.dominantColor} suit!`,
+        alternatives: `Alternative: Bet ${suggestedAmount} with ${strength.optimalTrump} trump for normal play. Without trump is risky but doubles your points if you win with your ${strength.dominantColor} suit!`,
       };
     }
 
@@ -184,7 +222,7 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
       amount: suggestedAmount,
       withoutTrump: false,
       skip: false,
-      reason: `⚡ HARD - Strong hand (${strength.trumpCount} trump, ${strength.highCards} high cards)`,
+      reason: `⚡ HARD - Strong hand (${strength.trumpCount} ${strength.optimalTrump} trump, ${strength.highCards} high cards)`,
       alternatives: `Alternative: Bet 8 (medium) for less pressure.`,
     };
   }
@@ -195,7 +233,7 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
       amount: 8,
       withoutTrump: false,
       skip: false,
-      reason: `✂️ MEDIUM - No red cards! You can cut Red 0 tricks with trump (${strength.trumpCount} trump cards)`,
+      reason: `✂️ MEDIUM - No red cards! Cut Red 0 with ${strength.optimalTrump} trump (${strength.trumpCount} cards)`,
       alternatives: `Alternative: Bet 7 to play safe, or 9 if you're confident in controlling Red 0 tricks.`,
     };
   }
@@ -206,7 +244,7 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
       amount: 8,
       withoutTrump: false,
       skip: false,
-      reason: `📊 MEDIUM - Decent hand (${strength.trumpCount} trump, ${strength.highCards} high cards)`,
+      reason: `📊 MEDIUM - Decent hand (${strength.trumpCount} ${strength.optimalTrump} trump, ${strength.highCards} high cards)`,
       alternatives: isDealer
         ? `As dealer, you must bet or raise. Bet 8 for a balanced risk.`
         : `Alternative: Skip to avoid risk, or bet 7 (normal) for minimum commitment.`,
@@ -219,8 +257,8 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
     withoutTrump: false,
     skip: !isDealer,
     reason: isDealer
-      ? `📋 NORMAL - As dealer, bet 7 (minimum) - ${strength.trumpCount} trump cards`
-      : `📋 NORMAL - Marginal hand, skip is safer but 7 is playable`,
+      ? `📋 NORMAL - As dealer, bet 7 (minimum) - ${strength.trumpCount} ${strength.optimalTrump} trump`
+      : `📋 NORMAL - Marginal hand (${strength.trumpCount} ${strength.optimalTrump} trump), skip is safer`,
     alternatives: isDealer
       ? `As dealer, you must bet. 7 is the safest minimum bet.`
       : `Alternative: Bet 7 if you feel lucky, but skipping avoids losing points.`,
