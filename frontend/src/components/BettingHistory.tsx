@@ -56,7 +56,13 @@ export function BettingHistory({ players, currentBets, dealerIndex }: BettingHis
           return (
             <div
               key={player.id}
-              className={`flex items-center justify-between p-2 rounded-lg transition-all ${
+              className={`flex items-center justify-between p-2 rounded-lg transition-all border-l-4 ${
+                // Team color border (ALWAYS visible)
+                player.teamId === 1
+                  ? 'border-l-orange-600 dark:border-l-orange-500'
+                  : 'border-l-purple-600 dark:border-l-purple-500'
+              } ${
+                // Background color based on bet status
                 bet
                   ? bet.skipped
                     ? 'bg-gray-300 dark:bg-gray-700 opacity-60'
@@ -68,7 +74,7 @@ export function BettingHistory({ players, currentBets, dealerIndex }: BettingHis
                   : 'bg-gray-200 dark:bg-gray-700 border border-dashed border-gray-400 dark:border-gray-500'
               }`}
             >
-              {/* Left side: Order number + Player name */}
+              {/* Left side: Order number + Player name + Team badge */}
               <div className="flex items-center gap-2">
                 <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                   bet && !bet.skipped
@@ -81,6 +87,17 @@ export function BettingHistory({ players, currentBets, dealerIndex }: BettingHis
                   <div className="flex items-center gap-1">
                     <span className="font-bold text-sm">
                       {player.name}
+                    </span>
+                    {/* Team color badge - ALWAYS visible */}
+                    <span
+                      className={`text-xs px-1.5 py-0.5 rounded font-bold ${
+                        player.teamId === 1
+                          ? 'bg-orange-600 dark:bg-orange-500 text-white'
+                          : 'bg-purple-600 dark:bg-purple-500 text-white'
+                      }`}
+                      title={`Team ${player.teamId}`}
+                    >
+                      T{player.teamId}
                     </span>
                     {isDealer && (
                       <span className="text-xs bg-white/30 px-1.5 py-0.5 rounded" title="Dealer">
