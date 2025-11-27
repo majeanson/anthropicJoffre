@@ -95,7 +95,26 @@ export class BotPlayer {
     }
 
     // Calculate bet amount based on hand strength
-    const baseBet = handStrength.estimatedTricks;
+    let baseBet = handStrength.estimatedTricks;
+
+    // IMPROVEMENT #2: Position-based bet adjustment
+    // Betting position affects strategy
+    const bettingPosition = this.getBettingPosition(gameState, playerIndex);
+
+    if (this.difficulty === 'hard') {
+      if (bettingPosition === 'first') {
+        // Betting first: Slightly conservative (set the bar, others might outbid)
+        baseBet = Math.max(7, baseBet - 0.5);
+      } else if (bettingPosition === 'last') {
+        // Betting last: More aggressive if good hand (know what to beat)
+        if (baseBet >= 8) {
+          baseBet = Math.min(12, baseBet + 0.5);
+        }
+      } else if (isDealer) {
+        // Dealer: More aggressive (control trump choice)
+        baseBet = Math.min(12, baseBet + 0.5);
+      }
+    }
 
     // Adjust for difficulty - limit to skip, 7, or 8 for all bots
     let betAmount: number;
@@ -126,14 +145,40 @@ export class BotPlayer {
       betAmount = Math.min(maxBet, betAmount);
     }
 
-    // Without trump decision based on hand strength
+    // IMPROVEMENT #3: Refined "without trump" strategy
     let withoutTrump = false;
     if (this.difficulty === 'hard') {
-      // Hard bots consider without trump if they have strong non-trump suits
-      const nonTrumpStrength = handStrength.longestSuit.count >= 4 && handStrength.highCards >= 3;
-      withoutTrump = nonTrumpStrength && Math.random() < 0.25;
+      // Check if "without trump" is viable:
+      // 1. Need control cards (6s and 7s) in dominant suit
+      // 2. Dominant suit must have 5+ cards with a 7
+      // 3. Avoid if Red 0 is NOT in dominant suit (wasted +5 points)
+      const dominantSuit = handStrength.longestSuit;
+      const hasRedZero = player.hand.some(c => c.color === 'red' && c.value === 0);
+      const redZeroInDominant = hasRedZero && player.hand.some(c => c.color === dominantSuit.color && c.value === 0 && c.color === 'red');
+
+      // Count control cards in dominant suit
+      const controlCardsInDominant = player.hand.filter(c =>
+        c.color === dominantSuit.color && c.value >= 6
+      ).length;
+
+      // Has a 7 in dominant suit
+      const has7InDominant = player.hand.some(c => c.color === dominantSuit.color && c.value === 7);
+
+      // Without trump is good if:
+      // - 5+ cards in dominant suit with a 7 and 2+ control cards
+      // - Either no Red 0, or Red 0 is in the dominant suit
+      const withoutTrumpViable =
+        dominantSuit.count >= 5 &&
+        has7InDominant &&
+        controlCardsInDominant >= 2 &&
+        (!hasRedZero || redZeroInDominant);
+
+      withoutTrump = withoutTrumpViable && Math.random() < 0.3;
     } else if (this.difficulty === 'medium') {
-      withoutTrump = Math.random() < 0.15;
+      // Medium: Basic check for dominant suit
+      const dominantSuit = handStrength.longestSuit;
+      const has7InDominant = player.hand.some(c => c.color === dominantSuit.color && c.value === 7);
+      withoutTrump = dominantSuit.count >= 5 && has7InDominant && Math.random() < 0.2;
     } else {
       withoutTrump = Math.random() < 0.10;
     }
@@ -144,6 +189,10 @@ export class BotPlayer {
   /**
    * Find the best trump color for this hand
    * During betting, bots should assume they'll choose the best trump if they win
+   *
+   * IMPROVEMENT #1: Void suit trump selection
+   * Void in a suit is HUGE advantage - you can cut every time that suit is led!
+   * Especially powerful if void is in RED (can capture all Red 0 tricks for +5 points)
    */
   private static findBestTrump(hand: Card[]): CardColor {
     const suitCounts: Record<CardColor, number> = { red: 0, brown: 0, green: 0, blue: 0 };
@@ -156,7 +205,51 @@ export class BotPlayer {
       }
     });
 
-    // Find color with best combination of quantity and quality
+    // Check for void suits (0 cards in a color)
+    const voidSuits = (Object.keys(suitCounts) as CardColor[]).filter(color => suitCounts[color] === 0);
+
+    // STRATEGY: If void in red, strongly prefer making red trump
+    // This allows cutting all Red 0 tricks for +5 bonus points!
+    if (voidSuits.includes('red')) {
+      // Find the suit with the most cards that ISN'T red
+      let bestNonRedScore = 0;
+
+      (['brown', 'green', 'blue'] as CardColor[]).forEach(color => {
+        const count = suitCounts[color];
+        const highCards = suitHighCards[color];
+        const score = count + (highCards * 2);
+        if (score > bestNonRedScore) {
+          bestNonRedScore = score;
+        }
+      });
+
+      // Make red trump (which we're void in) if we have decent cards in another suit
+      if (bestNonRedScore >= 3) {
+        return 'red';
+      }
+    }
+
+    // Check for ANY void suit - major advantage
+    if (voidSuits.length > 0) {
+      // Prefer void in non-red suits (less critical but still powerful)
+      const nonRedVoids = voidSuits.filter(v => v !== 'red');
+      if (nonRedVoids.length > 0) {
+        // Make the void suit trump if we have at least 3 cards in another suit
+        const voidToConsider = nonRedVoids[0];
+        const otherSuits = (Object.keys(suitCounts) as CardColor[]).filter(c => c !== voidToConsider);
+        const bestOtherSuit = otherSuits.reduce((best, color) => {
+          const score = suitCounts[color] + (suitHighCards[color] * 2);
+          const bestScore = suitCounts[best] + (suitHighCards[best] * 2);
+          return score > bestScore ? color : best;
+        });
+
+        if (suitCounts[bestOtherSuit] >= 3) {
+          return voidToConsider;
+        }
+      }
+    }
+
+    // No void advantage - find color with best combination of quantity and quality
     let bestTrump: CardColor = 'red';
     let bestScore = 0;
 
@@ -410,35 +503,84 @@ export class BotPlayer {
       }
     }
 
-    // Priority 4: Positional play based on position
+    // IMPROVEMENT #4: Strategic opening leads
     if (position === 1) {
-      // Leading: Use card counting to determine safe leads
-      // Lead with medium-high cards in long suits, avoid trump unless strong
-      const nonTrumpMedium = impacts.filter(i => !i.isTrump && i.impact === 'medium');
-      if (nonTrumpMedium.length > 0) {
-        // Lead from longest suit
-        const suitCounts: Record<CardColor, number> = { red: 0, brown: 0, green: 0, blue: 0 };
-        playableCards.forEach(card => suitCounts[card.color]++);
-        const longestSuit = (Object.entries(suitCounts) as [CardColor, number][]).reduce((max, [color, count]) =>
-          count > max.count ? { color, count } : max
-        , { color: 'red' as CardColor, count: 0 });
+      const trump = gameState.trump;
 
-        const longestSuitCards = nonTrumpMedium.filter(i => i.card.color === longestSuit.color);
+      // Count cards per suit
+      const suitCounts: Record<CardColor, number> = { red: 0, brown: 0, green: 0, blue: 0 };
+      playableCards.forEach(card => suitCounts[card.color]++);
+
+      // Strategy 1: Lead from longest suit (4+ cards) to flush out trumps
+      const longestSuit = (Object.entries(suitCounts) as [CardColor, number][]).reduce((max, [color, count]) =>
+        count > max.count ? { color, count } : max
+      , { color: 'red' as CardColor, count: 0 });
+
+      if (longestSuit.count >= 4 && longestSuit.color !== trump) {
+        // Lead medium card from longest suit
+        const longestSuitCards = impacts.filter(i =>
+          i.card.color === longestSuit.color &&
+          i.impact === 'medium'
+        );
         if (longestSuitCards.length > 0) {
           return longestSuitCards[0].card;
         }
+      }
+
+      // Strategy 2: Lead red non-trump early to force out Red 0
+      const tricksPlayed = this.cardMemory.get(gameState.id)?.length || 0;
+      if (tricksPlayed < 4 && trump !== 'red') {
+        const redNonZero = impacts.find(i =>
+          i.card.color === 'red' &&
+          i.card.value !== 0 &&
+          i.impact === 'medium'
+        );
+        if (redNonZero) {
+          return redNonZero.card;
+        }
+      }
+
+      // Strategy 3: Lead low trump if partner might have Red 0 (set up bonus trick)
+      // Only if we have 3+ trumps (can afford to spend one)
+      const trumpCards = playableCards.filter(c => c.color === trump);
+      if (trumpCards.length >= 3) {
+        const lowTrump = trumpCards.filter(c => c.value <= 3);
+        if (lowTrump.length > 0) {
+          return lowTrump[0];
+        }
+      }
+
+      // Strategy 4: Avoid leading singletons (gives away info)
+      const nonSingletons = impacts.filter(i => suitCounts[i.card.color] > 1);
+      if (nonSingletons.length > 0) {
+        // Lead medium card from non-singleton suits
+        const mediumNonSingletons = nonSingletons.filter(i => i.impact === 'medium');
+        if (mediumNonSingletons.length > 0) {
+          return mediumNonSingletons[0].card;
+        }
+        return nonSingletons[0].card;
+      }
+
+      // Fallback: Lead medium-high non-trump
+      const nonTrumpMedium = impacts.filter(i => !i.isTrump && i.impact === 'medium');
+      if (nonTrumpMedium.length > 0) {
         return nonTrumpMedium[0].card;
       }
     }
 
     if (position === 2) {
       // Second to play: Decide whether to win or duck
-      const canBeatFirst = impacts.some(i => i.canWinTrick);
-
-      if (canBeatFirst) {
-        // Win with lowest possible card
-        const winningCards = impacts.filter(i => i.canWinTrick).sort((a, b) => a.card.value - b.card.value);
-        return winningCards[0].card;
+      // IMPROVEMENT #5: Prefer guaranteed wins
+      const winningCards = impacts.filter(i => i.canWinTrick);
+      if (winningCards.length > 0) {
+        // Check for guaranteed wins first
+        const guaranteedWins = winningCards.filter(i => this.isGuaranteedWin(i.card, gameState));
+        if (guaranteedWins.length > 0) {
+          // Use lowest guaranteed winning card
+          return guaranteedWins.sort((a, b) => a.card.value - b.card.value)[0].card;
+        }
+        // Otherwise use lowest winning card
+        return winningCards.sort((a, b) => a.card.value - b.card.value)[0].card;
       } else {
         // Can't win, play lowest
         const lowCards = impacts.filter(i => i.impact === 'low');
@@ -454,8 +596,13 @@ export class BotPlayer {
         if (lowCards.length > 0) return lowCards[0].card;
       } else {
         // Try to win or overtrump
+        // IMPROVEMENT #5: Prefer guaranteed wins
         const winningCards = impacts.filter(i => i.canWinTrick);
         if (winningCards.length > 0) {
+          const guaranteedWins = winningCards.filter(i => this.isGuaranteedWin(i.card, gameState));
+          if (guaranteedWins.length > 0) {
+            return guaranteedWins.sort((a, b) => a.card.value - b.card.value)[0].card;
+          }
           return winningCards.sort((a, b) => a.card.value - b.card.value)[0].card;
         }
       }
@@ -469,8 +616,10 @@ export class BotPlayer {
         if (lowCards.length > 0) return lowCards[0].card;
       } else {
         // Enemy winning, win if possible
+        // IMPROVEMENT #5: At position 4, we know EXACTLY what's needed
         const winningCards = impacts.filter(i => i.canWinTrick);
         if (winningCards.length > 0) {
+          // Use absolute lowest card that can win (no need for guaranteed check, we're last!)
           return winningCards.sort((a, b) => a.card.value - b.card.value)[0].card;
         }
       }
@@ -555,6 +704,52 @@ export class BotPlayer {
   }
 
   /**
+   * IMPROVEMENT #5: Check if a card is GUARANTEED to win (card counting)
+   * Uses card memory to determine if all higher cards have been played
+   */
+  private static isGuaranteedWin(card: Card, gameState: GameState): boolean {
+    const trick = gameState.currentTrick;
+    if (trick.length === 0) return false; // Can't guarantee when leading
+
+    const trump = gameState.trump;
+    const ledSuit = trick[0].card.color;
+    const playedCards = this.cardMemory.get(gameState.id) || [];
+
+    // If our card is trump
+    if (card.color === trump) {
+      // Check if all higher trumps have been played
+      for (let val = card.value + 1; val <= 7; val++) {
+        const higherTrump = playedCards.some(c => c.color === trump && c.value === val);
+        if (!higherTrump) {
+          return false; // A higher trump could still beat us
+        }
+      }
+      return true; // All higher trumps played, we're guaranteed to win
+    }
+
+    // If our card is led suit (and trump hasn't been played in trick)
+    if (card.color === ledSuit) {
+      const trumpInTrick = trick.some(tc => tc.card.color === trump);
+      if (trumpInTrick) return false; // Trump already played, we can't win
+
+      // Check if all higher led suit cards have been played
+      for (let val = card.value + 1; val <= 7; val++) {
+        const higherLedCard = playedCards.some(c => c.color === ledSuit && c.value === val);
+        if (!higherLedCard) {
+          return false; // A higher led suit card could beat us
+        }
+      }
+
+      // Check if trump could still beat us (has anyone shown void in led suit?)
+      // For now, conservatively assume trump could be played unless we know otherwise
+      return false; // Too risky to guarantee when trump could be played
+    }
+
+    // Off-suit non-trump can't win
+    return false;
+  }
+
+  /**
    * Update card memory with played cards
    */
   private static updateCardMemory(gameState: GameState): void {
@@ -614,6 +809,24 @@ export class BotPlayer {
 
     const partner = gameState.players.find(p => p.id !== playerId && p.teamId === player.teamId);
     return partner || null;
+  }
+
+  /**
+   * Determine betting position (first, last, middle)
+   * IMPROVEMENT #2: Used for position-based bet adjustment
+   */
+  private static getBettingPosition(gameState: GameState, _playerIndex: number): 'first' | 'middle' | 'last' {
+    const currentBets = gameState.currentBets;
+    const validBets = currentBets.filter(b => !b.skipped);
+
+    // First to bet if no valid bets yet
+    if (validBets.length === 0) return 'first';
+
+    // Last to bet if 3 bets already placed
+    if (validBets.length === 3) return 'last';
+
+    // Otherwise middle
+    return 'middle';
   }
 
   /**

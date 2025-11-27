@@ -24,10 +24,21 @@ interface BetSuggestion {
 /**
  * Find the best trump color for this hand
  * During betting, assume you'll choose the best trump if you win
+ *
+ * IMPROVEMENT #1: Void suit trump selection
+ * Void in a suit is HUGE advantage - you can cut every time that suit is led!
+ * Especially powerful if void is in RED (can capture all Red 0 tricks for +5 points)
  */
 function findBestTrump(hand: Card[]): CardColor {
   const colorDistribution = new Map<CardColor, number>();
   const colorHighCards = new Map<CardColor, number>();
+
+  // Initialize all colors
+  const colors: CardColor[] = ['red', 'brown', 'green', 'blue'];
+  colors.forEach(color => {
+    colorDistribution.set(color, 0);
+    colorHighCards.set(color, 0);
+  });
 
   hand.forEach((card) => {
     colorDistribution.set(card.color, (colorDistribution.get(card.color) || 0) + 1);
@@ -36,7 +47,51 @@ function findBestTrump(hand: Card[]): CardColor {
     }
   });
 
-  // Find color with best combination of quantity and quality
+  // Check for void suits (0 cards in a color)
+  const voidSuits = colors.filter(color => colorDistribution.get(color) === 0);
+
+  // STRATEGY: If void in red, strongly prefer making red trump
+  // This allows cutting all Red 0 tricks for +5 bonus points!
+  if (voidSuits.includes('red')) {
+    // Find the suit with the most cards that ISN'T red
+    let bestNonRedScore = 0;
+
+    (['brown', 'green', 'blue'] as CardColor[]).forEach(color => {
+      const count = colorDistribution.get(color) || 0;
+      const highCards = colorHighCards.get(color) || 0;
+      const score = count + (highCards * 2);
+      if (score > bestNonRedScore) {
+        bestNonRedScore = score;
+      }
+    });
+
+    // Make red trump (which we're void in) if we have decent cards in another suit
+    if (bestNonRedScore >= 3) {
+      return 'red';
+    }
+  }
+
+  // Check for ANY void suit - major advantage
+  if (voidSuits.length > 0) {
+    // Prefer void in non-red suits (less critical but still powerful)
+    const nonRedVoids = voidSuits.filter(v => v !== 'red');
+    if (nonRedVoids.length > 0) {
+      // Make the void suit trump if we have at least 3 cards in another suit
+      const voidToConsider = nonRedVoids[0];
+      const otherSuits = colors.filter(c => c !== voidToConsider);
+      const bestOtherSuit = otherSuits.reduce((best, color) => {
+        const score = (colorDistribution.get(color) || 0) + ((colorHighCards.get(color) || 0) * 2);
+        const bestScore = (colorDistribution.get(best) || 0) + ((colorHighCards.get(best) || 0) * 2);
+        return score > bestScore ? color : best;
+      });
+
+      if ((colorDistribution.get(bestOtherSuit) || 0) >= 3) {
+        return voidToConsider;
+      }
+    }
+  }
+
+  // No void advantage - find color with best combination of quantity and quality
   let bestTrump: CardColor = 'red';
   let bestScore = 0;
 
