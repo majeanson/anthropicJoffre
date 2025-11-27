@@ -494,12 +494,83 @@ export class BotPlayer {
       }
     }
 
-    // PRIORITY 3: Get rid of brown 0 strategically (only if partner NOT winning)
+    // IMPROVEMENT #7: Endgame strategy detection
+    const player = gameState.players.find(p => p.id === playerId);
+    const tricksRemaining = player ? player.hand.length : 0;
+    const isEndgame = tricksRemaining <= 2;
+
+    // IMPROVEMENT #10: Better brown 0 disposal timing
     const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
     if (brownZero) {
-      // Play it if we're not winning or if it's safe (but NOT on partner!)
-      if (position > 1 && (!currentWinner || currentWinner !== playerId) && (!partner || currentWinner !== partner.id)) {
-        return brownZero.card;
+      // ENDGAME: Keep brown 0 if we're behind in bet (force opponent to take -2)
+      if (isEndgame && partner) {
+        const ourTeam = gameState.players.filter(p => p.teamId === player!.teamId);
+        const opponentTeam = gameState.players.filter(p => p.teamId !== player!.teamId);
+        const ourPoints = ourTeam.reduce((sum, p) => sum + p.pointsWon, 0);
+        const theirPoints = opponentTeam.reduce((sum, p) => sum + p.pointsWon, 0);
+
+        // If behind, keep brown 0 to minimize their points
+        if (ourPoints < theirPoints) {
+          // Don't play brown 0 in endgame when behind
+        } else {
+          // If ahead or tied, dump brown 0 when safe
+          if (position > 1 && (!currentWinner || currentWinner !== playerId) && (!partner || currentWinner !== partner.id)) {
+            return brownZero.card;
+          }
+        }
+      } else {
+        // EARLY/MID GAME: Dump brown 0 when opponent leading weak suits
+        if (position > 1 && (!currentWinner || currentWinner !== playerId) && (!partner || currentWinner !== partner.id)) {
+          return brownZero.card;
+        }
+      }
+    }
+
+    // IMPROVEMENT #7: Endgame aggressive/defensive strategy
+    if (isEndgame && partner && player) {
+      const ourTeam = gameState.players.filter(p => p.teamId === player.teamId);
+      const opponentTeam = gameState.players.filter(p => p.teamId !== player.teamId);
+      const ourPoints = ourTeam.reduce((sum, p) => sum + p.pointsWon, 0);
+      const theirPoints = opponentTeam.reduce((sum, p) => sum + p.pointsWon, 0);
+
+      // Check if Red 0 is still in play
+      const playedCards = this.cardMemory.get(gameState.id) || [];
+      const redZeroPlayed = playedCards.some(c => c.color === 'red' && c.value === 0);
+      const redZeroInTrick = currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
+      const redZeroStillOut = !redZeroPlayed && !redZeroInTrick;
+
+      // CASE 1: Red 0 still out and last 1-2 tricks - MUST secure it!
+      if (redZeroStillOut && redZeroInTrick && tricksRemaining <= 2) {
+        const winningCards = impacts.filter(i => i.canWinTrick);
+        if (winningCards.length > 0) {
+          // Use HIGHEST card to guarantee win (+5 points is worth it!)
+          return winningCards.sort((a, b) => b.card.value - a.card.value)[0].card;
+        }
+      }
+
+      // CASE 2: Close to bet target - aggressive play
+      const highestBet = gameState.highestBet;
+      if (highestBet) {
+        const betTarget = highestBet.amount;
+        const pointsNeeded = betTarget - ourPoints;
+
+        if (pointsNeeded > 0 && pointsNeeded <= (tricksRemaining * 6)) {
+          // We can still make our bet - play aggressively
+          const winningCards = impacts.filter(i => i.canWinTrick);
+          if (winningCards.length > 0) {
+            return winningCards.sort((a, b) => a.card.value - b.card.value)[0].card;
+          }
+        }
+
+        // CASE 3: Opponent close to their bet - defensive play
+        const opponentBetWinning = (theirPoints >= betTarget);
+        if (opponentBetWinning && tricksRemaining <= 2) {
+          // Deny them points - try to win every trick
+          const winningCards = impacts.filter(i => i.canWinTrick);
+          if (winningCards.length > 0) {
+            return winningCards.sort((a, b) => a.card.value - b.card.value)[0].card;
+          }
+        }
       }
     }
 
