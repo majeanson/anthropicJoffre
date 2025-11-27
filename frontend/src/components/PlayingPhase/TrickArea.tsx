@@ -13,6 +13,7 @@ import { PlayerPosition } from './PlayerPosition';
 import { ConfettiEffect } from '../ConfettiEffect';
 import { GameState, TrickCard, Player } from '../../types/game';
 import logger from '../../utils/logger';
+import type { MoveSuggestion } from '../../utils/moveSuggestion';
 
 interface TrickWinnerInfo {
   playerName: string;
@@ -30,6 +31,14 @@ export interface TrickAreaProps {
   onSwapPosition?: (targetPlayerId: string) => void;
   trickWinner?: TrickWinnerInfo | null;
   onClickPlayer?: (playerName: string) => void;
+  botThinkingMap: Map<string, string>;
+  openThinkingButtons: Set<string>;
+  onToggleBotThinking: (botName: string) => void;
+  currentSuggestion: MoveSuggestion | null;
+  suggestionOpen: boolean;
+  onToggleSuggestion: () => void;
+  beginnerMode: boolean;
+  isCurrentTurn: boolean;
 }
 
 export const TrickArea = memo(function TrickArea({
@@ -41,6 +50,14 @@ export const TrickArea = memo(function TrickArea({
   onSwapPosition,
   trickWinner,
   onClickPlayer,
+  botThinkingMap,
+  openThinkingButtons,
+  onToggleBotThinking,
+  currentSuggestion,
+  suggestionOpen,
+  onToggleSuggestion,
+  beginnerMode,
+  isCurrentTurn,
 }: TrickAreaProps) {
   const [showPreviousTrick, setShowPreviousTrick] = useState(false);
   const [trickCollectionAnimation, setTrickCollectionAnimation] = useState(false);
@@ -187,6 +204,19 @@ export const TrickArea = memo(function TrickArea({
           previousCardPositions[positionIndex]?.playerId === gameState.previousTrick?.winnerId)
     );
 
+    // Check if bot has thinking reason in current trick
+    const botThinking = player?.isBot && player.name && botThinkingMap.has(player.name)
+      ? botThinkingMap.get(player.name)!
+      : null;
+    const botThinkingOpen = player?.name ? openThinkingButtons.has(player.name) : false;
+
+    // Position for tooltip (opposite of player position)
+    const tooltipPositions: ('top' | 'bottom' | 'left' | 'right')[] = ['top', 'right', 'bottom', 'left'];
+    const tooltipPosition = tooltipPositions[positionIndex];
+
+    // Show suggestion button for human player when it's their turn and beginner mode is on
+    const showSuggestion = Boolean(isYou && isCurrentTurn && beginnerMode && currentSuggestion && !isSpectator);
+
     return (
       <PlayerPosition
         player={player}
@@ -197,6 +227,14 @@ export const TrickArea = memo(function TrickArea({
         onSwap={() => player && onSwapPosition?.(player.id)}
         currentPlayerTeamId={currentPlayer?.teamId}
         onClickPlayer={onClickPlayer}
+        botThinking={botThinking}
+        botThinkingOpen={botThinkingOpen}
+        onToggleBotThinking={() => player?.name && onToggleBotThinking(player.name)}
+        tooltipPosition={tooltipPosition}
+        showSuggestion={showSuggestion}
+        suggestion={currentSuggestion}
+        suggestionOpen={suggestionOpen}
+        onToggleSuggestion={onToggleSuggestion}
       />
     );
   };

@@ -22,7 +22,7 @@ import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
 import { MoveSuggestionPanel } from '../MoveSuggestionPanel';
-import { BotThinkingIndicator } from '../BotThinkingIndicator';
+import { suggestMove } from '../../utils/moveSuggestion';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';
@@ -139,11 +139,10 @@ function PlayingPhaseComponent({
     position: 'bottom' | 'left' | 'top' | 'right';
   } | null>(null);
 
-  // IMPROVEMENT #11: Bot thinking indicator state
-  const [botThinking, setBotThinking] = useState<{
-    botName: string;
-    action: string;
-  } | null>(null);
+  // IMPROVEMENT #11: Bot thinking - store reasons for ALL bots in current trick
+  const [botThinkingMap, setBotThinkingMap] = useState<Map<string, string>>(new Map());
+  const [openThinkingButtons, setOpenThinkingButtons] = useState<Set<string>>(new Set());
+  const [suggestionOpen, setSuggestionOpen] = useState(false);
 
   // Track autoplayEnabled with ref to avoid stale closure
   const autoplayEnabledRef = useRef(autoplayEnabled);
@@ -174,6 +173,23 @@ function PlayingPhaseComponent({
       onAutoplayToggle();
     }
   }, [isCurrentTurn, onAutoplayToggle]);
+
+  // Toggle handlers for bot thinking and move suggestions
+  const toggleBotThinking = useCallback((botName: string) => {
+    setOpenThinkingButtons(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(botName)) {
+        newSet.delete(botName);
+      } else {
+        newSet.add(botName);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const toggleSuggestion = useCallback(() => {
+    setSuggestionOpen(prev => !prev);
+  }, []);
 
   // Trick winner listener
   useEffect(() => {
@@ -237,42 +253,47 @@ function PlayingPhaseComponent({
     }
   }, [gameState.previousTrick, currentPlayer?.teamId, gameState.players]);
 
-  // IMPROVEMENT #11: Bot thinking indicator - show when bot plays a card
+  // IMPROVEMENT #11: Generate thinking reasons for ALL bots in current trick
   useEffect(() => {
-    const trickLength = gameState.currentTrick.length;
-    if (trickLength === 0) return;
+    const newMap = new Map<string, string>();
 
-    const lastPlay = gameState.currentTrick[trickLength - 1];
-    const lastPlayer = gameState.players.find(p => p.name === lastPlay.playerName);
+    gameState.currentTrick.forEach((play, index) => {
+      const player = gameState.players.find(p => p.name === play.playerName);
+      if (!player?.isBot) return; // Only for bots
 
-    if (!lastPlayer?.isBot) return; // Only show for bots
+      // Generate helpful message based on the card played
+      const card = play.card;
+      const trickLength = index + 1;
+      let action = '';
 
-    // Generate helpful message based on the card played
-    const card = lastPlay.card;
-    let action = '';
-
-    if (card.color === 'red' && card.value === 0) {
-      action = 'Playing Red 0 for +5 bonus points!';
-    } else if (card.color === 'brown' && card.value === 0) {
-      action = 'Dumping Brown 0 (-2 penalty)';
-    } else if (card.value === 7) {
-      if (trickLength === 1) {
-        action = `Leading with 7 ${card.color} to control the trick`;
+      if (card.color === 'red' && card.value === 0) {
+        action = 'Playing Red 0 for +5 bonus points!';
+      } else if (card.color === 'brown' && card.value === 0) {
+        action = 'Dumping Brown 0 (-2 penalty)';
+      } else if (card.value === 7) {
+        if (trickLength === 1) {
+          action = `Leading with 7 ${card.color} to control the trick`;
+        } else {
+          action = `Playing 7 ${card.color} to secure the win`;
+        }
+      } else if (trickLength === 1) {
+        action = `Leading with ${card.value} ${card.color}`;
+      } else if (card.color === gameState.trump) {
+        action = `Playing trump (${card.value} ${card.color})`;
       } else {
-        action = `Playing 7 ${card.color} to secure the win`;
+        action = `Playing ${card.value} ${card.color}`;
       }
-    } else if (trickLength === 1) {
-      action = `Leading with ${card.value} ${card.color}`;
-    } else if (card.color === gameState.trump) {
-      action = `Playing trump (${card.value} ${card.color})`;
-    } else {
-      action = `Playing ${card.value} ${card.color}`;
-    }
 
-    setBotThinking({
-      botName: lastPlayer.name,
-      action
+      newMap.set(player.name, action);
     });
+
+    setBotThinkingMap(newMap);
+
+    // Clear open buttons when trick changes (new trick starts)
+    if (gameState.currentTrick.length === 0) {
+      setOpenThinkingButtons(new Set());
+      setSuggestionOpen(false);
+    }
   }, [gameState.currentTrick, gameState.players, gameState.trump]);
 
   // "Your turn" notification
@@ -393,18 +414,15 @@ function PlayingPhaseComponent({
     );
   };
 
+  // Get current move suggestion for human player
+  const currentSuggestion = useMemo(() => {
+    if (!isCurrentTurn || isSpectator || gameState.phase !== 'playing') return null;
+    const suggestion = suggestMove(gameState, currentPlayerId);
+    return suggestion;
+  }, [isCurrentTurn, isSpectator, gameState, currentPlayerId]);
+
   return (
     <div className="h-screen-safe md:min-h-screen-safe bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-y-auto overflow-x-hidden md:overflow-visible">
-      {/* IMPROVEMENT #11: Bot thinking indicator */}
-      {botThinking && (
-        <BotThinkingIndicator
-          botName={botThinking.botName}
-          action={botThinking.action}
-          visible={!!botThinking}
-          onDismiss={() => setBotThinking(null)}
-        />
-      )}
-
       <GameHeader
         gameId={gameId || ''}
         roundNumber={gameState.roundNumber}
@@ -446,6 +464,14 @@ function PlayingPhaseComponent({
               onSwapPosition={onSwapPosition}
               trickWinner={trickWinner}
               onClickPlayer={onClickPlayer}
+              botThinkingMap={botThinkingMap}
+              openThinkingButtons={openThinkingButtons}
+              onToggleBotThinking={toggleBotThinking}
+              currentSuggestion={currentSuggestion}
+              suggestionOpen={suggestionOpen}
+              onToggleSuggestion={toggleSuggestion}
+              beginnerMode={beginnerMode}
+              isCurrentTurn={isCurrentTurn}
             />
 
             {/* Beginner Mode: Move Suggestion - Overlaid above bottom of playing field */}

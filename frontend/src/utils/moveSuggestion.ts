@@ -5,7 +5,7 @@
 
 import { Card, GameState, CardColor } from '../types/game';
 
-interface MoveSuggestion {
+export interface MoveSuggestion {
   card: Card;
   reason: string;
   priority: 'high' | 'medium' | 'low';
@@ -13,7 +13,7 @@ interface MoveSuggestion {
   alternatives?: string; // Explanation of other options and why this is better
 }
 
-interface BetSuggestion {
+export interface BetSuggestion {
   amount: number;
   withoutTrump: boolean;
   reason: string;

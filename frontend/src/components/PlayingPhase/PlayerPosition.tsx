@@ -8,6 +8,9 @@
 
 import { memo } from 'react';
 import { Player } from '../../types/game';
+import { BotThinkingIndicator } from '../BotThinkingIndicator';
+import { MoveSuggestionButton } from '../MoveSuggestionButton';
+import type { MoveSuggestion } from '../../utils/moveSuggestion';
 
 export interface PlayerPositionProps {
   player: Player | null;
@@ -18,6 +21,14 @@ export interface PlayerPositionProps {
   onSwap: () => void;
   currentPlayerTeamId?: number | null;
   onClickPlayer?: (playerName: string) => void;
+  botThinking: string | null;
+  botThinkingOpen: boolean;
+  onToggleBotThinking: () => void;
+  tooltipPosition: 'top' | 'bottom' | 'left' | 'right';
+  showSuggestion: boolean;
+  suggestion: MoveSuggestion | null;
+  suggestionOpen: boolean;
+  onToggleSuggestion: () => void;
 }
 
 export const PlayerPosition = memo(function PlayerPosition({
@@ -29,6 +40,14 @@ export const PlayerPosition = memo(function PlayerPosition({
   onSwap,
   currentPlayerTeamId,
   onClickPlayer,
+  botThinking,
+  botThinkingOpen,
+  onToggleBotThinking,
+  tooltipPosition,
+  showSuggestion,
+  suggestion,
+  suggestionOpen,
+  onToggleSuggestion,
 }: PlayerPositionProps) {
   // Helper: Get bot difficulty badge
   const getBotDifficultyBadge = (): JSX.Element | null => {
@@ -113,8 +132,47 @@ export const PlayerPosition = memo(function PlayerPosition({
   // Players can click on their own profile and other real players (not bots or empty seats)
   const isClickable = player && !player.isEmpty && !player.isBot && onClickPlayer;
 
+  // Helper: Format suggestion details for display
+  const getSuggestionDetails = (): string => {
+    if (!suggestion) return '';
+    return suggestion.explanation || suggestion.reason || '';
+  };
+
+  const getSuggestionSummary = (): string => {
+    if (!suggestion) return '';
+    const colorEmoji: Record<string, string> = {
+      red: '🔴',
+      blue: '🔵',
+      green: '🟢',
+      brown: '🟤',
+    };
+    return `${suggestion.card.value} ${colorEmoji[suggestion.card.color]}`;
+  };
+
   return (
-    <div className="flex items-center">
+    <div className="flex items-center gap-1">
+      {/* Bot Thinking Button - Show for bots who have played in current trick */}
+      {botThinking && player?.isBot && (
+        <BotThinkingIndicator
+          botName={player.name}
+          action={botThinking}
+          isOpen={botThinkingOpen}
+          onToggle={onToggleBotThinking}
+          position={tooltipPosition}
+        />
+      )}
+
+      {/* Move Suggestion Button - Show for human player when it's their turn */}
+      {showSuggestion && suggestion && (
+        <MoveSuggestionButton
+          suggestion={getSuggestionSummary()}
+          details={getSuggestionDetails()}
+          isOpen={suggestionOpen}
+          onToggle={onToggleSuggestion}
+          position={tooltipPosition}
+        />
+      )}
+
       <div className={getBadgeClasses()}>
         <span className="flex items-center justify-center">
           {player?.isEmpty && '💺 '}

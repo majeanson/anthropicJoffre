@@ -1,64 +1,65 @@
 /**
  * BotThinkingIndicator Component
- * IMPROVEMENT #11: Bot thinking tooltips UI
+ * IMPROVEMENT #11: Bot thinking tooltips UI (Mobile-Friendly Toggle Version)
  *
- * Shows what the bot is thinking when it makes a move
- * Displays brief explanatory messages about bot decisions
+ * Small floating button that toggles tooltip showing what the bot is thinking
+ * Mobile-friendly: User controls when to see the information
  */
-
-import { useEffect, useState } from 'react';
 
 interface BotThinkingIndicatorProps {
   botName: string;
-  action: string; // e.g., "Leading 7 red to flush out trumps", "Adding Red 0 for +5 bonus!"
-  visible: boolean;
-  onDismiss: () => void;
+  action: string;
+  isOpen: boolean;
+  onToggle: () => void;
+  position?: 'top' | 'bottom' | 'left' | 'right'; // Position relative to player
 }
 
-export function BotThinkingIndicator({ botName, action, visible, onDismiss }: BotThinkingIndicatorProps) {
-  const [isShowing, setIsShowing] = useState(false);
-
-  useEffect(() => {
-    if (visible) {
-      setIsShowing(true);
-      // Auto-dismiss after 4 seconds
-      const timer = setTimeout(() => {
-        setIsShowing(false);
-        setTimeout(onDismiss, 300); // Wait for fade-out animation
-      }, 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [visible, onDismiss]);
-
-  if (!visible && !isShowing) return null;
+export function BotThinkingIndicator({ botName, action, isOpen, onToggle, position = 'top' }: BotThinkingIndicatorProps) {
+  // Position classes for tooltip
+  const tooltipPosition = {
+    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
+    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
+    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
+    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  }[position];
 
   return (
-    <div
-      className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
-        isShowing ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-      }`}
-    >
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg shadow-2xl border-2 border-blue-300 max-w-md">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 bg-white/20 rounded-full">
-            <span className="text-xl animate-pulse">🤖</span>
+    <div className="relative inline-flex">
+      {/* Toggle Button - Small, mobile-friendly */}
+      <button
+        onClick={onToggle}
+        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center ${
+          isOpen
+            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white scale-110'
+            : 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 hover:scale-105'
+        }`}
+        aria-label={`${isOpen ? 'Hide' : 'Show'} ${botName}'s thinking`}
+        title={`${isOpen ? 'Hide' : 'Show'} what ${botName} is thinking`}
+      >
+        <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`}>
+          🤖
+        </span>
+      </button>
+
+      {/* Tooltip - Appears on toggle */}
+      {isOpen && (
+        <div
+          className={`absolute z-50 ${tooltipPosition} whitespace-nowrap pointer-events-none`}
+          style={{ maxWidth: '90vw' }}
+        >
+          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex-shrink-0">
+                <span className="text-sm md:text-lg">🤖</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-semibold opacity-90 truncate">{botName}</div>
+                <div className="text-xs md:text-sm font-bold mt-0.5">{action}</div>
+              </div>
+            </div>
           </div>
-          <div className="flex-1">
-            <div className="text-xs font-semibold opacity-90">{botName} is thinking...</div>
-            <div className="text-sm font-bold mt-0.5">{action}</div>
-          </div>
-          <button
-            onClick={() => {
-              setIsShowing(false);
-              setTimeout(onDismiss, 300);
-            }}
-            className="text-white/70 hover:text-white transition-colors"
-            aria-label="Dismiss"
-          >
-            ✕
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }
