@@ -9,12 +9,14 @@
 interface MoveSuggestionButtonProps {
   suggestion: string;
   details: string;
+  alternatives?: string;
   isOpen: boolean;
   onToggle: () => void;
   position?: 'top' | 'bottom' | 'left' | 'right';
+  showTutorial?: boolean;
 }
 
-export function MoveSuggestionButton({ suggestion, details, isOpen, onToggle, position = 'bottom' }: MoveSuggestionButtonProps) {
+export function MoveSuggestionButton({ suggestion, details, alternatives, isOpen, onToggle, position = 'bottom', showTutorial = false }: MoveSuggestionButtonProps) {
   // Position classes for tooltip
   const tooltipPosition = {
     top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
@@ -24,7 +26,17 @@ export function MoveSuggestionButton({ suggestion, details, isOpen, onToggle, po
   }[position];
 
   return (
-    <div className="relative inline-flex z-[100]">
+    <div className="relative inline-flex z-[100] motion-safe:animate-fade-in-scale">
+      {/* Tutorial Tooltip - Shows on first appearance */}
+      {showTutorial && !isOpen && (
+        <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-[101] pointer-events-none animate-bounce-once">
+          <div className="bg-gray-900 dark:bg-gray-800 text-white px-3 py-2 rounded-lg text-xs whitespace-nowrap shadow-2xl border border-gray-700">
+            👆 Press and hold to peek
+            <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-800 rotate-45 border-r border-b border-gray-700" />
+          </div>
+        </div>
+      )}
+
       {/* Press-to-Show Button - Hold to peek */}
       <button
         onMouseDown={onToggle}
@@ -59,7 +71,18 @@ export function MoveSuggestionButton({ suggestion, details, isOpen, onToggle, po
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-semibold opacity-90">Suggestion</div>
                 <div className="text-sm md:text-base font-bold mt-0.5">{suggestion}</div>
-                <div className="text-xs md:text-sm mt-1 opacity-90">{details}</div>
+                <div className="text-xs md:text-sm mt-1 opacity-90 whitespace-normal">{details}</div>
+
+                {/* Alternatives Section - Visually Separated */}
+                {alternatives && (
+                  <div className="mt-2 pt-2 border-t border-white/30">
+                    <div className="text-xs font-semibold opacity-70 flex items-center gap-1">
+                      <span>💭</span>
+                      <span>Alternative:</span>
+                    </div>
+                    <div className="text-xs mt-0.5 opacity-80 whitespace-normal">{alternatives}</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

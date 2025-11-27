@@ -282,6 +282,11 @@ export default {
           '0%': { width: '100%' },
           '100%': { width: '0%' },
         },
+        // Polish: Suggestion button entrance
+        'fade-in-scale': {
+          '0%': { opacity: '0', transform: 'scale(0.8)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
       },
       animation: {
         'slide-from-bottom': 'slide-from-bottom 0.4s ease-out',
@@ -329,6 +334,8 @@ export default {
         'bounce-once': 'bounce-once 0.5s ease-out',
         'spin-slow': 'spin-slow 3s linear infinite',
         'progress-fill': 'progress-fill 5s linear forwards',
+        // Polish: Suggestion button entrance
+        'fade-in-scale': 'fade-in-scale 0.3s ease-out',
       },
     },
   },

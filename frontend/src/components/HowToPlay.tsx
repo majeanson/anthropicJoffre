@@ -73,6 +73,58 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         </div>
       </section>
 
+      {/* Beginner Mode Features */}
+      <section className="bg-emerald-50 dark:bg-emerald-900/40 rounded-lg p-4 border-2 border-emerald-300 dark:border-emerald-600">
+        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+          💡 Beginner Mode Features
+        </h3>
+        <div className="space-y-4">
+          {/* Move Suggestions */}
+          <div>
+            <p className="font-semibold text-emerald-800 dark:text-emerald-200 mb-2 text-lg">
+              Move Suggestions (Press to Show)
+            </p>
+            <ul className="space-y-2 ml-4 text-base">
+              <li>• A <strong>💡 suggestion button</strong> appears next to your name during your turn</li>
+              <li>• <strong>Press and hold</strong> to peek at the AI's recommended card</li>
+              <li>• See reasoning for the suggestion and alternative options</li>
+              <li>• Release to hide - you control when to see hints</li>
+              <li>• Suggestions include defensive strategies (like using Brown 0 to poison opponent's trick)</li>
+            </ul>
+          </div>
+
+          {/* Bot Thinking Insights */}
+          <div>
+            <p className="font-semibold text-emerald-800 dark:text-emerald-200 mb-2 text-lg">
+              Bot Thinking Insights
+            </p>
+            <ul className="space-y-2 ml-4 text-base">
+              <li>• Bot difficulty badges (🤖 Easy/Med/Hard) show next to bot player names</li>
+              <li>• <strong>Press and hold the badge</strong> to see what the bot is thinking</li>
+              <li>• Learn strategic concepts like trump bleed, defensive plays, and trick control</li>
+              <li>• Release to hide - great for learning without spoiling your own decisions</li>
+            </ul>
+          </div>
+
+          {/* Clickable Player Names */}
+          <div>
+            <p className="font-semibold text-emerald-800 dark:text-emerald-200 mb-2 text-lg">
+              Clickable Player Names
+            </p>
+            <ul className="space-y-2 ml-4 text-base">
+              <li>• Click any human player's name to view their profile and stats</li>
+              <li>• Works during betting phase, playing phase, and team selection</li>
+              <li>• See win rates, game history, and recent performance</li>
+              <li>• Bot names are not clickable (they don't have profiles)</li>
+            </ul>
+          </div>
+
+          <p className="text-sm text-emerald-700 dark:text-emerald-300 italic mt-3 bg-emerald-100 dark:bg-emerald-800/50 p-2 rounded">
+            🎓 Learning Tip: Use bot thinking insights to understand advanced strategies, then apply them yourself!
+          </p>
+        </div>
+      </section>
+
       {/* Keyboard Navigation - Desktop only */}
       <section className="hidden md:block bg-indigo-50 dark:bg-indigo-900/40 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-600">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">

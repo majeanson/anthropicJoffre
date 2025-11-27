@@ -182,6 +182,11 @@ export const PlayerPosition = memo(function PlayerPosition({
     return suggestion.explanation || suggestion.reason || '';
   };
 
+  const getSuggestionAlternatives = (): string | undefined => {
+    if (!suggestion) return undefined;
+    return suggestion.alternatives;
+  };
+
   const getSuggestionSummary = (): string => {
     if (!suggestion) return '';
     const colorEmoji: Record<string, string> = {
@@ -200,9 +205,11 @@ export const PlayerPosition = memo(function PlayerPosition({
         <MoveSuggestionButton
           suggestion={getSuggestionSummary()}
           details={getSuggestionDetails()}
+          alternatives={getSuggestionAlternatives()}
           isOpen={suggestionOpen}
           onToggle={onToggleSuggestion}
           position={tooltipPosition}
+          showTutorial={!suggestionOpen}
         />
       )}
 
