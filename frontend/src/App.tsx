@@ -184,6 +184,12 @@ function AppContent() {
     setProfilePlayerName(playerName);
   }, []);
 
+  // Debug: Log when profilePlayerName changes
+  useEffect(() => {
+    console.log(`[App.tsx] profilePlayerName state changed to:`, profilePlayerName);
+    console.log(`[App.tsx] Should render modal:`, !!profilePlayerName);
+  }, [profilePlayerName]);
+
   // Online players tracking
   const [onlinePlayers, setOnlinePlayers] = useState<Array<{
     socketId: string;
@@ -1237,15 +1243,25 @@ function AppContent() {
 
         {/* Player Profile Modal - shows when clicking on player names */}
         <ErrorBoundary componentName="PlayerProfileModal">
-          <Suspense fallback={null}>
+          <Suspense fallback={<div>Loading profile...</div>}>
+            {(() => {
+              console.log(`[App.tsx] Checking profilePlayerName for modal render:`, profilePlayerName);
+              return null;
+            })()}
             {profilePlayerName && (
               <>
-                {console.log(`[App.tsx] Rendering PlayerProfileModal for: ${profilePlayerName}`)}
+                {(() => {
+                  console.log(`[App.tsx] Rendering PlayerProfileModal for: ${profilePlayerName}`);
+                  return null;
+                })()}
                 <PlayerProfileModal
                   playerName={profilePlayerName}
                   socket={socket}
                   isOpen={!!profilePlayerName}
-                  onClose={() => setProfilePlayerName(null)}
+                  onClose={() => {
+                    console.log(`[App.tsx] Closing PlayerProfileModal`);
+                    setProfilePlayerName(null);
+                  }}
                 />
               </>
             )}
