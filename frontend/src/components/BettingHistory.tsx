@@ -12,9 +12,10 @@ interface BettingHistoryProps {
   players: Player[];
   currentBets: Bet[];
   dealerIndex: number;
+  onClickPlayer?: (playerName: string) => void;
 }
 
-export function BettingHistory({ players, currentBets, dealerIndex }: BettingHistoryProps) {
+export function BettingHistory({ players, currentBets, dealerIndex, onClickPlayer }: BettingHistoryProps) {
   // Determine betting order (player after dealer goes first)
   const bettingOrder = [...Array(4)].map((_, i) => (dealerIndex + 1 + i) % 4);
 
@@ -85,9 +86,20 @@ export function BettingHistory({ players, currentBets, dealerIndex }: BettingHis
                 </span>
                 <div className="flex flex-col">
                   <div className="flex items-center gap-1">
-                    <span className="font-bold text-sm">
-                      {player.name}
-                    </span>
+                    {/* Player name - clickable if not a bot and onClickPlayer is provided */}
+                    {!player.isBot && onClickPlayer ? (
+                      <button
+                        onClick={() => onClickPlayer(player.name)}
+                        className="font-bold text-sm hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
+                        title={`View ${player.name}'s profile`}
+                      >
+                        {player.name}
+                      </button>
+                    ) : (
+                      <span className="font-bold text-sm">
+                        {player.name}
+                      </span>
+                    )}
                     {/* Team color badge - ALWAYS visible */}
                     <span
                       className={`text-xs px-1.5 py-0.5 rounded font-bold ${

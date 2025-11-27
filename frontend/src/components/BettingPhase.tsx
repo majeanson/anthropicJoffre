@@ -40,7 +40,7 @@ interface BettingPhaseProps {
   onClickPlayer: (playerName: string) => void; // Click player to view profile (REQUIRED)
 }
 
-function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
+function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage, onClickPlayer }: BettingPhaseProps) {
 
   // Get beginner mode setting
   const { beginnerMode } = useSettings();
@@ -306,6 +306,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
           players={players}
           currentBets={currentBets}
           dealerIndex={dealerIndex}
+          onClickPlayer={onClickPlayer}
         />
       </div>
 
