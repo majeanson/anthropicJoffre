@@ -9,11 +9,11 @@ import { ChatMessage } from '../types/game';
 import { GameHeader } from './GameHeader';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { sounds } from '../utils/sounds';
-import { InlineBetStatus } from './InlineBetStatus';
 import { SmartValidationMessage } from './SmartValidationMessage';
 import { useChatNotifications } from '../hooks/useChatNotifications';
 import { MoveSuggestionPanel } from './MoveSuggestionPanel';
 import { useSettings } from '../contexts/SettingsContext';
+import { BettingHistory } from './BettingHistory';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -40,7 +40,7 @@ interface BettingPhaseProps {
   onClickPlayer: (playerName: string) => void; // Click player to view profile (REQUIRED)
 }
 
-function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage, onClickPlayer }: BettingPhaseProps) {
+function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage }: BettingPhaseProps) {
 
   // Get beginner mode setting
   const { beginnerMode } = useSettings();
@@ -300,14 +300,12 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
         </div>
       )}
 
-      {/* Inline Bet Status - Compact horizontal display */}
+      {/* IMPROVEMENT #12: Betting History Visualization */}
       <div className="mb-6">
-        <InlineBetStatus
+        <BettingHistory
           players={players}
-          currentBets={new Map(currentBets.map(b => [b.playerName, { amount: b.amount, withoutTrump: b.withoutTrump }]))}
-          skippedPlayers={new Set(currentBets.filter(b => b.skipped).map(b => b.playerName))}
-          currentPlayerIndex={currentPlayerIndex}
-          onClickPlayer={onClickPlayer}
+          currentBets={currentBets}
+          dealerIndex={dealerIndex}
         />
       </div>
 
