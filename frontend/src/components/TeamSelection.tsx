@@ -9,6 +9,7 @@ import { UnifiedChat } from './UnifiedChat';
 import { TeamSelectionSocialSidebar } from './TeamSelectionSocialSidebar';
 import { sounds } from '../utils/sounds';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
 
 // Keyboard navigation type for team selection
 type NavSection = 'header' | 'teams' | 'difficulty' | 'actions' | 'rules';
@@ -321,7 +322,9 @@ export function TeamSelection({
 
         <div className="mb-6">
           <p className="text-sm text-umber-700 dark:text-gray-300 mb-2">Game ID:</p>
-          <div data-testid="game-id" className="bg-parchment-100 dark:bg-gray-700 p-3 rounded-lg font-mono text-lg text-center border-2 border-parchment-400 dark:border-gray-600 text-umber-900 dark:text-gray-100">{gameId}</div>
+          <UICard variant="bordered" size="md" className="bg-parchment-100 dark:bg-gray-700">
+            <div data-testid="game-id" className="font-mono text-lg text-center text-umber-900 dark:text-gray-100">{gameId}</div>
+          </UICard>
 
           {/* Copy Game Link Button */}
           <button
@@ -353,7 +356,7 @@ export function TeamSelection({
         {/* Team Selection */}
         <div className="grid grid-cols-2 gap-8 mb-8">
           {/* Team 1 */}
-          <div data-testid="team-1-container" className="border-2 border-orange-300 dark:border-orange-600 rounded-lg p-6 bg-orange-50 dark:bg-orange-900/40">
+          <UICard variant="bordered" size="lg" className="border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-900/40" data-testid="team-1-container">
             <h3 className="text-xl font-bold text-orange-800 dark:text-orange-200 mb-4 text-center">Team 1</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
@@ -462,10 +465,10 @@ export function TeamSelection({
                 );
               })}
             </div>
-          </div>
+          </UICard>
 
           {/* Team 2 */}
-          <div data-testid="team-2-container" className="border-2 border-purple-300 dark:border-purple-600 rounded-lg p-6 bg-purple-50 dark:bg-purple-900/40">
+          <UICard variant="bordered" size="lg" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/40" data-testid="team-2-container">
             <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-4 text-center">Team 2</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
@@ -572,7 +575,7 @@ export function TeamSelection({
                 );
               })}
             </div>
-          </div>
+          </UICard>
         </div>
 
 
@@ -580,7 +583,7 @@ export function TeamSelection({
         <div className="text-center space-y-3">
           {/* Bot Difficulty Selector */}
           {players.filter(p => !p.isEmpty).length < 4 && onAddBot && onBotDifficultyChange && (
-            <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-600 max-w-md mx-auto">
+            <UICard variant="bordered" size="md" className="bg-parchment-200 dark:bg-gray-700 max-w-md mx-auto">
               <label className="block text-xs font-semibold text-umber-700 dark:text-gray-300 mb-2">
                 Bot Difficulty
               </label>
@@ -619,7 +622,7 @@ export function TeamSelection({
                   Hard
                 </button>
               </div>
-            </div>
+            </UICard>
           )}
 
           <div className="flex gap-3 justify-center items-center">
@@ -661,9 +664,11 @@ export function TeamSelection({
           </div>
 
           {!canStartGame && (
-            <p data-testid="start-game-message" className="text-umber-800 dark:text-gray-200 bg-parchment-200 dark:bg-gray-600 border-2 border-umber-400 px-4 py-2 rounded-lg">
-              {startGameMessage}
-            </p>
+            <UICard variant="bordered" size="sm" className="bg-parchment-200 dark:bg-gray-600 border-umber-400">
+              <p data-testid="start-game-message" className="text-umber-800 dark:text-gray-200">
+                {startGameMessage}
+              </p>
+            </UICard>
           )}
         </div>
 
