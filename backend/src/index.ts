@@ -434,7 +434,14 @@ app.use('/api/', apiLimiter);
 
 // Serve Storybook static files at /storybook (Sprint 20)
 // Built from: frontend/storybook-static
-app.use('/storybook', express.static(resolve(__dirname, '../public/storybook')));
+// Only available when built locally with: npm run build:local
+const storybookPath = resolve(__dirname, '../public/storybook');
+if (existsSync(storybookPath)) {
+  app.use('/storybook', express.static(storybookPath));
+  logger.info('Storybook static files available at /storybook');
+} else {
+  logger.warn('Storybook not built - run "npm run build:local" to enable');
+}
 
 // Stricter rate limit for game creation
 const gameCreateLimiter = rateLimit({

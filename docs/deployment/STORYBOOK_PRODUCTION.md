@@ -1,57 +1,63 @@
-# Storybook Production Deployment
+# Storybook Deployment Guide
 
 **Last Updated**: 2025-11-27
-**Status**: ✅ **PRODUCTION READY**
+**Status**: ✅ **LOCAL DEVELOPMENT ONLY**
 
 ---
 
 ## 🎯 Overview
 
-Storybook is automatically built and deployed with the backend to Railway. It's accessible at `/storybook` route on the production backend URL.
+Storybook is available for local development only. It's NOT deployed to production (Railway) to reduce build time and deployment complexity. For production component documentation, use Storybook locally or deploy separately.
 
 ---
 
-## 🌐 Production URLs
+## 🌐 Access URLs
 
-### Development
+### Local Development
 - **Backend**: `http://localhost:3000`
-- **Storybook**: `http://localhost:3000/storybook`
+- **Storybook**: `http://localhost:3000/storybook` (after running `npm run build:local`)
 
 ### Production (Railway)
-- **Backend**: `https://your-app.up.railway.app` *(replace with your Railway URL)*
-- **Storybook**: `https://your-app.up.railway.app/storybook`
+- **Backend**: `https://your-app.up.railway.app`
+- **Storybook**: ❌ Not available in production (local development only)
 
 ---
 
 ## 🏗️ Build Process
 
-### Automatic (Railway Deployment)
+### Production Build (Railway)
 
-When you push to `main` branch, Railway automatically:
+Railway builds **backend only** (fast build ~1-2 minutes):
 
-1. **Builds backend** (`npm run build:backend`)
-   - Compiles TypeScript to `dist/`
+```bash
+npm run build
+# Runs: npm run build:backend
+# Output: dist/ (TypeScript compiled)
+```
 
-2. **Builds Storybook** (`npm run build:storybook`)
-   - Installs frontend dependencies
-   - Builds Storybook static site
-   - Copies to `backend/public/storybook/`
+**Storybook is NOT included** in production builds to keep deployment fast and simple.
 
-3. **Serves Storybook**
-   - Express static middleware at `/storybook` route
-   - Configured in `backend/src/index.ts:437`
+### Local Development Build (with Storybook)
 
-**Total Build Time**: ~5-8 minutes (backend ~1min + Storybook ~3-5min + dependencies ~2min)
-
-### Manual Local Build
+To use Storybook locally:
 
 ```bash
 cd backend
-npm run build
+
+# Build backend + Storybook (6-8 minutes)
+npm run build:local
+
+# Start server
 npm start
 
-# Access at http://localhost:3000/storybook
+# Access Storybook at http://localhost:3000/storybook
 ```
+
+**Build steps** (`build:local`):
+1. Compile backend TypeScript → `dist/`
+2. Install frontend dependencies
+3. Build Storybook static site → `frontend/storybook-static/`
+4. Copy to `backend/public/storybook/`
 
 ---
 
@@ -82,19 +88,30 @@ frontend/
 ```json
 {
   "scripts": {
-    "build": "npm run build:backend && npm run build:storybook",
+    "build": "npm run build:backend",
     "build:backend": "tsc -p tsconfig.build.json",
+    "build:local": "npm run build:backend && npm run build:storybook",
     "build:storybook": "cd ../frontend && npm install --legacy-peer-deps && npm run build-storybook && node -e \"...\""
   }
 }
 ```
+
+**Key Difference**:
+- `npm run build` - Production build (backend only, used by Railway)
+- `npm run build:local` - Local development build (backend + Storybook)
 
 ### Backend Static Serving
 
 **File**: `backend/src/index.ts` (line 437)
 ```typescript
 // Serve Storybook static files at /storybook (Sprint 20)
-app.use('/storybook', express.static(resolve(__dirname, '../public/storybook')));
+const storybookPath = resolve(__dirname, '../public/storybook');
+if (existsSync(storybookPath)) {
+  app.use('/storybook', express.static(storybookPath));
+  logger.info('Storybook static files available at /storybook');
+} else {
+  logger.warn('Storybook not built - run "npm run build:local" to enable');
+}
 ```
 
 ### `.gitignore`
@@ -142,12 +159,12 @@ backend/public/storybook/
 **Error**: Copy command fails
 **Fix**: Using Node.js `fs.cpSync()` instead of shell `cp` command
 
-### Storybook Not Loading in Production
+### Storybook Not Loading Locally
 
-1. **Check build logs**: Verify Storybook build completed
+1. **Check build**: Run `npm run build:local` in backend directory
 2. **Check file path**: Ensure `backend/public/storybook/index.html` exists
-3. **Check URL**: Must access `/storybook/` (with trailing slash) or `/storybook`
-4. **Check Railway logs**: Look for Express static middleware errors
+3. **Check URL**: Access `http://localhost:3000/storybook` (with or without trailing slash)
+4. **Check logs**: Look for "Storybook static files available at /storybook" message
 
 ### CORS Issues
 
@@ -158,13 +175,13 @@ Storybook is served from same domain as backend, so no CORS configuration needed
 ## 📈 Performance
 
 ### Build Time Impact
-- **Before**: Backend build ~1 minute
-- **After**: Backend + Storybook ~6-8 minutes
-- **Caching**: Railway caches `node_modules`, subsequent builds ~3-5 minutes
+- **Production (Railway)**: Backend only ~1-2 minutes (fast!)
+- **Local Development**: Backend + Storybook ~6-8 minutes
+- **Caching**: Subsequent local builds ~3-5 minutes with cached dependencies
 
 ### Runtime Performance
 - **No performance impact** - Static files served via Express
-- **CDN-ready** - Can be served via Railway's edge network
+- **Local only** - Does not affect production deployment size or speed
 
 ---
 
@@ -173,14 +190,14 @@ Storybook is served from same domain as backend, so no CORS configuration needed
 ### Add New Component Stories
 
 1. Create story file: `frontend/src/components/ui/stories/NewComponent.stories.tsx`
-2. Push to `main` branch
-3. Railway auto-deploys with new stories
+2. Run `npm run build:local` in backend directory (local dev only)
+3. Access at `http://localhost:3000/storybook`
 
 ### Update Existing Stories
 
 1. Edit story file in `frontend/src/components/ui/stories/`
-2. Push to `main` branch
-3. Railway auto-deploys with updates
+2. Run `npm run build:local` in backend directory (local dev only)
+3. Refresh browser at `http://localhost:3000/storybook`
 
 ---
 
@@ -210,6 +227,6 @@ Storybook is served from same domain as backend, so no CORS configuration needed
 
 ---
 
-**Status**: ✅ Production deployment working
+**Status**: ✅ **LOCAL DEVELOPMENT ONLY**
 **Last Verified**: 2025-11-27
-**Railway Build Time**: ~6-8 minutes
+**Railway Build Time**: ~1-2 minutes (backend only)
