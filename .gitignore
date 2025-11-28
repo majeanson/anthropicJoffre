@@ -7,3 +7,9 @@ build
 *.log
 .vercel
 .claude
+
+*storybook.log
+storybook-static
+
+# Backend public directory (generated from Storybook build)
+backend/public/storybook

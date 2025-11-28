@@ -432,6 +432,10 @@ const apiLimiter = rateLimit({
 // Apply rate limiting to all API routes
 app.use('/api/', apiLimiter);
 
+// Serve Storybook static files at /storybook (Sprint 20)
+// Built from: frontend/storybook-static
+app.use('/storybook', express.static(resolve(__dirname, '../public/storybook')));
+
 // Stricter rate limit for game creation
 const gameCreateLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
