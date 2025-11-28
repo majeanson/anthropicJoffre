@@ -6,6 +6,7 @@
  */
 
 import { getAvatarUrl } from '../utils/avatars';
+import { designTokens } from '../styles/designTokens';
 
 interface AvatarProps {
   username: string;
@@ -37,16 +38,16 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
   // Generate consistent color based on username
   const getColorFromUsername = (name: string): string => {
     const colors = [
-      'from-red-500 to-red-600',
-      'from-blue-500 to-blue-600',
-      'from-green-500 to-green-600',
-      'from-purple-500 to-purple-600',
-      'from-pink-500 to-pink-600',
-      'from-indigo-500 to-indigo-600',
-      'from-orange-500 to-orange-600',
-      'from-teal-500 to-teal-600',
-      'from-cyan-500 to-cyan-600',
-      'from-amber-500 to-amber-600',
+      designTokens.gradients.error,
+      designTokens.gradients.primary,
+      designTokens.gradients.success,
+      designTokens.gradients.team2,
+      designTokens.gradients.team1,
+      designTokens.gradients.info,
+      designTokens.gradients.warning,
+      designTokens.gradients.special,
+      designTokens.gradients.primaryDark,
+      designTokens.gradients.secondary,
     ];
 
     // Use first character code to pick color

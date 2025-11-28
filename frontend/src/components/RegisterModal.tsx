@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import logger from '../utils/logger';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { designTokens } from '../styles/designTokens';
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -152,18 +153,19 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         role="dialog"
         aria-modal="true"
         aria-labelledby="register-modal-title"
-        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-purple-500/30 w-full max-w-md max-h-[90vh] overflow-y-auto animate-scale-in"
+        className={`bg-gradient-to-br ${designTokens.gradients.primaryDark} dark:from-gray-900 dark:to-gray-800 rounded-lg shadow-2xl border-2 border-purple-500/30 w-full max-w-md max-h-[90vh] overflow-y-auto animate-scale-in`}
       >
 
         {/* Header */}
         <div className="p-6 border-b border-gray-700 flex justify-between items-center sticky top-0 bg-gray-900 z-10">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">📝</span>
+            <span className="text-3xl" aria-hidden="true">📝</span>
             <h2 id="register-modal-title" className="text-2xl font-bold text-white">Create Account</h2>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors"
+            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
+            aria-label="Close registration form"
           >
             ×
           </button>
@@ -261,10 +263,11 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
                 disabled={isLoading || !!successMessage}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                <span aria-hidden="true">{showPassword ? '👁️' : '👁️‍🗨️'}</span>
               </button>
             </div>
             {/* Password Strength Indicator */}
@@ -310,7 +313,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           <button
             type="submit"
             disabled={isLoading || !isFormValid || !!successMessage}
-            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
           >
             {isLoading ? 'Creating Account...' : 'Create Account'}
           </button>
@@ -322,7 +325,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
               <button
                 type="button"
                 onClick={onSwitchToLogin}
-                className="text-purple-400 hover:text-purple-300 font-semibold transition-colors"
+                className="text-purple-400 hover:text-purple-300 font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
                 disabled={isLoading || !!successMessage}
               >
                 Login here

@@ -1,5 +1,6 @@
 import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
+import { designTokens } from '../styles/designTokens';
 
 interface RematchVotingProps {
   socket: Socket | null;
@@ -30,7 +31,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
         </h2>
 
         <div className="bg-white dark:bg-gray-800/50 rounded-xl p-6 border-2 border-amber-600">
-          <div className="text-6xl mb-4">
+          <div className="text-6xl mb-4" aria-hidden="true">
             {rematchVotes.length === 4 ? '🎉' : '🔄'}
           </div>
 
@@ -83,7 +84,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
         {!hasVoted && (
           <button
             onClick={handleVoteRematch}
-            className="w-full py-4 px-8 rounded-xl font-black text-xl bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105"
+            className={`w-full py-4 px-8 rounded-xl font-black text-xl bg-gradient-to-r ${designTokens.gradients.success} text-white hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2`}
           >
             Vote for Rematch
           </button>

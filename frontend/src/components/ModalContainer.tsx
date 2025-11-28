@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { designTokens } from '../styles/designTokens';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '6xl';
 
@@ -34,7 +35,7 @@ export function ModalContainer({
   subtitle,
   children,
   maxWidth = '4xl',
-  headerGradient = 'from-amber-700 to-amber-900 dark:from-gray-700 dark:to-gray-800',
+  headerGradient = designTokens.gradients.warning + ' dark:from-gray-700 dark:to-gray-800',
   showCloseButton = true,
   footer,
 }: ModalContainerProps) {
@@ -54,7 +55,7 @@ export function ModalContainer({
         {(title || showCloseButton) && (
           <div className={`sticky top-0 bg-gradient-to-r ${headerGradient} p-6 flex items-center justify-between rounded-t-xl border-b-4 border-amber-950 dark:border-gray-900 z-10`}>
             <div className="flex items-center gap-3">
-              {titleIcon && <span className="text-4xl">{titleIcon}</span>}
+              {titleIcon && <span className="text-4xl" aria-hidden="true">{titleIcon}</span>}
               <div>
                 {title && <h2 className="text-2xl font-bold text-parchment-50">{title}</h2>}
                 {subtitle && <p className="text-amber-200 dark:text-gray-300 font-semibold">{subtitle}</p>}
@@ -63,7 +64,8 @@ export function ModalContainer({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
+                className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg focus:outline-none focus:ring-2 focus:ring-white/50"
+                aria-label="Close modal"
               >
                 ✕
               </button>

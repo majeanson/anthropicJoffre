@@ -6,6 +6,8 @@
  * User controls when to see bot decision-making process
  */
 
+import { designTokens } from '../styles/designTokens';
+
 interface BotThinkingIndicatorProps {
   botName: string;
   action: string;
@@ -32,15 +34,15 @@ export function BotThinkingIndicator({ botName, action, isOpen, onToggle, positi
         onMouseLeave={isOpen ? onToggle : undefined}
         onTouchStart={onToggle}
         onTouchEnd={onToggle}
-        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[60] ${
+        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[60] focus:outline-none focus:ring-2 focus:ring-offset-2 ${
           isOpen
-            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white scale-110'
-            : 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 hover:scale-105'
+            ? `bg-gradient-to-r ${designTokens.gradients.primary} text-white scale-110 focus:ring-blue-400`
+            : 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 hover:scale-105 focus:ring-blue-500'
         }`}
         aria-label="Press to show bot thinking"
         title="Press and hold to see what the bot is thinking"
       >
-        <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`}>
+        <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`} aria-hidden="true">
           🤖
         </span>
       </button>
@@ -51,10 +53,10 @@ export function BotThinkingIndicator({ botName, action, isOpen, onToggle, positi
           className={`absolute z-[70] ${tooltipPosition} whitespace-nowrap pointer-events-none`}
           style={{ maxWidth: '90vw' }}
         >
-          <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300">
+          <div className={`bg-gradient-to-r ${designTokens.gradients.primary} text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300`}>
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex-shrink-0">
-                <span className="text-sm md:text-lg">🤖</span>
+                <span className="text-sm md:text-lg" aria-hidden="true">🤖</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-semibold opacity-90 truncate">{botName}</div>

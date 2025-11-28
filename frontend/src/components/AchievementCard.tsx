@@ -6,6 +6,7 @@
  */
 
 import { AchievementProgress, AchievementTier } from '../types/achievements';
+import { designTokens } from '../styles/designTokens';
 
 interface AchievementCardProps {
   achievement: AchievementProgress;
@@ -15,10 +16,10 @@ interface AchievementCardProps {
 export function AchievementCard({ achievement, size = 'medium' }: AchievementCardProps) {
   const getTierColor = (tier: AchievementTier): string => {
     switch (tier) {
-      case 'bronze': return 'from-amber-700 to-amber-900';
-      case 'silver': return 'from-gray-400 to-gray-600';
-      case 'gold': return 'from-yellow-400 to-yellow-600';
-      case 'platinum': return 'from-cyan-400 to-cyan-600';
+      case 'bronze': return designTokens.gradients.warning;
+      case 'silver': return designTokens.gradients.secondary;
+      case 'gold': return designTokens.gradients.special;
+      case 'platinum': return designTokens.gradients.info;
     }
   };
 
@@ -64,7 +65,7 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
     >
       {/* Locked overlay */}
       {isLocked && achievement.is_secret && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl">
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-xl" aria-hidden="true">
           <span className="text-4xl">🔒</span>
         </div>
       )}

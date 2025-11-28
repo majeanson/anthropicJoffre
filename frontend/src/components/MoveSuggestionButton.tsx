@@ -6,6 +6,8 @@
  * User controls when to see beginner mode hints
  */
 
+import { designTokens } from '../styles/designTokens';
+
 interface MoveSuggestionButtonProps {
   suggestion: string;
   details: string;
@@ -44,15 +46,15 @@ export function MoveSuggestionButton({ suggestion, details, alternatives, isOpen
         onMouseLeave={isOpen ? onToggle : undefined}
         onTouchStart={onToggle}
         onTouchEnd={onToggle}
-        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[100] ${
+        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[100] focus:outline-none focus:ring-2 focus:ring-offset-2 ${
           isOpen
-            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white scale-110'
-            : 'bg-white dark:bg-gray-700 text-green-600 dark:text-green-400 hover:scale-105'
+            ? `bg-gradient-to-r ${designTokens.gradients.success} text-white scale-110 focus:ring-green-400`
+            : 'bg-white dark:bg-gray-700 text-green-600 dark:text-green-400 hover:scale-105 focus:ring-green-500'
         }`}
         aria-label="Press to show move suggestion"
         title="Press and hold to see suggestion"
       >
-        <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`}>
+        <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`} aria-hidden="true">
           💡
         </span>
       </button>
@@ -63,10 +65,10 @@ export function MoveSuggestionButton({ suggestion, details, alternatives, isOpen
           className={`fixed z-[9999] ${tooltipPosition} pointer-events-none`}
           style={{ maxWidth: '90vw', minWidth: '200px' }}
         >
-          <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-green-300">
+          <div className={`bg-gradient-to-r ${designTokens.gradients.success} text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-green-300`}>
             <div className="flex items-start gap-2">
               <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex-shrink-0">
-                <span className="text-sm md:text-lg">💡</span>
+                <span className="text-sm md:text-lg" aria-hidden="true">💡</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-semibold opacity-90">Suggestion</div>
@@ -77,7 +79,7 @@ export function MoveSuggestionButton({ suggestion, details, alternatives, isOpen
                 {alternatives && (
                   <div className="mt-2 pt-2 border-t border-white/30">
                     <div className="text-xs font-semibold opacity-70 flex items-center gap-1">
-                      <span>💭</span>
+                      <span aria-hidden="true">💭</span>
                       <span>Alternative:</span>
                     </div>
                     <div className="text-xs mt-0.5 opacity-80 whitespace-normal">{alternatives}</div>

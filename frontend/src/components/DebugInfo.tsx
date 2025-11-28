@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import buildInfoJson from '../buildInfo.json';
 import { BuildInfo } from '../types/buildInfo';
 import { CONFIG } from '../config/constants';
+import { designTokens } from '../styles/designTokens';
 
 // Type the imported JSON
 const buildInfo = buildInfoJson as BuildInfo;
@@ -102,18 +103,19 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
       <div
-        className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-indigo-600 dark:border-indigo-500"
+        className={`bg-gradient-to-br ${designTokens.gradients.primary} dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-indigo-600 dark:border-indigo-500`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <span className="text-4xl">🎮</span>
+            <span className="text-4xl" aria-hidden="true">🎮</span>
             <h2 className="text-4xl font-bold text-indigo-900 dark:text-indigo-100 font-serif">Debug Fun</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 text-3xl font-bold leading-none"
+            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 text-3xl font-bold leading-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            aria-label="Close debug info"
           >
             ×
           </button>
@@ -123,7 +125,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
         <div className="space-y-4">
           {/* Version */}
           <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">🏷️</span>
+            <span className="text-2xl flex-shrink-0" aria-hidden="true">🏷️</span>
             <div className="flex-1">
               <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Version</h3>
               <p className="text-gray-700 dark:text-gray-300 font-mono text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
@@ -134,7 +136,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
           {/* Build Date */}
           <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">📅</span>
+            <span className="text-2xl flex-shrink-0" aria-hidden="true">📅</span>
             <div className="flex-1">
               <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Build Date</h3>
               <p className="text-gray-700 dark:text-gray-300 text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
@@ -146,7 +148,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
           {/* Latest Commit */}
           {buildInfo.git && (
             <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">💾</span>
+              <span className="text-2xl flex-shrink-0" aria-hidden="true">💾</span>
               <div className="flex-1">
                 <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Latest Commit</h3>
                 <div className="bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
@@ -169,7 +171,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
           {/* Latest Done Features (Collapsible) */}
           {buildInfo.latestDoneFeatures && buildInfo.latestDoneFeatures.length > 0 && (
             <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">✨</span>
+              <span className="text-2xl flex-shrink-0" aria-hidden="true">✨</span>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Latest Done Features</h3>
@@ -218,7 +220,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
           {/* Future Features (Collapsible) */}
           {buildInfo.futureTodos && buildInfo.futureTodos.length > 0 && (
             <div className="flex items-start gap-3">
-              <span className="text-2xl flex-shrink-0">🚀</span>
+              <span className="text-2xl flex-shrink-0" aria-hidden="true">🚀</span>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
@@ -249,7 +251,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
           {/* Server Health Monitoring */}
           <div className="flex items-start gap-3">
-            <span className="text-2xl flex-shrink-0">🏥</span>
+            <span className="text-2xl flex-shrink-0" aria-hidden="true">🏥</span>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Server Health</h3>
@@ -265,7 +267,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                 <div className="space-y-2">
                   {healthLoading && (
                     <div className="bg-white dark:bg-gray-900 px-3 py-4 rounded border border-gray-300 dark:border-gray-700 text-center">
-                      <div className="animate-spin inline-block w-6 h-6 border-3 border-indigo-600 border-t-transparent rounded-full"></div>
+                      <div className="animate-spin inline-block w-6 h-6 border-3 border-indigo-600 border-t-transparent rounded-full" aria-hidden="true"></div>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading health data...</p>
                     </div>
                   )}
@@ -378,9 +380,9 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
 
           {/* Fun Stats */}
-          <div className="mt-6 p-4 bg-gradient-to-r from-purple-100 to-indigo-100 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-purple-300 dark:border-purple-700">
+          <div className={`mt-6 p-4 bg-gradient-to-r ${designTokens.gradients.team2} dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-purple-300 dark:border-purple-700`}>
             <p className="text-center text-sm text-purple-900 dark:text-purple-200 font-semibold">
-              🎉 Made with ❤️ and lots of ☕
+              <span aria-hidden="true">🎉</span> Made with <span aria-hidden="true">❤️</span> and lots of <span aria-hidden="true">☕</span>
             </p>
           </div>
         </div>

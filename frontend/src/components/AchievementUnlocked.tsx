@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { Achievement } from '../types/achievements';
+import { designTokens } from '../styles/designTokens';
 interface AchievementUnlockedProps {
   achievement: Achievement | null;
   onDismiss: () => void;
@@ -50,11 +51,11 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
   const getRarityColor = () => {
     switch (rarity) {
-      case 'common': return 'from-gray-600 to-gray-700';
-      case 'rare': return 'from-blue-600 to-blue-700';
-      case 'epic': return 'from-purple-600 to-purple-700';
-      case 'legendary': return 'from-yellow-500 to-orange-500';
-      default: return 'from-gray-600 to-gray-700';
+      case 'common': return designTokens.gradients.secondary;
+      case 'rare': return designTokens.gradients.primary;
+      case 'epic': return designTokens.gradients.team2;
+      case 'legendary': return designTokens.gradients.special;
+      default: return designTokens.gradients.secondary;
     }
   };
 
@@ -78,7 +79,7 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-2 right-2 text-white/70 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
+          className="absolute top-2 right-2 text-white/70 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
           aria-label="Close achievement notification"
         >
           ×
@@ -86,7 +87,7 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
         <div className="flex items-center gap-4">
           {/* Trophy Icon */}
-          <div className="text-5xl animate-spin-slow">
+          <div className="text-5xl animate-spin-slow" aria-hidden="true">
             🏆
           </div>
 
@@ -104,7 +105,7 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
           </div>
 
           {/* Icon */}
-          <div className="text-4xl">
+          <div className="text-4xl" aria-hidden="true">
             {achievement.icon}
           </div>
         </div>

@@ -31,6 +31,7 @@ import { User } from '../types/auth';
 import Avatar from './Avatar';
 import { PlayerProfileModal } from './PlayerProfileModal';
 import { useAuth } from '../contexts/AuthContext';
+import { designTokens } from '../styles/designTokens';
 
 interface ProfileButtonProps {
   user: User | null;
@@ -99,7 +100,7 @@ export function ProfileButton({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={handleClick}
-        className={`flex items-center gap-3 bg-gradient-to-r from-parchment-200 to-parchment-300 dark:from-gray-700 dark:to-gray-600 hover:from-parchment-300 hover:to-parchment-400 dark:hover:from-gray-600 dark:hover:to-gray-500 px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-parchment-400 dark:border-gray-500 ${className}`}
+        className={`flex items-center gap-3 bg-gradient-to-r from-parchment-200 to-parchment-300 dark:from-gray-700 dark:to-gray-600 hover:from-parchment-300 hover:to-parchment-400 dark:hover:from-gray-600 dark:hover:to-gray-500 px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-parchment-400 dark:border-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
         title={user ? `View ${user.username}'s profile` : 'Sign in to view your profile'}
       >
         <Avatar
@@ -137,24 +138,24 @@ export function ProfileButton({
           <div className="py-2">
             <button
               onClick={handleViewProfile}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
             >
-              <span>👤</span>
+              <span aria-hidden="true">👤</span>
               <span>View Profile</span>
             </button>
             <button
               onClick={handleEditProfile}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
             >
-              <span>✏️</span>
+              <span aria-hidden="true">✏️</span>
               <span>Edit Profile</span>
             </button>
             <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
             <button
               onClick={handleLogout}
-              className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors"
+              className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
             >
-              <span>🚪</span>
+              <span aria-hidden="true">🚪</span>
               <span>Logout</span>
             </button>
           </div>
