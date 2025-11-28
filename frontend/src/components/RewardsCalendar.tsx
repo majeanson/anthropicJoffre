@@ -139,19 +139,19 @@ export function RewardsCalendar({
 
     if (reward.isSpecial) {
       if (status === 'claimed') {
-        return `${baseClasses} bg-gradient-to-br from-purple-900/50 to-pink-900/50 border-purple-500 opacity-60`;
+        return `${baseClasses} bg-gradient-to-br ${colors.gradients.secondaryDark} border-purple-500 opacity-60`;
       }
       if (status === 'available') {
-        return `${baseClasses} bg-gradient-to-br from-purple-700 to-pink-700 border-purple-400 cursor-pointer hover:scale-105 shadow-lg shadow-purple-500/50 animate-pulse`;
+        return `${baseClasses} bg-gradient-to-br ${colors.gradients.secondary} border-purple-400 cursor-pointer hover:scale-105 shadow-lg shadow-purple-500/50 animate-pulse`;
       }
-      return `${baseClasses} bg-gradient-to-br from-purple-900/30 to-pink-900/30 border-purple-700/50`;
+      return `${baseClasses} bg-gradient-to-br ${colors.gradients.secondaryDark} border-purple-700/50`;
     }
 
     switch (status) {
       case 'claimed':
         return `${baseClasses} bg-gray-700 border-gray-600 opacity-60`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-blue-700 to-purple-700 border-blue-400 cursor-pointer hover:scale-105 shadow-lg`;
+        return `${baseClasses} bg-gradient-to-br ${colors.gradients.primaryDark} border-blue-400 cursor-pointer hover:scale-105 shadow-lg`;
       case 'missed':
         return `${baseClasses} bg-gray-800 border-gray-600 opacity-50`;
       case 'locked':
@@ -214,7 +214,7 @@ export function RewardsCalendar({
               {/* Legend */}
               <div className="flex flex-wrap gap-4 mb-6 p-4 bg-gray-700 rounded-lg">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gradient-to-br from-blue-700 to-purple-700 border-2 border-blue-400 rounded"></div>
+                  <div className={`w-4 h-4 bg-gradient-to-br ${colors.gradients.primaryDark} border-2 border-blue-400 rounded`}></div>
                   <span className="text-gray-300 text-sm">Available to claim</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -222,7 +222,7 @@ export function RewardsCalendar({
                   <span className="text-gray-300 text-sm">Claimed</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gradient-to-br from-purple-700 to-pink-700 border-2 border-purple-400 rounded"></div>
+                  <div className={`w-4 h-4 bg-gradient-to-br ${colors.gradients.secondary} border-2 border-purple-400 rounded`}></div>
                   <span className="text-gray-300 text-sm">Special Milestone</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -274,7 +274,7 @@ export function RewardsCalendar({
               </div>
 
               {/* Special Milestones Info */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-pink-900/30 border border-purple-700 rounded-lg">
+              <div className={`mt-6 p-4 bg-gradient-to-r ${colors.gradients.secondaryDark} border border-purple-700 rounded-lg`}>
                 <h3 className="text-white font-bold mb-2 flex items-center gap-2">
                   <span>⭐</span>
                   Special Milestone Rewards

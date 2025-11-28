@@ -47,16 +47,16 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-umber-600 to-umber-700 text-parchment-50 px-6 py-4 flex items-center justify-between rounded-t-lg border-b-2 border-umber-800">
+        <div className={`sticky top-0 z-10 bg-gradient-to-r ${colors.gradients.umber} text-parchment-50 px-6 py-4 flex items-center justify-between rounded-t-lg border-b-2 border-umber-800`}>
           <div>
             <h2 id="leaderboard-title" className="text-2xl font-bold flex items-center gap-2 font-serif">
-              🏆 Leaderboard
+              <span aria-hidden="true">🏆</span> Leaderboard
             </h2>
             <p className="text-sm text-parchment-200">Round {gameState.roundNumber} Stats & History</p>
           </div>
           <button
             onClick={onClose}
-            className="text-parchment-50 hover:bg-parchment-50 dark:bg-gray-800 hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold border border-parchment-400 dark:border-gray-600"
+            className="text-parchment-50 hover:bg-parchment-50 dark:bg-gray-800 hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold border border-parchment-400 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-parchment-400"
             aria-label="Close leaderboard"
           >
             ✕ Close
@@ -67,11 +67,11 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
           {/* Current Standings */}
           <section>
             <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
-              📊 Current Standings
+              <span aria-hidden="true">📊</span> Current Standings
             </h3>
             <div className="grid grid-cols-2 gap-4">
               {/* Team 1 */}
-              <div className={`bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/40 dark:to-orange-800/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600 ${
+              <div className={`bg-gradient-to-br ${colors.gradients.team1Light} dark:from-orange-900/40 dark:to-orange-800/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600 ${
                 leadingTeam === 1 ? 'ring-4 ring-yellow-400' : ''
               }`}>
                 <div className="flex items-center justify-between mb-4">
@@ -90,7 +90,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               </div>
 
               {/* Team 2 */}
-              <div className={`bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/40 dark:to-purple-800/40 rounded-lg p-6 border-2 border-purple-200 dark:border-purple-600 ${
+              <div className={`bg-gradient-to-br ${colors.gradients.team2Light} dark:from-purple-900/40 dark:to-purple-800/40 rounded-lg p-6 border-2 border-purple-200 dark:border-purple-600 ${
                 leadingTeam === 2 ? 'ring-4 ring-yellow-400' : ''
               }`}>
                 <div className="flex items-center justify-between mb-4">
@@ -120,9 +120,9 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
           {gameState.highestBet && (
             <section>
               <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
-                🎲 Current Bet
+                <span aria-hidden="true">🎲</span> Current Bet
               </h3>
-              <div className="bg-gradient-to-r from-parchment-100 to-parchment-50 dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600">
+              <div className={`bg-gradient-to-r ${colors.gradients.parchment} dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600`}>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <p className="text-sm text-umber-700 dark:text-gray-300 font-semibold">Highest Bidder</p>
@@ -155,7 +155,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
           {gameState.roundHistory.length > 0 && (
             <section>
               <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
-                📜 Round History
+                <span aria-hidden="true">📜</span> Round History
               </h3>
               <div className="space-y-3">
                 {gameState.roundHistory.slice().reverse().map((round) => {
@@ -177,9 +177,11 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                             {hasTricks && (
                               <button
                                 onClick={() => toggleRound(round.roundNumber)}
-                                className="text-sm text-umber-700 dark:text-gray-300 hover:text-umber-900 dark:text-gray-100 font-semibold flex items-center gap-1"
+                                className="text-sm text-umber-700 dark:text-gray-300 hover:text-umber-900 dark:text-gray-100 font-semibold flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-umber-500"
+                                aria-label={isExpanded ? 'Hide tricks' : 'Show tricks'}
                               >
-                                {isExpanded ? '▼ Hide Tricks' : '▶ Show Tricks'}
+                                <span aria-hidden="true">{isExpanded ? '▼' : '▶'}</span>
+                                {isExpanded ? 'Hide Tricks' : 'Show Tricks'}
                               </button>
                             )}
                           </div>
@@ -188,7 +190,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                               ? 'bg-forest-100 text-forest-800 border-forest-400'
                               : 'bg-crimson-100 text-crimson-800 border-crimson-400'
                           }`}>
-                            {round.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
+                            <span aria-hidden="true">{round.betMade ? '✓' : '✗'}</span> {round.betMade ? 'Bet Made' : 'Bet Failed'}
                           </span>
                         </div>
 
@@ -232,7 +234,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                       {isExpanded && hasTricks && (
                         <div className="bg-parchment-50 dark:bg-gray-800 border-t-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 p-4">
                           <div className="mb-3 flex items-center gap-2">
-                            <h5 className="text-sm font-bold text-umber-800 dark:text-gray-200">🃏 Tricks Played</h5>
+                            <h5 className="text-sm font-bold text-umber-800 dark:text-gray-200"><span aria-hidden="true">🃏</span> Tricks Played</h5>
                             {round.trump && (
                               <span className="text-xs bg-sapphire-100 text-sapphire-800 px-2 py-1 rounded-full font-semibold border border-sapphire-300">
                                 Trump: <span className="capitalize">{round.trump}</span>
@@ -252,7 +254,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                                       Trick {trickIndex + 1}
                                     </span>
                                     <span className={`text-xs px-2 py-1 rounded-full font-semibold ${winnerTeamColor}`}>
-                                      👑 {winner?.name || 'Unknown'} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
+                                      <span aria-hidden="true">👑</span> {winner?.name || 'Unknown'} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
                                     </span>
                                   </div>
                                   <div className="grid grid-cols-4 gap-2">

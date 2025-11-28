@@ -177,10 +177,12 @@ export const colors = {
     team1: 'from-orange-600 to-amber-600',
     team1Hover: 'from-orange-700 to-amber-700',
     team1Dark: 'from-orange-700 to-amber-800',
+    team1Light: 'from-orange-50 to-orange-100',
 
     team2: 'from-purple-600 to-indigo-600',
     team2Hover: 'from-purple-700 to-indigo-700',
     team2Dark: 'from-purple-700 to-indigo-800',
+    team2Light: 'from-purple-50 to-purple-100',
 
     // Quest system gradients
     questDaily: 'from-blue-600 to-purple-600',
@@ -203,6 +205,16 @@ export const colors = {
     statsRecentHover: 'from-purple-700 to-pink-700',
     statsRecentDark: 'from-purple-700 to-pink-800',
     statsRecentDarkHover: 'from-purple-600 to-pink-700',
+
+    // Parchment/theme background gradients
+    parchment: 'from-parchment-50 to-parchment-100',
+    parchmentDark: 'from-parchment-100 to-parchment-200',
+    umber: 'from-umber-600 to-umber-700',
+    umberDark: 'from-umber-700 to-umber-900',
+
+    // Neutral/gray gradients
+    neutral: 'from-gray-700 to-gray-800',
+    neutralHover: 'from-gray-800 to-gray-900',
   },
 
   // Border colors

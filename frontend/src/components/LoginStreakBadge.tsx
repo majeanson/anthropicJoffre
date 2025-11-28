@@ -81,10 +81,10 @@ export function LoginStreakBadge({
   if (!streak) return null;
 
   const getStreakColor = (currentStreak: number) => {
-    if (currentStreak === 0) return 'from-gray-600 to-gray-500';
+    if (currentStreak === 0) return colors.gradients.neutral;
     if (currentStreak < 3) return colors.gradients.primary;
     if (currentStreak < 7) return colors.gradients.secondary;
-    if (currentStreak < 14) return colors.gradients.special;
+    if (currentStreak < 14) return colors.gradients.questDaily;
     return colors.gradients.warning; // 14+ days = legendary
   };
 

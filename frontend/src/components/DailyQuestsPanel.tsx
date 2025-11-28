@@ -261,10 +261,10 @@ export function DailyQuestsPanel({
                       </div>
                       <div className="w-full bg-gray-600 rounded-full h-3 overflow-hidden">
                         <div
-                          className={`h-full transition-all duration-500 ${
+                          className={`h-full transition-all duration-500 bg-gradient-to-r ${
                             quest.completed
-                              ? 'bg-gradient-to-r from-green-500 to-green-400'
-                              : 'bg-gradient-to-r from-purple-500 to-blue-500'
+                              ? colors.gradients.success
+                              : colors.gradients.primary
                           }`}
                           style={{ width: `${progressPercent}%` }}
                         ></div>
@@ -293,7 +293,7 @@ export function DailyQuestsPanel({
                         <button
                           onClick={() => handleClaimReward(quest.id)}
                           disabled={claimingQuestId === quest.id}
-                          className="bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          className={`bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-400`}
                         >
                           {claimingQuestId === quest.id ? 'Claiming...' : 'Claim Reward'}
                         </button>
