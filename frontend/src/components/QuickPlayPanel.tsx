@@ -20,6 +20,7 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 import { getUserTierInfo } from '../utils/userTier';
+import { colors } from '../design-system';
 
 interface QuickPlayPanelProps {
   botDifficulty: BotDifficulty;
@@ -153,12 +154,12 @@ export function QuickPlayPanel({
               ? 'bg-amber-200 dark:bg-purple-900 text-amber-900 dark:text-purple-200'
               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
           }`}>
-            {quickPlayPersistence === 'elo' && tierInfo.canPlayRanked ? '🏆 Ranked' : '🎮 Casual'}
+            <span aria-hidden="true">{quickPlayPersistence === 'elo' && tierInfo.canPlayRanked ? '🏆' : '🎮'}</span> {quickPlayPersistence === 'elo' && tierInfo.canPlayRanked ? 'Ranked' : 'Casual'}
           </span>
         </div>
         <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
           {!tierInfo.canPlayRanked
-            ? '🔒 Register an account to enable ranked mode and stats tracking'
+            ? <><span aria-hidden="true">🔒</span> Register an account to enable ranked mode and stats tracking</>
             : quickPlayPersistence === 'elo'
             ? 'Game will be saved to your profile and affect your ranking'
             : 'No stats saved - play without affecting your ELO rating'}
@@ -170,13 +171,17 @@ export function QuickPlayPanel({
         data-keyboard-nav="quick-play"
         onClick={handleQuickPlay}
         disabled={!canPlay}
-        className={`w-full mt-3 py-4 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 border shadow focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
+        style={canPlay ? {
+          background: `linear-gradient(to right, ${colors.primary.start}, ${colors.primary.end})`,
+          borderColor: colors.primary.border
+        } : undefined}
+        className={`w-full mt-3 py-4 rounded-lg font-bold transition-all duration-200 flex items-center justify-center gap-2 border shadow focus-visible:ring-2 focus-visible:ring-offset-2 ${
           canPlay
-            ? 'bg-gradient-to-r from-umber-700 to-amber-800 dark:from-violet-700 dark:to-violet-800 text-white hover:from-umber-800 hover:to-amber-900 dark:hover:from-violet-600 dark:hover:to-violet-700 border-umber-900 dark:border-violet-600'
-            : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed border-gray-400 dark:border-gray-500'
+            ? 'text-white focus-visible:ring-purple-500'
+            : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed border-gray-400 dark:border-gray-500 focus-visible:ring-gray-400'
         }`}
       >
-        <span>⚡</span>
+        <span aria-hidden="true">⚡</span>
         <span>{canPlay ? 'Quick Play (1P + 3 Bots)' : 'Enter name to play'}</span>
       </button>
     </div>

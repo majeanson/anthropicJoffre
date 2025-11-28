@@ -6,6 +6,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { colors } from '../design-system';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -65,18 +66,22 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
         role="dialog"
         aria-modal="true"
         aria-labelledby="login-modal-title"
-        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-blue-500/30 w-full max-w-md animate-scale-in"
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.primary.start}, ${colors.primaryDark.end})`,
+          borderColor: colors.info.border
+        }}
+        className="rounded-lg shadow-2xl border-2 w-full max-w-md animate-scale-in"
       >
 
         {/* Header */}
         <div className="p-6 border-b border-gray-700 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🔐</span>
+            <span className="text-3xl" aria-hidden="true">🔐</span>
             <h2 id="login-modal-title" className="text-2xl font-bold text-white">Login</h2>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors"
+            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
           >
             ×
           </button>
@@ -127,10 +132,11 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
                 disabled={isLoading}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? '👁️' : '👁️‍🗨️'}
+                <span aria-hidden="true">{showPassword ? '👁️' : '👁️‍🗨️'}</span>
               </button>
             </div>
           </div>
@@ -140,7 +146,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
             <button
               type="button"
               onClick={onSwitchToPasswordReset}
-              className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              style={{ color: colors.info.end }}
+              className="text-sm hover:opacity-80 transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
               disabled={isLoading}
             >
               Forgot password?
@@ -151,7 +158,10 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
           <button
             type="submit"
             disabled={isLoading || !username.trim() || !password}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+            style={!(isLoading || !username.trim() || !password) ? {
+              background: `linear-gradient(to right, ${colors.info.start}, ${colors.info.end})`
+            } : undefined}
+            className="w-full py-3 text-white font-bold rounded transition-all hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>
@@ -163,7 +173,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
               <button
                 type="button"
                 onClick={onSwitchToRegister}
-                className="text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+                style={{ color: colors.info.end }}
+                className="hover:opacity-80 font-semibold transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
                 disabled={isLoading}
               >
                 Register here

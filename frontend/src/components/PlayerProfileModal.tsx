@@ -19,6 +19,7 @@ import { getTierColor, getTierIcon } from '../utils/tierBadge';
 import Avatar from './Avatar';
 import { useAuth } from '../contexts/AuthContext';
 import { AchievementProgress } from '../types/achievements';
+import { colors } from '../design-system';
 
 interface QuickStats {
   player_name: string;
@@ -210,15 +211,19 @@ export function PlayerProfileModal({
       onKeyDown={(e) => e.stopPropagation()}
     >
       <div
-        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-orange-500/30 p-6 w-full max-w-md shadow-2xl"
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.primary.start}, ${colors.primaryDark.end})`,
+          borderColor: colors.primary.border
+        }}
+        className="rounded-2xl border-2 p-6 w-full max-w-md shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-orange-400">Player Profile</h2>
+          <h2 className="text-2xl font-bold text-white">Player Profile</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl leading-none"
+            className="text-gray-400 hover:text-white text-2xl leading-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
             aria-label="Close"
           >
             ×
@@ -228,7 +233,7 @@ export function PlayerProfileModal({
         {/* Loading State */}
         {loading && (
           <div className="text-center py-8">
-            <div className="animate-spin text-4xl mb-2">⏳</div>
+            <div className="animate-spin text-4xl mb-2" aria-hidden="true">⏳</div>
             <p className="text-gray-400">Loading profile...</p>
           </div>
         )}
@@ -255,11 +260,11 @@ export function PlayerProfileModal({
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-white">{playerName}</h3>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className={`text-lg ${tierColor}`}>{tierIcon}</span>
+                  <span className={`text-lg ${tierColor}`} aria-hidden="true">{tierIcon}</span>
                   <span className={`font-semibold ${tierColor}`}>
                     {stats.ranking_tier}
                   </span>
-                  <span className="text-gray-400">•</span>
+                  <span className="text-gray-400" aria-hidden="true">•</span>
                   <span className="text-gray-300">{stats.elo_rating} ELO</span>
                 </div>
               </div>
@@ -282,20 +287,20 @@ export function PlayerProfileModal({
                     <div className="flex-1 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
                       <div className="text-xs font-semibold text-gray-400 mb-1">COUNTRY</div>
                       <div className="text-sm text-gray-200">
-                        {profile.country === 'US' && '🇺🇸 United States'}
-                        {profile.country === 'CA' && '🇨🇦 Canada'}
-                        {profile.country === 'GB' && '🇬🇧 United Kingdom'}
-                        {profile.country === 'FR' && '🇫🇷 France'}
-                        {profile.country === 'DE' && '🇩🇪 Germany'}
-                        {profile.country === 'ES' && '🇪🇸 Spain'}
-                        {profile.country === 'IT' && '🇮🇹 Italy'}
-                        {profile.country === 'JP' && '🇯🇵 Japan'}
-                        {profile.country === 'AU' && '🇦🇺 Australia'}
-                        {profile.country === 'BR' && '🇧🇷 Brazil'}
-                        {profile.country === 'MX' && '🇲🇽 Mexico'}
-                        {profile.country === 'IN' && '🇮🇳 India'}
-                        {profile.country === 'CN' && '🇨🇳 China'}
-                        {profile.country === 'KR' && '🇰🇷 South Korea'}
+                        {profile.country === 'US' && <><span aria-hidden="true">🇺🇸</span> United States</>}
+                        {profile.country === 'CA' && <><span aria-hidden="true">🇨🇦</span> Canada</>}
+                        {profile.country === 'GB' && <><span aria-hidden="true">🇬🇧</span> United Kingdom</>}
+                        {profile.country === 'FR' && <><span aria-hidden="true">🇫🇷</span> France</>}
+                        {profile.country === 'DE' && <><span aria-hidden="true">🇩🇪</span> Germany</>}
+                        {profile.country === 'ES' && <><span aria-hidden="true">🇪🇸</span> Spain</>}
+                        {profile.country === 'IT' && <><span aria-hidden="true">🇮🇹</span> Italy</>}
+                        {profile.country === 'JP' && <><span aria-hidden="true">🇯🇵</span> Japan</>}
+                        {profile.country === 'AU' && <><span aria-hidden="true">🇦🇺</span> Australia</>}
+                        {profile.country === 'BR' && <><span aria-hidden="true">🇧🇷</span> Brazil</>}
+                        {profile.country === 'MX' && <><span aria-hidden="true">🇲🇽</span> Mexico</>}
+                        {profile.country === 'IN' && <><span aria-hidden="true">🇮🇳</span> India</>}
+                        {profile.country === 'CN' && <><span aria-hidden="true">🇨🇳</span> China</>}
+                        {profile.country === 'KR' && <><span aria-hidden="true">🇰🇷</span> South Korea</>}
                         {!['US', 'CA', 'GB', 'FR', 'DE', 'ES', 'IT', 'JP', 'AU', 'BR', 'MX', 'IN', 'CN', 'KR'].includes(profile.country) && profile.country}
                       </div>
                     </div>
@@ -315,19 +320,19 @@ export function PlayerProfileModal({
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-                <div className="text-2xl font-bold text-orange-400">
+                <div className="text-2xl font-bold" style={{ color: colors.warning.end }}>
                   {stats.games_played}
                 </div>
                 <div className="text-sm text-gray-400">Games Played</div>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-                <div className="text-2xl font-bold text-green-400">
+                <div className="text-2xl font-bold" style={{ color: colors.success.end }}>
                   {stats.games_won}
                 </div>
                 <div className="text-sm text-gray-400">Games Won</div>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700 col-span-2">
-                <div className="text-2xl font-bold text-blue-400">
+                <div className="text-2xl font-bold" style={{ color: colors.info.end }}>
                   {stats.win_percentage.toFixed(1)}%
                 </div>
                 <div className="text-sm text-gray-400">Win Rate</div>
@@ -338,8 +343,8 @@ export function PlayerProfileModal({
             {achievements.length > 0 && (
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-semibold text-yellow-400 flex items-center gap-2">
-                    🏆 Achievements
+                  <h4 className="text-sm font-semibold" style={{ color: colors.warning.end }}>
+                    <span aria-hidden="true">🏆</span> Achievements
                   </h4>
                   <span className="text-xs text-gray-400">
                     {achievements.filter(a => a.is_unlocked).length}/{achievements.length} • {achievementPoints} pts
@@ -390,9 +395,12 @@ export function PlayerProfileModal({
               {onViewFullStats && (
                 <button
                   onClick={onViewFullStats}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-colors"
+                  style={{
+                    background: `linear-gradient(to right, ${colors.info.start}, ${colors.info.end})`
+                  }}
+                  className="w-full py-2 text-white rounded-lg font-semibold transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
                 >
-                  📊 View Full Statistics
+                  <span aria-hidden="true">📊</span> View Full Statistics
                 </button>
               )}
 
@@ -403,9 +411,12 @@ export function PlayerProfileModal({
                     <button
                       onClick={handleSendFriendRequest}
                       disabled={sendingRequest}
-                      className="w-full py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-colors"
+                      style={!sendingRequest ? {
+                        background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`
+                      } : undefined}
+                      className="w-full py-2 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
                     >
-                      {sendingRequest ? '⏳ Sending...' : '➕ Add Friend'}
+                      <span aria-hidden="true">{sendingRequest ? '⏳' : '➕'}</span> {sendingRequest ? 'Sending...' : 'Add Friend'}
                     </button>
                   )}
                   {friendStatus === 'pending' && (
@@ -413,15 +424,18 @@ export function PlayerProfileModal({
                       disabled
                       className="w-full py-2 bg-gray-600 text-gray-400 rounded-lg font-semibold cursor-not-allowed"
                     >
-                      ⏳ Friend Request Pending
+                      <span aria-hidden="true">⏳</span> Friend Request Pending
                     </button>
                   )}
                   {friendStatus === 'friends' && (
                     <button
                       onClick={handleRemoveFriend}
-                      className="w-full py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+                      style={{
+                        background: `linear-gradient(to right, ${colors.error.start}, ${colors.error.end})`
+                      }}
+                      className="w-full py-2 text-white rounded-lg font-semibold transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
                     >
-                      🗑️ Remove Friend
+                      <span aria-hidden="true">🗑️</span> Remove Friend
                     </button>
                   )}
                 </>

@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { API_ENDPOINTS } from '../config/constants';
+import { colors } from '../design-system';
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -72,17 +73,23 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onKeyDown={(e) => e.stopPropagation()}>
-      <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-lg shadow-2xl border-2 border-yellow-500/30 w-full max-w-md animate-scale-in">
+      <div
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.primary.start}, ${colors.primaryDark.end})`,
+          borderColor: colors.warning.border
+        }}
+        className="rounded-lg shadow-2xl border-2 w-full max-w-md animate-scale-in"
+      >
 
         {/* Header */}
         <div className="p-6 border-b border-gray-700 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🔑</span>
+            <span className="text-3xl" aria-hidden="true">🔑</span>
             <h2 className="text-2xl font-bold text-white">Reset Password</h2>
           </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors"
+            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
           >
             ×
           </button>
@@ -131,7 +138,10 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
               <button
                 type="submit"
                 disabled={isLoading || !email.trim()}
-                className="w-full py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                style={!(isLoading || !email.trim()) ? {
+                  background: `linear-gradient(to right, ${colors.warning.start}, ${colors.warning.end})`
+                } : undefined}
+                className="w-full py-3 text-white font-bold rounded transition-all hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 {isLoading ? 'Sending...' : 'Send Reset Instructions'}
               </button>
@@ -143,7 +153,8 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="text-yellow-400 hover:text-yellow-300 font-semibold transition-colors text-sm"
+              style={{ color: colors.warning.end }}
+              className="hover:opacity-80 font-semibold transition-all text-sm focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
               disabled={isLoading}
             >
               ← Back to Login

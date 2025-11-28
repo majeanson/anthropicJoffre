@@ -10,6 +10,7 @@ import { Suspense, lazy, useEffect, useState, useRef, useCallback } from 'react'
 import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
+import { colors } from '../design-system';
 
 // Lazy load modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -228,13 +229,18 @@ export function JoinGameForm({
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
+      <div
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.warning.start}, ${colors.warning.end}, ${colors.error.end})`
+        }}
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      >
         {/* Animated background cards */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
-          <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
-          <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
-          <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
+          <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }} aria-hidden="true">🃏</div>
+          <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} aria-hidden="true">🎴</div>
+          <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }} aria-hidden="true">🂡</div>
+          <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }} aria-hidden="true">🂱</div>
         </div>
 
         <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
@@ -248,15 +254,21 @@ export function JoinGameForm({
 
           {/* Show message when joining from URL */}
           {autoJoinGameId && (
-            <div className="mb-6 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 border-2 border-blue-500 dark:border-blue-600 rounded-lg p-5 animate-pulse shadow-lg">
+            <div
+              style={{
+                background: `linear-gradient(to right, ${colors.info.start}, ${colors.secondary.start})`,
+                borderColor: colors.info.border
+              }}
+              className="mb-6 border-2 rounded-lg p-5 animate-pulse shadow-lg"
+            >
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-2xl">🎮</span>
-                <p className="text-blue-900 dark:text-blue-200 font-bold text-lg text-center">
-                  Joining game: <span className="font-mono bg-white dark:bg-gray-800 px-2 py-1 rounded border border-blue-400 dark:border-blue-500">{gameId}</span>
+                <span className="text-2xl" aria-hidden="true">🎮</span>
+                <p className="text-white font-bold text-lg text-center">
+                  Joining game: <span className="font-mono bg-white/20 px-2 py-1 rounded border border-white/30">{gameId}</span>
                 </p>
               </div>
-              <p className="text-blue-700 dark:text-blue-300 font-medium text-center">
-                👇 Enter your name below to join!
+              <p className="text-white/90 font-medium text-center">
+                <span aria-hidden="true">👇</span> Enter your name below to join!
               </p>
             </div>
           )}
@@ -352,7 +364,7 @@ export function JoinGameForm({
                   onClick={onBackToHomepage}
                   className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
                 >
-                  🏠 Back to Homepage
+                  <span aria-hidden="true">🏠</span> Back to Homepage
                 </button>
               ) : (
                 <button
@@ -369,11 +381,14 @@ export function JoinGameForm({
                 ref={joinButtonRef}
                 data-testid="submit-join-button"
                 type="submit"
-                className={`flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                  joinType === 'player'
-                    ? 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 border-purple-800 focus:ring-purple-400'
-                    : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 border-blue-800 focus:ring-blue-400'
-                }`}
+                style={joinType === 'player' ? {
+                  background: `linear-gradient(to right, ${colors.secondary.start}, ${colors.secondary.end})`,
+                  borderColor: colors.secondary.border
+                } : {
+                  background: `linear-gradient(to right, ${colors.info.start}, ${colors.info.end})`,
+                  borderColor: colors.info.border
+                }}
+                className="flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
               >
                 {joinType === 'player' ? 'Join as Player' : 'Join as Spectator'}
               </button>

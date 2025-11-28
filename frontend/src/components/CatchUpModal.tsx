@@ -1,5 +1,6 @@
 import { memo, useEffect, useCallback } from 'react';
 import { GameState } from '../types/game';
+import { colors } from '../design-system';
 
 interface CatchUpModalProps {
   gameState: GameState;
@@ -41,13 +42,19 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 animate-fadeIn" onKeyDown={(e) => e.stopPropagation()}>
-      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-8 max-w-md w-full mx-4 border-4 border-amber-600 shadow-2xl animate-slideUp">
+      <div
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.warning.start}, ${colors.warning.end})`,
+          borderColor: colors.warning.border
+        }}
+        className="rounded-2xl p-8 max-w-md w-full mx-4 border-4 shadow-2xl animate-slideUp"
+      >
         {/* Header */}
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-black text-amber-900 mb-2">
-            🎉 Welcome Back!
+          <h2 className="text-3xl font-black text-white mb-2">
+            <span aria-hidden="true">🎉</span> Welcome Back!
           </h2>
-          <p className="text-amber-700 font-semibold">
+          <p className="text-white/90 font-semibold">
             You've successfully reconnected
           </p>
         </div>
@@ -55,9 +62,9 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
         {/* Game Status */}
         <div className="space-y-4 mb-6">
           {/* Round and Phase */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-amber-300">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2" style={{ borderColor: colors.warning.border }}>
             <div className="flex items-center gap-3">
-              <div className="text-3xl">📍</div>
+              <div className="text-3xl" aria-hidden="true">📍</div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Current Status</p>
                 <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
@@ -68,49 +75,73 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
           </div>
 
           {/* Team Scores */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-amber-300">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2" style={{ borderColor: colors.warning.border }}>
             <div className="flex items-center gap-3 mb-3">
-              <div className="text-3xl">🏆</div>
+              <div className="text-3xl" aria-hidden="true">🏆</div>
               <div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Score</p>
                 {leadingTeam && (
-                  <p className="text-lg font-bold text-green-600">
+                  <p className="text-lg font-bold" style={{ color: colors.success.end }}>
                     Team {leadingTeam} is leading!
                   </p>
                 )}
                 {!leadingTeam && (
-                  <p className="text-lg font-bold text-blue-600">
+                  <p className="text-lg font-bold" style={{ color: colors.info.end }}>
                     Tied game!
                   </p>
                 )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div className={`text-center p-3 rounded-lg ${
-                currentPlayer?.teamId === 1 ? 'bg-orange-100 border-2 border-orange-400' : 'bg-orange-50 border border-orange-200'
-              }`}>
-                <p className="text-xs text-orange-600 font-semibold">Team 1</p>
-                <p className="text-2xl font-black text-orange-700">{gameState.teamScores.team1}</p>
+              <div
+                style={currentPlayer?.teamId === 1 ? {
+                  backgroundColor: `${colors.team1.start}20`,
+                  borderColor: colors.team1.border,
+                  borderWidth: '2px'
+                } : {
+                  backgroundColor: `${colors.team1.start}10`,
+                  borderColor: `${colors.team1.border}80`,
+                  borderWidth: '1px'
+                }}
+                className="text-center p-3 rounded-lg"
+              >
+                <p className="text-xs font-semibold" style={{ color: colors.team1.end }}>Team 1</p>
+                <p className="text-2xl font-black" style={{ color: colors.team1.end }}>{gameState.teamScores.team1}</p>
               </div>
-              <div className={`text-center p-3 rounded-lg ${
-                currentPlayer?.teamId === 2 ? 'bg-purple-100 border-2 border-purple-400' : 'bg-purple-50 border border-purple-200'
-              }`}>
-                <p className="text-xs text-purple-600 font-semibold">Team 2</p>
-                <p className="text-2xl font-black text-purple-700">{gameState.teamScores.team2}</p>
+              <div
+                style={currentPlayer?.teamId === 2 ? {
+                  backgroundColor: `${colors.team2.start}20`,
+                  borderColor: colors.team2.border,
+                  borderWidth: '2px'
+                } : {
+                  backgroundColor: `${colors.team2.start}10`,
+                  borderColor: `${colors.team2.border}80`,
+                  borderWidth: '1px'
+                }}
+                className="text-center p-3 rounded-lg"
+              >
+                <p className="text-xs font-semibold" style={{ color: colors.team2.end }}>Team 2</p>
+                <p className="text-2xl font-black" style={{ color: colors.team2.end }}>{gameState.teamScores.team2}</p>
               </div>
             </div>
           </div>
 
           {/* Your Turn Indicator */}
           {isCurrentTurn && gameState.phase !== 'team_selection' && gameState.phase !== 'game_over' && (
-            <div className="bg-green-50 border-2 border-green-400 rounded-lg p-4">
+            <div
+              style={{
+                backgroundColor: `${colors.success.start}20`,
+                borderColor: colors.success.border
+              }}
+              className="border-2 rounded-lg p-4"
+            >
               <div className="flex items-center gap-3">
-                <div className="text-3xl animate-bounce">✨</div>
+                <div className="text-3xl animate-bounce" aria-hidden="true">✨</div>
                 <div>
-                  <p className="text-lg font-bold text-green-700">
+                  <p className="text-lg font-bold" style={{ color: colors.success.end }}>
                     It's your turn!
                   </p>
-                  <p className="text-sm text-green-600">
+                  <p className="text-sm" style={{ color: colors.success.end }}>
                     The game is waiting for you
                   </p>
                 </div>
@@ -120,11 +151,17 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
 
           {/* Waiting Indicator */}
           {!isCurrentTurn && gameState.phase !== 'team_selection' && gameState.phase !== 'game_over' && gameState.phase !== 'scoring' && (
-            <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+            <div
+              style={{
+                backgroundColor: `${colors.info.start}20`,
+                borderColor: colors.info.border
+              }}
+              className="border-2 rounded-lg p-4"
+            >
               <div className="flex items-center gap-3">
-                <div className="text-2xl">⏳</div>
+                <div className="text-2xl" aria-hidden="true">⏳</div>
                 <div>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm" style={{ color: colors.info.end }}>
                     Waiting for{' '}
                     <span className="font-bold">
                       {gameState.players[gameState.currentPlayerIndex]?.name}
@@ -140,7 +177,10 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
         <button
           onClick={onClose}
           autoFocus
-          className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl font-black text-lg shadow-lg transition-all transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-400 focus:ring-offset-2"
+          style={{
+            background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`
+          }}
+          className="w-full text-white py-4 rounded-xl font-black text-lg shadow-lg transition-all transform hover:scale-105 hover:opacity-90 focus:outline-none focus:ring-4 focus:ring-offset-2"
         >
           Continue Playing
         </button>

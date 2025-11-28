@@ -1,4 +1,5 @@
 import { BotDifficulty } from '../types/game';
+import { colors } from '../design-system';
 
 interface BotTakeoverModalProps {
   isOpen: boolean;
@@ -34,37 +35,52 @@ export function BotTakeoverModal({
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onKeyDown={(e) => e.stopPropagation()}>
-      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-6 max-w-md w-full mx-4 border-4 border-blue-600 dark:border-blue-500 shadow-2xl">
+      <div
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.info.start}, ${colors.primary.end})`,
+          borderColor: colors.info.border
+        }}
+        className="rounded-2xl p-6 max-w-md w-full mx-4 border-4 shadow-2xl"
+      >
         {/* Header */}
         <div className="mb-6">
-          <h2 className="text-3xl font-black text-blue-900 dark:text-blue-100 mb-2">
-            🎮 Game is Full!
+          <h2 className="text-3xl font-black text-white mb-2">
+            <span aria-hidden="true">🎮</span> Game is Full!
           </h2>
-          <p className="text-blue-700 dark:text-blue-300 font-semibold">
+          <p className="text-white/90 font-semibold">
             This game has bot players. You can take over a bot to join!
           </p>
         </div>
 
         {/* Info Box */}
-        <div className="bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-300 dark:border-blue-600 rounded-lg p-4 mb-6">
-          <p className="text-sm text-blue-800 dark:text-blue-200">
+        <div
+          style={{
+            backgroundColor: `${colors.info.start}30`,
+            borderColor: colors.info.border
+          }}
+          className="border-2 rounded-lg p-4 mb-6"
+        >
+          <p className="text-sm text-white">
             <strong>Note:</strong> You'll inherit the bot's team, position, hand, and score.
           </p>
         </div>
 
         {/* Bots List */}
         <div className="space-y-3 mb-6">
-          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-2">
+          <h3 className="text-lg font-bold text-white mb-2">
             Available Bots:
           </h3>
           {availableBots.map((bot) => (
             <div
               key={bot.name}
-              className={`rounded-lg p-4 border-2 ${
-                bot.teamId === 1
-                  ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-600'
-                  : 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-600'
-              }`}
+              style={bot.teamId === 1 ? {
+                backgroundColor: `${colors.team1.start}20`,
+                borderColor: colors.team1.border
+              } : {
+                backgroundColor: `${colors.team2.start}20`,
+                borderColor: colors.team2.border
+              }}
+              className="rounded-lg p-4 border-2"
             >
               <div className="flex items-center justify-between gap-4 mb-3">
                 {/* Bot Info */}
@@ -86,7 +102,10 @@ export function BotTakeoverModal({
               {/* Take Over Button */}
               <button
                 onClick={() => onTakeOver(bot.name)}
-                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-black py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                style={{
+                  background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`
+                }}
+                className="w-full text-white font-black py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 Take Over {bot.name}
               </button>

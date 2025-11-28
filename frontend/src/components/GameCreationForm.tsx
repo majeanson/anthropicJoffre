@@ -9,6 +9,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
+import { colors } from '../design-system';
 
 interface GameCreationFormProps {
   playerName: string;
@@ -168,13 +169,18 @@ export function GameCreationForm({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-4 relative overflow-hidden">
+    <div
+      style={{
+        background: `linear-gradient(to bottom right, ${colors.warning.start}, ${colors.warning.end}, ${colors.error.end})`
+      }}
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+    >
       {/* Animated background cards */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
-        <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
-        <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
-        <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
+        <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }} aria-hidden="true">🃏</div>
+        <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} aria-hidden="true">🎴</div>
+        <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }} aria-hidden="true">🂡</div>
+        <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }} aria-hidden="true">🂱</div>
       </div>
 
       <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
@@ -225,12 +231,12 @@ export function GameCreationForm({
                   ? 'bg-amber-200 dark:bg-purple-900 text-amber-900 dark:text-purple-200'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
               }`}>
-                {createGamePersistence === 'elo' ? '🏆 Ranked' : '🎮 Casual'}
+                <span aria-hidden="true">{createGamePersistence === 'elo' ? '🏆' : '🎮'}</span> {createGamePersistence === 'elo' ? 'Ranked' : 'Casual'}
               </span>
             </div>
             <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
               {!user
-                ? '🔒 Available when registered - Register to enable ranked mode'
+                ? <><span aria-hidden="true">🔒</span> Available when registered - Register to enable ranked mode</>
                 : createGamePersistence === 'elo'
                 ? 'Game will be saved to your profile and affect your ranking'
                 : 'No stats saved - play without affecting your ELO rating'}
@@ -251,7 +257,11 @@ export function GameCreationForm({
               ref={createButtonRef}
               data-testid="submit-create-button"
               type="submit"
-              className="flex-1 bg-gradient-to-r from-green-600 to-green-700 text-white py-3 rounded-xl font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+              style={{
+                background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`,
+                borderColor: colors.success.border
+              }}
+              className="flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
             >
               Create
             </button>

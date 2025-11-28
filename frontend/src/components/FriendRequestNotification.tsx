@@ -7,6 +7,7 @@
 
 import { useEffect } from 'react';
 import { FriendRequestNotification } from '../types/friends';
+import { colors } from '../design-system';
 
 interface FriendRequestNotificationProps {
   notification: FriendRequestNotification | null;
@@ -33,12 +34,18 @@ export default function FriendRequestNotificationComponent({
 
   return (
     <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
-      <div className="bg-gradient-to-br from-purple-900 to-purple-800 rounded-lg shadow-2xl border-2 border-purple-500/50 p-4 w-80">
+      <div
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.secondary.start}, ${colors.secondary.end})`,
+          borderColor: colors.secondary.border
+        }}
+        className="rounded-lg shadow-2xl border-2 p-4 w-80"
+      >
         <div className="flex items-start gap-3">
-          <span className="text-3xl">👥</span>
+          <span className="text-3xl" aria-hidden="true">👥</span>
           <div className="flex-1">
             <h3 className="text-white font-bold text-lg">Friend Request</h3>
-            <p className="text-gray-200 text-sm mt-1">
+            <p className="text-white/90 text-sm mt-1">
               <span className="font-semibold">{notification.from_player}</span> sent you a friend request
             </p>
             <div className="flex gap-2 mt-3">
@@ -47,13 +54,13 @@ export default function FriendRequestNotificationComponent({
                   onView();
                   onClose();
                 }}
-                className="flex-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded font-semibold transition-colors"
+                className="flex-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm rounded font-semibold transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 View
               </button>
               <button
                 onClick={onClose}
-                className="px-3 py-1.5 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
+                className="px-3 py-1.5 bg-gray-800/50 hover:bg-gray-800/70 text-white text-sm rounded transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
               >
                 Dismiss
               </button>
@@ -61,7 +68,7 @@ export default function FriendRequestNotificationComponent({
           </div>
           <button
             onClick={onClose}
-            className="text-gray-300 hover:text-white text-xl font-bold"
+            className="text-white/80 hover:text-white text-xl font-bold focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
           >
             ×
           </button>

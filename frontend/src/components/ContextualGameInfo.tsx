@@ -1,4 +1,5 @@
 import { CardColor } from '../types/game';
+import { colors } from '../design-system';
 
 interface ContextualGameInfoProps {
   state: 'waiting' | 'in_progress' | 'trick_complete';
@@ -52,7 +53,7 @@ export function ContextualGameInfo({
       >
         <div className="flex items-center justify-center gap-3 text-sm">
           <div className="flex items-center gap-1">
-            <span className="text-lg">🎲</span>
+            <span className="text-lg" aria-hidden="true">🎲</span>
             <span className={`font-bold ${teamColorClass}`}>{betAmount}</span>
             {withoutTrump && (
               <span className="text-umber-700 dark:text-gray-400 text-xs">(No Trump)</span>
@@ -68,7 +69,7 @@ export function ContextualGameInfo({
           <div className="text-umber-700 dark:text-gray-400 text-xs mt-1 flex items-center justify-center gap-1">
             {state === 'waiting' && <span className="font-semibold">(Waiting...)</span>}
             <span>{currentPlayerName}</span>
-            {timeRemaining !== undefined && <span>⏱️ {timeRemaining}s</span>}
+            {timeRemaining !== undefined && <span><span aria-hidden="true">⏱️</span> {timeRemaining}s</span>}
           </div>
         )}
       </div>
@@ -79,11 +80,15 @@ export function ContextualGameInfo({
   if (state === 'trick_complete' && trickWinnerName) {
     return (
       <div
-        className="bg-gradient-to-br from-green-500 to-green-600 dark:from-green-600 dark:to-green-700 border-2 border-green-700 rounded-lg px-4 py-3 text-center shadow-lg max-w-xs mx-auto animate-fadeIn"
+        style={{
+          background: `linear-gradient(to bottom right, ${colors.success.start}, ${colors.success.end})`,
+          borderColor: colors.success.border
+        }}
+        className="border-2 rounded-lg px-4 py-3 text-center shadow-lg max-w-xs mx-auto animate-fadeIn"
         data-testid="contextual-info-trick-complete"
       >
         <div className="text-white font-bold text-lg flex items-center justify-center gap-2">
-          <span>🏆</span>
+          <span aria-hidden="true">🏆</span>
           <span>{trickWinnerName} wins!</span>
         </div>
         {trickPoints !== undefined && (
