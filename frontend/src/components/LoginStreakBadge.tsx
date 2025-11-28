@@ -5,7 +5,7 @@
  * Displays player's current login streak with freeze indicator
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 
 interface LoginStreak {

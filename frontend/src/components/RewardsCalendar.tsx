@@ -5,7 +5,7 @@
  * 30-day progressive rewards calendar with special milestones
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 
 interface CalendarReward {

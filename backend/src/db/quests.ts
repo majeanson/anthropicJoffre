@@ -25,6 +25,11 @@ import {
  * Get all active quest templates
  */
 export async function getAllQuestTemplates(): Promise<QuestTemplate[]> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return [];
+  }
+
   const result = await pool.query<QuestTemplate>(
     `SELECT * FROM quest_templates WHERE is_active = TRUE ORDER BY quest_type, id`
   );
@@ -39,6 +44,11 @@ export async function getAllQuestTemplates(): Promise<QuestTemplate[]> {
 export async function getPlayerDailyQuests(
   playerName: string
 ): Promise<PlayerQuest[]> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return [];
+  }
+
   const client = await pool.connect();
 
   try {
@@ -81,6 +91,11 @@ export async function getPlayerDailyQuests(
 export async function updateQuestProgress(
   context: GameQuestContext
 ): Promise<QuestProgress[]> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return [];
+  }
+
   const client = await pool.connect();
 
   try {
@@ -170,6 +185,11 @@ export async function claimQuestReward(
   playerName: string,
   questId: number
 ): Promise<{ xp: number; currency: number } | null> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return null;
+  }
+
   const client = await pool.connect();
 
   try {
@@ -259,6 +279,11 @@ export async function updateLoginStreak(playerName: string): Promise<{
   longestStreak: number;
   freezeUsed: boolean;
 }> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return { currentStreak: 0, longestStreak: 0, freezeUsed: false };
+  }
+
   const result = await pool.query<{
     current_streak: number;
     longest_streak: number;
@@ -289,6 +314,11 @@ export async function getLoginStreak(playerName: string): Promise<{
   streakFreezeAvailable: boolean;
   totalLogins: number;
 } | null> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return null;
+  }
+
   const result = await pool.query(
     `
     SELECT
@@ -330,6 +360,11 @@ export async function getDailyRewardsCalendar(): Promise<
     description: string;
   }>
 > {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return [];
+  }
+
   const result = await pool.query(
     `
     SELECT
@@ -367,6 +402,17 @@ export async function getPlayerCalendarProgress(playerName: string): Promise<{
   lastClaimedDate: string | null;
   calendarResets: number;
 }> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return {
+      currentDay: 1,
+      rewardsClaimed: [],
+      monthStartDate: new Date().toISOString().split('T')[0],
+      lastClaimedDate: null,
+      calendarResets: 0,
+    };
+  }
+
   const client = await pool.connect();
 
   try {
@@ -442,6 +488,11 @@ export async function claimCalendarReward(
   playerName: string,
   dayNumber: number
 ): Promise<{ xp?: number; currency?: number } | null> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return null;
+  }
+
   const client = await pool.connect();
 
   try {
@@ -555,6 +606,17 @@ export async function getQuestStats(playerName: string): Promise<{
   totalXpEarned: number;
   totalCurrencyEarned: number;
 }> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return {
+      totalQuestsCompleted: 0,
+      totalQuestsClaimed: 0,
+      questsCompletedToday: 0,
+      totalXpEarned: 0,
+      totalCurrencyEarned: 0,
+    };
+  }
+
   const result = await pool.query(
     `
     SELECT

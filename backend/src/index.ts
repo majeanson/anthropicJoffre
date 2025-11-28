@@ -1616,7 +1616,7 @@ async function endRound(gameId: string) {
       for (const player of humanPlayers) {
         try {
           // Extract quest-relevant context from finished game
-          const questContext = extractQuestContext(game, player.name, gameId);
+          const questContext = extractQuestContext(game, player.name, gameId, winningTeam);
 
           // Update quest progress in database
           const questUpdates = await updateQuestProgress(questContext);

@@ -66,7 +66,8 @@ export interface GameQuestContext {
  * A comeback is when a team was behind by 10+ points and still won
  */
 export function isGameComeback(gameState: GameState, winningTeam: 1 | 2): boolean {
-  const { team1Score, team2Score } = gameState;
+  const team1Score = gameState.teamScores.team1;
+  const team2Score = gameState.teamScores.team2;
 
   if (winningTeam === 1) {
     // Team 1 won - check if they were ever behind by 10+
@@ -84,7 +85,8 @@ export function isGameComeback(gameState: GameState, winningTeam: 1 | 2): boolea
 export function extractQuestContext(
   gameState: GameState,
   playerName: string,
-  gameId: string
+  gameId: string,
+  winningTeam: 1 | 2
 ): GameQuestContext {
   const player = gameState.players.find(p => p.name === playerName);
 
@@ -93,11 +95,11 @@ export function extractQuestContext(
   }
 
   const playerTeam = player.teamId;
-  const won = gameState.winningTeam === playerTeam;
+  const won = winningTeam === playerTeam;
   const opponentTeam = playerTeam === 1 ? 2 : 1;
 
-  const finalScore = playerTeam === 1 ? gameState.team1Score : gameState.team2Score;
-  const opponentScore = opponentTeam === 1 ? gameState.team1Score : gameState.team2Score;
+  const finalScore = playerTeam === 1 ? gameState.teamScores.team1 : gameState.teamScores.team2;
+  const opponentScore = opponentTeam === 1 ? gameState.teamScores.team1 : gameState.teamScores.team2;
 
   // Check for special card events from round history
   let wonRedZero = false;
@@ -107,10 +109,10 @@ export function extractQuestContext(
   if (gameState.roundHistory && Array.isArray(gameState.roundHistory)) {
     for (const round of gameState.roundHistory) {
       if (round.tricks && Array.isArray(round.tricks)) {
-        for (const trick of round.tricks) {
+        for (const trickResult of round.tricks) {
           // Check if player won a trick with Red 0
-          if (trick.winnerId === player.id && trick.cards) {
-            const playerCard = trick.cards.find((c: any) =>
+          if (trickResult.winnerId === player.id && trickResult.trick) {
+            const playerCard = trickResult.trick.find((c: any) =>
               c.playerId === player.id && c.card?.color === 'red' && c.card?.value === 0
             );
             if (playerCard) {
@@ -119,8 +121,8 @@ export function extractQuestContext(
           }
 
           // Check if player played Brown 0 defensively (didn't win trick with it)
-          if (trick.winnerId !== player.id && trick.cards) {
-            const playerCard = trick.cards.find((c: any) =>
+          if (trickResult.winnerId !== player.id && trickResult.trick) {
+            const playerCard = trickResult.trick.find((c: any) =>
               c.playerId === player.id && c.card?.color === 'brown' && c.card?.value === 0
             );
             if (playerCard) {

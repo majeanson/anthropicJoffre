@@ -23,6 +23,11 @@ const runQuestMigration = async () => {
 
     console.log('📖 Loaded migration file:', migrationPath);
 
+    if (!pool) {
+      console.error('❌ Database pool not initialized');
+      process.exit(1);
+    }
+
     // Execute the migration
     await pool.query(migrationSQL);
 

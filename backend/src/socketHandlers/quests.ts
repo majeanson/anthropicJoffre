@@ -105,6 +105,11 @@ async function handleClaimQuestReward(
       return;
     }
 
+    if (!pool) {
+      this.emit('error', { message: 'Database not available' });
+      return;
+    }
+
     // Get updated player stats (with new XP and level)
     const { rows } = await pool.query(
       `SELECT total_xp, current_level, cosmetic_currency FROM player_stats WHERE player_name = $1`,

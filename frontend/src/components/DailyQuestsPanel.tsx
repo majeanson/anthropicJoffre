@@ -5,7 +5,7 @@
  * Displays player's daily quests with progress tracking and rewards
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 
 interface QuestTemplate {
