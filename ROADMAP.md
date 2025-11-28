@@ -198,9 +198,9 @@
 - Service worker for offline support
 
 ### 4. Sprint 21: UI Improvement & Refactoring via Storybook 🔄 IN PROGRESS
-**Effort**: 3-4 days (4-5 hours completed)
+**Effort**: 3-4 days (6-7 hours completed)
 **Impact**: Design consistency, accessibility, developer experience
-**Status**: Phases 1-3 Complete (60%) ✅
+**Status**: Phases 1-4 Complete (80%) ✅
 
 **Completed**:
 - ✅ **Phase 1: Design Token System** (Day 1)
@@ -230,11 +230,14 @@
   - Established presentational component pattern
   - Storybook coverage: 11 → 12 components (+9%)
 
-**In Progress**:
-- 🔄 **Phase 4: Complete Quest Stories** (Day 3)
-  - Extract DailyQuestsPanel presentational component
-  - Extract RewardsCalendar presentational component
-  - Or implement Socket.io mocking strategy
+- ✅ **Phase 4: Complete Quest Stories** (Day 3)
+  - Created DailyQuestsPanelDisplay presentational component (240 lines)
+  - Created RewardsCalendarDisplay presentational component (260 lines)
+  - Added DailyQuestsPanel Storybook story (380+ lines, 12 stories)
+  - Added RewardsCalendar Storybook story (420+ lines, 13 stories)
+  - 25+ interactive examples with controls
+  - Quest system: 100% Storybook coverage (3/3 components)
+  - Storybook coverage: 12 → 14 components (+17%)
 
 **Planned**:
 - ⏸️ **Phase 5: Accessibility & Responsive Design** (Day 4)
@@ -249,8 +252,9 @@
   - Accessibility features documentation
   - Sprint 21 completion summary
 
-**Progress**: 60% Complete (3,700+ lines added)
-**Storybook**: 12 components (+50% coverage)
+**Progress**: 80% Complete (5,000+ lines added)
+**Storybook**: 14 components (+75% coverage)
+**Quest System**: 100% Storybook coverage (3/3 components)
 **See**: docs/sprints/sprint21-summary.md
 
 ---
