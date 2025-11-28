@@ -1,3 +1,5 @@
+import { UICard } from './ui/UICard';
+
 interface HowToPlayProps {
   isModal?: boolean;
   isOpen?: boolean;
@@ -22,7 +24,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
       </section>
 
       {/* Betting Phase */}
-      <section className="bg-yellow-50 dark:bg-yellow-900/40 rounded-lg p-4 border-2 border-yellow-300 dark:border-yellow-600">
+      <UICard variant="bordered" size="md" className="border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           Betting Phase
         </h3>
@@ -34,10 +36,10 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           <li>• "Without Trump" doubles the bet stakes</li>
           <li>• Highest bidder becomes the offensive team</li>
         </ul>
-      </section>
+      </UICard>
 
       {/* Playing Phase */}
-      <section className="bg-blue-50 dark:bg-blue-900/40 rounded-lg p-4 border-2 border-blue-300 dark:border-blue-600">
+      <UICard variant="bordered" size="md" className="border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           Playing Phase
         </h3>
@@ -48,10 +50,10 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           <li>• Highest card in led suit wins if no trump played</li>
           <li>• Winner of each trick leads the next</li>
         </ul>
-      </section>
+      </UICard>
 
       {/* Card Queuing */}
-      <section className="bg-cyan-50 dark:bg-cyan-900/40 rounded-lg p-4 border-2 border-cyan-300 dark:border-cyan-600">
+      <UICard variant="bordered" size="md" className="border-cyan-300 dark:border-cyan-600 bg-cyan-50 dark:bg-cyan-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           🎯 Card Queuing
         </h3>
@@ -71,10 +73,10 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
             💡 Pro tip: Queue your card early to think ahead while others play!
           </p>
         </div>
-      </section>
+      </UICard>
 
       {/* Beginner Mode Features */}
-      <section className="bg-emerald-50 dark:bg-emerald-900/40 rounded-lg p-4 border-2 border-emerald-300 dark:border-emerald-600">
+      <UICard variant="bordered" size="md" className="border-emerald-300 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           💡 Beginner Mode Features
         </h3>
@@ -123,10 +125,10 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
             🎓 Learning Tip: Use bot thinking insights to understand advanced strategies, then apply them yourself!
           </p>
         </div>
-      </section>
+      </UICard>
 
       {/* Keyboard Navigation - Desktop only */}
-      <section className="hidden md:block bg-indigo-50 dark:bg-indigo-900/40 rounded-lg p-4 border-2 border-indigo-300 dark:border-indigo-600">
+      <UICard variant="bordered" size="md" className="hidden md:block border-indigo-300 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           ⌨️ Keyboard Shortcuts
         </h3>
@@ -150,10 +152,10 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
             💡 Tip: You can queue a card before your turn for instant auto-play!
           </p>
         </div>
-      </section>
+      </UICard>
 
       {/* Special Cards */}
-      <section className="bg-green-50 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
+      <UICard variant="bordered" size="md" className="border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           Special Cards
         </h3>
@@ -162,10 +164,10 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           <li>• <strong className="text-amber-800">Brown 0:</strong> -3 penalty points (-2 total for that trick)</li>
           <li>• All other tricks worth 1 point</li>
         </ul>
-      </section>
+      </UICard>
 
       {/* Scoring */}
-      <section className="bg-purple-50 dark:bg-purple-900/40 rounded-lg p-4 border-2 border-purple-300 dark:border-purple-600">
+      <UICard variant="bordered" size="md" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           Scoring
         </h3>
@@ -175,7 +177,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           <li>• Defensive team gains points from tricks won</li>
           <li>• If offensive fails, they lose bet points</li>
         </ul>
-      </section>
+      </UICard>
 
       {/* Teams */}
       <section>
@@ -183,14 +185,14 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           Teams
         </h3>
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-orange-100 dark:bg-orange-900/40 rounded-lg p-4 border-2 border-orange-400 dark:border-orange-600">
+          <UICard variant="bordered" size="md" className="border-orange-400 dark:border-orange-600 bg-orange-100 dark:bg-orange-900/40">
             <p className="text-lg font-bold text-orange-800 dark:text-orange-200">Team 1 (Orange)</p>
             <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">Players 1 & 3</p>
-          </div>
-          <div className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-4 border-2 border-purple-400 dark:border-purple-600">
+          </UICard>
+          <UICard variant="bordered" size="md" className="border-purple-400 dark:border-purple-600 bg-purple-100 dark:bg-purple-900/40">
             <p className="text-lg font-bold text-purple-800 dark:text-purple-200">Team 2 (Purple)</p>
             <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">Players 2 & 4</p>
-          </div>
+          </UICard>
         </div>
       </section>
     </div>
