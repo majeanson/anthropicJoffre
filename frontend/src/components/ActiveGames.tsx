@@ -12,6 +12,8 @@ import { CONFIG } from '../config/constants';
 import { ERROR_MESSAGES } from '../config/errorMessages';
 import logger from '../utils/logger';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { Button } from './ui/Button';
 
 interface ActiveGame {
   gameId: string;
@@ -79,21 +81,21 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
 
   if (loading && activeGames.length === 0) {
     return (
-      <div className="bg-blue-100 dark:bg-blue-900/30 border-2 border-blue-400 dark:border-blue-600 rounded-lg p-4">
-        <p className="text-blue-800 dark:text-blue-300 text-center">
+      <UICard variant="gradient" gradient="info" size="md" className="text-center">
+        <p className="text-white">
           🔍 Loading your active games...
         </p>
-      </div>
+      </UICard>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-100 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-600 rounded-lg p-4">
-        <p className="text-red-800 dark:text-red-300 text-center">
+      <UICard variant="gradient" gradient="error" size="md" className="text-center">
+        <p className="text-white">
           ⚠️ {error}
         </p>
-      </div>
+      </UICard>
     );
   }
 
@@ -117,17 +119,19 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
   };
 
   return (
-    <div className={`bg-gradient-to-r ${colors.gradients.success} border-2 border-green-400 dark:border-green-600 rounded-lg p-4 shadow-lg`}>
-      <h3 className="font-bold text-lg text-green-800 dark:text-green-300 mb-3 flex items-center gap-2">
+    <UICard variant="gradient" gradient="success" size="lg">
+      <h3 className="font-bold text-lg text-white mb-3 flex items-center gap-2">
         <span aria-hidden="true">🔄</span>
         <span>Your Active Games ({activeGames.length})</span>
       </h3>
 
       <div className="space-y-2">
         {activeGames.map((game) => (
-          <div
+          <UICard
             key={game.gameId}
-            className="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-green-300 dark:border-green-700 hover:border-green-500 dark:hover:border-green-500 transition-colors"
+            variant="bordered"
+            size="md"
+            className="hover:border-green-500 dark:hover:border-green-500 transition-colors"
           >
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex-1 min-w-0">
@@ -159,25 +163,26 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
                 </div>
               </div>
 
-              <button
+              <Button
+                variant="success"
                 onClick={() => {
                   sounds.buttonClick();
                   onResumeGame(game.gameId);
                 }}
                 disabled={!socket}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-400"
+                leftIcon={<span>▶️</span>}
                 aria-label={`Resume game ${game.gameId.substring(0, 8)}`}
               >
-                <span aria-hidden="true">▶️</span> Resume
-              </button>
+                Resume
+              </Button>
             </div>
-          </div>
+          </UICard>
         ))}
       </div>
 
-      <p className="text-xs text-green-700 dark:text-green-400 mt-3 text-center">
+      <p className="text-xs text-white/90 mt-3 text-center">
         💡 Click Resume to rejoin your game
       </p>
-    </div>
+    </UICard>
   );
 }
