@@ -19,6 +19,25 @@ export type { ButtonProps, ButtonVariant, ButtonSize } from './Button';
 export { IconButton } from './IconButton';
 export type { IconButtonProps, IconButtonVariant, IconButtonSize } from './IconButton';
 
+// Layout components
+export { UICard } from './UICard';
+export type {
+  UICardProps,
+  UICardVariant,
+  UICardSize,
+  UICardPadding,
+  UICardGradient,
+} from './UICard';
+
+export { UIBadge } from './UIBadge';
+export type {
+  UIBadgeProps,
+  UIBadgeVariant,
+  UIBadgeColor,
+  UIBadgeSize,
+  UIBadgeShape,
+} from './UIBadge';
+
 // Social components
 export { SocialListItem } from './SocialListItem';
 export { OnlineStatusBadge } from './OnlineStatusBadge';
