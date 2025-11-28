@@ -6,19 +6,21 @@ import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
 import { sounds } from '../utils/sounds';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { UIBadge } from './ui/UIBadge';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
 
 // Sprint 8 Task 2: Move pure helper functions outside component for performance
-const getPhaseColor = (phase: string) => {
+const getPhaseColor = (phase: string): 'info' | 'warning' | 'success' | 'team2' | 'gray' => {
   switch (phase) {
-    case 'team_selection': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-    case 'betting': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
-    case 'playing': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-    case 'scoring': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
-    case 'game_over': return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
-    default: return 'bg-gray-100 text-gray-800 dark:text-gray-200 dark:bg-gray-800 dark:text-gray-200';
+    case 'team_selection': return 'info';
+    case 'betting': return 'warning';
+    case 'playing': return 'success';
+    case 'scoring': return 'team2';
+    case 'game_over': return 'gray';
+    default: return 'gray';
   }
 };
 
@@ -465,7 +467,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-4 space-y-3">
           {/* Join with Game ID Section - Only in Active Games tab */}
           {activeTab === 'active' && (
-            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600">
+            <UICard variant="bordered" size="md">
               <button
                 onClick={() => setShowJoinInput(!showJoinInput)}
                 className="w-full flex items-center justify-between text-left"
@@ -501,12 +503,12 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   </button>
                 </div>
               )}
-            </div>
+            </UICard>
           )}
 
           {/* Sprint 6: Filter and Sort Bar - Only in Active Games tab */}
           {activeTab === 'active' && games.length > 0 && (
-            <div className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600">
+            <UICard variant="bordered" size="md">
               <div className="flex flex-wrap items-center gap-4">
                 {/* Filter Checkboxes */}
                 <div className="flex items-center gap-4 flex-wrap">
@@ -586,7 +588,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   Showing {filteredAndSortedGames.length} of {games.length} games
                 </div>
               )}
-            </div>
+            </UICard>
           )}
 
           {/* Loading State - Sprint 6: Skeleton Loaders */}
@@ -623,15 +625,15 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
           {/* Error State - Sprint 6: Enhanced with correlation ID and retry */}
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+            <UICard variant="gradient" gradient="error" size="md">
               <div className="flex items-start gap-3">
                 <span className="text-2xl">⚠️</span>
                 <div className="flex-1">
-                  <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                  <p className="text-white font-semibold mb-1">
                     {error}
                   </p>
                   {correlationId && (
-                    <p className="text-xs text-red-700 dark:text-red-300 font-mono mt-2">
+                    <p className="text-xs text-white/90 font-mono mt-2">
                       Error ID: {correlationId}
                       <br />
                       <span className="text-xs opacity-75">
@@ -650,13 +652,13 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                       }
                     }}
                     disabled={isRetrying}
-                    className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-3 bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isRetrying ? '🔄 Retrying...' : '🔄 Try Again'}
                   </button>
                 </div>
               </div>
-            </div>
+            </UICard>
           )}
 
           {/* Active Games Tab */}
@@ -680,12 +682,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                 </div>
               ) : (
                 filteredAndSortedGames.map((game, index) => (
-                  <div
+                  <UICard
                     key={game.gameId}
-                    className={`bg-white dark:bg-gray-700 rounded-xl p-4 border-2 transition-all shadow-sm hover:shadow-md ${
+                    variant="bordered"
+                    size="md"
+                    className={`transition-all shadow-sm hover:shadow-md ${
                       selectedIndex === index
                         ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500'
+                        : 'hover:border-amber-500 dark:hover:border-gray-500'
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -694,16 +698,20 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                           <span className="font-black text-xl text-umber-900 dark:text-gray-100">
                             Game {game.gameId}
                           </span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${getPhaseColor(game.phase)}`}>
+                          <UIBadge
+                            variant="solid"
+                            color={getPhaseColor(game.phase)}
+                            size="sm"
+                          >
                             {getPhaseLabel(game.phase)}
-                          </span>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                            game.persistenceMode === 'elo'
-                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                              : 'bg-gray-100 text-gray-700 dark:bg-gray-600 dark:text-gray-300'
-                          }`}>
+                          </UIBadge>
+                          <UIBadge
+                            variant="solid"
+                            color={game.persistenceMode === 'elo' ? 'warning' : 'gray'}
+                            size="sm"
+                          >
                             {game.persistenceMode === 'elo' ? '🏆 Ranked' : '🎲 Casual'}
-                          </span>
+                          </UIBadge>
                         </div>
                         <div className="text-sm text-umber-600 dark:text-gray-400 flex items-center gap-4">
                           <span>👥 {game.humanPlayerCount} player{game.humanPlayerCount !== 1 ? 's' : ''}</span>
@@ -750,7 +758,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                         )}
                       </div>
                     </div>
-                  </div>
+                  </UICard>
                 ))
               )}
             </>
@@ -774,12 +782,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   const timeAgo = getTimeAgo(finishedDate);
 
                   return (
-                    <div
+                    <UICard
                       key={game.game_id}
-                      className={`bg-white dark:bg-gray-700 rounded-xl p-4 border-2 transition-all shadow-sm hover:shadow-md ${
+                      variant="bordered"
+                      size="md"
+                      className={`transition-all shadow-sm hover:shadow-md ${
                         selectedIndex === index
                           ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/20'
-                          : 'border-parchment-300 dark:border-gray-600 hover:border-amber-500 dark:hover:border-gray-500'
+                          : 'hover:border-amber-500 dark:hover:border-gray-500'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-3">
@@ -788,13 +798,13 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                             <span className="font-black text-xl text-umber-900 dark:text-gray-100">
                               Game {game.game_id}
                             </span>
-                            <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                              game.winning_team === 1
-                                ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200'
-                                : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200'
-                            }`}>
+                            <UIBadge
+                              variant="solid"
+                              color={game.winning_team === 1 ? 'team1' : 'team2'}
+                              size="sm"
+                            >
                               🏆 Team {game.winning_team} Won
-                            </span>
+                            </UIBadge>
                           </div>
                           <div className="text-sm text-umber-600 dark:text-gray-400 flex items-center gap-4">
                             <span>📊 Score: {game.team1_score} - {game.team2_score}</span>
@@ -812,7 +822,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                           Watch Replay
                         </button>
                       </div>
-                    </div>
+                    </UICard>
                   );
                 })
               )}
