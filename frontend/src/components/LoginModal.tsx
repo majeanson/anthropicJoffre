@@ -1,12 +1,13 @@
 /**
  * Login Modal Component
  * Sprint 3 Phase 1
+ * Migrated to use Storybook Modal and Button components
  */
 
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useFocusTrap } from '../hooks/useFocusTrap';
-import { colors } from '../design-system';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -50,139 +51,111 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
     onClose();
   };
 
-  // Focus trap for keyboard navigation
-  const { containerRef } = useFocusTrap({
-    isActive: isOpen,
-    onEscape: handleClose,
-  });
-
-  // Early return AFTER all hooks (Rules of Hooks)
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onKeyDown={(e) => e.stopPropagation()}>
-      <div
-        ref={containerRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="login-modal-title"
-        style={{
-          background: `linear-gradient(to bottom right, ${colors.primary.start}, ${colors.primaryDark.end})`,
-          borderColor: colors.info.border
-        }}
-        className="rounded-lg shadow-2xl border-2 w-full max-w-md animate-scale-in"
-      >
-
-        {/* Header */}
-        <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl" aria-hidden="true">🔐</span>
-            <h2 id="login-modal-title" className="text-2xl font-bold text-white">Login</h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Login"
+      icon="🔐"
+      theme="blue"
+      size="sm"
+      ariaLabel="Login to your account"
+      testId="login-modal"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-500/20 border border-red-500 rounded p-3 text-red-200 text-sm">
+            {error}
           </div>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
-          >
-            ×
-          </button>
+        )}
+
+        {/* Username/Email Field */}
+        <div>
+          <label htmlFor="username" className="block text-sm font-semibold text-gray-300 mb-2">
+            Username or Email
+          </label>
+          <input
+            id="username"
+            type="text"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-blue-500 focus:outline-none"
+            placeholder="Enter your username or email"
+            disabled={isLoading}
+            autoComplete="username"
+          />
         </div>
 
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 rounded p-3 text-red-200 text-sm">
-              {error}
-            </div>
-          )}
-
-          {/* Username/Email Field */}
-          <div>
-            <label htmlFor="username" className="block text-sm font-semibold text-gray-300 mb-2">
-              Username or Email
-            </label>
+        {/* Password Field */}
+        <div>
+          <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2">
+            Password
+          </label>
+          <div className="relative">
             <input
-              id="username"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-blue-500 focus:outline-none"
-              placeholder="Enter your username or email"
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-blue-500 focus:outline-none pr-12"
+              placeholder="Enter your password"
               disabled={isLoading}
-              autoComplete="username"
+              autoComplete="current-password"
             />
-          </div>
-
-          {/* Password Field */}
-          <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-300 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-blue-500 focus:outline-none pr-12"
-                placeholder="Enter your password"
-                disabled={isLoading}
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
-                disabled={isLoading}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                <span aria-hidden="true">{showPassword ? '👁️' : '👁️‍🗨️'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Forgot Password Link */}
-          <div className="text-right">
             <button
               type="button"
-              onClick={onSwitchToPasswordReset}
-              style={{ color: colors.info.end }}
-              className="text-sm hover:opacity-80 transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
               disabled={isLoading}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              Forgot password?
+              <span aria-hidden="true">{showPassword ? '👁️' : '👁️‍🗨️'}</span>
             </button>
           </div>
+        </div>
 
-          {/* Login Button */}
-          <button
-            type="submit"
-            disabled={isLoading || !username.trim() || !password}
-            style={!(isLoading || !username.trim() || !password) ? {
-              background: `linear-gradient(to right, ${colors.info.start}, ${colors.info.end})`
-            } : undefined}
-            className="w-full py-3 text-white font-bold rounded transition-all hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+        {/* Forgot Password Link */}
+        <div className="text-right">
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            onClick={onSwitchToPasswordReset}
+            disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
-          </button>
+            Forgot password?
+          </Button>
+        </div>
 
-          {/* Register Link */}
-          <div className="text-center pt-4 border-t border-gray-700">
-            <p className="text-gray-400 text-sm">
-              Don't have an account?{' '}
-              <button
-                type="button"
-                onClick={onSwitchToRegister}
-                style={{ color: colors.info.end }}
-                className="hover:opacity-80 font-semibold transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
-                disabled={isLoading}
-              >
-                Register here
-              </button>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Login Button */}
+        <Button
+          type="submit"
+          variant="primary"
+          size="lg"
+          fullWidth
+          loading={isLoading}
+          disabled={!username.trim() || !password}
+        >
+          Login
+        </Button>
+
+        {/* Register Link */}
+        <div className="text-center pt-4 border-t border-gray-700">
+          <p className="text-gray-400 text-sm">
+            Don't have an account?{' '}
+            <Button
+              type="button"
+              variant="link"
+              size="sm"
+              onClick={onSwitchToRegister}
+              disabled={isLoading}
+            >
+              Register here
+            </Button>
+          </p>
+        </div>
+      </form>
+    </Modal>
   );
 }

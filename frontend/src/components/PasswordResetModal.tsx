@@ -1,11 +1,13 @@
 /**
  * Password Reset Modal Component
  * Sprint 3 Phase 1
+ * Migrated to use Storybook Modal and Button components
  */
 
 import React, { useState } from 'react';
 import { API_ENDPOINTS } from '../config/constants';
-import { colors } from '../design-system';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -68,100 +70,83 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
     onClose();
   };
 
-  // Early return AFTER all hooks (Rules of Hooks)
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in" onKeyDown={(e) => e.stopPropagation()}>
-      <div
-        style={{
-          background: `linear-gradient(to bottom right, ${colors.primary.start}, ${colors.primaryDark.end})`,
-          borderColor: colors.warning.border
-        }}
-        className="rounded-lg shadow-2xl border-2 w-full max-w-md animate-scale-in"
-      >
-
-        {/* Header */}
-        <div className="p-6 border-b border-gray-700 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl" aria-hidden="true">🔑</span>
-            <h2 className="text-2xl font-bold text-white">Reset Password</h2>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Reset Password"
+      icon="🔑"
+      theme="blue"
+      size="sm"
+      ariaLabel="Reset your password"
+      testId="password-reset-modal"
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="bg-green-500/20 border border-green-500 rounded p-3 text-green-200 text-sm">
+            {successMessage}
           </div>
-          <button
-            onClick={handleClose}
-            className="text-gray-400 hover:text-white text-2xl font-bold transition-colors focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
-          >
-            ×
-          </button>
-        </div>
+        )}
 
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Success Message */}
-          {successMessage && (
-            <div className="bg-green-500/20 border border-green-500 rounded p-3 text-green-200 text-sm">
-              {successMessage}
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="bg-red-500/20 border border-red-500 rounded p-3 text-red-200 text-sm">
+            {errorMessage}
+          </div>
+        )}
+
+        {!successMessage && (
+          <>
+            <p className="text-gray-300 text-sm">
+              Enter your email address and we'll send you instructions to reset your password.
+            </p>
+
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">
+                Email Address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-yellow-500 focus:outline-none"
+                placeholder="your@email.com"
+                disabled={isLoading}
+                autoComplete="email"
+              />
             </div>
-          )}
 
-          {/* Error Message */}
-          {errorMessage && (
-            <div className="bg-red-500/20 border border-red-500 rounded p-3 text-red-200 text-sm">
-              {errorMessage}
-            </div>
-          )}
-
-          {!successMessage && (
-            <>
-              <p className="text-gray-300 text-sm">
-                Enter your email address and we'll send you instructions to reset your password.
-              </p>
-
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-yellow-500 focus:outline-none"
-                  placeholder="your@email.com"
-                  disabled={isLoading}
-                  autoComplete="email"
-                />
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading || !email.trim()}
-                style={!(isLoading || !email.trim()) ? {
-                  background: `linear-gradient(to right, ${colors.warning.start}, ${colors.warning.end})`
-                } : undefined}
-                className="w-full py-3 text-white font-bold rounded transition-all hover:opacity-90 disabled:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-100 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-              >
-                {isLoading ? 'Sending...' : 'Send Reset Instructions'}
-              </button>
-            </>
-          )}
-
-          {/* Back to Login Link */}
-          <div className="text-center pt-4 border-t border-gray-700">
-            <button
-              type="button"
-              onClick={onSwitchToLogin}
-              style={{ color: colors.warning.end }}
-              className="hover:opacity-80 font-semibold transition-all text-sm focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
-              disabled={isLoading}
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              variant="warning"
+              size="lg"
+              fullWidth
+              loading={isLoading}
+              disabled={!email.trim()}
             >
-              ← Back to Login
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              Send Reset Instructions
+            </Button>
+          </>
+        )}
+
+        {/* Back to Login Link */}
+        <div className="text-center pt-4 border-t border-gray-700">
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            onClick={onSwitchToLogin}
+            disabled={isLoading}
+            leftIcon={<span>←</span>}
+          >
+            Back to Login
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
