@@ -11,6 +11,7 @@ import { sounds } from '../utils/sounds';
 import { CONFIG } from '../config/constants';
 import { ERROR_MESSAGES } from '../config/errorMessages';
 import logger from '../utils/logger';
+import { colors } from '../design-system';
 
 interface ActiveGame {
   gameId: string;
@@ -116,9 +117,9 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
   };
 
   return (
-    <div className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-400 dark:border-green-600 rounded-lg p-4 shadow-lg">
+    <div className={`bg-gradient-to-r ${colors.gradients.success} border-2 border-green-400 dark:border-green-600 rounded-lg p-4 shadow-lg`}>
       <h3 className="font-bold text-lg text-green-800 dark:text-green-300 mb-3 flex items-center gap-2">
-        <span>🔄</span>
+        <span aria-hidden="true">🔄</span>
         <span>Your Active Games ({activeGames.length})</span>
       </h3>
 
@@ -164,9 +165,10 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
                   onResumeGame(game.gameId);
                 }}
                 disabled={!socket}
-                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-400"
+                aria-label={`Resume game ${game.gameId.substring(0, 8)}`}
               >
-                ▶️ Resume
+                <span aria-hidden="true">▶️</span> Resume
               </button>
             </div>
           </div>
