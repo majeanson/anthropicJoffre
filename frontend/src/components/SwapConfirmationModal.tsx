@@ -7,6 +7,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { colors } from '../design-system';
 
 interface SwapConfirmationModalProps {
   isOpen: boolean;
@@ -67,7 +68,7 @@ export function SwapConfirmationModal({
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <span>🔄</span>
+            <span aria-hidden="true">🔄</span>
             <span>Swap Request</span>
           </h2>
           <div className="text-sm text-gray-600 dark:text-gray-400 font-mono">
@@ -82,14 +83,20 @@ export function SwapConfirmationModal({
           </p>
 
           {willChangeTeams && (
-            <div className="bg-yellow-100 dark:bg-yellow-900/30 border-2 border-yellow-400 dark:border-yellow-600 rounded-lg p-3">
+            <div
+              style={{
+                background: `linear-gradient(to right, ${colors.warning.start}, ${colors.warning.end})`,
+                borderColor: colors.warning.border
+              }}
+              className="border-2 rounded-lg p-3"
+            >
               <div className="flex items-start gap-2">
-                <span className="text-xl">⚠️</span>
+                <span className="text-xl" aria-hidden="true">⚠️</span>
                 <div className="flex-1">
-                  <p className="font-semibold text-yellow-800 dark:text-yellow-200">
+                  <p className="font-semibold text-white">
                     Warning: Team Change
                   </p>
-                  <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                  <p className="text-sm text-white/90">
                     This swap will change your team!
                   </p>
                 </div>
@@ -110,13 +117,20 @@ export function SwapConfirmationModal({
         <div className="flex gap-3 mt-6">
           <button
             onClick={onReject}
-            className="flex-1 px-4 py-3 bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg font-semibold transition-colors"
+            style={{
+              background: `linear-gradient(to right, ${colors.neutral.start}, ${colors.neutral.end})`
+            }}
+            className="flex-1 px-4 py-3 text-gray-800 dark:text-gray-200 rounded-lg font-semibold transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
           >
             Reject
           </button>
           <button
             onClick={onAccept}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-lg font-semibold transition-all shadow-lg"
+            style={{
+              background: `linear-gradient(to right, ${colors.primary.start}, ${colors.primary.end})`,
+              borderColor: colors.primary.border
+            }}
+            className="flex-1 px-4 py-3 text-white rounded-lg font-semibold transition-all shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
             Accept Swap
           </button>

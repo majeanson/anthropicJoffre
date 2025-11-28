@@ -1,3 +1,5 @@
+import { colors } from '../design-system';
+
 interface SkeletonProps {
   variant?: 'text' | 'circular' | 'rectangular' | 'card' | 'button';
   width?: string | number;
@@ -13,7 +15,7 @@ export function Skeleton({
   className = '',
   count = 1
 }: SkeletonProps) {
-  const baseClasses = 'animate-pulse bg-gradient-to-r from-parchment-200 via-parchment-300 to-parchment-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700 bg-[length:200%_100%] motion-safe:animate-[shimmer_2s_ease-in-out_infinite]';
+  const baseClasses = `animate-pulse bg-gradient-to-r ${colors.gradients.neutral} bg-[length:200%_100%] motion-safe:animate-[shimmer_2s_ease-in-out_infinite]`;
 
   const variantClasses = {
     text: 'h-4 rounded',

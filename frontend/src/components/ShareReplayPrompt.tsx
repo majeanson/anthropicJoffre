@@ -27,6 +27,7 @@
 import { useState } from 'react';
 import { Modal, Button } from './ui';
 import { sounds } from '../utils/sounds';
+import { colors } from '../design-system';
 
 interface ShareReplayPromptProps {
   gameId: string;
@@ -95,7 +96,7 @@ export function ShareReplayPrompt({
       {/* Share message */}
       <div className="bg-parchment-100 dark:bg-gray-800/50 rounded-lg p-4 mb-6 border-2 border-parchment-200 dark:border-gray-700">
         <p className="text-umber-900 dark:text-gray-300 text-center text-sm">
-          🎮 Share this epic game with friends!
+          <span aria-hidden="true">🎮</span> Share this epic game with friends!
         </p>
       </div>
 
@@ -107,22 +108,22 @@ export function ShareReplayPrompt({
           fullWidth
           onClick={handleCopyLink}
         >
-          {copied ? '✓ Link Copied!' : '🔗 Copy Replay Link'}
+          {copied ? <><span aria-hidden="true">✓</span> Link Copied!</> : <><span aria-hidden="true">🔗</span> Copy Replay Link</>}
         </Button>
 
         {/* Social Share Buttons */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={handleShareTwitter}
-            className="py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+            className="py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
           >
-            <span>🐦</span> Twitter
+            <span aria-hidden="true">🐦</span> Twitter
           </button>
           <button
             onClick={handleShareFacebook}
-            className="py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+            className="py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
           >
-            <span>📘</span> Facebook
+            <span aria-hidden="true">📘</span> Facebook
           </button>
         </div>
 
@@ -134,9 +135,12 @@ export function ShareReplayPrompt({
             onViewReplay();
             onClose();
           }}
-          className="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 border-emerald-800"
+          style={{
+            background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`,
+            borderColor: colors.success.border
+          }}
         >
-          📺 Watch Replay
+          <span aria-hidden="true">📺</span> Watch Replay
         </Button>
 
         {/* Close */}
