@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "npm run build:backend && npm run build:storybook",
+    "build:backend": "tsc -p tsconfig.build.json",
+    "build:storybook": "cd ../frontend && npm install --legacy-peer-deps && npm run build-storybook && node -e \"const fs=require('fs');const path=require('path');fs.mkdirSync(path.join(__dirname,'..','backend','public'),{recursive:true});fs.cpSync('storybook-static',path.join(__dirname,'..','backend','public','storybook'),{recursive:true});\"",
     "start": "node dist/index.js",
     "test": "vitest",
     "test:ui": "vitest --ui",
