@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { UIBadge } from './ui/UIBadge';
 
 interface LeaderboardProps {
   gameState: GameState;
@@ -71,9 +73,12 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
             </h3>
             <div className="grid grid-cols-2 gap-4">
               {/* Team 1 */}
-              <div className={`bg-gradient-to-br ${colors.gradients.team1Light} dark:from-orange-900/40 dark:to-orange-800/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600 ${
-                leadingTeam === 1 ? 'ring-4 ring-yellow-400' : ''
-              }`}>
+              <UICard
+                variant="gradient"
+                gradient="team1"
+                size="lg"
+                className={leadingTeam === 1 ? 'ring-4 ring-yellow-400' : ''}
+              >
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-2xl font-bold text-orange-800 dark:text-orange-200">Team 1</h4>
                   {leadingTeam === 1 && <span className="text-3xl" aria-hidden="true">👑</span>}
@@ -81,18 +86,21 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                 <div className="text-5xl font-bold text-orange-600 dark:text-orange-300 mb-4">{team1Score}</div>
                 <div className="space-y-2">
                   {team1Players.map(player => (
-                    <div key={player.id} className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 rounded px-3 py-2 border border-orange-200 dark:border-orange-700">
+                    <UICard key={player.id} variant="bordered" size="sm" className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 border-orange-200 dark:border-orange-700">
                       <p className="font-semibold text-orange-900 dark:text-orange-200">{player.name}</p>
                       <p className="text-sm text-orange-700 dark:text-orange-300">Tricks: {player.tricksWon}</p>
-                    </div>
+                    </UICard>
                   ))}
                 </div>
-              </div>
+              </UICard>
 
               {/* Team 2 */}
-              <div className={`bg-gradient-to-br ${colors.gradients.team2Light} dark:from-purple-900/40 dark:to-purple-800/40 rounded-lg p-6 border-2 border-purple-200 dark:border-purple-600 ${
-                leadingTeam === 2 ? 'ring-4 ring-yellow-400' : ''
-              }`}>
+              <UICard
+                variant="gradient"
+                gradient="team2"
+                size="lg"
+                className={leadingTeam === 2 ? 'ring-4 ring-yellow-400' : ''}
+              >
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-2xl font-bold text-purple-800 dark:text-purple-200">Team 2</h4>
                   {leadingTeam === 2 && <span className="text-3xl" aria-hidden="true">👑</span>}
@@ -100,13 +108,13 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                 <div className="text-5xl font-bold text-purple-600 dark:text-purple-300 mb-4">{team2Score}</div>
                 <div className="space-y-2">
                   {team2Players.map(player => (
-                    <div key={player.id} className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 rounded px-3 py-2 border border-purple-200 dark:border-purple-700">
+                    <UICard key={player.id} variant="bordered" size="sm" className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 border-purple-200 dark:border-purple-700">
                       <p className="font-semibold text-purple-900 dark:text-purple-200">{player.name}</p>
                       <p className="text-sm text-purple-700 dark:text-purple-300">Tricks: {player.tricksWon}</p>
-                    </div>
+                    </UICard>
                   ))}
                 </div>
-              </div>
+              </UICard>
             </div>
 
             {leadingTeam === null && (
@@ -122,7 +130,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
                 <span aria-hidden="true">🎲</span> Current Bet
               </h3>
-              <div className={`bg-gradient-to-r ${colors.gradients.parchment} dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600`}>
+              <UICard variant="bordered" size="md" className="bg-gradient-to-r from-parchment-100 to-parchment-200 dark:from-gray-700 dark:to-gray-800">
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
                     <p className="text-sm text-umber-700 dark:text-gray-300 font-semibold">Highest Bidder</p>
@@ -147,7 +155,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                     </p>
                   </div>
                 </div>
-              </div>
+              </UICard>
             </section>
           )}
 
@@ -164,9 +172,11 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                   const hasTricks = round.tricks && round.tricks.length > 0;
 
                   return (
-                    <div
+                    <UICard
                       key={round.roundNumber}
-                      className="bg-parchment-100 dark:bg-gray-700 rounded-lg overflow-hidden transition-colors border-2 border-parchment-400 dark:border-gray-600"
+                      variant="bordered"
+                      size="md"
+                      className="bg-parchment-100 dark:bg-gray-700 overflow-hidden transition-colors"
                     >
                       <div className="p-4 hover:bg-parchment-200 dark:bg-gray-600">
                         <div className="flex items-center justify-between mb-3">
@@ -185,13 +195,13 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                               </button>
                             )}
                           </div>
-                          <span className={`px-3 py-1 rounded-full text-sm font-semibold border-2 ${
-                            round.betMade
-                              ? 'bg-forest-100 text-forest-800 border-forest-400'
-                              : 'bg-crimson-100 text-crimson-800 border-crimson-400'
-                          }`}>
+                          <UIBadge
+                            variant="solid"
+                            color={round.betMade ? 'success' : 'error'}
+                            size="md"
+                          >
                             <span aria-hidden="true">{round.betMade ? '✓' : '✗'}</span> {round.betMade ? 'Bet Made' : 'Bet Failed'}
-                          </span>
+                          </UIBadge>
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
@@ -236,26 +246,24 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                           <div className="mb-3 flex items-center gap-2">
                             <h5 className="text-sm font-bold text-umber-800 dark:text-gray-200"><span aria-hidden="true">🃏</span> Tricks Played</h5>
                             {round.trump && (
-                              <span className="text-xs bg-sapphire-100 text-sapphire-800 px-2 py-1 rounded-full font-semibold border border-sapphire-300">
+                              <UIBadge variant="solid" color="info" size="sm">
                                 Trump: <span className="capitalize">{round.trump}</span>
-                              </span>
+                              </UIBadge>
                             )}
                           </div>
                           <div className="space-y-3">
                             {round.tricks.map((trick, trickIndex) => {
                               const winner = gameState.players.find(p => p.id === trick.winnerId);
-                              const winnerTeamColor = winner?.teamId === 1
-                                ? 'bg-orange-500 text-white border border-orange-700'
-                                : 'bg-purple-500 text-white border border-purple-700';
+                              const winnerBadgeColor = winner?.teamId === 1 ? 'team1' : 'team2';
                               return (
-                                <div key={trickIndex} className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-3 border border-parchment-400 dark:border-gray-600">
+                                <UICard key={trickIndex} variant="bordered" size="sm" className="bg-parchment-100 dark:bg-gray-700">
                                   <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm font-semibold text-umber-800 dark:text-gray-200">
                                       Trick {trickIndex + 1}
                                     </span>
-                                    <span className={`text-xs px-2 py-1 rounded-full font-semibold ${winnerTeamColor}`}>
+                                    <UIBadge variant="solid" color={winnerBadgeColor} size="sm">
                                       <span aria-hidden="true">👑</span> {winner?.name || 'Unknown'} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
-                                    </span>
+                                    </UIBadge>
                                   </div>
                                   <div className="grid grid-cols-4 gap-2">
                                     {trick.trick.map((trickCard, cardIndex) => {
@@ -273,13 +281,13 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                                       );
                                     })}
                                   </div>
-                                </div>
+                                </UICard>
                               );
                             })}
                           </div>
                         </div>
                       )}
-                    </div>
+                    </UICard>
                   );
                 })}
               </div>
@@ -288,11 +296,11 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
 
           {gameState.roundHistory.length === 0 && (
             <section>
-              <div className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-8 text-center border-2 border-parchment-400 dark:border-gray-600">
+              <UICard variant="bordered" size="lg" className="bg-parchment-100 dark:bg-gray-700 text-center">
                 <p className="text-umber-600 dark:text-gray-400 text-lg">
                   No rounds completed yet. Start playing to see round history!
                 </p>
-              </div>
+              </UICard>
             </section>
           )}
         </div>
