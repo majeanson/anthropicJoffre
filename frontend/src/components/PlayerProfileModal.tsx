@@ -19,7 +19,8 @@ import { getTierColor, getTierIcon } from '../utils/tierBadge';
 import Avatar from './Avatar';
 import { useAuth } from '../contexts/AuthContext';
 import { AchievementProgress } from '../types/achievements';
-import { colors } from '../design-system';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface QuickStats {
   player_name: string;
@@ -205,55 +206,36 @@ export function PlayerProfileModal({
   const tierIcon = stats ? getTierIcon(stats.ranking_tier) : '🏅';
 
   return (
-    <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Player Profile"
+      theme="blue"
+      size="lg"
+      testId="player-profile-modal"
     >
-      <div
-        style={{
-          background: `linear-gradient(to bottom right, ${colors.primary.start}, ${colors.primaryDark.end})`,
-          borderColor: colors.primary.border
-        }}
-        className="rounded-2xl border-2 p-6 w-full max-w-md shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Player Profile</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl leading-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
-            aria-label="Close"
-          >
-            ×
-          </button>
+
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-8">
+          <div className="animate-spin text-4xl mb-2" aria-hidden="true">⏳</div>
+          <p className="text-gray-400">Loading profile...</p>
         </div>
+      )}
 
-        {/* Loading State */}
-        {loading && (
-          <div className="text-center py-8">
-            <div className="animate-spin text-4xl mb-2" aria-hidden="true">⏳</div>
-            <p className="text-gray-400">Loading profile...</p>
-          </div>
-        )}
+      {/* Error State */}
+      {error && !loading && (
+        <div className="text-center py-8">
+          <p className="text-red-400 mb-4">{error}</p>
+          <Button variant="secondary" onClick={onClose}>
+            Close
+          </Button>
+        </div>
+      )}
 
-        {/* Error State */}
-        {error && !loading && (
-          <div className="text-center py-8">
-            <p className="text-red-400 mb-4">{error}</p>
-            <button
-              onClick={onClose}
-              className="px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        )}
-
-        {/* Profile Content */}
-        {!loading && !error && stats && (
-          <div className="space-y-6">
+      {/* Profile Content */}
+      {!loading && !error && stats && (
+        <div className="space-y-6">
             {/* Player Header */}
             <div className="flex items-center gap-4">
               <Avatar username={playerName} size="lg" />
@@ -320,19 +302,19 @@ export function PlayerProfileModal({
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-                <div className="text-2xl font-bold" style={{ color: colors.warning.end }}>
+                <div className="text-2xl font-bold text-yellow-400">
                   {stats.games_played}
                 </div>
                 <div className="text-sm text-gray-400">Games Played</div>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
-                <div className="text-2xl font-bold" style={{ color: colors.success.end }}>
+                <div className="text-2xl font-bold text-green-400">
                   {stats.games_won}
                 </div>
                 <div className="text-sm text-gray-400">Games Won</div>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700 col-span-2">
-                <div className="text-2xl font-bold" style={{ color: colors.info.end }}>
+                <div className="text-2xl font-bold text-blue-400">
                   {stats.win_percentage.toFixed(1)}%
                 </div>
                 <div className="text-sm text-gray-400">Win Rate</div>
@@ -343,7 +325,7 @@ export function PlayerProfileModal({
             {achievements.length > 0 && (
               <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-sm font-semibold" style={{ color: colors.warning.end }}>
+                  <h4 className="text-sm font-semibold text-yellow-400">
                     <span aria-hidden="true">🏆</span> Achievements
                   </h4>
                   <span className="text-xs text-gray-400">
@@ -389,70 +371,69 @@ export function PlayerProfileModal({
               </div>
             )}
 
-            {/* Actions */}
-            <div className="space-y-2">
-              {/* View Full Stats Button */}
-              {onViewFullStats && (
-                <button
-                  onClick={onViewFullStats}
-                  style={{
-                    background: `linear-gradient(to right, ${colors.info.start}, ${colors.info.end})`
-                  }}
-                  className="w-full py-2 text-white rounded-lg font-semibold transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                >
-                  <span aria-hidden="true">📊</span> View Full Statistics
-                </button>
-              )}
+          {/* Actions */}
+          <div className="space-y-2">
+            {/* View Full Stats Button */}
+            {onViewFullStats && (
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={onViewFullStats}
+                leftIcon={<span>📊</span>}
+              >
+                View Full Statistics
+              </Button>
+            )}
 
-              {/* Friend Actions - Only show if authenticated and not own profile */}
-              {isAuthenticated && !isOwnProfile && (
-                <>
-                  {friendStatus === 'none' && (
-                    <button
-                      onClick={handleSendFriendRequest}
-                      disabled={sendingRequest}
-                      style={!sendingRequest ? {
-                        background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`
-                      } : undefined}
-                      className="w-full py-2 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    >
-                      <span aria-hidden="true">{sendingRequest ? '⏳' : '➕'}</span> {sendingRequest ? 'Sending...' : 'Add Friend'}
-                    </button>
-                  )}
-                  {friendStatus === 'pending' && (
-                    <button
-                      disabled
-                      className="w-full py-2 bg-gray-600 text-gray-400 rounded-lg font-semibold cursor-not-allowed"
-                    >
-                      <span aria-hidden="true">⏳</span> Friend Request Pending
-                    </button>
-                  )}
-                  {friendStatus === 'friends' && (
-                    <button
-                      onClick={handleRemoveFriend}
-                      style={{
-                        background: `linear-gradient(to right, ${colors.error.start}, ${colors.error.end})`
-                      }}
-                      className="w-full py-2 text-white rounded-lg font-semibold transition-all hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-                    >
-                      <span aria-hidden="true">🗑️</span> Remove Friend
-                    </button>
-                  )}
-                </>
-              )}
+            {/* Friend Actions - Only show if authenticated and not own profile */}
+            {isAuthenticated && !isOwnProfile && (
+              <>
+                {friendStatus === 'none' && (
+                  <Button
+                    variant="success"
+                    fullWidth
+                    onClick={handleSendFriendRequest}
+                    disabled={sendingRequest}
+                    loading={sendingRequest}
+                    leftIcon={!sendingRequest ? <span>➕</span> : undefined}
+                  >
+                    {sendingRequest ? 'Sending...' : 'Add Friend'}
+                  </Button>
+                )}
+                {friendStatus === 'pending' && (
+                  <Button
+                    variant="secondary"
+                    fullWidth
+                    disabled
+                    leftIcon={<span>⏳</span>}
+                  >
+                    Friend Request Pending
+                  </Button>
+                )}
+                {friendStatus === 'friends' && (
+                  <Button
+                    variant="danger"
+                    fullWidth
+                    onClick={handleRemoveFriend}
+                    leftIcon={<span>🗑️</span>}
+                  >
+                    Remove Friend
+                  </Button>
+                )}
+              </>
+            )}
 
-              {/* Guest prompt */}
-              {!isAuthenticated && !isOwnProfile && (
-                <div className="text-center py-2 px-4 bg-blue-900/30 border border-blue-500/30 rounded-lg">
-                  <p className="text-sm text-blue-300">
-                    Sign in to add friends and send messages
-                  </p>
-                </div>
-              )}
-            </div>
+            {/* Guest prompt */}
+            {!isAuthenticated && !isOwnProfile && (
+              <div className="text-center py-2 px-4 bg-blue-900/30 border border-blue-500/30 rounded-lg">
+                <p className="text-sm text-blue-300">
+                  Sign in to add friends and send messages
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </Modal>
   );
 }

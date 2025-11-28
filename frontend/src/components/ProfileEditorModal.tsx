@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { User, UserProfile, UserPreferences, ProfileUpdateData } from '../types/auth';
 import { ProfileEditor, ProfileData } from './ProfileEditor';
 import logger from '../utils/logger';
+import { Modal } from './ui/Modal';
 
 interface ProfileEditorModalProps {
   user: User;
@@ -66,48 +67,43 @@ export function ProfileEditorModal({
 
   if (loading || !profileData) {
     return (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50" onKeyDown={(e) => e.stopPropagation()}>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-8">
+      <Modal
+        isOpen={true}
+        onClose={onClose}
+        title="Edit Profile"
+        theme="purple"
+        size="md"
+        showCloseButton={false}
+        testId="profile-editor-modal"
+      >
+        <div className="text-center py-8">
           <p className="text-gray-700 dark:text-gray-300">Loading profile...</p>
         </div>
-      </div>
+      </Modal>
     );
   }
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title="Edit Profile"
+      theme="purple"
+      size="md"
+      testId="profile-editor-modal"
     >
-      <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-purple-500/30 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale-in"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Profile</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 dark:hover:text-white text-2xl font-bold transition-colors"
-          >
-            ×
-          </button>
-        </div>
-        <div className="p-6">
-          <ProfileEditor
-            initialData={profileData}
-            onSave={async (data: ProfileData) => {
-              try {
-                await updateProfile(data);
-                onClose();
-              } catch (error) {
-                logger.error('Failed to update profile:', error);
-              }
-            }}
-            onCancel={onClose}
-          />
-        </div>
-      </div>
-    </div>
+      <ProfileEditor
+        initialData={profileData}
+        onSave={async (data: ProfileData) => {
+          try {
+            await updateProfile(data);
+            onClose();
+          } catch (error) {
+            logger.error('Failed to update profile:', error);
+          }
+        }}
+        onCancel={onClose}
+      />
+    </Modal>
   );
 }

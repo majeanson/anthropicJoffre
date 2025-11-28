@@ -6,8 +6,8 @@
  * Press "?" to open.
  */
 
-import { useEffect } from 'react';
-import { colors } from '../design-system';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface KeyboardShortcutsModalProps {
   isOpen: boolean;
@@ -20,55 +20,20 @@ export function KeyboardShortcutsModal({
   onClose,
   currentPhase = 'lobby',
 }: KeyboardShortcutsModalProps) {
-  // Handle Escape key to close
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   return (
     // Hidden on mobile - keyboard shortcuts aren't relevant for touch devices
-    <div
-      className="hidden sm:flex fixed inset-0 bg-black/70 backdrop-blur-sm items-center justify-center z-[100] p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
-    >
-      <div
-        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-blue-500/30 w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
+    <div className="hidden sm:block">
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title="Keyboard Shortcuts"
+        subtitle="Game Boy-style navigation"
+        icon={<span>⌨️</span>}
+        theme="parchment"
+        size="xl"
+        testId="keyboard-shortcuts-modal"
       >
-        {/* Header */}
-        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.primary} p-6 border-b-2 border-blue-500 z-10`}>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl" aria-hidden="true">⌨️</span>
-              <div>
-                <h2 className="text-2xl font-bold text-white">Keyboard Shortcuts</h2>
-                <p className="text-blue-100 text-sm">Game Boy-style navigation</p>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-blue-200 text-2xl leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
-              aria-label="Close keyboard shortcuts help"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="space-y-6">
           {/* Global Shortcuts */}
           <ShortcutSection
             title="Global Shortcuts"
@@ -155,15 +120,15 @@ export function KeyboardShortcutsModal({
           </div>
 
           {/* Got it button for keyboard navigation */}
-          <button
+          <Button
+            variant="primary"
+            fullWidth
             onClick={onClose}
-            autoFocus
-            className={`w-full mt-6 bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white py-3 rounded-xl font-bold shadow-lg transition-all focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900`}
           >
             Got it!
-          </button>
+          </Button>
         </div>
-      </div>
+      </Modal>
     </div>
   );
 }
