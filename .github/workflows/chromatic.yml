@@ -27,8 +27,8 @@ jobs:
         run: npm install --legacy-peer-deps
 
       - name: Publish to Chromatic
-        working-directory: frontend
         uses: chromaui/action@latest
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           buildScriptName: build-storybook
+          workingDir: frontend
