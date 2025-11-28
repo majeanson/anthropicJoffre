@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
 
 interface CalendarReward {
   dayNumber: number;
@@ -197,8 +198,10 @@ export function RewardsCalendar({
 
         {/* Notification */}
         {notification && (
-          <div className="mx-6 mt-4 p-3 bg-green-900/50 border border-green-500 rounded-lg text-green-100 text-center">
-            {notification}
+          <div className="mx-6 mt-4">
+            <UICard variant="gradient" gradient="success" size="sm" className="text-center">
+              <p className="text-white">{notification}</p>
+            </UICard>
           </div>
         )}
 
@@ -212,7 +215,8 @@ export function RewardsCalendar({
           ) : (
             <>
               {/* Legend */}
-              <div className="flex flex-wrap gap-4 mb-6 p-4 bg-gray-700 rounded-lg">
+              <UICard variant="default" size="sm" className="mb-6">
+                <div className="flex flex-wrap gap-4">
                 <div className="flex items-center gap-2">
                   <div className={`w-4 h-4 bg-gradient-to-br ${colors.gradients.primaryDark} border-2 border-blue-400 rounded`}></div>
                   <span className="text-gray-300 text-sm">Available to claim</span>
@@ -229,7 +233,8 @@ export function RewardsCalendar({
                   <div className="w-4 h-4 bg-gray-900 border-2 border-gray-700 rounded opacity-40"></div>
                   <span className="text-gray-300 text-sm">Locked</span>
                 </div>
-              </div>
+                </div>
+              </UICard>
 
               {/* Calendar Grid */}
               <div className="grid grid-cols-5 md:grid-cols-7 lg:grid-cols-10 gap-3">
@@ -274,7 +279,7 @@ export function RewardsCalendar({
               </div>
 
               {/* Special Milestones Info */}
-              <div className={`mt-6 p-4 bg-gradient-to-r ${colors.gradients.secondaryDark} border border-purple-700 rounded-lg`}>
+              <UICard variant="gradient" gradient="team2" size="md" className="mt-6">
                 <h3 className="text-white font-bold mb-2 flex items-center gap-2">
                   <span>⭐</span>
                   Special Milestone Rewards
@@ -294,7 +299,7 @@ export function RewardsCalendar({
                     rewards!
                   </div>
                 </div>
-              </div>
+              </UICard>
             </>
           )}
         </div>

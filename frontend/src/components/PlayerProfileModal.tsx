@@ -21,6 +21,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { AchievementProgress } from '../types/achievements';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
+import { UICard } from './ui/UICard';
+import { UIBadge } from './ui/UIBadge';
 
 interface QuickStats {
   player_name: string;
@@ -257,16 +259,16 @@ export function PlayerProfileModal({
               <div className="space-y-3">
                 {/* Bio */}
                 {profile.bio && (
-                  <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                  <UICard variant="bordered" size="sm">
                     <div className="text-xs font-semibold text-gray-400 mb-1">BIO</div>
                     <p className="text-sm text-gray-200">{profile.bio}</p>
-                  </div>
+                  </UICard>
                 )}
 
                 {/* Country and Favorite Team */}
                 <div className="flex gap-3">
                   {profile.country && (
-                    <div className="flex-1 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                    <UICard variant="bordered" size="sm" className="flex-1">
                       <div className="text-xs font-semibold text-gray-400 mb-1">COUNTRY</div>
                       <div className="text-sm text-gray-200">
                         {profile.country === 'US' && <><span aria-hidden="true">🇺🇸</span> United States</>}
@@ -285,15 +287,15 @@ export function PlayerProfileModal({
                         {profile.country === 'KR' && <><span aria-hidden="true">🇰🇷</span> South Korea</>}
                         {!['US', 'CA', 'GB', 'FR', 'DE', 'ES', 'IT', 'JP', 'AU', 'BR', 'MX', 'IN', 'CN', 'KR'].includes(profile.country) && profile.country}
                       </div>
-                    </div>
+                    </UICard>
                   )}
                   {profile.favorite_team && (
-                    <div className="flex-1 bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                    <UICard variant="bordered" size="sm" className="flex-1">
                       <div className="text-xs font-semibold text-gray-400 mb-1">FAVORITE TEAM</div>
                       <div className={`text-sm font-semibold ${profile.favorite_team === 1 ? 'text-orange-400' : 'text-purple-400'}`}>
                         Team {profile.favorite_team}
                       </div>
-                    </div>
+                    </UICard>
                   )}
                 </div>
               </div>
@@ -301,29 +303,29 @@ export function PlayerProfileModal({
 
             {/* Quick Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+              <UICard variant="bordered" size="sm">
                 <div className="text-2xl font-bold text-yellow-400">
                   {stats.games_played}
                 </div>
                 <div className="text-sm text-gray-400">Games Played</div>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+              </UICard>
+              <UICard variant="bordered" size="sm">
                 <div className="text-2xl font-bold text-green-400">
                   {stats.games_won}
                 </div>
                 <div className="text-sm text-gray-400">Games Won</div>
-              </div>
-              <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700 col-span-2">
+              </UICard>
+              <UICard variant="bordered" size="sm" className="col-span-2">
                 <div className="text-2xl font-bold text-blue-400">
                   {stats.win_percentage.toFixed(1)}%
                 </div>
                 <div className="text-sm text-gray-400">Win Rate</div>
-              </div>
+              </UICard>
             </div>
 
             {/* Achievements Showcase */}
             {achievements.length > 0 && (
-              <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+              <UICard variant="bordered" size="md">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-sm font-semibold text-yellow-400">
                     <span aria-hidden="true">🏆</span> Achievements
@@ -368,7 +370,7 @@ export function PlayerProfileModal({
                     <p className="text-sm text-gray-500 italic">No achievements yet</p>
                   )}
                 </div>
-              </div>
+              </UICard>
             )}
 
           {/* Actions */}
@@ -425,11 +427,11 @@ export function PlayerProfileModal({
 
             {/* Guest prompt */}
             {!isAuthenticated && !isOwnProfile && (
-              <div className="text-center py-2 px-4 bg-blue-900/30 border border-blue-500/30 rounded-lg">
-                <p className="text-sm text-blue-300">
+              <UICard variant="gradient" gradient="info" size="sm" className="text-center">
+                <p className="text-sm text-blue-100">
                   Sign in to add friends and send messages
                 </p>
-              </div>
+              </UICard>
             )}
           </div>
         </div>

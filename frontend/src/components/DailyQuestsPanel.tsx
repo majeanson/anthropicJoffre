@@ -8,6 +8,8 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { UIBadge } from './ui/UIBadge';
 
 interface QuestTemplate {
   id: number;
@@ -146,17 +148,6 @@ export function DailyQuestsPanel({
     return Math.min(100, Math.floor((progress / target) * 100));
   };
 
-  const getDifficultyColor = (type: 'easy' | 'medium' | 'hard') => {
-    switch (type) {
-      case 'easy':
-        return 'text-green-400 bg-green-900/30';
-      case 'medium':
-        return 'text-yellow-400 bg-yellow-900/30';
-      case 'hard':
-        return 'text-red-400 bg-red-900/30';
-    }
-  };
-
   const getDifficultyLabel = (type: 'easy' | 'medium' | 'hard') => {
     return type.charAt(0).toUpperCase() + type.slice(1);
   };
@@ -193,8 +184,10 @@ export function DailyQuestsPanel({
 
         {/* Notification */}
         {notification && (
-          <div className="mx-6 mt-4 p-3 bg-green-900/50 border border-green-500 rounded-lg text-green-100 text-center animate-pulse">
-            {notification}
+          <div className="mx-6 mt-4">
+            <UICard variant="gradient" gradient="success" size="sm" className="text-center animate-pulse">
+              <p className="text-white">{notification}</p>
+            </UICard>
           </div>
         )}
 
@@ -223,9 +216,11 @@ export function DailyQuestsPanel({
                 );
 
                 return (
-                  <div
+                  <UICard
                     key={quest.id}
-                    className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-colors"
+                    variant="bordered"
+                    size="md"
+                    className="hover:border-gray-500 transition-colors"
                   >
                     {/* Quest Header */}
                     <div className="flex items-start justify-between mb-3">
@@ -242,13 +237,19 @@ export function DailyQuestsPanel({
                       </div>
 
                       {/* Difficulty Badge */}
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(
-                          quest.template.quest_type
-                        )}`}
+                      <UIBadge
+                        variant="subtle"
+                        color={
+                          quest.template.quest_type === 'easy'
+                            ? 'success'
+                            : quest.template.quest_type === 'medium'
+                            ? 'warning'
+                            : 'error'
+                        }
+                        size="sm"
                       >
                         {getDifficultyLabel(quest.template.quest_type)}
-                      </span>
+                      </UIBadge>
                     </div>
 
                     {/* Progress Bar */}
@@ -303,7 +304,7 @@ export function DailyQuestsPanel({
                         <span className="text-gray-500 text-sm">In Progress</span>
                       )}
                     </div>
-                  </div>
+                  </UICard>
                 );
               })}
             </div>

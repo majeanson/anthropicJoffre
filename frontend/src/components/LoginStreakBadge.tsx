@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
 
 interface LoginStreak {
   currentStreak: number;
@@ -100,14 +101,16 @@ export function LoginStreakBadge({
     <>
       {/* Freeze Used Notification */}
       {freezeUsedNotification && (
-        <div className="fixed top-4 right-4 z-50 bg-blue-900/90 border-2 border-blue-500 rounded-lg p-4 shadow-xl animate-bounce">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl" aria-hidden="true">🛡️</span>
-            <div>
-              <p className="text-white font-bold">Streak Freeze Used!</p>
-              <p className="text-blue-200 text-sm">Your streak continues</p>
+        <div className="fixed top-4 right-4 z-50 animate-bounce">
+          <UICard variant="gradient" gradient="info" size="sm">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl" aria-hidden="true">🛡️</span>
+              <div>
+                <p className="text-white font-bold">Streak Freeze Used!</p>
+                <p className="text-blue-200 text-sm">Your streak continues</p>
+              </div>
             </div>
-          </div>
+          </UICard>
         </div>
       )}
 
@@ -141,8 +144,9 @@ export function LoginStreakBadge({
 
         {/* Tooltip */}
         {showTooltip && (
-          <div className="absolute top-full mt-2 left-0 bg-gray-800 border border-gray-600 rounded-lg p-4 shadow-xl z-50 min-w-[280px]">
-            <div className="space-y-2">
+          <div className="absolute top-full mt-2 left-0 z-50 min-w-[280px]">
+            <UICard variant="elevated" size="sm">
+              <div className="space-y-2">
               <div className="flex justify-between items-center border-b border-gray-600 pb-2">
                 <span className="text-gray-300 text-sm">Current Streak</span>
                 <span className="text-white font-bold">
@@ -178,7 +182,8 @@ export function LoginStreakBadge({
                   💡 Miss a day? Your streak freeze will protect you once per week!
                 </div>
               )}
-            </div>
+              </div>
+            </UICard>
           </div>
         )}
       </div>
