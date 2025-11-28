@@ -1,7 +1,7 @@
 # Project Roadmap
 
 **Last Updated**: 2025-11-27
-**Project Status**: Production-ready (Sprint 19-20 complete - Quest system + Storybook)
+**Project Status**: Production-ready (Sprint 19-21 in progress - Quest system + Storybook + Design Tokens)
 **Code Quality**: ⭐⭐⭐⭐⭐ (5/5 stars) - All improvement tasks complete!
 
 ---
@@ -197,14 +197,48 @@
 - Image lazy loading
 - Service worker for offline support
 
-### 4. UI Improvements
-**Effort**: 2-3 weeks
-**Impact**: User reach
-- Light vs Dark mode
-- UI improvements
-- Accessibility
-- Unification
-- Beautify
+### 4. Sprint 21: UI Improvement & Refactoring via Storybook 🔄 IN PROGRESS
+**Effort**: 3-4 days
+**Impact**: Design consistency, accessibility, developer experience
+**Status**: Phase 1 Complete ✅
+
+**Completed**:
+- ✅ **Phase 1: Design Token System** (Day 1)
+  - Created `frontend/src/design-system/` with 6 token files
+  - Colors: 30+ standardized gradients (reduced from 15+ variations)
+  - Typography: Complete type scale with responsive variants
+  - Spacing: Consistent spacing scale and component spacing
+  - Shadows: Shadow system with colored variants
+  - Breakpoints: Responsive design breakpoints
+  - Documentation: 700+ line comprehensive guide
+  - Helper functions for common patterns
+
+**In Progress**:
+- 🔄 **Phase 2: Component Refactoring** (Day 2)
+  - Refactor Button component with design tokens
+  - Add Card component Storybook story
+  - Add Avatar component Storybook story
+  - Extract Toast component
+
+**Planned**:
+- ⏸️ **Phase 3: Quest Component Stories** (Day 3)
+  - DailyQuestsPanel Storybook story
+  - RewardsCalendar Storybook story
+  - LoginStreakBadge Storybook story
+
+- ⏸️ **Phase 4: Accessibility & Responsive Design** (Day 3-4)
+  - Keyboard navigation improvements
+  - ARIA labels and roles
+  - Screen reader testing
+  - Responsive breakpoint testing
+  - Color contrast checking (WCAG AA)
+
+- ⏸️ **Phase 5: Documentation & Deployment** (Day 4)
+  - Component usage guidelines
+  - Accessibility features documentation
+  - Sprint 21 completion summary
+
+**See**: docs/sprints/sprint21-ui-improvement-plan.md
 
 ---
 ### 5. Mobile App Improvements
