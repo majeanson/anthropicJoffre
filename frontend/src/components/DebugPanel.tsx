@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { GameState } from '../types/game';
 import { Socket } from 'socket.io-client';
 import { CONFIG } from '../config/constants';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 import { colors } from '../design-system';
 
 interface DebugPanelProps {
@@ -106,36 +108,16 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
     : null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
-      role="dialog"
-      aria-labelledby="debug-panel-title"
-      aria-modal="true"
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Debug Panel"
+      subtitle="Game State Inspector"
+      icon="🐛"
+      theme="blue"
+      size="xl"
     >
-      <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.secondary} text-white px-6 py-4 flex items-center justify-between rounded-t-lg`}>
-          <div>
-            <h2 id="debug-panel-title" className="text-2xl font-bold flex items-center gap-2">
-              <span aria-hidden="true">🐛</span> Debug Panel
-            </h2>
-            <p className="text-sm text-purple-100">Game State Inspector</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:bg-white dark:bg-gray-800 hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold"
-            aria-label="Close debug panel"
-          >
-            ✕ Close
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
+      <div className="space-y-6">
           {/* Game Info */}
           <section aria-labelledby="game-info-heading">
             <h3 id="game-info-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
@@ -227,18 +209,15 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
               <h3 id="server-health-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200">
                 🖥️ Server Health
               </h3>
-              <button
+              <Button
+                variant="danger"
+                size="md"
                 onClick={handleClearAllGames}
                 disabled={isClearing || !socket}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                  isClearing || !socket
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-red-600 hover:bg-red-700 text-white shadow-md hover:shadow-lg'
-                }`}
                 title="Clear all games from memory (use when memory is high)"
               >
                 {isClearing ? '🔄 Clearing...' : '🗑️ Clear All Games'}
-              </button>
+              </Button>
             </div>
             {clearMessage && (
               <div className={`mb-3 p-3 rounded-lg border-2 ${
@@ -330,34 +309,37 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="md"
                     onClick={() => socket?.emit('debug_auto_play_card', { gameId })}
                     disabled={!socket}
-                    className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
                     title="Play a valid card for the current player"
                   >
                     🤖 Auto-Play Card
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="warning"
+                    size="md"
                     onClick={() => socket?.emit('debug_skip_trick', { gameId })}
                     disabled={!socket || gameState.currentTrick.length === 0}
-                    className="px-4 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
                     title="Complete the current trick by auto-playing remaining cards"
                   >
                     ⏭️ Skip Trick
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="md"
                     onClick={() => {
                       if (window.confirm('Skip entire round? This will auto-play all remaining cards.')) {
                         socket?.emit('debug_skip_round', { gameId });
                       }
                     }}
                     disabled={!socket}
-                    className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
                     title="Complete the entire round by auto-playing all cards"
                   >
                     ⏭️⏭️ Skip Round
-                  </button>
+                  </Button>
                 </div>
                 <p className="text-xs text-green-700 mt-3">
                   These controls automatically play cards for the current player. Use for testing game flow.
@@ -377,26 +359,28 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
 
                 {/* Auto-bet and Skip Betting */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="md"
                     onClick={() => socket?.emit('debug_auto_bet', { gameId })}
                     disabled={!socket}
-                    className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
                     title="Place a valid bet for the current player"
                   >
                     💰 Auto-Bet
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="md"
                     onClick={() => {
                       if (window.confirm('Skip betting phase? This will auto-bet for all players.')) {
                         socket?.emit('debug_skip_betting', { gameId });
                       }
                     }}
                     disabled={!socket}
-                    className="px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
                     title="Complete betting phase by auto-betting for all players"
                   >
                     ⏭️ Skip Betting
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Force Bet Override */}
@@ -601,8 +585,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
               {JSON.stringify(gameState, null, 2)}
             </pre>
           </details>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -4,6 +4,8 @@ import * as Sentry from '@sentry/react';
 import buildInfoJson from '../buildInfo.json';
 import { BuildInfo } from '../types/buildInfo';
 import { CONFIG } from '../config/constants';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 // Type the imported JSON
 const buildInfo = buildInfoJson as BuildInfo;
@@ -224,27 +226,25 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
   const finishedGames = games.filter(g => g.phase === 'game_over');
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
-      <div
-        className="bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border-4 border-indigo-600 dark:border-indigo-500"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl">🎮</span>
-            <h2 className="text-4xl font-bold text-indigo-900 dark:text-indigo-100 font-serif">Debug Fun</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 text-3xl font-bold leading-none"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="space-y-4">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Debug Fun"
+      icon="🎮"
+      theme="blue"
+      size="xl"
+      footer={
+        <Button
+          variant="primary"
+          size="lg"
+          onClick={onClose}
+          fullWidth
+        >
+          Got it!
+        </Button>
+      }
+    >
+      <div className="space-y-4">
           {/* Version */}
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0">🏷️</span>
@@ -524,20 +524,22 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
 
                   {/* Quick Actions */}
                   <div className="flex flex-wrap gap-2">
-                    <button
+                    <Button
+                      variant="warning"
+                      size="sm"
                       onClick={handleClearFinished}
                       disabled={isClearing || finishedGames.length === 0}
-                      className="text-xs px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
                       🗑️ Clear Finished ({finishedGames.length})
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
                       onClick={handleClearAll}
                       disabled={isClearing}
-                      className="text-xs px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
                       {isClearing ? '🔄 Clearing...' : `🗑️ Clear All (${games.length})`}
-                    </button>
+                    </Button>
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as 'uptime' | 'round')}
@@ -587,13 +589,14 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                                 {game.uptimeMinutes < 60 ? `${game.uptimeMinutes}m` : `${Math.floor(game.uptimeMinutes / 60)}h`}
                               </td>
                               <td className="px-3 py-2 text-center">
-                                <button
+                                <Button
+                                  variant="danger"
+                                  size="xs"
                                   onClick={() => handleClearGame(game.gameId)}
                                   disabled={isClearing}
-                                  className="px-2 py-0.5 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-semibold disabled:bg-gray-300"
                                 >
                                   Clear
-                                </button>
+                                </Button>
                               </td>
                             </tr>
                           ))}
@@ -646,21 +649,23 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                     Test Sentry error tracking integration for both frontend and backend.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <button
+                    <Button
+                      variant="warning"
+                      size="md"
                       onClick={handleTestFrontendSentry}
-                      className="bg-red-100 hover:bg-red-200 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-800 dark:text-red-300 font-semibold py-2 px-3 rounded transition-colors flex items-center justify-center gap-2 text-sm"
                     >
                       <span>📱</span>
                       <span>Test Frontend Sentry</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="warning"
+                      size="md"
                       onClick={handleTestBackendSentry}
-                      className="bg-orange-100 hover:bg-orange-200 dark:bg-orange-900/20 dark:hover:bg-orange-900/30 text-orange-800 dark:text-orange-300 font-semibold py-2 px-3 rounded transition-colors flex items-center justify-center gap-2 text-sm"
                       disabled={!socket}
                     >
                       <span>🖥️</span>
                       <span>Test Backend Sentry</span>
-                    </button>
+                    </Button>
                   </div>
                   <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded px-3 py-2">
                     <p className="text-xs text-blue-800 dark:text-blue-200">
@@ -687,17 +692,7 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
               🎉 Made with ❤️ and lots of ☕
             </p>
           </div>
-        </div>
-
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          autoFocus
-          className="w-full mt-8 bg-indigo-600 dark:bg-indigo-700 text-white py-4 rounded-lg font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors border-2 border-indigo-700 dark:border-indigo-600 text-lg focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:ring-offset-2"
-        >
-          Got it!
-        </button>
       </div>
-    </div>
+    </Modal>
   );
 }

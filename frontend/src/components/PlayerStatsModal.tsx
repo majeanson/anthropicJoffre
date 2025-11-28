@@ -10,6 +10,8 @@ import { UserProfile } from '../types/auth'; // Sprint 3 Phase 3.2
 import { MatchCard } from './MatchCard'; // Sprint 3 Phase 3.3
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 import { colors } from '../design-system';
 
 // Lazy load heavy modal
@@ -251,36 +253,31 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
   }, [gameHistory, historyTab, resultFilter, sortBy, sortOrder]);
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" onKeyDown={(e) => e.stopPropagation()}>
-      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600">
-        {/* Header - Sprint 3 Phase 2: Enhanced with avatar */}
-        <div className="sticky top-0 bg-gradient-to-r from-amber-700 to-amber-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-amber-950 dark:border-gray-900 z-10">
-          <div className="flex items-center gap-4">
-            <Avatar username={playerName} avatarUrl={user?.avatar_url} size="xl" />
-            <div>
-              <h2 className="text-2xl font-bold text-parchment-50">{playerName}</h2>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-amber-200 dark:text-gray-300 text-sm">
-                  {stats ? `Joined ${new Date(stats.created_at).toLocaleDateString()}` : 'Loading...'}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div className="flex items-center gap-4">
+          <Avatar username={playerName} avatarUrl={user?.avatar_url} size="xl" />
+          <div>
+            <h2 className="text-2xl font-bold text-parchment-50">{playerName}</h2>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-amber-200 dark:text-gray-300 text-sm">
+                {stats ? `Joined ${new Date(stats.created_at).toLocaleDateString()}` : 'Loading...'}
+              </span>
+              {isOwnProfile && (
+                <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
+                  You
                 </span>
-                {isOwnProfile && (
-                  <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-semibold">
-                    You
-                  </span>
-                )}
-              </div>
+              )}
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
-          >
-            ✕
-          </button>
         </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6">
+      }
+      theme="parchment"
+      size="xl"
+    >
+      <div className="space-y-6">
           {loading && (
             <div className="space-y-6">
               <CardSkeleton count={1} hasAvatar={false} />
@@ -307,17 +304,18 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                       </span>
                     </p>
                   )}
-                  <button
+                  <Button
+                    variant="danger"
+                    size="md"
                     onClick={() => {
                       setError(null);
                       setCorrelationId(null);
                       setLoading(true);
                       socket.emit('get_player_stats', { playerName });
                     }}
-                    className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
                   >
                     🔄 Try Again
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -719,16 +717,17 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                           <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
                             {historyError}
                           </p>
-                          <button
+                          <Button
+                            variant="danger"
+                            size="md"
                             onClick={() => {
                               setHistoryError(null);
                               setHistoryLoading(true);
                               socket.emit('get_player_history', { playerName, limit: 20 });
                             }}
-                            className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
                           >
                             🔄 Try Again
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -805,15 +804,16 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                           <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
                             {profileError}
                           </p>
-                          <button
+                          <Button
+                            variant="danger"
+                            size="md"
                             onClick={() => {
                               setProfileError(null);
                               loadProfile();
                             }}
-                            className="mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
                           >
                             🔄 Try Again
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </div>
@@ -856,7 +856,6 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
               </div>
             </>
           )}
-        </div>
       </div>
 
       {/* Match Stats Modal - Sprint 3 Phase 3.3 */}
@@ -874,6 +873,6 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
           />
         </Suspense>
       )}
-    </div>
+    </Modal>
   );
 }

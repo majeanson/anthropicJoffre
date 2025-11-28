@@ -3,6 +3,8 @@ import { Socket } from 'socket.io-client';
 import * as Sentry from '@sentry/react';
 import buildInfo from '../buildInfo.json';
 import { CONFIG } from '../config/constants';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 import { colors } from '../design-system';
 
 interface GlobalDebugModalProps {
@@ -168,30 +170,16 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Global Debug - All Games"
+      subtitle="Monitor & Manage Server"
+      icon="🌐"
+      theme="blue"
+      size="xl"
     >
-      <div
-        className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.info} text-white px-6 py-4 flex items-center justify-between rounded-t-lg z-10`}>
-          <div>
-            <h2 className="text-2xl font-bold"><span aria-hidden="true">🌐</span> Global Debug - All Games</h2>
-            <p className="text-sm text-blue-100">Monitor & Manage Server</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:bg-white hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold"
-          >
-            ✕ Close
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
+      <div className="space-y-6">
           {/* Server Health */}
           <section>
             <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">🖥️ Server Health</h3>
@@ -243,20 +231,22 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
           <section>
             <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">⚡ Quick Actions</h3>
             <div className="flex flex-wrap gap-3">
-              <button
+              <Button
+                variant="warning"
+                size="md"
                 onClick={handleClearFinished}
                 disabled={isClearing || finishedGames.length === 0}
-                className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 🗑️ Clear Finished ({finishedGames.length})
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="danger"
+                size="md"
                 onClick={handleClearAll}
                 disabled={isClearing}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 {isClearing ? '🔄 Clearing...' : `🗑️ Clear All (${games.length})`}
-              </button>
+              </Button>
             </div>
           </section>
 
@@ -270,21 +260,23 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                 Test Sentry error tracking integration for both frontend and backend.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
+                <Button
+                  variant="warning"
+                  size="lg"
                   onClick={handleTestFrontendSentry}
-                  className="bg-red-100 hover:bg-red-200 text-red-800 font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   <span>📱</span>
                   <span>Test Frontend Sentry</span>
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="warning"
+                  size="lg"
                   onClick={handleTestBackendSentry}
-                  className="bg-orange-100 hover:bg-orange-200 text-orange-800 font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                   disabled={!socket}
                 >
                   <span>🖥️</span>
                   <span>Test Backend Sentry</span>
-                </button>
+                </Button>
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
                 <p className="text-xs text-blue-800 dark:text-blue-200">
@@ -354,13 +346,14 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                           {game.uptimeMinutes < 60 ? `${game.uptimeMinutes}m` : `${Math.floor(game.uptimeMinutes / 60)}h`}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <button
+                          <Button
+                            variant="danger"
+                            size="xs"
                             onClick={() => handleClearGame(game.gameId)}
                             disabled={isClearing}
-                            className="px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded text-xs font-semibold disabled:bg-gray-300"
                           >
                             Clear
-                          </button>
+                          </Button>
                         </td>
                       </tr>
                     ))}
@@ -423,8 +416,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
               </div>
             </div>
           </section>
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

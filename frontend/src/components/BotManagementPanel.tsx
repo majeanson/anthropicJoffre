@@ -1,6 +1,7 @@
 import { memo } from 'react';
 import { GameState, BotDifficulty } from '../types/game';
-import { colors } from '../design-system';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface BotManagementPanelProps {
   isOpen: boolean;
@@ -72,35 +73,16 @@ export const BotManagementPanel = memo(function BotManagementPanel({
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-[10000] animate-fadeIn"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Team Management"
+      subtitle={`${isCreator ? 'Manage teams, positions & bots' : 'View teams & bots'} • Bots: ${botCount}/3`}
+      icon="⚙️"
+      theme="blue"
+      size="md"
     >
-      <div
-        className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-blue-600 dark:border-gray-600"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header - Match PlayerStatsModal pattern */}
-        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.primaryDark} hover:${colors.gradients.primaryDarkHover} p-6 flex items-center justify-between rounded-t-xl border-b-4 border-blue-950 dark:border-gray-900 z-10`}>
-          <div className="flex items-center gap-3">
-            <span className="text-4xl" aria-hidden="true">⚙️</span>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Team Management</h2>
-              <p className="text-blue-200 dark:text-gray-300 font-semibold">
-                {isCreator ? 'Manage teams, positions & bots' : 'View teams & bots'} • Bots: {botCount}/3
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Content - Match PlayerStatsModal pattern */}
-        <div className="p-6 space-y-3">
+      <div className="space-y-3">
           {gameState.players.map((player, index) => {
             const isMe = player.id === currentPlayerId;
             const isEmptySeat = player.isEmpty;
@@ -183,32 +165,34 @@ export const BotManagementPanel = memo(function BotManagementPanel({
 
                       {/* Swap Button for Bots */}
                       {canSwap(player) && (
-                        <button
+                        <Button
+                          variant="secondary"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleSwapClick(player.id);
                           }}
-                          className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                           title="Swap positions with this bot"
                         >
                           ↔️
-                        </button>
+                        </Button>
                       )}
 
                       {/* Kick Bot Button */}
                       {canKick(player) && (
-                        <button
+                        <Button
+                          variant="danger"
+                          size="sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             if (confirm(`Remove bot ${player.name}?`)) {
                               onKickPlayer!(player.id);
                             }
                           }}
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                           title="Remove bot from game"
                         >
                           ✕
-                        </button>
+                        </Button>
                       )}
                     </div>
                   ) : (
@@ -221,46 +205,49 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                       <div className="flex items-center gap-2">
                         {/* Swap Button */}
                         {canSwap(player) && (
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleSwapClick(player.id);
                             }}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                             title="Swap positions with this player (requires confirmation)"
                           >
                             ↔️
-                          </button>
+                          </Button>
                         )}
 
                         {/* Replace with Bot Button */}
                         {canReplace(player) && (
-                          <button
+                          <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               onReplaceWithBot(player.name);
                             }}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                             title="Replace with bot"
                           >
                             🤖 Bot
-                          </button>
+                          </Button>
                         )}
 
                         {/* Kick Button */}
                         {canKick(player) && (
-                          <button
+                          <Button
+                            variant="danger"
+                            size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               if (confirm(`Remove ${player.name} from the game?`)) {
                                 onKickPlayer!(player.id);
                               }
                             }}
-                            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-bold transition-colors"
                             title="Remove player from game"
                           >
                             ✕
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -270,16 +257,15 @@ export const BotManagementPanel = memo(function BotManagementPanel({
             );
           })}
 
-          {/* Help Text for Non-Creators */}
-          {!isCreator && (
-            <div className="mt-4 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
-              <p className="text-gray-700 dark:text-gray-300 text-sm">
-                ℹ️ Only the game creator can manage teams and swap positions
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Help Text for Non-Creators */}
+        {!isCreator && (
+          <div className="mt-4 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
+            <p className="text-gray-700 dark:text-gray-300 text-sm">
+              ℹ️ Only the game creator can manage teams and swap positions
+            </p>
+          </div>
+        )}
       </div>
-    </div>
+    </Modal>
   );
 });

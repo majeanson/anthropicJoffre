@@ -7,6 +7,8 @@
 
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 import { colors } from '../design-system';
 
 interface MatchStatsModalProps {
@@ -126,34 +128,16 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Match Details"
+      subtitle={`Game ID: ${gameId}`}
+      icon="📊"
+      theme="parchment"
+      size="xl"
     >
-      <div
-        className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-indigo-700 to-purple-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-indigo-950 dark:border-gray-900 z-10">
-          <div className="flex items-center gap-4">
-            <span className="text-4xl" aria-hidden="true">📊</span>
-            <div>
-              <h2 className="text-2xl font-bold text-parchment-50">Match Details</h2>
-              <p className="text-indigo-200 dark:text-gray-300 text-sm">Game ID: {gameId}</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6 space-y-6">
+      <div className="space-y-6">
           {loading && (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-purple-700"></div>
@@ -417,27 +401,28 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
               {/* Action Buttons */}
               <div className="flex justify-center gap-3 pt-4 border-t-2 border-gray-300 dark:border-gray-600">
                 {onViewReplay && (
-                  <button
+                  <Button
+                    variant="primary"
+                    size="lg"
                     onClick={() => {
                       onViewReplay(gameId);
                       onClose();
                     }}
-                    className={`px-8 py-3 bg-gradient-to-r ${colors.gradients.team2} hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-bold transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-400`}
                   >
                     <span aria-hidden="true">📺</span> View Full Replay
-                  </button>
+                  </Button>
                 )}
-                <button
+                <Button
+                  variant="secondary"
+                  size="lg"
                   onClick={onClose}
-                  className="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-bold transition-all focus:outline-none focus:ring-2 focus:ring-gray-400"
                 >
                   Close
-                </button>
+                </Button>
               </div>
             </>
           )}
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }
