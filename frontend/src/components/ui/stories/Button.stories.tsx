@@ -1,6 +1,6 @@
 /**
  * Button Component Stories
- * Sprint 20 - Storybook Integration
+ * Sprint 21 - Updated with design tokens
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -16,20 +16,25 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'danger', 'ghost', 'link'],
+      options: ['primary', 'secondary', 'success', 'warning', 'danger', 'ghost', 'link'],
+      description: 'Visual style variant',
     },
     size: {
       control: 'select',
       options: ['xs', 'sm', 'md', 'lg', 'xl'],
+      description: 'Button size',
     },
     disabled: {
       control: 'boolean',
+      description: 'Disabled state',
     },
     loading: {
       control: 'boolean',
+      description: 'Loading state with spinner',
     },
     fullWidth: {
       control: 'boolean',
+      description: 'Full width button',
     },
   },
 } satisfies Meta<typeof Button>;
@@ -37,6 +42,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// Variants
 export const Primary: Story = {
   args: {
     children: 'Primary Button',
@@ -48,6 +54,20 @@ export const Secondary: Story = {
   args: {
     children: 'Secondary Button',
     variant: 'secondary',
+  },
+};
+
+export const Success: Story = {
+  args: {
+    children: 'Success Button',
+    variant: 'success',
+  },
+};
+
+export const Warning: Story = {
+  args: {
+    children: 'Warning Button',
+    variant: 'warning',
   },
 };
 
