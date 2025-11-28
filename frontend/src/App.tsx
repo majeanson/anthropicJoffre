@@ -25,6 +25,9 @@ const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcuts
 const PlayerProfileModal = lazy(() => import('./components/PlayerProfileModal').then(m => ({ default: m.PlayerProfileModal })));
 // Beginner mode components
 const BeginnerTutorial = lazy(() => import('./components/BeginnerTutorial').then(m => ({ default: m.BeginnerTutorial })));
+// Sprint 19: Quest system components
+const DailyQuestsPanel = lazy(() => import('./components/DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
+const RewardsCalendar = lazy(() => import('./components/RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1
@@ -146,6 +149,10 @@ function AppContent() {
 
   // Task 10 Phase 2: Keyboard shortcuts help modal
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
+
+  // Sprint 19: Quest system state
+  const [showQuestsPanel, setShowQuestsPanel] = useState(false);
+  const [showRewardsCalendar, setShowRewardsCalendar] = useState(false);
 
   // Player profile modal state
   const [profilePlayerName, setProfilePlayerName] = useState<string | null>(null);
@@ -581,6 +588,13 @@ function AppContent() {
     }
   }, [gameState]);
 
+  // Sprint 19: Update login streak when player connects
+  useEffect(() => {
+    if (socket && currentPlayerName) {
+      socket.emit('update_login_streak', { playerName: currentPlayerName });
+    }
+  }, [socket, currentPlayerName]);
+
   // Sprint 5 Phase 3: Bot socket management functions now in useBotManagement hook
   // (spawnBotsForGame, handleAddBot, handleQuickPlay, handleBotAction)
 
@@ -637,7 +651,12 @@ function AppContent() {
     showAchievementsPanel,
     setShowAchievementsPanel,
     gameId,
-    socket
+    socket,
+    showQuestsPanel,
+    setShowQuestsPanel,
+    showRewardsCalendar,
+    setShowRewardsCalendar,
+    currentPlayerName
   };
 
   if (!gameState) {
@@ -659,6 +678,8 @@ function AppContent() {
           onShowLogin={modals.openLoginModal}
           onShowRegister={modals.openRegisterModal}
           onBotDifficultyChange={setBotDifficulty}
+          onShowQuests={() => setShowQuestsPanel(true)}
+          onShowRewardsCalendar={() => setShowRewardsCalendar(true)}
         />
       </>
     );

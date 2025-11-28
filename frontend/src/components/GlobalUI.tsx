@@ -28,6 +28,9 @@ const LoginModal = lazy(() => import('./LoginModal'));
 const RegisterModal = lazy(() => import('./RegisterModal'));
 const PasswordResetModal = lazy(() => import('./PasswordResetModal'));
 const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => ({ default: m.NotificationCenter })));
+// Sprint 19: Quest system components
+const DailyQuestsPanel = lazy(() => import('./DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
+const RewardsCalendar = lazy(() => import('./RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
 
 interface GlobalUIProps {
   reconnecting: boolean;
@@ -51,6 +54,12 @@ interface GlobalUIProps {
   setShowAchievementsPanel: (show: boolean) => void;
   gameId: string;
   socket: Socket | null;
+  // Sprint 19: Quest system
+  showQuestsPanel: boolean;
+  setShowQuestsPanel: (show: boolean) => void;
+  showRewardsCalendar: boolean;
+  setShowRewardsCalendar: (show: boolean) => void;
+  currentPlayerName: string;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({
@@ -73,7 +82,12 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   showAchievementsPanel,
   setShowAchievementsPanel,
   gameId,
-  socket
+  socket,
+  showQuestsPanel,
+  setShowQuestsPanel,
+  showRewardsCalendar,
+  setShowRewardsCalendar,
+  currentPlayerName
 }) => {
   const modals = useModals();
   const auth = useAuth();
@@ -184,6 +198,22 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
           isOpen={modals.showPasswordResetModal}
           onClose={modals.closePasswordResetModal}
           onSwitchToLogin={modals.switchToLogin}
+        />
+      </Suspense>
+
+      {/* Sprint 19: Quest System Modals */}
+      <Suspense fallback={<div />}>
+        <DailyQuestsPanel
+          socket={socket}
+          playerName={currentPlayerName}
+          isOpen={showQuestsPanel}
+          onClose={() => setShowQuestsPanel(false)}
+        />
+        <RewardsCalendar
+          socket={socket}
+          playerName={currentPlayerName}
+          isOpen={showRewardsCalendar}
+          onClose={() => setShowRewardsCalendar(false)}
         />
       </Suspense>
     </>

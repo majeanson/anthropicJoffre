@@ -170,28 +170,52 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
             </div>
           </section>
 
-          {/* Component Library */}
-          <section aria-labelledby="storybook-heading">
-            <h3 id="storybook-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
-              📚 Component Library
+          {/* Developer Resources */}
+          <section aria-labelledby="dev-resources-heading">
+            <h3 id="dev-resources-heading" className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
+              🔧 Developer Resources
             </h3>
-            <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-purple-300 rounded-lg p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-purple-900 mb-1">Storybook UI Documentation</p>
-                  <p className="text-xs text-purple-700">Browse all 53 interactive component examples</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {/* Storybook */}
+              <div className="bg-gradient-to-r from-pink-50 to-purple-50 border-2 border-purple-300 rounded-lg p-4">
+                <div className="flex flex-col h-full">
+                  <div className="flex-1 mb-3">
+                    <p className="text-sm font-semibold text-purple-900 mb-1">Storybook</p>
+                    <p className="text-xs text-purple-700">53 interactive UI components</p>
+                  </div>
+                  <a
+                    href="https://69291bd0d238365e7e12f66c-pybhemozfv.chromatic.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  >
+                    📖 Open Storybook
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
                 </div>
-                <a
-                  href="https://69291bd0d238365e7e12f66c-pybhemozfv.chromatic.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center gap-2"
-                >
-                  📖 Open Storybook
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
+              </div>
+
+              {/* Sentry */}
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 border-2 border-orange-300 rounded-lg p-4">
+                <div className="flex flex-col h-full">
+                  <div className="flex-1 mb-3">
+                    <p className="text-sm font-semibold text-orange-900 mb-1">Sentry Dashboard</p>
+                    <p className="text-xs text-orange-700">Error tracking & monitoring</p>
+                  </div>
+                  <a
+                    href="https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                  >
+                    🐛 Open Sentry
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
               </div>
             </div>
           </section>

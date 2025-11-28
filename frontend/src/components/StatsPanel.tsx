@@ -19,6 +19,8 @@ interface StatsPanelProps {
   setShowPlayerStats: (show: boolean) => void;
   setShowLeaderboard: (show: boolean) => void;
   setShowBrowser: (show: boolean) => void;
+  onShowQuests?: () => void;
+  onShowRewardsCalendar?: () => void;
 }
 
 export function StatsPanel({
@@ -29,6 +31,8 @@ export function StatsPanel({
   setShowPlayerStats,
   setShowLeaderboard,
   setShowBrowser,
+  onShowQuests,
+  onShowRewardsCalendar,
 }: StatsPanelProps) {
   return (
     <div className="space-y-3">
@@ -87,6 +91,35 @@ export function StatsPanel({
             <span className="text-xl">📜</span>
             Recent Games
           </button>
+
+          {/* Sprint 19: Quest System Buttons */}
+          {onShowQuests && (
+            <button
+              data-keyboard-nav="daily-quests"
+              onClick={() => {
+                sounds.buttonClick();
+                onShowQuests();
+              }}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white py-4 rounded-lg font-bold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-700 transition-all duration-200 border border-blue-800 dark:border-purple-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+            >
+              <span className="text-xl">📋</span>
+              Daily Quests
+            </button>
+          )}
+
+          {onShowRewardsCalendar && (
+            <button
+              data-keyboard-nav="rewards-calendar"
+              onClick={() => {
+                sounds.buttonClick();
+                onShowRewardsCalendar();
+              }}
+              className="w-full bg-gradient-to-r from-pink-600 to-orange-600 dark:from-pink-700 dark:to-orange-800 text-white py-4 rounded-lg font-bold hover:from-pink-700 hover:to-orange-700 dark:hover:from-pink-600 dark:hover:to-orange-700 transition-all duration-200 border border-pink-800 dark:border-orange-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+            >
+              <span className="text-xl">🎁</span>
+              Rewards Calendar
+            </button>
+          )}
         </div>
 
         {!socket && (
