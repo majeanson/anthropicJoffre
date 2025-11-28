@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { GameState, BotDifficulty } from '../types/game';
+import { colors } from '../design-system';
 
 interface BotManagementPanelProps {
   isOpen: boolean;
@@ -80,9 +81,9 @@ export const BotManagementPanel = memo(function BotManagementPanel({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header - Match PlayerStatsModal pattern */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-700 to-blue-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-blue-950 dark:border-gray-900 z-10">
+        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.primaryDark} hover:${colors.gradients.primaryDarkHover} p-6 flex items-center justify-between rounded-t-xl border-b-4 border-blue-950 dark:border-gray-900 z-10`}>
           <div className="flex items-center gap-3">
-            <span className="text-4xl">⚙️</span>
+            <span className="text-4xl" aria-hidden="true">⚙️</span>
             <div>
               <h2 className="text-2xl font-bold text-white">Team Management</h2>
               <p className="text-blue-200 dark:text-gray-300 font-semibold">

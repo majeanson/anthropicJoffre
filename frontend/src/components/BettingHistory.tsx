@@ -7,6 +7,7 @@
  */
 
 import { Bet, Player } from '../types/game';
+import { colors } from '../design-system';
 
 interface BettingHistoryProps {
   players: Player[];

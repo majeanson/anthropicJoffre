@@ -14,6 +14,7 @@ import { useChatNotifications } from '../hooks/useChatNotifications';
 import { MoveSuggestionPanel } from './MoveSuggestionPanel';
 import { useSettings } from '../contexts/SettingsContext';
 import { BettingHistory } from './BettingHistory';
+import { colors } from '../design-system';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -276,11 +277,11 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
           {isMyTurn && (
             <div className="absolute inset-0 -m-4 rounded-full bg-gradient-radial from-blue-400/30 via-blue-400/10 to-transparent motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" />
           )}
-          <div className={`relative px-3 md:px-4 py-2 md:py-3 rounded-xl text-sm md:text-base font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap transition-all ${
+          <div className={`relative px-3 md:px-4 py-2 md:py-3 rounded-xl text-sm md:text-base font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap transition-all bg-gradient-to-r ${
             players[currentPlayerIndex]?.teamId === 1
-              ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white'
-              : 'bg-gradient-to-r from-purple-500 to-purple-600 text-white'
-          } ${isMyTurn ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse' : ''}`}>
+              ? colors.gradients.team1
+              : colors.gradients.team2
+          } text-white ${isMyTurn ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse' : ''}`}>
             {isMyTurn && (
               <span className="motion-safe:animate-arrow-bounce motion-reduce:inline">👇</span>
             )}
@@ -420,7 +421,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                       <button
                         data-testid="skip-bet-button"
                         onClick={handleSkip}
-                        className={`flex-1 py-4 px-6 rounded-xl font-black text-base bg-gradient-to-r from-gray-500 to-gray-600 text-white hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 shadow-lg transform hover:scale-105 ${
+                        className={`flex-1 py-4 px-6 rounded-xl font-black text-base bg-gradient-to-r ${colors.gradients.secondary} hover:${colors.gradients.secondaryHover} text-white transition-all duration-300 border-2 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 ${
                           navLevel === 2 && actionIndex === 0 ? 'ring-4 ring-orange-500 border-orange-500' : 'border-gray-700'
                         }`}
                       >
@@ -430,10 +431,10 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                     <button
                       onClick={handlePlaceBet}
                       disabled={!isCurrentBetValid()}
-                      className={`flex-1 py-4 px-6 rounded-xl font-black text-base transition-all duration-300 border-2 shadow-lg transform ${
+                      className={`flex-1 py-4 px-6 rounded-xl font-black text-base transition-all duration-300 border-2 shadow-lg transform focus:outline-none focus:ring-2 ${
                         isCurrentBetValid()
-                          ? 'bg-gradient-to-r from-green-600 to-green-700 text-white hover:from-green-700 hover:to-green-800 hover:scale-105'
-                          : 'bg-gradient-to-r from-gray-300 to-gray-400 text-gray-600 cursor-not-allowed border-gray-400 opacity-60'
+                          ? `bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white hover:scale-105 focus:ring-green-400`
+                          : `bg-gradient-to-r ${colors.gradients.secondary} text-gray-600 cursor-not-allowed border-gray-400 opacity-60`
                       } ${navLevel === 2 && (actionIndex === 1 || !canSkip()) ? 'ring-4 ring-orange-500 border-orange-500' : 'border-green-800'}`}
                     >
                       Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
