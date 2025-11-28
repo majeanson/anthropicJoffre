@@ -1,5 +1,6 @@
 import { BotDifficulty } from '../types/game';
-import { colors } from '../design-system';
+import { Modal } from './ui/Modal';
+import { Button } from './ui/Button';
 
 interface BotTakeoverModalProps {
   isOpen: boolean;
@@ -18,8 +19,6 @@ export function BotTakeoverModal({
   onTakeOver,
   onCancel,
 }: BotTakeoverModalProps) {
-  if (!isOpen) return null;
-
   const getDifficultyEmoji = (difficulty: BotDifficulty): string => {
     switch (difficulty) {
       case 'easy':
@@ -34,93 +33,69 @@ export function BotTakeoverModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onKeyDown={(e) => e.stopPropagation()}>
-      <div
-        style={{
-          background: `linear-gradient(to bottom right, ${colors.info.start}, ${colors.primary.end})`,
-          borderColor: colors.info.border
-        }}
-        className="rounded-2xl p-6 max-w-md w-full mx-4 border-4 shadow-2xl"
-      >
-        {/* Header */}
-        <div className="mb-6">
-          <h2 className="text-3xl font-black text-white mb-2">
-            <span aria-hidden="true">🎮</span> Game is Full!
-          </h2>
-          <p className="text-white/90 font-semibold">
-            This game has bot players. You can take over a bot to join!
-          </p>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onCancel}
+      title="Game is Full!"
+      subtitle="You can take over a bot to join"
+      icon="🎮"
+      theme="blue"
+      size="md"
+      footer={
+        <Button variant="secondary" onClick={onCancel} fullWidth>
+          Cancel
+        </Button>
+      }
+    >
+      {/* Info Box */}
+      <div className="bg-blue-100/50 dark:bg-blue-900/20 border-2 border-blue-600 dark:border-blue-700 rounded-lg p-4 mb-6">
+        <p className="text-sm text-gray-900 dark:text-gray-100">
+          <strong>Note:</strong> You'll inherit the bot's team, position, hand, and score.
+        </p>
+      </div>
 
-        {/* Info Box */}
-        <div
-          style={{
-            backgroundColor: `${colors.info.start}30`,
-            borderColor: colors.info.border
-          }}
-          className="border-2 rounded-lg p-4 mb-6"
-        >
-          <p className="text-sm text-white">
-            <strong>Note:</strong> You'll inherit the bot's team, position, hand, and score.
-          </p>
-        </div>
-
-        {/* Bots List */}
-        <div className="space-y-3 mb-6">
-          <h3 className="text-lg font-bold text-white mb-2">
-            Available Bots:
-          </h3>
-          {availableBots.map((bot) => (
-            <div
-              key={bot.name}
-              style={bot.teamId === 1 ? {
-                backgroundColor: `${colors.team1.start}20`,
-                borderColor: colors.team1.border
-              } : {
-                backgroundColor: `${colors.team2.start}20`,
-                borderColor: colors.team2.border
-              }}
-              className="rounded-lg p-4 border-2"
-            >
-              <div className="flex items-center justify-between gap-4 mb-3">
-                {/* Bot Info */}
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className={`w-3 h-3 rounded-full ${
-                      bot.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
-                    }`}></span>
-                    <span className="font-bold text-gray-900 dark:text-gray-100">
-                      {bot.name}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    Team {bot.teamId} • {getDifficultyEmoji(bot.difficulty)} {bot.difficulty.charAt(0).toUpperCase() + bot.difficulty.slice(1)}
-                  </div>
+      {/* Bots List */}
+      <div className="space-y-3">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+          Available Bots:
+        </h3>
+        {availableBots.map((bot) => (
+          <div
+            key={bot.name}
+            className={`rounded-lg p-4 border-2 ${
+              bot.teamId === 1
+                ? 'bg-orange-100/30 dark:bg-orange-900/20 border-orange-600 dark:border-orange-700'
+                : 'bg-purple-100/30 dark:bg-purple-900/20 border-purple-600 dark:border-purple-700'
+            }`}
+          >
+            <div className="flex items-center justify-between gap-4 mb-3">
+              {/* Bot Info */}
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <span className={`w-3 h-3 rounded-full ${
+                    bot.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
+                  }`}></span>
+                  <span className="font-bold text-gray-900 dark:text-gray-100">
+                    {bot.name}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  Team {bot.teamId} • {getDifficultyEmoji(bot.difficulty)} {bot.difficulty.charAt(0).toUpperCase() + bot.difficulty.slice(1)}
                 </div>
               </div>
-
-              {/* Take Over Button */}
-              <button
-                onClick={() => onTakeOver(bot.name)}
-                style={{
-                  background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`
-                }}
-                className="w-full text-white font-black py-2 px-4 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-              >
-                Take Over {bot.name}
-              </button>
             </div>
-          ))}
-        </div>
 
-        {/* Cancel Button */}
-        <button
-          onClick={onCancel}
-          className="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white font-black py-3 px-6 rounded-xl transition-all duration-200 shadow-md"
-        >
-          Cancel
-        </button>
+            {/* Take Over Button */}
+            <Button
+              variant="success"
+              onClick={() => onTakeOver(bot.name)}
+              fullWidth
+            >
+              Take Over {bot.name}
+            </Button>
+          </div>
+        ))}
       </div>
-    </div>
+    </Modal>
   );
 }
