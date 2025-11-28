@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon, getRankMedal } from '../utils/tierBadge';
 import { TableSkeleton } from './ui/Skeleton';
+import { colors } from '../design-system';
 
 interface LeaderboardPlayer {
   player_name: string;
@@ -103,7 +104,7 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
               <div className="flex justify-center">
                 <button
                   onClick={() => setShowRoundStats(!showRoundStats)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
+                  className={`bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2`}
                 >
                   {showRoundStats ? '🏆 Show Game Stats' : '📊 Show Round Stats'}
                 </button>

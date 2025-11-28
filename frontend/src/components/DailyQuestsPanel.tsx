@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
+import { colors } from '../design-system';
 
 interface QuestTemplate {
   id: number;
@@ -172,7 +173,7 @@ export function DailyQuestsPanel({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 rounded-t-lg">
+        <div className={`bg-gradient-to-r ${colors.gradients.primaryDark} p-6 rounded-t-lg`}>
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold text-white">Daily Quests</h2>
@@ -182,7 +183,8 @@ export function DailyQuestsPanel({
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 text-3xl font-bold leading-none"
+              className="text-white hover:text-gray-200 text-3xl font-bold leading-none focus:outline-none focus:ring-2 focus:ring-purple-400"
+              aria-label="Close"
             >
               ×
             </button>

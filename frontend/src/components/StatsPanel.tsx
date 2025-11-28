@@ -10,6 +10,7 @@
 
 import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
+import { colors } from '../design-system';
 
 interface StatsPanelProps {
   socket: Socket | null;
@@ -86,7 +87,7 @@ export function StatsPanel({
               sounds.buttonClick();
               setShowBrowser(true);
             }}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-700 dark:to-pink-800 text-white py-4 rounded-lg font-bold hover:from-purple-700 hover:to-pink-700 dark:hover:from-purple-600 dark:hover:to-pink-700 transition-all duration-200 border border-purple-800 dark:border-pink-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+            className={`w-full bg-gradient-to-r ${colors.gradients.special} hover:${colors.gradients.specialHover} text-white py-4 rounded-lg font-bold transition-all duration-200 border border-purple-800 dark:border-pink-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2`}
           >
             <span className="text-xl">📜</span>
             Recent Games

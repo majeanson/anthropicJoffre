@@ -7,6 +7,7 @@
  */
 
 import { useEffect } from 'react';
+import { colors } from '../design-system';
 
 interface KeyboardShortcutsModalProps {
   isOpen: boolean;
@@ -47,10 +48,10 @@ export function KeyboardShortcutsModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-purple-600 p-6 border-b-2 border-blue-500 z-10">
+        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.primary} p-6 border-b-2 border-blue-500 z-10`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <span className="text-4xl">⌨️</span>
+              <span className="text-4xl" aria-hidden="true">⌨️</span>
               <div>
                 <h2 className="text-2xl font-bold text-white">Keyboard Shortcuts</h2>
                 <p className="text-blue-100 text-sm">Game Boy-style navigation</p>
@@ -58,7 +59,7 @@ export function KeyboardShortcutsModal({
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-blue-200 text-2xl leading-none transition-colors"
+              className="text-white hover:text-blue-200 text-2xl leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-blue-300"
               aria-label="Close keyboard shortcuts help"
             >
               ✕
@@ -157,7 +158,7 @@ export function KeyboardShortcutsModal({
           <button
             onClick={onClose}
             autoFocus
-            className="w-full mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-3 rounded-xl font-bold shadow-lg transition-all focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900"
+            className={`w-full mt-6 bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white py-3 rounded-xl font-bold shadow-lg transition-all focus:outline-none focus:ring-4 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900`}
           >
             Got it!
           </button>

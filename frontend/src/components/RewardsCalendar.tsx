@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
+import { colors } from '../design-system';
 
 interface CalendarReward {
   dayNumber: number;
@@ -171,7 +172,7 @@ export function RewardsCalendar({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 p-6 rounded-t-lg sticky top-0 z-10">
+        <div className={`bg-gradient-to-r ${colors.gradients.special} p-6 rounded-t-lg sticky top-0 z-10`}>
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold text-white">30-Day Rewards Calendar</h2>
@@ -186,7 +187,8 @@ export function RewardsCalendar({
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 text-3xl font-bold leading-none"
+              className="text-white hover:text-gray-200 text-3xl font-bold leading-none focus:outline-none focus:ring-2 focus:ring-pink-400"
+              aria-label="Close"
             >
               ×
             </button>
