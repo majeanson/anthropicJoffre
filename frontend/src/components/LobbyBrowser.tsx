@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '../config/constants';
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
 import { sounds } from '../utils/sounds';
+import { colors } from '../design-system';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -805,9 +806,9 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
 
                         <button
                           onClick={() => setReplayGameId(game.game_id)}
-                          className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg font-bold hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center gap-2"
+                          className={`bg-gradient-to-r ${colors.gradients.primaryDark} hover:${colors.gradients.primaryDarkHover} text-white px-4 py-2 rounded-lg font-bold transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-400`}
                         >
-                          <span>📺</span>
+                          <span aria-hidden="true">📺</span>
                           Watch Replay
                         </button>
                       </div>
