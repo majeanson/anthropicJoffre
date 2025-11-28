@@ -5,6 +5,7 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 import { getUserTierInfo } from '../utils/userTier';
+import { colors } from '../design-system';
 
 interface PlayContentProps {
   hasValidSession?: boolean;
@@ -79,9 +80,9 @@ export function PlayContent({
           data-testid="rejoin-game-button"
           data-keyboard-nav="rejoin-game"
           onClick={onRejoinGame}
-          className="w-full bg-gradient-to-r from-umber-600 to-umber-700 dark:from-gray-600 dark:to-gray-700 text-white py-4 rounded-xl font-bold hover:from-umber-700 hover:to-umber-800 dark:hover:from-gray-700 dark:hover:to-gray-800 transition-all duration-300 flex items-center justify-center gap-2 ring-2 ring-umber-400 dark:ring-gray-500 animate-pulse border border-umber-800 dark:border-gray-600 shadow-lg focus-visible:ring-4 focus-visible:ring-orange-500"
+          className={`w-full bg-gradient-to-r ${colors.gradients.warning} hover:${colors.gradients.warningHover} text-white py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2 ring-2 ring-orange-400 animate-pulse border border-orange-800 shadow-lg focus-visible:ring-4 focus-visible:ring-orange-500`}
         >
-          <span>🔄</span>
+          <span aria-hidden="true">🔄</span>
           <span>Rejoin Game</span>
         </button>
       )}
@@ -117,9 +118,9 @@ export function PlayContent({
             data-testid="join-game-button"
             data-keyboard-nav="browse-games"
             onClick={() => { sounds.buttonClick(); onBrowseGames(); }}
-            className="w-full bg-gradient-to-r from-amber-600 to-orange-600 dark:from-indigo-700 dark:to-indigo-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-orange-700 dark:hover:from-indigo-600 dark:hover:to-indigo-700 transition-all duration-200 border border-amber-800 dark:border-indigo-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+            className={`w-full bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white py-3 rounded-lg font-bold transition-all duration-200 border border-blue-800 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2`}
           >
-            <span>🔍</span>
+            <span aria-hidden="true">🔍</span>
             Browse & Join Games
           </button>
         </div>

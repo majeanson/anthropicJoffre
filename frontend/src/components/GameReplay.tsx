@@ -5,6 +5,7 @@ import { sounds } from '../utils/sounds';
 import { TrickHistory } from './TrickHistory';
 import { Card } from './Card';
 import logger from '../utils/logger';
+import { colors } from '../design-system';
 
 interface ReplayData {
   game_id: string;
@@ -344,10 +345,10 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 to-green-600 dark:from-emerald-700 dark:to-green-700 text-white px-4 md:px-8 py-4 md:py-6 rounded-t-lg md:rounded-t-xl">
+        <div className={`bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white px-4 md:px-8 py-4 md:py-6 rounded-t-lg md:rounded-t-xl`}>
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 md:gap-4 min-w-0">
-              <span className="text-2xl md:text-4xl">🎮</span>
+              <span className="text-2xl md:text-4xl" aria-hidden="true">🎮</span>
               <div className="min-w-0">
                 <h2 className="text-xl md:text-3xl font-black">Game Replay</h2>
                 <p className="text-emerald-100 text-xs md:text-sm mt-1 truncate">
@@ -363,15 +364,15 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                   navigator.clipboard.writeText(replayUrl);
                   sounds.buttonClick();
                 }}
-                className="p-2 md:px-4 md:py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2"
+                className="p-2 md:px-4 md:py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-300"
                 title="Copy replay link"
               >
-                <span>🔗</span>
+                <span aria-hidden="true">🔗</span>
                 <span className="hidden md:inline">Share</span>
               </button>
               <button
                 onClick={onClose}
-                className="text-white hover:text-emerald-100 text-2xl md:text-4xl font-bold leading-none transition-colors"
+                className="text-white hover:text-emerald-100 text-2xl md:text-4xl font-bold leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-green-300 rounded"
                 aria-label="Close replay viewer"
               >
                 ×

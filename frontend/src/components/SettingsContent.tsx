@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { DarkModeToggle } from './DarkModeToggle';
 import { sounds } from '../utils/sounds';
+import { colors } from '../design-system';
 
 interface SettingsContentProps {
   onShowRules: () => void;
@@ -125,9 +126,9 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
             <button
               data-keyboard-nav="debug-fun"
               onClick={() => { sounds.buttonClick(); onShowDebug(); }}
-              className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-700 dark:to-purple-700 text-white py-3 rounded-lg font-bold hover:from-indigo-700 hover:to-purple-700 dark:hover:from-indigo-600 dark:hover:to-purple-600 transition-all duration-200 border border-indigo-800 dark:border-indigo-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+              className={`w-full bg-gradient-to-r ${colors.gradients.primaryDark} hover:${colors.gradients.primaryDarkHover} text-white py-3 rounded-lg font-bold transition-all duration-200 border border-indigo-800 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2`}
             >
-              🎮 Debug Fun
+              <span aria-hidden="true">🎮</span> Debug Fun
             </button>
           </div>
 
