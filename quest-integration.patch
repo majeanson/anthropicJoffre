@@ -1,0 +1,184 @@
+# Quest System Integration Patch
+# Sprint 19: Daily Engagement System
+# Apply manually to complete the frontend integration
+
+##############################################################################
+# FILE: frontend/src/App.tsx
+##############################################################################
+
+# 1. Add quest component imports (after line 27, after BeginnerTutorial import)
+# Add these lines:
+
+// Sprint 19: Quest system components
+const DailyQuestsPanel = lazy(() => import('./components/DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
+const LoginStreakBadge = lazy(() => import('./components/LoginStreakBadge').then(m => ({ default: m.LoginStreakBadge })));
+const RewardsCalendar = lazy(() => import('./components/RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
+
+# 2. Add quest state (after line 148, after showKeyboardShortcuts state)
+# Add these lines:
+
+  // Sprint 19: Quest system state
+  const [showQuestsPanel, setShowQuestsPanel] = useState(false);
+  const [showRewardsCalendar, setShowRewardsCalendar] = useState(false);
+
+# 3. Add login streak update effect (after line 588, after the gameState useEffect)
+# Add these lines:
+
+  // Sprint 19: Update login streak when player connects
+  useEffect(() => {
+    if (socket && currentPlayerName) {
+      socket.emit('update_login_streak', { playerName: currentPlayerName });
+    }
+  }, [socket, currentPlayerName]);
+
+# 4. Add quest props to globalUIProps object (around line 642, after socket line)
+# Change from:
+    socket
+  };
+
+# To:
+    socket,
+    showQuestsPanel,
+    setShowQuestsPanel,
+    showRewardsCalendar,
+    setShowRewardsCalendar,
+    currentPlayerName
+  };
+
+# 5. Add quest handlers to Lobby component (around line 670, after onBotDifficultyChange)
+# Add these lines:
+
+          onShowQuests={() => setShowQuestsPanel(true)}
+          onShowRewardsCalendar={() => setShowRewardsCalendar(true)}
+
+##############################################################################
+# FILE: frontend/src/components/GlobalUI.tsx
+##############################################################################
+
+# 1. Add quest component imports (after line 30, after NotificationCenter import)
+# Add these lines:
+
+const DailyQuestsPanel = lazy(() => import('./DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
+const RewardsCalendar = lazy(() => import('./RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
+
+# 2. Add quest props to GlobalUIProps interface (after line 53, after socket prop)
+# Add these lines:
+
+  showQuestsPanel: boolean;
+  setShowQuestsPanel: (show: boolean) => void;
+  showRewardsCalendar: boolean;
+  setShowRewardsCalendar: (show: boolean) => void;
+  currentPlayerName: string;
+
+# 3. Add quest props to destructuring (after line 78, after socket)
+# Add these lines:
+
+  showQuestsPanel,
+  setShowQuestsPanel,
+  showRewardsCalendar,
+  setShowRewardsCalendar,
+  currentPlayerName,
+
+# 4. Add quest modals to JSX (after line 147, after FriendsPanel Suspense block, before Achievement & Social UI comment)
+# Add these lines:
+
+      {/* Sprint 19: Quest System Modals */}
+      <Suspense fallback={<div />}>
+        <DailyQuestsPanel
+          socket={socket}
+          playerName={currentPlayerName}
+          isOpen={showQuestsPanel}
+          onClose={() => setShowQuestsPanel(false)}
+        />
+        <RewardsCalendar
+          socket={socket}
+          playerName={currentPlayerName}
+          isOpen={showRewardsCalendar}
+          onClose={() => setShowRewardsCalendar(false)}
+        />
+      </Suspense>
+
+##############################################################################
+# FILE: frontend/src/components/Lobby.tsx
+##############################################################################
+
+# 1. Add quest props to LobbyProps interface (after line 41, after onShowRegister)
+# Add these lines:
+
+  onShowQuests?: () => void;
+  onShowRewardsCalendar?: () => void;
+
+# 2. Add quest props to destructuring (around line 45)
+# Change from:
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister }: LobbyProps) {
+
+# To:
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowQuests, onShowRewardsCalendar }: LobbyProps) {
+
+# 3. Pass quest props to StatsPanel (around line 574, after setShowBrowser prop)
+# Add these lines:
+
+                    onShowQuests={onShowQuests}
+                    onShowRewardsCalendar={onShowRewardsCalendar}
+
+##############################################################################
+# FILE: frontend/src/components/StatsPanel.tsx
+##############################################################################
+
+# 1. Add quest props to StatsPanelProps interface (after line 21, after setShowBrowser)
+# Add these lines:
+
+  onShowQuests?: () => void;
+  onShowRewardsCalendar?: () => void;
+
+# 2. Add quest props to destructuring (after line 31, after setShowBrowser)
+# Add these lines:
+
+  onShowQuests,
+  onShowRewardsCalendar,
+
+# 3. Add quest buttons to JSX (after line 91, after Recent Games button, before closing </div>)
+# Add these lines:
+
+          {/* Sprint 19: Quest System Buttons */}
+          {onShowQuests && (
+            <button
+              data-keyboard-nav="daily-quests"
+              onClick={() => {
+                sounds.buttonClick();
+                onShowQuests();
+              }}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-700 dark:to-purple-800 text-white py-4 rounded-lg font-bold hover:from-blue-700 hover:to-purple-700 dark:hover:from-blue-600 dark:hover:to-purple-700 transition-all duration-200 border border-blue-800 dark:border-purple-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+            >
+              <span className="text-xl">📋</span>
+              Daily Quests
+            </button>
+          )}
+
+          {onShowRewardsCalendar && (
+            <button
+              data-keyboard-nav="rewards-calendar"
+              onClick={() => {
+                sounds.buttonClick();
+                onShowRewardsCalendar();
+              }}
+              className="w-full bg-gradient-to-r from-pink-600 to-orange-600 dark:from-pink-700 dark:to-orange-800 text-white py-4 rounded-lg font-bold hover:from-pink-700 hover:to-orange-700 dark:hover:from-pink-600 dark:hover:to-orange-700 transition-all duration-200 border border-pink-800 dark:border-orange-600 shadow flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2"
+            >
+              <span className="text-xl">🎁</span>
+              Rewards Calendar
+            </button>
+          )}
+
+##############################################################################
+# Integration Complete!
+##############################################################################
+
+After applying these changes:
+1. Run database migration: `cd backend && npm run db:migrate`
+2. Start backend: `cd backend && npm run dev`
+3. Start frontend: `cd frontend && npm run dev`
+4. Test the quest system:
+   - Click "Daily Quests" button in Stats panel
+   - Click "Rewards Calendar" button
+   - Play a game and watch quest progress update
+   - Complete quests and claim rewards
