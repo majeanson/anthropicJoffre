@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 import * as Sentry from '@sentry/react';
 import buildInfo from '../buildInfo.json';
 import { CONFIG } from '../config/constants';
+import { colors } from '../design-system';
 
 interface GlobalDebugModalProps {
   isOpen: boolean;
@@ -177,9 +178,9 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-4 flex items-center justify-between rounded-t-lg z-10">
+        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.info} text-white px-6 py-4 flex items-center justify-between rounded-t-lg z-10`}>
           <div>
-            <h2 className="text-2xl font-bold">🌐 Global Debug - All Games</h2>
+            <h2 className="text-2xl font-bold"><span aria-hidden="true">🌐</span> Global Debug - All Games</h2>
             <p className="text-sm text-blue-100">Monitor & Manage Server</p>
           </div>
           <button

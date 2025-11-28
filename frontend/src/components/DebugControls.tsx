@@ -10,6 +10,7 @@ import React from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
 import { UnifiedDebugPanel } from './UnifiedDebugPanel';
+import { colors } from '../design-system';
 
 interface DebugControlsProps {
   gameState: GameState | null;
@@ -48,11 +49,11 @@ const DebugControls: React.FC<DebugControlsProps> = ({
       <div className="fixed top-4 right-4 z-50">
         <button
           onClick={() => setDebugMenuOpen(!debugMenuOpen)}
-          className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-all flex items-center gap-2 backdrop-blur-sm"
+          className={`bg-gradient-to-r ${colors.gradients.secondary} hover:${colors.gradients.secondaryHover} text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-all flex items-center gap-2 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400`}
           title="Debug Menu"
           aria-label="Open debug menu"
         >
-          🐛 Debug
+          <span aria-hidden="true">🐛</span> Debug
         </button>
 
         {/* Dropdown Menu */}

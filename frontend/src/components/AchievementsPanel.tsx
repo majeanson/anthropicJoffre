@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { AchievementProgress, AchievementCategory, AchievementTier } from '../types/achievements';
 import { AchievementCard } from './AchievementCard';
+import { colors } from '../design-system';
 
 interface AchievementsPanelProps {
   isOpen: boolean;
@@ -83,7 +84,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
           <div className="mt-3">
             <div className="h-3 bg-black/30 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-yellow-400 to-yellow-600 transition-all duration-500"
+                className={`h-full bg-gradient-to-r ${colors.gradients.warning} transition-all duration-500`}
                 style={{ width: `${completionPercent}%` }}
               />
             </div>

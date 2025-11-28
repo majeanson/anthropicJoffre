@@ -20,6 +20,7 @@ import { OnlinePlayer } from '../types/game';
 import { useAuth } from '../contexts/AuthContext';
 import { ProfileButton } from './ProfileButton';
 import { ProfileEditorModal } from './ProfileEditorModal';
+import { colors } from '../design-system';
 
 // Lazy load heavy modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -446,14 +447,14 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       <button
                         data-keyboard-nav="login-btn"
                         onClick={onShowLogin}
-                        className="text-sm px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-semibold transition-all duration-200 shadow focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                        className={`text-sm px-4 py-2 bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white rounded-lg font-semibold transition-all duration-200 shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                       >
                         Login
                       </button>
                       <button
                         data-keyboard-nav="register-btn"
                         onClick={onShowRegister}
-                        className="text-sm px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white rounded-lg font-semibold transition-all duration-200 shadow focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+                        className={`text-sm px-4 py-2 bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white rounded-lg font-semibold transition-all duration-200 shadow focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2`}
                       >
                         Register
                       </button>

@@ -6,6 +6,7 @@ import { CardColor } from '../types/game';
 import { useCountUp } from '../hooks/useCountUp';
 import { useSettings } from '../contexts/SettingsContext';
 import logger from '../utils/logger';
+import { colors } from '../design-system';
 
 interface GameHeaderProps {
   gameId: string;

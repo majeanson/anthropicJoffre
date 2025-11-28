@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
+import { colors } from '../design-system';
 
 interface LeaderboardProps {
   gameState: GameState;
@@ -75,7 +76,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               }`}>
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-2xl font-bold text-orange-800 dark:text-orange-200">Team 1</h4>
-                  {leadingTeam === 1 && <span className="text-3xl">👑</span>}
+                  {leadingTeam === 1 && <span className="text-3xl" aria-hidden="true">👑</span>}
                 </div>
                 <div className="text-5xl font-bold text-orange-600 dark:text-orange-300 mb-4">{team1Score}</div>
                 <div className="space-y-2">
@@ -94,7 +95,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               }`}>
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-2xl font-bold text-purple-800 dark:text-purple-200">Team 2</h4>
-                  {leadingTeam === 2 && <span className="text-3xl">👑</span>}
+                  {leadingTeam === 2 && <span className="text-3xl" aria-hidden="true">👑</span>}
                 </div>
                 <div className="text-5xl font-bold text-purple-600 dark:text-purple-300 mb-4">{team2Score}</div>
                 <div className="space-y-2">

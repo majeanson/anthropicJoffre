@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { GameState } from '../types/game';
 import { Socket } from 'socket.io-client';
 import { CONFIG } from '../config/constants';
+import { colors } from '../design-system';
 
 interface DebugPanelProps {
   gameState: GameState | null;
@@ -118,10 +119,10 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 flex items-center justify-between rounded-t-lg">
+        <div className={`sticky top-0 bg-gradient-to-r ${colors.gradients.secondary} text-white px-6 py-4 flex items-center justify-between rounded-t-lg`}>
           <div>
             <h2 id="debug-panel-title" className="text-2xl font-bold flex items-center gap-2">
-              🐛 Debug Panel
+              <span aria-hidden="true">🐛</span> Debug Panel
             </h2>
             <p className="text-sm text-purple-100">Game State Inspector</p>
           </div>
@@ -187,9 +188,9 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                     href="https://69291bd0d238365e7e12f66c-pybhemozfv.chromatic.com/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className={`px-4 py-2 bg-gradient-to-r ${colors.gradients.secondary} hover:${colors.gradients.secondaryHover} text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-400`}
                   >
-                    📖 Open Storybook
+                    <span aria-hidden="true">📖</span> Open Storybook
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
@@ -208,9 +209,9 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                     href="https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                    className={`px-4 py-2 bg-gradient-to-r ${colors.gradients.warning} hover:${colors.gradients.warningHover} text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-400`}
                   >
-                    🐛 Open Sentry
+                    <span aria-hidden="true">🐛</span> Open Sentry
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>

@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { GameState } from '../types/game';
 import { markTutorialCompleted, getTutorialStats } from '../utils/tutorialProgress';
+import { colors } from '../design-system';
 
 export type TutorialPhase =
   | 'team_selection'
@@ -235,15 +236,15 @@ export function BeginnerTutorial({
       data-testid="beginner-tutorial"
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-blue-700 dark:to-indigo-800 px-4 py-3 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800">
+      <div className={`bg-gradient-to-r ${colors.gradients.primary} dark:${colors.gradients.primaryDark} px-4 py-3 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800`}>
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-white font-bold text-lg flex items-center gap-2">
-            <span className="text-2xl">{currentStep.icon}</span>
+            <span className="text-2xl" aria-hidden="true">{currentStep.icon}</span>
             <span>{currentStep.title}</span>
           </h3>
           <button
             onClick={handleDismiss}
-            className="text-white hover:text-red-300 transition-colors text-xl font-bold"
+            className="text-white hover:text-red-300 transition-colors text-xl font-bold focus:outline-none focus:ring-2 focus:ring-white"
             title="Close Tutorial"
             data-testid="tutorial-close-button"
           >
@@ -272,7 +273,7 @@ export function BeginnerTutorial({
           <div key={step.phase} className={index > 0 ? 'mt-4 pt-4 border-t border-blue-300 dark:border-blue-700' : ''}>
             {/* Step header */}
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl">{step.icon}</span>
+              <span className="text-xl" aria-hidden="true">{step.icon}</span>
               <span className="text-blue-900 dark:text-blue-100 text-sm font-bold">{step.title}</span>
               {step.phase === currentStep?.phase && (
                 <span className="ml-auto text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">NEW</span>
@@ -290,7 +291,7 @@ export function BeginnerTutorial({
       <div className="px-4 pb-4">
         <button
           onClick={handleDismiss}
-          className="w-full bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-bold py-2 px-3 rounded transition-colors text-sm"
+          className={`w-full bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white font-bold py-2 px-3 rounded transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-blue-400`}
           data-testid="tutorial-got-it-button"
         >
           Got It! ✓

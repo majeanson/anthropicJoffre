@@ -7,6 +7,7 @@
 
 import { Component, ErrorInfo, ReactNode } from 'react';
 import logger from '../utils/logger';
+import { colors } from '../design-system';
 
 declare global {
   interface Window {
@@ -126,9 +127,9 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // Otherwise, use the inline error UI
       return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-900 to-gray-900">
+        <div className={`flex items-center justify-center min-h-screen bg-gradient-to-br ${colors.gradients.error}`}>
           <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-2xl max-w-md text-center">
-            <div className="text-6xl mb-4">⚠️</div>
+            <div className="text-6xl mb-4" aria-hidden="true">⚠️</div>
             <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
               Something Went Wrong
             </h2>
@@ -157,13 +158,13 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex gap-4 justify-center">
               <button
                 onClick={this.handleReset}
-                className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+                className={`bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white px-6 py-3 rounded-lg transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-green-400`}
               >
                 Try Again
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+                className={`bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white px-6 py-3 rounded-lg transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400`}
               >
                 Reload Game
               </button>
