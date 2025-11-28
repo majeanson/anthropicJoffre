@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
+import { colors } from '../design-system';
 
 interface LoginStreak {
   currentStreak: number;
@@ -81,10 +82,10 @@ export function LoginStreakBadge({
 
   const getStreakColor = (currentStreak: number) => {
     if (currentStreak === 0) return 'from-gray-600 to-gray-500';
-    if (currentStreak < 3) return 'from-blue-600 to-blue-500';
-    if (currentStreak < 7) return 'from-purple-600 to-purple-500';
-    if (currentStreak < 14) return 'from-pink-600 to-pink-500';
-    return 'from-orange-600 to-orange-500'; // 14+ days = legendary
+    if (currentStreak < 3) return colors.gradients.primary;
+    if (currentStreak < 7) return colors.gradients.secondary;
+    if (currentStreak < 14) return colors.gradients.special;
+    return colors.gradients.warning; // 14+ days = legendary
   };
 
   const getStreakEmoji = (currentStreak: number) => {
@@ -101,7 +102,7 @@ export function LoginStreakBadge({
       {freezeUsedNotification && (
         <div className="fixed top-4 right-4 z-50 bg-blue-900/90 border-2 border-blue-500 rounded-lg p-4 shadow-xl animate-bounce">
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🛡️</span>
+            <span className="text-3xl" aria-hidden="true">🛡️</span>
             <div>
               <p className="text-white font-bold">Streak Freeze Used!</p>
               <p className="text-blue-200 text-sm">Your streak continues</p>
@@ -120,10 +121,10 @@ export function LoginStreakBadge({
           onClick={onClick}
           className={`bg-gradient-to-r ${getStreakColor(
             streak.currentStreak
-          )} text-white px-4 py-2 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105`}
+          )} text-white px-4 py-2 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400`}
         >
           <div className="flex items-center gap-2">
-            <span className="text-xl">{getStreakEmoji(streak.currentStreak)}</span>
+            <span className="text-xl" aria-hidden="true">{getStreakEmoji(streak.currentStreak)}</span>
             <div className="text-left">
               <div className="text-xs opacity-80">Login Streak</div>
               <div className="text-lg leading-none">
@@ -131,7 +132,7 @@ export function LoginStreakBadge({
               </div>
             </div>
             {streak.streakFreezeAvailable && (
-              <span className="text-blue-200 text-sm ml-1" title="Freeze Available">
+              <span className="text-blue-200 text-sm ml-1" title="Freeze Available" aria-hidden="true">
                 🛡️
               </span>
             )}
@@ -152,7 +153,7 @@ export function LoginStreakBadge({
               <div className="flex justify-between items-center border-b border-gray-600 pb-2">
                 <span className="text-gray-300 text-sm">Longest Streak</span>
                 <span className="text-yellow-400 font-bold">
-                  {streak.longestStreak} days 🏆
+                  {streak.longestStreak} days <span aria-hidden="true">🏆</span>
                 </span>
               </div>
 

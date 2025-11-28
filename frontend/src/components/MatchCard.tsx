@@ -6,6 +6,7 @@
  */
 
 import { GameHistoryEntry } from '../types/game';
+import { colors } from '../design-system';
 
 interface MatchCardProps {
   game: GameHistoryEntry;
@@ -95,9 +96,9 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
             e.stopPropagation();
             onViewReplay(game.game_id);
           }}
-          className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-2 px-4 rounded-lg font-bold transition-all"
+          className={`w-full bg-gradient-to-r ${colors.gradients.team2} hover:from-purple-700 hover:to-indigo-700 text-white py-2 px-4 rounded-lg font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400`}
         >
-          📺 View Replay
+          <span aria-hidden="true">📺</span> View Replay
         </button>
       )}
     </div>

@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { GameState, Card } from '../types/game';
 import { suggestMove, suggestBet } from '../utils/moveSuggestion';
+import { colors } from '../design-system';
 
 interface MoveSuggestionPanelProps {
   gameState: GameState;
@@ -34,7 +35,7 @@ export function MoveSuggestionPanel({
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">💡</span>
+          <span className="text-2xl" aria-hidden="true">💡</span>
           <div className="flex-1">
             <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
               {suggestion.skip ? 'Consider Skipping' : `Suggested Bet: ${suggestion.amount} points`}
@@ -82,7 +83,7 @@ export function MoveSuggestionPanel({
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🎯</span>
+          <span className="text-2xl" aria-hidden="true">🎯</span>
           <div className="flex-1">
             <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
               Suggested: <span className={getPriorityColor()}>{getCardDisplay(suggestion.card)}</span>
@@ -109,7 +110,7 @@ export function MoveSuggestionPanel({
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-3 shadow-md">
+    <div className={`bg-gradient-to-r ${colors.gradients.info} dark:from-blue-900/40 dark:to-indigo-900/40 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-3 shadow-md`}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
           {gameState.phase === 'betting' && renderBettingSuggestion()}
@@ -119,8 +120,9 @@ export function MoveSuggestionPanel({
         {/* Expand/Collapse Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors text-lg"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
           title={isExpanded ? 'Show less' : 'Show more'}
+          aria-label={isExpanded ? 'Show less' : 'Show more'}
         >
           {isExpanded ? '▲' : '▼'}
         </button>

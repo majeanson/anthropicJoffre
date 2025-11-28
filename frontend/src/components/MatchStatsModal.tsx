@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
+import { colors } from '../design-system';
 
 interface MatchStatsModalProps {
   gameId: string;
@@ -137,7 +138,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-indigo-700 to-purple-900 dark:from-gray-700 dark:to-gray-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-indigo-950 dark:border-gray-900 z-10">
           <div className="flex items-center gap-4">
-            <span className="text-4xl">📊</span>
+            <span className="text-4xl" aria-hidden="true">📊</span>
             <div>
               <h2 className="text-2xl font-bold text-parchment-50">Match Details</h2>
               <p className="text-indigo-200 dark:text-gray-300 text-sm">Game ID: {gameId}</p>
@@ -173,33 +174,33 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
               <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
                 <button
                   onClick={() => setSelectedTab('overview')}
-                  className={`px-6 py-3 font-bold transition-all ${
+                  className={`px-6 py-3 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
                     selectedTab === 'overview'
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg'
+                      ? `bg-gradient-to-r ${colors.gradients.team2} text-white rounded-t-lg`
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg'
                   }`}
                 >
-                  📈 Overview
+                  <span aria-hidden="true">📈</span> Overview
                 </button>
                 <button
                   onClick={() => setSelectedTab('rounds')}
-                  className={`px-6 py-3 font-bold transition-all ${
+                  className={`px-6 py-3 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
                     selectedTab === 'rounds'
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg'
+                      ? `bg-gradient-to-r ${colors.gradients.team2} text-white rounded-t-lg`
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg'
                   }`}
                 >
-                  🔄 Round-by-Round
+                  <span aria-hidden="true">🔄</span> Round-by-Round
                 </button>
                 <button
                   onClick={() => setSelectedTab('players')}
-                  className={`px-6 py-3 font-bold transition-all ${
+                  className={`px-6 py-3 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
                     selectedTab === 'players'
-                      ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-t-lg'
+                      ? `bg-gradient-to-r ${colors.gradients.team2} text-white rounded-t-lg`
                       : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg'
                   }`}
                 >
-                  👥 Player Stats
+                  <span aria-hidden="true">👥</span> Player Stats
                 </button>
               </div>
 
@@ -210,11 +211,11 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                   {matchData.winning_team ? (
                     <div className={`p-6 rounded-xl text-center border-4 ${
                       matchData.winning_team === 1
-                        ? 'bg-gradient-to-r from-orange-400 to-orange-600 border-orange-800'
-                        : 'bg-gradient-to-r from-purple-400 to-purple-600 border-purple-800'
+                        ? `bg-gradient-to-r ${colors.gradients.team1} border-orange-800`
+                        : `bg-gradient-to-r ${colors.gradients.team2} border-purple-800`
                     }`}>
                       <h3 className="text-3xl font-bold text-white mb-2">
-                        🏆 Team {matchData.winning_team} Victory!
+                        <span aria-hidden="true">🏆</span> Team {matchData.winning_team} Victory!
                       </h3>
                       <div className="text-xl text-white font-semibold">
                         {getTeamPlayers(matchData.winning_team).join(' & ')}
@@ -223,7 +224,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                   ) : (
                     <div className="p-6 rounded-xl text-center border-4 bg-gradient-to-r from-gray-400 to-gray-600 border-gray-800">
                       <h3 className="text-3xl font-bold text-white mb-2">
-                        ⏳ Game In Progress
+                        <span aria-hidden="true">⏳</span> Game In Progress
                       </h3>
                       <div className="text-xl text-white font-semibold">
                         Match not yet finished
@@ -275,7 +276,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                             ? 'text-orange-800 dark:text-orange-300'
                             : 'text-purple-800 dark:text-purple-300'
                         }`}>
-                          Team {teamId} {matchData.winning_team === teamId && '👑'}
+                          Team {teamId} {matchData.winning_team === teamId && <span aria-hidden="true">👑</span>}
                         </h4>
                         <div className="space-y-2">
                           {getTeamPlayers(teamId as 1 | 2).map(player => (
@@ -318,7 +319,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                             >
                               <div className="font-semibold">{player}</div>
                               <div className="text-gray-600 dark:text-gray-400">
-                                {bet.amount} pts {bet.withoutTrump && '🚫♠️'}
+                                {bet.amount} pts {bet.withoutTrump && <span aria-hidden="true">🚫♠️</span>}
                               </div>
                             </div>
                           ))}
@@ -421,14 +422,14 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                       onViewReplay(gameId);
                       onClose();
                     }}
-                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-bold transition-all shadow-lg hover:shadow-xl"
+                    className={`px-8 py-3 bg-gradient-to-r ${colors.gradients.team2} hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg font-bold transition-all shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-400`}
                   >
-                    📺 View Full Replay
+                    <span aria-hidden="true">📺</span> View Full Replay
                   </button>
                 )}
                 <button
                   onClick={onClose}
-                  className="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-bold transition-all"
+                  className="px-8 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-bold transition-all focus:outline-none focus:ring-2 focus:ring-gray-400"
                 >
                   Close
                 </button>

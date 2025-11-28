@@ -10,6 +10,7 @@ import { UserProfile } from '../types/auth'; // Sprint 3 Phase 3.2
 import { MatchCard } from './MatchCard'; // Sprint 3 Phase 3.3
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
+import { colors } from '../design-system';
 
 // Lazy load heavy modal
 const MatchStatsModal = lazy(() => import('./MatchStatsModal').then(m => ({ default: m.MatchStatsModal })));
@@ -292,7 +293,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
           {!loading && error && (
             <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <span className="text-2xl">⚠️</span>
+                <span className="text-2xl" aria-hidden="true">⚠️</span>
                 <div className="flex-1">
                   <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
                     {error}
@@ -324,7 +325,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
 
           {!loading && !error && !stats && (
             <div className="text-center py-12">
-              <span className="text-6xl">❌</span>
+              <span className="text-6xl" aria-hidden="true">❌</span>
               <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold text-lg">
                 No statistics found for {playerName}
               </p>
@@ -359,44 +360,44 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
               <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
                 <button
                   onClick={() => setActiveTab('round')}
-                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 ${
+                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                     activeTab === 'round'
-                      ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg'
+                      ? `bg-gradient-to-r ${colors.gradients.primary} text-white rounded-t-lg`
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  📊 Round Stats
+                  <span aria-hidden="true">📊</span> Round Stats
                 </button>
                 <button
                   onClick={() => setActiveTab('game')}
-                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 ${
+                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 ${
                     activeTab === 'game'
-                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-t-lg'
+                      ? `bg-gradient-to-r ${colors.gradients.secondary} text-white rounded-t-lg`
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  🏆 Game Stats
+                  <span aria-hidden="true">🏆</span> Game Stats
                 </button>
                 <button
                   onClick={() => setActiveTab('history')}
-                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 ${
+                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 ${
                     activeTab === 'history'
-                      ? 'bg-gradient-to-r from-green-600 to-green-700 text-white rounded-t-lg'
+                      ? `bg-gradient-to-r ${colors.gradients.success} text-white rounded-t-lg`
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
                 >
-                  📜 Game History
+                  <span aria-hidden="true">📜</span> Game History
                 </button>
                 {isOwnProfile && (
                   <button
                     onClick={() => setActiveTab('profile')}
-                    className={`flex-1 py-3 px-4 font-bold transition-all duration-200 ${
+                    className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 ${
                       activeTab === 'profile'
-                        ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-t-lg'
+                        ? `bg-gradient-to-r ${colors.gradients.warning} text-white rounded-t-lg`
                         : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
                     }`}
                   >
-                    👤 Profile
+                    <span aria-hidden="true">👤</span> Profile
                   </button>
                 )}
               </div>
@@ -427,7 +428,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {/* Trick Performance */}
                   <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 dark:from-indigo-900/40 dark:to-cyan-900/40 rounded-lg p-6 border-2 border-indigo-200 dark:border-indigo-600">
                     <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                      🎯 Trick Performance
+                      <span aria-hidden="true">🎯</span> Trick Performance
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
@@ -452,7 +453,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {/* Betting Performance */}
                   <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/40 dark:to-yellow-900/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600">
                     <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                      💰 Betting Performance
+                      <span aria-hidden="true">💰</span> Betting Performance
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
@@ -489,7 +490,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {/* Points Performance */}
                   <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/40 dark:to-teal-900/40 rounded-lg p-6 border-2 border-emerald-200 dark:border-emerald-600">
                     <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                      ⭐ Points Performance
+                      <span aria-hidden="true">⭐</span> Points Performance
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
@@ -511,14 +512,14 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-red-50 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-200 dark:border-red-600">
                       <p className="text-red-700 dark:text-red-300 font-bold mb-2 flex items-center gap-2">
-                        🔴 Red Zeros Collected
+                        <span aria-hidden="true">🔴</span> Red Zeros Collected
                       </p>
                       <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.red_zeros_collected || 0}</p>
                       <p className="text-xs text-red-600 dark:text-red-400 mt-1">+5 bonus points each</p>
                     </div>
                     <div className="bg-amber-50 dark:bg-amber-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600">
                       <p className="text-amber-700 dark:text-amber-300 font-bold mb-2 flex items-center gap-2">
-                        🟤 Brown Zeros Received
+                        <span aria-hidden="true">🟤</span> Brown Zeros Received
                       </p>
                       <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">{stats.brown_zeros_received || 0}</p>
                       <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">-3 penalty points each</p>
@@ -553,7 +554,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {/* Streaks */}
                   <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/40 dark:to-orange-900/40 rounded-lg p-6 border-2 border-yellow-200 dark:border-yellow-600">
                     <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                      🔥 Streaks
+                      <span aria-hidden="true">🔥</span> Streaks
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
@@ -578,7 +579,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {/* Game Records */}
                   <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/40 dark:to-blue-900/40 rounded-lg p-6 border-2 border-cyan-200 dark:border-cyan-600">
                     <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                      📈 Game Records
+                      <span aria-hidden="true">📈</span> Game Records
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
@@ -605,23 +606,23 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
                     <button
                       onClick={() => setHistoryTab('finished')}
-                      className={`px-4 py-2 font-bold transition-all ${
+                      className={`px-4 py-2 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 ${
                         historyTab === 'finished'
                           ? 'border-b-4 border-green-600 text-green-700 dark:text-green-400 -mb-0.5'
                           : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                       }`}
                     >
-                      ✓ Finished Games
+                      <span aria-hidden="true">✓</span> Finished Games
                     </button>
                     <button
                       onClick={() => setHistoryTab('unfinished')}
-                      className={`px-4 py-2 font-bold transition-all ${
+                      className={`px-4 py-2 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-orange-400 ${
                         historyTab === 'unfinished'
                           ? 'border-b-4 border-orange-600 text-orange-700 dark:text-orange-400 -mb-0.5'
                           : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                       }`}
                     >
-                      ⏸ Unfinished Games
+                      <span aria-hidden="true">⏸</span> Unfinished Games
                     </button>
                   </div>
 
@@ -641,55 +642,55 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                       </button>
                       <button
                         onClick={() => setResultFilter('won')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 ${
                           resultFilter === 'won'
                             ? 'bg-green-600 text-white dark:bg-green-500'
                             : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900'
                         }`}
                       >
-                        🏆 Wins
+                        <span aria-hidden="true">🏆</span> Wins
                       </button>
                       <button
                         onClick={() => setResultFilter('lost')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-red-400 ${
                           resultFilter === 'lost'
                             ? 'bg-red-600 text-white dark:bg-red-500'
                             : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900'
                         }`}
                       >
-                        ❌ Losses
+                        <span aria-hidden="true">❌</span> Losses
                       </button>
 
                       <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-4">Sort by:</span>
                       <button
                         onClick={() => setSortBy('date')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                           sortBy === 'date'
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
                         }`}
                       >
-                        📅 Date
+                        <span aria-hidden="true">📅</span> Date
                       </button>
                       <button
                         onClick={() => setSortBy('score')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                           sortBy === 'score'
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
                         }`}
                       >
-                        ⚡ Score
+                        <span aria-hidden="true">⚡</span> Score
                       </button>
                       <button
                         onClick={() => setSortBy('rounds')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                           sortBy === 'rounds'
                             ? 'bg-blue-600 text-white'
                             : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
                         }`}
                       >
-                        🔄 Rounds
+                        <span aria-hidden="true">🔄</span> Rounds
                       </button>
 
                       <button
@@ -713,7 +714,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {!historyLoading && historyError && (
                     <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
                       <div className="flex items-start gap-3">
-                        <span className="text-2xl">⚠️</span>
+                        <span className="text-2xl" aria-hidden="true">⚠️</span>
                         <div className="flex-1">
                           <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
                             {historyError}
@@ -735,7 +736,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
 
                   {!historyLoading && !historyError && gameHistory.length === 0 && (
                     <div className="text-center py-12">
-                      <span className="text-6xl">📭</span>
+                      <span className="text-6xl" aria-hidden="true">📭</span>
                       <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold text-lg">
                         No game history found
                       </p>
@@ -749,7 +750,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                     <>
                       {filteredAndSortedGames.length === 0 ? (
                         <div className="text-center py-12">
-                          <span className="text-4xl">🔍</span>
+                          <span className="text-4xl" aria-hidden="true">🔍</span>
                           <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold">
                             No {resultFilter === 'won' ? 'wins' : resultFilter === 'lost' ? 'losses' : historyTab + ' games'} found
                           </p>
@@ -799,7 +800,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {!profileLoading && profileError && (
                     <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
                       <div className="flex items-start gap-3">
-                        <span className="text-2xl">⚠️</span>
+                        <span className="text-2xl" aria-hidden="true">⚠️</span>
                         <div className="flex-1">
                           <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
                             {profileError}
