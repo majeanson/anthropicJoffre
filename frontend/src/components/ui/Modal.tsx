@@ -87,6 +87,10 @@ export interface ModalProps {
   stackLevel?: number;
   /** Custom z-index override */
   customZIndex?: number;
+  /** Custom height class (e.g., 'h-[600px]') */
+  customHeight?: string;
+  /** Custom className for content area */
+  contentClassName?: string;
 
   // Accessibility
   /** aria-label for modal */
@@ -112,6 +116,8 @@ export function Modal({
   mobileFullScreen = true,
   stackLevel = 0,
   customZIndex,
+  customHeight,
+  contentClassName,
   ariaLabel,
   testId = 'modal',
 }: ModalProps) {
@@ -183,7 +189,7 @@ export function Modal({
 
       {/* Modal Content */}
       <div
-        className={`relative bg-gradient-to-br ${themeConfig.bg} shadow-2xl ${sizes.modal[size]} w-full flex flex-col border-4 ${themeConfig.border} animate-slideUp ${mobileClasses} overflow-hidden`}
+        className={`relative bg-gradient-to-br ${themeConfig.bg} shadow-2xl ${sizes.modal[size]} w-full flex flex-col border-4 ${themeConfig.border} animate-slideUp ${mobileClasses} overflow-hidden ${customHeight || ''}`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -229,7 +235,7 @@ export function Modal({
         )}
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className={contentClassName || 'flex-1 overflow-y-auto p-6'}>
           {children}
         </div>
 

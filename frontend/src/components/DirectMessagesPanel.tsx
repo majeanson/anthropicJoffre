@@ -1,6 +1,6 @@
 /**
  * DirectMessagesPanel Component
- * Sprint 16 Day 4
+ * Sprint 16 Day 4 | Refactored Sprint 19B
  *
  * Full-featured direct messaging panel with conversation list and message threads.
  *
@@ -12,6 +12,12 @@
  * - Delete messages and conversations
  * - Search messages
  * - Typing indicators (future)
+ *
+ * Uses unified UI components:
+ * - Modal for panel structure
+ * - Button for send button
+ * - ConversationItem for conversation list items
+ * - MessageBubble for message display
  *
  * Usage:
  * ```tsx
@@ -27,6 +33,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import Avatar from './Avatar';
+import { Modal, Button, ConversationItem, MessageBubble } from './ui';
 import { ListSkeleton } from './ui/Skeleton';
 
 interface DirectMessage {
@@ -232,168 +239,113 @@ export function DirectMessagesPanel({
         };
   };
 
-  // Format timestamp
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const hours = diff / (1000 * 60 * 60);
-
-    if (hours < 1) {
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    } else if (hours < 24) {
-      return `${Math.floor(hours)}h ago`;
-    } else {
-      return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Direct Messages"
+      icon={<span className="text-2xl">💬</span>}
+      theme="blue"
+      size="xl"
+      customHeight="h-[600px]"
+      contentClassName="flex flex-col p-0 overflow-hidden"
     >
-      <div
-        className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl border-2 border-blue-500/30 w-full max-w-5xl h-[600px] shadow-2xl flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <h2 className="text-2xl font-bold text-blue-400 flex items-center gap-2">
-            💬 Direct Messages
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl leading-none"
-            aria-label="Close"
-          >
-            ×
-          </button>
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Conversations List */}
+        <div className="w-80 border-r border-gray-700 overflow-y-auto">
+          {loading && (
+            <div className="p-4">
+              <ListSkeleton count={8} hasAvatar={true} hasSecondaryText={true} />
+            </div>
+          )}
+          {!loading && conversations.length === 0 && (
+            <div className="text-center py-8 text-gray-400">
+              <p className="mb-2">No conversations yet</p>
+              <p className="text-sm">Start chatting with friends!</p>
+            </div>
+          )}
+          {conversations.map((conv) => {
+            const other = getOtherUser(conv);
+            const isSelected = selectedConversation === other.username;
+
+            return (
+              <ConversationItem
+                key={`${conv.user1_id}-${conv.user2_id}`}
+                username={other.username}
+                avatar={<Avatar username={other.username} avatarUrl={other.avatar_url} size="md" />}
+                lastMessage={conv.last_message_preview}
+                timestamp={conv.last_message_at}
+                unreadCount={conv.unread_count}
+                isSelected={isSelected}
+                onClick={() => setSelectedConversation(other.username)}
+              />
+            );
+          })}
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Conversations List */}
-          <div className="w-80 border-r border-gray-700 overflow-y-auto">
-            {loading && (
-              <div className="p-4">
-                <ListSkeleton count={8} hasAvatar={true} hasSecondaryText={true} />
+        {/* Messages Area */}
+        <div className="flex-1 flex flex-col">
+          {!selectedConversation && (
+            <div className="flex-1 flex items-center justify-center text-gray-400">
+              <div className="text-center">
+                <div className="text-6xl mb-4">💬</div>
+                <p className="text-lg">Select a conversation to start messaging</p>
               </div>
-            )}
-            {!loading && conversations.length === 0 && (
-              <div className="text-center py-8 text-gray-400">
-                <p className="mb-2">No conversations yet</p>
-                <p className="text-sm">Start chatting with friends!</p>
-              </div>
-            )}
-            {conversations.map((conv) => {
-              const other = getOtherUser(conv);
-              const isSelected = selectedConversation === other.username;
+            </div>
+          )}
 
-              return (
-                <button
-                  key={`${conv.user1_id}-${conv.user2_id}`}
-                  onClick={() => setSelectedConversation(other.username)}
-                  className={`w-full p-4 flex items-start gap-3 hover:bg-gray-700/50 transition-colors ${
-                    isSelected ? 'bg-blue-900/30 border-l-2 border-blue-500' : ''
-                  }`}
-                >
-                  <Avatar username={other.username} avatarUrl={other.avatar_url} size="md" />
-                  <div className="flex-1 text-left min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-semibold text-white truncate">{other.username}</span>
-                      <span className="text-xs text-gray-400">{formatTime(conv.last_message_at)}</span>
-                    </div>
-                    <p className="text-sm text-gray-400 truncate">{conv.last_message_preview}</p>
-                    {conv.unread_count > 0 && (
-                      <div className="mt-1">
-                        <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
-                          {conv.unread_count} new
-                        </span>
-                      </div>
-                    )}
+          {selectedConversation && (
+            <>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {messages.length === 0 && (
+                  <div className="text-center text-gray-400 py-4">
+                    No messages yet. Say hi!
                   </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Messages Area */}
-          <div className="flex-1 flex flex-col">
-            {!selectedConversation && (
-              <div className="flex-1 flex items-center justify-center text-gray-400">
-                <div className="text-center">
-                  <div className="text-6xl mb-4">💬</div>
-                  <p className="text-lg">Select a conversation to start messaging</p>
-                </div>
+                )}
+                {messages.map((msg) => {
+                  const isSent = msg.sender_username === currentUsername;
+                  return (
+                    <MessageBubble
+                      key={msg.message_id}
+                      text={msg.message_text}
+                      isSent={isSent}
+                      timestamp={msg.created_at}
+                      isRead={isSent ? msg.is_read : undefined}
+                    />
+                  );
+                })}
+                <div ref={messagesEndRef} />
               </div>
-            )}
 
-            {selectedConversation && (
-              <>
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                  {messages.length === 0 && (
-                    <div className="text-center text-gray-400 py-4">
-                      No messages yet. Say hi!
-                    </div>
-                  )}
-                  {messages.map((msg) => {
-                    const isSent = msg.sender_username === currentUsername;
-                    return (
-                      <div
-                        key={msg.message_id}
-                        className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div className={`max-w-[70%] ${isSent ? 'items-end' : 'items-start'} flex flex-col`}>
-                          <div
-                            className={`px-4 py-2 rounded-2xl ${
-                              isSent
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-gray-700 text-gray-100'
-                            }`}
-                          >
-                            <p className="break-words">{msg.message_text}</p>
-                          </div>
-                          <span className="text-xs text-gray-400 mt-1 px-2">
-                            {formatTime(msg.created_at)}
-                            {isSent && msg.is_read && ' • Read'}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  <div ref={messagesEndRef} />
-                </div>
-
-                {/* Input */}
-                <form
-                  onSubmit={handleSendMessage}
-                  className="p-4 border-t border-gray-700 flex gap-2"
+              {/* Input */}
+              <form
+                onSubmit={handleSendMessage}
+                className="p-4 border-t border-gray-700 flex gap-2"
+              >
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder={`Message ${selectedConversation}...`}
+                  className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  maxLength={2000}
+                />
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={!inputMessage.trim() || sendingMessage}
+                  className="bg-blue-600 hover:bg-blue-500 border-blue-700"
                 >
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder={`Message ${selectedConversation}...`}
-                    className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    maxLength={2000}
-                  />
-                  <button
-                    type="submit"
-                    disabled={!inputMessage.trim() || sendingMessage}
-                    className="px-6 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
-                  >
-                    Send
-                  </button>
-                </form>
-              </>
-            )}
-          </div>
+                  Send
+                </Button>
+              </form>
+            </>
+          )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }
