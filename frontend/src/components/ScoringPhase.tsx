@@ -6,6 +6,7 @@ import { ChatMessage } from '../types/game';
 import { GameHeader } from './GameHeader';
 import { TrickHistory } from './TrickHistory';
 import { useChatNotifications } from '../hooks/useChatNotifications';
+import { colors } from '../design-system';
 
 interface ScoringPhaseProps {
   gameState: GameState;
@@ -97,7 +98,7 @@ export function ScoringPhase({
   const statistics: RoundStatistics | undefined = latestRound?.statistics;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 to-pink-900 flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: colors.gradients.secondary }}>
       {/* Game Header */}
       <GameHeader
         gameId={gameId}
@@ -150,7 +151,7 @@ export function ScoringPhase({
           </h2>
 
         {/* Timer and Ready Status */}
-        <div className="mb-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/40 dark:to-purple-900/40 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600">
+        <div className="mb-6 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600" style={{ background: colors.gradients.info }}>
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
             {/* Timer - Centered on mobile, left on desktop */}
             <div className="flex items-center gap-3">
@@ -167,13 +168,13 @@ export function ScoringPhase({
                 onClick={handleReady}
                 disabled={isReady}
                 data-testid="ready-button"
-                className={`px-4 md:px-6 py-2 rounded-lg font-bold transition-all text-sm md:text-base w-full md:w-auto ${
+                className={`px-4 md:px-6 py-2 rounded-lg font-bold transition-all text-sm md:text-base w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 ${
                   isReady
                     ? 'bg-green-500 text-white cursor-not-allowed'
                     : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
               >
-                {isReady ? '✓ Ready' : 'Ready Up'}
+                {isReady ? <span aria-hidden="true">✓</span> : ''}{isReady ? ' Ready' : 'Ready Up'}
               </button>
             </div>
           </div>
@@ -196,10 +197,10 @@ export function ScoringPhase({
             <div className="relative">
               {/* Spinning cards animation */}
               <div className="flex gap-2 mb-4">
-                <div className="w-12 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg animate-bounce" style={{animationDelay: '0s'}}></div>
-                <div className="w-12 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                <div className="w-12 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                <div className="w-12 h-16 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg animate-bounce" style={{animationDelay: '0.3s'}}></div>
+                <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0s', background: colors.gradients.error}}></div>
+                <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0.1s', background: colors.gradients.info}}></div>
+                <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0.2s', background: colors.gradients.success}}></div>
+                <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0.3s', background: colors.gradients.warning}}></div>
               </div>
               <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
                 Calculating round results...
@@ -210,12 +211,12 @@ export function ScoringPhase({
           <div>
             {/* Team Scores - Large and Clear */}
             <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="text-center p-6 bg-orange-50 dark:bg-orange-900/40 rounded-lg border-2 border-orange-200 dark:border-orange-600" data-testid="team-1-score-card">
+          <div className="text-center p-6 rounded-lg border-2 border-orange-200 dark:border-orange-600" data-testid="team-1-score-card" style={{ background: colors.gradients.team1 }}>
             <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">Team 1</h3>
             <p className="text-5xl font-bold text-orange-600 dark:text-orange-300" data-testid="team-1-score">{gameState.teamScores.team1}</p>
             <p className="text-xs text-orange-700 dark:text-orange-300 mt-2">Total Score</p>
           </div>
-          <div className="text-center p-6 bg-purple-50 dark:bg-purple-900/40 rounded-lg border-2 border-purple-200 dark:border-purple-600" data-testid="team-2-score-card">
+          <div className="text-center p-6 rounded-lg border-2 border-purple-200 dark:border-purple-600" data-testid="team-2-score-card" style={{ background: colors.gradients.team2 }}>
             <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">Team 2</h3>
             <p className="text-5xl font-bold text-purple-600 dark:text-purple-300" data-testid="team-2-score">{gameState.teamScores.team2}</p>
             <p className="text-xs text-purple-700 dark:text-purple-300 mt-2">Total Score</p>
@@ -226,9 +227,9 @@ export function ScoringPhase({
         {latestRound && (
           <section className="mb-6">
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b-2 border-gray-300 dark:border-gray-600 pb-2">
-              🎲 Round Bet
+              <span aria-hidden="true">🎲</span> Round Bet
             </h3>
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600">
+            <div className="rounded-lg p-4 border-2 border-blue-200 dark:border-blue-600" style={{ background: colors.gradients.info }}>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <p className="text-sm text-gray-700 dark:text-gray-300 font-semibold mb-1">Highest Bidder</p>
@@ -262,9 +263,9 @@ export function ScoringPhase({
         {latestRound && (
           <section className="mb-6">
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b-2 border-gray-300 dark:border-gray-600 pb-2">
-              📊 Round Results
+              <span aria-hidden="true">📊</span> Round Results
             </h3>
-            <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-lg p-4 border-2 border-gray-300 dark:border-gray-600">
+            <div className="rounded-lg p-4 border-2 border-gray-300 dark:border-gray-600" style={{ background: colors.gradients.primary }}>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                 <div>
                   <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">Offensive Team</p>
@@ -313,9 +314,9 @@ export function ScoringPhase({
         {latestRound?.tricks && latestRound.tricks.length > 0 && (
           <section className="mb-6">
             <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b-2 border-gray-300 dark:border-gray-600 pb-2">
-              🃏 Tricks Played
+              <span aria-hidden="true">🃏</span> Tricks Played
             </h3>
-            <div className="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/40 dark:to-blue-900/40 rounded-lg p-4 border-2 border-indigo-200 dark:border-indigo-600">
+            <div className="rounded-lg p-4 border-2 border-indigo-200 dark:border-indigo-600" style={{ background: colors.gradients.info }}>
               {latestRound.trump && (
                 <div className="mb-4 flex items-center justify-center gap-2">
                   <span className="text-sm bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 px-3 py-1 rounded-full font-semibold border-2 border-blue-300 dark:border-blue-700">
@@ -335,8 +336,8 @@ export function ScoringPhase({
 
         {/* Round Statistics */}
         {statistics && (
-          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600 mb-4">
-            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center">🏅 Round Highlights</h3>
+          <div className="rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600 mb-4" style={{ background: colors.gradients.warning }}>
+            <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center"><span aria-hidden="true">🏅</span> Round Highlights</h3>
             <div className="grid grid-cols-2 gap-4">
               {statistics.trickMaster && (
                 <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border-2 border-yellow-300 shadow-sm">

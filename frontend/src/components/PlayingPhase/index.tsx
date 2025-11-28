@@ -22,6 +22,7 @@ import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
 import { suggestMove } from '../../utils/moveSuggestion';
+import { colors } from '../../design-system';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';
@@ -368,7 +369,7 @@ function PlayingPhaseComponent({
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50">
         {/* Spotlight effect for current player's turn */}
         {isCurrentTurn && (
-          <div className="absolute inset-0 -m-12 rounded-full bg-gradient-radial from-blue-400/30 via-blue-400/10 to-transparent motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" />
+          <div className="absolute inset-0 -m-12 rounded-full motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(96, 165, 250, 0.3) 0%, rgba(96, 165, 250, 0.1) 50%, transparent 100%)' }} />
         )}
         <div
           className={`relative bg-umber-800/90 rounded-2xl px-6 py-4 lg:px-8 lg:py-6 shadow-xl transition-all ${
@@ -395,7 +396,7 @@ function PlayingPhaseComponent({
                   gameState.players[gameState.currentPlayerIndex]?.name
                 }...`}
           </p>
-          <div className="mt-2 flex gap-1 justify-center">
+          <div className="mt-2 flex gap-1 justify-center" aria-hidden="true">
             <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce"></div>
             <div
               className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce"

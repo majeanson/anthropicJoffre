@@ -10,6 +10,7 @@ import { memo } from 'react';
 import { Player } from '../../types/game';
 import { MoveSuggestionButton } from '../MoveSuggestionButton';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
+import { colors } from '../../design-system';
 
 export interface PlayerPositionProps {
   player: Player | null;
@@ -97,7 +98,7 @@ export const PlayerPosition = memo(function PlayerPosition({
               } whitespace-nowrap pointer-events-none`}
               style={{ maxWidth: '90vw' }}
             >
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300">
+              <div className="text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300" style={{ background: colors.gradients.info }}>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex-shrink-0">
                     <span className="text-sm md:text-lg">🤖</span>
@@ -152,13 +153,17 @@ export const PlayerPosition = memo(function PlayerPosition({
       'max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg';
 
     let colorClasses = '';
+    let bgStyle = {};
     if (!player || player.isEmpty) {
       colorClasses =
-        'bg-gradient-to-br from-gray-400 to-gray-600 text-gray-200 border-2 border-dashed border-gray-500';
+        'text-gray-200 border-2 border-dashed border-gray-500';
+      bgStyle = { background: 'linear-gradient(to bottom right, rgb(156, 163, 175), rgb(75, 85, 99))' };
     } else if (player.teamId === 1) {
-      colorClasses = 'bg-gradient-to-br from-orange-500 to-orange-700 text-white';
+      colorClasses = 'text-white';
+      bgStyle = { background: colors.gradients.team1 };
     } else {
-      colorClasses = 'bg-gradient-to-br from-purple-500 to-purple-700 text-white';
+      colorClasses = 'text-white';
+      bgStyle = { background: colors.gradients.team2 };
     }
 
     const winnerRing = isWinner ? 'ring-2 md:ring-3 ring-yellow-400' : '';
@@ -213,9 +218,9 @@ export const PlayerPosition = memo(function PlayerPosition({
         />
       )}
 
-      <div className={getBadgeClasses()}>
+      <div className={getBadgeClasses()} style={(player && !player.isEmpty) ? (player.teamId === 1 ? { background: colors.gradients.team1 } : { background: colors.gradients.team2 }) : {}}>
         <span className="flex items-center justify-center relative">
-          {player?.isEmpty && '💺 '}
+          {player?.isEmpty && <span aria-hidden="true">💺 </span>}
           {isClickable ? (
             <button
               onClick={handleNameClick}

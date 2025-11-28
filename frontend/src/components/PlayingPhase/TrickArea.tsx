@@ -14,6 +14,7 @@ import { ConfettiEffect } from '../ConfettiEffect';
 import { GameState, TrickCard, Player } from '../../types/game';
 import logger from '../../utils/logger';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
+import { colors } from '../../design-system';
 
 interface TrickWinnerInfo {
   playerName: string;
@@ -221,15 +222,12 @@ export const TrickArea = memo(function TrickArea({
       {gameState.previousTrick && (
         <button
           onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-          className={`absolute top-2 md:top-4 left-2 md:left-4 z-50 ${
-            showPreviousTrick
-              ? 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700'
-              : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700'
-          } active:scale-95 text-parchment-50 w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-base md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2`}
+          className={`absolute top-2 md:top-4 left-2 md:left-4 z-50 active:scale-95 text-parchment-50 w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-base md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2`}
+          style={{ background: showPreviousTrick ? colors.gradients.info : colors.gradients.warning }}
           title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
         >
-          <span className="md:hidden">{showPreviousTrick ? '▶️' : '⏮️'}</span>
-          <span className="hidden md:inline">{showPreviousTrick ? '▶️ Current' : '⏮️ Previous'}</span>
+          <span className="md:hidden" aria-hidden="true">{showPreviousTrick ? '▶️' : '⏮️'}</span>
+          <span className="hidden md:inline">{showPreviousTrick ? <><span aria-hidden="true">▶️</span> Current</> : <><span aria-hidden="true">⏮️</span> Previous</>}</span>
         </button>
       )}
 

@@ -11,6 +11,7 @@ import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { Card as CardType, TrickCard } from '../../types/game';
 import { sounds } from '../../utils/sounds';
+import { colors } from '../../design-system';
 
 export interface PlayerHandProps {
   hand: CardType[];
@@ -281,9 +282,9 @@ export const PlayerHand = memo(function PlayerHand({
           data-testid="player-hand"
         >
           <div className="text-center py-8">
-            <div className="inline-block bg-gradient-to-br from-parchment-100 to-parchment-50 px-6 py-4 rounded-xl border-2 border-parchment-400 dark:border-gray-600 shadow-lg">
+            <div className="inline-block px-6 py-4 rounded-xl border-2 border-parchment-400 dark:border-gray-600 shadow-lg" style={{ background: colors.gradients.primary }}>
               <span className="text-umber-800 dark:text-gray-200 text-base font-semibold">
-                🔒 Hands Hidden
+                <span aria-hidden="true">🔒</span> Hands Hidden
               </span>
               <p className="text-umber-600 dark:text-gray-400 text-sm mt-1.5">Spectator Mode</p>
             </div>

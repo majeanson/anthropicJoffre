@@ -12,6 +12,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { GameState, Card } from '../types/game';
 import { TrickHistory } from './TrickHistory';
 import { Card as CardComponent } from './Card';
+import { colors } from '../design-system';
 
 interface RoundStatistics {
   // Performance-based stats
@@ -344,10 +345,10 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           <div className="relative">
             {/* Spinning cards animation */}
             <div className="flex gap-2 mb-4">
-              <div className="w-12 h-16 bg-gradient-to-br from-red-400 to-red-600 rounded-lg animate-bounce" style={{animationDelay: '0s'}}></div>
-              <div className="w-12 h-16 bg-gradient-to-br from-amber-700 to-amber-900 rounded-lg animate-bounce" style={{animationDelay: '0.1s'}}></div>
-              <div className="w-12 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-lg animate-bounce" style={{animationDelay: '0.2s'}}></div>
-              <div className="w-12 h-16 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-lg animate-bounce" style={{animationDelay: '0.3s'}}></div>
+              <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0s', background: colors.gradients.error}}></div>
+              <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0.1s', background: colors.gradients.warning}}></div>
+              <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0.2s', background: colors.gradients.success}}></div>
+              <div className="w-12 h-16 rounded-lg animate-bounce" style={{animationDelay: '0.3s', background: colors.gradients.special}}></div>
             </div>
             <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
               Calculating round results...
@@ -362,7 +363,12 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     <div className="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
       {/* Header */}
       <div className="text-center animate-fadeInDown">
-        <h2 className="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 dark:from-blue-400 dark:via-purple-400 dark:to-indigo-400 mb-2">
+        <h2 className="text-3xl sm:text-4xl font-black mb-2" style={{
+          background: colors.gradients.special,
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
           Round {gameState.roundNumber} Complete
         </h2>
       </div>
@@ -406,7 +412,8 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       <div className="flex justify-center pt-4 animate-fadeInUp" style={{ animationDelay: '600ms' }}>
         <button
           onClick={onReady}
-          className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 dark:from-blue-500 dark:to-purple-600 text-white font-bold text-lg rounded-xl hover:from-amber-600 hover:to-orange-700 dark:hover:from-blue-600 dark:hover:to-purple-700 transition-all transform hover:scale-105 active:scale-95 shadow-xl hover:shadow-2xl"
+          className="px-8 py-4 text-white font-bold text-lg rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+          style={{ background: colors.gradients.special }}
         >
           Ready for Next Round
         </button>
@@ -416,9 +423,9 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
         <div className={`p-4 sm:p-6 rounded-xl border-4 transition-all ${
           lastRound.offensiveTeam === 1
-            ? 'bg-orange-100 dark:bg-orange-900/30 border-orange-400 dark:border-orange-600 shadow-lg'
-            : 'bg-orange-50 dark:bg-gray-800 border-orange-200 dark:border-gray-700'
-        }`}>
+            ? 'border-orange-400 dark:border-orange-600 shadow-lg'
+            : 'border-orange-200 dark:border-gray-700'
+        }`} style={{ background: lastRound.offensiveTeam === 1 ? colors.gradients.team1 : colors.gradients.team1 + '80' }}>
           <h3 className="font-bold text-lg sm:text-xl text-orange-600 dark:text-orange-400 mb-2">Team 1</h3>
 
           {/* Round Points - Main Focus */}
@@ -443,9 +450,9 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
 
         <div className={`p-4 sm:p-6 rounded-xl border-4 transition-all ${
           lastRound.offensiveTeam === 2
-            ? 'bg-purple-100 dark:bg-purple-900/30 border-purple-400 dark:border-purple-600 shadow-lg'
-            : 'bg-purple-50 dark:bg-gray-800 border-purple-200 dark:border-gray-700'
-        }`}>
+            ? 'border-purple-400 dark:border-purple-600 shadow-lg'
+            : 'border-purple-200 dark:border-gray-700'
+        }`} style={{ background: lastRound.offensiveTeam === 2 ? colors.gradients.team2 : colors.gradients.team2 + '80' }}>
           <h3 className="font-bold text-lg sm:text-xl text-purple-600 dark:text-purple-400 mb-2">Team 2</h3>
 
           {/* Round Points - Main Focus */}

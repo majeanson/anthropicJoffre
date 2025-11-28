@@ -8,6 +8,7 @@ import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 import { UnifiedChat } from './UnifiedChat';
 import { TeamSelectionSocialSidebar } from './TeamSelectionSocialSidebar';
 import { sounds } from '../utils/sounds';
+import { colors } from '../design-system';
 
 // Keyboard navigation type for team selection
 type NavSection = 'header' | 'teams' | 'difficulty' | 'actions' | 'rules';
@@ -282,7 +283,7 @@ export function TeamSelection({
   }, [players, team1Players, team2Players]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: colors.gradients.special }}>
       <div className="bg-parchment-50 dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-4xl w-full relative border-2 border-amber-700 dark:border-gray-600 backdrop-blur-sm">
 
         {/* Top-left buttons */}
@@ -291,18 +292,20 @@ export function TeamSelection({
             <button
               ref={leaveButtonRef}
               onClick={onLeaveGame}
-              className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-red-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+              className="text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-red-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+              style={{ background: colors.gradients.error }}
               title="Leave Game"
             >
-              🚪 Leave
+              <span aria-hidden="true">🚪</span> Leave
             </button>
           )}
           <button
             onClick={() => setShowSocialSidebar(!showSocialSidebar)}
-            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-green-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+            className="text-white px-3 py-1.5 rounded-lg font-bold transition-all duration-300 text-xs flex items-center gap-1 border-2 border-green-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+            style={{ background: colors.gradients.success }}
             title="Find players to invite"
           >
-            👥 Find Players
+            <span aria-hidden="true">👥</span> Find Players
           </button>
           <button
             ref={darkModeButtonRef}
@@ -324,10 +327,11 @@ export function TeamSelection({
           <button
             ref={copyLinkButtonRef}
             onClick={handleCopyGameLink}
-            className="w-full mt-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2.5 rounded-lg font-bold transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            className="w-full mt-3 text-white px-4 py-2.5 rounded-lg font-bold transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            style={{ background: colors.gradients.info }}
             title="Copy shareable game link"
           >
-            <span>🔗</span>
+            <span aria-hidden="true">🔗</span>
             <span>Copy Game Link</span>
           </button>
         </div>
@@ -387,7 +391,8 @@ export function TeamSelection({
                           {!isCurrentPlayer && currentPlayer && (
                             <button
                               onClick={() => onSwapPosition(playerAtPosition.id)}
-                              className="text-xs bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0"
+                              className="text-xs text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-orange-800 shadow-sm flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+                              style={{ background: colors.gradients.team1 }}
                               title={currentPlayer.teamId !== 1 ? 'Swap with this player (changes teams!)' : 'Swap positions'}
                               aria-label={`Swap positions with ${playerAtPosition.name}${currentPlayer.teamId !== 1 ? ' (this will change your team)' : ''}`}
                             >
@@ -397,11 +402,12 @@ export function TeamSelection({
                           {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
                             <button
                               onClick={() => onKickPlayer(playerAtPosition.id)}
-                              className="text-xs bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0"
+                              className="text-xs text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                              style={{ background: colors.gradients.error }}
                               title="Remove player from game"
                               aria-label={`Remove ${playerAtPosition.name} from game`}
                             >
-                              ✕
+                              <span aria-hidden="true">✕</span>
                             </button>
                           )}
                         </div>
@@ -430,7 +436,8 @@ export function TeamSelection({
                                     }
                                   }
                                 }}
-                                className="text-xs bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm"
+                                className="text-xs text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+                                style={{ background: colors.gradients.success }}
                               >
                                 Fill Seat
                               </button>
@@ -496,7 +503,8 @@ export function TeamSelection({
                           {!isCurrentPlayer && currentPlayer && (
                             <button
                               onClick={() => onSwapPosition(playerAtPosition.id)}
-                              className="text-xs bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0"
+                              className="text-xs text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-purple-800 shadow-sm flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2"
+                              style={{ background: colors.gradients.team2 }}
                               title={currentPlayer.teamId !== 2 ? 'Swap with this player (changes teams!)' : 'Swap positions'}
                             >
                               Swap
@@ -505,10 +513,11 @@ export function TeamSelection({
                           {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
                             <button
                               onClick={() => onKickPlayer(playerAtPosition.id)}
-                              className="text-xs bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0"
+                              className="text-xs text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-red-800 shadow-sm flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+                              style={{ background: colors.gradients.error }}
                               title="Remove player from game"
                             >
-                              ✕
+                              <span aria-hidden="true">✕</span>
                             </button>
                           )}
                         </div>
@@ -537,7 +546,8 @@ export function TeamSelection({
                                     }
                                   }
                                 }}
-                                className="text-xs bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm"
+                                className="text-xs text-white px-3 py-1.5 rounded-lg font-bold transition-all border border-green-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2"
+                                style={{ background: colors.gradients.success }}
                               >
                                 Fill Seat
                               </button>
@@ -618,10 +628,11 @@ export function TeamSelection({
               <button
                 ref={addBotButtonRef}
                 onClick={onAddBot}
-                className="bg-gradient-to-r from-umber-600 to-amber-700 dark:from-gray-600 dark:to-gray-700 hover:from-umber-700 hover:to-amber-800 dark:hover:from-gray-700 dark:hover:to-gray-800 text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-200 border border-umber-800 dark:border-gray-600 shadow flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+                className="text-white px-6 py-3 rounded-lg text-base font-bold transition-all duration-200 border border-umber-800 dark:border-gray-600 shadow flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+                style={{ background: colors.gradients.warning }}
                 title="Add a bot player"
               >
-                🤖 Add Bot
+                <span aria-hidden="true">🤖</span> Add Bot
               </button>
             )}
 
@@ -660,9 +671,10 @@ export function TeamSelection({
           <button
             ref={rulesButtonRef}
             onClick={() => setShowRules(true)}
-            className="w-full bg-gradient-to-r from-amber-600 to-amber-700 dark:from-amber-700 dark:to-amber-800 text-white py-3 rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 dark:hover:from-amber-800 dark:hover:to-amber-900 transition-all duration-300 border-2 border-amber-800 dark:border-amber-900 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+            className="w-full text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 border-amber-800 dark:border-amber-900 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+            style={{ background: colors.gradients.warning }}
           >
-            📖 Game Rules
+            <span aria-hidden="true">📖</span> Game Rules
           </button>
         </div>
       </div>

@@ -11,6 +11,7 @@ import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import { ContextualGameInfo } from '../ContextualGameInfo';
 import { TimeoutIndicator } from '../TimeoutIndicator';
 import { GameState, CardColor, Player } from '../../types/game';
+import { colors } from '../../design-system';
 
 export interface ScoreBoardProps {
   gameState: GameState;
@@ -108,7 +109,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
       >
         <div className="flex justify-between items-center gap-2 md:gap-8">
           {/* Team 1 */}
-          <div className="flex-1 bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible">
+          <div className="flex-1 rounded-xl p-2 md:p-3 border border-orange-200 relative overflow-visible" style={{ background: colors.gradients.team1 }}>
             <h3 className="text-xs md:text-sm font-semibold text-orange-600/70 uppercase tracking-wider mb-1 flex items-center justify-start gap-1">
               <span>Team 1</span>
               {gameState.highestBet &&
@@ -190,7 +191,7 @@ export const ScoreBoard = memo(function ScoreBoard({ gameState, isCurrentTurn, o
           </div>
 
           {/* Team 2 */}
-          <div className="flex-1 bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible">
+          <div className="flex-1 rounded-xl p-2 md:p-3 text-right border border-purple-200 relative overflow-visible" style={{ background: colors.gradients.team2 }}>
             <h3 className="text-xs md:text-sm font-semibold text-purple-600/70 uppercase tracking-wider mb-1 flex items-center justify-end gap-1">
               {gameState.highestBet &&
                 gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId ===

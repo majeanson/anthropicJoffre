@@ -9,6 +9,7 @@ import { FriendWithStatus } from '../types/friends';
 import { OnlinePlayer } from '../types/game';
 import { RecentPlayer } from '../utils/recentPlayers';
 import { useAuth } from '../contexts/AuthContext';
+import { colors } from '../design-system';
 
 interface TeamSelectionSocialSidebarProps {
   socket: Socket | null;
@@ -113,7 +114,7 @@ export function TeamSelectionSocialSidebar({
   return (
     <div className="fixed inset-y-0 right-0 w-80 bg-parchment-50 dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto border-l-4 border-amber-700 dark:border-gray-600">
       {/* Header */}
-      <div className="sticky top-0 bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 p-4 border-b-2 border-amber-800 dark:border-gray-600">
+      <div className="sticky top-0 p-4 border-b-2 border-amber-800 dark:border-gray-600" style={{ background: colors.gradients.warning }}>
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xl font-bold text-white">Find Players</h2>
           <button
@@ -193,11 +194,12 @@ export function TeamSelectionSocialSidebar({
                     <button
                       onClick={() => handleInvitePlayer(friend.player_name)}
                       disabled={invitedPlayers.has(friend.player_name)}
-                      className={`text-xs px-3 py-1 rounded font-bold transition-all ${
+                      className={`text-xs px-3 py-1 rounded font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 ${
                         invitedPlayers.has(friend.player_name)
                           ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                          : 'text-white'
                       }`}
+                      style={invitedPlayers.has(friend.player_name) ? {} : { background: colors.gradients.success }}
                     >
                       {invitedPlayers.has(friend.player_name) ? 'Invited' : 'Invite'}
                     </button>
@@ -241,11 +243,12 @@ export function TeamSelectionSocialSidebar({
                       <button
                         onClick={() => handleInvitePlayer(player.playerName)}
                         disabled={invitedPlayers.has(player.playerName)}
-                        className={`text-xs px-3 py-1 rounded font-bold transition-all ${
+                        className={`text-xs px-3 py-1 rounded font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 ${
                           invitedPlayers.has(player.playerName)
                             ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                            : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                            : 'text-white'
                         }`}
+                        style={invitedPlayers.has(player.playerName) ? {} : { background: colors.gradients.success }}
                       >
                         {invitedPlayers.has(player.playerName) ? 'Invited' : 'Invite'}
                       </button>
@@ -293,11 +296,12 @@ export function TeamSelectionSocialSidebar({
                         <button
                           onClick={() => handleInvitePlayer(player.name)}
                           disabled={invitedPlayers.has(player.name)}
-                          className={`text-xs px-3 py-1 rounded font-bold transition-all ${
+                          className={`text-xs px-3 py-1 rounded font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 ${
                             invitedPlayers.has(player.name)
                               ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white'
+                              : 'text-white'
                           }`}
+                          style={invitedPlayers.has(player.name) ? {} : { background: colors.gradients.secondary }}
                         >
                           {invitedPlayers.has(player.name) ? 'Invited' : 'Invite'}
                         </button>
@@ -321,9 +325,10 @@ export function TeamSelectionSocialSidebar({
             navigator.clipboard.writeText(gameUrl);
             alert('Game link copied! Share it with anyone.');
           }}
-          className="w-full bg-gradient-to-r from-amber-600 to-amber-700 dark:from-amber-700 dark:to-amber-800 text-white py-3 rounded-lg font-bold hover:from-amber-700 hover:to-amber-800 dark:hover:from-amber-800 dark:hover:to-amber-900 transition-all shadow-lg"
+          className="w-full text-white py-3 rounded-lg font-bold transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
+          style={{ background: colors.gradients.warning }}
         >
-          📋 Copy Game Link
+          <span aria-hidden="true">📋</span> Copy Game Link
         </button>
       </div>
     </div>
