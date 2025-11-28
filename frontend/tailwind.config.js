@@ -1,4 +1,16 @@
-/** @type {import('tailwindcss').Config} */
+/**
+ * Tailwind CSS Configuration
+ * Sprint 21: Enhanced with design token system
+ *
+ * Design tokens available at: frontend/src/design-system/
+ * - colors.ts - Standardized color palette and gradients
+ * - typography.ts - Typography scale
+ * - spacing.ts - Spacing scale
+ * - shadows.ts - Shadow definitions
+ * - breakpoints.ts - Responsive breakpoints
+ *
+ * @type {import('tailwindcss').Config}
+ */
 export default {
   darkMode: 'class', // Enable dark mode with class strategy
   content: [
@@ -9,6 +21,7 @@ export default {
     extend: {
       colors: {
         // Historic theme colors inspired by traditional card game aesthetics
+        // Note: Design token system available at frontend/src/design-system/colors.ts
         parchment: {
           50: '#FDFCFA',
           100: '#F9F7F3',
