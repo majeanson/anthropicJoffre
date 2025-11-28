@@ -10,6 +10,7 @@ import { Socket } from 'socket.io-client';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
 
 interface MatchStatsModalProps {
   gameId: string;
@@ -206,50 +207,52 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                       </div>
                     </div>
                   ) : (
-                    <div className="p-6 rounded-xl text-center border-4 bg-gradient-to-r from-gray-400 to-gray-600 border-gray-800">
+                    <UICard variant="gradient" gradient="gray" size="lg" className="text-center border-4 border-gray-800">
                       <h3 className="text-3xl font-bold text-white mb-2">
                         <span aria-hidden="true">⏳</span> Game In Progress
                       </h3>
                       <div className="text-xl text-white font-semibold">
                         Match not yet finished
                       </div>
-                    </div>
+                    </UICard>
                   )}
 
                   {/* Game Stats Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white dark:bg-gray-700 rounded-lg p-4 text-center border-2 border-gray-300 dark:border-gray-600">
+                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
                       <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                         {matchData.team1_score} - {matchData.team2_score}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Final Score</div>
-                    </div>
-                    <div className="bg-white dark:bg-gray-700 rounded-lg p-4 text-center border-2 border-gray-300 dark:border-gray-600">
+                    </UICard>
+                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
                       <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                         {matchData.rounds}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Rounds Played</div>
-                    </div>
-                    <div className="bg-white dark:bg-gray-700 rounded-lg p-4 text-center border-2 border-gray-300 dark:border-gray-600">
+                    </UICard>
+                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
                       <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                         {formatDuration(matchData.game_duration_seconds)}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Duration</div>
-                    </div>
-                    <div className="bg-white dark:bg-gray-700 rounded-lg p-4 text-center border-2 border-gray-300 dark:border-gray-600">
+                    </UICard>
+                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
                       <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
                         {matchData.trump_suit || 'N/A'}
                       </div>
                       <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Trump Suit</div>
-                    </div>
+                    </UICard>
                   </div>
 
                   {/* Teams */}
                   <div className="grid grid-cols-2 gap-4">
                     {[1, 2].map(teamId => (
-                      <div
+                      <UICard
                         key={teamId}
-                        className={`p-6 rounded-xl border-4 ${
+                        variant="bordered"
+                        size="lg"
+                        className={`border-4 ${
                           teamId === 1
                             ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-600'
                             : 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-600'
@@ -264,17 +267,19 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                         </h4>
                         <div className="space-y-2">
                           {getTeamPlayers(teamId as 1 | 2).map(player => (
-                            <div
+                            <UICard
                               key={player}
-                              className="bg-white dark:bg-gray-700 rounded-lg p-3"
+                              variant="default"
+                              size="sm"
+                              className="bg-white dark:bg-gray-700"
                             >
                               <div className="font-semibold text-gray-900 dark:text-gray-100">
                                 {player}
                               </div>
-                            </div>
+                            </UICard>
                           ))}
                         </div>
-                      </div>
+                      </UICard>
                     ))}
                   </div>
                 </div>
@@ -284,9 +289,11 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
               {selectedTab === 'rounds' && (
                 <div className="space-y-4">
                   {matchData.round_history.map((round, idx) => (
-                    <div
+                    <UICard
                       key={idx}
-                      className="bg-white dark:bg-gray-700 rounded-lg p-6 border-2 border-gray-300 dark:border-gray-600"
+                      variant="bordered"
+                      size="lg"
+                      className="bg-white dark:bg-gray-700"
                     >
                       <h4 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
                         Round {round.roundNumber}
@@ -339,7 +346,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                           )}
                         </div>
                       </div>
-                    </div>
+                    </UICard>
                   ))}
                 </div>
               )}
