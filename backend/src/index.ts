@@ -107,6 +107,9 @@ import {
 } from './db';
 // Import conditional persistence manager
 import * as PersistenceManager from './db/persistenceManager';
+// Import quest system (Sprint 19: Daily Engagement System)
+import { updateQuestProgress } from './db/quests';
+import { extractQuestContext } from './game/quests';
 import {
   saveGameState as saveGameToDB,
   loadGameState as loadGameFromDB,
@@ -203,6 +206,7 @@ import { registerFriendHandlers } from './socketHandlers/friends'; // Sprint 2 P
 import { registerNotificationHandlers } from './socketHandlers/notifications'; // Sprint 3 Phase 5
 import { registerDirectMessageHandlers } from './socketHandlers/directMessages'; // Sprint 16 Day 4
 import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 Day 6
+import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: Daily Engagement System
 import {
   generateSessionToken as generateSessionTokenUtil,
   createPlayerSession as createPlayerSessionUtil,
@@ -1192,6 +1196,11 @@ io.on('connection', (socket) => {
   registerSocialHandlers(io, socket, { errorBoundaries });
 
   // ============================================================================
+  // Quest Handlers - Sprint 19: Daily Engagement System
+  // ============================================================================
+  registerQuestHandlers(socket);
+
+  // ============================================================================
   // Connection Handlers - Refactored (Sprint 3)
   // ============================================================================
   registerConnectionHandlers(socket, {
@@ -1598,6 +1607,32 @@ async function endRound(gameId: string) {
         // Emit secret achievement unlocks
         for (const achievement of secretUnlocked) {
           await emitAchievementUnlocked(io, gameId, player.name, achievement);
+        }
+      }
+
+      // ============================================================================
+      // QUEST INTEGRATION - Sprint 19: Update quest progress for human players
+      // ============================================================================
+      for (const player of humanPlayers) {
+        try {
+          // Extract quest-relevant context from finished game
+          const questContext = extractQuestContext(game, player.name, gameId);
+
+          // Update quest progress in database
+          const questUpdates = await updateQuestProgress(questContext);
+
+          // Notify player of quest progress updates
+          if (questUpdates.length > 0) {
+            const playerSocket = connectionManager.getSocketIdForPlayer(player.name);
+            if (playerSocket) {
+              io.to(playerSocket).emit('quest_progress_update', {
+                updates: questUpdates,
+              });
+            }
+          }
+        } catch (error) {
+          console.error(`[Quests] Error updating quest progress for ${player.name}:`, error);
+          // Don't block game completion if quest update fails
         }
       }
     } catch (error) {
