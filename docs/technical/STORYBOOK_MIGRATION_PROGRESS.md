@@ -68,34 +68,45 @@ All modals now use:
    - Game cards → UICard (bordered)
    - Resume button → Button (success)
 
+**Batch 4: Lobby Browser** (1 component, 8 instances)
+7. ✅ LobbyBrowser.tsx
+   - Join with Game ID section → UICard (bordered)
+   - Filter/Sort bar → UICard (bordered)
+   - Error state → UICard (gradient error)
+   - Active game cards → UICard (bordered)
+   - Recent game cards → UICard (bordered)
+   - Phase badges → UIBadge (solid)
+   - Game mode badges → UIBadge (solid)
+   - Winning team badges → UIBadge (solid)
+
 ---
 
 ## 📊 Migration Statistics
 
 ### Total Instances Migrated
 - **Sprint 22**: 60 instances (16 Modal + 44 Button)
-- **Current Session**: 27 instances (22 UICard + 4 UIBadge + 1 Button)
-- **Grand Total**: **87 Storybook component instances**
+- **Current Session**: 35 instances (30 UICard + 7 UIBadge)
+- **Grand Total**: **95 Storybook component instances**
 
 ### Components Migrated
-- **Total Components**: 22 components
+- **Total Components**: 23 components
 - **Modals**: 16/16 (100%)
 - **Quest/Profile**: 4/4 (100%)
-- **Lobby**: 2/~10 (20%)
+- **Lobby**: 3/~10 (30%)
 - **Game Flow**: 1/~5 (20%)
 
 ### Code Reduction
 - **Sprint 22**: -398 lines (modals)
-- **Current Session**: ~-50 lines (cards/badges)
-- **Total**: **-448 lines removed**
+- **Current Session**: ~-60 lines (cards/badges)
+- **Total**: **-458 lines removed**
 
 ---
 
 ## 🎯 Phase 1 Goal: 50+ Component Instances
 
 **Target**: 50 component instances using UICard/UIBadge
-**Current**: 27 instances (54% of goal)
-**Remaining**: 23 instances
+**Current**: 35 instances (70% of goal)
+**Remaining**: 15 instances
 
 ---
 
@@ -125,10 +136,10 @@ All modals now use:
 | Metric | Sprint 22 | Current | Target |
 |--------|-----------|---------|--------|
 | Modal Standardization | 100% | 100% | 100% |
-| Card Standardization | 0% | 15% | 80% |
-| Badge Standardization | 0% | 2% | 80% |
-| Button Standardization | 5% | 10% | 80% |
-| Overall Adoption | 20% | 30% | 80% |
+| Card Standardization | 0% | 25% | 80% |
+| Badge Standardization | 0% | 8% | 80% |
+| Button Standardization | 5% | 12% | 80% |
+| Overall Adoption | 20% | 35% | 80% |
 
 ---
 
