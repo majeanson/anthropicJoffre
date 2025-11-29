@@ -7,7 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { UICard, Button } from './ui';
+import { UICard, Button, Alert } from './ui';
 
 interface LoginStreak {
   currentStreak: number;
@@ -179,9 +179,9 @@ export function LoginStreakBadge({
               </div>
 
               {streak.streakFreezeAvailable && (
-                <div className="mt-3 p-2 bg-blue-900/30 border border-blue-700 rounded text-xs text-blue-200">
-                  💡 Miss a day? Your streak freeze will protect you once per week!
-                </div>
+                <Alert variant="info" icon="💡" className="mt-3">
+                  Miss a day? Your streak freeze will protect you once per week!
+                </Alert>
               )}
               </div>
             </UICard>

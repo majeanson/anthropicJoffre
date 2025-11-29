@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { AchievementProgress, AchievementCategory, AchievementTier } from '../types/achievements';
 import { AchievementCard } from './AchievementCard';
-import { Modal, UICard, LoadingState, EmptyState } from './ui';
+import { Modal, UICard, LoadingState, EmptyState, ProgressBar, Select, Checkbox } from './ui';
 
 interface AchievementsPanelProps {
   isOpen: boolean;
@@ -72,59 +72,55 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
     >
       {/* Progress bar */}
       <div className="mb-4">
-        <div className="h-3 bg-black/30 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-amber-500 to-orange-600 transition-all duration-500"
-            style={{ width: `${completionPercent}%` }}
-          />
-        </div>
+        <ProgressBar
+          value={completionPercent}
+          max={100}
+          variant="gradient"
+          color="warning"
+          size="lg"
+        />
       </div>
 
       {/* Filters */}
       <UICard variant="bordered" size="sm" className="mb-4">
         <div className="flex flex-wrap items-center gap-4">
           {/* Category filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-umber-800 dark:text-gray-200">Category:</label>
-            <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value as AchievementCategory | 'all')}
-              className="px-3 py-1 rounded-lg border-2 border-parchment-400 dark:border-gray-600 bg-white dark:bg-gray-700 text-umber-800 dark:text-gray-200 text-sm"
-            >
-              <option value="all">All</option>
-              <option value="gameplay">Gameplay</option>
-              <option value="milestone">Milestone</option>
-              <option value="social">Social</option>
-              <option value="special">Special</option>
-            </select>
-          </div>
+          <Select
+            label="Category"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value as AchievementCategory | 'all')}
+            size="sm"
+            options={[
+              { value: 'all', label: 'All' },
+              { value: 'gameplay', label: 'Gameplay' },
+              { value: 'milestone', label: 'Milestone' },
+              { value: 'social', label: 'Social' },
+              { value: 'special', label: 'Special' },
+            ]}
+          />
 
           {/* Tier filter */}
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold text-umber-800 dark:text-gray-200">Tier:</label>
-            <select
-              value={filterTier}
-              onChange={(e) => setFilterTier(e.target.value as AchievementTier | 'all')}
-              className="px-3 py-1 rounded-lg border-2 border-parchment-400 dark:border-gray-600 bg-white dark:bg-gray-700 text-umber-800 dark:text-gray-200 text-sm"
-            >
-              <option value="all">All</option>
-              <option value="bronze">Bronze</option>
-              <option value="silver">Silver</option>
-              <option value="gold">Gold</option>
-              <option value="platinum">Platinum</option>
-            </select>
-          </div>
+          <Select
+            label="Tier"
+            value={filterTier}
+            onChange={(e) => setFilterTier(e.target.value as AchievementTier | 'all')}
+            size="sm"
+            options={[
+              { value: 'all', label: 'All' },
+              { value: 'bronze', label: 'Bronze' },
+              { value: 'silver', label: 'Silver' },
+              { value: 'gold', label: 'Gold' },
+              { value: 'platinum', label: 'Platinum' },
+            ]}
+          />
 
           {/* Show unlocked only */}
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={showUnlockedOnly}
-              onChange={(e) => setShowUnlockedOnly(e.target.checked)}
-              className="w-4 h-4"
-            />
-            <span className="text-sm font-semibold text-umber-800 dark:text-gray-200">Unlocked only</span>
-          </label>
+          <Checkbox
+            label="Unlocked only"
+            checked={showUnlockedOnly}
+            onChange={(e) => setShowUnlockedOnly(e.target.checked)}
+            size="sm"
+          />
 
           <div className="ml-auto text-sm text-umber-600 dark:text-gray-400">
             Showing {filteredAchievements.length} achievements
