@@ -1,12 +1,12 @@
 /**
  * PlayerPosition Component
- * Renders player name badge and bot difficulty indicator (with press-to-show thinking)
+ * Renders player name badge and bot difficulty indicator (with click-to-toggle thinking)
  *
  * Extracted from PlayingPhase.tsx (lines 517-599, 908-1014)
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
-import { memo } from 'react';
+import { memo, useRef, useEffect } from 'react';
 import { Player } from '../../types/game';
 import { MoveSuggestionButton } from '../MoveSuggestionButton';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
@@ -43,7 +43,95 @@ export const PlayerPosition = memo(function PlayerPosition({
   suggestionOpen,
   onToggleSuggestion,
 }: PlayerPositionProps) {
-  // Helper: Get bot difficulty badge (now with bot thinking on click/press)
+  const badgeRef = useRef<HTMLButtonElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  // Close tooltip when clicking outside
+  useEffect(() => {
+    if (!botThinkingOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        badgeRef.current &&
+        !badgeRef.current.contains(event.target as Node) &&
+        tooltipRef.current &&
+        !tooltipRef.current.contains(event.target as Node)
+      ) {
+        onToggleBotThinking();
+      }
+    };
+
+    // Close on escape key
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onToggleBotThinking();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [botThinkingOpen, onToggleBotThinking]);
+
+  // Get tooltip position style for mobile-friendly positioning
+  const getTooltipStyle = () => {
+    if (!badgeRef.current) return {};
+
+    const rect = badgeRef.current.getBoundingClientRect();
+    const isMobile = window.innerWidth < 640;
+    const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 250;
+    const padding = 16;
+
+    // On mobile, always position at bottom center of screen for visibility
+    if (isMobile) {
+      return {
+        bottom: padding,
+        left: padding,
+        right: padding,
+        width: 'auto',
+      };
+    }
+
+    // Desktop positioning based on tooltipPosition prop
+    switch (tooltipPosition) {
+      case 'top':
+        return {
+          bottom: window.innerHeight - rect.top + 8,
+          left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
+          width: tooltipWidth,
+        };
+      case 'bottom':
+        return {
+          top: rect.bottom + 8,
+          left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
+          width: tooltipWidth,
+        };
+      case 'left':
+        return {
+          top: Math.max(padding, rect.top - 20),
+          right: window.innerWidth - rect.left + 8,
+          width: tooltipWidth,
+        };
+      case 'right':
+        return {
+          top: Math.max(padding, rect.top - 20),
+          left: rect.right + 8,
+          width: tooltipWidth,
+        };
+      default:
+        return {
+          top: rect.bottom + 8,
+          left: rect.left + rect.width / 2 - tooltipWidth / 2,
+          width: tooltipWidth,
+        };
+    }
+  };
+
+  // Helper: Get bot difficulty badge (now with bot thinking on click toggle)
   const getBotDifficultyBadge = (): JSX.Element | null => {
     if (!player?.isBot || !player.botDifficulty) return null;
 
@@ -55,48 +143,43 @@ export const PlayerPosition = memo(function PlayerPosition({
 
     const badge = badges[player.botDifficulty];
 
-    // If bot has thinking info, make badge pressable
+    // If bot has thinking info, make badge clickable (toggle)
     if (botThinking) {
       return (
-        <button
-          onMouseDown={onToggleBotThinking}
-          onMouseUp={onToggleBotThinking}
-          onMouseLeave={botThinkingOpen ? onToggleBotThinking : undefined}
-          onTouchStart={onToggleBotThinking}
-          onTouchEnd={onToggleBotThinking}
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg transition-all active:scale-95 cursor-pointer hover:brightness-110 ${
-            botThinkingOpen ? 'ring-2 ring-white scale-105' : ''
-          }`}
-          title={`Press to see what ${player.name} is thinking`}
-        >
-          <span className={isThinking ? 'animate-pulse' : ''}>{badge.icon}</span>
-          <span className="hidden md:inline">{badge.label}</span>
-          {isThinking && (
-            <span className="flex gap-0.5 text-base md:text-xs">
-              <span className="animate-bounce" style={{ animationDelay: '0ms' }}>
-                .
+        <>
+          <button
+            ref={badgeRef}
+            onClick={onToggleBotThinking}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg transition-all active:scale-95 cursor-pointer hover:brightness-110 ${
+              botThinkingOpen ? 'ring-2 ring-white scale-105' : ''
+            }`}
+            title={`Click to see what ${player.name} is thinking`}
+            aria-expanded={botThinkingOpen}
+            aria-label={botThinkingOpen ? `Hide ${player.name}'s thinking` : `Show ${player.name}'s thinking`}
+          >
+            <span className={isThinking ? 'animate-pulse' : ''}>{badge.icon}</span>
+            <span className="hidden md:inline">{badge.label}</span>
+            {isThinking && (
+              <span className="flex gap-0.5 text-base md:text-xs">
+                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>
+                  .
+                </span>
+                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>
+                  .
+                </span>
+                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>
+                  .
+                </span>
               </span>
-              <span className="animate-bounce" style={{ animationDelay: '150ms' }}>
-                .
-              </span>
-              <span className="animate-bounce" style={{ animationDelay: '300ms' }}>
-                .
-              </span>
-            </span>
-          )}
-          {/* Tooltip shown while pressed */}
+            )}
+          </button>
+          {/* Tooltip shown when toggled on - fixed position for proper z-index */}
           {botThinkingOpen && (
             <div
-              className={`fixed z-[10500] ${
-                tooltipPosition === 'top'
-                  ? 'bottom-full left-1/2 -translate-x-1/2 mb-2'
-                  : tooltipPosition === 'bottom'
-                  ? 'top-full left-1/2 -translate-x-1/2 mt-2'
-                  : tooltipPosition === 'left'
-                  ? 'right-full top-1/2 -translate-y-1/2 mr-2'
-                  : 'left-full top-1/2 -translate-y-1/2 ml-2'
-              } whitespace-nowrap pointer-events-none`}
-              style={{ maxWidth: '90vw' }}
+              ref={tooltipRef}
+              className="fixed z-[10500]"
+              style={getTooltipStyle()}
+              role="tooltip"
             >
               <div className="text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300" style={{ background: colors.gradients.info }}>
                 <div className="flex items-center gap-2">
@@ -104,14 +187,14 @@ export const PlayerPosition = memo(function PlayerPosition({
                     <span className="text-sm md:text-lg">🤖</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold opacity-90 truncate">{player.name}</div>
+                    <div className="text-xs font-semibold truncate">{player.name}</div>
                     <div className="text-xs md:text-sm font-bold mt-0.5">{botThinking}</div>
                   </div>
                 </div>
               </div>
             </div>
           )}
-        </button>
+        </>
       );
     }
 

@@ -70,39 +70,56 @@ export function MoveSuggestionButton({
   }, [isOpen, onToggle]);
 
   // Position classes for tooltip - using portal-like fixed positioning
+  // On mobile, always center horizontally for better visibility
   const getTooltipStyle = () => {
     if (!buttonRef.current) return {};
 
     const rect = buttonRef.current.getBoundingClientRect();
-    const tooltipWidth = 280;
+    const isMobile = window.innerWidth < 640;
+    const tooltipWidth = isMobile ? Math.min(300, window.innerWidth - 32) : 280;
     const tooltipHeight = 150; // Approximate height
-    const padding = 8;
+    const padding = 16;
+
+    // On mobile, always position at bottom center of screen for visibility
+    if (isMobile) {
+      return {
+        bottom: padding,
+        left: padding,
+        right: padding,
+        width: 'auto',
+      };
+    }
 
     switch (position) {
       case 'top':
         return {
           bottom: window.innerHeight - rect.top + padding,
           left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
+          width: tooltipWidth,
         };
       case 'bottom':
         return {
           top: rect.bottom + padding,
           left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
+          width: tooltipWidth,
         };
       case 'left':
         return {
           top: Math.max(padding, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - padding)),
           right: window.innerWidth - rect.left + padding,
+          width: tooltipWidth,
         };
       case 'right':
         return {
           top: Math.max(padding, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - padding)),
           left: rect.right + padding,
+          width: tooltipWidth,
         };
       default:
         return {
           top: rect.bottom + padding,
           left: rect.left + rect.width / 2 - tooltipWidth / 2,
+          width: tooltipWidth,
         };
     }
   };
@@ -148,7 +165,7 @@ export function MoveSuggestionButton({
         <div
           ref={tooltipRef}
           className="fixed z-[10000]"
-          style={{ ...getTooltipStyle(), width: 280 }}
+          style={getTooltipStyle()}
           role="tooltip"
         >
           <UICard
@@ -164,18 +181,18 @@ export function MoveSuggestionButton({
                 </span>
               </div>
               <div className="flex-1 min-w-0 text-white">
-                <div className="text-xs font-semibold opacity-90">Suggestion</div>
+                <div className="text-xs font-semibold">Suggestion</div>
                 <div className="text-sm md:text-base font-bold mt-0.5">{suggestion}</div>
-                <div className="text-xs md:text-sm mt-1 opacity-90 whitespace-normal">{details}</div>
+                <div className="text-xs md:text-sm mt-1 whitespace-normal">{details}</div>
 
                 {/* Alternatives Section - Visually Separated */}
                 {alternatives && (
                   <div className="mt-2 pt-2 border-t border-white/30">
-                    <div className="text-xs font-semibold opacity-70 flex items-center gap-1">
+                    <div className="text-xs font-semibold flex items-center gap-1">
                       <span aria-hidden="true">💭</span>
                       <span>Alternative:</span>
                     </div>
-                    <div className="text-xs mt-0.5 opacity-80 whitespace-normal">{alternatives}</div>
+                    <div className="text-xs mt-0.5 whitespace-normal">{alternatives}</div>
                   </div>
                 )}
               </div>
