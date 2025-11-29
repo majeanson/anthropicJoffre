@@ -3,6 +3,7 @@
  * Shows completed and remaining tutorial steps in beginner mode
  */
 
+import { useEffect, useRef } from 'react';
 import { getTutorialStats, ALL_TUTORIAL_PHASES, TutorialPhase } from '../utils/tutorialProgress';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
@@ -38,6 +39,26 @@ const TUTORIAL_TITLES: Record<TutorialPhase, string> = {
 
 export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModalProps) {
   const stats = getTutorialStats();
+  const lastCompletedRef = useRef<HTMLDivElement>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to the most recently completed tutorial when modal opens
+  useEffect(() => {
+    if (isOpen && lastCompletedRef.current && listContainerRef.current) {
+      // Small delay to ensure modal is fully rendered
+      setTimeout(() => {
+        lastCompletedRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [isOpen]);
+
+  // Find the index of the last completed tutorial
+  const lastCompletedIndex = ALL_TUTORIAL_PHASES.reduce((lastIdx, phase, idx) => {
+    return stats.completedPhases.includes(phase) ? idx : lastIdx;
+  }, -1);
 
   return (
     <Modal
@@ -75,13 +96,15 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
         )}
 
         {/* Tutorial Steps List */}
-        <div className="space-y-3">
-          {ALL_TUTORIAL_PHASES.map((phase) => {
+        <div ref={listContainerRef} className="space-y-3">
+          {ALL_TUTORIAL_PHASES.map((phase, index) => {
             const isCompleted = stats.completedPhases.includes(phase);
+            const isLastCompleted = index === lastCompletedIndex;
 
             return (
               <div
                 key={phase}
+                ref={isLastCompleted ? lastCompletedRef : undefined}
                 className={`
                   flex items-start gap-3 p-3 rounded-lg border-2 transition-all
                   ${
