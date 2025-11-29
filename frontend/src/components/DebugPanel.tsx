@@ -566,8 +566,8 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                   {gameState.currentBets.map((bet) => {
                     const player = gameState.players.find(p => p.id === bet.playerId);
                     return (
-                      <div key={bet.playerId} className="flex items-center justify-between bg-white dark:bg-gray-800 rounded p-2 border border-gray-200">
-                        <span className="font-medium text-gray-700 dark:text-gray-300">{player?.name}</span>
+                      <div key={bet.playerId} className="flex items-center justify-between bg-parchment-50 dark:bg-gray-800 rounded p-2 border border-parchment-400 dark:border-gray-600">
+                        <span className="font-medium text-umber-800 dark:text-gray-300">{player?.name}</span>
                         <span className={`text-sm font-semibold ${bet.skipped ? 'text-gray-500' : 'text-purple-600'}`}>
                           {bet.skipped ? 'Skipped' : `${bet.amount}${bet.withoutTrump ? ' 🚫' : ''}`}
                         </span>

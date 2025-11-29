@@ -225,14 +225,14 @@ export function SettingsPanel({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-[9998] transition-opacity"
+        className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-[10000] transition-opacity"
         onClick={onClose}
         data-testid="settings-backdrop"
       />
 
       {/* Settings Panel - Increased width for tabs */}
       <div
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-parchment-100 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg shadow-2xl z-[9999] w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-parchment-100 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg shadow-2xl z-[10001] w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
         onClick={(e) => e.stopPropagation()}
         data-testid="settings-panel"
       >

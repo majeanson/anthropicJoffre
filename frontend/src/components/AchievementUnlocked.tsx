@@ -74,7 +74,7 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
   const name = achievement.name || achievement.achievement_name;
 
   return (
-    <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-500 ${
+    <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[10000] transition-all duration-500 ${
       isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
     }`}>
       <UICard

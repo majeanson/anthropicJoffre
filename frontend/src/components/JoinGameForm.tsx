@@ -344,8 +344,8 @@ export function JoinGameForm({
 
             {/* Info message for spectator mode */}
             {joinType === 'spectator' && (
-              <div className="bg-parchment-200 border-2 border-umber-400 rounded-lg p-3">
-                <p className="text-sm text-umber-800">
+              <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-400 dark:border-gray-600 rounded-lg p-3">
+                <p className="text-sm text-umber-900 dark:text-gray-300">
                   As a spectator, you can watch the game but cannot play cards. Player hands will be hidden.
                 </p>
               </div>

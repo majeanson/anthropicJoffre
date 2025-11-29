@@ -50,7 +50,7 @@ export function TimeoutBanner({
           <div className="h-12 w-2 bg-white/20 rounded-full overflow-hidden">
             <div
               className={`w-full transition-all duration-1000 ease-linear ${
-                isCritical ? 'bg-red-200' : isWarning ? 'bg-orange-200' : 'bg-blue-200'
+                isCritical ? 'bg-red-400' : isWarning ? 'bg-orange-400' : 'bg-blue-400'
               }`}
               style={{
                 height: `${(secondsRemaining / 60) * 100}%`,

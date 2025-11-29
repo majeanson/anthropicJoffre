@@ -583,7 +583,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-white dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-300 dark:border-gray-600 animate-pulse"
+                  className="bg-parchment-50 dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-400 dark:border-gray-600 animate-pulse"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 space-y-2">

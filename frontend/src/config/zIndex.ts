@@ -4,12 +4,18 @@
  * Centralized z-index values to prevent stacking context issues.
  * All components should use these constants instead of arbitrary values.
  *
+ * IMPORTANT: Game elements use values up to z-[9999] for effects like:
+ * - Card transitions and animations
+ * - Score floating animations
+ * - Queued card highlighting
+ *
+ * Modals and overlays MUST use values >= 10000 to appear above game content.
+ *
  * Usage:
  * ```tsx
  * import { zIndex } from '@/config/zIndex';
  *
  * <div style={{ zIndex: zIndex.modal }}>...</div>
- * <div className="z-[var(--z-modal)]">...</div>
  * ```
  */
 
@@ -17,35 +23,47 @@ export const zIndex = {
   /** Base layer - normal document flow */
   base: 0,
 
+  /** Game board elements - cards, players */
+  gameBoard: 10,
+
+  /** Player hand container */
+  playerHand: 45,
+
   /** Dropdown menus, select options */
-  dropdown: 10,
+  dropdown: 100,
 
   /** Sticky headers, fixed navigation */
-  sticky: 20,
+  sticky: 200,
 
   /** Floating action buttons, chat bubbles */
-  floating: 30,
+  floating: 300,
 
-  /** Tooltips, popovers */
-  tooltip: 40,
+  /** Tooltips, popovers (in-game) */
+  tooltip: 400,
 
-  /** Modals - main layer */
-  modal: 50,
+  /** Game effects - card animations, score floats */
+  gameEffects: 9999,
+
+  /** Modals - main layer (ABOVE all game content) */
+  modal: 10000,
 
   /** Nested modals (stack level 1) */
-  modalNested1: 60,
+  modalNested1: 10100,
 
   /** Nested modals (stack level 2) */
-  modalNested2: 70,
+  modalNested2: 10200,
 
   /** Toast notifications */
-  toast: 80,
+  toast: 10300,
 
   /** Loading overlays, blocking UI */
-  overlay: 90,
+  overlay: 10400,
+
+  /** Suggestion/thinking tooltips (appear over modals too) */
+  suggestionTooltip: 10500,
 
   /** Absolute maximum - emergency overrides only */
-  max: 100,
+  max: 10999,
 } as const;
 
 /**
@@ -53,25 +71,22 @@ export const zIndex = {
  * @param stackLevel - 0 for base modal, 1+ for nested modals
  */
 export function getModalZIndex(stackLevel: number = 0): number {
-  return zIndex.modal + (stackLevel * 10);
+  return zIndex.modal + (stackLevel * 100);
 }
 
 /**
- * CSS custom properties for Tailwind
- * Add these to your tailwind.config.js theme.extend:
+ * CSS custom properties reference for Tailwind classes:
  *
- * ```js
- * extend: {
- *   zIndex: {
- *     dropdown: '10',
- *     sticky: '20',
- *     floating: '30',
- *     tooltip: '40',
- *     modal: '50',
- *     toast: '80',
- *     overlay: '90',
- *     max: '100',
- *   }
- * }
- * ```
+ * Game elements:
+ * - z-[10]     - game board
+ * - z-[45]     - player hand
+ * - z-[9999]   - game effects (card animations, score floats)
+ *
+ * UI overlays (must be >= 10000):
+ * - z-[10000]  - modals (base)
+ * - z-[10100]  - nested modal 1
+ * - z-[10200]  - nested modal 2
+ * - z-[10300]  - toasts
+ * - z-[10400]  - loading overlays
+ * - z-[10500]  - suggestion tooltips
  */

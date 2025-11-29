@@ -236,7 +236,7 @@ export function BeginnerTutorial({
       variant="gradient"
       gradient="info"
       size="lg"
-      className="fixed top-20 right-4 md:right-6 z-[9999] w-[380px] max-w-[calc(100vw-2rem)] animate-slide-in border-4 border-blue-400 dark:border-blue-600"
+      className="fixed top-20 right-4 md:right-6 z-[10000] w-[380px] max-w-[calc(100vw-2rem)] animate-slide-in border-4 border-blue-400 dark:border-blue-600"
       data-testid="beginner-tutorial"
     >
       {/* Header */}

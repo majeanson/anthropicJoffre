@@ -83,12 +83,12 @@ function PlayingPhaseComponent({
   // Safety check: If player not found and not spectator, show error BEFORE calling any hooks
   if (!playerLookup && !isSpectator) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-green-900 to-blue-900">
-        <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl text-center">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900">
+        <div className="bg-parchment-50 dark:bg-gray-800 p-8 rounded-lg shadow-xl text-center border-2 border-parchment-400 dark:border-gray-600">
+          <h2 className="text-2xl font-bold mb-4 text-umber-900 dark:text-gray-100">
             Player Not Found
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <p className="text-umber-700 dark:text-gray-300 mb-6">
             Your player data could not be found in this game.
           </p>
           <button
@@ -96,7 +96,7 @@ function PlayingPhaseComponent({
               sessionStorage.removeItem('gameSession');
               window.location.reload();
             }}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg transition-colors border-2 border-blue-800"
           >
             Return to Lobby
           </button>
@@ -396,13 +396,13 @@ function PlayingPhaseComponent({
                 }...`}
           </p>
           <div className="mt-2 flex gap-1 justify-center" aria-hidden="true">
-            <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-400 dark:bg-gray-500 rounded-full animate-bounce"></div>
             <div
-              className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce"
+              className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-400 dark:bg-gray-500 rounded-full animate-bounce"
               style={{ animationDelay: '0.1s' }}
             ></div>
             <div
-              className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-300 rounded-full animate-bounce"
+              className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-400 dark:bg-gray-500 rounded-full animate-bounce"
               style={{ animationDelay: '0.2s' }}
             ></div>
           </div>

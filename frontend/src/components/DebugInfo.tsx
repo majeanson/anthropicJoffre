@@ -114,7 +114,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             <span className="text-2xl flex-shrink-0" aria-hidden="true">🏷️</span>
             <div className="flex-1">
               <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Version</h3>
-              <p className="text-gray-700 dark:text-gray-300 font-mono text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
+              <p className="text-umber-800 dark:text-gray-300 font-mono text-sm bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700">
                 v{buildInfo.version}
               </p>
             </div>
@@ -125,7 +125,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             <span className="text-2xl flex-shrink-0" aria-hidden="true">📅</span>
             <div className="flex-1">
               <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Build Date</h3>
-              <p className="text-gray-700 dark:text-gray-300 text-sm bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
+              <p className="text-umber-800 dark:text-gray-300 text-sm bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700">
                 {formatDate(buildInfo.buildDate || buildInfo.releaseDate || new Date().toISOString())}
               </p>
             </div>
@@ -137,16 +137,16 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
               <span className="text-2xl flex-shrink-0" aria-hidden="true">💾</span>
               <div className="flex-1">
                 <h3 className="font-bold text-indigo-900 dark:text-indigo-200 mb-1">Latest Commit</h3>
-                <div className="bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700">
+                <div className="bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-mono text-xs text-indigo-600 dark:text-indigo-400 font-bold">
                       {buildInfo.git.commitHash}
                     </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                    <span className="text-xs text-umber-600 dark:text-gray-400">
                       on {buildInfo.git.branch}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
+                  <p className="text-sm text-umber-800 dark:text-gray-300 break-words">
                     {getCommitTitle(buildInfo.git.commitMessage)}
                   </p>
                 </div>
@@ -175,13 +175,13 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                     {buildInfo.latestDoneFeatures.map((featureGroup, index) => (
                       <div
                         key={index}
-                        className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700"
+                        className="bg-parchment-100 dark:bg-gray-900 px-4 py-3 rounded border border-parchment-400 dark:border-gray-700"
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <span className="font-semibold text-indigo-900 dark:text-indigo-200">
                             {featureGroup.title}
                           </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-umber-600 dark:text-gray-400">
                             {featureGroup.date}
                           </span>
                         </div>
@@ -189,7 +189,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                           {featureGroup.features.map((feature, fIndex) => (
                             <li
                               key={fIndex}
-                              className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300"
+                              className="flex items-start gap-2 text-sm text-umber-800 dark:text-gray-300"
                             >
                               <span className="text-green-500 dark:text-green-400 flex-shrink-0">✓</span>
                               <span>{feature}</span>
@@ -225,7 +225,7 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                     {buildInfo.futureTodos.map((todo, index) => (
                     <li
                       key={index}
-                      className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-900 px-3 py-2 rounded border border-gray-300 dark:border-gray-700"
+                      className="flex items-start gap-2 text-sm text-umber-800 dark:text-gray-300 bg-parchment-100 dark:bg-gray-900 px-3 py-2 rounded border border-parchment-400 dark:border-gray-700"
                     >
                       <span className="text-indigo-500 dark:text-indigo-400 flex-shrink-0">▸</span>
                       <span>{todo}</span>
@@ -255,9 +255,9 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
               {showHealth && (
                 <div className="space-y-2">
                   {healthLoading && (
-                    <div className="bg-white dark:bg-gray-900 px-3 py-4 rounded border border-gray-300 dark:border-gray-700 text-center">
+                    <div className="bg-parchment-100 dark:bg-gray-900 px-3 py-4 rounded border border-parchment-400 dark:border-gray-700 text-center">
                       <Spinner size="sm" color="primary" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading health data...</p>
+                      <p className="text-sm text-umber-700 dark:text-gray-400 mt-2">Loading health data...</p>
                     </div>
                   )}
 
@@ -276,14 +276,14 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                   )}
 
                   {healthData && !healthLoading && (
-                    <div className="bg-white dark:bg-gray-900 px-4 py-3 rounded border border-gray-300 dark:border-gray-700 space-y-3">
+                    <div className="bg-parchment-100 dark:bg-gray-900 px-4 py-3 rounded border border-parchment-400 dark:border-gray-700 space-y-3">
                       {/* Status & Uptime */}
-                      <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center justify-between pb-2 border-b border-parchment-300 dark:border-gray-700">
                         <div>
                           <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-semibold rounded">
                             {healthData.status.toUpperCase()}
                           </span>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          <p className="text-xs text-umber-600 dark:text-gray-400 mt-1">
                             Uptime: {healthData.uptime.formatted}
                           </p>
                         </div>

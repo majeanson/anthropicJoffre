@@ -207,29 +207,29 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
 
                   {/* Game Stats Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
+                    <UICard variant="bordered" size="md" className="text-center">
                       <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
                         {matchData.team1_score} - {matchData.team2_score}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Final Score</div>
+                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Final Score</div>
                     </UICard>
-                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
+                    <UICard variant="bordered" size="md" className="text-center">
                       <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                         {matchData.rounds}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Rounds Played</div>
+                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Rounds Played</div>
                     </UICard>
-                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
+                    <UICard variant="bordered" size="md" className="text-center">
                       <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                         {formatDuration(matchData.game_duration_seconds)}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Duration</div>
+                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Duration</div>
                     </UICard>
-                    <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-700 text-center">
+                    <UICard variant="bordered" size="md" className="text-center">
                       <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
                         {matchData.trump_suit || 'N/A'}
                       </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">Trump Suit</div>
+                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Trump Suit</div>
                     </UICard>
                   </div>
 
@@ -259,9 +259,8 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                               key={player}
                               variant="default"
                               size="sm"
-                              className="bg-white dark:bg-gray-700"
                             >
-                              <div className="font-semibold text-gray-900 dark:text-gray-100">
+                              <div className="font-semibold text-umber-900 dark:text-gray-100">
                                 {player}
                               </div>
                             </UICard>
@@ -281,23 +280,22 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                       key={idx}
                       variant="bordered"
                       size="lg"
-                      className="bg-white dark:bg-gray-700"
                     >
-                      <h4 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                      <h4 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4">
                         Round {round.roundNumber}
                       </h4>
 
                       {/* Bets */}
                       <div className="mb-4">
-                        <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Bets:</h5>
+                        <h5 className="font-semibold text-umber-800 dark:text-gray-300 mb-2">Bets:</h5>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {Object.entries(round.bets).map(([player, bet]) => (
                             <div
                               key={player}
-                              className="bg-gray-100 dark:bg-gray-600 rounded p-2 text-sm"
+                              className="bg-parchment-100 dark:bg-gray-600 rounded p-2 text-sm"
                             >
-                              <div className="font-semibold">{player}</div>
-                              <div className="text-gray-600 dark:text-gray-400">
+                              <div className="font-semibold text-umber-900 dark:text-gray-100">{player}</div>
+                              <div className="text-umber-700 dark:text-gray-400">
                                 {bet.amount} pts {bet.withoutTrump && <span aria-hidden="true">🚫♠️</span>}
                               </div>
                             </div>
@@ -307,7 +305,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
 
                       {/* Results */}
                       <div>
-                        <h5 className="font-semibold text-gray-700 dark:text-gray-300 mb-2">Results:</h5>
+                        <h5 className="font-semibold text-umber-800 dark:text-gray-300 mb-2">Results:</h5>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                           {round.pointsWon ? Object.entries(round.pointsWon).map(([player, points]) => {
                             const bet = round.bets?.[player];
@@ -362,29 +360,29 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                           {player} (Team {teamId})
                         </h4>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div className="bg-white dark:bg-gray-700 rounded-lg p-3 text-center">
+                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
                             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                               {stats.totalPoints}
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Total Points</div>
+                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Total Points</div>
                           </div>
-                          <div className="bg-white dark:bg-gray-700 rounded-lg p-3 text-center">
+                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
                             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                               {stats.roundsWon}
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Rounds Won</div>
+                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Rounds Won</div>
                           </div>
-                          <div className="bg-white dark:bg-gray-700 rounded-lg p-3 text-center">
+                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
                             <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                               {stats.betsWon}
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Bets Won</div>
+                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Bets Won</div>
                           </div>
-                          <div className="bg-white dark:bg-gray-700 rounded-lg p-3 text-center">
+                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
                             <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
                               {stats.tricksWon}
                             </div>
-                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">Tricks Won</div>
+                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Tricks Won</div>
                           </div>
                         </div>
                       </div>

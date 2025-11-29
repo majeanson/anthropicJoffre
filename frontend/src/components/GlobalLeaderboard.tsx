@@ -127,21 +127,21 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
                   className={`grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 p-4 rounded-lg transition-all duration-200 ${
                     index < 3
                       ? 'bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40 border-2 border-yellow-400 dark:border-yellow-600'
-                      : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750 border border-gray-300 dark:border-gray-600'
+                      : 'bg-parchment-50 dark:bg-gray-800 hover:bg-parchment-100 dark:hover:bg-gray-750 border border-parchment-400 dark:border-gray-600'
                   } ${onViewPlayerStats ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
                   onClick={() => onViewPlayerStats?.(player.player_name)}
                 >
                   {/* Rank */}
                   <div className="col-span-1 flex items-center">
-                    <span className="text-2xl md:text-3xl font-bold text-gray-700 dark:text-gray-300">
+                    <span className="text-2xl md:text-3xl font-bold text-umber-800 dark:text-gray-300">
                       {getRankMedal(index + 1)}
                     </span>
                   </div>
 
                   {/* Player Name */}
                   <div className="col-span-1 md:col-span-2 flex flex-col justify-center">
-                    <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{player.player_name}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                    <p className="font-bold text-lg text-umber-900 dark:text-gray-100">{player.player_name}</p>
+                    <p className="text-xs text-umber-600 dark:text-gray-400">
                       {showRoundStats
                         ? `${player.rounds_won || 0}W - ${(player.total_rounds_played || 0) - (player.rounds_won || 0)}L`
                         : `${player.games_won}W - ${player.games_lost}L`

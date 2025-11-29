@@ -94,18 +94,18 @@ export const UICard: React.FC<UICardProps> = ({
       }[padding]
     : '';
 
-  // Variant-specific styles
+  // Variant-specific styles - use parchment theme for light mode consistency
   const variantStyles = {
-    default: 'bg-white dark:bg-gray-800 shadow-md',
-    elevated: 'bg-white dark:bg-gray-800 shadow-lg',
-    bordered: 'bg-white dark:bg-gray-800 border-2 shadow-sm',
+    default: 'bg-parchment-50 dark:bg-gray-800 shadow-md',
+    elevated: 'bg-parchment-50 dark:bg-gray-800 shadow-lg',
+    bordered: 'bg-parchment-50 dark:bg-gray-800 border-2 shadow-sm',
     gradient: '',
   }[variant];
 
   // Border color for bordered variant
   const borderColor =
     variant === 'bordered'
-      ? 'border-gray-200 dark:border-gray-600'
+      ? 'border-parchment-400 dark:border-gray-600'
       : '';
 
   // Gradient styles (only for gradient variant)

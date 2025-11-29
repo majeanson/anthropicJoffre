@@ -395,7 +395,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         </div>
 
         {/* Game Info Bar */}
-        <div className="bg-white dark:bg-gray-800 px-4 md:px-8 py-3 md:py-4 border-b-2 border-emerald-200 dark:border-gray-700">
+        <div className="bg-parchment-50 dark:bg-gray-800 px-4 md:px-8 py-3 md:py-4 border-b-2 border-parchment-400 dark:border-gray-700">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="grid grid-cols-2 md:flex gap-3 md:gap-6">
               {/* Final Score */}
@@ -509,8 +509,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             <div className="lg:col-span-2">
               {/* Current Trick */}
               {currentTrick && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg mb-4 md:mb-6">
-                  <h3 className="text-lg md:text-xl font-black text-gray-700 dark:text-gray-200 mb-3 md:mb-4 flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
+                <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg mb-4 md:mb-6 border border-parchment-400 dark:border-gray-600">
+                  <h3 className="text-lg md:text-xl font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4 flex flex-col md:flex-row md:items-center gap-1 md:gap-2">
                     <div className="flex items-center gap-2">
                       <span className="text-xl md:text-2xl">🎴</span>
                       <span>Current Trick</span>
@@ -560,8 +560,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
               {/* Player Hands */}
               {Object.keys(startingHands).length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg">
-                  <h3 className="text-lg md:text-xl font-black text-gray-700 dark:text-gray-200 mb-4 flex items-center gap-2">
+                <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-parchment-400 dark:border-gray-600">
+                  <h3 className="text-lg md:text-xl font-black text-umber-800 dark:text-gray-200 mb-4 flex items-center gap-2">
                     <span className="text-xl md:text-2xl">🃏</span>
                     Player Hands (Round Start)
                   </h3>
@@ -601,12 +601,12 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             {/* Right: Controls & History */}
             <div className="space-y-4 md:space-y-6">
               {/* Playback Controls */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg">
-                <h3 className="text-base md:text-lg font-black text-gray-700 dark:text-gray-200 mb-3 md:mb-4">Playback Controls</h3>
+              <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-parchment-400 dark:border-gray-600">
+                <h3 className="text-base md:text-lg font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4">Playback Controls</h3>
 
                 {/* Speed Control */}
                 <div className="mb-3 md:mb-4">
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">Speed:</p>
+                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">Speed:</p>
                   <div className="flex gap-2">
                     {[0.5, 1, 2].map(speed => (
                       <Button
@@ -657,7 +657,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
                 {/* Round Jump Buttons */}
                 <div className="border-t pt-3 md:pt-4 dark:border-gray-700">
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">Jump to Round:</p>
+                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">Jump to Round:</p>
                   <div className="grid grid-cols-5 md:grid-cols-3 gap-1">
                     {replayData.round_history.map((_, idx) => (
                       <Button
@@ -676,8 +676,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
               {/* Trick History */}
               {currentRound && (
-                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg">
-                  <h3 className="text-base md:text-lg font-black text-gray-700 dark:text-gray-200 mb-3 md:mb-4">
+                <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-parchment-400 dark:border-gray-600">
+                  <h3 className="text-base md:text-lg font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4">
                     Round {currentRoundIndex + 1} Tricks
                   </h3>
                   <TrickHistory

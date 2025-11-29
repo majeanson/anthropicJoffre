@@ -136,16 +136,16 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           <div>
             <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-1">Card Navigation:</p>
             <ul className="space-y-1 ml-4">
-              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">←</kbd> <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">→</kbd> Navigate between cards</li>
-              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Tab</kbd> / <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Shift+Tab</kbd> Cycle through cards</li>
-              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">1</kbd>-<kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">9</kbd> Quick select by position</li>
+              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">←</kbd> <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">→</kbd> Navigate between cards</li>
+              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Tab</kbd> / <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Shift+Tab</kbd> Cycle through cards</li>
+              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">1</kbd>-<kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">9</kbd> Quick select by position</li>
             </ul>
           </div>
           <div>
             <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-1">Card Actions:</p>
             <ul className="space-y-1 ml-4">
-              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Enter</kbd> / <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Space</kbd> Play selected card (or queue if not your turn)</li>
-              <li>• <kbd className="px-2 py-1 bg-white dark:bg-gray-700 rounded border border-gray-300 dark:border-gray-600 font-mono text-sm">Esc</kbd> Clear selection</li>
+              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Enter</kbd> / <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Space</kbd> Play selected card (or queue if not your turn)</li>
+              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Esc</kbd> Clear selection</li>
             </ul>
           </div>
           <p className="text-sm text-indigo-700 dark:text-indigo-300 italic mt-2">
