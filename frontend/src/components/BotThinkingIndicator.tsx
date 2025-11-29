@@ -143,7 +143,7 @@ export function BotThinkingIndicator({
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-xs font-semibold opacity-90 truncate">{botName}</div>
+                <div className="text-xs font-semibold truncate">{botName}</div>
                 <div className="text-xs md:text-sm font-bold mt-0.5">{action}</div>
               </div>
             </div>

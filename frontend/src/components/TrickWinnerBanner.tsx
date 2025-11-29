@@ -28,7 +28,7 @@ export function TrickWinnerBanner({ playerName, points, teamColor }: TrickWinner
 
   return (
     <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none motion-safe:animate-fadeIn motion-reduce:opacity-90 max-w-[90vw] px-2">
-      <UICard variant="bordered" size="sm" gradient={gradientType} className="border-2 border-yellow-400 opacity-90 text-white">
+      <UICard variant="bordered" size="sm" gradient={gradientType} className="border-2 border-yellow-400 text-white">
         <div className="flex items-center gap-2">
           <span className="text-xl md:text-2xl" aria-hidden="true">👑</span>
           <div className="text-sm md:text-base">

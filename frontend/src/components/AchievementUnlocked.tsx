@@ -102,13 +102,13 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
           {/* Content */}
           <div className="text-white">
-            <div className="text-xs uppercase tracking-wider mb-1 opacity-90">
+            <div className="text-xs uppercase tracking-wider mb-1">
               {achievement.is_secret ? '🔓 Secret Achievement Unlocked!' : 'Achievement Unlocked!'}
             </div>
             <div className="font-bold text-xl mb-1">
               {name}
             </div>
-            <div className="text-sm opacity-90">
+            <div className="text-sm">
               {achievement.description}
             </div>
           </div>

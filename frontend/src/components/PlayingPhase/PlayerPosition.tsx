@@ -86,13 +86,15 @@ export const PlayerPosition = memo(function PlayerPosition({
     const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 250;
     const padding = 16;
 
-    // On mobile, always position at bottom center of screen for visibility
+    // On mobile, position in center of screen above the player hand
     if (isMobile) {
       return {
-        bottom: padding,
+        top: '50%',
         left: padding,
         right: padding,
+        transform: 'translateY(-50%)',
         width: 'auto',
+        maxWidth: `calc(100vw - ${padding * 2}px)`,
       };
     }
 
