@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { useSettings } from '../contexts/SettingsContext';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
+import { Button, UIToggle, UIDivider, Tabs, Tab } from './ui';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -60,26 +61,10 @@ export function SettingsPanel({
     onOpenRules?.();
   };
 
-  const tabs: { key: SettingsTab; label: string; icon: string }[] = [
-    { key: 'settings', label: 'Settings', icon: '⚙️' },
-    { key: 'advanced', label: 'Advanced', icon: '🔧' },
+  const settingsTabs: Tab[] = [
+    { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'advanced', label: 'Advanced', icon: '🔧' },
   ];
-
-  const ToggleSwitch = ({ enabled, onChange, label }: { enabled: boolean; onChange: () => void; label: string }) => (
-    <button
-      onClick={onChange}
-      className={`relative w-12 h-6 rounded-full transition-colors ${
-        enabled ? 'bg-green-500' : 'bg-gray-300'
-      }`}
-      title={`${enabled ? 'Disable' : 'Enable'} ${label}`}
-    >
-      <div
-        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-          enabled ? 'translate-x-6' : 'translate-x-0'
-        }`}
-      />
-    </button>
-  );
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -93,7 +78,7 @@ export function SettingsPanel({
                   <span className="text-2xl">{soundEnabled ? '🔊' : '🔇'}</span>
                   <span className="text-umber-900 dark:text-gray-100 font-semibold">Sound</span>
                 </div>
-                <ToggleSwitch enabled={soundEnabled} onChange={onSoundToggle} label="Sound" />
+                <UIToggle enabled={soundEnabled} onChange={() => onSoundToggle()} label="Sound" />
               </div>
             )}
 
@@ -108,7 +93,7 @@ export function SettingsPanel({
                   Tutorial tips + 2x timeout (120s)
                 </span>
               </div>
-              <ToggleSwitch enabled={beginnerMode} onChange={() => setBeginnerMode(!beginnerMode)} label="Beginner Mode" />
+              <UIToggle enabled={beginnerMode} onChange={(v) => setBeginnerMode(v)} label="Beginner Mode" />
             </div>
 
             {/* Autoplay Toggle */}
@@ -118,37 +103,41 @@ export function SettingsPanel({
                   <span className="text-2xl">{autoplayEnabled ? '⚡' : '🎮'}</span>
                   <span className="text-umber-900 dark:text-gray-100 font-semibold">Autoplay</span>
                 </div>
-                <ToggleSwitch enabled={autoplayEnabled} onChange={onAutoplayToggle} label="Autoplay" />
+                <UIToggle enabled={autoplayEnabled} onChange={() => onAutoplayToggle()} label="Autoplay" />
               </div>
             )}
 
             {/* Divider */}
-            <div className="border-t border-amber-700/30 dark:border-gray-600"></div>
+            <UIDivider color="amber" spacing="none" />
 
             {/* Rules Button */}
             {onOpenRules && (
-              <button
+              <Button
                 onClick={handleRules}
-                className="w-full bg-parchment-200 dark:bg-gray-700 hover:bg-parchment-300 dark:hover:bg-gray-600 border border-amber-700 dark:border-gray-600 rounded px-3 py-2 transition-colors flex items-center gap-2"
+                variant="ghost"
+                size="md"
+                fullWidth
+                className="justify-start"
                 data-testid="settings-rules"
               >
                 <span className="text-2xl">📖</span>
-                <span className="text-umber-900 dark:text-gray-100 font-semibold">How to Play</span>
-              </button>
+                <span>How to Play</span>
+              </Button>
             )}
 
             {/* Leave Game Button */}
             {onLeaveGame && (
               <>
-                <div className="border-t border-amber-700/30 dark:border-gray-600"></div>
-                <button
+                <UIDivider color="amber" spacing="none" />
+                <Button
                   onClick={handleLeaveGame}
-                  className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-bold py-2 px-3 rounded transition-all shadow-md flex items-center justify-center gap-2"
+                  variant="danger"
+                  fullWidth
                   data-testid="settings-leave-game"
                 >
                   <span className="text-2xl">🚪</span>
                   <span>Leave Game</span>
-                </button>
+                </Button>
               </>
             )}
           </div>
@@ -167,7 +156,7 @@ export function SettingsPanel({
                 <span className="text-2xl">{darkMode ? '🌙' : '☀️'}</span>
                 <span className="text-umber-900 dark:text-gray-100 font-semibold">Dark Mode</span>
               </div>
-              <ToggleSwitch enabled={darkMode} onChange={() => setDarkMode(!darkMode)} label="Dark Mode" />
+              <UIToggle enabled={darkMode} onChange={(v) => setDarkMode(v)} label="Dark Mode" />
             </div>
 
             {/* Animations Toggle */}
@@ -176,7 +165,7 @@ export function SettingsPanel({
                 <span className="text-2xl">✨</span>
                 <span className="text-umber-900 dark:text-gray-100 font-semibold">Animations</span>
               </div>
-              <ToggleSwitch enabled={animationsEnabled} onChange={() => setAnimationsEnabled(!animationsEnabled)} label="Animations" />
+              <UIToggle enabled={animationsEnabled} onChange={(v) => setAnimationsEnabled(v)} label="Animations" />
             </div>
 
             {/* Connection Quality */}
@@ -192,34 +181,38 @@ export function SettingsPanel({
 
             {/* Bot Management Button */}
             {!isSpectator && onOpenBotManagement && (
-              <button
+              <Button
                 onClick={handleBotManagement}
-                className="w-full bg-parchment-200 dark:bg-gray-700 hover:bg-parchment-300 dark:hover:bg-gray-600 border border-amber-700 dark:border-gray-600 rounded px-3 py-2 transition-colors flex items-center justify-between"
+                variant="ghost"
+                size="md"
+                fullWidth
+                className="justify-between"
                 data-testid="settings-bot-management"
               >
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🤖</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Bot Management</span>
+                  <span>Bot Management</span>
                 </div>
                 <span className="text-umber-700 dark:text-gray-300 text-sm">({botCount}/3)</span>
-              </button>
+              </Button>
             )}
 
             {/* Divider */}
-            <div className="border-t border-amber-700/30 dark:border-gray-600"></div>
+            <UIDivider color="amber" spacing="none" />
 
             {/* Clear Cache Button */}
-            <button
+            <Button
               onClick={() => {
                 localStorage.clear();
                 alert('Cache cleared! The page will reload.');
                 window.location.reload();
               }}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 rounded transition-all shadow-md flex items-center justify-center gap-2"
+              variant="warning"
+              fullWidth
             >
               <span className="text-xl">🗑️</span>
               <span>Clear Cache</span>
-            </button>
+            </Button>
           </div>
         );
 
@@ -249,39 +242,28 @@ export function SettingsPanel({
             <span>⚙️</span>
             <span>Settings</span>
           </h2>
-          <button
+          <Button
             onClick={onClose}
-            className="text-white hover:text-red-300 transition-colors text-xl font-bold"
+            variant="ghost"
+            size="sm"
+            className="!text-white hover:!text-red-300"
             title="Close Settings"
             data-testid="settings-close-button"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-amber-700/30 dark:border-gray-600">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex-1 px-3 py-2 flex items-center justify-center gap-1 transition-colors ${
-                activeTab === tab.key
-                  ? 'bg-parchment-200 dark:bg-gray-700 border-b-2 border-amber-700 dark:border-blue-500'
-                  : 'hover:bg-parchment-200/50 dark:hover:bg-gray-700/50'
-              }`}
-            >
-              <span className="text-lg">{tab.icon}</span>
-              <span className={`text-sm font-medium ${
-                activeTab === tab.key
-                  ? 'text-umber-900 dark:text-gray-100'
-                  : 'text-umber-700 dark:text-gray-400'
-              }`}>
-                {tab.label}
-              </span>
-            </button>
-          ))}
-        </div>
+        <Tabs
+          tabs={settingsTabs}
+          activeTab={activeTab}
+          onChange={(id) => setActiveTab(id as SettingsTab)}
+          variant="underline"
+          size="sm"
+          fullWidth
+          className="border-b border-amber-700/30 dark:border-gray-600"
+        />
 
         {/* Tab Content */}
         <div className="p-4 max-h-[400px] overflow-y-auto">

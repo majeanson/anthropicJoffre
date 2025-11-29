@@ -85,6 +85,12 @@ export const LongMessage: Story = {
 };
 
 export const ConversationListExample: Story = {
+  args: {
+    username: 'JohnDoe',
+    lastMessage: 'Hey! Want to play?',
+    timestamp: new Date().toISOString(),
+    onClick: () => console.log('Clicked'),
+  },
   render: () => (
     <div className="max-w-md bg-gray-900 rounded-lg overflow-hidden">
       <div className="p-4 border-b border-gray-700">

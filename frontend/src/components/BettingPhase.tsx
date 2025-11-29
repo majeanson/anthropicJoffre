@@ -14,7 +14,8 @@ import { useChatNotifications } from '../hooks/useChatNotifications';
 import { MoveSuggestionPanel } from './MoveSuggestionPanel';
 import { useSettings } from '../contexts/SettingsContext';
 import { BettingHistory } from './BettingHistory';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { Button } from './ui/Button';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -267,7 +268,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
       />
 
       <div className="flex-1 flex items-center justify-center p-4">
-        <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-6 shadow-lg max-w-2xl w-full border-2 border-parchment-400 dark:border-gray-600">
+        <UICard variant="bordered" size="lg" className="bg-parchment-50 dark:bg-gray-800 max-w-2xl w-full border-2 border-parchment-400 dark:border-gray-600">
           <h2 className="text-2xl font-bold text-umber-900 dark:text-gray-100 font-serif mb-4">Betting Phase</h2>
 
       {/* Current Turn Indicator with Timeout */}
@@ -279,8 +280,8 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
           )}
           <div className={`relative px-3 md:px-4 py-2 md:py-3 rounded-xl text-sm md:text-base font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap transition-all bg-gradient-to-r ${
             players[currentPlayerIndex]?.teamId === 1
-              ? colors.gradients.team1
-              : colors.gradients.team2
+              ? 'from-orange-400 to-amber-500'
+              : 'from-purple-400 to-indigo-500'
           } text-white ${isMyTurn ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse' : ''}`}>
             {isMyTurn && (
               <span className="motion-safe:animate-arrow-bounce motion-reduce:inline">👇</span>
@@ -357,20 +358,22 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                     {[7, 8, 9, 10, 11, 12].map((amount) => {
                       const isValid = isBetAmountValid(amount);
                       return (
-                        <button
+                        <Button
                           key={amount}
                           onClick={() => setSelectedAmount(amount)}
                           disabled={!isValid}
-                          className={`py-3 px-4 rounded-lg font-semibold transition-all text-base border-2 ${
+                          variant={selectedAmount === amount ? 'primary' : 'ghost'}
+                          size="md"
+                          className={`py-3 px-4 ${
                             !isValid
-                              ? 'bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-600 cursor-not-allowed opacity-50 border-gray-400'
+                              ? 'opacity-50'
                               : selectedAmount === amount
-                                ? 'bg-umber-600 text-parchment-50 ring-2 ring-umber-400 border-umber-700'
-                                : 'bg-parchment-100 dark:bg-gray-700 text-umber-800 dark:text-gray-200 hover:bg-parchment-200 dark:bg-gray-600 border-parchment-400 dark:border-gray-600'
+                                ? 'ring-2 ring-umber-400'
+                                : ''
                           }`}
                         >
                           {amount}
-                        </button>
+                        </Button>
                       );
                     })}
                   </div>
@@ -418,27 +421,25 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
                   </label>
                   <div className="flex gap-3">
                     {canSkip() && (
-                      <button
+                      <Button
                         data-testid="skip-bet-button"
                         onClick={handleSkip}
-                        className={`flex-1 py-4 px-6 rounded-xl font-black text-base bg-gradient-to-r ${colors.gradients.secondary} hover:${colors.gradients.secondaryHover} text-white transition-all duration-300 border-2 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 ${
-                          navLevel === 2 && actionIndex === 0 ? 'ring-4 ring-orange-500 border-orange-500' : 'border-gray-700'
+                        variant="secondary"
+                        className={`flex-1 py-4 ${
+                          navLevel === 2 && actionIndex === 0 ? 'ring-4 ring-orange-500' : ''
                         }`}
                       >
                         SKIP
-                      </button>
+                      </Button>
                     )}
-                    <button
+                    <Button
                       onClick={handlePlaceBet}
                       disabled={!isCurrentBetValid()}
-                      className={`flex-1 py-4 px-6 rounded-xl font-black text-base transition-all duration-300 border-2 shadow-lg transform focus:outline-none focus:ring-2 ${
-                        isCurrentBetValid()
-                          ? `bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white hover:scale-105 focus:ring-green-400`
-                          : `bg-gradient-to-r ${colors.gradients.secondary} text-gray-600 cursor-not-allowed border-gray-400 opacity-60`
-                      } ${navLevel === 2 && (actionIndex === 1 || !canSkip()) ? 'ring-4 ring-orange-500 border-orange-500' : 'border-green-800'}`}
+                      variant={isCurrentBetValid() ? 'success' : 'secondary'}
+                      className={`flex-1 py-4 ${navLevel === 2 && (actionIndex === 1 || !canSkip()) ? 'ring-4 ring-orange-500' : ''}`}
                     >
                       Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -478,7 +479,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
           Waiting for other players to bet...
         </div>
       )}
-        </div>
+        </UICard>
       </div>
 
       <Leaderboard

@@ -10,9 +10,7 @@ import { UserProfile } from '../types/auth'; // Sprint 3 Phase 3.2
 import { MatchCard } from './MatchCard'; // Sprint 3 Phase 3.3
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
-import { Modal } from './ui/Modal';
-import { Button } from './ui/Button';
-import { colors } from '../design-system';
+import { Modal, Button, Spinner, Tabs } from './ui';
 
 // Lazy load heavy modal
 const MatchStatsModal = lazy(() => import('./MatchStatsModal').then(m => ({ default: m.MatchStatsModal })));
@@ -355,50 +353,19 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
               </div>
 
               {/* Tab Navigation */}
-              <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
-                <button
-                  onClick={() => setActiveTab('round')}
-                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                    activeTab === 'round'
-                      ? `bg-gradient-to-r ${colors.gradients.primary} text-white rounded-t-lg`
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <span aria-hidden="true">📊</span> Round Stats
-                </button>
-                <button
-                  onClick={() => setActiveTab('game')}
-                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-400 ${
-                    activeTab === 'game'
-                      ? `bg-gradient-to-r ${colors.gradients.secondary} text-white rounded-t-lg`
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <span aria-hidden="true">🏆</span> Game Stats
-                </button>
-                <button
-                  onClick={() => setActiveTab('history')}
-                  className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400 ${
-                    activeTab === 'history'
-                      ? `bg-gradient-to-r ${colors.gradients.success} text-white rounded-t-lg`
-                      : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  <span aria-hidden="true">📜</span> Game History
-                </button>
-                {isOwnProfile && (
-                  <button
-                    onClick={() => setActiveTab('profile')}
-                    className={`flex-1 py-3 px-4 font-bold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-400 ${
-                      activeTab === 'profile'
-                        ? `bg-gradient-to-r ${colors.gradients.warning} text-white rounded-t-lg`
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    <span aria-hidden="true">👤</span> Profile
-                  </button>
-                )}
-              </div>
+              <Tabs
+                tabs={[
+                  { id: 'round', label: '📊 Round Stats' },
+                  { id: 'game', label: '🏆 Game Stats' },
+                  { id: 'history', label: '📜 Game History' },
+                  ...(isOwnProfile ? [{ id: 'profile', label: '👤 Profile' }] : []),
+                ]}
+                activeTab={activeTab}
+                onChange={(id) => setActiveTab(id as typeof activeTab)}
+                variant="pills"
+                size="md"
+                fullWidth
+              />
 
               {/* Round Stats Tab */}
               {activeTab === 'round' && (
@@ -601,109 +568,80 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
               {activeTab === 'history' && (
                 <div className="space-y-4 animate-fadeIn">
                   {/* Sub-tabs for Finished/Unfinished */}
-                  <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
-                    <button
-                      onClick={() => setHistoryTab('finished')}
-                      className={`px-4 py-2 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 ${
-                        historyTab === 'finished'
-                          ? 'border-b-4 border-green-600 text-green-700 dark:text-green-400 -mb-0.5'
-                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-                      }`}
-                    >
-                      <span aria-hidden="true">✓</span> Finished Games
-                    </button>
-                    <button
-                      onClick={() => setHistoryTab('unfinished')}
-                      className={`px-4 py-2 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-orange-400 ${
-                        historyTab === 'unfinished'
-                          ? 'border-b-4 border-orange-600 text-orange-700 dark:text-orange-400 -mb-0.5'
-                          : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
-                      }`}
-                    >
-                      <span aria-hidden="true">⏸</span> Unfinished Games
-                    </button>
-                  </div>
+                  <Tabs
+                    tabs={[
+                      { id: 'finished', label: '✓ Finished Games' },
+                      { id: 'unfinished', label: '⏸ Unfinished Games' },
+                    ]}
+                    activeTab={historyTab}
+                    onChange={(id) => setHistoryTab(id as typeof historyTab)}
+                    variant="underline"
+                    size="sm"
+                  />
 
                   {/* Result Filter - Only show for finished games */}
                   {historyTab === 'finished' && (
                     <div className="flex gap-2 items-center flex-wrap">
                       <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Filter:</span>
-                      <button
+                      <Button
                         onClick={() => setResultFilter('all')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all ${
-                          resultFilter === 'all'
-                            ? 'bg-gray-700 text-white dark:bg-gray-300 dark:text-gray-900'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        }`}
+                        variant={resultFilter === 'all' ? 'secondary' : 'ghost'}
+                        size="sm"
                       >
                         All Games
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setResultFilter('won')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 ${
-                          resultFilter === 'won'
-                            ? 'bg-green-600 text-white dark:bg-green-500'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-green-100 dark:hover:bg-green-900'
-                        }`}
+                        variant={resultFilter === 'won' ? 'success' : 'ghost'}
+                        size="sm"
                       >
-                        <span aria-hidden="true">🏆</span> Wins
-                      </button>
-                      <button
+                        🏆 Wins
+                      </Button>
+                      <Button
                         onClick={() => setResultFilter('lost')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-red-400 ${
-                          resultFilter === 'lost'
-                            ? 'bg-red-600 text-white dark:bg-red-500'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-red-100 dark:hover:bg-red-900'
-                        }`}
+                        variant={resultFilter === 'lost' ? 'danger' : 'ghost'}
+                        size="sm"
                       >
-                        <span aria-hidden="true">❌</span> Losses
-                      </button>
+                        ❌ Losses
+                      </Button>
 
                       <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-4">Sort by:</span>
-                      <button
+                      <Button
                         onClick={() => setSortBy('date')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                          sortBy === 'date'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
-                        }`}
+                        variant={sortBy === 'date' ? 'primary' : 'ghost'}
+                        size="sm"
                       >
-                        <span aria-hidden="true">📅</span> Date
-                      </button>
-                      <button
+                        📅 Date
+                      </Button>
+                      <Button
                         onClick={() => setSortBy('score')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                          sortBy === 'score'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
-                        }`}
+                        variant={sortBy === 'score' ? 'primary' : 'ghost'}
+                        size="sm"
                       >
-                        <span aria-hidden="true">⚡</span> Score
-                      </button>
-                      <button
+                        ⚡ Score
+                      </Button>
+                      <Button
                         onClick={() => setSortBy('rounds')}
-                        className={`px-3 py-1 rounded-lg text-sm font-bold transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 ${
-                          sortBy === 'rounds'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-blue-900'
-                        }`}
+                        variant={sortBy === 'rounds' ? 'primary' : 'ghost'}
+                        size="sm"
                       >
-                        <span aria-hidden="true">🔄</span> Rounds
-                      </button>
+                        🔄 Rounds
+                      </Button>
 
-                      <button
+                      <Button
                         onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-                        className="px-3 py-1 rounded-lg text-sm font-bold transition-all bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+                        variant="ghost"
+                        size="sm"
                         title={sortOrder === 'desc' ? 'Sort descending' : 'Sort ascending'}
                       >
                         {sortOrder === 'desc' ? '↓' : '↑'}
-                      </button>
+                      </Button>
                     </div>
                   )}
 
                   {historyLoading && (
                     <div className="text-center py-12">
-                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-green-700"></div>
+                      <Spinner size="lg" color="success" />
                       <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading game history...</p>
                     </div>
                   )}
@@ -790,7 +728,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                 <div className="space-y-4 animate-fadeIn">
                   {profileLoading && (
                     <div className="text-center py-12">
-                      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-amber-700"></div>
+                      <Spinner size="lg" color="warning" />
                       <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading profile...</p>
                     </div>
                   )}

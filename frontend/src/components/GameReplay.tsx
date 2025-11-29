@@ -4,8 +4,8 @@ import { RoundHistory, Card as CardType } from '../types/game';
 import { sounds } from '../utils/sounds';
 import { TrickHistory } from './TrickHistory';
 import { Card } from './Card';
+import { Modal, Button, Spinner, UICard } from './ui';
 import logger from '../utils/logger';
-import { colors } from '../design-system';
 
 interface ReplayData {
   game_id: string;
@@ -241,97 +241,106 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   // Early returns AFTER all hooks
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onKeyDown={(e) => e.stopPropagation()}>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md">
-          <div className="text-center">
-            <div className="animate-spin text-4xl mb-4">🔄</div>
-            <p className="text-lg font-semibold text-gray-700 dark:text-gray-200" data-testid="loading-message">
-              Loading replay...
-            </p>
-          </div>
+      <Modal
+        isOpen={true}
+        onClose={onClose}
+        size="sm"
+        showCloseButton={false}
+        theme="parchment"
+        testId="loading-modal"
+      >
+        <div className="text-center py-4">
+          <Spinner size="lg" color="primary" className="mb-4" />
+          <p className="text-lg font-semibold text-gray-700 dark:text-gray-200" data-testid="loading-message">
+            Loading replay...
+          </p>
         </div>
-      </div>
+      </Modal>
     );
   }
 
   if (error || !replayData) {
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
-        <div
-          className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md w-full"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {/* Sprint 6: Enhanced error display */}
-          <div className="text-center">
-            <div className="text-4xl mb-4">⚠️</div>
-            <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2" data-testid="error-message">
-              {error || 'Failed to load replay'}
-            </p>
-            {correlationId && (
-              <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-700" data-testid="error-correlation-id">
-                <p className="text-xs text-red-700 dark:text-red-300 font-mono">
-                  Error ID: {correlationId}
-                </p>
-                <p className="text-xs text-red-600 dark:text-red-400 mt-1 opacity-75">
-                  Please include this ID when reporting the issue
-                </p>
-              </div>
-            )}
-            <div className="flex gap-3 mt-6 justify-center">
-              <button
-                data-testid="retry-button"
-                onClick={() => {
-                  setError(null);
-                  setCorrelationId(null);
-                  setLoading(true);
-                  if (socket) {
-                    socket.emit('get_game_replay', { gameId });
-                  }
-                }}
-                className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-all"
-              >
-                🔄 Try Again
-              </button>
-              <button
-                data-testid="close-button"
-                onClick={onClose}
-                className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-bold transition-all"
-              >
-                Close
-              </button>
-            </div>
+      <Modal
+        isOpen={true}
+        onClose={onClose}
+        title="Error"
+        icon="⚠️"
+        theme="red"
+        size="sm"
+        testId="error-modal"
+      >
+        <div className="text-center">
+          <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2" data-testid="error-message">
+            {error || 'Failed to load replay'}
+          </p>
+          {correlationId && (
+            <UICard variant="default" size="sm" className="mt-4 !bg-red-50 dark:!bg-red-900/30 !border-red-200 dark:!border-red-700" data-testid="error-correlation-id">
+              <p className="text-xs text-red-700 dark:text-red-300 font-mono">
+                Error ID: {correlationId}
+              </p>
+              <p className="text-xs text-red-600 dark:text-red-400 mt-1 opacity-75">
+                Please include this ID when reporting the issue
+              </p>
+            </UICard>
+          )}
+          <div className="flex gap-3 mt-6 justify-center">
+            <Button
+              data-testid="retry-button"
+              onClick={() => {
+                setError(null);
+                setCorrelationId(null);
+                setLoading(true);
+                if (socket) {
+                  socket.emit('get_game_replay', { gameId });
+                }
+              }}
+              variant="success"
+              leftIcon={<span>🔄</span>}
+            >
+              Try Again
+            </Button>
+            <Button
+              data-testid="close-button"
+              onClick={onClose}
+              variant="secondary"
+            >
+              Close
+            </Button>
           </div>
         </div>
-      </div>
+      </Modal>
     );
   }
 
   // Validate replay data has rounds
   if (!replayData.round_history || replayData.round_history.length === 0) {
     return (
-      <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
-        <div
-          className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-2xl max-w-md"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="text-center">
-            <div className="text-4xl mb-4">⚠️</div>
-            <p className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2" data-testid="no-data-warning">
-              No Replay Data Available
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              This game has no recorded rounds. The game may have ended prematurely or data was not saved.
-            </p>
-            <button
-              data-testid="close-button"
-              onClick={onClose}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all"
-            >
-              Close
-            </button>
-          </div>
+      <Modal
+        isOpen={true}
+        onClose={onClose}
+        title="No Replay Data"
+        icon="⚠️"
+        theme="parchment"
+        size="sm"
+        testId="no-data-modal"
+      >
+        <div className="text-center">
+          <p className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2" data-testid="no-data-warning">
+            No Replay Data Available
+          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            This game has no recorded rounds. The game may have ended prematurely or data was not saved.
+          </p>
+          <Button
+            data-testid="close-button"
+            onClick={onClose}
+            variant="primary"
+          >
+            Close
+          </Button>
         </div>
-      </div>
+      </Modal>
     );
   }
 
@@ -345,7 +354,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className={`bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white px-4 md:px-8 py-4 md:py-6 rounded-t-lg md:rounded-t-xl`}>
+        <div className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 md:px-8 py-4 md:py-6 rounded-t-lg md:rounded-t-xl">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 md:gap-4 min-w-0">
               <span className="text-2xl md:text-4xl" aria-hidden="true">🎮</span>
@@ -358,25 +367,29 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             </div>
             <div className="flex items-center gap-2 md:gap-3 flex-shrink-0">
               {/* Share Button */}
-              <button
+              <Button
                 onClick={() => {
                   const replayUrl = `${window.location.origin}?replay=${gameId}`;
                   navigator.clipboard.writeText(replayUrl);
                   sounds.buttonClick();
                 }}
-                className="p-2 md:px-4 md:py-2 bg-white/20 hover:bg-white/30 rounded-lg font-semibold transition-colors flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-green-300"
+                variant="ghost"
+                size="sm"
+                className="!bg-white/20 hover:!bg-white/30 !text-white !border-0"
                 title="Copy replay link"
+                leftIcon={<span aria-hidden="true">🔗</span>}
               >
-                <span aria-hidden="true">🔗</span>
                 <span className="hidden md:inline">Share</span>
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={onClose}
-                className="text-white hover:text-emerald-100 text-2xl md:text-4xl font-bold leading-none transition-colors focus:outline-none focus:ring-2 focus:ring-green-300 rounded"
+                variant="ghost"
+                size="sm"
+                className="!bg-transparent !border-0 !text-white hover:!text-emerald-100 !text-2xl md:!text-4xl !p-1"
                 aria-label="Close replay viewer"
               >
                 ×
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -596,50 +609,50 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                   <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">Speed:</p>
                   <div className="flex gap-2">
                     {[0.5, 1, 2].map(speed => (
-                      <button
+                      <Button
                         key={speed}
                         data-testid={`speed-${speed}x`}
                         onClick={() => setPlaySpeed(speed as 0.5 | 1 | 2)}
-                        className={`px-3 py-1.5 md:py-1 rounded ${
-                          playSpeed === speed
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        } transition-colors text-sm font-semibold`}
+                        variant={playSpeed === speed ? 'primary' : 'ghost'}
+                        size="sm"
                       >
                         {speed}x
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
 
                 {/* Play/Pause & Navigation */}
                 <div className="flex items-center justify-center gap-3 md:gap-2 mb-3 md:mb-4">
-                  <button
+                  <Button
                     data-testid="prev-trick-button"
                     onClick={handlePrevTrick}
                     disabled={!hasPrevTrick && !hasPrevRound}
-                    className="p-3 md:p-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xl md:text-base"
+                    variant="ghost"
+                    size="md"
                     aria-label="Previous trick"
                   >
                     ⏮️
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     data-testid="play-pause-button"
                     onClick={handlePlayPause}
-                    className="p-4 md:p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-2xl md:text-xl"
+                    variant="primary"
+                    size="lg"
                     aria-label={isPlaying ? 'Pause' : 'Play'}
                   >
                     {isPlaying ? '⏸️' : '▶️'}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     data-testid="next-trick-button"
                     onClick={handleNextTrick}
                     disabled={!hasNextTrick && !hasNextRound}
-                    className="p-3 md:p-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-xl md:text-base"
+                    variant="ghost"
+                    size="md"
                     aria-label="Next trick"
                   >
                     ⏭️
-                  </button>
+                  </Button>
                 </div>
 
                 {/* Round Jump Buttons */}
@@ -647,18 +660,15 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                   <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2">Jump to Round:</p>
                   <div className="grid grid-cols-5 md:grid-cols-3 gap-1">
                     {replayData.round_history.map((_, idx) => (
-                      <button
+                      <Button
                         key={idx}
                         data-testid={`round-jump-${idx + 1}`}
                         onClick={() => navigateToRound(idx)}
-                        className={`p-1.5 md:p-1 text-xs rounded ${
-                          idx === currentRoundIndex
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600'
-                        } transition-colors font-semibold`}
+                        variant={idx === currentRoundIndex ? 'primary' : 'ghost'}
+                        size="xs"
                       >
                         R{idx + 1}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>

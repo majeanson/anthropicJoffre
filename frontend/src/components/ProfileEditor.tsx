@@ -6,6 +6,8 @@
 import { useState } from 'react';
 import { AvatarSelector } from './AvatarSelector';
 import { getAvatarById } from '../utils/avatars';
+import { Button, Checkbox, Select } from './ui';
+import type { SelectOption } from './ui/Select';
 
 export interface ProfileData {
   avatar_id?: string;
@@ -24,22 +26,30 @@ interface ProfileEditorProps {
 }
 
 // Common countries for the dropdown
-const COUNTRIES = [
-  { code: 'US', name: 'United States' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'FR', name: 'France' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'ES', name: 'Spain' },
-  { code: 'IT', name: 'Italy' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'KR', name: 'South Korea' },
-  { code: 'CN', name: 'China' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'BR', name: 'Brazil' },
-  { code: 'MX', name: 'Mexico' },
-  { code: 'IN', name: 'India' },
-  { code: 'RU', name: 'Russia' },
+const COUNTRY_OPTIONS: SelectOption[] = [
+  { value: '', label: 'Not specified' },
+  { value: 'US', label: 'United States' },
+  { value: 'CA', label: 'Canada' },
+  { value: 'GB', label: 'United Kingdom' },
+  { value: 'FR', label: 'France' },
+  { value: 'DE', label: 'Germany' },
+  { value: 'ES', label: 'Spain' },
+  { value: 'IT', label: 'Italy' },
+  { value: 'JP', label: 'Japan' },
+  { value: 'KR', label: 'South Korea' },
+  { value: 'CN', label: 'China' },
+  { value: 'AU', label: 'Australia' },
+  { value: 'BR', label: 'Brazil' },
+  { value: 'MX', label: 'Mexico' },
+  { value: 'IN', label: 'India' },
+  { value: 'RU', label: 'Russia' },
+];
+
+// Profile visibility options
+const VISIBILITY_OPTIONS: SelectOption[] = [
+  { value: 'public', label: 'Public - Anyone can view' },
+  { value: 'friends_only', label: 'Friends Only' },
+  { value: 'private', label: 'Private - Only you' },
 ];
 
 export function ProfileEditor({ initialData, onSave, onCancel }: ProfileEditorProps) {
@@ -93,12 +103,12 @@ export function ProfileEditor({ initialData, onSave, onCancel }: ProfileEditorPr
           <div className="w-20 h-20 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center text-6xl">
             {selectedAvatar?.emoji || '👤'}
           </div>
-          <button
+          <Button
             onClick={() => setShowAvatarSelector(!showAvatarSelector)}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors"
+            variant="primary"
           >
             {showAvatarSelector ? 'Hide Avatars' : 'Change Avatar'}
-          </button>
+          </Button>
         </div>
 
         {showAvatarSelector && (
@@ -134,24 +144,15 @@ export function ProfileEditor({ initialData, onSave, onCancel }: ProfileEditorPr
       </div>
 
       {/* Country */}
-      <div>
-        <label htmlFor="country" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          Country
-        </label>
-        <select
-          id="country"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          className="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
-        >
-          <option value="">Not specified</option>
-          {COUNTRIES.map(c => (
-            <option key={c.code} value={c.code}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Select
+        id="country"
+        label="Country"
+        options={COUNTRY_OPTIONS}
+        value={country}
+        onChange={(e) => setCountry(e.target.value)}
+        variant="filled"
+        fullWidth
+      />
 
       {/* Favorite Team */}
       <div>
@@ -159,98 +160,77 @@ export function ProfileEditor({ initialData, onSave, onCancel }: ProfileEditorPr
           Favorite Team Color
         </label>
         <div className="flex gap-3">
-          <button
+          <Button
             onClick={() => setFavoriteTeam(null)}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-              favoriteTeam === null
-                ? 'bg-gray-600 text-white ring-4 ring-gray-400'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-            }`}
+            variant={favoriteTeam === null ? 'primary' : 'ghost'}
+            size="sm"
           >
             None
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setFavoriteTeam(1)}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-              favoriteTeam === 1
-                ? 'bg-orange-600 text-white ring-4 ring-orange-400'
-                : 'bg-orange-200 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 hover:bg-orange-300 dark:hover:bg-orange-800/30'
-            }`}
+            variant={favoriteTeam === 1 ? 'warning' : 'ghost'}
+            size="sm"
           >
             Team 1 (Orange)
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setFavoriteTeam(2)}
-            className={`px-4 py-2 rounded-lg font-semibold transition-all ${
-              favoriteTeam === 2
-                ? 'bg-purple-600 text-white ring-4 ring-purple-400'
-                : 'bg-purple-200 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-300 dark:hover:bg-purple-800/30'
-            }`}
+            variant={favoriteTeam === 2 ? 'secondary' : 'ghost'}
+            size="sm"
           >
             Team 2 (Purple)
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Privacy Settings */}
-      <div>
-        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-          Profile Visibility
-        </label>
-        <select
-          value={visibility}
-          onChange={(e) => setVisibility(e.target.value as 'public' | 'friends_only' | 'private')}
-          className="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none"
-        >
-          <option value="public">Public - Anyone can view</option>
-          <option value="friends_only">Friends Only</option>
-          <option value="private">Private - Only you</option>
-        </select>
-      </div>
+      <Select
+        id="visibility"
+        label="Profile Visibility"
+        options={VISIBILITY_OPTIONS}
+        value={visibility}
+        onChange={(e) => setVisibility(e.target.value as 'public' | 'friends_only' | 'private')}
+        variant="filled"
+        fullWidth
+      />
 
       {/* Toggle Settings */}
       <div className="space-y-3">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={showOnlineStatus}
-            onChange={(e) => setShowOnlineStatus(e.target.checked)}
-            className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-          />
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            Show online status to others
-          </span>
-        </label>
+        <Checkbox
+          id="showOnlineStatus"
+          label="Show online status to others"
+          checked={showOnlineStatus}
+          onChange={(e) => setShowOnlineStatus(e.target.checked)}
+          variant="toggle"
+        />
 
-        <label className="flex items-center gap-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={allowFriendRequests}
-            onChange={(e) => setAllowFriendRequests(e.target.checked)}
-            className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-          />
-          <span className="text-sm text-gray-700 dark:text-gray-300">
-            Allow friend requests
-          </span>
-        </label>
+        <Checkbox
+          id="allowFriendRequests"
+          label="Allow friend requests"
+          checked={allowFriendRequests}
+          onChange={(e) => setAllowFriendRequests(e.target.checked)}
+          variant="toggle"
+        />
       </div>
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <button
+        <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-semibold transition-colors"
+          variant="primary"
+          className="flex-1"
         >
           {isSaving ? 'Saving...' : 'Save Profile'}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={onCancel}
           disabled={isSaving}
-          className="px-6 py-3 bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white rounded-lg font-semibold transition-colors"
+          variant="secondary"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

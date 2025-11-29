@@ -7,7 +7,8 @@
 
 import { Component, ErrorInfo, ReactNode } from 'react';
 import logger from '../utils/logger';
-import { colors } from '../design-system';
+import { Button } from './ui/Button';
+import { UICard } from './ui/UICard';
 
 declare global {
   interface Window {
@@ -127,8 +128,8 @@ export class ErrorBoundary extends Component<Props, State> {
 
       // Otherwise, use the inline error UI
       return (
-        <div className={`flex items-center justify-center min-h-screen bg-gradient-to-br ${colors.gradients.error}`}>
-          <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-2xl max-w-md text-center">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-500 to-rose-600">
+          <UICard variant="elevated" size="lg" className="max-w-md text-center">
             <div className="text-6xl mb-4" aria-hidden="true">⚠️</div>
             <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
               Something Went Wrong
@@ -156,25 +157,27 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
             )}
             <div className="flex gap-4 justify-center">
-              <button
+              <Button
+                variant="success"
+                size="lg"
                 onClick={this.handleReset}
-                className={`bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white px-6 py-3 rounded-lg transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-green-400`}
               >
                 Try Again
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
+                size="lg"
                 onClick={() => window.location.reload()}
-                className={`bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white px-6 py-3 rounded-lg transition-colors font-semibold focus:outline-none focus:ring-2 focus:ring-blue-400`}
               >
                 Reload Game
-              </button>
+              </Button>
             </div>
             {this.state.errorCount > 1 && (
               <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
                 Error count: {this.state.errorCount}
               </p>
             )}
-          </div>
+          </UICard>
         </div>
       );
     }

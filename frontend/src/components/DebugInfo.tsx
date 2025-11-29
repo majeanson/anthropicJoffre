@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import buildInfoJson from '../buildInfo.json';
 import { BuildInfo } from '../types/buildInfo';
 import { CONFIG } from '../config/constants';
-import { designTokens } from '../styles/designTokens';
+import { Modal, Button, Spinner } from './ui';
+import { UICard } from './ui/UICard';
 
 // Type the imported JSON
 const buildInfo = buildInfoJson as BuildInfo;
@@ -82,8 +83,6 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
     }
   }, [showHealth]);
 
-  if (!isOpen) return null;
-
   const formatDate = (isoString: string) => {
     const date = new Date(isoString);
     return date.toLocaleString('en-US', {
@@ -101,28 +100,15 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
-      <div
-        className={`bg-gradient-to-br ${designTokens.gradients.primary} dark:from-gray-800 dark:to-gray-900 rounded-xl p-8 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto border-4 border-indigo-600 dark:border-indigo-500`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl" aria-hidden="true">🎮</span>
-            <h2 className="text-4xl font-bold text-indigo-900 dark:text-indigo-100 font-serif">Debug Fun</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 text-3xl font-bold leading-none focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            aria-label="Close debug info"
-          >
-            ×
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="space-y-4">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Debug Fun"
+      icon={<span>🎮</span>}
+      theme="purple"
+      size="lg"
+    >
+      <div className="space-y-4">
           {/* Version */}
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0" aria-hidden="true">🏷️</span>
@@ -175,12 +161,13 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Latest Done Features</h3>
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setShowLatestFeatures(!showLatestFeatures)}
-                    className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
                   >
                     {showLatestFeatures ? 'Hide' : 'Show'}
-                  </button>
+                  </Button>
                 </div>
 
                 {showLatestFeatures && (
@@ -224,12 +211,13 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
-                  <button
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={() => setShowFutureFeatures(!showFutureFeatures)}
-                    className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
                   >
                     {showFutureFeatures ? 'Hide' : 'Show'}
-                  </button>
+                  </Button>
                 </div>
 
                 {showFutureFeatures && (
@@ -255,19 +243,20 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Server Health</h3>
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={() => setShowHealth(!showHealth)}
-                  className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
                 >
                   {showHealth ? 'Hide' : 'Show'} Health
-                </button>
+                </Button>
               </div>
 
               {showHealth && (
                 <div className="space-y-2">
                   {healthLoading && (
                     <div className="bg-white dark:bg-gray-900 px-3 py-4 rounded border border-gray-300 dark:border-gray-700 text-center">
-                      <div className="animate-spin inline-block w-6 h-6 border-3 border-indigo-600 border-t-transparent rounded-full" aria-hidden="true"></div>
+                      <Spinner size="sm" color="primary" />
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Loading health data...</p>
                     </div>
                   )}
@@ -275,12 +264,14 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                   {healthError && (
                     <div className="bg-red-50 dark:bg-red-900/20 px-3 py-3 rounded border border-red-300 dark:border-red-700">
                       <p className="text-sm text-red-700 dark:text-red-300">❌ {healthError}</p>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         onClick={fetchHealthData}
-                        className="text-xs text-red-600 dark:text-red-400 underline mt-1"
+                        className="text-red-600 dark:text-red-400 underline mt-1 p-0"
                       >
                         Retry
-                      </button>
+                      </Button>
                     </div>
                   )}
 
@@ -296,12 +287,14 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
                             Uptime: {healthData.uptime.formatted}
                           </p>
                         </div>
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={fetchHealthData}
-                          className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                          className="text-indigo-600 dark:text-indigo-400 hover:underline p-0"
                         >
                           🔄 Refresh
-                        </button>
+                        </Button>
                       </div>
 
                       {/* Game State */}
@@ -380,22 +373,24 @@ export function DebugInfo({ isOpen, onClose }: DebugInfoProps) {
 
 
           {/* Fun Stats */}
-          <div className={`mt-6 p-4 bg-gradient-to-r ${designTokens.gradients.team2} dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg border-2 border-purple-300 dark:border-purple-700`}>
-            <p className="text-center text-sm text-purple-900 dark:text-purple-200 font-semibold">
+          <UICard variant="gradient" gradient="team2" size="sm" className="mt-6">
+            <p className="text-center text-sm text-white font-semibold">
               <span aria-hidden="true">🎉</span> Made with <span aria-hidden="true">❤️</span> and lots of <span aria-hidden="true">☕</span>
             </p>
-          </div>
+          </UICard>
         </div>
 
         {/* Close Button */}
-        <button
+        <Button
+          variant="primary"
+          size="lg"
+          fullWidth
           onClick={onClose}
           autoFocus
-          className="w-full mt-8 bg-indigo-600 dark:bg-indigo-700 text-white py-4 rounded-lg font-bold hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors border-2 border-indigo-700 dark:border-indigo-600 text-lg focus:outline-none focus:ring-4 focus:ring-indigo-400 focus:ring-offset-2"
+          className="mt-6"
         >
           Got it!
-        </button>
-      </div>
-    </div>
+        </Button>
+    </Modal>
   );
 }

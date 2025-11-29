@@ -6,7 +6,8 @@
 import { useState } from 'react';
 import { GameState, Card } from '../types/game';
 import { suggestMove, suggestBet } from '../utils/moveSuggestion';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { Button } from './ui/Button';
 
 interface MoveSuggestionPanelProps {
   gameState: GameState;
@@ -110,7 +111,7 @@ export function MoveSuggestionPanel({
   };
 
   return (
-    <div className={`bg-gradient-to-r ${colors.gradients.info} dark:from-blue-900/40 dark:to-indigo-900/40 border-2 border-blue-300 dark:border-blue-700 rounded-lg p-3 shadow-md`}>
+    <UICard variant="gradient" gradient="info" size="sm" className="border-2 border-blue-300 dark:border-blue-700">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
           {gameState.phase === 'betting' && renderBettingSuggestion()}
@@ -118,16 +119,17 @@ export function MoveSuggestionPanel({
         </div>
 
         {/* Expand/Collapse Button */}
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 rounded"
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 p-1"
           title={isExpanded ? 'Show less' : 'Show more'}
           aria-label={isExpanded ? 'Show less' : 'Show more'}
         >
           {isExpanded ? '▲' : '▼'}
-        </button>
+        </Button>
       </div>
-
-    </div>
+    </UICard>
   );
 }

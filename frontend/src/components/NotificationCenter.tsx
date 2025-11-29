@@ -9,6 +9,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { Notification } from '../types/notifications';
+import { UICard, Button, EmptyState } from './ui';
 
 interface NotificationCenterProps {
   socket: Socket | null;
@@ -115,52 +116,53 @@ export function NotificationCenter({ socket, isAuthenticated }: NotificationCent
   return (
     <div className="fixed bottom-4 right-4 z-40" ref={dropdownRef}>
       {/* Floating Bell Button with Badge */}
-      <button
+      <Button
+        variant="primary"
+        size="lg"
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-2xl transition-all duration-200 hover:scale-110 active:scale-95"
+        className="relative p-3 rounded-full"
         title="Notifications"
       >
         <span className="text-2xl">🔔</span>
         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
           {unreadCount > 9 ? '9+' : unreadCount}
         </span>
-      </button>
+      </Button>
 
       {/* Dropdown - Positioned above the floating button */}
       {isOpen && (
-        <div className="absolute right-0 bottom-full mb-2 w-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border-2 border-gray-200 dark:border-gray-600 z-50 max-h-[600px] flex flex-col">
+        <UICard variant="elevated" size="md" className="absolute right-0 bottom-full mb-2 w-96 z-50 max-h-[600px] flex flex-col border-2">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b-2 border-gray-200 dark:border-gray-600">
+          <div className="flex items-center justify-between pb-4 border-b-2 border-gray-200 dark:border-gray-600">
             <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">
               Notifications
             </h3>
             <div className="flex gap-2">
               {unreadCount > 0 && (
-                <button
+                <Button
+                  variant="primary"
+                  size="sm"
                   onClick={handleMarkAllAsRead}
-                  className="text-xs px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold transition-colors"
                 >
                   Mark all read
-                </button>
+                </Button>
               )}
               {notifications.length > 0 && (
-                <button
+                <Button
+                  variant="secondary"
+                  size="sm"
                   onClick={handleClearAll}
-                  className="text-xs px-2 py-1 bg-gray-500 hover:bg-gray-600 text-white rounded font-semibold transition-colors"
                 >
                   Clear all
-                </button>
+                </Button>
               )}
             </div>
           </div>
 
           {/* Notifications List */}
-          <div className="overflow-y-auto flex-1">
+          <div className="overflow-y-auto flex-1 -mx-4">
             {notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                <span className="text-4xl mb-2 block">🔕</span>
-                <p>No notifications</p>
-              </div>
+              <EmptyState icon="🔕" title="No notifications" compact />
             ) : (
               notifications.map((notification) => (
                 <div
@@ -195,7 +197,7 @@ export function NotificationCenter({ socket, isAuthenticated }: NotificationCent
               ))
             )}
           </div>
-        </div>
+        </UICard>
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ConnectionStatus } from '../types/game';
+import { UIBadge, TeamCard } from './ui';
 
 interface PlayerConnectionIndicatorProps {
   status?: ConnectionStatus;
@@ -127,15 +128,14 @@ export const PlayerCardWithStatus: React.FC<PlayerCardWithStatusProps> = ({
   reconnectTimeLeft,
   isBot,
 }) => {
-  const teamColor = teamId === 1 ? 'bg-orange-100 border-orange-400' : 'bg-purple-100 border-purple-400';
-  const teamColorDark = teamId === 1 ? 'dark:bg-orange-900/20 dark:border-orange-600' : 'dark:bg-purple-900/20 dark:border-purple-600';
-
   const isDisconnected = connectionStatus === 'disconnected';
-  const opacity = isDisconnected ? 'opacity-50' : '';
 
   return (
-    <div
-      className={`relative p-3 rounded-lg border-2 ${teamColor} ${teamColorDark} ${opacity} transition-opacity duration-300`}
+    <TeamCard
+      teamId={teamId}
+      variant="subtle"
+      size="md"
+      className={`relative ${isDisconnected ? 'opacity-50' : ''} transition-opacity duration-300`}
     >
       {/* Connection status indicator in top-right corner */}
       {!isBot && (
@@ -157,7 +157,7 @@ export const PlayerCardWithStatus: React.FC<PlayerCardWithStatusProps> = ({
           <span className="text-xs text-green-600 dark:text-green-400">(You)</span>
         )}
         {isBot && (
-          <span className="text-xs bg-blue-500 text-white px-1 rounded">BOT</span>
+          <UIBadge variant="solid" color="info" size="xs">BOT</UIBadge>
         )}
       </div>
 
@@ -167,7 +167,7 @@ export const PlayerCardWithStatus: React.FC<PlayerCardWithStatusProps> = ({
           Reconnecting... {Math.floor(reconnectTimeLeft / 60)}:{(reconnectTimeLeft % 60).toString().padStart(2, '0')}
         </div>
       )}
-    </div>
+    </TeamCard>
   );
 };
 

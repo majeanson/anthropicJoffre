@@ -7,8 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { colors } from '../design-system';
-import { UICard } from './ui/UICard';
+import { Modal, UICard, Spinner, Button } from './ui';
 
 interface CalendarReward {
   dayNumber: number;
@@ -86,7 +85,7 @@ export function RewardsCalendar({
       if (data.rewards.xp) rewardText.push(`+${data.rewards.xp} XP`);
       if (data.rewards.currency) rewardText.push(`+${data.rewards.currency} coins`);
 
-      setNotification(`✅ Day ${data.dayNumber} claimed: ${rewardText.join(', ')}!`);
+      setNotification(`Day ${data.dayNumber} claimed: ${rewardText.join(', ')}!`);
       setTimeout(() => setNotification(null), 5000);
       setClaimingDay(null);
     };
@@ -107,14 +106,14 @@ export function RewardsCalendar({
 
     // Check if can claim (must be current day or earlier)
     if (dayNumber > progress.currentDay) {
-      setNotification('❌ Cannot claim future rewards!');
+      setNotification('Cannot claim future rewards!');
       setTimeout(() => setNotification(null), 3000);
       return;
     }
 
     // Check if already claimed
     if (progress.rewardsClaimed.includes(dayNumber)) {
-      setNotification('⚠️ Already claimed!');
+      setNotification('Already claimed!');
       setTimeout(() => setNotification(null), 3000);
       return;
     }
@@ -140,19 +139,19 @@ export function RewardsCalendar({
 
     if (reward.isSpecial) {
       if (status === 'claimed') {
-        return `${baseClasses} bg-gradient-to-br ${colors.gradients.secondaryDark} border-purple-500 opacity-60`;
+        return `${baseClasses} bg-gradient-to-br from-gray-600 to-gray-800 border-purple-500 opacity-60`;
       }
       if (status === 'available') {
-        return `${baseClasses} bg-gradient-to-br ${colors.gradients.secondary} border-purple-400 cursor-pointer hover:scale-105 shadow-lg shadow-purple-500/50 animate-pulse`;
+        return `${baseClasses} bg-gradient-to-br from-gray-500 to-gray-700 border-purple-400 cursor-pointer hover:scale-105 shadow-lg shadow-purple-500/50 animate-pulse`;
       }
-      return `${baseClasses} bg-gradient-to-br ${colors.gradients.secondaryDark} border-purple-700/50`;
+      return `${baseClasses} bg-gradient-to-br from-gray-600 to-gray-800 border-purple-700/50`;
     }
 
     switch (status) {
       case 'claimed':
         return `${baseClasses} bg-gray-700 border-gray-600 opacity-60`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br ${colors.gradients.primaryDark} border-blue-400 cursor-pointer hover:scale-105 shadow-lg`;
+        return `${baseClasses} bg-gradient-to-br from-purple-600 to-indigo-700 border-blue-400 cursor-pointer hover:scale-105 shadow-lg`;
       case 'missed':
         return `${baseClasses} bg-gray-800 border-gray-600 opacity-50`;
       case 'locked':
@@ -161,156 +160,134 @@ export function RewardsCalendar({
     }
   };
 
-  if (!isOpen) return null;
+  // Generate subtitle with progress info
+  const subtitle = progress
+    ? `Day ${progress.currentDay} of 30 • ${progress.calendarResets} cycles completed`
+    : 'Login daily to unlock progressive rewards';
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="30-Day Rewards Calendar"
+      subtitle={subtitle}
+      icon="📅"
+      theme="purple"
+      size="xl"
+      testId="rewards-calendar-modal"
     >
-      <div
-        className="bg-gray-800 rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className={`bg-gradient-to-r ${colors.gradients.special} p-6 rounded-t-lg sticky top-0 z-10`}>
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-white">30-Day Rewards Calendar</h2>
-              <p className="text-purple-100 mt-1">
-                Login daily to unlock progressive rewards
-              </p>
-              {progress && (
-                <p className="text-white mt-2 font-semibold">
-                  Day {progress.currentDay} of 30 • {progress.calendarResets} cycles completed
-                </p>
-              )}
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-gray-200 text-3xl font-bold leading-none focus:outline-none focus:ring-2 focus:ring-pink-400"
-              aria-label="Close"
-            >
-              ×
-            </button>
-          </div>
+      {/* Notification */}
+      {notification && (
+        <div className="mb-4">
+          <UICard variant="gradient" gradient="success" size="sm" className="text-center">
+            <p className="text-white">{notification}</p>
+          </UICard>
         </div>
+      )}
 
-        {/* Notification */}
-        {notification && (
-          <div className="mx-6 mt-4">
-            <UICard variant="gradient" gradient="success" size="sm" className="text-center">
-              <p className="text-white">{notification}</p>
-            </UICard>
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="p-6">
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-              <p className="text-gray-400 mt-4">Loading calendar...</p>
-            </div>
-          ) : (
-            <>
-              {/* Legend */}
-              <UICard variant="default" size="sm" className="mb-6">
-                <div className="flex flex-wrap gap-4">
-                <div className="flex items-center gap-2">
-                  <div className={`w-4 h-4 bg-gradient-to-br ${colors.gradients.primaryDark} border-2 border-blue-400 rounded`}></div>
-                  <span className="text-gray-300 text-sm">Available to claim</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-700 border-2 border-gray-600 rounded opacity-60"></div>
-                  <span className="text-gray-300 text-sm">Claimed</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className={`w-4 h-4 bg-gradient-to-br ${colors.gradients.secondary} border-2 border-purple-400 rounded`}></div>
-                  <span className="text-gray-300 text-sm">Special Milestone</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-900 border-2 border-gray-700 rounded opacity-40"></div>
-                  <span className="text-gray-300 text-sm">Locked</span>
-                </div>
-                </div>
-              </UICard>
-
-              {/* Calendar Grid */}
-              <div className="grid grid-cols-5 md:grid-cols-7 lg:grid-cols-10 gap-3">
-                {calendar.map((reward) => {
-                  const status = getDayStatus(reward.dayNumber);
-
-                  return (
-                    <button
-                      key={reward.dayNumber}
-                      onClick={() =>
-                        status === 'available' && handleClaimReward(reward.dayNumber)
-                      }
-                      disabled={status !== 'available' || claimingDay !== null}
-                      className={getDayClasses(reward)}
-                    >
-                      {/* Day Number */}
-                      <div className="text-xs text-gray-300 font-bold mb-1">
-                        Day {reward.dayNumber}
-                      </div>
-
-                      {/* Icon */}
-                      <div className="text-2xl mb-1">{reward.icon}</div>
-
-                      {/* Description */}
-                      <div className="text-xs text-gray-300 text-center leading-tight">
-                        {reward.description}
-                      </div>
-
-                      {/* Status Indicator */}
-                      {status === 'claimed' && (
-                        <div className="absolute top-1 right-1 text-green-400">✓</div>
-                      )}
-                      {status === 'available' && (
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                      )}
-                      {reward.isSpecial && (
-                        <div className="absolute -top-1 -left-1 text-yellow-400">⭐</div>
-                      )}
-                    </button>
-                  );
-                })}
+      {/* Content */}
+      {loading ? (
+        <div className="text-center py-12">
+          <Spinner size="lg" color="primary" />
+          <p className="text-gray-400 mt-4">Loading calendar...</p>
+        </div>
+      ) : (
+        <>
+          {/* Legend */}
+          <UICard variant="default" size="sm" className="mb-6">
+            <div className="flex flex-wrap gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gradient-to-br from-purple-600 to-indigo-700 border-2 border-blue-400 rounded"></div>
+                <span className="text-gray-300 text-sm">Available to claim</span>
               </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-700 border-2 border-gray-600 rounded opacity-60"></div>
+                <span className="text-gray-300 text-sm">Claimed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gradient-to-br from-gray-500 to-gray-700 border-2 border-purple-400 rounded"></div>
+                <span className="text-gray-300 text-sm">Special Milestone</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-900 border-2 border-gray-700 rounded opacity-40"></div>
+                <span className="text-gray-300 text-sm">Locked</span>
+              </div>
+            </div>
+          </UICard>
 
-              {/* Special Milestones Info */}
-              <UICard variant="gradient" gradient="team2" size="md" className="mt-6">
-                <h3 className="text-white font-bold mb-2 flex items-center gap-2">
-                  <span>⭐</span>
-                  Special Milestone Rewards
-                </h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                  <div className="text-purple-200">
-                    <span className="font-semibold">Day 7:</span> 50 coins + card back
-                  </div>
-                  <div className="text-purple-200">
-                    <span className="font-semibold">Day 14:</span> 100 coins + title
-                  </div>
-                  <div className="text-purple-200">
-                    <span className="font-semibold">Day 21:</span> 150 coins + badge
-                  </div>
-                  <div className="text-purple-200">
-                    <span className="font-semibold">Day 30:</span> 500 coins + exclusive
-                    rewards!
-                  </div>
-                </div>
-              </UICard>
-            </>
-          )}
-        </div>
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-5 md:grid-cols-7 lg:grid-cols-10 gap-3">
+            {calendar.map((reward) => {
+              const status = getDayStatus(reward.dayNumber);
 
-        {/* Footer */}
-        <div className="bg-gray-700 p-4 rounded-b-lg border-t border-gray-600">
-          <p className="text-gray-400 text-sm text-center">
-            🔁 Calendar resets every 30 days • Login daily to maximize rewards
-          </p>
-        </div>
-      </div>
-    </div>
+              return (
+                <Button
+                  key={reward.dayNumber}
+                  onClick={() =>
+                    status === 'available' && handleClaimReward(reward.dayNumber)
+                  }
+                  disabled={status !== 'available' || claimingDay !== null}
+                  variant="ghost"
+                  size="md"
+                  className={getDayClasses(reward)}
+                >
+                  {/* Day Number */}
+                  <div className="text-xs text-gray-300 font-bold mb-1">
+                    Day {reward.dayNumber}
+                  </div>
+
+                  {/* Icon */}
+                  <div className="text-2xl mb-1">{reward.icon}</div>
+
+                  {/* Description */}
+                  <div className="text-xs text-gray-300 text-center leading-tight">
+                    {reward.description}
+                  </div>
+
+                  {/* Status Indicator */}
+                  {status === 'claimed' && (
+                    <div className="absolute top-1 right-1 text-green-400">✓</div>
+                  )}
+                  {status === 'available' && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  )}
+                  {reward.isSpecial && (
+                    <div className="absolute -top-1 -left-1 text-yellow-400">⭐</div>
+                  )}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Special Milestones Info */}
+          <UICard variant="gradient" gradient="team2" size="md" className="mt-6">
+            <h3 className="text-white font-bold mb-2 flex items-center gap-2">
+              <span>⭐</span>
+              Special Milestone Rewards
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <div className="text-purple-200">
+                <span className="font-semibold">Day 7:</span> 50 coins + card back
+              </div>
+              <div className="text-purple-200">
+                <span className="font-semibold">Day 14:</span> 100 coins + title
+              </div>
+              <div className="text-purple-200">
+                <span className="font-semibold">Day 21:</span> 150 coins + badge
+              </div>
+              <div className="text-purple-200">
+                <span className="font-semibold">Day 30:</span> 500 coins + exclusive
+                rewards!
+              </div>
+            </div>
+          </UICard>
+        </>
+      )}
+
+      {/* Footer Note */}
+      <p className="text-gray-400 text-sm text-center mt-6 pt-4 border-t border-gray-600">
+        Calendar resets every 30 days • Login daily to maximize rewards
+      </p>
+    </Modal>
   );
 }

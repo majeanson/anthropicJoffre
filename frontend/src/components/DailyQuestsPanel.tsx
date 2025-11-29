@@ -7,9 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { colors } from '../design-system';
-import { UICard } from './ui/UICard';
-import { UIBadge } from './ui/UIBadge';
+import { UICard, UIBadge, Button, LoadingState, EmptyState, Modal, ProgressBar } from './ui';
 
 interface QuestTemplate {
   id: number;
@@ -144,76 +142,44 @@ export function DailyQuestsPanel({
     socket.emit('claim_quest_reward', { playerName, questId });
   };
 
-  const getProgressPercentage = (progress: number, target: number) => {
-    return Math.min(100, Math.floor((progress / target) * 100));
-  };
-
   const getDifficultyLabel = (type: 'easy' | 'medium' | 'hard') => {
     return type.charAt(0).toUpperCase() + type.slice(1);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      onClick={onClose}
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Daily Quests"
+      icon="📋"
+      subtitle="Complete quests to earn XP and coins"
+      theme="purple"
+      size="lg"
+      testId="daily-quests"
     >
-      <div
-        className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className={`bg-gradient-to-r ${colors.gradients.primaryDark} p-6 rounded-t-lg`}>
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-bold text-white">Daily Quests</h2>
-              <p className="text-purple-100 mt-1">
-                Complete quests to earn XP and coins
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-gray-200 text-3xl font-bold leading-none focus:outline-none focus:ring-2 focus:ring-purple-400"
-              aria-label="Close"
-            >
-              ×
-            </button>
-          </div>
+      {/* Notification */}
+      {notification && (
+        <div className="mb-4">
+          <UICard variant="gradient" gradient="success" size="sm" className="text-center animate-pulse">
+            <p className="text-white">{notification}</p>
+          </UICard>
         </div>
+      )}
 
-        {/* Notification */}
-        {notification && (
-          <div className="mx-6 mt-4">
-            <UICard variant="gradient" gradient="success" size="sm" className="text-center animate-pulse">
-              <p className="text-white">{notification}</p>
-            </UICard>
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="p-6">
+      {/* Content */}
+      <div>
           {loading ? (
-            <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-              <p className="text-gray-400 mt-4">Loading quests...</p>
-            </div>
+            <LoadingState message="Loading quests..." size="lg" />
           ) : quests.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-400 text-lg">No quests available</p>
-              <p className="text-gray-500 text-sm mt-2">
-                Check back tomorrow for new quests!
-              </p>
-            </div>
+            <EmptyState
+              icon="📋"
+              title="No quests available"
+              description="Check back tomorrow for new quests!"
+            />
           ) : (
             <div className="space-y-4">
               {quests.map((quest) => {
                 if (!quest.template) return null;
-
-                const progressPercent = getProgressPercentage(
-                  quest.progress,
-                  quest.template.target_value
-                );
 
                 return (
                   <UICard
@@ -254,22 +220,15 @@ export function DailyQuestsPanel({
 
                     {/* Progress Bar */}
                     <div className="mb-3">
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-300">
-                          Progress: {quest.progress}/{quest.template.target_value}
-                        </span>
-                        <span className="text-gray-300">{progressPercent}%</span>
-                      </div>
-                      <div className="w-full bg-gray-600 rounded-full h-3 overflow-hidden">
-                        <div
-                          className={`h-full transition-all duration-500 bg-gradient-to-r ${
-                            quest.completed
-                              ? colors.gradients.success
-                              : colors.gradients.primary
-                          }`}
-                          style={{ width: `${progressPercent}%` }}
-                        ></div>
-                      </div>
+                      <ProgressBar
+                        value={quest.progress}
+                        max={quest.template.target_value}
+                        label={`Progress: ${quest.progress}/${quest.template.target_value}`}
+                        showValue
+                        variant="gradient"
+                        color={quest.completed ? 'success' : 'primary'}
+                        size="md"
+                      />
                     </div>
 
                     {/* Rewards and Action */}
@@ -291,13 +250,13 @@ export function DailyQuestsPanel({
 
                       {/* Claim Button */}
                       {quest.completed && !quest.reward_claimed ? (
-                        <button
+                        <Button
                           onClick={() => handleClaimReward(quest.id)}
                           disabled={claimingQuestId === quest.id}
-                          className={`bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white px-4 py-2 rounded-lg font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-400`}
+                          variant="success"
                         >
                           {claimingQuestId === quest.id ? 'Claiming...' : 'Claim Reward'}
-                        </button>
+                        </Button>
                       ) : quest.reward_claimed ? (
                         <span className="text-green-400 font-semibold">✓ Claimed</span>
                       ) : (
@@ -309,15 +268,14 @@ export function DailyQuestsPanel({
               })}
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div className="bg-gray-700 p-4 rounded-b-lg border-t border-gray-600">
-          <p className="text-gray-400 text-sm text-center">
-            🔄 New quests available every day at midnight
-          </p>
-        </div>
       </div>
-    </div>
+
+      {/* Footer note */}
+      <div className="mt-4 text-center">
+        <p className="text-gray-400 dark:text-gray-500 text-sm">
+          🔄 New quests available every day at midnight
+        </p>
+      </div>
+    </Modal>
   );
 }

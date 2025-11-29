@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon, getRankMedal } from '../utils/tierBadge';
 import { TableSkeleton } from './ui/Skeleton';
-import { colors } from '../design-system';
+import { Modal, Button, UICard, EmptyState } from './ui';
 
 interface LeaderboardPlayer {
   player_name: string;
@@ -59,27 +59,16 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
   }, [isOpen, socket]);
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn" onKeyDown={(e) => e.stopPropagation()}>
-      <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border-4 border-amber-900 dark:border-gray-600">
-        {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-700 to-blue-700 dark:from-purple-800 dark:to-blue-800 p-6 flex items-center justify-between rounded-t-xl border-b-4 border-purple-950 dark:border-gray-900 z-10">
-          <div className="flex items-center gap-3">
-            <span className="text-4xl">🏆</span>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Global Leaderboard</h2>
-              <p className="text-purple-200 dark:text-blue-200">Top {players.length} Players</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="bg-red-600 hover:bg-red-700 text-white w-10 h-10 rounded-full font-bold text-xl transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg"
-          >
-            ✕
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-6">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Global Leaderboard"
+      subtitle={`Top ${players.length} Players`}
+      icon="🏆"
+      theme="purple"
+      size="xl"
+    >
+      <div className="space-y-4">
           {loading && (
             <div className="space-y-4">
               <TableSkeleton rows={10} columns={7} showHeader={true} />
@@ -87,27 +76,24 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
           )}
 
           {!loading && players.length === 0 && (
-            <div className="text-center py-12">
-              <span className="text-6xl">🎮</span>
-              <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold text-lg">
-                No players yet!
-              </p>
-              <p className="text-gray-600 dark:text-gray-400">
-                Be the first to play and claim the top spot!
-              </p>
-            </div>
+            <EmptyState
+              icon="🎮"
+              title="No players yet!"
+              description="Be the first to play and claim the top spot!"
+              card
+            />
           )}
 
           {!loading && players.length > 0 && (
             <div className="space-y-4">
               {/* Toggle Stats View Button */}
               <div className="flex justify-center">
-                <button
+                <Button
+                  variant="primary"
                   onClick={() => setShowRoundStats(!showRoundStats)}
-                  className={`bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2`}
                 >
                   {showRoundStats ? '🏆 Show Game Stats' : '📊 Show Round Stats'}
-                </button>
+                </Button>
               </div>
 
               {/* Table Header - Game Stats */}
@@ -222,41 +208,40 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
               ))}
             </div>
           )}
-        </div>
 
-        {/* Footer */}
-        {!loading && players.length > 0 && (
-          <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-b-xl border-t-2 border-gray-300 dark:border-gray-600">
-            <div className="flex flex-wrap gap-4 justify-center text-sm text-gray-600 dark:text-gray-400">
-              <div className="flex items-center gap-2">
-                <span>💎 Diamond:</span>
-                <span className="font-bold">{players.filter(p => p.ranking_tier === 'Diamond').length}</span>
+          {/* Footer */}
+          {!loading && players.length > 0 && (
+            <UICard variant="bordered" size="md" className="mt-4">
+              <div className="flex flex-wrap gap-4 justify-center text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2">
+                  <span>💎 Diamond:</span>
+                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Diamond').length}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>🏆 Platinum:</span>
+                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Platinum').length}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>🥇 Gold:</span>
+                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Gold').length}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>🥈 Silver:</span>
+                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Silver').length}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>🥉 Bronze:</span>
+                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Bronze').length}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span>🏆 Platinum:</span>
-                <span className="font-bold">{players.filter(p => p.ranking_tier === 'Platinum').length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>🥇 Gold:</span>
-                <span className="font-bold">{players.filter(p => p.ranking_tier === 'Gold').length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>🥈 Silver:</span>
-                <span className="font-bold">{players.filter(p => p.ranking_tier === 'Silver').length}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>🥉 Bronze:</span>
-                <span className="font-bold">{players.filter(p => p.ranking_tier === 'Bronze').length}</span>
-              </div>
-            </div>
-            {onViewPlayerStats && (
-              <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
-                Click on a player to view detailed statistics
-              </p>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+              {onViewPlayerStats && (
+                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
+                  Click on a player to view detailed statistics
+                </p>
+              )}
+            </UICard>
+          )}
+        </div>
+    </Modal>
   );
 }

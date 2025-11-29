@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { UIBadge } from './ui/UIBadge';
 
 interface TimeoutIndicatorProps {
   duration: number; // Duration in milliseconds
@@ -51,15 +52,15 @@ export function TimeoutIndicator({ duration, isActive, resetKey, onTimeout }: Ti
   const percentage = (timeRemaining / duration) * 100;
 
   // Color based on urgency (smooth transitions, no flashing)
-  const getBadgeColor = () => {
-    if (percentage > 50) return 'bg-green-500 text-white';
-    if (percentage > 25) return 'bg-yellow-500 text-white';
-    return 'bg-red-500 text-white';
+  const getBadgeColor = (): 'success' | 'warning' | 'error' => {
+    if (percentage > 50) return 'success';
+    if (percentage > 25) return 'warning';
+    return 'error';
   };
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 md:px-3 md:py-1 rounded-full text-xs md:text-sm font-bold transition-colors duration-500 ${getBadgeColor()}`}>
+    <UIBadge variant="solid" color={getBadgeColor()} size="sm" className="transition-colors duration-500">
       ⏱️ {seconds}s
-    </span>
+    </UIBadge>
   );
 }

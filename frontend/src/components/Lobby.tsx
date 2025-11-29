@@ -20,7 +20,7 @@ import { OnlinePlayer } from '../types/game';
 import { useAuth } from '../contexts/AuthContext';
 import { ProfileButton } from './ProfileButton';
 import { ProfileEditorModal } from './ProfileEditorModal';
-import { colors } from '../design-system';
+import { Button } from './ui/Button';
 
 // Lazy load heavy modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -444,20 +444,22 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       </p>
                     )}
                     <div className="flex items-center justify-center gap-2">
-                      <button
+                      <Button
                         data-keyboard-nav="login-btn"
                         onClick={onShowLogin}
-                        className={`text-sm px-4 py-2 bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white rounded-lg font-semibold transition-all duration-200 shadow focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                        variant="primary"
+                        size="sm"
                       >
                         Login
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         data-keyboard-nav="register-btn"
                         onClick={onShowRegister}
-                        className={`text-sm px-4 py-2 bg-gradient-to-r ${colors.gradients.success} hover:${colors.gradients.successHover} text-white rounded-lg font-semibold transition-all duration-200 shadow focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2`}
+                        variant="success"
+                        size="sm"
                       >
                         Register
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -467,25 +469,20 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             {/* Horizontal Tab Navigation */}
             <div className="mb-6">
               <div className="grid grid-cols-4 gap-2 mb-4">
-                <button
+                <Button
                   data-nav-tab="play"
                   onClick={() => { sounds.buttonClick(); setMainTab('play'); setNavCol(0); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
-                    mainTab === 'play'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
-                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                  }`}
+                  variant={mainTab === 'play' ? 'primary' : 'ghost'}
+                  size="md"
                 >
                   PLAY
-                </button>
-                <button
+                </Button>
+                <Button
                   data-nav-tab="social"
                   onClick={() => { sounds.buttonClick(); setMainTab('social'); setNavCol(1); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm relative focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
-                    mainTab === 'social'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
-                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                  }`}
+                  variant={mainTab === 'social' ? 'primary' : 'ghost'}
+                  size="md"
+                  className="relative"
                 >
                   SOCIAL
                   {onlinePlayers.length > 0 && (
@@ -493,29 +490,23 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       {onlinePlayers.length}
                     </span>
                   )}
-                </button>
-                <button
+                </Button>
+                <Button
                   data-nav-tab="stats"
                   onClick={() => { sounds.buttonClick(); setMainTab('stats'); setNavCol(2); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
-                    mainTab === 'stats'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
-                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                  }`}
+                  variant={mainTab === 'stats' ? 'primary' : 'ghost'}
+                  size="md"
                 >
                   STATS
-                </button>
-                <button
+                </Button>
+                <Button
                   data-nav-tab="settings"
                   onClick={() => { sounds.buttonClick(); setMainTab('settings'); setNavCol(3); }}
-                  className={`py-3 rounded-lg font-bold transition-all duration-200 text-sm focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-2 ${
-                    mainTab === 'settings'
-                      ? 'bg-gradient-to-r from-umber-600 to-umber-700 dark:from-purple-700 dark:to-purple-800 text-white shadow-lg scale-105 border-b-4 border-orange-500 dark:border-purple-500'
-                      : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-                  }`}
+                  variant={mainTab === 'settings' ? 'primary' : 'ghost'}
+                  size="md"
                 >
                   SETTINGS
-                </button>
+                </Button>
               </div>
 
               {/* Tab Content */}

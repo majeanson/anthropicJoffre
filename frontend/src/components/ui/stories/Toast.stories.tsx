@@ -132,6 +132,10 @@ export const LongMessage: Story = {
 
 // All variants showcase
 export const AllVariants: Story = {
+  args: {
+    message: 'Example message',
+    onClose: () => console.log('Closed'),
+  },
   render: () => {
     const [toasts, setToasts] = useState([
       { id: 1, variant: 'success' as const, message: 'Quest completed!' },
@@ -164,6 +168,10 @@ export const AllVariants: Story = {
 
 // Interactive example with manual dismiss
 export const Interactive: Story = {
+  args: {
+    message: 'Click the close button to dismiss',
+    onClose: () => console.log('Closed'),
+  },
   render: () => {
     const [showToast, setShowToast] = useState(true);
 
@@ -199,6 +207,10 @@ export const Interactive: Story = {
 
 // Quest-related toasts
 export const QuestToasts: Story = {
+  args: {
+    message: 'Quest example',
+    onClose: () => console.log('Closed'),
+  },
   render: () => {
     const [toasts, setToasts] = useState([
       { id: 1, variant: 'success' as const, title: 'Quest Complete!', message: 'Play 5 Games - Reward: 100 points', icon: '📋' },

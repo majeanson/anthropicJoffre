@@ -25,13 +25,13 @@
  * ```
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { User } from '../types/auth';
 import Avatar from './Avatar';
 import { PlayerProfileModal } from './PlayerProfileModal';
 import { useAuth } from '../contexts/AuthContext';
-import { designTokens } from '../styles/designTokens';
+import { UIDropdownMenu, DropdownMenuItem } from './ui';
 
 interface ProfileButtonProps {
   user: User | null;
@@ -53,114 +53,101 @@ export function ProfileButton({
   compact = false
 }: ProfileButtonProps) {
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const { logout } = useAuth();
 
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
-      }
-    };
-
-    if (showDropdown) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [showDropdown]);
-
-  const handleClick = () => {
-    if (user) {
-      setShowDropdown(!showDropdown);
-    } else if (onShowLogin) {
-      onShowLogin();
-    }
-  };
-
   const handleViewProfile = () => {
-    setShowDropdown(false);
     setShowProfileModal(true);
   };
 
   const handleEditProfile = () => {
-    setShowDropdown(false);
     if (onShowProfileEditor) {
       onShowProfileEditor();
     }
   };
 
   const handleLogout = () => {
-    setShowDropdown(false);
     logout();
   };
 
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={handleClick}
-        className={`flex items-center gap-3 bg-gradient-to-r from-parchment-200 to-parchment-300 dark:from-gray-700 dark:to-gray-600 hover:from-parchment-300 hover:to-parchment-400 dark:hover:from-gray-600 dark:hover:to-gray-500 px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-parchment-400 dark:border-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
-        title={user ? `View ${user.username}'s profile` : 'Sign in to view your profile'}
-      >
-        <Avatar
-          username={user?.username || playerName || 'Guest'}
-          avatarUrl={user?.avatar_url}
-          size={compact ? "sm" : "md"}
-        />
-        {!compact && (
-          <div className="flex flex-col items-start">
-            <div className="text-xs font-medium text-umber-600 dark:text-gray-400 uppercase tracking-wide">
-              My Profile
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-base font-bold text-umber-900 dark:text-gray-100 max-w-[120px] truncate">
-                {user?.username || playerName || 'Guest'}
-              </span>
-              {user?.is_verified && (
-                <span className="text-blue-500 text-sm" title="Verified">
-                  ✓
-                </span>
-              )}
-              {user && (
-                <svg className="w-4 h-4 text-umber-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              )}
-            </div>
-          </div>
-        )}
-      </button>
+  // Define dropdown menu items
+  const menuItems: DropdownMenuItem[] = [
+    {
+      label: 'View Profile',
+      icon: '👤',
+      onClick: handleViewProfile,
+      'data-testid': 'view-profile-button',
+    },
+    {
+      label: 'Edit Profile',
+      icon: '✏️',
+      onClick: handleEditProfile,
+      'data-testid': 'edit-profile-button',
+    },
+    { type: 'divider' },
+    {
+      label: 'Logout',
+      icon: '🚪',
+      onClick: handleLogout,
+      danger: true,
+      'data-testid': 'logout-button',
+    },
+  ];
 
-      {/* Dropdown Menu - Only for authenticated users */}
-      {user && showDropdown && (
-        <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 animate-fade-in">
-          <div className="py-2">
-            <button
-              onClick={handleViewProfile}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
-            >
-              <span aria-hidden="true">👤</span>
-              <span>View Profile</span>
-            </button>
-            <button
-              onClick={handleEditProfile}
-              className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
-            >
-              <span aria-hidden="true">✏️</span>
-              <span>Edit Profile</span>
-            </button>
-            <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-            <button
-              onClick={handleLogout}
-              className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 transition-colors focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-700"
-            >
-              <span aria-hidden="true">🚪</span>
-              <span>Logout</span>
-            </button>
+  // Trigger button element
+  const triggerButton = (
+    <button
+      onClick={!user ? onShowLogin : undefined}
+      className={`flex items-center gap-3 bg-gradient-to-r from-parchment-200 to-parchment-300 dark:from-gray-700 dark:to-gray-600 hover:from-parchment-300 hover:to-parchment-400 dark:hover:from-gray-600 dark:hover:to-gray-500 px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-parchment-400 dark:border-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
+      title={user ? `View ${user.username}'s profile` : 'Sign in to view your profile'}
+    >
+      <Avatar
+        username={user?.username || playerName || 'Guest'}
+        avatarUrl={user?.avatar_url}
+        size={compact ? "sm" : "md"}
+      />
+      {!compact && (
+        <div className="flex flex-col items-start">
+          <div className="text-xs font-medium text-umber-600 dark:text-gray-400 uppercase tracking-wide">
+            My Profile
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-base font-bold text-umber-900 dark:text-gray-100 max-w-[120px] truncate">
+              {user?.username || playerName || 'Guest'}
+            </span>
+            {user?.is_verified && (
+              <span className="text-blue-500 text-sm" title="Verified">
+                ✓
+              </span>
+            )}
+            {user && (
+              <svg className="w-4 h-4 text-umber-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            )}
           </div>
         </div>
       )}
+    </button>
+  );
+
+  // For non-authenticated users, just render the button without dropdown
+  if (!user) {
+    return (
+      <div className="relative">
+        {triggerButton}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <UIDropdownMenu
+        trigger={triggerButton}
+        items={menuItems}
+        position="bottom-right"
+        width="md"
+        testId="profile-dropdown"
+      />
 
       {/* Profile Modal */}
       {user && socket && (
@@ -171,6 +158,6 @@ export function ProfileButton({
           onClose={() => setShowProfileModal(false)}
         />
       )}
-    </div>
+    </>
   );
 }

@@ -153,17 +153,13 @@ export const PlayerPosition = memo(function PlayerPosition({
       'max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg';
 
     let colorClasses = '';
-    let bgStyle = {};
     if (!player || player.isEmpty) {
       colorClasses =
         'text-gray-200 border-2 border-dashed border-gray-500';
-      bgStyle = { background: 'linear-gradient(to bottom right, rgb(156, 163, 175), rgb(75, 85, 99))' };
     } else if (player.teamId === 1) {
       colorClasses = 'text-white';
-      bgStyle = { background: colors.gradients.team1 };
     } else {
       colorClasses = 'text-white';
-      bgStyle = { background: colors.gradients.team2 };
     }
 
     const winnerRing = isWinner ? 'ring-2 md:ring-3 ring-yellow-400' : '';

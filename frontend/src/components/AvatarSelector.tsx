@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { AVATARS, AVATAR_CATEGORIES, Avatar } from '../utils/avatars';
+import { Button } from './ui/Button';
 
 interface AvatarSelectorProps {
   selectedAvatarId?: string;
@@ -22,46 +23,42 @@ export function AvatarSelector({ selectedAvatarId, onSelect }: AvatarSelectorPro
     <div className="space-y-4">
       {/* Category Filter */}
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
+          variant={selectedCategory === 'all' ? 'primary' : 'ghost'}
+          size="sm"
           onClick={() => setSelectedCategory('all')}
-          className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
-            selectedCategory === 'all'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-          }`}
         >
           All
-        </button>
+        </Button>
         {AVATAR_CATEGORIES.map(category => (
-          <button
+          <Button
             key={category.id}
+            variant={selectedCategory === category.id ? 'primary' : 'ghost'}
+            size="sm"
             onClick={() => setSelectedCategory(category.id)}
-            className={`px-3 py-1 rounded-lg text-sm font-semibold transition-all ${
-              selectedCategory === category.id
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-            }`}
           >
             {category.name}
-          </button>
+          </Button>
         ))}
       </div>
 
       {/* Avatar Grid */}
       <div className="grid grid-cols-6 gap-2 max-h-64 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
         {filteredAvatars.map(avatar => (
-          <button
+          <Button
             key={avatar.id}
             onClick={() => onSelect(avatar.id)}
-            className={`aspect-square flex items-center justify-center text-4xl rounded-lg transition-all hover:scale-110 ${
+            variant={selectedAvatarId === avatar.id ? 'primary' : 'ghost'}
+            size="lg"
+            className={`aspect-square flex items-center justify-center text-4xl hover:scale-110 ${
               selectedAvatarId === avatar.id
-                ? 'bg-blue-500 ring-4 ring-blue-400 scale-110'
-                : 'bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600'
+                ? 'ring-4 ring-blue-400 scale-110'
+                : ''
             }`}
             title={avatar.name}
           >
             {avatar.emoji}
-          </button>
+          </Button>
         ))}
       </div>
 

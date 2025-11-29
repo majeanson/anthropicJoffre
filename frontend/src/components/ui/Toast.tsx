@@ -22,7 +22,8 @@
  */
 
 import { useEffect, useState } from 'react';
-import { colors, spacing, shadows, typography } from '../../design-system';
+import { spacing, shadows, typography } from '../../design-system';
+import { Button } from './Button';
 
 export type ToastVariant = 'success' | 'warning' | 'error' | 'info';
 
@@ -144,20 +145,15 @@ export function Toast({
 
       {/* Close button */}
       {showCloseButton && (
-        <button
+        <Button
           onClick={handleClose}
-          className={`
-            flex-shrink-0 ml-4
-            text-gray-400 hover:text-gray-600 dark:hover:text-gray-200
-            transition-colors duration-200
-            ${colors.focus.light} dark:${colors.focus.dark}
-            focus-visible:ring-2 focus-visible:ring-offset-2
-            rounded
-          `}
+          variant="ghost"
+          size="sm"
+          className="flex-shrink-0 ml-4 !p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           aria-label="Close notification"
         >
           <span className="text-xl">×</span>
-        </button>
+        </Button>
       )}
 
       {/* Progress bar */}

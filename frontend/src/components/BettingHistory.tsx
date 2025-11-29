@@ -7,7 +7,7 @@
  */
 
 import { Bet, Player } from '../types/game';
-import { colors } from '../design-system';
+import { UICard, UIBadge, Button } from './ui';
 
 interface BettingHistoryProps {
   players: Player[];
@@ -40,7 +40,7 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
     : null;
 
   return (
-    <div className="bg-gradient-to-br from-parchment-100 to-parchment-200 dark:from-gray-800 dark:to-gray-900 border-2 border-umber-700 dark:border-gray-600 rounded-lg p-4 shadow-md">
+    <UICard variant="bordered" size="md" className="bg-gradient-to-br from-parchment-100 to-parchment-200 dark:from-gray-800 dark:to-gray-900 shadow-md">
       <div className="text-umber-800 dark:text-gray-300 font-bold text-sm mb-3 flex items-center gap-2">
         <span className="text-lg">📜</span>
         <span>Betting History</span>
@@ -89,32 +89,39 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
                   <div className="flex items-center gap-1">
                     {/* Player name - clickable if not a bot and onClickPlayer is provided */}
                     {!player.isBot && onClickPlayer ? (
-                      <button
+                      <Button
                         onClick={() => onClickPlayer(player.name)}
-                        className="font-bold text-sm hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
+                        variant="link"
+                        size="sm"
+                        className="font-bold text-sm !p-0 !px-1 !-mx-1"
                         title={`View ${player.name}'s profile`}
                       >
                         {player.name}
-                      </button>
+                      </Button>
                     ) : (
                       <span className="font-bold text-sm">
                         {player.name}
                       </span>
                     )}
                     {/* Team color badge - ALWAYS visible */}
-                    <span
-                      className={`text-xs px-1.5 py-0.5 rounded font-bold ${
-                        player.teamId === 1
-                          ? 'bg-orange-600 dark:bg-orange-500 text-white'
-                          : 'bg-purple-600 dark:bg-purple-500 text-white'
-                      }`}
-                      title={`Team ${player.teamId}`}
-                    >
-                      T{player.teamId}
+                    <span title={`Team ${player.teamId}`}>
+                      <UIBadge
+                        variant="solid"
+                        color={player.teamId === 1 ? 'team1' : 'team2'}
+                        size="xs"
+                      >
+                        T{player.teamId}
+                      </UIBadge>
                     </span>
                     {isDealer && (
-                      <span className="text-xs bg-white/30 px-1.5 py-0.5 rounded" title="Dealer">
-                        🎴
+                      <span title="Dealer">
+                        <UIBadge
+                          variant="subtle"
+                          color="gray"
+                          size="xs"
+                        >
+                          🎴
+                        </UIBadge>
                       </span>
                     )}
                   </div>
@@ -125,20 +132,23 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
               <div className="flex items-center gap-2">
                 {bet ? (
                   bet.skipped ? (
-                    <span className="text-xs font-bold text-gray-600 dark:text-gray-400">
+                    <UIBadge variant="outline" color="gray" size="sm">
                       SKIP
-                    </span>
+                    </UIBadge>
                   ) : (
                     <>
                       <span className="text-xl font-black">
                         {bet.amount}
                       </span>
                       {bet.withoutTrump && (
-                        <span
-                          className="text-xs bg-white/30 px-2 py-1 rounded font-bold"
-                          title="Without Trump (2x points)"
-                        >
-                          ×2
+                        <span title="Without Trump (2x points)">
+                          <UIBadge
+                            variant="subtle"
+                            color="gray"
+                            size="xs"
+                          >
+                            ×2
+                          </UIBadge>
                         </span>
                       )}
                       {isHighestBet && (
@@ -172,6 +182,6 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
           </div>
         </div>
       </div>
-    </div>
+    </UICard>
   );
 }

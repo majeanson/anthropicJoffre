@@ -100,6 +100,10 @@ export const ZeroCount: Story = {
 };
 
 export const AbsolutePosition: Story = {
+  args: {
+    count: 5,
+    position: 'absolute',
+  },
   render: () => (
     <div className="relative inline-block p-4 bg-gray-700 rounded">
       <span className="text-white">Notifications</span>
@@ -109,6 +113,9 @@ export const AbsolutePosition: Story = {
 };
 
 export const AllVariants: Story = {
+  args: {
+    count: 3,
+  },
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
@@ -132,6 +139,9 @@ export const AllVariants: Story = {
 };
 
 export const AllSizes: Story = {
+  args: {
+    count: 5,
+  },
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">

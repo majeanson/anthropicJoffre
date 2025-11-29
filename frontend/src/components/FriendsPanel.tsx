@@ -19,8 +19,9 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { FriendWithStatus, FriendRequest, FriendRequestNotification } from '../types/friends';
-import { Modal, Button, SocialListItem, UnreadBadge } from './ui';
+import { Modal, Button, SocialListItem, UIBadge, Tabs, Input, EmptyState, LoadingState } from './ui';
 import type { PlayerStatus } from './ui/OnlineStatusBadge';
+import type { Tab } from './ui/Tabs';
 
 interface FriendsPanelProps {
   socket: Socket | null;
@@ -140,6 +141,13 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
 
   const pendingRequestsCount = pendingRequests.length;
 
+  // Define tabs with badges
+  const tabs: Tab[] = [
+    { id: 'friends', label: `Friends (${friends.length})`, icon: '👥' },
+    { id: 'requests', label: 'Requests', icon: '📩', badge: pendingRequestsCount },
+    { id: 'search', label: 'Add Friends', icon: '🔍' },
+  ];
+
   return (
     <Modal
       isOpen={isOpen}
@@ -150,47 +158,14 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
       size="lg"
     >
       {/* Tab Navigation */}
-      <div className="flex border-b border-gray-700 -mt-4 mb-4">
-        <button
-          onClick={() => setActiveTab('friends')}
-          className={`flex-1 py-3 px-4 font-semibold transition-colors ${
-            activeTab === 'friends'
-              ? 'bg-purple-600 text-white'
-              : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-          }`}
-        >
-          Friends ({friends.length})
-        </button>
-        <button
-          onClick={() => setActiveTab('requests')}
-          className={`flex-1 py-3 px-4 font-semibold transition-colors relative ${
-            activeTab === 'requests'
-              ? 'bg-purple-600 text-white'
-              : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-          }`}
-        >
-          Requests
-          {pendingRequestsCount > 0 && (
-            <UnreadBadge
-              count={pendingRequestsCount}
-              variant="red"
-              size="sm"
-              position="absolute"
-              className="top-2 right-2"
-            />
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('search')}
-          className={`flex-1 py-3 px-4 font-semibold transition-colors ${
-            activeTab === 'search'
-              ? 'bg-purple-600 text-white'
-              : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
-          }`}
-        >
-          Add Friends
-        </button>
-      </div>
+      <Tabs
+        tabs={tabs}
+        activeTab={activeTab}
+        onChange={(tabId) => setActiveTab(tabId as 'friends' | 'requests' | 'search')}
+        variant="boxed"
+        fullWidth
+        className="-mt-4 mb-4"
+      />
 
       {/* Content */}
       <div className="space-y-4">
@@ -199,10 +174,11 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
         {activeTab === 'friends' && (
           <div className="space-y-3">
             {friends.length === 0 ? (
-              <div className="text-center py-12 text-gray-400">
-                <p className="text-lg">No friends yet</p>
-                <p className="text-sm mt-2">Add some friends to get started!</p>
-              </div>
+              <EmptyState
+                icon="👥"
+                title="No friends yet"
+                description="Add some friends to get started!"
+              />
             ) : (
               friends.map((friend) => (
                 <SocialListItem
@@ -243,7 +219,7 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
               <h3 className="text-lg font-semibold text-white mb-3">Received Requests</h3>
               <div className="space-y-3">
                 {pendingRequests.length === 0 ? (
-                  <p className="text-gray-400 text-center py-4">No pending requests</p>
+                  <EmptyState icon="📬" title="No pending requests" compact />
                 ) : (
                   pendingRequests.map((request) => (
                     <SocialListItem
@@ -280,7 +256,7 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
               <h3 className="text-lg font-semibold text-white mb-3">Sent Requests</h3>
               <div className="space-y-3">
                 {sentRequests.length === 0 ? (
-                  <p className="text-gray-400 text-center py-4">No sent requests</p>
+                  <EmptyState icon="📤" title="No sent requests" compact />
                 ) : (
                   sentRequests.map((request) => (
                     <SocialListItem
@@ -288,9 +264,9 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
                       playerName={request.to_player}
                       metadata={`Sent ${new Date(request.created_at).toLocaleDateString()}`}
                       actions={
-                        <span className="px-3 py-1 bg-yellow-600 text-white text-sm rounded font-semibold">
+                        <UIBadge variant="solid" color="warning" size="sm">
                           Pending
-                        </span>
+                        </UIBadge>
                       }
                     />
                   ))
@@ -304,13 +280,15 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
         {activeTab === 'search' && (
           <div className="space-y-4">
             <div className="flex gap-2">
-              <input
+              <Input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 placeholder="Search for players..."
-                className="flex-1 px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-purple-500 focus:outline-none"
+                variant="filled"
+                leftIcon={<span>🔍</span>}
+                containerClassName="flex-1"
               />
               <Button
                 variant="primary"
@@ -323,11 +301,11 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
             </div>
 
             {isLoading && (
-              <p className="text-gray-400 text-center py-4">Searching...</p>
+              <LoadingState message="Searching..." size="sm" />
             )}
 
             {!isLoading && searchResults.length === 0 && searchQuery.length >= 2 && (
-              <p className="text-gray-400 text-center py-4">No players found</p>
+              <EmptyState icon="🔍" title="No players found" compact />
             )}
 
             <div className="space-y-3">
@@ -342,13 +320,13 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
                     metadata={`${player.games_played} games • ${player.games_won} wins`}
                     actions={
                       alreadyFriend ? (
-                        <span className="px-3 py-1 bg-green-600 text-white text-sm rounded font-semibold">
+                        <UIBadge variant="solid" color="success" size="sm">
                           Friends
-                        </span>
+                        </UIBadge>
                       ) : alreadySent ? (
-                        <span className="px-3 py-1 bg-yellow-600 text-white text-sm rounded font-semibold">
+                        <UIBadge variant="solid" color="warning" size="sm">
                           Pending
-                        </span>
+                        </UIBadge>
                       ) : (
                         <Button
                           variant="primary"

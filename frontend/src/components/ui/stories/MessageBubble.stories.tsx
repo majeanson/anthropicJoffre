@@ -77,6 +77,11 @@ export const OldMessage: Story = {
 };
 
 export const ConversationExample: Story = {
+  args: {
+    text: 'Example message',
+    isSent: true,
+    timestamp: new Date().toISOString(),
+  },
   render: () => (
     <div className="max-w-2xl space-y-3 bg-gray-900 p-4 rounded-lg">
       <MessageBubble

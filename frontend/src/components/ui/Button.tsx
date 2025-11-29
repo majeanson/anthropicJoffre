@@ -32,7 +32,7 @@
  * ```
  */
 
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import { ButtonHTMLAttributes, ReactNode, forwardRef } from 'react';
 import { colors, spacing, shadows } from '../../design-system';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost' | 'link';
@@ -129,7 +129,7 @@ const sizeClasses: Record<ButtonSize, string> = {
   xl: `${spacing.button.xl} text-xl`,    // py-4 px-8 text-xl
 };
 
-export function Button({
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button({
   variant = 'primary',
   size = 'md',
   children,
@@ -141,7 +141,7 @@ export function Button({
   className = '',
   type = 'button',
   ...props
-}: ButtonProps) {
+}, ref) {
   const isDisabled = disabled || loading;
 
   // Loading spinner
@@ -170,6 +170,7 @@ export function Button({
 
   return (
     <button
+      ref={ref}
       type={type}
       className={`
         ${variantClasses[variant]}
@@ -192,4 +193,4 @@ export function Button({
       {!loading && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
     </button>
   );
-}
+});

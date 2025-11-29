@@ -297,12 +297,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Latest Done Features</h3>
-                  <button
+                  <Button
                     onClick={() => setShowLatestFeatures(!showLatestFeatures)}
-                    className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                    variant="secondary"
+                    size="xs"
                   >
                     {showLatestFeatures ? 'Hide' : 'Show'}
-                  </button>
+                  </Button>
                 </div>
 
                 {showLatestFeatures && (
@@ -346,12 +347,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Future Features</h3>
-                  <button
+                  <Button
                     onClick={() => setShowFutureFeatures(!showFutureFeatures)}
-                    className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                    variant="secondary"
+                    size="xs"
                   >
                     {showFutureFeatures ? 'Hide' : 'Show'}
-                  </button>
+                  </Button>
                 </div>
 
                 {showFutureFeatures && (
@@ -377,12 +379,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Server Health</h3>
-                <button
+                <Button
                   onClick={() => setShowHealth(!showHealth)}
-                  className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                  variant="secondary"
+                  size="xs"
                 >
                   {showHealth ? 'Hide' : 'Show'} Health
-                </button>
+                </Button>
               </div>
 
               {showHealth && (
@@ -397,12 +400,14 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                   {healthError && (
                     <div className="bg-red-50 dark:bg-red-900/20 px-3 py-3 rounded border border-red-300 dark:border-red-700">
                       <p className="text-sm text-red-700 dark:text-red-300">❌ {healthError}</p>
-                      <button
+                      <Button
                         onClick={fetchHealthData}
-                        className="text-xs text-red-600 dark:text-red-400 underline mt-1"
+                        variant="link"
+                        size="xs"
+                        className="text-red-600 dark:text-red-400 mt-1"
                       >
                         Retry
-                      </button>
+                      </Button>
                     </div>
                   )}
 
@@ -418,12 +423,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                             Uptime: {healthData.uptime.formatted}
                           </p>
                         </div>
-                        <button
+                        <Button
                           onClick={fetchHealthData}
-                          className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                          variant="link"
+                          size="xs"
                         >
                           🔄 Refresh
-                        </button>
+                        </Button>
                       </div>
 
                       {/* Game State */}
@@ -506,12 +512,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Game Monitoring ({games.length} active)</h3>
-                <button
+                <Button
                   onClick={() => setShowGames(!showGames)}
-                  className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                  variant="secondary"
+                  size="xs"
                 >
                   {showGames ? 'Hide' : 'Show'} Games
-                </button>
+                </Button>
               </div>
 
               {showGames && (
@@ -635,12 +642,13 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-indigo-900 dark:text-indigo-200">Sentry Error Tracking Tests</h3>
-                <button
+                <Button
                   onClick={() => setShowSentry(!showSentry)}
-                  className="text-xs bg-indigo-600 dark:bg-indigo-700 text-white px-3 py-1 rounded hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
+                  variant="secondary"
+                  size="xs"
                 >
                   {showSentry ? 'Hide' : 'Show'} Tests
-                </button>
+                </Button>
               </div>
 
               {showSentry && (

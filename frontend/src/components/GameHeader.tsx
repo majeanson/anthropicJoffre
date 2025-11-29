@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { SettingsPanel } from './SettingsPanel';
 import { TutorialProgressModal } from './TutorialProgressModal';
+import { HeaderActionButton, Button } from './ui';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { CardColor } from '../types/game';
 import { useCountUp } from '../hooks/useCountUp';
 import { useSettings } from '../contexts/SettingsContext';
 import logger from '../utils/logger';
-import { colors } from '../design-system';
 
 interface GameHeaderProps {
   gameId: string;
@@ -142,15 +142,17 @@ export function GameHeader({
         {/* Desktop: Single row - All items on same horizontal line */}
         <div className="hidden md:flex items-center gap-3">
           {/* Game Info - Clickable to copy link */}
-          <button
+          <Button
             onClick={handleCopyGameLink}
-            className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0 hover:bg-white/30 dark:hover:bg-black/30 transition-all cursor-pointer border border-transparent hover:border-white/50"
+            variant="ghost"
+            size="xs"
+            className="!bg-white/20 dark:!bg-black/20 !text-white/80 dark:!text-gray-300 hover:!bg-white/30 dark:hover:!bg-black/30"
             title="Click to copy game link"
           >
-            <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">
+            <p className="text-xs font-mono font-bold">
               {linkCopied ? '✓ Copied!' : gameId}
             </p>
-          </button>
+          </Button>
           <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
             <p className="text-xs text-white dark:text-gray-100 font-bold" data-testid="round-number">R{roundNumber}</p>
           </div>
@@ -210,107 +212,81 @@ export function GameHeader({
           <div className="flex items-center gap-2 flex-wrap">
             {/* Chat Button */}
             {onOpenChat && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenChat}
-                className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                icon="💬"
+                label="Chat"
+                badgeCount={unreadChatCount}
                 title="Chat"
-                data-testid="header-chat-button"
-              >
-                <span className="text-base md:text-lg">💬</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Chat</span>
-                {unreadChatCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
-                    {unreadChatCount}
-                  </span>
-                )}
-              </button>
+                testId="header-chat-button"
+              />
             )}
 
             {/* Leaderboard Button */}
             {onOpenLeaderboard && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenLeaderboard}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                icon="🏆"
+                label="Stats"
                 title="Leaderboard"
-                data-testid="header-leaderboard-button"
-              >
-                <span className="text-base md:text-lg">🏆</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Stats</span>
-              </button>
+                testId="header-leaderboard-button"
+              />
             )}
 
             {/* Achievements Button - Sprint 2 Phase 1 */}
             {onOpenAchievements && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenAchievements}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                icon="🏅"
+                label="Achievements"
                 title="Achievements"
-                data-testid="header-achievements-button"
-              >
-                <span className="text-base md:text-lg">🏅</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Achievements</span>
-              </button>
+                testId="header-achievements-button"
+              />
             )}
 
             {/* Friends Button - Sprint 2 Phase 2 */}
             {onOpenFriends && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenFriends}
-                className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                icon="👥"
+                label="Friends"
+                badgeCount={pendingFriendRequestsCount}
                 title="Friends"
-                data-testid="header-friends-button"
-              >
-                <span className="text-base md:text-lg">👥</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Friends</span>
-                {pendingFriendRequestsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
-                    {pendingFriendRequestsCount}
-                  </span>
-                )}
-              </button>
+                testId="header-friends-button"
+              />
             )}
 
             {/* Notifications Button - Sprint 3 Phase 5 */}
             {onOpenNotifications && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenNotifications}
-                className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                icon="🔔"
+                label="Notifications"
+                badgeCount={unreadNotificationsCount}
                 title="Notifications"
-                data-testid="header-notifications-button"
-              >
-                <span className="text-base md:text-lg">🔔</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Notifications</span>
-                {unreadNotificationsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
-                    {unreadNotificationsCount}
-                  </span>
-                )}
-              </button>
+                testId="header-notifications-button"
+              />
             )}
 
             {/* Tutorial Progress Button - Only in beginner mode */}
             {beginnerMode && (
-              <button
+              <HeaderActionButton
                 onClick={() => setTutorialProgressOpen(true)}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+                icon="📚"
+                label="Tutorials"
                 title="Tutorial Progress"
-                data-testid="header-tutorial-button"
-              >
-                <span className="text-base md:text-lg">📚</span>
-                <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Tutorials</span>
-              </button>
+                testId="header-tutorial-button"
+              />
             )}
 
             {/* Settings Button - Opens unified settings panel */}
-            <button
+            <HeaderActionButton
               onClick={() => setSettingsOpen(true)}
-              className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 md:px-3 md:py-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center gap-1.5"
+              icon="⚙️"
+              label="Settings"
               title="Settings"
-              data-testid="header-settings-button"
-            >
-              <span className="text-base md:text-lg">⚙️</span>
-              <span className="hidden md:inline text-white dark:text-gray-100 font-semibold text-sm">Settings</span>
-            </button>
+              testId="header-settings-button"
+            />
           </div>
         </div>
 
@@ -318,15 +294,17 @@ export function GameHeader({
         <div className="md:hidden space-y-1">
           {/* Row 1: Game Info and Scores */}
           <div className="flex items-center gap-2">
-            <button
+            <Button
               onClick={handleCopyGameLink}
-              className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0 active:bg-white/30 dark:active:bg-black/30"
+              variant="ghost"
+              size="xs"
+              className="!bg-white/20 dark:!bg-black/20 !text-white/80 dark:!text-gray-300"
               title="Click to copy game link"
             >
-              <p className="text-xs text-white/80 dark:text-gray-300 font-mono font-bold">
+              <p className="text-xs font-mono font-bold">
                 {linkCopied ? '✓' : gameId}
               </p>
-            </button>
+            </Button>
             <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
               <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
             </div>
@@ -376,72 +354,69 @@ export function GameHeader({
           <div className="flex items-center justify-center gap-1 flex-wrap">
             {/* Chat Button */}
             {onOpenChat && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenChat}
-                className="relative bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600 flex items-center"
+                icon="💬"
+                badgeCount={unreadChatCount}
                 title="Chat"
-              >
-                <span className="text-base">💬</span>
-                {unreadChatCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold animate-pulse z-50">
-                    {unreadChatCount}
-                  </span>
-                )}
-              </button>
+                size="sm"
+                className="p-1.5"
+              />
             )}
 
             {/* Leaderboard Button */}
             {onOpenLeaderboard && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenLeaderboard}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                icon="🏆"
                 title="Leaderboard"
-              >
-                <span className="text-base">🏆</span>
-              </button>
+                size="sm"
+                className="p-1.5"
+              />
             )}
 
             {/* Achievements Button - Sprint 2 Phase 1 */}
             {onOpenAchievements && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenAchievements}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                icon="🏅"
                 title="Achievements"
-              >
-                <span className="text-base">🏅</span>
-              </button>
+                size="sm"
+                className="p-1.5"
+              />
             )}
 
             {/* Friends Button - Sprint 2 Phase 2 */}
             {onOpenFriends && (
-              <button
+              <HeaderActionButton
                 onClick={onOpenFriends}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                icon="👥"
+                badgeCount={pendingFriendRequestsCount}
                 title="Friends"
-              >
-                <span className="text-base">👥</span>
-              </button>
+                size="sm"
+                className="p-1.5"
+              />
             )}
 
             {/* Tutorial Progress Button - Only in beginner mode */}
             {beginnerMode && (
-              <button
+              <HeaderActionButton
                 onClick={() => setTutorialProgressOpen(true)}
-                className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+                icon="📚"
                 title="Tutorial Progress"
-              >
-                <span className="text-base">📚</span>
-              </button>
+                size="sm"
+                className="p-1.5"
+              />
             )}
 
             {/* Settings Button */}
-            <button
+            <HeaderActionButton
               onClick={() => setSettingsOpen(true)}
-              className="bg-white/20 dark:bg-black/30 hover:bg-white/30 dark:hover:bg-black/40 p-1.5 rounded backdrop-blur-sm transition-all duration-200 border border-white/30 dark:border-gray-600"
+              icon="⚙️"
               title="Settings"
-            >
-              <span className="text-base">⚙️</span>
-            </button>
+              size="sm"
+              className="p-1.5"
+            />
           </div>
         </div>
       </div>

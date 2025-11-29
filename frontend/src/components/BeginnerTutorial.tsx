@@ -8,7 +8,8 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { GameState } from '../types/game';
 import { markTutorialCompleted, getTutorialStats } from '../utils/tutorialProgress';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { Button } from './ui/Button';
 
 export type TutorialPhase =
   | 'team_selection'
@@ -231,25 +232,30 @@ export function BeginnerTutorial({
   const tutorialStats = getTutorialStats();
 
   return createPortal(
-    <div
-      className="fixed top-20 right-4 md:right-6 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900 dark:to-indigo-900 border-4 border-blue-400 dark:border-blue-600 rounded-xl shadow-2xl z-[9999] w-[380px] max-w-[calc(100vw-2rem)] animate-slide-in"
+    <UICard
+      variant="gradient"
+      gradient="info"
+      size="lg"
+      className="fixed top-20 right-4 md:right-6 z-[9999] w-[380px] max-w-[calc(100vw-2rem)] animate-slide-in border-4 border-blue-400 dark:border-blue-600"
       data-testid="beginner-tutorial"
     >
       {/* Header */}
-      <div className={`bg-gradient-to-r ${colors.gradients.primary} dark:${colors.gradients.primaryDark} px-4 py-3 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800`}>
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700 px-4 py-3 -mx-4 -mt-4 mb-4 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-white font-bold text-lg flex items-center gap-2">
             <span className="text-2xl" aria-hidden="true">{currentStep.icon}</span>
             <span>{currentStep.title}</span>
           </h3>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleDismiss}
-            className="text-white hover:text-red-300 transition-colors text-xl font-bold focus:outline-none focus:ring-2 focus:ring-white"
+            className="text-white hover:text-red-300 p-1"
             title="Close Tutorial"
             data-testid="tutorial-close-button"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         {/* Progress Bar */}
@@ -267,7 +273,7 @@ export function BeginnerTutorial({
       </div>
 
       {/* Content */}
-      <div className="p-4 max-h-[400px] overflow-y-auto">
+      <div className="max-h-[400px] overflow-y-auto -mx-4 px-4">
         {/* Show all accumulated steps */}
         {accumulatedSteps.map((step, index) => (
           <div key={step.phase} className={index > 0 ? 'mt-4 pt-4 border-t border-blue-300 dark:border-blue-700' : ''}>
@@ -288,16 +294,17 @@ export function BeginnerTutorial({
       </div>
 
       {/* Actions */}
-      <div className="px-4 pb-4">
-        <button
+      <div className="mt-4 -mx-4 -mb-4 px-4 pb-4">
+        <Button
+          variant="primary"
+          fullWidth
           onClick={handleDismiss}
-          className={`w-full bg-gradient-to-r ${colors.gradients.primary} hover:${colors.gradients.primaryHover} text-white font-bold py-2 px-3 rounded transition-colors text-sm focus:outline-none focus:ring-2 focus:ring-blue-400`}
           data-testid="tutorial-got-it-button"
         >
           Got It! ✓
-        </button>
+        </Button>
       </div>
-    </div>,
+    </UICard>,
     document.body
   );
 }

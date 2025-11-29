@@ -53,8 +53,8 @@ export interface ModalProps {
   children: ReactNode;
 
   // Header customization
-  /** Modal title */
-  title?: string;
+  /** Modal title (can be string or ReactNode for custom headers) */
+  title?: ReactNode;
   /** Subtitle text below title */
   subtitle?: string;
   /** Icon element to show before title */
@@ -193,7 +193,7 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        aria-label={ariaLabel || title}
+        aria-label={ariaLabel || (typeof title === 'string' ? title : undefined)}
         aria-labelledby={title ? `${testId}-title` : undefined}
         data-testid={`${testId}-content`}
       >

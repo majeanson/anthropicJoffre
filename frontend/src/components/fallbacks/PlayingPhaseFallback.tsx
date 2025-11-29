@@ -5,10 +5,16 @@
  * Fallback UI when PlayingPhase encounters an error
  */
 
+import { UICard, Button } from '../ui';
+
 export function PlayingPhaseFallback() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-900 via-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <div className="bg-gray-800 rounded-lg shadow-2xl border-2 border-red-500 p-8 max-w-md text-center">
+      <UICard
+        variant="elevated"
+        size="lg"
+        className="border-2 border-red-500 max-w-md text-center"
+      >
         <div className="text-6xl mb-4">🎮</div>
         <h2 className="text-2xl font-bold text-white mb-4">
           Game Error
@@ -17,23 +23,25 @@ export function PlayingPhaseFallback() {
           Something went wrong during gameplay. Your game state should be preserved.
         </p>
         <div className="space-y-3">
-          <button
+          <Button
             onClick={() => window.location.reload()}
-            className="w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+            variant="success"
+            fullWidth
           >
             Reload Game
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => window.history.back()}
-            className="w-full bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+            variant="secondary"
+            fullWidth
           >
             Return to Lobby
-          </button>
+          </Button>
         </div>
         <p className="text-xs text-gray-400 mt-4">
           If this persists, please refresh the page or contact support
         </p>
-      </div>
+      </UICard>
     </div>
   );
 }

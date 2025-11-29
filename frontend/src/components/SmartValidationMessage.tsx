@@ -1,3 +1,5 @@
+import { UICard, UICardGradient } from './ui/UICard';
+
 interface ValidationMessage {
   type: 'error' | 'warning' | 'info' | 'success';
   text: string;
@@ -20,44 +22,32 @@ export function SmartValidationMessage({ messages }: SmartValidationMessageProps
 
   if (!topMessage) return null;
 
-  const styles = {
-    error: {
-      bg: 'bg-red-100 dark:bg-red-900/30',
-      border: 'border-red-500 dark:border-red-700',
-      text: 'text-red-800 dark:text-red-300',
-      icon: '❌'
-    },
-    warning: {
-      bg: 'bg-yellow-100 dark:bg-yellow-900/30',
-      border: 'border-yellow-500 dark:border-yellow-700',
-      text: 'text-yellow-800 dark:text-yellow-300',
-      icon: '⚠️'
-    },
-    info: {
-      bg: 'bg-blue-100 dark:bg-blue-900/30',
-      border: 'border-blue-500 dark:border-blue-700',
-      text: 'text-blue-800 dark:text-blue-300',
-      icon: 'ℹ️'
-    },
-    success: {
-      bg: 'bg-green-100 dark:bg-green-900/30',
-      border: 'border-green-500 dark:border-green-700',
-      text: 'text-green-800 dark:text-green-300',
-      icon: '✅'
-    }
+  const iconMap = {
+    error: '❌',
+    warning: '⚠️',
+    info: 'ℹ️',
+    success: '✅'
   };
 
-  const style = styles[topMessage.type];
+  const gradientMap: Record<string, UICardGradient> = {
+    error: 'error',
+    warning: 'warning',
+    info: 'info',
+    success: 'success'
+  };
 
   return (
-    <div
-      className={`${style.bg} ${style.border} ${style.text} border-2 rounded-lg px-4 py-3 flex items-center gap-2 shadow-md transition-all duration-200 h-14`}
+    <UICard
+      variant="gradient"
+      gradient={gradientMap[topMessage.type]}
+      size="sm"
+      className="border-2 flex items-center gap-2 shadow-md transition-all duration-200 h-14"
       data-testid={`validation-message-${topMessage.type}`}
-      role="alert"
-      aria-live="polite"
     >
-      <span className="text-xl flex-shrink-0">{style.icon}</span>
-      <span className="font-semibold text-sm flex-1">{topMessage.text}</span>
-    </div>
+      <div role="alert" aria-live="polite" className="flex items-center gap-2 w-full">
+        <span className="text-xl flex-shrink-0">{iconMap[topMessage.type]}</span>
+        <span className="font-semibold text-sm flex-1">{topMessage.text}</span>
+      </div>
+    </UICard>
   );
 }

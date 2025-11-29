@@ -322,6 +322,16 @@ export const AllMilestones: Story = {
 
 // Interactive example
 export const Interactive: Story = {
+  args: {
+    calendar: generateCalendar(),
+    progress: {
+      currentDay: 5,
+      rewardsClaimed: [1, 2, 3, 4],
+      monthStartDate: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
+      lastClaimedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      calendarResets: 0,
+    },
+  },
   render: () => {
     const [progress, setProgress] = useState({
       currentDay: 5,
@@ -377,7 +387,7 @@ export const Interactive: Story = {
         currentDay: 1,
         rewardsClaimed: [],
         monthStartDate: new Date().toISOString(),
-        lastClaimedDate: null,
+        lastClaimedDate: new Date().toISOString(),
         calendarResets: progress.calendarResets + 1,
       });
       setNotification('🔄 Calendar reset! Starting new cycle.');

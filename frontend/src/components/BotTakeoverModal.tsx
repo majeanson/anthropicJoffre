@@ -1,6 +1,5 @@
 import { BotDifficulty } from '../types/game';
-import { Modal } from './ui/Modal';
-import { Button } from './ui/Button';
+import { Modal, Button, Alert, TeamCard, TeamIndicator } from './ui';
 
 interface BotTakeoverModalProps {
   isOpen: boolean;
@@ -48,11 +47,9 @@ export function BotTakeoverModal({
       }
     >
       {/* Info Box */}
-      <div className="bg-blue-100/50 dark:bg-blue-900/20 border-2 border-blue-600 dark:border-blue-700 rounded-lg p-4 mb-6">
-        <p className="text-sm text-gray-900 dark:text-gray-100">
-          <strong>Note:</strong> You'll inherit the bot's team, position, hand, and score.
-        </p>
-      </div>
+      <Alert variant="info" className="mb-6">
+        <strong>Note:</strong> You'll inherit the bot's team, position, hand, and score.
+      </Alert>
 
       {/* Bots List */}
       <div className="space-y-3">
@@ -60,21 +57,17 @@ export function BotTakeoverModal({
           Available Bots:
         </h3>
         {availableBots.map((bot) => (
-          <div
+          <TeamCard
             key={bot.name}
-            className={`rounded-lg p-4 border-2 ${
-              bot.teamId === 1
-                ? 'bg-orange-100/30 dark:bg-orange-900/20 border-orange-600 dark:border-orange-700'
-                : 'bg-purple-100/30 dark:bg-purple-900/20 border-purple-600 dark:border-purple-700'
-            }`}
+            teamId={bot.teamId}
+            variant="subtle"
+            size="lg"
           >
             <div className="flex items-center justify-between gap-4 mb-3">
               {/* Bot Info */}
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${
-                    bot.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
-                  }`}></span>
+                  <TeamIndicator teamId={bot.teamId} size="md" />
                   <span className="font-bold text-gray-900 dark:text-gray-100">
                     {bot.name}
                   </span>
@@ -93,7 +86,7 @@ export function BotTakeoverModal({
             >
               Take Over {bot.name}
             </Button>
-          </div>
+          </TeamCard>
         ))}
       </div>
     </Modal>

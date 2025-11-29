@@ -98,12 +98,15 @@ export const typography = {
   },
 } as const;
 
+// Typography variants that return string values
+type TypographyVariant = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'body' | 'bodyLarge' | 'bodySmall' | 'caption' | 'captionBold' | 'label' | 'labelSmall' | 'display1' | 'display2' | 'code' | 'codeInline';
+
 // Helper function to combine typography classes
 export function getTypography(
-  variant: keyof typeof typography,
+  variant: TypographyVariant,
   additionalClasses?: string
 ): string {
-  const baseClass = typography[variant];
+  const baseClass = typography[variant] as string;
   return additionalClasses ? `${baseClass} ${additionalClasses}` : baseClass;
 }
 

@@ -1,4 +1,5 @@
 import { Player } from '../types/game';
+import { UICard, Button } from './ui';
 
 interface InlineBetStatusProps {
   players: Player[];
@@ -56,8 +57,10 @@ export function InlineBetStatus({
   };
 
   return (
-    <div
-      className="bg-parchment-100 dark:bg-gray-800 border border-umber-700 dark:border-gray-600 rounded-lg px-3 py-3 shadow-md"
+    <UICard
+      variant="bordered"
+      size="sm"
+      className="bg-parchment-100 dark:bg-gray-800 border-umber-700 dark:border-gray-600"
       data-testid="inline-bet-status"
     >
       <div className="text-umber-700 dark:text-gray-400 font-semibold text-sm mb-2 text-center">
@@ -79,14 +82,16 @@ export function InlineBetStatus({
               <div className="flex items-center gap-2">
                 <span className="text-base">{display.icon}</span>
                 {isClickable ? (
-                  <button
+                  <Button
                     onClick={() => onClickPlayer(player.name)}
-                    className="font-bold hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
+                    variant="link"
+                    size="sm"
+                    className="font-bold !p-0 !px-1 !-mx-1"
                     data-testid={`player-name-${player.name}`}
                     title={`View ${player.name}'s profile`}
                   >
                     {player.name}
-                  </button>
+                  </Button>
                 ) : (
                   <span className="font-bold" data-testid={`player-name-${player.name}`}>{player.name}</span>
                 )}
@@ -96,6 +101,6 @@ export function InlineBetStatus({
           );
         })}
       </div>
-    </div>
+    </UICard>
   );
 }

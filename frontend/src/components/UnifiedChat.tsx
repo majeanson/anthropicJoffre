@@ -34,6 +34,7 @@ import { Socket } from 'socket.io-client';
 import { ChatMessage } from '../types/game';
 import { EmojiPicker } from './EmojiPicker';
 import { PlayerNameButton } from './PlayerNameButton';
+import { Button, UIBadge, Input, IconButton } from './ui';
 
 type ChatMode = 'panel' | 'floating' | 'embedded' | 'modal';
 type ChatContext = 'team' | 'game' | 'lobby' | 'dm';
@@ -171,19 +172,26 @@ export function UnifiedChat({
   // Floating button (collapsed state)
   if (mode === 'floating' && !isExpanded) {
     return (
-      <button
+      <Button
         onClick={toggleChat}
-        className="fixed bottom-4 right-4 bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 transition-all hover:scale-105 z-40"
+        variant="primary"
+        className="fixed bottom-4 right-4 rounded-full shadow-lg z-40 hover:scale-105 transition-transform"
         data-testid="unified-chat-button"
       >
         <span className="text-xl">💬</span>
         <span className="font-semibold">Chat</span>
         {unreadCount > 0 && (
-          <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold animate-pulse">
+          <UIBadge
+            variant="solid"
+            color="error"
+            size="xs"
+            pulse
+            className="ml-1"
+          >
             {unreadCount}
-          </span>
+          </UIBadge>
         )}
-      </button>
+      </Button>
     );
   }
 
@@ -218,22 +226,24 @@ export function UnifiedChat({
           <h3 className="font-bold flex items-center gap-2">{chatTitle}</h3>
           <div className="flex items-center gap-2">
             {mode === 'floating' && (
-              <button
+              <IconButton
                 onClick={toggleChat}
-                className="text-parchment-50 hover:text-parchment-200 text-xl font-bold leading-none"
-                aria-label="Minimize"
-              >
-                −
-              </button>
+                icon="−"
+                ariaLabel="Minimize"
+                variant="minimal"
+                size="sm"
+                className="text-parchment-50 hover:text-parchment-200 hover:bg-white/10"
+              />
             )}
             {(mode === 'panel' || mode === 'modal') && onClose && (
-              <button
+              <IconButton
                 onClick={onClose}
-                className="text-parchment-50 hover:text-parchment-200 text-xl font-bold leading-none"
-                aria-label="Close"
-              >
-                ×
-              </button>
+                icon="×"
+                ariaLabel="Close"
+                variant="minimal"
+                size="sm"
+                className="text-parchment-50 hover:text-parchment-200 hover:bg-white/10"
+              />
             )}
           </div>
         </div>
@@ -286,14 +296,16 @@ export function UnifiedChat({
         {showQuickEmojis && (
           <div className="flex-shrink-0 px-2 sm:px-3 py-2 bg-parchment-100 dark:bg-gray-700 border-t border-amber-200 dark:border-gray-600 flex gap-1 sm:gap-2 flex-wrap">
             {quickEmojis.map((emoji) => (
-              <button
+              <Button
                 key={emoji}
                 onClick={() => handleQuickEmoji(emoji)}
-                className="px-2 py-1 bg-white dark:bg-gray-600 hover:bg-amber-100 dark:hover:bg-gray-500 rounded transition-colors text-xs sm:text-sm border border-amber-200 dark:border-gray-500 flex-shrink-0"
+                variant="ghost"
+                size="sm"
                 type="button"
+                className="flex-shrink-0 px-2 py-1 text-xs sm:text-sm"
               >
                 {emoji}
-              </button>
+              </Button>
             ))}
           </div>
         )}
@@ -303,14 +315,16 @@ export function UnifiedChat({
           <div className="flex gap-1 sm:gap-2 items-center">
             {showEmojiPicker && (
               <div className="relative flex-shrink-0">
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowEmojis(!showEmojis)}
-                  className="px-2 sm:px-3 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-gray-600 dark:hover:bg-gray-500 text-white rounded transition-colors text-sm h-[38px] flex items-center justify-center"
+                  variant="warning"
+                  size="sm"
                   aria-label="Emoji picker"
+                  className="h-[38px]"
                 >
                   😀
-                </button>
+                </Button>
                 {showEmojis && (
                   <div className="absolute bottom-full mb-2 left-0 z-10">
                     <EmojiPicker onSelectEmoji={handleEmojiSelect} onClose={() => setShowEmojis(false)} />
@@ -318,22 +332,25 @@ export function UnifiedChat({
                 )}
               </div>
             )}
-            <input
+            <Input
               ref={inputRef}
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder={placeholder}
-              className="flex-1 min-w-0 px-2 sm:px-3 py-2 border-2 border-amber-200 dark:border-gray-600 rounded focus:outline-none focus:border-amber-500 dark:bg-gray-700 dark:text-gray-100 text-sm h-[38px]"
               maxLength={200}
+              size="sm"
+              className="flex-1 min-w-0 h-[38px]"
             />
-            <button
+            <Button
               type="submit"
               disabled={!inputMessage.trim()}
-              className="px-3 sm:px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-blue-600 dark:hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded transition-colors text-sm flex-shrink-0 h-[38px] flex items-center justify-center"
+              variant="warning"
+              size="sm"
+              className="flex-shrink-0 h-[38px]"
             >
               Send
-            </button>
+            </Button>
           </div>
         </form>
       </>

@@ -20,6 +20,10 @@ export const colors = {
     700: '#1d4ed8',
     800: '#1e40af',
     900: '#1e3a8a',
+    // Gradient helpers
+    start: '#3b82f6',
+    end: '#2563eb',
+    border: '#1d4ed8',
   },
 
   secondary: {
@@ -33,6 +37,10 @@ export const colors = {
     700: '#7e22ce',
     800: '#6b21a8',
     900: '#581c87',
+    // Gradient helpers
+    start: '#a855f7',
+    end: '#9333ea',
+    border: '#7e22ce',
   },
 
   // Semantic colors
@@ -47,6 +55,10 @@ export const colors = {
     700: '#15803d',
     800: '#166534',
     900: '#14532d',
+    // Gradient helpers
+    start: '#16a34a',
+    end: '#15803d',
+    border: '#166534',
   },
 
   warning: {
@@ -60,6 +72,10 @@ export const colors = {
     700: '#a16207',
     800: '#854d0e',
     900: '#713f12',
+    // Gradient helpers
+    start: '#eab308',
+    end: '#ca8a04',
+    border: '#a16207',
   },
 
   error: {
@@ -73,6 +89,10 @@ export const colors = {
     700: '#b91c1c',
     800: '#991b1b',
     900: '#7f1d1d',
+    // Gradient helpers
+    start: '#ef4444',
+    end: '#dc2626',
+    border: '#b91c1c',
   },
 
   info: {
@@ -86,6 +106,10 @@ export const colors = {
     700: '#0369a1',
     800: '#075985',
     900: '#0c4a6e',
+    // Gradient helpers
+    start: '#0ea5e9',
+    end: '#0284c7',
+    border: '#0369a1',
   },
 
   // Team colors
@@ -100,6 +124,10 @@ export const colors = {
     700: '#c2410c',
     800: '#9a3412',
     900: '#7c2d12',
+    // Gradient helpers
+    start: '#f97316',
+    end: '#ea580c',
+    border: '#c2410c',
   },
 
   team2: {
@@ -113,6 +141,10 @@ export const colors = {
     700: '#7e22ce',
     800: '#6b21a8',
     900: '#581c87',
+    // Gradient helpers
+    start: '#a855f7',
+    end: '#9333ea',
+    border: '#7e22ce',
   },
 
   // Parchment theme (light mode)
@@ -215,6 +247,11 @@ export const colors = {
     // Neutral/gray gradients
     neutral: 'from-gray-700 to-gray-800',
     neutralHover: 'from-gray-800 to-gray-900',
+
+    // Special/highlight gradients
+    special: 'from-amber-500 to-orange-500',
+    specialHover: 'from-amber-600 to-orange-600',
+    specialDark: 'from-amber-600 to-orange-700',
   },
 
   // Border colors

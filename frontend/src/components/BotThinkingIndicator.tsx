@@ -6,7 +6,8 @@
  * User controls when to see bot decision-making process
  */
 
-import { designTokens } from '../styles/designTokens';
+import { Button } from './ui/Button';
+import { UICard } from './ui/UICard';
 
 interface BotThinkingIndicatorProps {
   botName: string;
@@ -28,24 +29,22 @@ export function BotThinkingIndicator({ botName, action, isOpen, onToggle, positi
   return (
     <div className="relative inline-flex z-[60]">
       {/* Press-to-Show Button - Hold to peek */}
-      <button
+      <Button
+        variant={isOpen ? 'primary' : 'secondary'}
+        size="sm"
         onMouseDown={onToggle}
         onMouseUp={onToggle}
         onMouseLeave={isOpen ? onToggle : undefined}
         onTouchStart={onToggle}
         onTouchEnd={onToggle}
-        className={`w-8 h-8 md:w-10 md:h-10 rounded-full shadow-lg transition-all active:scale-95 flex items-center justify-center z-[60] focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-          isOpen
-            ? `bg-gradient-to-r ${designTokens.gradients.primary} text-white scale-110 focus:ring-blue-400`
-            : 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 hover:scale-105 focus:ring-blue-500'
-        }`}
+        className={`w-8 h-8 md:w-10 md:h-10 rounded-full p-0 ${isOpen ? 'scale-110' : ''}`}
         aria-label="Press to show bot thinking"
         title="Press and hold to see what the bot is thinking"
       >
         <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`} aria-hidden="true">
           🤖
         </span>
-      </button>
+      </Button>
 
       {/* Tooltip - Appears while pressed */}
       {isOpen && (
@@ -53,7 +52,7 @@ export function BotThinkingIndicator({ botName, action, isOpen, onToggle, positi
           className={`absolute z-[70] ${tooltipPosition} whitespace-nowrap pointer-events-none`}
           style={{ maxWidth: '90vw' }}
         >
-          <div className={`bg-gradient-to-r ${designTokens.gradients.primary} text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300`}>
+          <UICard variant="gradient" gradient="info" size="sm" className="text-white border-2 border-blue-300">
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex-shrink-0">
                 <span className="text-sm md:text-lg" aria-hidden="true">🤖</span>
@@ -63,7 +62,7 @@ export function BotThinkingIndicator({ botName, action, isOpen, onToggle, positi
                 <div className="text-xs md:text-sm font-bold mt-0.5">{action}</div>
               </div>
             </div>
-          </div>
+          </UICard>
         </div>
       )}
     </div>

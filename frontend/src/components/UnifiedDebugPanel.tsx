@@ -28,6 +28,7 @@ import buildInfoJson from '../buildInfo.json';
 import { BuildInfo, CleanupResult } from '../types/buildInfo';
 import * as Sentry from '@sentry/react';
 import { CONFIG } from '../config/constants';
+import { Modal, Button, UICard, Input, Spinner, Tabs } from './ui';
 
 const buildInfo = buildInfoJson as BuildInfo;
 
@@ -236,68 +237,41 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
     return message.split('\n')[0];
   };
 
-  if (!isOpen) return null;
-
   const highestBidder = gameState?.highestBet
     ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)
     : null;
 
-  // Tab button component
-  const TabButton = ({ tab, icon, label }: { tab: TabType; icon: string; label: string }) => (
-    <button
-      onClick={() => setActiveTab(tab)}
-      className={`flex-1 py-3 px-2 font-semibold transition-all text-sm md:text-base ${
-        activeTab === tab
-          ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg'
-          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-      }`}
-    >
-      <span className="hidden sm:inline">{icon} {label}</span>
-      <span className="sm:hidden">{icon}</span>
-    </button>
-  );
+  // Tab definitions for the Tabs component
+  const tabs = [
+    { id: 'build' as const, label: '🏷️ Build Info', shortLabel: '🏷️' },
+    { id: 'gameState' as const, label: '🎮 Game State', shortLabel: '🎮' },
+    { id: 'automation' as const, label: '🤖 Automation', shortLabel: '🤖' },
+    { id: 'serverHealth' as const, label: '🖥️ Server Health', shortLabel: '🖥️' },
+    { id: 'testControls' as const, label: '🧪 Test Controls', shortLabel: '🧪' },
+  ];
 
   return (
-    <div
-      className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-2 sm:p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
-      role="dialog"
-      aria-modal="true"
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Unified Debug Panel"
+      icon="🐛"
+      size="xl"
+      theme="purple"
+      subtitle={`v${buildInfo.version} - All-in-One Developer Tools`}
     >
-      <div
-        className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl shadow-2xl w-full max-w-6xl max-h-[95vh] flex flex-col border-2 border-purple-500/30 animate-fade-in"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white px-4 sm:px-6 py-4 rounded-t-2xl flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🐛</span>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold">Unified Debug Panel</h2>
-              <p className="text-xs sm:text-sm text-purple-100">v{buildInfo.version} - All-in-One Developer Tools</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:bg-white/20 rounded-lg px-3 py-2 transition-colors font-bold text-xl"
-            aria-label="Close"
-          >
-            ✕
-          </button>
-        </div>
+      {/* Tabs */}
+      <Tabs
+        tabs={tabs.map(t => ({ id: t.id, label: t.label }))}
+        activeTab={activeTab}
+        onChange={(id) => setActiveTab(id as TabType)}
+        variant="pills"
+        size="md"
+        className="mb-4"
+      />
 
-        {/* Tabs */}
-        <div className="flex border-b border-gray-700 bg-gray-800">
-          <TabButton tab="build" icon="🏷️" label="Build Info" />
-          <TabButton tab="gameState" icon="🎮" label="Game State" />
-          <TabButton tab="automation" icon="🤖" label="Automation" />
-          <TabButton tab="serverHealth" icon="🖥️" label="Server Health" />
-          <TabButton tab="testControls" icon="🧪" label="Test Controls" />
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gradient-to-br from-gray-900 to-gray-800">
+      {/* Content */}
+      <div className="space-y-4">
           {/* Tab 1: Build Info */}
           {activeTab === 'build' && (
             <div className="space-y-4 animate-slide-in">
@@ -369,12 +343,13 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                       <span className="text-2xl">✨</span>
                       <h3 className="font-bold text-pink-300 text-lg">Latest Features</h3>
                     </div>
-                    <button
+                    <Button
                       onClick={() => setShowLatestFeatures(!showLatestFeatures)}
-                      className="text-xs bg-pink-600 hover:bg-pink-500 text-white px-3 py-1 rounded transition-colors"
+                      variant="primary"
+                      size="sm"
                     >
                       {showLatestFeatures ? 'Hide' : 'Show'}
-                    </button>
+                    </Button>
                   </div>
 
                   {showLatestFeatures && (
@@ -408,12 +383,13 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                       <span className="text-2xl">🚀</span>
                       <h3 className="font-bold text-violet-300 text-lg">Future Features</h3>
                     </div>
-                    <button
+                    <Button
                       onClick={() => setShowFutureFeatures(!showFutureFeatures)}
-                      className="text-xs bg-violet-600 hover:bg-violet-500 text-white px-3 py-1 rounded transition-colors"
+                      variant="primary"
+                      size="sm"
                     >
                       {showFutureFeatures ? 'Hide' : 'Show'}
-                    </button>
+                    </Button>
                   </div>
 
                   {showFutureFeatures && (
@@ -439,13 +415,15 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                   <p className="text-sm text-gray-300 mb-3">
                     Remove obsolete 6-character game IDs from production database
                   </p>
-                  <button
+                  <Button
                     onClick={runCleanup}
                     disabled={cleanupLoading}
-                    className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-4 py-2 rounded-lg font-bold transition-colors"
+                    variant="danger"
+                    size="md"
+                    className="w-full"
                   >
                     {cleanupLoading ? '⏳ Cleaning...' : '🗑️ Run Cleanup'}
-                  </button>
+                  </Button>
 
                   {cleanupError && (
                     <div className="mt-2 bg-red-900/30 px-3 py-2 rounded border border-red-500">
@@ -667,31 +645,34 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                     </span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <button
+                    <Button
                       onClick={() => socket?.emit('debug_auto_play_card', { gameId })}
                       disabled={!socket}
-                      className="px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                      variant="primary"
+                      size="md"
                     >
                       🤖 Auto-Play Card
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => socket?.emit('debug_skip_trick', { gameId })}
                       disabled={!socket || gameState.currentTrick.length === 0}
-                      className="px-4 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                      variant="warning"
+                      size="md"
                     >
                       ⏭️ Skip Trick
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => {
                         if (window.confirm('Skip entire round? Auto-play all remaining cards.')) {
                           socket?.emit('debug_skip_round', { gameId });
                         }
                       }}
                       disabled={!socket}
-                      className="px-4 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                      variant="secondary"
+                      size="md"
                     >
                       ⏭️⏭️ Skip Round
-                    </button>
+                    </Button>
                   </div>
                   <p className="text-xs text-green-300 mt-3">
                     Auto-play cards for current player. Use for testing game flow.
@@ -710,24 +691,26 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                    <button
+                    <Button
                       onClick={() => socket?.emit('debug_auto_bet', { gameId })}
                       disabled={!socket}
-                      className="px-4 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                      variant="primary"
+                      size="md"
                     >
                       💰 Auto-Bet
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       onClick={() => {
                         if (window.confirm('Skip betting phase? Auto-bet for all players.')) {
                           socket?.emit('debug_skip_betting', { gameId });
                         }
                       }}
                       disabled={!socket}
-                      className="px-4 py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg"
+                      variant="secondary"
+                      size="md"
                     >
                       ⏭️ Skip Betting
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="border-t-2 border-orange-500/30 pt-4">
@@ -735,20 +718,22 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                     <div className="grid grid-cols-12 gap-2">
                       {[7, 8, 9, 10, 11, 12].map(amount => (
                         <div key={amount} className="col-span-6 md:col-span-2 flex flex-col gap-1">
-                          <button
+                          <Button
                             onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: false })}
                             disabled={!socket}
-                            className="px-2 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg text-sm font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                            variant="warning"
+                            size="sm"
                           >
                             {amount}
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: true })}
                             disabled={!socket}
-                            className="px-2 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-xs font-semibold disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+                            variant="danger"
+                            size="sm"
                           >
                             {amount} 🚫
-                          </button>
+                          </Button>
                         </div>
                       ))}
                     </div>
@@ -784,23 +769,21 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                   <span>🖥️</span> Server Health Monitoring
                 </h3>
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={fetchDetailedHealth}
-                    className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded transition-colors"
+                    variant="primary"
+                    size="sm"
                   >
                     🔄 Refresh
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={handleClearAllGames}
                     disabled={isClearing || !socket}
-                    className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
-                      isClearing || !socket
-                        ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                        : 'bg-red-600 hover:bg-red-500 text-white shadow-md hover:shadow-lg'
-                    }`}
+                    variant="danger"
+                    size="sm"
                   >
                     {isClearing ? '🔄 Clearing...' : '🗑️ Clear All Games'}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -817,10 +800,10 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
               )}
 
               {healthLoading && (
-                <div className="bg-gray-800/50 px-4 py-8 rounded-lg border border-gray-700 text-center">
-                  <div className="animate-spin inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+                <UICard variant="elevated" size="lg" className="text-center py-8">
+                  <Spinner size="lg" color="primary" />
                   <p className="text-sm text-gray-400 mt-3">Loading health data...</p>
-                </div>
+                </UICard>
               )}
 
               {healthError && (
@@ -957,77 +940,85 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
               )}
 
               {/* Score Manipulation */}
-              <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-4">
+              <UICard variant="gradient" gradient="success" size="md">
                 <h3 className="text-lg font-bold text-green-300 mb-3 flex items-center gap-2">
                   <span>🎯</span> Set Team Scores
                 </h3>
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
                     <label className="block text-xs font-semibold text-gray-300 mb-2">Team 1 Score</label>
-                    <input
+                    <Input
                       type="number"
-                      min="0"
-                      max="100"
+                      min={0}
+                      max={100}
                       value={team1Score}
                       onChange={(e) => setTeam1Score(parseInt(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-gray-800 text-white"
+                      variant="filled"
+                      size="md"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-300 mb-2">Team 2 Score</label>
-                    <input
+                    <Input
                       type="number"
-                      min="0"
-                      max="100"
+                      min={0}
+                      max={100}
                       value={team2Score}
                       onChange={(e) => setTeam2Score(parseInt(e.target.value) || 0)}
-                      className="w-full px-3 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-gray-800 text-white"
+                      variant="filled"
+                      size="md"
                     />
                   </div>
                 </div>
-                <button
+                <Button
                   onClick={handleSetScores}
-                  className="w-full bg-green-600 hover:bg-green-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  variant="success"
+                  size="md"
+                  className="w-full"
                 >
                   Apply Scores
-                </button>
-              </div>
+                </Button>
+              </UICard>
 
               {/* Quick Actions */}
-              <div className="bg-gradient-to-r from-purple-900/50 to-violet-900/50 border border-purple-500/30 rounded-lg p-4">
+              <UICard variant="gradient" gradient="primary" size="md">
                 <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
                   <span>⚡</span> Quick Actions
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
-                  <button
+                  <Button
                     onClick={() => { setTeam1Score(40); setTeam2Score(0); }}
-                    className="bg-orange-600/30 hover:bg-orange-600/50 border border-orange-500 text-orange-300 font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
+                    variant="warning"
+                    size="sm"
                   >
                     Team 1 Near Win (40-0)
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => { setTeam1Score(0); setTeam2Score(40); }}
-                    className="bg-purple-600/30 hover:bg-purple-600/50 border border-purple-500 text-purple-300 font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
+                    variant="secondary"
+                    size="sm"
                   >
                     Team 2 Near Win (0-40)
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => { setTeam1Score(35); setTeam2Score(35); }}
-                    className="bg-blue-600/30 hover:bg-blue-600/50 border border-blue-500 text-blue-300 font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
+                    variant="primary"
+                    size="sm"
                   >
                     Close Game (35-35)
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => { setTeam1Score(0); setTeam2Score(0); }}
-                    className="bg-gray-600/30 hover:bg-gray-600/50 border border-gray-500 text-gray-300 font-semibold py-2 px-3 rounded-lg transition-colors text-sm"
+                    variant="ghost"
+                    size="sm"
                   >
                     Reset Scores (0-0)
-                  </button>
+                  </Button>
                 </div>
-              </div>
+              </UICard>
 
               {/* Sentry Testing */}
-              <div className="bg-gradient-to-r from-red-900/50 to-pink-900/50 border border-red-500/30 rounded-lg p-4">
+              <UICard variant="gradient" gradient="error" size="md">
                 <h3 className="text-lg font-bold text-red-300 mb-3 flex items-center gap-2">
                   <span>🚨</span> Sentry Error Tracking Tests
                 </h3>
@@ -1035,23 +1026,23 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                   Test Sentry error tracking integration for both frontend and backend.
                 </p>
                 <div className="grid grid-cols-2 gap-3">
-                  <button
+                  <Button
                     onClick={handleTestFrontendSentry}
-                    className="bg-red-600/30 hover:bg-red-600/50 border border-red-500 text-red-300 font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    variant="danger"
+                    size="md"
                   >
-                    <span>📱</span>
-                    <span>Test Frontend Sentry</span>
-                  </button>
-                  <button
+                    📱 Test Frontend Sentry
+                  </Button>
+                  <Button
                     onClick={handleTestBackendSentry}
-                    className="bg-orange-600/30 hover:bg-orange-600/50 border border-orange-500 text-orange-300 font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                     disabled={!socket}
+                    variant="warning"
+                    size="md"
                   >
-                    <span>🖥️</span>
-                    <span>Test Backend Sentry</span>
-                  </button>
+                    🖥️ Test Backend Sentry
+                  </Button>
                 </div>
-                <div className="bg-blue-900/30 border border-blue-500 rounded-lg p-3 mt-3">
+                <UICard variant="elevated" size="sm" className="mt-3 !bg-blue-900/30 !border-blue-500">
                   <p className="text-xs text-blue-300">
                     <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
                     <a
@@ -1064,53 +1055,26 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                     </a>
                     {' '}to verify errors appear and configure alerts.
                   </p>
-                </div>
-              </div>
+                </UICard>
+              </UICard>
 
               {/* Warning */}
-              <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-4">
+              <UICard variant="gradient" gradient="warning" size="md">
                 <p className="text-sm text-yellow-300">
                   <strong>⚠️ Warning:</strong> These actions directly modify the game state.
                   Use for testing purposes only. Changes affect all connected players.
                 </p>
-              </div>
+              </UICard>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-800 border-t border-gray-700 px-4 sm:px-6 py-3 rounded-b-2xl">
+        <div className="mt-4 pt-4 border-t border-gray-700">
           <p className="text-center text-xs sm:text-sm text-gray-400">
             Made with ❤️ and lots of ☕ • v{buildInfo.version} • {buildInfo.buildStatus}
           </p>
         </div>
-      </div>
-
-      <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        @keyframes slide-in {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-
-        .animate-slide-in {
-          animation: slide-in 0.3s ease-out;
-        }
-      `}</style>
-    </div>
+    </Modal>
   );
 }

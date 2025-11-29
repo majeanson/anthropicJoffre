@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { UICard, Spinner, ProgressBar } from './ui';
 
 interface ReconnectingBannerProps {
   attempt: number;
@@ -6,38 +7,34 @@ interface ReconnectingBannerProps {
 }
 
 export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, maxAttempts }: ReconnectingBannerProps) {
-  const progress = (attempt / maxAttempts) * 100;
   const isFirstAttempt = attempt <= 2;
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
-      <div className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-2xl backdrop-blur-sm min-w-[300px]">
+      <UICard variant="elevated" size="sm" gradient="info" className="min-w-[300px] text-white">
         <div className="flex items-center gap-3 mb-2">
-          <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+          <Spinner size="sm" color="white" />
           <span className="font-bold">Reconnecting to game...</span>
         </div>
 
         {/* Helpful hint for cold start */}
         {isFirstAttempt && (
           <p className="text-xs text-blue-100 mb-2">
-            ⏳ Server may be waking up (cold start). This can take 10-30 seconds...
+            Server may be waking up (cold start). This can take 10-30 seconds...
           </p>
         )}
 
-        {/* Attempt counter */}
-        <div className="flex items-center justify-between text-sm mb-1">
-          <span className="text-white/80">Attempt {attempt} of {maxAttempts}</span>
-          <span className="text-white/80">{Math.round(progress)}%</span>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full bg-blue-800/50 rounded-full h-2 overflow-hidden">
-          <div
-            className="bg-white h-full transition-all duration-300 ease-out"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
+        {/* Progress bar with attempt counter */}
+        <ProgressBar
+          value={attempt}
+          max={maxAttempts}
+          label={`Attempt ${attempt} of ${maxAttempts}`}
+          showValue
+          size="sm"
+          color="info"
+          className="[&_*]:text-white/80 [&>div:first-child]:text-white/80 [&>div:last-child]:bg-blue-800/50 [&>div:last-child>div]:bg-white"
+        />
+      </UICard>
     </div>
   );
 });

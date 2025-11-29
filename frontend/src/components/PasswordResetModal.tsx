@@ -8,6 +8,8 @@ import React, { useState } from 'react';
 import { API_ENDPOINTS } from '../config/constants';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Alert } from './ui/Alert';
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -84,40 +86,33 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Success Message */}
         {successMessage && (
-          <div className="bg-green-500/20 border border-green-500 rounded p-3 text-green-200 text-sm">
-            {successMessage}
-          </div>
+          <Alert variant="success">{successMessage}</Alert>
         )}
 
         {/* Error Message */}
         {errorMessage && (
-          <div className="bg-red-500/20 border border-red-500 rounded p-3 text-red-200 text-sm">
-            {errorMessage}
-          </div>
+          <Alert variant="error">{errorMessage}</Alert>
         )}
 
         {!successMessage && (
           <>
-            <p className="text-gray-300 text-sm">
+            <Alert variant="info">
               Enter your email address and we'll send you instructions to reset your password.
-            </p>
+            </Alert>
 
             {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700 focus:border-yellow-500 focus:outline-none"
-                placeholder="your@email.com"
-                disabled={isLoading}
-                autoComplete="email"
-              />
-            </div>
+            <Input
+              id="email"
+              label="Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              disabled={isLoading}
+              autoComplete="email"
+              variant="filled"
+              fullWidth
+            />
 
             {/* Submit Button */}
             <Button

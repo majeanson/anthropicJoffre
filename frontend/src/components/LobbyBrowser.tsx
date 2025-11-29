@@ -5,9 +5,7 @@ import { API_ENDPOINTS } from '../config/constants';
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
 import { sounds } from '../utils/sounds';
-import { colors } from '../design-system';
-import { UICard } from './ui/UICard';
-import { UIBadge } from './ui/UIBadge';
+import { UICard, UIBadge, EmptyState, Tabs, Tab, Checkbox, Select, SelectOption, Button } from './ui';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -105,6 +103,25 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   // Track if we've done the initial load for each tab
   const hasLoadedActiveGames = useRef(false);
   const hasLoadedRecentGames = useRef(false);
+
+  // Tab definitions for Tabs component
+  const lobbyTabs: Tab[] = [
+    { id: 'active', label: 'Active Games', icon: '🎮' },
+    { id: 'recent', label: 'Recent Finished Games', icon: '📜' },
+  ];
+
+  // Select options for filters
+  const gameModeOptions: SelectOption[] = [
+    { value: 'all', label: 'All Games' },
+    { value: 'ranked', label: 'Ranked' },
+    { value: 'casual', label: 'Casual' },
+  ];
+
+  const sortByOptions: SelectOption[] = [
+    { value: 'newest', label: 'Newest' },
+    { value: 'players', label: 'Most Players' },
+    { value: 'score', label: 'Highest Score' },
+  ];
 
   // Handler to validate join game request
   const handleJoinGameClick = (game: LobbyGame) => {
@@ -428,39 +445,30 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
               }
             </p>
           </div>
-          <button
+          <Button
             onClick={onClose}
-            className="text-white hover:bg-white/20 rounded-full p-2 transition-colors"
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20 rounded-full p-2"
             aria-label="Close"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </Button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b-2 border-parchment-300 dark:border-gray-600 bg-parchment-100 dark:bg-gray-700">
-          <button
-            onClick={() => setActiveTab('active')}
-            className={`flex-1 py-4 px-6 font-bold text-lg transition-all ${
-              activeTab === 'active'
-                ? 'bg-parchment-50 dark:bg-gray-800 text-amber-700 dark:text-amber-500 border-b-4 border-amber-700 dark:border-amber-500'
-                : 'text-umber-600 dark:text-gray-400 hover:bg-parchment-200 dark:hover:bg-gray-600'
-            }`}
-          >
-            🎮 Active Games
-          </button>
-          <button
-            onClick={() => setActiveTab('recent')}
-            className={`flex-1 py-4 px-6 font-bold text-lg transition-all ${
-              activeTab === 'recent'
-                ? 'bg-parchment-50 dark:bg-gray-800 text-amber-700 dark:text-amber-500 border-b-4 border-amber-700 dark:border-amber-500'
-                : 'text-umber-600 dark:text-gray-400 hover:bg-parchment-200 dark:hover:bg-gray-600'
-            }`}
-          >
-            📜 Recent Finished Games
-          </button>
+        <div className="bg-parchment-100 dark:bg-gray-700">
+          <Tabs
+            tabs={lobbyTabs}
+            activeTab={activeTab}
+            onChange={(tabId) => setActiveTab(tabId as 'active' | 'recent')}
+            variant="underline"
+            size="lg"
+            fullWidth
+            className="border-parchment-300 dark:border-gray-600"
+          />
         </div>
 
         {/* Content Area */}
@@ -468,8 +476,10 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           {/* Join with Game ID Section - Only in Active Games tab */}
           {activeTab === 'active' && (
             <UICard variant="bordered" size="md">
-              <button
+              <Button
                 onClick={() => setShowJoinInput(!showJoinInput)}
+                variant="ghost"
+                size="md"
                 className="w-full flex items-center justify-between text-left"
               >
                 <div className="flex items-center gap-2">
@@ -477,7 +487,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   <span className="font-semibold text-umber-900 dark:text-gray-100">Join with Game ID</span>
                 </div>
                 <span className="text-sm text-umber-600 dark:text-gray-400">{showJoinInput ? '▲' : '▼'}</span>
-              </button>
+              </Button>
 
               {showJoinInput && (
                 <div className="mt-3 space-y-2 animate-fadeIn origin-top">
@@ -488,7 +498,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                     className="w-full px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-600 text-umber-900 dark:text-gray-100 text-sm"
                     placeholder="Enter Game ID"
                   />
-                  <button
+                  <Button
                     data-testid="join-game-button"
                     onClick={() => {
                       if (gameId.trim()) {
@@ -497,10 +507,12 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                       }
                     }}
                     disabled={!gameId.trim()}
-                    className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="secondary"
+                    size="md"
+                    className="w-full"
                   >
                     Join Game
-                  </button>
+                  </Button>
                 </div>
               )}
             </UICard>
@@ -512,74 +524,48 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
               <div className="flex flex-wrap items-center gap-4">
                 {/* Filter Checkboxes */}
                 <div className="flex items-center gap-4 flex-wrap">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filterWithBots}
-                      onChange={(e) => setFilterWithBots(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
-                      🤖 With Bots
-                    </span>
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filterNeedsPlayers}
-                      onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
-                      💺 Needs Players
-                    </span>
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filterInProgress}
-                      onChange={(e) => setFilterInProgress(e.target.checked)}
-                      className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
-                      🎮 In Progress
-                    </span>
-                  </label>
+                  <Checkbox
+                    label="🤖 With Bots"
+                    size="sm"
+                    checked={filterWithBots}
+                    onChange={(e) => setFilterWithBots(e.target.checked)}
+                  />
+                  <Checkbox
+                    label="💺 Needs Players"
+                    size="sm"
+                    checked={filterNeedsPlayers}
+                    onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
+                  />
+                  <Checkbox
+                    label="🎮 In Progress"
+                    size="sm"
+                    checked={filterInProgress}
+                    onChange={(e) => setFilterInProgress(e.target.checked)}
+                  />
                 </div>
 
                 {/* Game Mode Filter */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
-                    Mode:
-                  </span>
-                  <select
-                    value={filterGameMode}
-                    onChange={(e) => setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')}
-                    className="px-3 py-1.5 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-600 text-umber-900 dark:text-gray-100 text-sm font-medium cursor-pointer"
-                  >
-                    <option value="all">🎯 All Games</option>
-                    <option value="ranked">🏆 Ranked</option>
-                    <option value="casual">🎲 Casual</option>
-                  </select>
-                </div>
+                <Select
+                  label="Mode"
+                  size="sm"
+                  variant="default"
+                  value={filterGameMode}
+                  onChange={(e) => setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')}
+                  options={gameModeOptions}
+                  leftIcon="🎯"
+                />
 
                 {/* Sort Dropdown */}
-                <div className="flex items-center gap-2 ml-auto">
-                  <span className="text-sm font-medium text-umber-900 dark:text-gray-100">
-                    Sort by:
-                  </span>
-                  <select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
-                    className="px-3 py-1.5 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-600 text-umber-900 dark:text-gray-100 text-sm font-medium cursor-pointer"
-                  >
-                    <option value="newest">⏰ Newest</option>
-                    <option value="players">👥 Most Players</option>
-                    <option value="score">📊 Highest Score</option>
-                  </select>
-                </div>
+                <Select
+                  label="Sort by"
+                  size="sm"
+                  variant="default"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
+                  options={sortByOptions}
+                  leftIcon="⏰"
+                  containerClassName="ml-auto"
+                />
               </div>
 
               {/* Active filter count */}
@@ -641,7 +627,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                       </span>
                     </p>
                   )}
-                  <button
+                  <Button
                     onClick={() => {
                       setError(null);
                       setCorrelationId(null);
@@ -652,10 +638,12 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                       }
                     }}
                     disabled={isRetrying}
-                    className="mt-3 bg-red-800 hover:bg-red-900 text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    variant="danger"
+                    size="md"
+                    className="mt-3"
                   >
                     {isRetrying ? '🔄 Retrying...' : '🔄 Try Again'}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </UICard>
@@ -665,21 +653,17 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           {activeTab === 'active' && !loading && !error && (
             <>
               {games.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-2xl mb-2">🎮</p>
-                  <p className="text-umber-700 dark:text-gray-300 font-semibold">No active games</p>
-                  <p className="text-umber-600 dark:text-gray-400 text-sm mt-1">
-                    Create a new game to get started!
-                  </p>
-                </div>
+                <EmptyState
+                  icon="🎮"
+                  title="No active games"
+                  description="Create a new game to get started!"
+                />
               ) : filteredAndSortedGames.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-2xl mb-2">🔍</p>
-                  <p className="text-umber-700 dark:text-gray-300 font-semibold">No games match your filters</p>
-                  <p className="text-umber-600 dark:text-gray-400 text-sm mt-1">
-                    Try adjusting your filters to see more games
-                  </p>
-                </div>
+                <EmptyState
+                  icon="🔍"
+                  title="No games match your filters"
+                  description="Try adjusting your filters to see more games"
+                />
               ) : (
                 filteredAndSortedGames.map((game, index) => (
                   <UICard
@@ -737,24 +721,26 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                             1. Team selection games with open spots or bots
                             2. In-progress games with bots (to replace them) */}
                         {(game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) && (
-                          <button
+                          <Button
                             onClick={() => handleJoinGameClick(game)}
-                            className="bg-gradient-to-r from-green-600 to-green-700 text-white px-3 md:px-4 py-2 rounded-lg font-bold hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 text-sm"
+                            variant="success"
+                            size="sm"
                           >
                             Join
-                          </button>
+                          </Button>
                         )}
                         {game.isInProgress && (
-                          <button
+                          <Button
                             onClick={() => {
                               onSpectateGame(game.gameId);
                               onClose();
                             }}
-                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 md:px-4 py-2 rounded-lg font-bold hover:from-blue-700 hover:to-blue-800 transition-all duration-300 border-2 border-blue-800 shadow-lg transform hover:scale-105 flex items-center gap-1 md:gap-2 text-sm"
+                            variant="primary"
+                            size="sm"
                           >
                             <span>👁️</span>
                             Spectate
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -768,13 +754,11 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           {activeTab === 'recent' && !loading && !error && (
             <>
               {recentGames.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-2xl mb-2">📜</p>
-                  <p className="text-umber-700 dark:text-gray-300 font-semibold">No recent games</p>
-                  <p className="text-umber-600 dark:text-gray-400 text-sm mt-1">
-                    Completed games will appear here
-                  </p>
-                </div>
+                <EmptyState
+                  icon="📜"
+                  title="No recent games"
+                  description="Completed games will appear here"
+                />
               ) : (
                 recentGames.map((game, index) => {
                   const durationMinutes = Math.floor(game.game_duration_seconds / 60);
@@ -814,13 +798,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                           </div>
                         </div>
 
-                        <button
+                        <Button
                           onClick={() => setReplayGameId(game.game_id)}
-                          className={`bg-gradient-to-r ${colors.gradients.primaryDark} hover:${colors.gradients.primaryDarkHover} text-white px-4 py-2 rounded-lg font-bold transition-all duration-300 border-2 border-purple-800 shadow-lg transform hover:scale-105 flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-400`}
+                          variant="secondary"
+                          size="sm"
                         >
                           <span aria-hidden="true">📺</span>
                           Watch Replay
-                        </button>
+                        </Button>
                       </div>
                     </UICard>
                   );

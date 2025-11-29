@@ -7,8 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { colors } from '../design-system';
-import { UICard } from './ui/UICard';
+import { UICard, Button } from './ui';
 
 interface LoginStreak {
   currentStreak: number;
@@ -82,11 +81,11 @@ export function LoginStreakBadge({
   if (!streak) return null;
 
   const getStreakColor = (currentStreak: number) => {
-    if (currentStreak === 0) return colors.gradients.neutral;
-    if (currentStreak < 3) return colors.gradients.primary;
-    if (currentStreak < 7) return colors.gradients.secondary;
-    if (currentStreak < 14) return colors.gradients.questDaily;
-    return colors.gradients.warning; // 14+ days = legendary
+    if (currentStreak === 0) return 'from-gray-400 to-gray-500';
+    if (currentStreak < 3) return 'from-blue-500 to-indigo-600';
+    if (currentStreak < 7) return 'from-gray-500 to-gray-700';
+    if (currentStreak < 14) return 'from-purple-500 to-indigo-600';
+    return 'from-amber-500 to-orange-600'; // 14+ days = legendary
   };
 
   const getStreakEmoji = (currentStreak: number) => {
@@ -120,11 +119,13 @@ export function LoginStreakBadge({
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
       >
-        <button
+        <Button
           onClick={onClick}
+          variant="primary"
+          size="md"
           className={`bg-gradient-to-r ${getStreakColor(
             streak.currentStreak
-          )} text-white px-4 py-2 rounded-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-400`}
+          )} hover:scale-105`}
         >
           <div className="flex items-center gap-2">
             <span className="text-xl" aria-hidden="true">{getStreakEmoji(streak.currentStreak)}</span>
@@ -140,7 +141,7 @@ export function LoginStreakBadge({
               </span>
             )}
           </div>
-        </button>
+        </Button>
 
         {/* Tooltip */}
         {showTooltip && (

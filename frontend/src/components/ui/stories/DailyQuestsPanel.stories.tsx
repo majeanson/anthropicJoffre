@@ -322,6 +322,9 @@ export const NearCompletion: Story = {
 
 // Interactive example
 export const Interactive: Story = {
+  args: {
+    quests: [easyQuest, mediumQuest, hardQuest],
+  },
   render: () => {
     const [quests, setQuests] = useState([easyQuest, mediumQuest, hardQuest]);
     const [notification, setNotification] = useState<string | null>(null);
@@ -366,7 +369,6 @@ export const Interactive: Story = {
               ...q,
               progress: newProgress,
               completed,
-              completed_at: completed ? new Date().toISOString() : q.completed_at,
             };
           }
           return q;

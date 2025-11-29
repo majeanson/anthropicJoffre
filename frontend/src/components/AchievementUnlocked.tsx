@@ -7,7 +7,9 @@
 
 import { useEffect, useState } from 'react';
 import { Achievement } from '../types/achievements';
-import { designTokens } from '../styles/designTokens';
+import { UICard, UICardGradient } from './ui/UICard';
+import { Button } from './ui/Button';
+
 interface AchievementUnlockedProps {
   achievement: Achievement | null;
   onDismiss: () => void;
@@ -49,13 +51,13 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
   const rarity = getRarity();
 
-  const getRarityColor = () => {
+  const getRarityGradient = (): UICardGradient => {
     switch (rarity) {
-      case 'common': return designTokens.gradients.secondary;
-      case 'rare': return designTokens.gradients.primary;
-      case 'epic': return designTokens.gradients.team2;
-      case 'legendary': return designTokens.gradients.special;
-      default: return designTokens.gradients.secondary;
+      case 'common': return 'success';
+      case 'rare': return 'info';
+      case 'epic': return 'team2';
+      case 'legendary': return 'warning';
+      default: return 'success';
     }
   };
 
@@ -75,15 +77,22 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
     <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[100] transition-all duration-500 ${
       isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
     }`}>
-      <div className={`bg-gradient-to-r ${getRarityColor()} rounded-lg p-6 ${getRarityGlow()} animate-bounce-once relative`}>
+      <UICard
+        variant="gradient"
+        gradient={getRarityGradient()}
+        size="lg"
+        className={`${getRarityGlow()} animate-bounce-once relative`}
+      >
         {/* Close Button */}
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleClose}
-          className="absolute top-2 right-2 text-white/70 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-white/50"
+          className="absolute top-2 right-2 text-white/70 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
           aria-label="Close achievement notification"
         >
           ×
-        </button>
+        </Button>
 
         <div className="flex items-center gap-4">
           {/* Trophy Icon */}
@@ -114,7 +123,7 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
         <div className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden">
           <div className="h-full bg-white animate-progress-fill" />
         </div>
-      </div>
+      </UICard>
     </div>
   );
 }

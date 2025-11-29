@@ -22,7 +22,6 @@ import { AchievementProgress } from '../types/achievements';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { UICard } from './ui/UICard';
-import { UIBadge } from './ui/UIBadge';
 
 interface QuickStats {
   player_name: string;

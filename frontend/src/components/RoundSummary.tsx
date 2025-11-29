@@ -13,6 +13,7 @@ import { GameState, Card } from '../types/game';
 import { TrickHistory } from './TrickHistory';
 import { Card as CardComponent } from './Card';
 import { colors } from '../design-system';
+import { UICard, Button } from './ui';
 
 interface RoundStatistics {
   // Performance-based stats
@@ -323,16 +324,18 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
     else if (title === 'Rainbow') description = 'All 4 suits';
 
     return (
-      <div
-        className="flex items-center gap-3 p-4 bg-amber-50 dark:bg-gray-700 rounded-lg border-2 border-amber-200 dark:border-gray-600 transform hover:scale-105 transition-transform animate-fadeInUp"
-        style={{ animationDelay: `${index * 150}ms` }}
-      >
-        <span className="text-3xl">{icon}</span>
-        <div className="flex-1 min-w-0">
-          <div className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">{title}</div>
-          <div className="font-bold text-base text-gray-900 dark:text-white truncate">{stat.playerName}</div>
-          <div className="text-sm text-gray-700 dark:text-gray-300">{description}</div>
-        </div>
+      <div style={{ animationDelay: `${index * 150}ms` }} className="animate-fadeInUp">
+        <UICard
+          variant="bordered"
+          className="flex items-center gap-3 bg-amber-50 dark:bg-gray-700 border-2 border-amber-200 dark:border-gray-600 transform hover:scale-105 transition-transform"
+        >
+          <span className="text-3xl">{icon}</span>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium text-amber-700 dark:text-amber-400 uppercase tracking-wide">{title}</div>
+            <div className="font-bold text-base text-gray-900 dark:text-white truncate">{stat.playerName}</div>
+            <div className="text-sm text-gray-700 dark:text-gray-300">{description}</div>
+          </div>
+        </UICard>
       </div>
     );
   };
@@ -381,9 +384,11 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           {gameState.players.map((player) => {
             const isReady = gameState.playersReady?.includes(player.name) || false;
             return (
-              <div
+              <UICard
                 key={player.id}
-                className={`p-3 rounded-lg border-2 transition-all ${
+                variant="bordered"
+                size="sm"
+                className={`transition-all ${
                   isReady
                     ? 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600'
                     : 'bg-gray-50 dark:bg-gray-800 border-gray-300 dark:border-gray-600'
@@ -402,7 +407,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </UICard>
             );
           })}
         </div>
@@ -410,22 +415,28 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       
       {/* Ready Button */}
       <div className="flex justify-center pt-4 animate-fadeInUp" style={{ animationDelay: '600ms' }}>
-        <button
+        <Button
           onClick={onReady}
-          className="px-8 py-4 text-white font-bold text-lg rounded-xl transition-all transform hover:scale-105 active:scale-95 shadow-xl hover:shadow-2xl focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+          variant="primary"
+          size="lg"
+          className="px-8 py-4 text-lg transform hover:scale-105 active:scale-95 shadow-xl hover:shadow-2xl"
           style={{ background: colors.gradients.special }}
         >
           Ready for Next Round
-        </button>
+        </Button>
       </div>
 
       {/* Team Scores */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
-        <div className={`p-4 sm:p-6 rounded-xl border-4 transition-all ${
-          lastRound.offensiveTeam === 1
-            ? 'border-orange-400 dark:border-orange-600 shadow-lg'
-            : 'border-orange-200 dark:border-gray-700'
-        }`} style={{ background: lastRound.offensiveTeam === 1 ? colors.gradients.team1 : colors.gradients.team1 + '80' }}>
+        <UICard
+          variant="bordered"
+          gradient="team1"
+          className={`border-4 transition-all ${
+            lastRound.offensiveTeam === 1
+              ? 'border-orange-400 dark:border-orange-600 shadow-lg'
+              : 'border-orange-200 dark:border-gray-700'
+          }`}
+        >
           <h3 className="font-bold text-lg sm:text-xl text-orange-600 dark:text-orange-400 mb-2">Team 1</h3>
 
           {/* Round Points - Main Focus */}
@@ -446,13 +457,17 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           <div className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mt-3 pt-3 border-t-2 border-orange-200 dark:border-gray-600">
             Total Score: <span className="font-bold">{gameState.teamScores.team1}</span>
           </div>
-        </div>
+        </UICard>
 
-        <div className={`p-4 sm:p-6 rounded-xl border-4 transition-all ${
-          lastRound.offensiveTeam === 2
-            ? 'border-purple-400 dark:border-purple-600 shadow-lg'
-            : 'border-purple-200 dark:border-gray-700'
-        }`} style={{ background: lastRound.offensiveTeam === 2 ? colors.gradients.team2 : colors.gradients.team2 + '80' }}>
+        <UICard
+          variant="bordered"
+          gradient="team2"
+          className={`border-4 transition-all ${
+            lastRound.offensiveTeam === 2
+              ? 'border-purple-400 dark:border-purple-600 shadow-lg'
+              : 'border-purple-200 dark:border-gray-700'
+          }`}
+        >
           <h3 className="font-bold text-lg sm:text-xl text-purple-600 dark:text-purple-400 mb-2">Team 2</h3>
 
           {/* Round Points - Main Focus */}
@@ -473,7 +488,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           <div className="text-base sm:text-lg text-gray-700 dark:text-gray-300 mt-3 pt-3 border-t-2 border-purple-200 dark:border-gray-600">
             Total Score: <span className="font-bold">{gameState.teamScores.team2}</span>
           </div>
-        </div>
+        </UICard>
       </div>
 
       {/* Round Highlights - Only 3 stats, cycling */}
@@ -492,7 +507,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       {lastRound.tricks && lastRound.tricks.length > 0 && (
         <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '300ms' }}>
           <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">🃏 Trick History</h3>
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border-2 border-amber-200 dark:border-gray-600 shadow-lg">
+          <UICard variant="bordered" className="bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-gray-600">
             <TrickHistory
               tricks={lastRound.tricks}
               players={gameState.players}
@@ -500,14 +515,14 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
               compact={true}
               showWinner={true}
             />
-          </div>
+          </UICard>
         </div>
       )}
 
       {/* Detailed Player Statistics */}
       <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '400ms' }}>
         <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">📊 Player Performance</h3>
-        <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden border-2 border-amber-200 dark:border-gray-600 shadow-lg">
+        <UICard variant="bordered" className="bg-white dark:bg-gray-800 overflow-hidden border-2 border-amber-200 dark:border-gray-600">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px]">
               <thead className="bg-amber-100 dark:bg-gray-700">
@@ -555,7 +570,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
               </tbody>
             </table>
           </div>
-        </div>
+        </UICard>
       </div>
 
       {/* Bets and Starting Hands */}
@@ -563,9 +578,10 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
         <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">🃏 Bets & Starting Hands</h3>
         <div className="space-y-3">
           {gameState.players.map((player) => (
-            <div
+            <UICard
               key={player.id}
-              className="p-3 sm:p-4 bg-amber-50 dark:bg-gray-800 rounded-lg border border-amber-200 dark:border-gray-700 hover:shadow-md transition-shadow"
+              variant="bordered"
+              className="bg-amber-50 dark:bg-gray-800 border-amber-200 dark:border-gray-700 hover:shadow-md transition-shadow"
             >
               {/* Player Name and Team */}
               <div className="flex items-center justify-between mb-2">
@@ -586,7 +602,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
                 <span className="text-gray-600 dark:text-gray-400 font-medium mb-1 block">Starting Hand:</span>
                 {renderHand(player.name)}
               </div>
-            </div>
+            </UICard>
           ))}
         </div>
       </div>

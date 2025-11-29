@@ -6,7 +6,9 @@
  */
 
 import { GameHistoryEntry } from '../types/game';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { UIBadge } from './ui/UIBadge';
+import { Button } from './ui/Button';
 
 interface MatchCardProps {
   game: GameHistoryEntry;
@@ -18,15 +20,11 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
   const isWin = game.won_game;
 
   return (
-    <div
-      onClick={() => onViewDetails?.(game.game_id)}
-      className={`rounded-lg p-4 border-2 transition-all hover:shadow-lg ${
-        onViewDetails ? 'cursor-pointer hover:scale-[1.02]' : ''
-      } ${
-        isWin
-          ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-600'
-          : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-600'
-      }`}
+    <UICard
+      variant="gradient"
+      gradient={isWin ? 'success' : 'error'}
+      onClick={onViewDetails ? () => onViewDetails(game.game_id) : undefined}
+      className={onViewDetails ? 'cursor-pointer' : ''}
     >
       {/* Header: Result + Date */}
       <div className="flex items-center justify-between gap-4 mb-3">
@@ -39,13 +37,9 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
             }`}>
               {isWin ? '✓ Victory' : '✗ Defeat'}
             </span>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-              game.team_id === 1
-                ? 'bg-orange-500 text-white'
-                : 'bg-purple-500 text-white'
-            }`}>
+            <UIBadge variant="solid" color={game.team_id === 1 ? 'team1' : 'team2'} size="xs" shape="pill">
               Team {game.team_id}
-            </span>
+            </UIBadge>
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-400">
             {game.finished_at ? new Date(game.finished_at).toLocaleDateString('en-US', {
@@ -91,16 +85,17 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
 
       {/* View Replay Button */}
       {onViewReplay && game.is_finished && (
-        <button
+        <Button
+          variant="secondary"
+          fullWidth
           onClick={(e) => {
             e.stopPropagation();
             onViewReplay(game.game_id);
           }}
-          className={`w-full bg-gradient-to-r ${colors.gradients.team2} hover:from-purple-700 hover:to-indigo-700 text-white py-2 px-4 rounded-lg font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400`}
         >
           <span aria-hidden="true">📺</span> View Replay
-        </button>
+        </Button>
       )}
-    </div>
+    </UICard>
   );
 }

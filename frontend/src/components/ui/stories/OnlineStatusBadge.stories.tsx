@@ -65,6 +65,9 @@ export const WithText: Story = {
 };
 
 export const AllStates: Story = {
+  args: {
+    status: 'online',
+  },
   render: () => (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">

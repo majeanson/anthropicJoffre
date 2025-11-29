@@ -1,5 +1,5 @@
 import { CardColor } from '../types/game';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
 
 interface ContextualGameInfoProps {
   state: 'waiting' | 'in_progress' | 'trick_complete';
@@ -47,8 +47,10 @@ export function ContextualGameInfo({
       : 'text-umber-900 dark:text-gray-100';
 
     return (
-      <div
-        className="bg-parchment-100 dark:bg-gray-800 border-2 border-umber-700 dark:border-gray-600 rounded-lg px-4 py-2 text-center shadow-lg max-w-xs mx-auto"
+      <UICard
+        variant="bordered"
+        size="sm"
+        className="bg-parchment-100 dark:bg-gray-800 border-umber-700 dark:border-gray-600 text-center max-w-xs mx-auto"
         data-testid={state === 'waiting' ? 'contextual-info-waiting' : 'contextual-info-in-progress'}
       >
         <div className="flex items-center justify-center gap-3 text-sm">
@@ -72,19 +74,18 @@ export function ContextualGameInfo({
             {timeRemaining !== undefined && <span><span aria-hidden="true">⏱️</span> {timeRemaining}s</span>}
           </div>
         )}
-      </div>
+      </UICard>
     );
   }
 
   // Trick complete (temporary flash)
   if (state === 'trick_complete' && trickWinnerName) {
     return (
-      <div
-        style={{
-          background: `linear-gradient(to bottom right, ${colors.success.start}, ${colors.success.end})`,
-          borderColor: colors.success.border
-        }}
-        className="border-2 rounded-lg px-4 py-3 text-center shadow-lg max-w-xs mx-auto animate-fadeIn"
+      <UICard
+        variant="gradient"
+        gradient="success"
+        size="sm"
+        className="text-center max-w-xs mx-auto animate-fadeIn"
         data-testid="contextual-info-trick-complete"
       >
         <div className="text-white font-bold text-lg flex items-center justify-center gap-2">
@@ -96,7 +97,7 @@ export function ContextualGameInfo({
             +{trickPoints} points
           </div>
         )}
-      </div>
+      </UICard>
     );
   }
 

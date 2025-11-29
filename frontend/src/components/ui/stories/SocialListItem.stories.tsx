@@ -127,6 +127,10 @@ export const SearchResult: Story = {
 };
 
 export const ListExample: Story = {
+  args: {
+    playerName: 'JohnDoe',
+    status: 'online',
+  },
   render: () => (
     <div className="max-w-md space-y-3 bg-gray-900 p-4 rounded-lg">
       <h3 className="text-white font-bold mb-2">Friends List</h3>

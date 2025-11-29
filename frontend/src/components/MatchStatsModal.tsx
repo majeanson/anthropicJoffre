@@ -7,10 +7,7 @@
 
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
-import { Modal } from './ui/Modal';
-import { Button } from './ui/Button';
-import { colors } from '../design-system';
-import { UICard } from './ui/UICard';
+import { Modal, Button, UICard, Spinner } from './ui';
 
 interface MatchStatsModalProps {
   gameId: string;
@@ -141,7 +138,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
       <div className="space-y-6">
           {loading && (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-300 border-t-purple-700"></div>
+              <Spinner size="lg" color="primary" />
               <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading match details...</p>
             </div>
           )}
@@ -157,36 +154,27 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
             <>
               {/* Tabs */}
               <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
-                <button
+                <Button
                   onClick={() => setSelectedTab('overview')}
-                  className={`px-6 py-3 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
-                    selectedTab === 'overview'
-                      ? `bg-gradient-to-r ${colors.gradients.team2} text-white rounded-t-lg`
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg'
-                  }`}
+                  variant={selectedTab === 'overview' ? 'secondary' : 'ghost'}
+                  size="md"
                 >
                   <span aria-hidden="true">📈</span> Overview
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setSelectedTab('rounds')}
-                  className={`px-6 py-3 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
-                    selectedTab === 'rounds'
-                      ? `bg-gradient-to-r ${colors.gradients.team2} text-white rounded-t-lg`
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg'
-                  }`}
+                  variant={selectedTab === 'rounds' ? 'secondary' : 'ghost'}
+                  size="md"
                 >
                   <span aria-hidden="true">🔄</span> Round-by-Round
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => setSelectedTab('players')}
-                  className={`px-6 py-3 font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 ${
-                    selectedTab === 'players'
-                      ? `bg-gradient-to-r ${colors.gradients.team2} text-white rounded-t-lg`
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-t-lg'
-                  }`}
+                  variant={selectedTab === 'players' ? 'secondary' : 'ghost'}
+                  size="md"
                 >
                   <span aria-hidden="true">👥</span> Player Stats
-                </button>
+                </Button>
               </div>
 
               {/* Overview Tab */}
@@ -196,8 +184,8 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                   {matchData.winning_team ? (
                     <div className={`p-6 rounded-xl text-center border-4 ${
                       matchData.winning_team === 1
-                        ? `bg-gradient-to-r ${colors.gradients.team1} border-orange-800`
-                        : `bg-gradient-to-r ${colors.gradients.team2} border-purple-800`
+                        ? 'bg-gradient-to-r from-orange-400 to-amber-500 border-orange-800'
+                        : 'bg-gradient-to-r from-purple-400 to-indigo-500 border-purple-800'
                     }`}>
                       <h3 className="text-3xl font-bold text-white mb-2">
                         <span aria-hidden="true">🏆</span> Team {matchData.winning_team} Victory!
@@ -207,7 +195,7 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                       </div>
                     </div>
                   ) : (
-                    <UICard variant="gradient" gradient="gray" size="lg" className="text-center border-4 border-gray-800">
+                    <UICard variant="bordered" size="lg" className="text-center border-4 border-gray-800 bg-gray-700 dark:bg-gray-800">
                       <h3 className="text-3xl font-bold text-white mb-2">
                         <span aria-hidden="true">⏳</span> Game In Progress
                       </h3>

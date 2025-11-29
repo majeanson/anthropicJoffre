@@ -22,7 +22,6 @@ import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
 import { suggestMove } from '../../utils/moveSuggestion';
-import { colors } from '../../design-system';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';

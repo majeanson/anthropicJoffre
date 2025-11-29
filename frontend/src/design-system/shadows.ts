@@ -36,12 +36,15 @@ export const shadows = {
   tooltip: 'shadow-lg',
 } as const;
 
+// Shadow sizes that return string values
+type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner' | 'card' | 'modal' | 'button' | 'dropdown' | 'tooltip';
+
 // Helper function to get shadow class
 export function getShadow(
-  size: keyof typeof shadows,
+  size: ShadowSize,
   hover = false
 ): string {
-  const baseShadow = shadows[size];
+  const baseShadow = shadows[size] as string;
 
   if (hover) {
     return `${baseShadow} hover:shadow-lg transition-shadow duration-200`;

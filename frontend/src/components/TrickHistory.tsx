@@ -1,5 +1,7 @@
 import { TrickResult, Player, CardColor } from '../types/game';
 import { Card as CardComponent } from './Card';
+import { UICard } from './ui/UICard';
+import { UIBadge } from './ui/UIBadge';
 
 interface TrickHistoryProps {
   tricks: TrickResult[];
@@ -34,18 +36,14 @@ export function TrickHistory({
 
         // Find winner's team for color coding
         const winner = players.find(p => p.name === trick.winnerName);
-        const winnerTeamColor = winner?.teamId === 1
-          ? 'bg-orange-500 text-white border-2 border-orange-700'
-          : 'bg-purple-500 text-white border-2 border-purple-700';
+        const winnerTeamColor = winner?.teamId === 1 ? 'team1' : 'team2';
 
         return (
-          <div
+          <UICard
             key={trickIndex}
-            className={`rounded-lg p-3 border-2 ${
-              isCurrentTrick
-                ? 'border-yellow-400 ring-2 ring-yellow-500 bg-gray-800 dark:bg-gray-700'
-                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'
-            } ${compact ? 'p-2' : 'p-3'}`}
+            variant="bordered"
+            size={compact ? 'sm' : 'md'}
+            className={isCurrentTrick ? 'border-yellow-400 ring-2 ring-yellow-500' : ''}
           >
             {/* Trick Header */}
             <div className="flex items-center justify-between mb-3">
@@ -53,9 +51,9 @@ export function TrickHistory({
                 Trick {trickIndex + 1}
               </span>
               {showWinner && (
-                <span className={`px-3 py-1 rounded-full font-semibold ${compact ? 'text-xs' : 'text-xs'} ${winnerTeamColor}`}>
+                <UIBadge variant="solid" color={winnerTeamColor} size="xs" shape="pill">
                   👑 {trick.winnerName || 'Unknown'} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
-                </span>
+                </UIBadge>
               )}
             </div>
 
@@ -80,7 +78,7 @@ export function TrickHistory({
                 );
               })}
             </div>
-          </div>
+          </UICard>
         );
       })}
     </div>

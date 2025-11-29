@@ -28,6 +28,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { Socket } from 'socket.io-client';
 import { CardSkeleton } from './ui/Skeleton';
+import { Button, Tabs, Tab } from './ui';
 import { useAuth } from '../contexts/AuthContext';
 import Avatar from './Avatar';
 import { PlayerNameButton } from './PlayerNameButton';
@@ -145,19 +146,13 @@ export function SocialHub({
     socket.emit('send_friend_request', { toPlayer: playerName });
   };
 
-  // Tab button component
-  const TabButton = ({ tab, icon, label }: { tab: SocialTab; icon: string; label: string }) => (
-    <button
-      onClick={() => setActiveTab(tab)}
-      className={`flex-1 py-3 font-semibold transition-all ${
-        activeTab === tab
-          ? 'bg-blue-600 text-white'
-          : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-      }`}
-    >
-      {icon} {label}
-    </button>
-  );
+  // Tab definitions for Tabs component
+  const socialTabs: Tab[] = [
+    { id: 'friends', label: 'Friends', icon: '👥' },
+    { id: 'achievements', label: 'Achievements', icon: '🏆' },
+    { id: 'recent', label: 'Recent Players', icon: '🕐' },
+    { id: 'suggestions', label: 'Suggestions', icon: '✨' },
+  ];
 
   return (
     <div
@@ -172,22 +167,27 @@ export function SocialHub({
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 className="text-2xl font-bold text-blue-400">Social Hub</h2>
-          <button
+          <Button
             onClick={onClose}
-            className="text-gray-400 hover:text-white text-2xl leading-none"
+            variant="ghost"
+            size="sm"
+            className="text-gray-400 hover:text-white"
             aria-label="Close"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-gray-700">
-          <TabButton tab="friends" icon="👥" label="Friends" />
-          <TabButton tab="achievements" icon="🏆" label="Achievements" />
-          <TabButton tab="recent" icon="🕐" label="Recent Players" />
-          <TabButton tab="suggestions" icon="✨" label="Suggestions" />
-        </div>
+        <Tabs
+          tabs={socialTabs}
+          activeTab={activeTab}
+          onChange={(id) => setActiveTab(id as SocialTab)}
+          variant="pills"
+          size="md"
+          fullWidth
+          className="border-b border-gray-700"
+        />
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
@@ -248,20 +248,22 @@ export function SocialHub({
                     </div>
                     <div className="flex gap-2">
                       {!player.isFriend && (
-                        <button
+                        <Button
                           onClick={() => handleSendFriendRequest(player.playerName)}
-                          className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-semibold transition-colors"
+                          variant="success"
+                          size="sm"
                         >
                           ➕ Add Friend
-                        </button>
+                        </Button>
                       )}
                       {onSendMessage && (
-                        <button
+                        <Button
                           onClick={() => onSendMessage(player.playerName)}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-colors"
+                          variant="primary"
+                          size="sm"
                         >
                           💬 Message
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -300,12 +302,13 @@ export function SocialHub({
                         <p className="text-sm text-emerald-400">{suggestion.reason}</p>
                       </div>
                     </div>
-                    <button
+                    <Button
                       onClick={() => handleSendFriendRequest(suggestion.playerName)}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold transition-colors"
+                      variant="success"
+                      size="sm"
                     >
                       ➕ Add Friend
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>

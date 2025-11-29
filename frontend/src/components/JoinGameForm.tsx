@@ -10,7 +10,8 @@ import { Suspense, lazy, useEffect, useState, useRef, useCallback } from 'react'
 import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { Button } from './ui/Button';
 
 // Lazy load modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -230,10 +231,7 @@ export function JoinGameForm({
   return (
     <>
       <div
-        style={{
-          background: `linear-gradient(to bottom right, ${colors.warning.start}, ${colors.warning.end}, ${colors.error.end})`
-        }}
-        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-amber-400 via-orange-500 to-red-500"
       >
         {/* Animated background cards */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -254,12 +252,11 @@ export function JoinGameForm({
 
           {/* Show message when joining from URL */}
           {autoJoinGameId && (
-            <div
-              style={{
-                background: `linear-gradient(to right, ${colors.info.start}, ${colors.secondary.start})`,
-                borderColor: colors.info.border
-              }}
-              className="mb-6 border-2 rounded-lg p-5 animate-pulse shadow-lg"
+            <UICard
+              variant="gradient"
+              gradient="info"
+              size="md"
+              className="mb-6 animate-pulse shadow-lg"
             >
               <div className="flex items-center justify-center gap-2 mb-2">
                 <span className="text-2xl" aria-hidden="true">🎮</span>
@@ -270,7 +267,7 @@ export function JoinGameForm({
               <p className="text-white/90 font-medium text-center">
                 <span aria-hidden="true">👇</span> Enter your name below to join!
               </p>
-            </div>
+            </UICard>
           )}
 
           <form onSubmit={handleJoin} className="space-y-4">
@@ -357,41 +354,40 @@ export function JoinGameForm({
             <div className="flex gap-3">
               {/* Show appropriate back button based on context */}
               {autoJoinGameId ? (
-                <button
+                <Button
                   ref={backButtonRef}
                   data-testid="back-to-homepage-button"
                   type="button"
+                  variant="secondary"
+                  size="lg"
                   onClick={onBackToHomepage}
-                  className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  className="flex-1"
                 >
                   <span aria-hidden="true">🏠</span> Back to Homepage
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
                   ref={backButtonRef}
                   data-testid="back-button"
                   type="button"
+                  variant="secondary"
+                  size="lg"
                   onClick={() => { sounds.buttonClick(); onBack(); }}
-                  className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+                  className="flex-1"
                 >
                   Back
-                </button>
+                </Button>
               )}
-              <button
+              <Button
                 ref={joinButtonRef}
                 data-testid="submit-join-button"
                 type="submit"
-                style={joinType === 'player' ? {
-                  background: `linear-gradient(to right, ${colors.secondary.start}, ${colors.secondary.end})`,
-                  borderColor: colors.secondary.border
-                } : {
-                  background: `linear-gradient(to right, ${colors.info.start}, ${colors.info.end})`,
-                  borderColor: colors.info.border
-                }}
-                className="flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                variant={joinType === 'player' ? 'secondary' : 'primary'}
+                size="lg"
+                className="flex-1"
               >
                 {joinType === 'player' ? 'Join as Player' : 'Join as Spectator'}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

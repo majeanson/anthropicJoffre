@@ -235,6 +235,15 @@ export const SevenDayMilestone: Story = {
 
 // All streak levels showcase
 export const AllStreakLevels: Story = {
+  args: {
+    streak: {
+      currentStreak: 5,
+      longestStreak: 10,
+      lastLoginDate: new Date().toISOString(),
+      streakFreezeAvailable: true,
+      totalLogins: 25,
+    },
+  },
   render: () => (
     <div className="flex flex-col gap-4 p-8 bg-gray-900 rounded-lg">
       <h3 className="text-white text-xl font-bold mb-2">Streak Progression</h3>
@@ -308,6 +317,15 @@ export const AllStreakLevels: Story = {
 
 // Interactive example
 export const Interactive: Story = {
+  args: {
+    streak: {
+      currentStreak: 5,
+      longestStreak: 10,
+      lastLoginDate: new Date().toISOString(),
+      streakFreezeAvailable: true,
+      totalLogins: 50,
+    },
+  },
   render: () => {
     const [currentStreak, setCurrentStreak] = useState(5);
     const [showNotification, setShowNotification] = useState(false);

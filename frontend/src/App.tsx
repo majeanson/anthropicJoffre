@@ -25,9 +25,8 @@ const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcuts
 const PlayerProfileModal = lazy(() => import('./components/PlayerProfileModal').then(m => ({ default: m.PlayerProfileModal })));
 // Beginner mode components
 const BeginnerTutorial = lazy(() => import('./components/BeginnerTutorial').then(m => ({ default: m.BeginnerTutorial })));
-// Sprint 19: Quest system components
-const DailyQuestsPanel = lazy(() => import('./components/DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
-const RewardsCalendar = lazy(() => import('./components/RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
+// Sprint 19: Quest system components (lazy loaded when UI is integrated)
+// TODO: Integrate DailyQuestsPanel and RewardsCalendar into the game UI
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
 import { useAuth } from './contexts/AuthContext'; // Sprint 3 Phase 1

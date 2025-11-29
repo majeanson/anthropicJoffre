@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
-import { designTokens } from '../styles/designTokens';
+import { UICard, Button, TeamIndicator } from './ui';
 
 interface RematchVotingProps {
   socket: Socket | null;
@@ -24,13 +24,13 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
   };
 
   return (
-    <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-2xl mx-auto border-4 border-amber-700 dark:border-gray-600">
+    <UICard variant="elevated" size="lg" className="max-w-2xl mx-auto">
       <div className="text-center space-y-6">
         <h2 className="text-3xl font-black text-umber-900 dark:text-gray-100 font-serif">
           Play Again?
         </h2>
 
-        <div className="bg-white dark:bg-gray-800/50 rounded-xl p-6 border-2 border-amber-600">
+        <UICard variant="bordered" size="md" className="bg-white dark:bg-gray-800/50">
           <div className="text-6xl mb-4" aria-hidden="true">
             {rematchVotes.length === 4 ? '🎉' : '🔄'}
           </div>
@@ -66,9 +66,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
                   }`}
                   title={player.name}
                 >
-                  <div className={`w-3 h-3 rounded-full mb-2 ${
-                    player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
-                  }`} />
+                  <TeamIndicator teamId={player.teamId} size="md" className="mb-2" />
                   <div className="text-xs font-bold text-umber-900 dark:text-gray-100 max-w-[60px] truncate">
                     {isCurrentPlayer ? 'You' : player.name}
                   </div>
@@ -79,25 +77,27 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
               );
             })}
           </div>
-        </div>
+        </UICard>
 
         {!hasVoted && (
-          <button
+          <Button
+            variant="success"
+            size="lg"
             onClick={handleVoteRematch}
-            className={`w-full py-4 px-8 rounded-xl font-black text-xl bg-gradient-to-r ${designTokens.gradients.success} text-white hover:from-green-700 hover:to-green-800 transition-all duration-300 border-2 border-green-800 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2`}
+            className="w-full text-xl font-black"
           >
             Vote for Rematch
-          </button>
+          </Button>
         )}
 
         {hasVoted && votesNeeded > 0 && (
-          <div className="bg-blue-50 border-2 border-blue-400 text-blue-800 px-4 py-3 rounded-lg">
-            <p className="font-semibold">
+          <UICard variant="bordered" size="sm" gradient="info">
+            <p className="font-semibold text-blue-800 dark:text-blue-200">
               ✓ You voted for rematch. Waiting for other players...
             </p>
-          </div>
+          </UICard>
         )}
       </div>
-    </div>
+    </UICard>
   );
 }

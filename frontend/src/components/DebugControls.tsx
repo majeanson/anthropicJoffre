@@ -10,7 +10,8 @@ import React from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
 import { UnifiedDebugPanel } from './UnifiedDebugPanel';
-import { colors } from '../design-system';
+import { Button } from './ui/Button';
+import { UICard } from './ui/UICard';
 
 interface DebugControlsProps {
   gameState: GameState | null;
@@ -47,42 +48,48 @@ const DebugControls: React.FC<DebugControlsProps> = ({
     <>
       {/* Debug Menu Button */}
       <div className="fixed top-4 right-4 z-50">
-        <button
+        <Button
+          variant="secondary"
+          size="md"
           onClick={() => setDebugMenuOpen(!debugMenuOpen)}
-          className={`bg-gradient-to-r ${colors.gradients.secondary} hover:${colors.gradients.secondaryHover} text-white px-4 py-2 rounded-lg shadow-lg font-bold transition-all flex items-center gap-2 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400`}
+          className="flex items-center gap-2 backdrop-blur-sm"
           title="Debug Menu"
           aria-label="Open debug menu"
         >
           <span aria-hidden="true">🐛</span> Debug
-        </button>
+        </Button>
 
         {/* Dropdown Menu */}
         {debugMenuOpen && (
-          <div className="absolute top-12 right-0 bg-gradient-to-br from-gray-900 to-gray-800 border border-purple-500/30 rounded-lg shadow-2xl p-2 min-w-[180px] backdrop-blur-sm">
-            <button
+          <UICard variant="elevated" size="sm" className="absolute top-12 right-0 min-w-[180px] backdrop-blur-sm bg-gray-900">
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 setDebugPanelOpen(true);
                 setDebugMenuOpen(false);
               }}
-              className="w-full text-left px-3 py-2 rounded hover:bg-purple-600/30 transition-colors flex items-center gap-2 text-sm font-medium text-white"
+              className="w-full justify-start text-white hover:bg-purple-600/30"
             >
               🐛 Unified Debug Panel
-            </button>
+            </Button>
             {gameState && (
               <>
                 <div className="border-t border-gray-700 my-1" />
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={() => {
                     setShowBotManagement(true);
                     setDebugMenuOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2 rounded hover:bg-yellow-600/30 transition-colors flex items-center gap-2 text-sm font-medium text-white"
+                  className="w-full justify-start text-white hover:bg-yellow-600/30"
                 >
                   🤖 Bot Settings
-                </button>
+                </Button>
               </>
             )}
-          </div>
+          </UICard>
         )}
       </div>
 

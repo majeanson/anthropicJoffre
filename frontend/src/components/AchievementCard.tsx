@@ -6,7 +6,7 @@
  */
 
 import { AchievementProgress, AchievementTier } from '../types/achievements';
-import { designTokens } from '../styles/designTokens';
+import { UICard, ProgressBar } from './ui';
 
 interface AchievementCardProps {
   achievement: AchievementProgress;
@@ -16,10 +16,10 @@ interface AchievementCardProps {
 export function AchievementCard({ achievement, size = 'medium' }: AchievementCardProps) {
   const getTierColor = (tier: AchievementTier): string => {
     switch (tier) {
-      case 'bronze': return designTokens.gradients.warning;
-      case 'silver': return designTokens.gradients.secondary;
-      case 'gold': return designTokens.gradients.special;
-      case 'platinum': return designTokens.gradients.info;
+      case 'bronze': return 'from-amber-500 to-orange-600';
+      case 'silver': return 'from-gray-400 to-gray-600';
+      case 'gold': return 'from-purple-500 to-pink-600';
+      case 'platinum': return 'from-blue-400 to-cyan-500';
     }
   };
 
@@ -34,14 +34,9 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
 
   const isLocked = !achievement.is_unlocked;
   const hasProgress = achievement.max_progress > 1;
-  const progressPercent = hasProgress ? (achievement.progress / achievement.max_progress) * 100 : 0;
 
-  // Size classes
-  const sizeClasses = {
-    small: 'p-3',
-    medium: 'p-4',
-    large: 'p-6',
-  };
+  // Map achievement size to UICard size
+  const uiCardSize = size === 'small' ? 'sm' : size === 'large' ? 'lg' : 'md';
 
   const iconSizes = {
     small: 'text-3xl',
@@ -56,8 +51,10 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
   };
 
   return (
-    <div
-      className={`relative ${sizeClasses[size]} rounded-xl border-2 ${getTierBorder(achievement.tier)} transition-all ${
+    <UICard
+      variant="bordered"
+      size={uiCardSize}
+      className={`relative border-2 ${getTierBorder(achievement.tier)} transition-all ${
         isLocked
           ? 'bg-gray-800 dark:bg-gray-900 opacity-50 grayscale'
           : `bg-gradient-to-br ${getTierColor(achievement.tier)} shadow-lg hover:scale-105 motion-safe:transition-transform`
@@ -88,16 +85,17 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
           {/* Progress bar for incremental achievements */}
           {hasProgress && !isLocked && (
             <div className="mt-2">
-              <div className="flex items-center justify-between text-xs text-white/80 mb-1">
-                <span>Progress</span>
-                <span>{achievement.progress}/{achievement.max_progress}</span>
-              </div>
-              <div className="h-2 bg-black/30 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-white/80 transition-all duration-300"
-                  style={{ width: `${progressPercent}%` }}
-                />
-              </div>
+              <ProgressBar
+                value={achievement.progress}
+                max={achievement.max_progress}
+                label="Progress"
+                showValue
+                valueFormatter={(v, max) => `${v}/${max}`}
+                variant="default"
+                color="gray"
+                size="sm"
+                className="[&_.bg-gray-200]:bg-black/30 [&_.bg-gray-500]:bg-white/80"
+              />
             </div>
           )}
 
@@ -117,6 +115,6 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
           </div>
         </div>
       </div>
-    </div>
+    </UICard>
   );
 }

@@ -8,6 +8,7 @@
 
 import { useEffect } from 'react';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
+import { UICard, UICardGradient } from './ui/UICard';
 
 interface ConnectionQualityIndicatorProps {
   stats: ConnectionStats;
@@ -27,70 +28,47 @@ export function ConnectionQualityIndicator({ stats, showToast }: ConnectionQuali
   }, [quality, showToast]);
 
   // Get color and icon based on quality
-  const getQualityDisplay = () => {
+  const getQualityDisplay = (): { gradient: UICardGradient; icon: string; label: string } => {
     switch (quality) {
       case 'excellent':
-        return {
-          color: 'text-green-600 dark:text-green-400',
-          bg: 'bg-green-100 dark:bg-green-900/30',
-          border: 'border-green-500 dark:border-green-600',
-          icon: '🟢',
-          label: 'Excellent',
-        };
+        return { gradient: 'success', icon: '🟢', label: 'Excellent' };
       case 'good':
-        return {
-          color: 'text-blue-600 dark:text-blue-400',
-          bg: 'bg-blue-100 dark:bg-blue-900/30',
-          border: 'border-blue-500 dark:border-blue-600',
-          icon: '🔵',
-          label: 'Good',
-        };
+        return { gradient: 'info', icon: '🔵', label: 'Good' };
       case 'fair':
-        return {
-          color: 'text-yellow-600 dark:text-yellow-400',
-          bg: 'bg-yellow-100 dark:bg-yellow-900/30',
-          border: 'border-yellow-500 dark:border-yellow-600',
-          icon: '🟡',
-          label: 'Fair',
-        };
+        return { gradient: 'warning', icon: '🟡', label: 'Fair' };
       case 'poor':
-        return {
-          color: 'text-red-600 dark:text-red-400',
-          bg: 'bg-red-100 dark:bg-red-900/30',
-          border: 'border-red-500 dark:border-red-600',
-          icon: '🔴',
-          label: 'Poor',
-        };
+        return { gradient: 'error', icon: '🔴', label: 'Poor' };
       case 'offline':
-        return {
-          color: 'text-gray-600 dark:text-gray-400',
-          bg: 'bg-gray-100 dark:bg-gray-900/30',
-          border: 'border-gray-500 dark:border-gray-600',
-          icon: '⚫',
-          label: 'Offline',
-        };
+        return { gradient: 'primary', icon: '⚫', label: 'Offline' };
     }
   };
 
   const display = getQualityDisplay();
 
   return (
-    <div
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 ${display.bg} ${display.border} transition-all duration-300`}
-      title={`Connection: ${display.label}${ping ? ` (${ping}ms)` : ''}`}
+    <UICard
+      variant="gradient"
+      gradient={display.gradient}
+      size="sm"
+      className="inline-flex items-center gap-2 border-2"
     >
-      <span className="text-base">{display.icon}</span>
-      <div className="flex flex-col items-start">
-        <span className={`text-xs font-medium ${display.color}`}>
-          {display.label}
-        </span>
-        {ping !== null && (
-          <span className={`text-xs font-mono ${display.color}`}>
-            {ping}ms
+      <div
+        className="flex items-center gap-2"
+        title={`Connection: ${display.label}${ping ? ` (${ping}ms)` : ''}`}
+      >
+        <span className="text-base">{display.icon}</span>
+        <div className="flex flex-col items-start">
+          <span className="text-xs font-medium">
+            {display.label}
           </span>
-        )}
+          {ping !== null && (
+            <span className="text-xs font-mono">
+              {ping}ms
+            </span>
+          )}
+        </div>
       </div>
-    </div>
+    </UICard>
   );
 }
 

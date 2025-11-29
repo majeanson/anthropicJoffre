@@ -27,6 +27,7 @@ import { PlayerNameButton } from './PlayerNameButton';
 import { PlayerProfileModal } from './PlayerProfileModal';
 import { UnifiedChat } from './UnifiedChat';
 import type { ChatMessage } from '../types/game';
+import { Button } from './ui/Button';
 
 interface SocialPanelProps {
   socialTab: 'recent' | 'online' | 'chat' | 'friends' | 'messages' | 'profile';
@@ -270,7 +271,7 @@ export function SocialPanel({
     <>
       {/* Sub-tabs for Social - Reordered: Messages | Friends | Online | Profile | Chat */}
       <div className="grid grid-cols-5 gap-1.5">
-        <button
+        <Button
           data-keyboard-nav="social-messages"
           data-nav-subtab="messages"
           onClick={() => {
@@ -281,11 +282,9 @@ export function SocialPanel({
             }
             setSocialTab('messages');
           }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs relative focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
-            socialTab === 'messages'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
-              : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-          }`}
+          variant={socialTab === 'messages' ? 'primary' : 'ghost'}
+          size="sm"
+          className="relative"
         >
           💬
           {unreadDMCount > 0 && (
@@ -293,8 +292,8 @@ export function SocialPanel({
               {unreadDMCount}
             </span>
           )}
-        </button>
-        <button
+        </Button>
+        <Button
           data-keyboard-nav="social-friends"
           data-nav-subtab="friends"
           onClick={() => {
@@ -305,27 +304,21 @@ export function SocialPanel({
             }
             setSocialTab('friends');
           }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
-            socialTab === 'friends'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
-              : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-          }`}
+          variant={socialTab === 'friends' ? 'primary' : 'ghost'}
+          size="sm"
         >
           👥
-        </button>
-        <button
+        </Button>
+        <Button
           data-keyboard-nav="social-online"
           data-nav-subtab="online"
           onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
-            socialTab === 'online'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
-              : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-          }`}
+          variant={socialTab === 'online' ? 'primary' : 'ghost'}
+          size="sm"
         >
           🟢 {onlinePlayers.length}
-        </button>
-        <button
+        </Button>
+        <Button
           data-keyboard-nav="social-profile"
           data-nav-subtab="profile"
           onClick={() => {
@@ -336,26 +329,20 @@ export function SocialPanel({
             }
             setSocialTab('profile');
           }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
-            socialTab === 'profile'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
-              : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-          }`}
+          variant={socialTab === 'profile' ? 'primary' : 'ghost'}
+          size="sm"
         >
           👤
-        </button>
-        <button
+        </Button>
+        <Button
           data-keyboard-nav="social-chat"
           data-nav-subtab="chat"
           onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
-          className={`py-2 rounded-lg font-bold transition-all duration-200 text-xs focus-visible:ring-2 focus-visible:ring-orange-500 dark:focus-visible:ring-purple-500 focus-visible:ring-offset-1 ${
-            socialTab === 'chat'
-              ? 'bg-gradient-to-r from-umber-500 to-umber-600 dark:from-purple-600 dark:to-purple-700 text-white shadow-lg border-b-2 border-orange-400 dark:border-purple-400'
-              : 'bg-parchment-200 dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-parchment-300 dark:hover:bg-gray-600'
-          }`}
+          variant={socialTab === 'chat' ? 'primary' : 'ghost'}
+          size="sm"
         >
           💭
-        </button>
+        </Button>
       </div>
 
       {/* Content Area */}
@@ -371,12 +358,13 @@ export function SocialPanel({
               </div>
             ) : (
               <div className="text-center py-8">
-                <button
+                <Button
                   onClick={() => {
                     sounds.buttonClick();
                     setShowDirectMessages(true);
                   }}
-                  className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-bold shadow-lg transition-all duration-200"
+                  variant="primary"
+                  size="lg"
                 >
                   💬 Open Direct Messages
                   {unreadDMCount > 0 && (
@@ -384,7 +372,7 @@ export function SocialPanel({
                       {unreadDMCount} new
                     </span>
                   )}
-                </button>
+                </Button>
                 <p className="text-sm text-umber-600 dark:text-gray-400 mt-4">
                   Send private messages to friends and recent players
                 </p>
@@ -429,19 +417,20 @@ export function SocialPanel({
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {showFriendButton && (
-                          <button
+                          <Button
                             onClick={() => {
                               sounds.buttonClick();
                               handleSendFriendRequest(player.playerName!);
                             }}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-xs font-bold transition-colors"
+                            variant="primary"
+                            size="sm"
                             title="Send friend request"
                           >
                             ➕
-                          </button>
+                          </Button>
                         )}
                         {player.gameId && player.status !== 'in_lobby' && (
-                          <button
+                          <Button
                             data-keyboard-nav={`join-player-${player.socketId}`}
                             onClick={() => {
                               sounds.buttonClick();
@@ -453,11 +442,12 @@ export function SocialPanel({
                                 onJoinGame(player.gameId!, nameToUse.trim());
                               }
                             }}
-                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs font-bold transition-colors"
+                            variant="success"
+                            size="sm"
                             title="Join their game"
                           >
                             🎮 Join
-                          </button>
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -545,18 +535,20 @@ export function SocialPanel({
                               </p>
                             </div>
                             <div className="flex gap-2">
-                              <button
+                              <Button
                                 onClick={() => handleAcceptRequest(request.id)}
-                                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded text-sm font-bold transition-colors"
+                                variant="success"
+                                size="sm"
                               >
                                 ✓ Accept
-                              </button>
-                              <button
+                              </Button>
+                              <Button
                                 onClick={() => handleRejectRequest(request.id)}
-                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded text-sm font-bold transition-colors"
+                                variant="danger"
+                                size="sm"
                               >
                                 × Reject
-                              </button>
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -635,7 +627,7 @@ export function SocialPanel({
                               </div>
                               <div className="flex gap-1 flex-shrink-0">
                                 {isOnline && onlinePlayer?.gameId && onlinePlayer.status !== 'in_lobby' && (
-                                  <button
+                                  <Button
                                     data-keyboard-nav={`join-friend-${friend.player_name}`}
                                     onClick={() => {
                                       sounds.buttonClick();
@@ -647,19 +639,21 @@ export function SocialPanel({
                                         onJoinGame(onlinePlayer.gameId!, nameToUse.trim());
                                       }
                                     }}
-                                    className="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded text-xs font-bold transition-colors"
+                                    variant="secondary"
+                                    size="sm"
                                     title="Join their game"
                                   >
                                     🎮
-                                  </button>
+                                  </Button>
                                 )}
-                                <button
+                                <Button
                                   onClick={() => handleRemoveFriend(friend.player_name)}
-                                  className="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs font-bold transition-colors"
+                                  variant="danger"
+                                  size="sm"
                                   title="Remove friend"
                                 >
                                   ×
-                                </button>
+                                </Button>
                               </div>
                             </div>
                           </div>
@@ -693,12 +687,13 @@ export function SocialPanel({
                                 Played together recently
                               </p>
                             </div>
-                            <button
+                            <Button
                               onClick={() => handleSendFriendRequest(suggestion)}
-                              className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-xs font-bold transition-colors flex-shrink-0"
+                              variant="success"
+                              size="sm"
                             >
                               ➕ Add
-                            </button>
+                            </Button>
                           </div>
                         </div>
                       ))}
@@ -776,32 +771,34 @@ export function SocialPanel({
 
                 {/* Quick Actions */}
                 <div className="space-y-2">
-                  <button
+                  <Button
                     onClick={() => {
                       sounds.buttonClick();
                       setShowDirectMessages(true);
                     }}
-                    className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                    variant="primary"
+                    size="md"
+                    className="w-full"
                   >
-                    <span>💬</span>
-                    <span>View Messages</span>
+                    💬 View Messages
                     {unreadDMCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
+                      <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">
                         {unreadDMCount}
                       </span>
                     )}
-                  </button>
+                  </Button>
 
-                  <button
+                  <Button
                     onClick={() => {
                       sounds.buttonClick();
                       setSocialTab('friends');
                     }}
-                    className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2"
+                    variant="secondary"
+                    size="md"
+                    className="w-full"
                   >
-                    <span>👥</span>
-                    <span>View Friends ({friends.length})</span>
-                  </button>
+                    👥 View Friends ({friends.length})
+                  </Button>
                 </div>
 
                 {/* Profile Info */}
@@ -830,18 +827,19 @@ export function SocialPanel({
                       Profile
                     </h4>
                     {!isEditingProfile ? (
-                      <button
+                      <Button
                         onClick={() => {
                           sounds.buttonClick();
                           setIsEditingProfile(true);
                         }}
-                        className="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1 rounded font-semibold transition-colors"
+                        variant="primary"
+                        size="sm"
                       >
                         ✏️ Edit
-                      </button>
+                      </Button>
                     ) : (
                       <div className="flex gap-2">
-                        <button
+                        <Button
                           onClick={() => {
                             sounds.buttonClick();
                             setIsEditingProfile(false);
@@ -850,17 +848,19 @@ export function SocialPanel({
                               socket.emit('get_user_profile', { username: user.username });
                             }
                           }}
-                          className="text-xs bg-gray-500 hover:bg-gray-400 text-white px-3 py-1 rounded font-semibold transition-colors"
+                          variant="ghost"
+                          size="sm"
                         >
                           Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={handleSaveProfile}
                           disabled={isSavingProfile}
-                          className="text-xs bg-green-600 hover:bg-green-500 disabled:bg-gray-400 text-white px-3 py-1 rounded font-semibold transition-colors"
+                          variant="success"
+                          size="sm"
                         >
                           {isSavingProfile ? '⏳ Saving...' : '💾 Save'}
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>
@@ -937,37 +937,30 @@ export function SocialPanel({
                           Favorite Team
                         </label>
                         <div className="flex gap-2">
-                          <button
+                          <Button
                             onClick={() => setProfileFavoriteTeam(1)}
-                            className={`flex-1 py-2 px-3 rounded font-semibold transition-all ${
-                              profileFavoriteTeam === 1
-                                ? 'bg-orange-600 text-white ring-2 ring-orange-400'
-                                : 'bg-white dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-orange-100 dark:hover:bg-gray-600'
-                            }`}
+                            variant={profileFavoriteTeam === 1 ? 'warning' : 'ghost'}
+                            size="sm"
+                            className="flex-1"
                           >
                             Team 1
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => setProfileFavoriteTeam(2)}
-                            className={`flex-1 py-2 px-3 rounded font-semibold transition-all ${
-                              profileFavoriteTeam === 2
-                                ? 'bg-purple-600 text-white ring-2 ring-purple-400'
-                                : 'bg-white dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-purple-100 dark:hover:bg-gray-600'
-                            }`}
+                            variant={profileFavoriteTeam === 2 ? 'secondary' : 'ghost'}
+                            size="sm"
+                            className="flex-1"
                           >
                             Team 2
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => setProfileFavoriteTeam(null)}
-                            className={`px-3 rounded font-semibold transition-all ${
-                              profileFavoriteTeam === null
-                                ? 'bg-gray-500 text-white ring-2 ring-gray-400'
-                                : 'bg-white dark:bg-gray-700 text-umber-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                            }`}
+                            variant={profileFavoriteTeam === null ? 'primary' : 'ghost'}
+                            size="sm"
                             title="Clear selection"
                           >
                             ✕
-                          </button>
+                          </Button>
                         </div>
                       </div>
                     </div>

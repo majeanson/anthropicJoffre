@@ -4,7 +4,6 @@ import { Socket } from 'socket.io-client';
 import { CONFIG } from '../config/constants';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
-import { colors } from '../design-system';
 
 interface DebugPanelProps {
   gameState: GameState | null;
@@ -170,7 +169,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                     href="https://69291bd0d238365e7e12f66c-pybhemozfv.chromatic.com/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`px-4 py-2 bg-gradient-to-r ${colors.gradients.secondary} hover:${colors.gradients.secondaryHover} text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-400`}
+                    className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-700 hover:from-gray-600 hover:to-gray-800 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
                   >
                     <span aria-hidden="true">📖</span> Open Storybook
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +190,7 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                     href="https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`px-4 py-2 bg-gradient-to-r ${colors.gradients.warning} hover:${colors.gradients.warningHover} text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-400`}
+                    className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
                   >
                     <span aria-hidden="true">🐛</span> Open Sentry
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -389,22 +388,26 @@ export function DebugPanel({ gameState, gameId, isOpen, onClose, socket }: Debug
                   <div className="grid grid-cols-12 gap-2">
                     {[7, 8, 9, 10, 11, 12].map(amount => (
                       <div key={amount} className="col-span-6 md:col-span-2 flex flex-col gap-1">
-                        <button
+                        <Button
                           onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: false })}
                           disabled={!socket}
-                          className="px-2 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                          variant="warning"
+                          size="sm"
+                          className="px-2 py-2"
                           title={`Force bet ${amount} with trump`}
                         >
                           {amount}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: true })}
                           disabled={!socket}
-                          className="px-2 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-semibold disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                          variant="danger"
+                          size="xs"
+                          className="px-2 py-2"
                           title={`Force bet ${amount} WITHOUT trump (2x)`}
                         >
                           {amount} 🚫
-                        </button>
+                        </Button>
                       </div>
                     ))}
                   </div>

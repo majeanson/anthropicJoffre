@@ -11,7 +11,6 @@ import { sounds } from '../utils/sounds';
 import { CONFIG } from '../config/constants';
 import { ERROR_MESSAGES } from '../config/errorMessages';
 import logger from '../utils/logger';
-import { colors } from '../design-system';
 import { UICard } from './ui/UICard';
 import { Button } from './ui/Button';
 

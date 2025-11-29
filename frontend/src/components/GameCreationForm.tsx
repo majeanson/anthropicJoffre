@@ -9,7 +9,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
-import { colors } from '../design-system';
+import { Button, UIBadge, Input, Checkbox } from './ui';
 
 interface GameCreationFormProps {
   playerName: string;
@@ -170,10 +170,7 @@ export function GameCreationForm({
 
   return (
     <div
-      style={{
-        background: `linear-gradient(to bottom right, ${colors.warning.start}, ${colors.warning.end}, ${colors.error.end})`
-      }}
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-amber-400 via-orange-500 to-red-500"
     >
       {/* Animated background cards */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -192,47 +189,41 @@ export function GameCreationForm({
 
         <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Create Game</h2>
         <form onSubmit={handleCreate} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
-              Your Name
-            </label>
-            <input
-              ref={nameInputRef}
-              data-testid="player-name-input"
-              type="text"
-              value={playerName}
-              onChange={(e) => setPlayerName(e.target.value)}
-              className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 focus:outline-none focus:ring-offset-2"
-              placeholder={user ? "Using authenticated username" : "Enter your name"}
-              disabled={!!user}
-              required
-            />
-          </div>
+          <Input
+            ref={nameInputRef}
+            id="playerName"
+            data-testid="player-name-input"
+            label="Your Name"
+            type="text"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            placeholder={user ? "Using authenticated username" : "Enter your name"}
+            disabled={!!user}
+            required
+            variant="default"
+            fullWidth
+          />
 
           {/* Persistence Mode Selector */}
           <div className={`bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3 ${!user ? 'opacity-60' : ''}`}>
             <div className="flex items-center justify-between gap-3">
-              <label className={`flex items-center gap-2 flex-1 ${user ? 'cursor-pointer' : 'cursor-not-allowed'}`}>
-                <input
-                  ref={rankedCheckboxRef}
-                  data-testid="persistence-mode-checkbox"
-                  type="checkbox"
-                  checked={createGamePersistence === 'elo'}
-                  onChange={(e) => setCreateGamePersistence(e.target.checked ? 'elo' : 'casual')}
-                  disabled={!user}
-                  className="w-4 h-4 text-umber-600 dark:text-purple-600 bg-parchment-50 dark:bg-gray-700 border-umber-300 dark:border-gray-500 rounded focus:ring-umber-500 dark:focus:ring-purple-500 focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                <span className="text-sm font-medium text-umber-800 dark:text-gray-200">
-                  Ranked Mode
-                </span>
-              </label>
-              <span className={`text-xs px-2 py-1 rounded-full font-semibold ${
-                createGamePersistence === 'elo'
-                  ? 'bg-amber-200 dark:bg-purple-900 text-amber-900 dark:text-purple-200'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-              }`}>
+              <Checkbox
+                ref={rankedCheckboxRef}
+                id="persistenceMode"
+                data-testid="persistence-mode-checkbox"
+                label="Ranked Mode"
+                checked={createGamePersistence === 'elo'}
+                onChange={(e) => setCreateGamePersistence(e.target.checked ? 'elo' : 'casual')}
+                disabled={!user}
+                size="sm"
+              />
+              <UIBadge
+                variant="solid"
+                color={createGamePersistence === 'elo' ? 'warning' : 'gray'}
+                size="sm"
+              >
                 <span aria-hidden="true">{createGamePersistence === 'elo' ? '🏆' : '🎮'}</span> {createGamePersistence === 'elo' ? 'Ranked' : 'Casual'}
-              </span>
+              </UIBadge>
             </div>
             <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
               {!user
@@ -244,27 +235,27 @@ export function GameCreationForm({
           </div>
 
           <div className="flex gap-3">
-            <button
+            <Button
               ref={backButtonRef}
               data-testid="back-button"
               type="button"
+              variant="secondary"
+              size="lg"
               onClick={() => { sounds.buttonClick(); onBack(); }}
-              className="flex-1 bg-gradient-to-r from-gray-500 to-gray-600 text-white py-3 rounded-xl font-bold hover:from-gray-600 hover:to-gray-700 transition-all duration-300 border-2 border-gray-700 shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
+              className="flex-1"
             >
               Back
-            </button>
-            <button
+            </Button>
+            <Button
               ref={createButtonRef}
               data-testid="submit-create-button"
               type="submit"
-              style={{
-                background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`,
-                borderColor: colors.success.border
-              }}
-              className="flex-1 text-white py-3 rounded-xl font-bold transition-all duration-300 border-2 shadow-lg transform hover:scale-105 hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2"
+              variant="success"
+              size="lg"
+              className="flex-1"
             >
               Create
-            </button>
+            </Button>
           </div>
         </form>
       </div>

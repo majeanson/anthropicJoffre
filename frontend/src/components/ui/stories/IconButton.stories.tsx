@@ -16,7 +16,7 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'danger'],
+      options: ['circular', 'square', 'minimal'],
     },
     size: {
       control: 'select',
@@ -31,34 +31,34 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Primary: Story = {
+export const Circular: Story = {
   args: {
     icon: '✕',
-    'aria-label': 'Close',
-    variant: 'primary',
+    ariaLabel: 'Close',
+    variant: 'circular',
   },
 };
 
-export const Secondary: Story = {
+export const Square: Story = {
   args: {
     icon: '⚙️',
-    'aria-label': 'Settings',
-    variant: 'secondary',
+    ariaLabel: 'Settings',
+    variant: 'square',
   },
 };
 
-export const Danger: Story = {
+export const Minimal: Story = {
   args: {
     icon: '🗑️',
-    'aria-label': 'Delete',
-    variant: 'danger',
+    ariaLabel: 'Delete',
+    variant: 'minimal',
   },
 };
 
 export const Small: Story = {
   args: {
     icon: '✕',
-    'aria-label': 'Close',
+    ariaLabel: 'Close',
     size: 'sm',
   },
 };
@@ -66,7 +66,7 @@ export const Small: Story = {
 export const Large: Story = {
   args: {
     icon: '⚙️',
-    'aria-label': 'Settings',
+    ariaLabel: 'Settings',
     size: 'lg',
   },
 };
@@ -74,7 +74,7 @@ export const Large: Story = {
 export const Disabled: Story = {
   args: {
     icon: '✕',
-    'aria-label': 'Close',
+    ariaLabel: 'Close',
     disabled: true,
   },
 };

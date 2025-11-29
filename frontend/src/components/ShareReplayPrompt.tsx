@@ -27,7 +27,7 @@
 import { useState } from 'react';
 import { Modal, Button } from './ui';
 import { sounds } from '../utils/sounds';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
 
 interface ShareReplayPromptProps {
   gameId: string;
@@ -94,11 +94,11 @@ export function ShareReplayPrompt({
       </div>
 
       {/* Share message */}
-      <div className="bg-parchment-100 dark:bg-gray-800/50 rounded-lg p-4 mb-6 border-2 border-parchment-200 dark:border-gray-700">
+      <UICard variant="bordered" size="sm" className="mb-6 bg-parchment-100 dark:bg-gray-800/50">
         <p className="text-umber-900 dark:text-gray-300 text-center text-sm">
           <span aria-hidden="true">🎮</span> Share this epic game with friends!
         </p>
-      </div>
+      </UICard>
 
       {/* Action buttons */}
       <div className="space-y-3">
@@ -113,31 +113,29 @@ export function ShareReplayPrompt({
 
         {/* Social Share Buttons */}
         <div className="grid grid-cols-2 gap-3">
-          <button
+          <Button
+            variant="primary"
             onClick={handleShareTwitter}
-            className="py-2 bg-sky-500 hover:bg-sky-600 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:ring-offset-2"
+            className="bg-sky-500 hover:bg-sky-600 border-sky-600"
           >
             <span aria-hidden="true">🐦</span> Twitter
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
             onClick={handleShareFacebook}
-            className="py-2 bg-blue-700 hover:bg-blue-800 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            className="bg-blue-700 hover:bg-blue-800 border-blue-800"
           >
             <span aria-hidden="true">📘</span> Facebook
-          </button>
+          </Button>
         </div>
 
         {/* View Replay */}
         <Button
-          variant="primary"
+          variant="success"
           fullWidth
           onClick={() => {
             onViewReplay();
             onClose();
-          }}
-          style={{
-            background: `linear-gradient(to right, ${colors.success.start}, ${colors.success.end})`,
-            borderColor: colors.success.border
           }}
         >
           <span aria-hidden="true">📺</span> Watch Replay

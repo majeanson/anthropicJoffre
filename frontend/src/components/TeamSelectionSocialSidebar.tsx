@@ -9,7 +9,8 @@ import { FriendWithStatus } from '../types/friends';
 import { OnlinePlayer } from '../types/game';
 import { RecentPlayer } from '../utils/recentPlayers';
 import { useAuth } from '../contexts/AuthContext';
-import { colors } from '../design-system';
+import { Button } from './ui/Button';
+import { UICard } from './ui/UICard';
 
 interface TeamSelectionSocialSidebarProps {
   socket: Socket | null;
@@ -114,51 +115,47 @@ export function TeamSelectionSocialSidebar({
   return (
     <div className="fixed inset-y-0 right-0 w-80 bg-parchment-50 dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto border-l-4 border-amber-700 dark:border-gray-600">
       {/* Header */}
-      <div className="sticky top-0 p-4 border-b-2 border-amber-800 dark:border-gray-600" style={{ background: colors.gradients.warning }}>
+      <UICard variant="gradient" gradient="warning" size="md" className="sticky top-0 rounded-none border-b-2 border-amber-800 dark:border-gray-600">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xl font-bold text-white">Find Players</h2>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onClose}
-            className="text-white hover:text-gray-200 text-2xl font-bold leading-none"
+            className="text-white hover:text-gray-200 text-2xl font-bold leading-none p-0"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         {/* Tabs */}
         <div className="flex gap-2">
-          <button
+          <Button
+            variant={activeTab === 'friends' ? 'secondary' : 'ghost'}
+            size="sm"
             onClick={() => setActiveTab('friends')}
-            className={`flex-1 py-2 px-3 rounded font-bold text-sm transition-all ${
-              activeTab === 'friends'
-                ? 'bg-white text-amber-800 dark:bg-gray-700 dark:text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
+            className={`flex-1 ${activeTab !== 'friends' ? 'bg-white/20 text-white hover:bg-white/30' : ''}`}
           >
             👥 Friends
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={activeTab === 'online' ? 'secondary' : 'ghost'}
+            size="sm"
             onClick={() => setActiveTab('online')}
-            className={`flex-1 py-2 px-3 rounded font-bold text-sm transition-all ${
-              activeTab === 'online'
-                ? 'bg-white text-amber-800 dark:bg-gray-700 dark:text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
+            className={`flex-1 ${activeTab !== 'online' ? 'bg-white/20 text-white hover:bg-white/30' : ''}`}
           >
             🟢 Online
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={activeTab === 'recent' ? 'secondary' : 'ghost'}
+            size="sm"
             onClick={() => setActiveTab('recent')}
-            className={`flex-1 py-2 px-3 rounded font-bold text-sm transition-all ${
-              activeTab === 'recent'
-                ? 'bg-white text-amber-800 dark:bg-gray-700 dark:text-white'
-                : 'bg-white/20 text-white hover:bg-white/30'
-            }`}
+            className={`flex-1 ${activeTab !== 'recent' ? 'bg-white/20 text-white hover:bg-white/30' : ''}`}
           >
             🕐 Recent
-          </button>
+          </Button>
         </div>
-      </div>
+      </UICard>
 
       {/* Content */}
       <div className="p-4">
@@ -191,18 +188,14 @@ export function TeamSelectionSocialSidebar({
                         {friend.player_name}
                       </span>
                     </div>
-                    <button
+                    <Button
+                      variant={invitedPlayers.has(friend.player_name) ? 'secondary' : 'success'}
+                      size="sm"
                       onClick={() => handleInvitePlayer(friend.player_name)}
                       disabled={invitedPlayers.has(friend.player_name)}
-                      className={`text-xs px-3 py-1 rounded font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 ${
-                        invitedPlayers.has(friend.player_name)
-                          ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                          : 'text-white'
-                      }`}
-                      style={invitedPlayers.has(friend.player_name) ? {} : { background: colors.gradients.success }}
                     >
                       {invitedPlayers.has(friend.player_name) ? 'Invited' : 'Invite'}
-                    </button>
+                    </Button>
                   </div>
                   {friend.status !== 'offline' && (
                     <div className="mt-1 text-xs text-umber-600 dark:text-gray-400">
@@ -240,18 +233,14 @@ export function TeamSelectionSocialSidebar({
                           {player.playerName}
                         </span>
                       </div>
-                      <button
+                      <Button
+                        variant={invitedPlayers.has(player.playerName) ? 'secondary' : 'success'}
+                        size="sm"
                         onClick={() => handleInvitePlayer(player.playerName)}
                         disabled={invitedPlayers.has(player.playerName)}
-                        className={`text-xs px-3 py-1 rounded font-bold transition-all focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 ${
-                          invitedPlayers.has(player.playerName)
-                            ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                            : 'text-white'
-                        }`}
-                        style={invitedPlayers.has(player.playerName) ? {} : { background: colors.gradients.success }}
                       >
                         {invitedPlayers.has(player.playerName) ? 'Invited' : 'Invite'}
-                      </button>
+                      </Button>
                     </div>
                     <div className="mt-1 text-xs text-umber-600 dark:text-gray-400">
                       {player.status === 'in_game' && '🎮 In game'}
@@ -293,18 +282,14 @@ export function TeamSelectionSocialSidebar({
                             {player.name}
                           </span>
                         </div>
-                        <button
+                        <Button
+                          variant={invitedPlayers.has(player.name) ? 'secondary' : 'primary'}
+                          size="sm"
                           onClick={() => handleInvitePlayer(player.name)}
                           disabled={invitedPlayers.has(player.name)}
-                          className={`text-xs px-3 py-1 rounded font-bold transition-all focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 ${
-                            invitedPlayers.has(player.name)
-                              ? 'bg-gray-300 text-gray-600 cursor-not-allowed'
-                              : 'text-white'
-                          }`}
-                          style={invitedPlayers.has(player.name) ? {} : { background: colors.gradients.secondary }}
                         >
                           {invitedPlayers.has(player.name) ? 'Invited' : 'Invite'}
-                        </button>
+                        </Button>
                       </div>
                       <div className="mt-1 text-xs text-umber-600 dark:text-gray-400">
                         {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} together
@@ -319,17 +304,18 @@ export function TeamSelectionSocialSidebar({
 
       {/* Quick Copy Link Button */}
       <div className="sticky bottom-0 p-4 bg-parchment-100 dark:bg-gray-900 border-t-2 border-amber-700 dark:border-gray-600">
-        <button
+        <Button
+          variant="warning"
+          size="lg"
+          fullWidth
           onClick={() => {
             const gameUrl = `${window.location.origin}?join=${gameId}`;
             navigator.clipboard.writeText(gameUrl);
             alert('Game link copied! Share it with anyone.');
           }}
-          className="w-full text-white py-3 rounded-lg font-bold transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
-          style={{ background: colors.gradients.warning }}
         >
           <span aria-hidden="true">📋</span> Copy Game Link
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -22,6 +22,7 @@
  */
 
 import { ReactNode } from 'react';
+import { Button } from './ui';
 
 interface PlayerNameButtonProps {
   playerName: string;
@@ -38,29 +39,29 @@ export function PlayerNameButton({
   className = '',
   children
 }: PlayerNameButtonProps) {
-  // Base styles for all variants
-  const baseStyles = 'cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-400/50 rounded';
-
-  // Variant-specific styles
+  // Variant-specific styles that extend Button's link/ghost variants
   const variantStyles = {
-    inline: 'text-orange-400 hover:text-orange-300 hover:underline font-semibold',
+    inline: 'text-orange-400 hover:text-orange-300 hover:underline font-semibold !p-0',
     badge: 'px-2 py-1 bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 hover:text-orange-300 border border-orange-500/30 rounded-lg font-semibold',
-    plain: 'text-white hover:text-orange-400'
+    plain: 'text-white hover:text-orange-400 !p-0'
   };
 
-  const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${className}`;
+  // Map PlayerNameButton variants to Button variants
+  const buttonVariant = variant === 'badge' ? 'ghost' : 'link';
 
   return (
-    <button
+    <Button
       onClick={(e) => {
         e.stopPropagation(); // Prevent parent click handlers
         onClick();
       }}
-      className={combinedClassName}
+      variant={buttonVariant}
+      size="sm"
+      className={`${variantStyles[variant]} ${className}`}
       title={`View ${playerName}'s profile`}
       aria-label={`View ${playerName}'s profile`}
     >
       {children || playerName}
-    </button>
+    </Button>
   );
 }

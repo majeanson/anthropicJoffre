@@ -5,7 +5,6 @@ import buildInfo from '../buildInfo.json';
 import { CONFIG } from '../config/constants';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
-import { colors } from '../design-system';
 
 interface GlobalDebugModalProps {
   isOpen: boolean;
@@ -246,6 +245,24 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
                 disabled={isClearing}
               >
                 {isClearing ? '🔄 Clearing...' : `🗑️ Clear All (${games.length})`}
+              </Button>
+            </div>
+          </section>
+
+          {/* Storybook */}
+          <section>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">📖 Storybook UI</h3>
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+                Browse all UI components in the design system.
+              </p>
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={() => window.open('http://localhost:6006', '_blank')}
+              >
+                <span>📚</span>
+                <span>Open Storybook (localhost:6006)</span>
               </Button>
             </div>
           </section>

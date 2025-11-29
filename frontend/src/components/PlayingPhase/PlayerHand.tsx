@@ -11,7 +11,7 @@ import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { Card as CardType, TrickCard } from '../../types/game';
 import { sounds } from '../../utils/sounds';
-import { colors } from '../../design-system';
+import { UICard } from '../ui/UICard';
 
 export interface PlayerHandProps {
   hand: CardType[];
@@ -277,19 +277,21 @@ export const PlayerHand = memo(function PlayerHand({
   if (isSpectator) {
     return (
       <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-10">
-        <div
-          className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600"
+        <UICard
+          variant="bordered"
+          size="lg"
+          className="bg-umber-900/40 backdrop-blur-xl shadow-2xl"
           data-testid="player-hand"
         >
           <div className="text-center py-8">
-            <div className="inline-block px-6 py-4 rounded-xl border-2 border-parchment-400 dark:border-gray-600 shadow-lg" style={{ background: colors.gradients.primary }}>
+            <UICard variant="bordered" size="md" gradient="primary" className="inline-block shadow-lg">
               <span className="text-umber-800 dark:text-gray-200 text-base font-semibold">
                 <span aria-hidden="true">🔒</span> Hands Hidden
               </span>
               <p className="text-umber-600 dark:text-gray-400 text-sm mt-1.5">Spectator Mode</p>
-            </div>
+            </UICard>
           </div>
-        </div>
+        </UICard>
       </div>
     );
   }
@@ -309,8 +311,10 @@ export const PlayerHand = memo(function PlayerHand({
 
   return (
     <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-[45] overflow-visible">
-      <div
-        className="bg-umber-900/40 backdrop-blur-xl rounded-2xl p-2 md:p-4 lg:p-6 shadow-2xl border-2 border-parchment-400 dark:border-gray-600 overflow-visible"
+      <UICard
+        variant="bordered"
+        size="lg"
+        className="bg-umber-900/40 backdrop-blur-xl shadow-2xl overflow-visible"
         data-testid="player-hand"
       >
         <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-2 md:mx-0 px-2 md:px-0 pt-6 -mt-4 pb-2">
@@ -371,7 +375,7 @@ export const PlayerHand = memo(function PlayerHand({
             })}
           </div>
         </div>
-      </div>
+      </UICard>
     </div>
   );
 });

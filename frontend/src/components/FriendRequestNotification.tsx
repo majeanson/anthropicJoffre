@@ -7,7 +7,8 @@
 
 import { useEffect } from 'react';
 import { FriendRequestNotification } from '../types/friends';
-import { colors } from '../design-system';
+import { UICard } from './ui/UICard';
+import { Button } from './ui/Button';
 
 interface FriendRequestNotificationProps {
   notification: FriendRequestNotification | null;
@@ -34,13 +35,7 @@ export default function FriendRequestNotificationComponent({
 
   return (
     <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
-      <div
-        style={{
-          background: `linear-gradient(to bottom right, ${colors.secondary.start}, ${colors.secondary.end})`,
-          borderColor: colors.secondary.border
-        }}
-        className="rounded-lg shadow-2xl border-2 p-4 w-80"
-      >
+      <UICard variant="gradient" gradient="team2" size="md" className="w-80 border-2">
         <div className="flex items-start gap-3">
           <span className="text-3xl" aria-hidden="true">👥</span>
           <div className="flex-1">
@@ -49,31 +44,37 @@ export default function FriendRequestNotificationComponent({
               <span className="font-semibold">{notification.from_player}</span> sent you a friend request
             </p>
             <div className="flex gap-2 mt-3">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => {
                   onView();
                   onClose();
                 }}
-                className="flex-1 px-3 py-1.5 bg-white/20 hover:bg-white/30 text-white text-sm rounded font-semibold transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="flex-1 bg-white/20 hover:bg-white/30 text-white"
               >
                 View
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={onClose}
-                className="px-3 py-1.5 bg-gray-800/50 hover:bg-gray-800/70 text-white text-sm rounded transition-all focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+                className="bg-gray-800/50 hover:bg-gray-800/70 text-white"
               >
                 Dismiss
-              </button>
+              </Button>
             </div>
           </div>
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onClose}
-            className="text-white/80 hover:text-white text-xl font-bold focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-2 focus-visible:outline-none rounded"
+            className="text-white/80 hover:text-white text-xl font-bold p-0 w-6 h-6"
           >
             ×
-          </button>
+          </Button>
         </div>
-      </div>
+      </UICard>
     </div>
   );
 }

@@ -60,6 +60,8 @@ const ModalWrapper = (args: any) => {
 export const Basic: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Basic Modal',
     children: (
       <div>
@@ -77,6 +79,8 @@ export const Basic: Story = {
 export const WithSubtitle: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Modal with Subtitle',
     subtitle: 'This is a helpful subtitle',
     children: (
@@ -90,6 +94,8 @@ export const WithSubtitle: Story = {
 export const WithIcon: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Victory!',
     subtitle: 'Team 1 Wins!',
     icon: <span className="text-4xl">🏆</span>,
@@ -105,6 +111,8 @@ export const WithIcon: Story = {
 export const WithFooter: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Confirm Action',
     children: (
       <p className="text-gray-700 dark:text-gray-300">
@@ -123,6 +131,8 @@ export const WithFooter: Story = {
 export const BlueTheme: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Blue Theme',
     icon: <span className="text-4xl">💬</span>,
     theme: 'blue',
@@ -137,6 +147,8 @@ export const BlueTheme: Story = {
 export const PurpleTheme: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Purple Theme',
     icon: <span className="text-4xl">👥</span>,
     theme: 'purple',
@@ -151,6 +163,8 @@ export const PurpleTheme: Story = {
 export const SmallSize: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Small Modal',
     size: 'sm',
     children: (
@@ -164,6 +178,8 @@ export const SmallSize: Story = {
 export const LargeSize: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'Large Modal',
     size: 'lg',
     children: (
@@ -185,6 +201,8 @@ export const LargeSize: Story = {
 export const NoCloseButton: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'No Close Button',
     showCloseButton: false,
     children: (
@@ -206,6 +224,8 @@ export const NoCloseButton: Story = {
 export const NoBackdropClose: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
+    isOpen: true,
+    onClose: () => {},
     title: 'No Backdrop Close',
     closeOnBackdrop: false,
     children: (

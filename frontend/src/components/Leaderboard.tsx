@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import { GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
-import { colors } from '../design-system';
-import { UICard } from './ui/UICard';
-import { UIBadge } from './ui/UIBadge';
+import { UICard, UIBadge, Modal, Button } from './ui';
 
 interface LeaderboardProps {
   gameState: GameState;
@@ -13,8 +11,6 @@ interface LeaderboardProps {
 
 export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
   const [expandedRounds, setExpandedRounds] = useState<Set<number>>(new Set());
-
-  if (!isOpen) return null;
 
   // Determine which team is leading
   const team1Score = gameState.teamScores.team1;
@@ -36,36 +32,17 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
   };
 
   return (
-    <div
-      className="fixed inset-0 bg-umber-900 bg-opacity-60 z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-      onKeyDown={(e) => e.stopPropagation()}
-      role="dialog"
-      aria-labelledby="leaderboard-title"
-      aria-modal="true"
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Leaderboard"
+      icon="🏆"
+      subtitle={`Round ${gameState.roundNumber} Stats & History`}
+      theme="parchment"
+      size="xl"
+      testId="leaderboard"
     >
-      <div
-        className="bg-parchment-50 dark:bg-gray-800 rounded-lg shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border-2 border-parchment-400 dark:border-gray-600"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className={`sticky top-0 z-10 bg-gradient-to-r ${colors.gradients.umber} text-parchment-50 px-6 py-4 flex items-center justify-between rounded-t-lg border-b-2 border-umber-800`}>
-          <div>
-            <h2 id="leaderboard-title" className="text-2xl font-bold flex items-center gap-2 font-serif">
-              <span aria-hidden="true">🏆</span> Leaderboard
-            </h2>
-            <p className="text-sm text-parchment-200">Round {gameState.roundNumber} Stats & History</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-parchment-50 hover:bg-parchment-50 dark:bg-gray-800 hover:bg-opacity-20 rounded-lg px-4 py-2 transition-colors font-semibold border border-parchment-400 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-parchment-400"
-            aria-label="Close leaderboard"
-          >
-            ✕ Close
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
+      <div className="space-y-6">
           {/* Current Standings */}
           <section>
             <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
@@ -185,14 +162,15 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                               Round {round.roundNumber}
                             </h4>
                             {hasTricks && (
-                              <button
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => toggleRound(round.roundNumber)}
-                                className="text-sm text-umber-700 dark:text-gray-300 hover:text-umber-900 dark:text-gray-100 font-semibold flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-umber-500"
                                 aria-label={isExpanded ? 'Hide tricks' : 'Show tricks'}
                               >
                                 <span aria-hidden="true">{isExpanded ? '▼' : '▶'}</span>
                                 {isExpanded ? 'Hide Tricks' : 'Show Tricks'}
-                              </button>
+                              </Button>
                             )}
                           </div>
                           <UIBadge
@@ -303,8 +281,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               </UICard>
             </section>
           )}
-        </div>
       </div>
-    </div>
+    </Modal>
   );
 }

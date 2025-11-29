@@ -138,7 +138,7 @@ export const LargeSize: Story = {
 // States
 export const Playable: Story = {
   args: {
-    card: { color: 'green', value: 8 },
+    card: { color: 'green', value: 5 },
     size: 'medium',
     isPlayable: true,
   },
@@ -153,7 +153,7 @@ export const Playable: Story = {
 
 export const KeyboardSelected: Story = {
   args: {
-    card: { color: 'blue', value: 9 },
+    card: { color: 'blue', value: 6 },
     size: 'medium',
     isKeyboardSelected: true,
   },
@@ -168,7 +168,7 @@ export const KeyboardSelected: Story = {
 
 export const Disabled: Story = {
   args: {
-    card: { color: 'red', value: 10 },
+    card: { color: 'red', value: 7 },
     size: 'medium',
     disabled: true,
   },
@@ -176,9 +176,12 @@ export const Disabled: Story = {
 
 // Value showcase
 export const AllValues: Story = {
+  args: {
+    card: { color: 'blue', value: 1 },
+  },
   render: () => (
     <div className="flex gap-2 flex-wrap max-w-2xl">
-      {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((value) => (
+      {([0, 1, 2, 3, 4, 5, 6, 7] as const).map((value) => (
         <Card key={value} card={{ color: 'blue', value }} size="small" />
       ))}
     </div>
@@ -186,7 +189,7 @@ export const AllValues: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'All card values (1-13) in blue color',
+        story: 'All card values (0-7) in blue color',
       },
     },
   },
@@ -194,6 +197,9 @@ export const AllValues: Story = {
 
 // Color showcase
 export const AllColors: Story = {
+  args: {
+    card: { color: 'red', value: 7 },
+  },
   render: () => {
     const colors: CardColor[] = ['red', 'brown', 'green', 'blue'];
     return (
@@ -215,6 +221,9 @@ export const AllColors: Story = {
 
 // Special cards showcase
 export const SpecialCards: Story = {
+  args: {
+    card: { color: 'red', value: 0 },
+  },
   render: () => (
     <div className="flex gap-4">
       <div className="flex flex-col items-center gap-2">
@@ -239,7 +248,7 @@ export const SpecialCards: Story = {
 // Interactive example
 export const Interactive: Story = {
   args: {
-    card: { color: 'green', value: 8 },
+    card: { color: 'green', value: 5 },
     size: 'large',
     onClick: () => alert('Card clicked!'),
   },

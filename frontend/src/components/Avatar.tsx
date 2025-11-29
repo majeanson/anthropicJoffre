@@ -6,7 +6,6 @@
  */
 
 import { getAvatarUrl } from '../utils/avatars';
-import { designTokens } from '../styles/designTokens';
 
 interface AvatarProps {
   username: string;
@@ -37,22 +36,22 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
 
   // Generate consistent color based on username
   const getColorFromUsername = (name: string): string => {
-    const colors = [
-      designTokens.gradients.error,
-      designTokens.gradients.primary,
-      designTokens.gradients.success,
-      designTokens.gradients.team2,
-      designTokens.gradients.team1,
-      designTokens.gradients.info,
-      designTokens.gradients.warning,
-      designTokens.gradients.special,
-      designTokens.gradients.primaryDark,
-      designTokens.gradients.secondary,
+    const gradientOptions = [
+      'from-red-500 to-rose-600',
+      'from-blue-500 to-indigo-600',
+      'from-green-500 to-emerald-600',
+      'from-purple-400 to-indigo-500',
+      'from-orange-400 to-amber-500',
+      'from-blue-400 to-cyan-500',
+      'from-amber-500 to-orange-600',
+      'from-purple-500 to-pink-600',
+      'from-blue-600 to-indigo-700',
+      'from-gray-500 to-gray-700',
     ];
 
     // Use first character code to pick color
-    const index = name.charCodeAt(0) % colors.length;
-    return colors[index];
+    const index = name.charCodeAt(0) % gradientOptions.length;
+    return gradientOptions[index];
   };
 
   // Check if avatarUrl is an emoji or avatar ID

@@ -33,7 +33,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import Avatar from './Avatar';
-import { Modal, Button, ConversationItem, MessageBubble } from './ui';
+import { Modal, Button, ConversationItem, MessageBubble, EmptyState } from './ui';
 import { ListSkeleton } from './ui/Skeleton';
 
 interface DirectMessage {
@@ -260,10 +260,12 @@ export function DirectMessagesPanel({
             </div>
           )}
           {!loading && conversations.length === 0 && (
-            <div className="text-center py-8 text-gray-400">
-              <p className="mb-2">No conversations yet</p>
-              <p className="text-sm">Start chatting with friends!</p>
-            </div>
+            <EmptyState
+              icon="💬"
+              title="No conversations yet"
+              description="Start chatting with friends!"
+              compact
+            />
           )}
           {conversations.map((conv) => {
             const other = getOtherUser(conv);
@@ -287,11 +289,12 @@ export function DirectMessagesPanel({
         {/* Messages Area */}
         <div className="flex-1 flex flex-col">
           {!selectedConversation && (
-            <div className="flex-1 flex items-center justify-center text-gray-400">
-              <div className="text-center">
-                <div className="text-6xl mb-4">💬</div>
-                <p className="text-lg">Select a conversation to start messaging</p>
-              </div>
+            <div className="flex-1 flex items-center justify-center">
+              <EmptyState
+                icon="💬"
+                title="Select a conversation"
+                description="Choose a conversation to start messaging"
+              />
             </div>
           )}
 
@@ -300,9 +303,7 @@ export function DirectMessagesPanel({
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.length === 0 && (
-                  <div className="text-center text-gray-400 py-4">
-                    No messages yet. Say hi!
-                  </div>
+                  <EmptyState icon="👋" title="No messages yet" description="Say hi!" compact />
                 )}
                 {messages.map((msg) => {
                   const isSent = msg.sender_username === currentUsername;

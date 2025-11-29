@@ -1,7 +1,14 @@
 import { memo } from 'react';
 import { GameState, BotDifficulty } from '../types/game';
-import { Modal } from './ui/Modal';
-import { Button } from './ui/Button';
+import { Modal, Button, UICard, Select } from './ui';
+import type { SelectOption } from './ui/Select';
+
+// Bot difficulty options
+const DIFFICULTY_OPTIONS: SelectOption[] = [
+  { value: 'easy', label: '😊 Easy' },
+  { value: 'medium', label: '🙂 Medium' },
+  { value: 'hard', label: '😎 Hard' },
+];
 
 interface BotManagementPanelProps {
   isOpen: boolean;
@@ -104,9 +111,11 @@ export const BotManagementPanel = memo(function BotManagementPanel({
             const isPlayerTurn = gameState.currentPlayerIndex === index;
 
             return (
-              <div
+              <UICard
                 key={`${player.name}-${index}`}
-                className={`${bgColor} border-2 ${borderColor} rounded-lg p-4 transition-all ${
+                variant="bordered"
+                size="md"
+                className={`${bgColor} border-2 ${borderColor} transition-all ${
                   isMe ? 'ring-2 ring-blue-500' : ''
                 }`}
               >
@@ -149,19 +158,19 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                       </div>
 
                       {/* Difficulty Selector - Dark mode support */}
-                      <select
+                      <Select
+                        id={`difficulty-${player.name}`}
                         value={player.botDifficulty || 'hard'}
                         onChange={(e) => {
                           e.stopPropagation(); // Prevent modal closing on select
                           onChangeBotDifficulty(player.name, e.target.value as BotDifficulty);
                         }}
-                        className="bg-white dark:bg-gray-700 dark:text-gray-100 border-2 border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                        onClick={(e) => e.stopPropagation()}
+                        options={DIFFICULTY_OPTIONS}
+                        variant="default"
+                        size="sm"
                         title="Change bot difficulty"
-                      >
-                        <option value="easy">😊 Easy</option>
-                        <option value="medium">🙂 Medium</option>
-                        <option value="hard">😎 Hard</option>
-                      </select>
+                      />
 
                       {/* Swap Button for Bots */}
                       {canSwap(player) && (
@@ -253,17 +262,17 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                     </div>
                   )}
                 </div>
-              </div>
+              </UICard>
             );
           })}
 
         {/* Help Text for Non-Creators */}
         {!isCreator && (
-          <div className="mt-4 bg-gray-100 dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center">
+          <UICard variant="bordered" size="md" className="mt-4 bg-gray-100 dark:bg-gray-700 text-center">
             <p className="text-gray-700 dark:text-gray-300 text-sm">
               ℹ️ Only the game creator can manage teams and swap positions
             </p>
-          </div>
+          </UICard>
         )}
       </div>
     </Modal>
