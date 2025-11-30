@@ -8,12 +8,12 @@ import { applySkinToDocument, getSkin, skinList } from '../src/config/skins';
 
 // Apply default skin on load
 if (typeof document !== 'undefined') {
-  applySkinToDocument(getSkin('retro-gaming'));
+  applySkinToDocument(getSkin('midnight-alchemy'));
 }
 
 // Decorator to wrap all stories with SkinProvider
 const withSkinProvider: Decorator = (Story, context) => {
-  const skinId = context.globals.skin || 'retro-gaming';
+  const skinId = context.globals.skin || 'midnight-alchemy';
 
   React.useEffect(() => {
     applySkinToDocument(getSkin(skinId));
@@ -43,7 +43,7 @@ const preview: Preview = {
     skin: {
       name: 'Skin',
       description: 'UI Skin/Theme',
-      defaultValue: 'retro-gaming',
+      defaultValue: 'midnight-alchemy',
       toolbar: {
         icon: 'paintbrush',
         items: skinList.map(s => ({

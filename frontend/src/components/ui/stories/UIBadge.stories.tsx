@@ -1,8 +1,8 @@
 /**
- * UIBadge Component Stories
- * Sprint 21 - Reusable badge/tag component
+ * UIBadge Component Stories - Multi-Skin Edition
  *
- * Comprehensive showcase of badge variants, colors, sizes, and features.
+ * Badge/tag component with proper CSS variable support for all themes.
+ * Switch skins using the paintbrush icon in the Storybook toolbar.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -15,8 +15,22 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Flexible badge component for labels, status indicators, and tags. Supports solid, outline, subtle, and translucent variants with multiple colors and full dark mode support.',
+        component: `
+# UIBadge Component
+
+Flexible badge component for labels, status indicators, and tags.
+
+## Features
+- **5 variants**: solid, outline, subtle, arcane, translucent
+- **10 colors**: team1, team2, success, warning, error, info, muted, accent, gray, primary
+- **3 sizes**: xs, sm, md
+- **2 shapes**: rounded, pill
+- **Pulse animation** for status indicators
+
+## Multi-Skin Support
+Switch skins using the paintbrush icon in the Storybook toolbar to preview
+how the component looks across all available themes.
+        `,
       },
     },
   },
@@ -24,12 +38,12 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['solid', 'outline', 'subtle', 'translucent'],
+      options: ['solid', 'outline', 'subtle', 'arcane', 'translucent'],
       description: 'Visual style variant',
     },
     color: {
       control: 'select',
-      options: ['team1', 'team2', 'success', 'warning', 'error', 'info', 'gray', 'primary'],
+      options: ['team1', 'team2', 'success', 'warning', 'error', 'info', 'muted', 'accent', 'gray', 'primary'],
       description: 'Color scheme',
     },
     size: {
@@ -119,7 +133,7 @@ export const AllVariants: Story = {
   render: () => (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-3 items-center">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-24">
+        <span className="text-sm font-medium w-24" style={{ color: 'var(--color-text-secondary)' }}>
           Solid:
         </span>
         <UIBadge variant="solid" color="success">
@@ -136,7 +150,7 @@ export const AllVariants: Story = {
         </UIBadge>
       </div>
       <div className="flex flex-wrap gap-3 items-center">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-24">
+        <span className="text-sm font-medium w-24" style={{ color: 'var(--color-text-secondary)' }}>
           Outline:
         </span>
         <UIBadge variant="outline" color="success">
@@ -153,7 +167,7 @@ export const AllVariants: Story = {
         </UIBadge>
       </div>
       <div className="flex flex-wrap gap-3 items-center">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-24">
+        <span className="text-sm font-medium w-24" style={{ color: 'var(--color-text-secondary)' }}>
           Subtle:
         </span>
         <UIBadge variant="subtle" color="success">
@@ -170,7 +184,7 @@ export const AllVariants: Story = {
         </UIBadge>
       </div>
       <div className="flex flex-wrap gap-3 items-center">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-24">
+        <span className="text-sm font-medium w-24" style={{ color: 'var(--color-text-secondary)' }}>
           Translucent:
         </span>
         <UIBadge variant="translucent" color="success">
@@ -229,7 +243,7 @@ export const PillShape: Story = {
   render: () => (
     <div className="space-y-3">
       <div className="flex gap-3 items-center">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-20">
+        <span className="text-sm font-medium w-20" style={{ color: 'var(--color-text-secondary)' }}>
           Rounded:
         </span>
         <UIBadge shape="rounded" color="success">
@@ -243,7 +257,7 @@ export const PillShape: Story = {
         </UIBadge>
       </div>
       <div className="flex gap-3 items-center">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-20">
+        <span className="text-sm font-medium w-20" style={{ color: 'var(--color-text-secondary)' }}>
           Pill:
         </span>
         <UIBadge shape="pill" color="success">
@@ -320,7 +334,7 @@ export const PulsingBadge: Story = {
           Offline
         </UIBadge>
       </div>
-      <p className="text-sm text-gray-500 dark:text-gray-400">
+      <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
         Pulse animation for live status indicators
       </p>
     </div>
@@ -385,7 +399,7 @@ export const StatusExamples: Story = {
     <div className="space-y-4">
       {/* User Status */}
       <div>
-        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
           User Status
         </h4>
         <div className="flex flex-wrap gap-2">
@@ -406,7 +420,7 @@ export const StatusExamples: Story = {
 
       {/* Game Status */}
       <div>
-        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
           Game Status
         </h4>
         <div className="flex flex-wrap gap-2">
@@ -427,7 +441,7 @@ export const StatusExamples: Story = {
 
       {/* Priority Levels */}
       <div>
-        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
           Priority Levels
         </h4>
         <div className="flex flex-wrap gap-2">
@@ -445,12 +459,15 @@ export const StatusExamples: Story = {
 
       {/* Notification Counts */}
       <div>
-        <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
           Notification Counts
         </h4>
         <div className="flex flex-wrap gap-3">
           <div className="relative">
-            <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+            <button
+              className="px-4 py-2 rounded-lg"
+              style={{ backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)' }}
+            >
               Messages
             </button>
             <UIBadge
@@ -463,7 +480,10 @@ export const StatusExamples: Story = {
             </UIBadge>
           </div>
           <div className="relative">
-            <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg">
+            <button
+              className="px-4 py-2 rounded-lg"
+              style={{ backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)' }}
+            >
               Notifications
             </button>
             <UIBadge
@@ -489,14 +509,14 @@ export const StatusExamples: Story = {
   },
 };
 
-// Dark Mode Showcase
-export const DarkModeShowcase: Story = {
+// Skin Showcase
+export const SkinShowcase: Story = {
   args: { children: null },
   render: () => (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
             Solid
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -515,7 +535,7 @@ export const DarkModeShowcase: Story = {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
             Outline
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -534,7 +554,7 @@ export const DarkModeShowcase: Story = {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
             Subtle
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -553,7 +573,7 @@ export const DarkModeShowcase: Story = {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
             Translucent
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -572,15 +592,15 @@ export const DarkModeShowcase: Story = {
           </div>
         </div>
       </div>
-      <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
-        Toggle dark mode in Storybook toolbar to see all variants adapt
+      <p className="text-sm text-center" style={{ color: 'var(--color-text-muted)' }}>
+        Switch skins using the paintbrush icon in the Storybook toolbar
       </p>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'All badge variants demonstrating dark mode support',
+        story: 'All badge variants demonstrating multi-skin support',
       },
     },
   },
@@ -592,12 +612,21 @@ export const RealWorldExamples: Story = {
   render: () => (
     <div className="space-y-6 max-w-2xl">
       {/* Player Card with Status */}
-      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <div
+        className="p-4 rounded-lg"
+        style={{
+          backgroundColor: 'var(--color-bg-secondary)',
+          boxShadow: 'var(--shadow-md)',
+        }}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full" />
+            <div
+              className="w-10 h-10 rounded-full"
+              style={{ background: 'linear-gradient(135deg, var(--color-team2-primary), var(--color-team1-primary))' }}
+            />
             <div>
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+              <h4 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 John Doe
               </h4>
               <UIBadge color="success" variant="subtle" size="xs" icon={<DotIcon />}>
@@ -612,9 +641,15 @@ export const RealWorldExamples: Story = {
       </div>
 
       {/* Game Lobby Card */}
-      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <div
+        className="p-4 rounded-lg"
+        style={{
+          backgroundColor: 'var(--color-bg-secondary)',
+          boxShadow: 'var(--shadow-md)',
+        }}
+      >
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+          <h4 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
             Game Room #1234
           </h4>
           <UIBadge color="success" pulse icon={<DotIcon />}>
@@ -635,13 +670,19 @@ export const RealWorldExamples: Story = {
       </div>
 
       {/* Stats Dashboard */}
-      <div className="p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+      <div
+        className="p-4 rounded-lg"
+        style={{
+          backgroundColor: 'var(--color-bg-secondary)',
+          boxShadow: 'var(--shadow-md)',
+        }}
+      >
+        <h4 className="font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
           Player Stats
         </h4>
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               28
             </div>
             <UIBadge variant="subtle" color="success" size="xs">
@@ -649,7 +690,7 @@ export const RealWorldExamples: Story = {
             </UIBadge>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               15
             </div>
             <UIBadge variant="subtle" color="error" size="xs">
@@ -657,7 +698,7 @@ export const RealWorldExamples: Story = {
             </UIBadge>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               2
             </div>
             <UIBadge variant="subtle" color="gray" size="xs">

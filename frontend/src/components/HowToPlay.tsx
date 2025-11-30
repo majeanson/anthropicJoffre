@@ -1,4 +1,4 @@
-import { Modal, Button, UICard } from './ui';
+import { Modal, Button } from './ui';
 
 interface HowToPlayProps {
   isModal?: boolean;
@@ -6,17 +6,56 @@ interface HowToPlayProps {
   onClose?: () => void;
 }
 
+// Helper for section cards - uses CSS variables for consistent theming
+const SectionCard = ({
+  children,
+  borderColor,
+}: {
+  children: React.ReactNode;
+  borderColor: string;
+}) => (
+  <div
+    className="rounded-lg p-4 border-2"
+    style={{
+      borderColor,
+      backgroundColor: 'var(--color-bg-tertiary)',
+    }}
+  >
+    {children}
+  </div>
+);
+
+const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+  <h3
+    className="text-2xl font-bold mb-3 flex items-center gap-2"
+    style={{ color: 'var(--color-text-primary)' }}
+  >
+    {children}
+  </h3>
+);
+
+const Kbd = ({ children }: { children: React.ReactNode }) => (
+  <kbd
+    className="px-2 py-1 rounded border font-mono text-sm"
+    style={{
+      backgroundColor: 'var(--color-bg-tertiary)',
+      borderColor: 'var(--color-border-default)',
+      color: 'var(--color-text-primary)',
+    }}
+  >
+    {children}
+  </kbd>
+);
+
 export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlayProps) {
   // If it's a modal and not open, don't render
   if (isModal && !isOpen) return null;
 
   const content = (
-    <div className="space-y-6 text-umber-800 dark:text-gray-200">
+    <div className="space-y-6" style={{ color: 'var(--color-text-primary)' }}>
       {/* Overview */}
       <section>
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Overview
-        </h3>
+        <SectionTitle>Overview</SectionTitle>
         <p className="text-lg leading-relaxed">
           J⋀ffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
           The first team to reach 41 points wins the game!
@@ -24,24 +63,24 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
       </section>
 
       {/* Special Cards */}
-      <UICard variant="bordered" size="md" className="border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Cards
-        </h3>
+      <SectionCard borderColor="var(--color-success)">
+        <SectionTitle>Cards</SectionTitle>
         <ul className="space-y-2 text-lg">
           <li>• 4 colors (Red, Brown, Green, Blue) with cards going from [0-7]</li>
           <li>• Two special cards that you WANT to get ... or AVOID!</li>
-          <li>• <strong className="text-red-600">Red 0:</strong> +5 bonus points (6 total for that trick)</li>
-          <li>• <strong className="text-amber-800">Brown 0:</strong> -3 penalty points (-2 total for that trick)</li>
+          <li>
+            • <strong style={{ color: 'var(--color-suit-red)' }}>Red 0:</strong> +5 bonus points (6 total for that trick)
+          </li>
+          <li>
+            • <strong style={{ color: 'var(--color-suit-brown)' }}>Brown 0:</strong> -3 penalty points (-2 total for that trick)
+          </li>
           <li>• All other tricks worth 1 point</li>
         </ul>
-      </UICard>
+      </SectionCard>
 
       {/* Betting Phase */}
-      <UICard variant="bordered" size="md" className="border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Betting Phase
-        </h3>
+      <SectionCard borderColor="var(--color-warning)">
+        <SectionTitle>Betting Phase</SectionTitle>
         <ul className="space-y-2 text-lg">
           <li>• The winning bet starts the round. First card played chooses the trump color!</li>
           <li>• Each round starts with betting (7-12 points)</li>
@@ -52,13 +91,11 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           <li>• "Without Trump" doubles the bet stakes</li>
           <li>• Highest bidder becomes the offensive team</li>
         </ul>
-      </UICard>
+      </SectionCard>
 
       {/* Playing Phase */}
-      <UICard variant="bordered" size="md" className="border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Playing Phase
-        </h3>
+      <SectionCard borderColor="var(--color-info)">
+        <SectionTitle>Playing Phase</SectionTitle>
         <ul className="space-y-2 text-lg">
           <li>• Highest bidder leads the first trick. First card played chooses the trump color!</li>
           <li>• <strong>You must follow suit</strong> if you have the led color</li>
@@ -66,30 +103,26 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           <li>• Highest card in led suit wins if no trump played</li>
           <li>• Winner of each trick leads the next</li>
         </ul>
-      </UICard>
+      </SectionCard>
 
-       {/* Scoring */}
-      <UICard variant="bordered" size="md" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Scoring
-        </h3>
+      {/* Scoring */}
+      <SectionCard borderColor="var(--color-team2-primary)">
+        <SectionTitle>Scoring</SectionTitle>
         <ul className="space-y-2 text-lg">
           <li>• Offensive team wins if they meet their bet</li>
           <li>• They gain points equal to their bet</li>
           <li>• Defensive team gains points from tricks won</li>
           <li>• If offensive fails, they lose bet points</li>
         </ul>
-      </UICard>
+      </SectionCard>
 
       {/* Beginner Mode Features */}
-      <UICard variant="bordered" size="md" className="border-emerald-300 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Beginner Mode Features (Toggle in settings)
-        </h3>
+      <SectionCard borderColor="var(--color-success)">
+        <SectionTitle>Beginner Mode Features (Toggle in settings)</SectionTitle>
         <div className="space-y-4">
           {/* Move Suggestions */}
           <div>
-            <p className="font-semibold text-emerald-800 dark:text-emerald-200 mb-2 text-lg">
+            <p className="font-semibold mb-2 text-lg" style={{ color: 'var(--color-success)' }}>
               Move Suggestions (Press to Show)
             </p>
             <ul className="space-y-2 ml-4 text-base">
@@ -103,7 +136,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
 
           {/* Bot Thinking Insights */}
           <div>
-            <p className="font-semibold text-emerald-800 dark:text-emerald-200 mb-2 text-lg">
+            <p className="font-semibold mb-2 text-lg" style={{ color: 'var(--color-success)' }}>
               Bot Thinking Insights
             </p>
             <ul className="space-y-2 ml-4 text-base">
@@ -116,7 +149,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
 
           {/* Clickable Player Names */}
           <div>
-            <p className="font-semibold text-emerald-800 dark:text-emerald-200 mb-2 text-lg">
+            <p className="font-semibold mb-2 text-lg" style={{ color: 'var(--color-success)' }}>
               Clickable Player Names
             </p>
             <ul className="space-y-2 ml-4 text-base">
@@ -127,17 +160,21 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
             </ul>
           </div>
 
-          <p className="text-sm text-emerald-700 dark:text-emerald-300 italic mt-3 bg-emerald-100 dark:bg-emerald-800/50 p-2 rounded">
+          <p
+            className="text-sm italic mt-3 p-2 rounded"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--color-success) 15%, var(--color-bg-tertiary))',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             Learning Tip: Use bot thinking insights to understand advanced strategies, then apply them yourself!
           </p>
         </div>
-      </UICard>
+      </SectionCard>
 
       {/* Card Queuing */}
-      <UICard variant="bordered" size="md" className="border-cyan-300 dark:border-cyan-600 bg-cyan-50 dark:bg-cyan-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Card Queuing
-        </h3>
+      <SectionCard borderColor="var(--color-info)">
+        <SectionTitle>Card Queuing</SectionTitle>
         <div className="space-y-2 text-lg">
           <p>
             <strong>Pre-select your next card</strong> while waiting for your turn!
@@ -150,53 +187,81 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
             <li>• Only one card can be queued at a time</li>
             <li>• Great for fast-paced gameplay and quick decision-making!</li>
           </ul>
-          <p className="text-sm text-cyan-700 dark:text-cyan-300 italic mt-3 bg-cyan-100 dark:bg-cyan-800/50 p-2 rounded">
+          <p
+            className="text-sm italic mt-3 p-2 rounded"
+            style={{
+              backgroundColor: 'color-mix(in srgb, var(--color-info) 15%, var(--color-bg-tertiary))',
+              color: 'var(--color-text-secondary)',
+            }}
+          >
             Pro tip: Queue your card early to think ahead while others play!
           </p>
         </div>
-      </UICard>
+      </SectionCard>
 
       {/* Keyboard Navigation - Desktop only */}
-      <UICard variant="bordered" size="md" className="hidden md:block border-indigo-300 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Keyboard Shortcuts
-        </h3>
-        <div className="space-y-3 text-lg">
-          <div>
-            <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-1">Card Navigation:</p>
-            <ul className="space-y-1 ml-4">
-              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">←</kbd> <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">→</kbd> Navigate between cards</li>
-              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Tab</kbd> / <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Shift+Tab</kbd> Cycle through cards</li>
-              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">1</kbd>-<kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">9</kbd> Quick select by position</li>
-            </ul>
+      <div className="hidden md:block">
+        <SectionCard borderColor="var(--color-team2-primary)">
+          <SectionTitle>Keyboard Shortcuts</SectionTitle>
+          <div className="space-y-3 text-lg">
+            <div>
+              <p className="font-semibold mb-1" style={{ color: 'var(--color-text-accent)' }}>
+                Card Navigation:
+              </p>
+              <ul className="space-y-1 ml-4">
+                <li>• <Kbd>←</Kbd> <Kbd>→</Kbd> Navigate between cards</li>
+                <li>• <Kbd>Tab</Kbd> / <Kbd>Shift+Tab</Kbd> Cycle through cards</li>
+                <li>• <Kbd>1</Kbd>-<Kbd>9</Kbd> Quick select by position</li>
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold mb-1" style={{ color: 'var(--color-text-accent)' }}>
+                Card Actions:
+              </p>
+              <ul className="space-y-1 ml-4">
+                <li>• <Kbd>Enter</Kbd> / <Kbd>Space</Kbd> Play selected card (or queue if not your turn)</li>
+                <li>• <Kbd>Esc</Kbd> Clear selection</li>
+              </ul>
+            </div>
+            <p className="text-sm italic mt-2" style={{ color: 'var(--color-text-muted)' }}>
+              Tip: You can queue a card before your turn for instant auto-play!
+            </p>
           </div>
-          <div>
-            <p className="font-semibold text-indigo-800 dark:text-indigo-200 mb-1">Card Actions:</p>
-            <ul className="space-y-1 ml-4">
-              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Enter</kbd> / <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Space</kbd> Play selected card (or queue if not your turn)</li>
-              <li>• <kbd className="px-2 py-1 bg-parchment-100 dark:bg-gray-700 rounded border border-parchment-400 dark:border-gray-600 font-mono text-sm text-umber-900 dark:text-gray-200">Esc</kbd> Clear selection</li>
-            </ul>
-          </div>
-          <p className="text-sm text-indigo-700 dark:text-indigo-300 italic mt-2">
-            Tip: You can queue a card before your turn for instant auto-play!
-          </p>
-        </div>
-      </UICard>
-      
+        </SectionCard>
+      </div>
+
       {/* Teams */}
       <section>
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Teams
-        </h3>
+        <SectionTitle>Teams</SectionTitle>
         <div className="grid grid-cols-2 gap-4">
-          <UICard variant="bordered" size="md" className="border-orange-400 dark:border-orange-600 bg-orange-100 dark:bg-orange-900/40">
-            <p className="text-lg font-bold text-orange-800 dark:text-orange-200">Team 1 (Orange)</p>
-            <p className="text-sm text-orange-700 dark:text-orange-300 mt-1">Players 1 & 3</p>
-          </UICard>
-          <UICard variant="bordered" size="md" className="border-purple-400 dark:border-purple-600 bg-purple-100 dark:bg-purple-900/40">
-            <p className="text-lg font-bold text-purple-800 dark:text-purple-200">Team 2 (Purple)</p>
-            <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">Players 2 & 4</p>
-          </UICard>
+          <div
+            className="rounded-lg p-4 border-2"
+            style={{
+              borderColor: 'var(--color-team1-primary)',
+              backgroundColor: 'color-mix(in srgb, var(--color-team1-primary) 15%, var(--color-bg-tertiary))',
+            }}
+          >
+            <p className="text-lg font-bold" style={{ color: 'var(--color-team1-primary)' }}>
+              Team 1 (Orange)
+            </p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+              Players 1 & 3
+            </p>
+          </div>
+          <div
+            className="rounded-lg p-4 border-2"
+            style={{
+              borderColor: 'var(--color-team2-primary)',
+              backgroundColor: 'color-mix(in srgb, var(--color-team2-primary) 15%, var(--color-bg-tertiary))',
+            }}
+          >
+            <p className="text-lg font-bold" style={{ color: 'var(--color-team2-primary)' }}>
+              Team 2 (Purple)
+            </p>
+            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+              Players 2 & 4
+            </p>
+          </div>
         </div>
       </section>
     </div>
@@ -210,7 +275,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         onClose={onClose || (() => {})}
         title="Game Rules"
         icon="📖"
-        theme="parchment"
+        theme="arcane"
         size="lg"
         testId="how-to-play-modal"
       >

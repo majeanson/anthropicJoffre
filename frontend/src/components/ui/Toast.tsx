@@ -1,21 +1,20 @@
 /**
- * Toast Component - Midnight Alchemy Edition
+ * Toast Component - Multi-Skin Edition
  *
- * Mystical notification toasts with ethereal glows and arcane animations.
- * Features brass frame aesthetics and alchemical progress indicators.
+ * Notification toasts with proper CSS variable support for all themes.
  *
  * Features:
  * - 4 variants: success, warning, error, info
- * - Auto-dismiss with arcane progress bar
- * - Manual close button with copper accents
- * - Slide-in animation with ethereal glow
- * - Icon support with element theming
+ * - Auto-dismiss with progress bar
+ * - Manual close button
+ * - Slide-in animation
+ * - Icon support
  *
  * Usage:
  * ```tsx
  * <Toast
  *   variant="success"
- *   message="The transmutation was successful!"
+ *   message="Operation completed successfully!"
  *   onClose={() => setShowToast(false)}
  *   autoDismiss={3000}
  * />
@@ -43,22 +42,15 @@ export interface ToastProps {
   showCloseButton?: boolean;
 }
 
+// Variant styles using CSS variables
 const variantStyles: Record<ToastVariant, {
-  border: string;
-  icon: string;
-  iconGlow: string;
-  progressBar: string;
-  gradientFrom: string;
+  borderVar: string;
+  iconVar: string;
   defaultIcon: ReactNode;
-  alchemySymbol: string;
 }> = {
   success: {
-    border: '#4A9C6D',
-    icon: '#4A9C6D',
-    iconGlow: 'rgba(74, 156, 109, 0.5)',
-    progressBar: '#4A9C6D',
-    gradientFrom: 'rgba(74, 156, 109, 0.1)',
-    alchemySymbol: '☿', // Mercury - transformation complete
+    borderVar: 'var(--color-success)',
+    iconVar: 'var(--color-success)',
     defaultIcon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -66,12 +58,8 @@ const variantStyles: Record<ToastVariant, {
     ),
   },
   warning: {
-    border: '#D4A574',
-    icon: '#D4A574',
-    iconGlow: 'rgba(212, 165, 116, 0.5)',
-    progressBar: '#D4A574',
-    gradientFrom: 'rgba(212, 165, 116, 0.1)',
-    alchemySymbol: '△', // Fire - caution
+    borderVar: 'var(--color-warning)',
+    iconVar: 'var(--color-warning)',
     defaultIcon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -79,12 +67,8 @@ const variantStyles: Record<ToastVariant, {
     ),
   },
   error: {
-    border: '#8B3D3D',
-    icon: '#A63D3D',
-    iconGlow: 'rgba(166, 61, 61, 0.5)',
-    progressBar: '#A63D3D',
-    gradientFrom: 'rgba(166, 61, 61, 0.1)',
-    alchemySymbol: '☠', // Danger
+    borderVar: 'var(--color-error)',
+    iconVar: 'var(--color-error)',
     defaultIcon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -92,12 +76,8 @@ const variantStyles: Record<ToastVariant, {
     ),
   },
   info: {
-    border: '#4682B4',
-    icon: '#4682B4',
-    iconGlow: 'rgba(70, 130, 180, 0.5)',
-    progressBar: '#4682B4',
-    gradientFrom: 'rgba(70, 130, 180, 0.1)',
-    alchemySymbol: '☽', // Moon - knowledge
+    borderVar: 'var(--color-info)',
+    iconVar: 'var(--color-info)',
     defaultIcon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -152,36 +132,39 @@ export function Toast({
         min-w-[320px] max-w-md
         flex items-start gap-3
         p-4
-        rounded-lg
+        rounded-[var(--radius-lg)]
         relative overflow-hidden
         transition-all duration-300
+        border-2
         ${isVisible ? 'animate-slide-in-right' : 'opacity-0 translate-x-4'}
       `}
       style={{
-        background: `linear-gradient(135deg, ${style.gradientFrom} 0%, #131824 50%, #0B0E14 100%)`,
-        borderWidth: '2px',
-        borderStyle: 'solid',
-        borderColor: style.border,
+        backgroundColor: 'var(--color-bg-secondary)',
+        borderColor: style.borderVar,
         boxShadow: `
-          0 8px 32px rgba(0, 0, 0, 0.5),
-          0 0 30px ${style.iconGlow},
-          inset 0 1px 0 rgba(255, 255, 255, 0.05)
+          var(--shadow-lg),
+          0 0 30px color-mix(in srgb, ${style.borderVar} 30%, transparent)
         `,
-        fontFamily: '"Cormorant Garamond", Georgia, serif',
       }}
       role="alert"
       aria-live={variant === 'error' ? 'assertive' : 'polite'}
     >
-      {/* Sacred geometry corner accents */}
-      <div className="absolute top-1 left-1 w-3 h-3 border-l border-t opacity-40" style={{ borderColor: style.border }} />
-      <div className="absolute top-1 right-1 w-3 h-3 border-r border-t opacity-40" style={{ borderColor: style.border }} />
+      {/* Corner accents */}
+      <div
+        className="absolute top-1 left-1 w-3 h-3 border-l border-t opacity-40"
+        style={{ borderColor: style.borderVar }}
+      />
+      <div
+        className="absolute top-1 right-1 w-3 h-3 border-r border-t opacity-40"
+        style={{ borderColor: style.borderVar }}
+      />
 
-      {/* Icon with ethereal glow effect */}
+      {/* Icon */}
       <div
         className="flex-shrink-0 text-xl mt-0.5"
         style={{
-          color: style.icon,
-          filter: `drop-shadow(0 0 8px ${style.iconGlow})`,
+          color: style.iconVar,
+          filter: `drop-shadow(0 0 8px color-mix(in srgb, ${style.iconVar} 50%, transparent))`,
         }}
       >
         {displayIcon}
@@ -191,24 +174,21 @@ export function Toast({
       <div className="flex-1 min-w-0">
         {title && (
           <p
-            className="font-semibold text-sm tracking-wide uppercase"
-            style={{
-              color: '#E8E4DC',
-              fontFamily: '"Cinzel", Georgia, serif',
-            }}
+            className="font-display font-semibold text-sm tracking-wide uppercase"
+            style={{ color: 'var(--color-text-primary)' }}
           >
             {title}
           </p>
         )}
         <p
-          className={`text-sm leading-relaxed ${title ? 'mt-1' : ''}`}
-          style={{ color: '#9CA3AF' }}
+          className={`text-sm leading-relaxed font-body ${title ? 'mt-1' : ''}`}
+          style={{ color: 'var(--color-text-secondary)' }}
         >
           {message}
         </p>
       </div>
 
-      {/* Close button with brass styling */}
+      {/* Close button */}
       {showCloseButton && (
         <button
           onClick={handleClose}
@@ -216,15 +196,15 @@ export function Toast({
             flex-shrink-0
             -mt-1 -mr-1
             p-1.5
-            rounded-md
+            rounded-[var(--radius-md)]
             opacity-60 hover:opacity-100
-            transition-all duration-200
+            transition-all duration-[var(--duration-fast)]
             focus:outline-none
             focus-visible:ring-2
-            focus-visible:ring-[#C17F59]
-            hover:bg-[#2D3548]
+            focus-visible:ring-[var(--color-text-accent)]
+            hover:bg-[var(--color-bg-tertiary)]
           "
-          style={{ color: '#6B7280' }}
+          style={{ color: 'var(--color-text-muted)' }}
           aria-label="Dismiss notification"
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -237,21 +217,27 @@ export function Toast({
         </button>
       )}
 
-      {/* Progress bar with ethereal glow */}
+      {/* Progress bar */}
       {autoDismiss > 0 && (
         <div
           className="absolute bottom-0 left-0 h-1 transition-all duration-100 ease-linear"
           style={{
             width: `${progress}%`,
-            background: `linear-gradient(90deg, ${style.progressBar}, ${style.icon})`,
-            boxShadow: `0 0 12px ${style.iconGlow}`,
+            backgroundColor: style.borderVar,
+            boxShadow: `0 0 12px color-mix(in srgb, ${style.borderVar} 50%, transparent)`,
           }}
         />
       )}
 
       {/* Bottom corner accents */}
-      <div className="absolute bottom-1 left-1 w-3 h-3 border-l border-b opacity-40" style={{ borderColor: style.border }} />
-      <div className="absolute bottom-1 right-1 w-3 h-3 border-r border-b opacity-40" style={{ borderColor: style.border }} />
+      <div
+        className="absolute bottom-1 left-1 w-3 h-3 border-l border-b opacity-40"
+        style={{ borderColor: style.borderVar }}
+      />
+      <div
+        className="absolute bottom-1 right-1 w-3 h-3 border-r border-b opacity-40"
+        style={{ borderColor: style.borderVar }}
+      />
     </div>
   );
 }
@@ -292,22 +278,22 @@ export function ToastContainer({ children, position = 'top-right' }: ToastContai
 
 export interface PresetToastProps extends Omit<ToastProps, 'variant'> {}
 
-/** Success toast - Transmutation complete */
+/** Success toast */
 export const SuccessToast = (props: PresetToastProps) => (
   <Toast variant="success" {...props} />
 );
 
-/** Warning toast - Unstable mixture */
+/** Warning toast */
 export const WarningToast = (props: PresetToastProps) => (
   <Toast variant="warning" {...props} />
 );
 
-/** Error toast - Volatile reaction */
+/** Error toast */
 export const ErrorToast = (props: PresetToastProps) => (
   <Toast variant="error" {...props} />
 );
 
-/** Info toast - Ancient knowledge */
+/** Info toast */
 export const InfoToast = (props: PresetToastProps) => (
   <Toast variant="info" {...props} />
 );

@@ -1,14 +1,13 @@
 /**
- * UIBadge Component - Midnight Alchemy Edition
+ * UIBadge Component - Multi-Skin Edition
  *
- * Mystical badge/tag component with ethereal styling.
- * Features brass accents and alchemical color schemes.
+ * Badge/tag component with proper CSS variable support for all themes.
  *
  * Features:
  * - 4 variants: solid, outline, subtle, arcane
- * - Multiple color schemes with elemental glows
+ * - Multiple color schemes
  * - Pulse animation for status indicators
- * - Sacred geometry styling
+ * - Corner accents for arcane variant
  *
  * @example
  * ```tsx
@@ -69,94 +68,29 @@ const sizeStyles: Record<UIBadgeSize, { padding: string; text: string; icon: str
   md: { padding: 'px-3 py-1.5', text: 'text-base', icon: 'w-4 h-4' },
 };
 
-// Color + Variant styles with Midnight Alchemy theming
-const colorStyles: Record<UIBadgeColor, {
-  solid: { bg: string; text: string; shadow: string };
-  outline: { border: string; text: string };
-  subtle: { bg: string; text: string };
-  arcane: { bg: string; border: string; text: string; shadow: string };
-  translucent: { bg: string; text: string };
-}> = {
-  team1: {
-    solid: { bg: '#d97706', text: '#0B0E14', shadow: 'rgba(217, 119, 6, 0.5)' },
-    outline: { border: '#d97706', text: '#d97706' },
-    subtle: { bg: 'rgba(217, 119, 6, 0.15)', text: '#d97706' },
-    arcane: { bg: 'rgba(217, 119, 6, 0.1)', border: '#d97706', text: '#d97706', shadow: 'rgba(217, 119, 6, 0.3)' },
-    translucent: { bg: 'rgba(217, 119, 6, 0.2)', text: '#d97706' },
-  },
-  team2: {
-    solid: { bg: '#7c3aed', text: '#E8E4DC', shadow: 'rgba(124, 58, 237, 0.5)' },
-    outline: { border: '#7c3aed', text: '#7c3aed' },
-    subtle: { bg: 'rgba(124, 58, 237, 0.15)', text: '#7c3aed' },
-    arcane: { bg: 'rgba(124, 58, 237, 0.1)', border: '#7c3aed', text: '#7c3aed', shadow: 'rgba(124, 58, 237, 0.3)' },
-    translucent: { bg: 'rgba(124, 58, 237, 0.2)', text: '#7c3aed' },
-  },
-  success: {
-    solid: { bg: '#4A9C6D', text: '#0B0E14', shadow: 'rgba(74, 156, 109, 0.5)' },
-    outline: { border: '#4A9C6D', text: '#4A9C6D' },
-    subtle: { bg: 'rgba(74, 156, 109, 0.15)', text: '#4A9C6D' },
-    arcane: { bg: 'rgba(74, 156, 109, 0.1)', border: '#4A9C6D', text: '#4A9C6D', shadow: 'rgba(74, 156, 109, 0.3)' },
-    translucent: { bg: 'rgba(74, 156, 109, 0.2)', text: '#4A9C6D' },
-  },
-  warning: {
-    solid: { bg: '#D4A574', text: '#0B0E14', shadow: 'rgba(212, 165, 116, 0.5)' },
-    outline: { border: '#D4A574', text: '#D4A574' },
-    subtle: { bg: 'rgba(212, 165, 116, 0.15)', text: '#D4A574' },
-    arcane: { bg: 'rgba(212, 165, 116, 0.1)', border: '#D4A574', text: '#D4A574', shadow: 'rgba(212, 165, 116, 0.3)' },
-    translucent: { bg: 'rgba(212, 165, 116, 0.2)', text: '#D4A574' },
-  },
-  error: {
-    solid: { bg: '#A63D3D', text: '#E8E4DC', shadow: 'rgba(166, 61, 61, 0.5)' },
-    outline: { border: '#A63D3D', text: '#A63D3D' },
-    subtle: { bg: 'rgba(166, 61, 61, 0.15)', text: '#A63D3D' },
-    arcane: { bg: 'rgba(166, 61, 61, 0.1)', border: '#8B3D3D', text: '#A63D3D', shadow: 'rgba(166, 61, 61, 0.3)' },
-    translucent: { bg: 'rgba(166, 61, 61, 0.2)', text: '#A63D3D' },
-  },
-  info: {
-    solid: { bg: '#4682B4', text: '#E8E4DC', shadow: 'rgba(70, 130, 180, 0.5)' },
-    outline: { border: '#4682B4', text: '#4682B4' },
-    subtle: { bg: 'rgba(70, 130, 180, 0.15)', text: '#4682B4' },
-    arcane: { bg: 'rgba(70, 130, 180, 0.1)', border: '#4682B4', text: '#4682B4', shadow: 'rgba(70, 130, 180, 0.3)' },
-    translucent: { bg: 'rgba(70, 130, 180, 0.2)', text: '#4682B4' },
-  },
-  muted: {
-    solid: { bg: '#6B7280', text: '#E8E4DC', shadow: 'rgba(107, 114, 128, 0.4)' },
-    outline: { border: '#6B7280', text: '#6B7280' },
-    subtle: { bg: 'rgba(107, 114, 128, 0.15)', text: '#9CA3AF' },
-    arcane: { bg: 'rgba(107, 114, 128, 0.1)', border: '#6B7280', text: '#9CA3AF', shadow: 'rgba(107, 114, 128, 0.2)' },
-    translucent: { bg: 'rgba(107, 114, 128, 0.2)', text: '#9CA3AF' },
-  },
-  accent: {
-    solid: { bg: '#C17F59', text: '#0B0E14', shadow: 'rgba(193, 127, 89, 0.5)' },
-    outline: { border: '#C17F59', text: '#D4A574' },
-    subtle: { bg: 'rgba(193, 127, 89, 0.15)', text: '#D4A574' },
-    arcane: { bg: 'rgba(193, 127, 89, 0.1)', border: '#C17F59', text: '#D4A574', shadow: 'rgba(193, 127, 89, 0.3)' },
-    translucent: { bg: 'rgba(193, 127, 89, 0.2)', text: '#D4A574' },
-  },
-  gray: {
-    solid: { bg: '#6B7280', text: '#E8E4DC', shadow: 'rgba(107, 114, 128, 0.4)' },
-    outline: { border: '#6B7280', text: '#6B7280' },
-    subtle: { bg: 'rgba(107, 114, 128, 0.15)', text: '#9CA3AF' },
-    arcane: { bg: 'rgba(107, 114, 128, 0.1)', border: '#6B7280', text: '#9CA3AF', shadow: 'rgba(107, 114, 128, 0.2)' },
-    translucent: { bg: 'rgba(107, 114, 128, 0.2)', text: '#9CA3AF' },
-  },
-  primary: {
-    solid: { bg: '#C17F59', text: '#0B0E14', shadow: 'rgba(193, 127, 89, 0.5)' },
-    outline: { border: '#C17F59', text: '#D4A574' },
-    subtle: { bg: 'rgba(193, 127, 89, 0.15)', text: '#D4A574' },
-    arcane: { bg: 'rgba(193, 127, 89, 0.1)', border: '#C17F59', text: '#D4A574', shadow: 'rgba(193, 127, 89, 0.3)' },
-    translucent: { bg: 'rgba(193, 127, 89, 0.2)', text: '#D4A574' },
-  },
+// Color to CSS variable mappings
+const colorVars: Record<UIBadgeColor, string> = {
+  team1: 'var(--color-team1-primary)',
+  team2: 'var(--color-team2-primary)',
+  success: 'var(--color-success)',
+  warning: 'var(--color-warning)',
+  error: 'var(--color-error)',
+  info: 'var(--color-info)',
+  muted: 'var(--color-text-muted)',
+  accent: 'var(--color-text-accent)',
+  gray: 'var(--color-text-muted)',
+  primary: 'var(--color-text-accent)',
 };
 
 /**
- * UIBadge - Mystical badge component for labels and status indicators
+ * UIBadge - Badge component for labels and status indicators
  *
  * Variants:
- * - solid: Full background with ethereal glow
+ * - solid: Full background
  * - outline: Border with colored text
  * - subtle: Muted background
- * - arcane: Sacred geometry with corner accents
+ * - arcane: Corner accents with glow
+ * - translucent: Semi-transparent with blur
  */
 export const UIBadge: React.FC<UIBadgeProps> = ({
   variant = 'solid',
@@ -169,49 +103,49 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
   children,
 }) => {
   const sizeStyle = sizeStyles[size];
-  const colorStyle = colorStyles[color][variant];
+  const colorVar = colorVars[color];
 
   // Get variant-specific styles
   const getStyles = (): React.CSSProperties => {
     switch (variant) {
       case 'solid':
         return {
-          backgroundColor: (colorStyle as typeof colorStyles.accent.solid).bg,
-          color: (colorStyle as typeof colorStyles.accent.solid).text,
-          boxShadow: `0 2px 10px ${(colorStyle as typeof colorStyles.accent.solid).shadow}`,
+          backgroundColor: colorVar,
+          color: 'var(--color-text-inverse)',
+          boxShadow: `0 2px 10px color-mix(in srgb, ${colorVar} 40%, transparent)`,
         };
       case 'outline':
         return {
           backgroundColor: 'transparent',
           borderWidth: '1px',
           borderStyle: 'solid',
-          borderColor: (colorStyle as typeof colorStyles.accent.outline).border,
-          color: (colorStyle as typeof colorStyles.accent.outline).text,
+          borderColor: colorVar,
+          color: colorVar,
         };
       case 'subtle':
         return {
-          backgroundColor: (colorStyle as typeof colorStyles.accent.subtle).bg,
-          color: (colorStyle as typeof colorStyles.accent.subtle).text,
+          backgroundColor: `color-mix(in srgb, ${colorVar} 15%, var(--color-bg-secondary))`,
+          color: colorVar,
         };
       case 'arcane':
         return {
-          backgroundColor: (colorStyle as typeof colorStyles.accent.arcane).bg,
+          backgroundColor: `color-mix(in srgb, ${colorVar} 10%, var(--color-bg-secondary))`,
           borderWidth: '1px',
           borderStyle: 'solid',
-          borderColor: (colorStyle as typeof colorStyles.accent.arcane).border,
-          color: (colorStyle as typeof colorStyles.accent.arcane).text,
-          boxShadow: `0 0 15px ${(colorStyle as typeof colorStyles.accent.arcane).shadow}`,
+          borderColor: colorVar,
+          color: colorVar,
+          boxShadow: `0 0 15px color-mix(in srgb, ${colorVar} 30%, transparent)`,
         };
       case 'translucent':
         return {
-          backgroundColor: (colorStyle as typeof colorStyles.accent.translucent).bg,
-          color: (colorStyle as typeof colorStyles.accent.translucent).text,
+          backgroundColor: `color-mix(in srgb, ${colorVar} 20%, transparent)`,
+          color: colorVar,
           backdropFilter: 'blur(4px)',
         };
       default:
         return {
-          backgroundColor: (colorStyle as typeof colorStyles.accent.solid).bg,
-          color: (colorStyle as typeof colorStyles.accent.solid).text,
+          backgroundColor: colorVar,
+          color: 'var(--color-text-inverse)',
         };
     }
   };
@@ -220,38 +154,35 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
     <span
       className={`
         inline-flex items-center gap-1.5
-        font-semibold tracking-wide uppercase
-        transition-all duration-200
+        font-display font-semibold tracking-wide uppercase
+        transition-all duration-[var(--duration-normal)]
         ${sizeStyle.padding}
         ${sizeStyle.text}
-        ${shape === 'pill' ? 'rounded-full' : 'rounded-md'}
+        ${shape === 'pill' ? 'rounded-full' : 'rounded-[var(--radius-md)]'}
         ${pulse ? 'animate-pulse' : ''}
         ${variant === 'arcane' ? 'relative' : ''}
         ${className}
       `}
-      style={{
-        ...getStyles(),
-        fontFamily: '"Cinzel", Georgia, serif',
-      }}
+      style={getStyles()}
     >
       {/* Arcane corner accents */}
       {variant === 'arcane' && (
         <>
           <span
             className="absolute top-0 left-0 w-1.5 h-1.5 border-l border-t rounded-tl-sm"
-            style={{ borderColor: (colorStyle as typeof colorStyles.accent.arcane).border }}
+            style={{ borderColor: colorVar }}
           />
           <span
             className="absolute top-0 right-0 w-1.5 h-1.5 border-r border-t rounded-tr-sm"
-            style={{ borderColor: (colorStyle as typeof colorStyles.accent.arcane).border }}
+            style={{ borderColor: colorVar }}
           />
           <span
             className="absolute bottom-0 left-0 w-1.5 h-1.5 border-l border-b rounded-bl-sm"
-            style={{ borderColor: (colorStyle as typeof colorStyles.accent.arcane).border }}
+            style={{ borderColor: colorVar }}
           />
           <span
             className="absolute bottom-0 right-0 w-1.5 h-1.5 border-r border-b rounded-br-sm"
-            style={{ borderColor: (colorStyle as typeof colorStyles.accent.arcane).border }}
+            style={{ borderColor: colorVar }}
           />
         </>
       )}
@@ -268,7 +199,7 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
 
 export interface PresetBadgeProps extends Omit<UIBadgeProps, 'variant' | 'color'> {}
 
-/** Arcane badge with sacred geometry styling */
+/** Arcane badge with corner accents */
 export const ArcaneBadge: React.FC<PresetBadgeProps> = (props) => (
   <UIBadge variant="arcane" color="accent" {...props} />
 );

@@ -4,8 +4,6 @@ import { sounds } from '../utils/sounds';
 interface SettingsContextType {
   soundEnabled: boolean;
   setSoundEnabled: (enabled: boolean) => void;
-  darkMode: boolean;
-  setDarkMode: (enabled: boolean) => void;
   autoplayEnabled: boolean;
   setAutoplayEnabled: (enabled: boolean) => void;
   animationsEnabled: boolean;
@@ -29,11 +27,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return saved !== null ? JSON.parse(saved) : true;
   });
 
-  const [darkMode, setDarkModeState] = useState<boolean>(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved !== null ? JSON.parse(saved) : false;
-  });
-
   const [animationsEnabled, setAnimationsEnabledState] = useState<boolean>(() => {
     const saved = localStorage.getItem('animationsEnabled');
     return saved !== null ? JSON.parse(saved) : true;
@@ -55,16 +48,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('soundEnabled', JSON.stringify(soundEnabled));
   }, [soundEnabled]);
 
-  // Sync dark mode
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-  }, [darkMode]);
-
   // Sync animations settings
   useEffect(() => {
     localStorage.setItem('animationsEnabled', JSON.stringify(animationsEnabled));
@@ -83,10 +66,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const setDarkMode = (enabled: boolean) => {
-    setDarkModeState(enabled);
-  };
-
   const setAnimationsEnabled = (enabled: boolean) => {
     setAnimationsEnabledState(enabled);
   };
@@ -100,8 +79,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
       value={{
         soundEnabled,
         setSoundEnabled,
-        darkMode,
-        setDarkMode,
         autoplayEnabled,
         setAutoplayEnabled,
         animationsEnabled,

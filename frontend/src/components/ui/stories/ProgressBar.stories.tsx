@@ -1,42 +1,35 @@
 /**
- * ProgressBar Component Stories - Midnight Alchemy Edition
+ * ProgressBar Component Stories - Multi-Skin Edition
  *
- * Mystical progress indicators showing transmutation completion,
- * essence collection, and the advancement of the Great Work.
+ * Progress indicators with proper CSS variable support for all themes.
+ * Switch skins using the paintbrush icon in the Storybook toolbar.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { ProgressBar } from '../ProgressBar';
 
 const meta = {
-  title: 'Midnight Alchemy/ProgressBar',
+  title: 'UI/ProgressBar',
   component: ProgressBar,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'midnight',
-      values: [
-        { name: 'midnight', value: '#0B0E14' },
-        { name: 'chamber', value: '#131824' },
-      ],
-    },
     docs: {
       description: {
         component: `
-# Midnight Alchemy Progress Bars
+# ProgressBar Component
 
-Mystical progress indicators showing transmutation completion,
-essence collection, and the advancement of the Great Work.
+Progress indicators with proper CSS variable support for all themes.
 
 ## Features
-- **3 variants**: default, gradient, striped
+- **4 variants**: default, gradient, arcane, striped
 - **3 sizes**: sm, md, lg
-- **6 colors**: primary, success, warning, error, info, gray
+- **8 colors**: accent, primary, success, warning, error, info, muted, gray
 - **Custom formatting**: Display values in any format
 - **Animation**: Smooth transitions
 
-## Alchemical Usage
-Track the progress of experiments, quests, and achievements.
+## Multi-Skin Support
+Switch skins using the paintbrush icon in the Storybook toolbar to preview
+how the component looks across all available themes.
         `,
       },
     },
@@ -53,7 +46,7 @@ Track the progress of experiments, quests, and achievements.
     },
     variant: {
       control: 'select',
-      options: ['default', 'gradient', 'striped'],
+      options: ['default', 'gradient', 'arcane', 'striped'],
       description: 'Progress bar variant',
     },
     size: {
@@ -63,7 +56,7 @@ Track the progress of experiments, quests, and achievements.
     },
     color: {
       control: 'select',
-      options: ['primary', 'success', 'warning', 'error', 'info', 'gray'],
+      options: ['accent', 'primary', 'success', 'warning', 'error', 'info', 'muted', 'gray'],
       description: 'Color theme',
     },
     showValue: {
@@ -242,10 +235,10 @@ export const AllSizes: Story = {
     value: 50,
   },
   render: () => (
-    <div className="space-y-6 p-6 bg-[#0B0E14] rounded-xl">
-      <ProgressBar value={60} size="sm" label="Minor Essence" showValue />
-      <ProgressBar value={60} size="md" label="Standard Essence" showValue />
-      <ProgressBar value={60} size="lg" label="Grand Essence" showValue />
+    <div className="space-y-6 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+      <ProgressBar value={60} size="sm" label="Small" showValue />
+      <ProgressBar value={60} size="md" label="Medium" showValue />
+      <ProgressBar value={60} size="lg" label="Large" showValue />
     </div>
   ),
 };
@@ -259,13 +252,14 @@ export const AllColors: Story = {
     value: 50,
   },
   render: () => (
-    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <ProgressBar value={70} color="primary" label="Copper" showValue />
-      <ProgressBar value={70} color="success" label="Emerald" showValue />
-      <ProgressBar value={70} color="warning" label="Amber" showValue />
-      <ProgressBar value={70} color="error" label="Ruby" showValue />
-      <ProgressBar value={70} color="info" label="Sapphire" showValue />
-      <ProgressBar value={70} color="gray" label="Quicksilver" showValue />
+    <div className="space-y-4 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+      <ProgressBar value={70} color="accent" label="Accent" showValue />
+      <ProgressBar value={70} color="primary" label="Primary" showValue />
+      <ProgressBar value={70} color="success" label="Success" showValue />
+      <ProgressBar value={70} color="warning" label="Warning" showValue />
+      <ProgressBar value={70} color="error" label="Error" showValue />
+      <ProgressBar value={70} color="info" label="Info" showValue />
+      <ProgressBar value={70} color="muted" label="Muted" showValue />
     </div>
   ),
 };
@@ -279,10 +273,10 @@ export const AllVariants: Story = {
     value: 50,
   },
   render: () => (
-    <div className="space-y-6 p-6 bg-[#0B0E14] rounded-xl">
-      <ProgressBar value={65} variant="default" label="Standard" showValue />
-      <ProgressBar value={65} variant="gradient" label="Ethereal" showValue />
-      <ProgressBar value={65} variant="striped" label="Flowing" showValue />
+    <div className="space-y-6 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+      <ProgressBar value={65} variant="default" label="Default" showValue />
+      <ProgressBar value={65} variant="gradient" label="Gradient" showValue />
+      <ProgressBar value={65} variant="arcane" label="Arcane" showValue />
     </div>
   ),
 };
@@ -299,32 +293,31 @@ export const DailyQuests: Story = {
     <div
       className="space-y-4 p-6 rounded-xl"
       style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '1px solid #2D3548',
+        backgroundColor: 'var(--color-bg-secondary)',
+        border: '1px solid var(--color-border-default)',
       }}
     >
       <h3
-        className="text-lg font-bold mb-4"
+        className="text-lg font-bold mb-4 font-display"
         style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-          textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
+          color: 'var(--color-text-accent)',
+          textShadow: '0 0 10px color-mix(in srgb, var(--color-text-accent) 30%, transparent)',
         }}
       >
-        Daily Rituals
+        Daily Quests
       </h3>
       <ProgressBar
         value={3}
         max={5}
-        label="Win 5 Experiments"
+        label="Win 5 Games"
         showValue
         valueFormatter={(v, m) => `${v}/${m}`}
-        color="primary"
+        color="accent"
       />
       <ProgressBar
         value={10}
         max={10}
-        label="Use 10 Catalysts"
+        label="Play 10 Rounds"
         showValue
         valueFormatter={(v, m) => `${v}/${m}`}
         color="success"
@@ -332,7 +325,7 @@ export const DailyQuests: Story = {
       <ProgressBar
         value={1}
         max={3}
-        label="Collect All Elements"
+        label="Win a Bet"
         showValue
         valueFormatter={(v, m) => `${v}/${m}`}
         color="warning"
@@ -353,26 +346,23 @@ export const AchievementProgress: Story = {
     <div
       className="space-y-4 p-6 rounded-xl"
       style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
+        backgroundColor: 'var(--color-bg-primary)',
+        border: '1px solid var(--color-border-default)',
       }}
     >
       <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#D4A574',
-        }}
+        className="text-lg font-bold mb-4 font-display"
+        style={{ color: 'var(--color-text-accent)' }}
       >
-        Mastery Progress
+        Achievement Progress
       </h3>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">⚗</span>
+          <span className="text-2xl">🏆</span>
           <div className="flex-1">
             <ProgressBar
               value={75}
-              label="Master Alchemist"
+              label="Veteran Player"
               showValue
               variant="gradient"
               color="warning"
@@ -380,24 +370,24 @@ export const AchievementProgress: Story = {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-2xl">☉</span>
+          <span className="text-2xl">✓</span>
           <div className="flex-1">
             <ProgressBar
               value={100}
-              label="First Transmutation"
+              label="First Win"
               showValue
               color="success"
             />
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-2xl">☿</span>
+          <span className="text-2xl">🎯</span>
           <div className="flex-1">
             <ProgressBar
               value={40}
-              label="Mercury Master"
+              label="Sharpshooter"
               showValue
-              color="primary"
+              color="accent"
             />
           </div>
         </div>
@@ -410,7 +400,7 @@ export const AchievementProgress: Story = {
 // ESSENCE STRENGTH
 // ============================================================================
 
-export const EssenceStrength: Story = {
+export const HealthLevels: Story = {
   args: {
     value: 50,
   },
@@ -418,22 +408,19 @@ export const EssenceStrength: Story = {
     <div
       className="space-y-4 p-6 rounded-xl"
       style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
+        backgroundColor: 'var(--color-bg-primary)',
+        border: '1px solid var(--color-border-default)',
       }}
     >
       <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#E8E4DC',
-        }}
+        className="text-lg font-bold mb-4 font-display"
+        style={{ color: 'var(--color-text-primary)' }}
       >
-        Essence Potency Levels
+        Health Levels
       </h3>
       <ProgressBar
         value={25}
-        label="Diluted"
+        label="Critical"
         showValue
         color="error"
         size="sm"
@@ -447,14 +434,14 @@ export const EssenceStrength: Story = {
       />
       <ProgressBar
         value={75}
-        label="Concentrated"
+        label="Good"
         showValue
         color="info"
         size="sm"
       />
       <ProgressBar
         value={100}
-        label="Pure Essence"
+        label="Full Health"
         showValue
         color="success"
         size="sm"
@@ -475,35 +462,32 @@ export const LoadingStates: Story = {
     <div
       className="space-y-6 p-6 rounded-xl"
       style={{
-        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
-        border: '1px solid #2D3548',
+        backgroundColor: 'var(--color-bg-secondary)',
+        border: '1px solid var(--color-border-default)',
       }}
     >
       <h3
-        className="text-lg font-bold mb-4"
-        style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#9CA3AF',
-        }}
+        className="text-lg font-bold mb-4 font-display"
+        style={{ color: 'var(--color-text-secondary)' }}
       >
-        Establishing Connection
+        Loading Progress
       </h3>
       <ProgressBar
         value={30}
-        variant="striped"
-        label="Binding ethereal link..."
+        variant="arcane"
+        label="Connecting..."
         color="info"
       />
       <ProgressBar
         value={60}
-        variant="striped"
-        label="Channeling ancient knowledge..."
-        color="primary"
+        variant="arcane"
+        label="Loading assets..."
+        color="accent"
       />
       <ProgressBar
         value={90}
         variant="gradient"
-        label="The laboratory awakens..."
+        label="Almost ready..."
         color="success"
       />
     </div>
@@ -511,10 +495,10 @@ export const LoadingStates: Story = {
 };
 
 // ============================================================================
-// LABORATORY HEALTH
+// GAME STATUS
 // ============================================================================
 
-export const LaboratoryHealth: Story = {
+export const GameStatus: Story = {
   args: {
     value: 50,
   },
@@ -522,39 +506,38 @@ export const LaboratoryHealth: Story = {
     <div
       className="space-y-3 p-6 rounded-xl"
       style={{
-        background: '#0B0E14',
-        border: '1px solid #2D3548',
+        backgroundColor: 'var(--color-bg-primary)',
+        border: '1px solid var(--color-border-default)',
       }}
     >
       <h3
-        className="text-sm font-bold uppercase mb-2"
+        className="text-sm font-bold uppercase mb-2 font-display"
         style={{
-          fontFamily: '"Cinzel", Georgia, serif',
-          color: '#6B7280',
+          color: 'var(--color-text-muted)',
           letterSpacing: '0.1em',
         }}
       >
-        Laboratory Status
+        Game Status
       </h3>
       <ProgressBar
         value={45}
-        label="Essence Reserves"
+        label="Team Score"
         showValue
-        valueFormatter={(v) => `${v} units`}
-        color={45 > 80 ? 'error' : 45 > 60 ? 'warning' : 'success'}
+        valueFormatter={(v) => `${v} pts`}
+        color="success"
         size="sm"
       />
       <ProgressBar
         value={72}
-        label="Catalyst Purity"
+        label="Round Progress"
         showValue
         valueFormatter={(v) => `${v}%`}
-        color={72 > 80 ? 'error' : 72 > 60 ? 'warning' : 'success'}
+        color="warning"
         size="sm"
       />
       <ProgressBar
         value={23}
-        label="Ethereal Flow"
+        label="XP Progress"
         showValue
         valueFormatter={(v) => `${v}%`}
         color="info"

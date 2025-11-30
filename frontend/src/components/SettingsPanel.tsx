@@ -43,7 +43,7 @@ export function SettingsPanel({
   isSpectator = false,
   connectionStats
 }: SettingsPanelProps) {
-  const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled, beginnerMode, setBeginnerMode } = useSettings();
+  const { animationsEnabled, setAnimationsEnabled, beginnerMode, setBeginnerMode } = useSettings();
   const { skinId, setSkin, availableSkins } = useSkin();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
@@ -70,10 +70,10 @@ export function SettingsPanel({
     { id: 'advanced', label: 'Advanced', icon: '🔧' },
   ];
 
-  // Convert skins to Select options
+  // Convert skins to Select options (skin names already include emoji indicators)
   const skinOptions = availableSkins.map(skin => ({
     value: skin.id,
-    label: `${skin.isDark ? '🌙' : '☀️'} ${skin.name}`,
+    label: skin.name,
   }));
 
   const renderTabContent = () => {
@@ -203,24 +203,6 @@ export function SettingsPanel({
             <p className="text-sm text-[var(--color-text-muted)] mb-3">
               Advanced settings for power users
             </p>
-
-            {/* Dark Mode Toggle */}
-            <div className="flex items-center justify-between" data-testid="settings-dark-mode">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{darkMode ? '🌙' : '☀️'}</span>
-                <span className="text-[var(--color-text-primary)] font-semibold">Dark Mode</span>
-              </div>
-              <UIToggle enabled={darkMode} onChange={(v) => setDarkMode(v)} label="Dark Mode" />
-            </div>
-
-            {/* Animations Toggle */}
-            <div className="flex items-center justify-between" data-testid="settings-animations">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">✨</span>
-                <span className="text-[var(--color-text-primary)] font-semibold">Animations</span>
-              </div>
-              <UIToggle enabled={animationsEnabled} onChange={(v) => setAnimationsEnabled(v)} label="Animations" />
-            </div>
 
             {/* Connection Quality */}
             {connectionStats && (

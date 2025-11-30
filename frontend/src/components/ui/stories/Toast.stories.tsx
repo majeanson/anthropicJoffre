@@ -1,6 +1,8 @@
 /**
- * Toast Component Stories
- * Sprint 21 - Notification toast showcase
+ * Toast Component Stories - Multi-Skin Edition
+ *
+ * Notification toasts with proper CSS variable support for all themes.
+ * Switch skins using the paintbrush icon in the Storybook toolbar.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -12,6 +14,26 @@ const meta = {
   component: Toast,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: `
+# Toast Component
+
+Notification toasts with proper CSS variable support for all themes.
+
+## Features
+- **4 variants**: success, warning, error, info
+- **Auto-dismiss** with progress bar
+- **Manual close** button
+- **Custom icons**
+- **Slide-in animation**
+
+## Multi-Skin Support
+Switch skins using the paintbrush icon in the Storybook toolbar to preview
+how the component looks across all available themes.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {

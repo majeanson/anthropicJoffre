@@ -17,6 +17,7 @@ export type SkinId =
   | 'tavern-noir'
   | 'luxury-casino'
   | 'modern-minimal'
+  | 'modern-minimal-dark'
   | 'cyberpunk-neon'
   | 'classic-parchment';
 
@@ -179,7 +180,7 @@ export interface Skin {
 
 export const tavernNoirSkin: Skin = {
   id: 'tavern-noir',
-  name: 'Tavern Noir',
+  name: '🌙 Tavern Noir',
   description: 'Moody candlelit atmosphere with art deco elegance and mysterious shadows',
   preview: 'linear-gradient(135deg, #0d0c0a 0%, #1c1814 50%, #2a2118 100%)',
   isDark: true,
@@ -319,7 +320,7 @@ export const tavernNoirSkin: Skin = {
 
 export const luxuryCasinoSkin: Skin = {
   id: 'luxury-casino',
-  name: 'Luxury Casino',
+  name: '🌙 Luxury Casino',
   description: 'Sophisticated elegance with gold accents and velvet depth',
   preview: 'linear-gradient(135deg, #0a0908 0%, #1a1614 50%, #0a0908 100%)',
   isDark: true,
@@ -458,31 +459,31 @@ export const luxuryCasinoSkin: Skin = {
 
 export const modernMinimalSkin: Skin = {
   id: 'modern-minimal',
-  name: 'Modern Minimal',
+  name: '☀️ Modern Minimal',
   description: 'Clean lines, generous whitespace, and refined simplicity',
-  preview: 'linear-gradient(135deg, #f0eeec 0%, #e8e6e3 50%, #dddad6 100%)',
+  preview: 'linear-gradient(135deg, #f5f3f0 0%, #ebe8e4 50%, #e0ddd8 100%)',
   isDark: false,
 
   colors: {
     bg: {
-      primary: '#f0eeec',           // Warm off-white (less harsh)
-      secondary: '#f5f3f1',         // Slightly warmer white
-      tertiary: '#e8e6e3',          // Light warm gray
-      accent: '#18181b',            // Keep dark accent
-      overlay: 'rgba(240, 238, 236, 0.98)',
+      primary: '#f5f3f0',           // Softer warm cream (easier on eyes)
+      secondary: '#faf8f5',         // Light cream
+      tertiary: '#ebe8e4',          // Warm light gray
+      accent: '#374151',            // Softer dark gray (not pure black)
+      overlay: 'rgba(245, 243, 240, 0.98)',
     },
 
     text: {
-      primary: '#18181b',
-      secondary: '#52525b',
-      accent: '#0369a1',
-      inverse: '#fafaf9',
-      muted: '#a1a1aa',
+      primary: '#374151',           // Softer dark gray (not pure black)
+      secondary: '#6b7280',         // Medium gray
+      accent: '#0284c7',            // Slightly softer blue
+      inverse: '#faf8f5',
+      muted: '#9ca3af',
     },
 
     border: {
-      default: '#d4d4d8',
-      accent: '#18181b',
+      default: '#d1d5db',
+      accent: '#374151',
       subtle: '#e4e4e7',
     },
 
@@ -588,13 +589,149 @@ export const modernMinimalSkin: Skin = {
 };
 
 // ============================================================================
+// MODERN MINIMAL DARK SKIN
+// Clean, sharp design with dark mode - same aesthetic, inverted colors
+// ============================================================================
+
+export const modernMinimalDarkSkin: Skin = {
+  id: 'modern-minimal-dark',
+  name: '🌙 Modern Minimal Dark',
+  description: 'Clean minimalist design with a sleek dark interface',
+  preview: 'linear-gradient(135deg, #18181b 0%, #27272a 50%, #3f3f46 100%)',
+  isDark: true,
+
+  colors: {
+    bg: {
+      primary: '#18181b',           // Zinc-900
+      secondary: '#1f1f23',         // Slightly lighter
+      tertiary: '#27272a',          // Zinc-800
+      accent: '#f4f4f5',            // Light accent (inverted)
+      overlay: 'rgba(24, 24, 27, 0.98)',
+    },
+
+    text: {
+      primary: '#f4f4f5',           // Zinc-100
+      secondary: '#a1a1aa',         // Zinc-400
+      accent: '#38bdf8',            // Sky-400 (softer blue)
+      inverse: '#18181b',
+      muted: '#71717a',             // Zinc-500
+    },
+
+    border: {
+      default: '#3f3f46',           // Zinc-700
+      accent: '#f4f4f5',
+      subtle: '#27272a',
+    },
+
+    success: '#22c55e',             // Green-500
+    warning: '#f59e0b',             // Amber-500
+    error: '#ef4444',               // Red-500
+    info: '#38bdf8',                // Sky-400
+
+    team1: {
+      primary: '#ea580c',           // Orange-600
+      secondary: '#f97316',
+      text: '#ffffff',
+    },
+    team2: {
+      primary: '#6366f1',           // Indigo-500
+      secondary: '#818cf8',
+      text: '#ffffff',
+    },
+
+    suits: {
+      red: '#ef4444',
+      brown: '#a16207',
+      green: '#22c55e',
+      blue: '#38bdf8',
+    },
+
+    glow: '#38bdf8',
+    highlight: '#38bdf8',
+    shadow: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  typography: {
+    fontFamily: {
+      display: '"Inter", "SF Pro Display", -apple-system, sans-serif',
+      body: '"Inter", "SF Pro Text", -apple-system, sans-serif',
+      mono: '"JetBrains Mono", "SF Mono", monospace',
+    },
+    fontWeight: {
+      normal: 400,
+      medium: 500,
+      bold: 600,
+      black: 700,
+    },
+  },
+
+  effects: {
+    radius: {
+      sm: '6px',
+      md: '10px',
+      lg: '14px',
+      xl: '20px',
+      full: '9999px',
+    },
+
+    shadows: {
+      sm: '0 1px 3px rgba(0, 0, 0, 0.3)',
+      md: '0 4px 12px rgba(0, 0, 0, 0.4)',
+      lg: '0 12px 28px rgba(0, 0, 0, 0.5)',
+      glow: '0 0 0 3px rgba(56, 189, 248, 0.2)',
+      inset: 'inset 0 1px 3px rgba(0, 0, 0, 0.3)',
+    },
+
+    animations: {
+      duration: {
+        fast: '120ms',
+        normal: '200ms',
+        slow: '300ms',
+      },
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    },
+
+    specialEffects: {
+      scanlines: false,
+      noise: false,
+      glow: false,
+      pixelated: false,
+      gradientOverlay: false,
+    },
+  },
+
+  components: {
+    button: {
+      borderWidth: '1px',
+      textTransform: 'none',
+      letterSpacing: '-0.01em',
+    },
+    card: {
+      borderWidth: '1px',
+      bgColor: '#27272a',           // Dark card background
+      cornerRadius: '10px',
+    },
+    modal: {
+      backdropBlur: '20px',
+      borderWidth: '1px',
+    },
+    input: {
+      borderWidth: '1px',
+      focusRingWidth: '2px',
+    },
+  },
+
+  cssVariables: {},
+};
+
+// ============================================================================
 // CYBERPUNK NEON SKIN
 // Intense neon on dark, high contrast with digital glitch aesthetic
 // ============================================================================
 
 export const cyberpunkNeonSkin: Skin = {
   id: 'cyberpunk-neon',
-  name: 'Cyberpunk Neon',
+  name: '🌙 Cyberpunk Neon',
   description: 'High-contrast neon with digital glitch effects and electric intensity',
   preview: 'linear-gradient(135deg, #05050a 0%, #0a0a1a 50%, #050510 100%)',
   isDark: true,
@@ -735,7 +872,7 @@ export const cyberpunkNeonSkin: Skin = {
 
 export const classicParchmentSkin: Skin = {
   id: 'classic-parchment',
-  name: 'Classic Parchment',
+  name: '☀️ Classic Parchment',
   description: 'Traditional elegance with aged paper textures and classic typography',
   preview: 'linear-gradient(135deg, #e8dcc8 0%, #d9ccb4 50%, #c9bea8 100%)',
   isDark: false,
@@ -874,7 +1011,7 @@ export const classicParchmentSkin: Skin = {
 
 export const midnightAlchemySkin: Skin = {
   id: 'midnight-alchemy',
-  name: 'Midnight Alchemy',
+  name: '🌙 Midnight Alchemy',
   description: 'Mystical alchemist\'s study with ancient artifacts, copper accents, and ethereal glow',
   preview: 'linear-gradient(135deg, #0B0E14 0%, #131824 50%, #1A1F2E 100%)',
   isDark: true,
@@ -1017,6 +1154,7 @@ export const skins: Record<SkinId, Skin> = {
   'tavern-noir': tavernNoirSkin,
   'luxury-casino': luxuryCasinoSkin,
   'modern-minimal': modernMinimalSkin,
+  'modern-minimal-dark': modernMinimalDarkSkin,
   'cyberpunk-neon': cyberpunkNeonSkin,
   'classic-parchment': classicParchmentSkin,
 };
