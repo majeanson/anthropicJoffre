@@ -4,7 +4,7 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { GameHeader } from '../../GameHeader';
 
 const meta: Meta<typeof GameHeader> = {
@@ -114,7 +114,7 @@ export const WithScoreAnimation: Story = {
           onOpenFriends={() => {}}
           highestBet={{ amount: 10, withoutTrump: true, playerId: 'p1' }}
           trump="blue"
-          bettingTeamId: 2,
+          bettingTeamId={2}
         />
         <div className="p-4 flex gap-4 justify-center">
           <button
