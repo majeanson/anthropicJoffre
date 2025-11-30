@@ -7,6 +7,7 @@ import { SocketProvider } from './contexts/SocketContext';
 import { GameProvider } from './contexts/GameContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { AuthProvider } from './contexts/AuthContext'; // Sprint 3 Phase 1
+import { SkinProvider } from './contexts/SkinContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import logger from './utils/logger';
 import { initWebVitals } from './utils/webVitals';
@@ -53,15 +54,17 @@ initWebVitals();
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <AuthProvider>
-        <SocketProvider>
-          <GameProvider>
-            <SettingsProvider>
-              <App />
-            </SettingsProvider>
-          </GameProvider>
-        </SocketProvider>
-      </AuthProvider>
+      <SkinProvider>
+        <AuthProvider>
+          <SocketProvider>
+            <GameProvider>
+              <SettingsProvider>
+                <App />
+              </SettingsProvider>
+            </GameProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </SkinProvider>
     </ErrorBoundary>
   </React.StrictMode>,
 );

@@ -1,11 +1,11 @@
 /**
- * Skin System Configuration
+ * Skin System Configuration - Tavern Noir Edition
  *
  * A comprehensive theming system that allows users to choose from
  * multiple visual styles. Each skin defines colors, typography,
  * effects, and component-specific styling.
  *
- * Default skin: Retro Gaming (neon arcade aesthetic)
+ * Default skin: Tavern Noir (moody atmospheric card game aesthetic)
  */
 
 // ============================================================================
@@ -13,11 +13,12 @@
 // ============================================================================
 
 export type SkinId =
-  | 'retro-gaming'
+  | 'midnight-alchemy'
+  | 'tavern-noir'
   | 'luxury-casino'
   | 'modern-minimal'
   | 'cyberpunk-neon'
-  | 'classic-historic';
+  | 'classic-parchment';
 
 export interface SkinColors {
   // Background layers
@@ -172,73 +173,73 @@ export interface Skin {
 }
 
 // ============================================================================
-// RETRO GAMING SKIN (Default)
-// Neon arcade aesthetic with pixel-perfect vibes
+// TAVERN NOIR SKIN (Default)
+// Moody atmospheric card game with film noir + Victorian tavern aesthetic
 // ============================================================================
 
-export const retroGamingSkin: Skin = {
-  id: 'retro-gaming',
-  name: 'Retro Gaming',
-  description: 'Neon arcade aesthetic with pixel-perfect vibes and CRT glow effects',
-  preview: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)',
+export const tavernNoirSkin: Skin = {
+  id: 'tavern-noir',
+  name: 'Tavern Noir',
+  description: 'Moody candlelit atmosphere with art deco elegance and mysterious shadows',
+  preview: 'linear-gradient(135deg, #0d0c0a 0%, #1c1814 50%, #2a2118 100%)',
   isDark: true,
 
   colors: {
     bg: {
-      primary: '#0f0f23',           // Deep space blue-black
-      secondary: '#1a1a2e',         // Slightly lighter
-      tertiary: '#16213e',          // Card backgrounds
-      accent: '#e94560',            // Hot pink accent
-      overlay: 'rgba(15, 15, 35, 0.95)',
+      primary: '#0d0c0a',           // Deep charcoal-black
+      secondary: '#1c1814',         // Dark mahogany
+      tertiary: '#2a2118',          // Warm dark brown
+      accent: '#c9a227',            // Burnished gold
+      overlay: 'rgba(13, 12, 10, 0.96)',
     },
 
     text: {
-      primary: '#edf2f4',           // Bright white
-      secondary: '#8d99ae',         // Cool gray
-      accent: '#00fff5',            // Cyan neon
-      inverse: '#0f0f23',           // Dark for light backgrounds
-      muted: '#4a5568',             // Very subdued
+      primary: '#f4efe4',           // Warm ivory
+      secondary: '#a89b8a',         // Aged parchment
+      accent: '#c9a227',            // Burnished gold
+      inverse: '#0d0c0a',           // Deep charcoal
+      muted: '#6b5d4d',             // Dusty brown
     },
 
     border: {
-      default: '#2d3748',           // Subtle border
-      accent: '#e94560',            // Hot pink
-      subtle: '#1a202c',            // Nearly invisible
+      default: '#3d3429',           // Dark brass
+      accent: '#c9a227',            // Gold
+      subtle: '#261f19',            // Nearly invisible
     },
 
-    success: '#00ff88',             // Neon green
-    warning: '#ffbe0b',             // Arcade yellow
-    error: '#ff006e',               // Hot pink-red
-    info: '#00fff5',                // Cyan
+    success: '#4a9c6d',             // Muted emerald
+    warning: '#d4a03a',             // Amber candlelight
+    error: '#a63d3d',               // Deep crimson
+    info: '#5c8db8',                // Smoky blue
 
     team1: {
-      primary: '#ff6b35',           // Orange neon
-      secondary: '#f7931a',
-      text: '#ffffff',
+      primary: '#a63d3d',           // Crimson velvet
+      secondary: '#c45454',
+      text: '#f4efe4',
     },
     team2: {
-      primary: '#9d4edd',           // Purple neon
-      secondary: '#7b2cbf',
-      text: '#ffffff',
+      primary: '#3d6a8a',           // Midnight blue
+      secondary: '#4d82a6',
+      text: '#f4efe4',
     },
 
     suits: {
-      red: '#ff2a6d',               // Neon red
-      brown: '#d4a373',             // Warm brown (less neon)
-      green: '#05ffa1',             // Neon green
-      blue: '#00d4ff',              // Neon blue
+      red: '#b84444',               // Blood red
+      brown: '#8b6914',             // Dark amber
+      green: '#3d7a54',             // Forest green
+      blue: '#3d6a8a',              // Steel blue
     },
 
-    glow: '#00fff5',
-    highlight: '#e94560',
+    glow: '#c9a227',                // Gold candlelight
+    highlight: '#c9a227',
     shadow: '#000000',
   },
 
   typography: {
     fontFamily: {
-      display: '"Press Start 2P", "VT323", monospace',
-      body: '"VT323", "Roboto Mono", monospace',
-      mono: '"Roboto Mono", "Fira Code", monospace',
+      display: '"Playfair Display", "Crimson Text", Georgia, serif',
+      body: '"Crimson Text", "Georgia", serif',
+      mono: '"JetBrains Mono", "Fira Code", monospace',
     },
     fontWeight: {
       normal: 400,
@@ -250,52 +251,52 @@ export const retroGamingSkin: Skin = {
 
   effects: {
     radius: {
-      sm: '2px',                    // Pixel-perfect small
-      md: '4px',                    // Subtle rounding
-      lg: '8px',                    // Cards, buttons
-      xl: '12px',                   // Modals
-      full: '9999px',               // Pills
+      sm: '3px',
+      md: '6px',
+      lg: '10px',
+      xl: '16px',
+      full: '9999px',
     },
 
     shadows: {
-      sm: '0 2px 4px rgba(0, 0, 0, 0.5)',
-      md: '0 4px 12px rgba(0, 0, 0, 0.6)',
-      lg: '0 8px 24px rgba(0, 0, 0, 0.7)',
-      glow: '0 0 20px rgba(0, 255, 245, 0.4), 0 0 40px rgba(0, 255, 245, 0.2)',
-      inset: 'inset 0 2px 4px rgba(0, 0, 0, 0.4)',
+      sm: '0 2px 8px rgba(0, 0, 0, 0.4)',
+      md: '0 4px 16px rgba(0, 0, 0, 0.5)',
+      lg: '0 8px 32px rgba(0, 0, 0, 0.6), 0 0 80px rgba(201, 162, 39, 0.08)',
+      glow: '0 0 20px rgba(201, 162, 39, 0.25), 0 0 60px rgba(201, 162, 39, 0.1)',
+      inset: 'inset 0 2px 8px rgba(0, 0, 0, 0.5)',
     },
 
     animations: {
       duration: {
-        fast: '150ms',
-        normal: '300ms',
-        slow: '500ms',
+        fast: '180ms',
+        normal: '350ms',
+        slow: '600ms',
       },
       easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
 
     specialEffects: {
-      scanlines: true,
-      noise: true,
-      glow: true,
+      scanlines: false,
+      noise: true,              // Subtle grain texture
+      glow: true,               // Candlelight glow
       pixelated: false,
-      gradientOverlay: true,
+      gradientOverlay: true,    // Vignette effect
     },
   },
 
   components: {
     button: {
-      borderWidth: '3px',
+      borderWidth: '2px',
       textTransform: 'uppercase',
-      letterSpacing: '0.1em',
+      letterSpacing: '0.12em',
     },
     card: {
-      borderWidth: '4px',
-      bgColor: '#1a1a2e',
+      borderWidth: '3px',
+      bgColor: '#f8f4e8',
       cornerRadius: '8px',
     },
     modal: {
-      backdropBlur: '8px',
+      backdropBlur: '12px',
       borderWidth: '2px',
     },
     input: {
@@ -305,46 +306,45 @@ export const retroGamingSkin: Skin = {
   },
 
   cssVariables: {
-    '--skin-scanline-opacity': '0.03',
-    '--skin-noise-opacity': '0.02',
-    '--skin-glow-intensity': '1',
-    '--skin-crt-curve': '0',
+    '--skin-noise-opacity': '0.04',
+    '--skin-vignette-intensity': '0.6',
+    '--skin-candlelight-flicker': '1',
   },
 };
 
 // ============================================================================
 // LUXURY CASINO SKIN
-// Sophisticated, dark with gold accents
+// Sophisticated, dark with gold accents and velvet textures
 // ============================================================================
 
 export const luxuryCasinoSkin: Skin = {
   id: 'luxury-casino',
   name: 'Luxury Casino',
-  description: 'Sophisticated elegance with gold accents and felt textures',
-  preview: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
+  description: 'Sophisticated elegance with gold accents and velvet depth',
+  preview: 'linear-gradient(135deg, #0a0908 0%, #1a1614 50%, #0a0908 100%)',
   isDark: true,
 
   colors: {
     bg: {
-      primary: '#0d0d0d',           // Near black
-      secondary: '#1a1a1a',         // Rich black
-      tertiary: '#2d2d2d',          // Card backgrounds
-      accent: '#d4af37',            // Gold
-      overlay: 'rgba(13, 13, 13, 0.95)',
+      primary: '#0a0908',           // Near black with warmth
+      secondary: '#141210',         // Rich black
+      tertiary: '#1e1a16',          // Card backgrounds
+      accent: '#d4af37',            // Pure gold
+      overlay: 'rgba(10, 9, 8, 0.96)',
     },
 
     text: {
-      primary: '#f5f5f5',           // Off-white
-      secondary: '#a0a0a0',         // Silver gray
+      primary: '#f5f0e6',           // Cream white
+      secondary: '#9a9080',         // Warm gray
       accent: '#d4af37',            // Gold
-      inverse: '#0d0d0d',           // Dark
-      muted: '#666666',             // Subdued
+      inverse: '#0a0908',           // Dark
+      muted: '#5a5448',             // Subdued
     },
 
     border: {
-      default: '#333333',
+      default: '#2e2820',
       accent: '#d4af37',
-      subtle: '#222222',
+      subtle: '#1a1612',
     },
 
     success: '#2ecc71',
@@ -353,21 +353,21 @@ export const luxuryCasinoSkin: Skin = {
     info: '#3498db',
 
     team1: {
-      primary: '#c0392b',           // Deep red
-      secondary: '#e74c3c',
+      primary: '#9b2335',           // Deep burgundy
+      secondary: '#b83347',
       text: '#ffffff',
     },
     team2: {
-      primary: '#2980b9',           // Royal blue
-      secondary: '#3498db',
+      primary: '#1e3a5f',           // Navy blue
+      secondary: '#2a4f7f',
       text: '#ffffff',
     },
 
     suits: {
-      red: '#c0392b',
-      brown: '#8b4513',
-      green: '#27ae60',
-      blue: '#2980b9',
+      red: '#9b2335',
+      brown: '#8b6914',
+      green: '#1a6b4a',
+      blue: '#1e3a5f',
     },
 
     glow: '#d4af37',
@@ -394,16 +394,16 @@ export const luxuryCasinoSkin: Skin = {
       sm: '4px',
       md: '8px',
       lg: '12px',
-      xl: '16px',
+      xl: '20px',
       full: '9999px',
     },
 
     shadows: {
-      sm: '0 2px 4px rgba(0, 0, 0, 0.3)',
-      md: '0 4px 12px rgba(0, 0, 0, 0.4)',
-      lg: '0 8px 24px rgba(0, 0, 0, 0.5)',
-      glow: '0 0 20px rgba(212, 175, 55, 0.3)',
-      inset: 'inset 0 2px 4px rgba(0, 0, 0, 0.2)',
+      sm: '0 2px 6px rgba(0, 0, 0, 0.35)',
+      md: '0 4px 16px rgba(0, 0, 0, 0.45)',
+      lg: '0 8px 32px rgba(0, 0, 0, 0.55), 0 0 60px rgba(212, 175, 55, 0.06)',
+      glow: '0 0 30px rgba(212, 175, 55, 0.25)',
+      inset: 'inset 0 2px 6px rgba(0, 0, 0, 0.3)',
     },
 
     animations: {
@@ -417,10 +417,10 @@ export const luxuryCasinoSkin: Skin = {
 
     specialEffects: {
       scanlines: false,
-      noise: true,           // Felt texture
+      noise: true,
       glow: true,
       pixelated: false,
-      gradientOverlay: false,
+      gradientOverlay: true,
     },
   },
 
@@ -431,12 +431,12 @@ export const luxuryCasinoSkin: Skin = {
       letterSpacing: '0.15em',
     },
     card: {
-      borderWidth: '3px',
-      bgColor: '#1a1a1a',
-      cornerRadius: '12px',
+      borderWidth: '2px',
+      bgColor: '#f5f0e6',
+      cornerRadius: '10px',
     },
     modal: {
-      backdropBlur: '12px',
+      backdropBlur: '16px',
       borderWidth: '1px',
     },
     input: {
@@ -446,79 +446,79 @@ export const luxuryCasinoSkin: Skin = {
   },
 
   cssVariables: {
-    '--skin-felt-texture': 'url("/textures/felt.png")',
+    '--skin-noise-opacity': '0.025',
     '--skin-gold-shimmer': '1',
   },
 };
 
 // ============================================================================
 // MODERN MINIMAL SKIN
-// Clean, sharp, lots of whitespace
+// Clean, sharp, generous whitespace with subtle warmth
 // ============================================================================
 
 export const modernMinimalSkin: Skin = {
   id: 'modern-minimal',
   name: 'Modern Minimal',
-  description: 'Clean lines, generous whitespace, and subtle elegance',
-  preview: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #e9ecef 100%)',
+  description: 'Clean lines, generous whitespace, and refined simplicity',
+  preview: 'linear-gradient(135deg, #fafaf9 0%, #f5f5f4 50%, #e7e5e4 100%)',
   isDark: false,
 
   colors: {
     bg: {
-      primary: '#ffffff',
-      secondary: '#f8f9fa',
-      tertiary: '#e9ecef',
-      accent: '#212529',
-      overlay: 'rgba(255, 255, 255, 0.98)',
+      primary: '#fafaf9',
+      secondary: '#f5f5f4',
+      tertiary: '#e7e5e4',
+      accent: '#18181b',
+      overlay: 'rgba(250, 250, 249, 0.98)',
     },
 
     text: {
-      primary: '#212529',
-      secondary: '#6c757d',
-      accent: '#0066cc',
-      inverse: '#ffffff',
-      muted: '#adb5bd',
+      primary: '#18181b',
+      secondary: '#52525b',
+      accent: '#0369a1',
+      inverse: '#fafaf9',
+      muted: '#a1a1aa',
     },
 
     border: {
-      default: '#dee2e6',
-      accent: '#212529',
-      subtle: '#f1f3f5',
+      default: '#d4d4d8',
+      accent: '#18181b',
+      subtle: '#e4e4e7',
     },
 
-    success: '#198754',
-    warning: '#fd7e14',
-    error: '#dc3545',
-    info: '#0dcaf0',
+    success: '#15803d',
+    warning: '#b45309',
+    error: '#b91c1c',
+    info: '#0369a1',
 
     team1: {
-      primary: '#fd7e14',
-      secondary: '#ffc107',
-      text: '#212529',
+      primary: '#c2410c',
+      secondary: '#ea580c',
+      text: '#ffffff',
     },
     team2: {
-      primary: '#6f42c1',
-      secondary: '#9775fa',
+      primary: '#4338ca',
+      secondary: '#6366f1',
       text: '#ffffff',
     },
 
     suits: {
-      red: '#dc3545',
-      brown: '#795548',
-      green: '#198754',
-      blue: '#0d6efd',
+      red: '#b91c1c',
+      brown: '#78350f',
+      green: '#15803d',
+      blue: '#0369a1',
     },
 
-    glow: '#0066cc',
-    highlight: '#0066cc',
-    shadow: 'rgba(0, 0, 0, 0.1)',
+    glow: '#0369a1',
+    highlight: '#0369a1',
+    shadow: 'rgba(0, 0, 0, 0.08)',
   },
 
   typography: {
     fontFamily: {
       display: '"Inter", "SF Pro Display", -apple-system, sans-serif',
       body: '"Inter", "SF Pro Text", -apple-system, sans-serif',
-      mono: '"SF Mono", "Fira Code", monospace',
+      mono: '"JetBrains Mono", "SF Mono", monospace',
     },
     fontWeight: {
       normal: 400,
@@ -531,25 +531,25 @@ export const modernMinimalSkin: Skin = {
   effects: {
     radius: {
       sm: '6px',
-      md: '12px',
-      lg: '16px',
-      xl: '24px',
+      md: '10px',
+      lg: '14px',
+      xl: '20px',
       full: '9999px',
     },
 
     shadows: {
-      sm: '0 1px 2px rgba(0, 0, 0, 0.05)',
-      md: '0 4px 6px rgba(0, 0, 0, 0.07)',
-      lg: '0 10px 15px rgba(0, 0, 0, 0.1)',
-      glow: '0 0 0 3px rgba(0, 102, 204, 0.15)',
-      inset: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
+      sm: '0 1px 2px rgba(0, 0, 0, 0.04)',
+      md: '0 4px 8px rgba(0, 0, 0, 0.06)',
+      lg: '0 12px 24px rgba(0, 0, 0, 0.08)',
+      glow: '0 0 0 3px rgba(3, 105, 161, 0.12)',
+      inset: 'inset 0 1px 2px rgba(0, 0, 0, 0.04)',
     },
 
     animations: {
       duration: {
-        fast: '150ms',
-        normal: '250ms',
-        slow: '350ms',
+        fast: '120ms',
+        normal: '200ms',
+        slow: '300ms',
       },
       easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
     },
@@ -572,7 +572,7 @@ export const modernMinimalSkin: Skin = {
     card: {
       borderWidth: '1px',
       bgColor: '#ffffff',
-      cornerRadius: '12px',
+      cornerRadius: '10px',
     },
     modal: {
       backdropBlur: '20px',
@@ -589,64 +589,64 @@ export const modernMinimalSkin: Skin = {
 
 // ============================================================================
 // CYBERPUNK NEON SKIN
-// Intense neon on dark, high contrast
+// Intense neon on dark, high contrast with digital glitch aesthetic
 // ============================================================================
 
 export const cyberpunkNeonSkin: Skin = {
   id: 'cyberpunk-neon',
   name: 'Cyberpunk Neon',
-  description: 'High-contrast neon colors with intense glow effects',
-  preview: 'linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0a1a2e 100%)',
+  description: 'High-contrast neon with digital glitch effects and electric intensity',
+  preview: 'linear-gradient(135deg, #05050a 0%, #0a0a1a 50%, #050510 100%)',
   isDark: true,
 
   colors: {
     bg: {
-      primary: '#0a0a0a',
-      secondary: '#121212',
-      tertiary: '#1a1a2e',
-      accent: '#ff00ff',
-      overlay: 'rgba(10, 10, 10, 0.95)',
+      primary: '#05050a',
+      secondary: '#0a0a14',
+      tertiary: '#10101e',
+      accent: '#ff0080',
+      overlay: 'rgba(5, 5, 10, 0.96)',
     },
 
     text: {
-      primary: '#ffffff',
-      secondary: '#b0b0b0',
+      primary: '#f0f0f5',
+      secondary: '#8888a0',
       accent: '#00ffff',
-      inverse: '#0a0a0a',
-      muted: '#505050',
+      inverse: '#05050a',
+      muted: '#404060',
     },
 
     border: {
-      default: '#333333',
-      accent: '#ff00ff',
-      subtle: '#1a1a1a',
+      default: '#202040',
+      accent: '#ff0080',
+      subtle: '#101020',
     },
 
-    success: '#00ff00',
-    warning: '#ffff00',
-    error: '#ff0000',
+    success: '#00ff88',
+    warning: '#ffcc00',
+    error: '#ff0044',
     info: '#00ffff',
 
     team1: {
       primary: '#ff6600',
-      secondary: '#ff9900',
+      secondary: '#ff8833',
       text: '#000000',
     },
     team2: {
-      primary: '#cc00ff',
-      secondary: '#9900ff',
+      primary: '#9900ff',
+      secondary: '#bb44ff',
       text: '#ffffff',
     },
 
     suits: {
       red: '#ff0044',
       brown: '#cc6600',
-      green: '#00ff44',
-      blue: '#0088ff',
+      green: '#00ff88',
+      blue: '#00aaff',
     },
 
     glow: '#00ffff',
-    highlight: '#ff00ff',
+    highlight: '#ff0080',
     shadow: '#000000',
   },
 
@@ -666,26 +666,26 @@ export const cyberpunkNeonSkin: Skin = {
 
   effects: {
     radius: {
-      sm: '0px',                    // Sharp edges
-      md: '2px',
-      lg: '4px',
+      sm: '2px',
+      md: '4px',
+      lg: '6px',
       xl: '8px',
       full: '9999px',
     },
 
     shadows: {
-      sm: '0 0 10px rgba(255, 0, 255, 0.3)',
-      md: '0 0 20px rgba(255, 0, 255, 0.4)',
-      lg: '0 0 40px rgba(255, 0, 255, 0.5)',
-      glow: '0 0 30px rgba(0, 255, 255, 0.6), 0 0 60px rgba(0, 255, 255, 0.3)',
-      inset: 'inset 0 0 10px rgba(255, 0, 255, 0.2)',
+      sm: '0 0 10px rgba(0, 255, 255, 0.2)',
+      md: '0 0 20px rgba(255, 0, 128, 0.25)',
+      lg: '0 0 40px rgba(0, 255, 255, 0.3), 0 0 80px rgba(255, 0, 128, 0.15)',
+      glow: '0 0 30px rgba(0, 255, 255, 0.5), 0 0 60px rgba(0, 255, 255, 0.25)',
+      inset: 'inset 0 0 20px rgba(0, 255, 255, 0.1)',
     },
 
     animations: {
       duration: {
-        fast: '100ms',
-        normal: '200ms',
-        slow: '400ms',
+        fast: '80ms',
+        normal: '150ms',
+        slow: '300ms',
       },
       easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
@@ -707,11 +707,11 @@ export const cyberpunkNeonSkin: Skin = {
     },
     card: {
       borderWidth: '2px',
-      bgColor: '#121212',
+      bgColor: '#0a0a14',
       cornerRadius: '4px',
     },
     modal: {
-      backdropBlur: '4px',
+      backdropBlur: '8px',
       borderWidth: '2px',
     },
     input: {
@@ -721,73 +721,74 @@ export const cyberpunkNeonSkin: Skin = {
   },
 
   cssVariables: {
-    '--skin-scanline-opacity': '0.05',
-    '--skin-noise-opacity': '0.03',
+    '--skin-scanline-opacity': '0.04',
+    '--skin-noise-opacity': '0.025',
     '--skin-glow-intensity': '1.5',
+    '--skin-glitch-intensity': '1',
   },
 };
 
 // ============================================================================
-// CLASSIC HISTORIC SKIN
-// Traditional card game aesthetic (original theme updated)
+// CLASSIC PARCHMENT SKIN
+// Traditional card game aesthetic with warm parchment and ink
 // ============================================================================
 
-export const classicHistoricSkin: Skin = {
-  id: 'classic-historic',
-  name: 'Classic Historic',
-  description: 'Traditional card game aesthetic with parchment and rich wood tones',
-  preview: 'linear-gradient(135deg, #F5F1E8 0%, #EBE4D7 50%, #D9C1A1 100%)',
+export const classicParchmentSkin: Skin = {
+  id: 'classic-parchment',
+  name: 'Classic Parchment',
+  description: 'Traditional elegance with aged paper textures and classic typography',
+  preview: 'linear-gradient(135deg, #f7f3eb 0%, #ebe5d9 50%, #ddd5c3 100%)',
   isDark: false,
 
   colors: {
     bg: {
-      primary: '#F5F1E8',           // Warm parchment
-      secondary: '#FDFCFA',         // Light parchment
-      tertiary: '#EBE4D7',          // Slightly darker
-      accent: '#B82020',            // Deep crimson
-      overlay: 'rgba(245, 241, 232, 0.98)',
+      primary: '#f7f3eb',
+      secondary: '#fdfbf7',
+      tertiary: '#ebe5d9',
+      accent: '#8b2323',
+      overlay: 'rgba(247, 243, 235, 0.98)',
     },
 
     text: {
-      primary: '#5A3922',           // Dark umber
-      secondary: '#85532A',         // Medium brown
-      accent: '#B82020',            // Crimson
-      inverse: '#FDFCFA',           // Light
-      muted: '#A06730',             // Subdued brown
+      primary: '#3d3428',
+      secondary: '#5e5344',
+      accent: '#8b2323',
+      inverse: '#fdfbf7',
+      muted: '#8a7e6c',
     },
 
     border: {
-      default: '#D9C1A1',           // Warm border
-      accent: '#B82020',            // Crimson
-      subtle: '#EBE4D7',            // Very subtle
+      default: '#c9bea8',
+      accent: '#8b2323',
+      subtle: '#ddd5c3',
     },
 
-    success: '#357A49',             // Forest green
-    warning: '#B8864D',             // Amber
-    error: '#B82020',               // Crimson
-    info: '#1F5FA4',                // Sapphire
+    success: '#2d6a4f',
+    warning: '#b07d2b',
+    error: '#8b2323',
+    info: '#1e5c8a',
 
     team1: {
-      primary: '#B82020',           // Crimson
-      secondary: '#D63939',
-      text: '#ffffff',
+      primary: '#8b2323',
+      secondary: '#a63a3a',
+      text: '#fdfbf7',
     },
     team2: {
-      primary: '#1F5FA4',           // Sapphire
-      secondary: '#2E79C2',
-      text: '#ffffff',
+      primary: '#1e5c8a',
+      secondary: '#2874a6',
+      text: '#fdfbf7',
     },
 
     suits: {
-      red: '#B82020',
-      brown: '#6D4427',
-      green: '#357A49',
-      blue: '#1F5FA4',
+      red: '#8b2323',
+      brown: '#6b4423',
+      green: '#2d6a4f',
+      blue: '#1e5c8a',
     },
 
-    glow: '#D4AF37',                // Gold glow
-    highlight: '#B82020',
-    shadow: 'rgba(90, 57, 34, 0.2)',
+    glow: '#d4af37',
+    highlight: '#8b2323',
+    shadow: 'rgba(61, 52, 40, 0.15)',
   },
 
   typography: {
@@ -814,25 +815,25 @@ export const classicHistoricSkin: Skin = {
     },
 
     shadows: {
-      sm: '0 2px 4px rgba(90, 57, 34, 0.1)',
-      md: '0 4px 8px rgba(90, 57, 34, 0.15)',
-      lg: '0 8px 16px rgba(90, 57, 34, 0.2)',
-      glow: '0 0 20px rgba(212, 175, 55, 0.2)',
-      inset: 'inset 0 2px 4px rgba(90, 57, 34, 0.1)',
+      sm: '0 2px 6px rgba(61, 52, 40, 0.1)',
+      md: '0 4px 12px rgba(61, 52, 40, 0.12)',
+      lg: '0 8px 24px rgba(61, 52, 40, 0.15)',
+      glow: '0 0 20px rgba(212, 175, 55, 0.15)',
+      inset: 'inset 0 2px 6px rgba(61, 52, 40, 0.08)',
     },
 
     animations: {
       duration: {
-        fast: '200ms',
-        normal: '350ms',
-        slow: '500ms',
+        fast: '180ms',
+        normal: '300ms',
+        slow: '450ms',
       },
       easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
     },
 
     specialEffects: {
       scanlines: false,
-      noise: true,           // Paper texture
+      noise: true,
       glow: false,
       pixelated: false,
       gradientOverlay: false,
@@ -846,12 +847,12 @@ export const classicHistoricSkin: Skin = {
       letterSpacing: '0.02em',
     },
     card: {
-      borderWidth: '3px',
-      bgColor: '#d6ccba',
+      borderWidth: '2px',
+      bgColor: '#fdfbf7',
       cornerRadius: '8px',
     },
     modal: {
-      backdropBlur: '8px',
+      backdropBlur: '10px',
       borderWidth: '2px',
     },
     input: {
@@ -861,7 +862,149 @@ export const classicHistoricSkin: Skin = {
   },
 
   cssVariables: {
-    '--skin-paper-texture': 'url("/textures/parchment.png")',
+    '--skin-noise-opacity': '0.035',
+    '--skin-paper-warmth': '1',
+  },
+};
+
+// ============================================================================
+// MIDNIGHT ALCHEMY SKIN (New Default)
+// Mystical alchemist's study - occult manuscripts, brass instruments, ethereal glow
+// ============================================================================
+
+export const midnightAlchemySkin: Skin = {
+  id: 'midnight-alchemy',
+  name: 'Midnight Alchemy',
+  description: 'Mystical alchemist\'s study with ancient artifacts, copper accents, and ethereal glow',
+  preview: 'linear-gradient(135deg, #0B0E14 0%, #131824 50%, #1A1F2E 100%)',
+  isDark: true,
+
+  colors: {
+    bg: {
+      primary: '#0B0E14',           // Deep midnight void
+      secondary: '#131824',         // Alchemist's chamber
+      tertiary: '#1A1F2E',          // Workbench shadow
+      accent: '#C17F59',            // Burnished copper
+      overlay: 'rgba(11, 14, 20, 0.96)',
+    },
+
+    text: {
+      primary: '#E8E4DC',           // Aged manuscript
+      secondary: '#9CA3AF',         // Faded ink
+      accent: '#D4A574',            // Rose gold illumination
+      inverse: '#0B0E14',           // Deep void
+      muted: '#6B7280',             // Weathered text
+    },
+
+    border: {
+      default: '#2D3548',           // Brass patina
+      accent: '#C17F59',            // Polished copper
+      subtle: '#1F2937',            // Shadow edge
+    },
+
+    success: '#2DD4BF',             // Alchemical teal (transmutation)
+    warning: '#F59E0B',             // Molten gold
+    error: '#DC2626',               // Dragon's blood
+    info: '#60A5FA',                // Celestial blue
+
+    team1: {
+      primary: '#B45309',           // Ember orange
+      secondary: '#D97706',
+      text: '#FEF3C7',
+    },
+    team2: {
+      primary: '#7C3AED',           // Mystic violet
+      secondary: '#8B5CF6',
+      text: '#F5F3FF',
+    },
+
+    suits: {
+      red: '#DC2626',               // Ruby essence
+      brown: '#B45309',             // Amber resin
+      green: '#059669',             // Emerald elixir
+      blue: '#2563EB',              // Sapphire tincture
+    },
+
+    glow: '#D4A574',                // Rose gold ethereal
+    highlight: '#C17F59',           // Copper luminance
+    shadow: '#000000',
+  },
+
+  typography: {
+    fontFamily: {
+      display: '"Cinzel Decorative", "Cinzel", Georgia, serif',
+      body: '"Cormorant Garamond", "Georgia", serif',
+      mono: '"Fira Code", "JetBrains Mono", monospace',
+    },
+    fontWeight: {
+      normal: 400,
+      medium: 500,
+      bold: 700,
+      black: 900,
+    },
+  },
+
+  effects: {
+    radius: {
+      sm: '4px',
+      md: '8px',
+      lg: '12px',
+      xl: '20px',
+      full: '9999px',
+    },
+
+    shadows: {
+      sm: '0 2px 8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(193, 127, 89, 0.05)',
+      md: '0 4px 16px rgba(0, 0, 0, 0.6), 0 0 30px rgba(193, 127, 89, 0.08)',
+      lg: '0 8px 32px rgba(0, 0, 0, 0.7), 0 0 60px rgba(212, 165, 116, 0.1)',
+      glow: '0 0 30px rgba(212, 165, 116, 0.3), 0 0 60px rgba(193, 127, 89, 0.15)',
+      inset: 'inset 0 2px 8px rgba(0, 0, 0, 0.5)',
+    },
+
+    animations: {
+      duration: {
+        fast: '150ms',
+        normal: '300ms',
+        slow: '500ms',
+      },
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+
+    specialEffects: {
+      scanlines: false,
+      noise: true,
+      glow: true,
+      pixelated: false,
+      gradientOverlay: true,
+    },
+  },
+
+  components: {
+    button: {
+      borderWidth: '2px',
+      textTransform: 'uppercase',
+      letterSpacing: '0.15em',
+    },
+    card: {
+      borderWidth: '2px',
+      bgColor: '#F5F0E6',
+      cornerRadius: '10px',
+    },
+    modal: {
+      backdropBlur: '16px',
+      borderWidth: '2px',
+    },
+    input: {
+      borderWidth: '2px',
+      focusRingWidth: '3px',
+    },
+  },
+
+  cssVariables: {
+    '--skin-noise-opacity': '0.03',
+    '--skin-vignette-intensity': '0.5',
+    '--skin-particle-opacity': '0.4',
+    '--skin-glow-intensity': '1.2',
   },
 };
 
@@ -870,16 +1013,17 @@ export const classicHistoricSkin: Skin = {
 // ============================================================================
 
 export const skins: Record<SkinId, Skin> = {
-  'retro-gaming': retroGamingSkin,
+  'midnight-alchemy': midnightAlchemySkin,
+  'tavern-noir': tavernNoirSkin,
   'luxury-casino': luxuryCasinoSkin,
   'modern-minimal': modernMinimalSkin,
   'cyberpunk-neon': cyberpunkNeonSkin,
-  'classic-historic': classicHistoricSkin,
+  'classic-parchment': classicParchmentSkin,
 };
 
 export const skinList: Skin[] = Object.values(skins);
 
-export const defaultSkinId: SkinId = 'retro-gaming';
+export const defaultSkinId: SkinId = 'midnight-alchemy';
 
 // ============================================================================
 // UTILITY FUNCTIONS

@@ -1,17 +1,15 @@
 /**
- * ProgressBar Component
- * Storybook UI Component
+ * ProgressBar Component - Midnight Alchemy Edition
  *
- * Unified progress bar with multiple variants and animations.
- * Used for loading states, achievements, quests, and form validation.
+ * Mystical progress bar with ethereal glows and alchemical aesthetics.
+ * Features transmutation-style animations and brass accents.
  *
  * Features:
- * - 3 variants: default, gradient, striped
+ * - 3 variants: default, gradient, arcane (striped with glow)
  * - 3 sizes: sm, md, lg
- * - Color themes
- * - Animated transitions
+ * - Color themes with elemental glows
+ * - Animated transitions like transmutation
  * - Optional label and value display
- * - Dark mode support
  *
  * Usage:
  * ```tsx
@@ -20,17 +18,17 @@
  * <ProgressBar
  *   value={5}
  *   max={10}
- *   label="Quest Progress"
+ *   label="Transmutation Progress"
  *   showValue
- *   variant="gradient"
- *   color="success"
+ *   variant="arcane"
+ *   color="accent"
  * />
  * ```
  */
 
-export type ProgressBarVariant = 'default' | 'gradient' | 'striped';
+export type ProgressBarVariant = 'default' | 'gradient' | 'arcane';
 export type ProgressBarSize = 'sm' | 'md' | 'lg';
-export type ProgressBarColor = 'primary' | 'success' | 'warning' | 'error' | 'info' | 'gray';
+export type ProgressBarColor = 'accent' | 'success' | 'warning' | 'error' | 'info' | 'muted';
 
 export interface ProgressBarProps {
   /** Current value */
@@ -57,44 +55,53 @@ export interface ProgressBarProps {
 
 const sizeClasses: Record<ProgressBarSize, { bar: string; text: string }> = {
   sm: { bar: 'h-1.5', text: 'text-xs' },
-  md: { bar: 'h-2', text: 'text-sm' },
-  lg: { bar: 'h-3', text: 'text-base' },
+  md: { bar: 'h-3', text: 'text-sm' },
+  lg: { bar: 'h-4', text: 'text-base' },
 };
 
-const colorClasses: Record<ProgressBarColor, { bg: string; track: string }> = {
-  primary: {
-    bg: 'bg-blue-500 dark:bg-blue-400',
-    track: 'bg-blue-100 dark:bg-blue-900/30',
+// Color styles with Midnight Alchemy ethereal glows
+const colorStyles: Record<ProgressBarColor, {
+  fill: string;
+  track: string;
+  glow: string;
+  gradient: string;
+}> = {
+  accent: {
+    fill: '#C17F59',
+    track: '#1A1F2E',
+    glow: 'rgba(193, 127, 89, 0.5)',
+    gradient: 'linear-gradient(90deg, #C17F59, #D4A574, #C17F59)',
   },
   success: {
-    bg: 'bg-green-500 dark:bg-green-400',
-    track: 'bg-green-100 dark:bg-green-900/30',
+    fill: '#4A9C6D',
+    track: '#1A1F2E',
+    glow: 'rgba(74, 156, 109, 0.5)',
+    gradient: 'linear-gradient(90deg, #3d8b63, #4A9C6D, #5AAD7D)',
   },
   warning: {
-    bg: 'bg-yellow-500 dark:bg-yellow-400',
-    track: 'bg-yellow-100 dark:bg-yellow-900/30',
+    fill: '#D4A574',
+    track: '#1A1F2E',
+    glow: 'rgba(212, 165, 116, 0.5)',
+    gradient: 'linear-gradient(90deg, #C99227, #D4A574, #E6C557)',
   },
   error: {
-    bg: 'bg-red-500 dark:bg-red-400',
-    track: 'bg-red-100 dark:bg-red-900/30',
+    fill: '#A63D3D',
+    track: '#1A1F2E',
+    glow: 'rgba(166, 61, 61, 0.5)',
+    gradient: 'linear-gradient(90deg, #8B3D3D, #A63D3D, #C54545)',
   },
   info: {
-    bg: 'bg-cyan-500 dark:bg-cyan-400',
-    track: 'bg-cyan-100 dark:bg-cyan-900/30',
+    fill: '#4682B4',
+    track: '#1A1F2E',
+    glow: 'rgba(70, 130, 180, 0.5)',
+    gradient: 'linear-gradient(90deg, #3D6B8B, #4682B4, #5A9FD4)',
   },
-  gray: {
-    bg: 'bg-gray-500 dark:bg-gray-400',
-    track: 'bg-gray-200 dark:bg-gray-700',
+  muted: {
+    fill: '#6B7280',
+    track: '#1A1F2E',
+    glow: 'rgba(107, 114, 128, 0.3)',
+    gradient: 'linear-gradient(90deg, #4A4A4A, #6B7280, #8A8A8A)',
   },
-};
-
-const gradientClasses: Record<ProgressBarColor, string> = {
-  primary: 'bg-gradient-to-r from-blue-400 to-blue-600 dark:from-blue-500 dark:to-blue-700',
-  success: 'bg-gradient-to-r from-green-400 to-green-600 dark:from-green-500 dark:to-green-700',
-  warning: 'bg-gradient-to-r from-yellow-400 to-yellow-600 dark:from-yellow-500 dark:to-yellow-700',
-  error: 'bg-gradient-to-r from-red-400 to-red-600 dark:from-red-500 dark:to-red-700',
-  info: 'bg-gradient-to-r from-cyan-400 to-cyan-600 dark:from-cyan-500 dark:to-cyan-700',
-  gray: 'bg-gradient-to-r from-gray-400 to-gray-600 dark:from-gray-500 dark:to-gray-700',
 };
 
 export function ProgressBar({
@@ -102,7 +109,7 @@ export function ProgressBar({
   max = 100,
   variant = 'default',
   size = 'md',
-  color = 'primary',
+  color = 'accent',
   label,
   showValue = false,
   valueFormatter,
@@ -118,28 +125,64 @@ export function ProgressBar({
     : `${Math.round(percentage)}%`;
 
   const sizeStyle = sizeClasses[size];
-  const colorStyle = colorClasses[color];
+  const colorStyle = colorStyles[color];
 
-  // Determine bar color based on variant
-  const barColorClass = variant === 'gradient' ? gradientClasses[color] : colorStyle.bg;
+  // Determine fill style based on variant
+  const getFillStyle = (): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {
+      width: `${percentage}%`,
+      boxShadow: `0 0 12px ${colorStyle.glow}, 0 0 20px ${colorStyle.glow}`,
+    };
 
-  // Striped animation classes
-  const stripedClasses = variant === 'striped'
-    ? 'bg-[length:1rem_1rem] bg-[linear-gradient(45deg,rgba(255,255,255,.15)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.15)_50%,rgba(255,255,255,.15)_75%,transparent_75%,transparent)] animate-[stripes_1s_linear_infinite]'
-    : '';
+    if (variant === 'gradient' || variant === 'arcane') {
+      return {
+        ...baseStyle,
+        background: colorStyle.gradient,
+        backgroundSize: variant === 'arcane' ? '200% 100%' : '100% 100%',
+        animation: variant === 'arcane' ? 'shimmer-slide 2s ease-in-out infinite' : undefined,
+      };
+    }
+
+    return {
+      ...baseStyle,
+      backgroundColor: colorStyle.fill,
+    };
+  };
+
+  // Arcane animation styles (mystical energy flow)
+  const arcaneStyle: React.CSSProperties = variant === 'arcane' ? {
+    backgroundImage: `
+      linear-gradient(45deg, rgba(255,255,255,.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.1) 75%, transparent 75%, transparent),
+      ${colorStyle.gradient}
+    `,
+    backgroundSize: '1rem 1rem, 200% 100%',
+  } : {};
 
   return (
     <div className={`w-full ${className}`}>
       {/* Label and Value Row */}
       {(label || showValue) && (
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-2">
           {label && (
-            <span className={`font-medium text-umber-800 dark:text-gray-200 ${sizeStyle.text}`}>
+            <span
+              className={`font-semibold tracking-wider uppercase ${sizeStyle.text}`}
+              style={{
+                color: '#9CA3AF',
+                fontFamily: '"Cinzel", Georgia, serif',
+              }}
+            >
               {label}
             </span>
           )}
           {showValue && (
-            <span className={`font-semibold text-umber-700 dark:text-gray-300 ${sizeStyle.text}`}>
+            <span
+              className={`font-semibold ${sizeStyle.text}`}
+              style={{
+                color: '#D4A574',
+                fontFamily: '"Cinzel", Georgia, serif',
+                textShadow: `0 0 8px ${colorStyle.glow}`,
+              }}
+            >
               {displayValue}
             </span>
           )}
@@ -149,27 +192,66 @@ export function ProgressBar({
       {/* Progress Track */}
       <div
         className={`
-          w-full rounded-full overflow-hidden
-          ${colorStyle.track}
+          w-full rounded-full overflow-hidden relative
           ${sizeStyle.bar}
         `}
+        style={{
+          backgroundColor: colorStyle.track,
+          boxShadow: 'inset 0 2px 6px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(45, 53, 72, 0.5)',
+        }}
         role="progressbar"
         aria-valuenow={value}
         aria-valuemin={0}
         aria-valuemax={max}
         aria-label={label || 'Progress'}
       >
-        {/* Progress Fill */}
+        {/* Progress Fill with ethereal glow */}
         <div
           className={`
             h-full rounded-full
-            ${barColorClass}
-            ${stripedClasses}
-            ${animated ? 'transition-all duration-300 ease-out' : ''}
+            ${animated ? 'transition-all duration-500 ease-out' : ''}
           `}
-          style={{ width: `${percentage}%` }}
+          style={{
+            ...getFillStyle(),
+            ...arcaneStyle,
+          }}
         />
+
+        {/* Arcane shimmer overlay */}
+        {variant === 'arcane' && percentage > 0 && (
+          <div
+            className="absolute inset-0 rounded-full overflow-hidden"
+            style={{
+              width: `${percentage}%`,
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+              animation: 'shimmer-slide 1.5s ease-in-out infinite',
+            }}
+          />
+        )}
       </div>
     </div>
   );
 }
+
+// ============================================================================
+// PRESET PROGRESS BAR COMPONENTS
+// ============================================================================
+
+export interface PresetProgressBarProps extends Omit<ProgressBarProps, 'variant' | 'color'> {}
+
+/** Arcane progress with mystical energy effect */
+export const ArcaneProgressBar = (props: PresetProgressBarProps) => (
+  <ProgressBar variant="arcane" color="accent" {...props} />
+);
+
+/** Success progress for completed transmutations */
+export const SuccessProgressBar = (props: PresetProgressBarProps) => (
+  <ProgressBar variant="gradient" color="success" {...props} />
+);
+
+/** Warning progress for volatile reactions */
+export const WarningProgressBar = (props: PresetProgressBarProps) => (
+  <ProgressBar variant="gradient" color="warning" {...props} />
+);
+
+export default ProgressBar;

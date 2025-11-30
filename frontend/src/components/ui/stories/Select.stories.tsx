@@ -1,16 +1,46 @@
 /**
- * Select Component Stories
- * Comprehensive Storybook stories for the Select component
+ * Select Component Stories - Midnight Alchemy Edition
+ *
+ * Mystical dropdown menus for choosing elements, catalysts,
+ * and configurations in the alchemist's laboratory.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { Select } from '../Select';
 
 const meta = {
-  title: 'UI/Select',
+  title: 'Midnight Alchemy/Select',
   component: Select,
   parameters: {
     layout: 'centered',
+    backgrounds: {
+      default: 'midnight',
+      values: [
+        { name: 'midnight', value: '#0B0E14' },
+        { name: 'chamber', value: '#131824' },
+      ],
+    },
+    docs: {
+      description: {
+        component: `
+# Midnight Alchemy Select
+
+Mystical dropdown menus for choosing elements, catalysts,
+and configurations in the alchemist's laboratory.
+
+## Features
+- **3 variants**: default, filled, outlined
+- **3 sizes**: sm, md, lg
+- **Icon support**: Left-positioned alchemical symbols
+- **Helper text**: Guidance for selections
+- **Error states**: Validation feedback
+
+## Alchemical Usage
+Perfect for element selection, difficulty settings,
+and experiment configurations.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -46,50 +76,63 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const difficultyOptions = [
-  { value: 'easy', label: 'Easy' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'hard', label: 'Hard' },
+  { value: 'apprentice', label: 'Apprentice' },
+  { value: 'journeyman', label: 'Journeyman' },
+  { value: 'master', label: 'Master Alchemist' },
 ];
 
-const regionOptions = [
-  { value: 'na', label: 'North America' },
-  { value: 'eu', label: 'Europe' },
-  { value: 'asia', label: 'Asia Pacific' },
-  { value: 'sa', label: 'South America' },
+const elementOptions = [
+  { value: 'fire', label: '△ Fire' },
+  { value: 'water', label: '▽ Water' },
+  { value: 'earth', label: '◇ Earth' },
+  { value: 'air', label: '○ Air' },
 ];
 
-// Basic Variants
+const realmOptions = [
+  { value: 'arcane', label: 'Arcane Academy' },
+  { value: 'ember', label: 'Ember Forge' },
+  { value: 'void', label: 'The Void' },
+  { value: 'crystal', label: 'Crystal Sanctum' },
+];
+
+// ============================================================================
+// BASIC VARIANTS
+// ============================================================================
+
 export const Default: Story = {
   args: {
-    label: 'Difficulty',
+    label: 'Mastery Level',
     options: difficultyOptions,
-    placeholder: 'Select difficulty',
+    placeholder: 'Select your level...',
     variant: 'default',
   },
 };
 
 export const Filled: Story = {
   args: {
-    label: 'Difficulty',
+    label: 'Mastery Level',
     options: difficultyOptions,
-    placeholder: 'Select difficulty',
+    placeholder: 'Select your level...',
     variant: 'filled',
   },
 };
 
 export const Outlined: Story = {
   args: {
-    label: 'Difficulty',
+    label: 'Mastery Level',
     options: difficultyOptions,
-    placeholder: 'Select difficulty',
+    placeholder: 'Select your level...',
     variant: 'outlined',
   },
 };
 
-// Sizes
+// ============================================================================
+// SIZES
+// ============================================================================
+
 export const Small: Story = {
   args: {
-    label: 'Small Select',
+    label: 'Small Selection',
     options: difficultyOptions,
     size: 'sm',
   },
@@ -97,7 +140,7 @@ export const Small: Story = {
 
 export const Medium: Story = {
   args: {
-    label: 'Medium Select',
+    label: 'Medium Selection',
     options: difficultyOptions,
     size: 'md',
   },
@@ -105,98 +148,117 @@ export const Medium: Story = {
 
 export const Large: Story = {
   args: {
-    label: 'Large Select',
+    label: 'Large Selection',
     options: difficultyOptions,
     size: 'lg',
   },
 };
 
-// With Placeholder
+// ============================================================================
+// WITH PLACEHOLDER
+// ============================================================================
+
 export const WithPlaceholder: Story = {
   args: {
-    label: 'Region',
-    options: regionOptions,
-    placeholder: 'Choose your region...',
+    label: 'Realm',
+    options: realmOptions,
+    placeholder: 'Choose your realm...',
   },
 };
 
-// With Helper Text
+// ============================================================================
+// WITH HELPER TEXT
+// ============================================================================
+
 export const WithHelperText: Story = {
   args: {
-    label: 'Game Mode',
+    label: 'Experiment Mode',
     options: [
-      { value: 'casual', label: 'Casual' },
+      { value: 'practice', label: 'Practice' },
       { value: 'ranked', label: 'Ranked' },
-      { value: 'tournament', label: 'Tournament' },
+      { value: 'tournament', label: 'Grand Tournament' },
     ],
-    helperText: 'Ranked games affect your rating',
+    helperText: 'Ranked experiments affect your guild standing',
   },
 };
 
-// With Error
+// ============================================================================
+// WITH ERROR
+// ============================================================================
+
 export const WithError: Story = {
   args: {
-    label: 'Team',
+    label: 'Guild Allegiance',
     options: [
-      { value: 'team1', label: 'Team 1' },
-      { value: 'team2', label: 'Team 2' },
+      { value: 'guild1', label: 'Order of the Phoenix' },
+      { value: 'guild2', label: 'Brotherhood of Mercury' },
     ],
-    placeholder: 'Select your team',
-    error: 'Please select a team to continue',
+    placeholder: 'Select your guild',
+    error: 'You must pledge allegiance to continue',
   },
 };
 
-// With Icon
+// ============================================================================
+// WITH ICON
+// ============================================================================
+
 export const WithIcon: Story = {
   args: {
-    label: 'Language',
-    options: [
-      { value: 'en', label: 'English' },
-      { value: 'es', label: 'Español' },
-      { value: 'fr', label: 'Français' },
-      { value: 'de', label: 'Deutsch' },
-    ],
-    leftIcon: <span>🌐</span>,
+    label: 'Primary Element',
+    options: elementOptions,
+    leftIcon: <span>⚗</span>,
   },
 };
 
-// Disabled
+// ============================================================================
+// DISABLED
+// ============================================================================
+
 export const Disabled: Story = {
   args: {
-    label: 'Disabled Select',
+    label: 'Sealed Selection',
     options: difficultyOptions,
-    value: 'medium',
+    value: 'journeyman',
     disabled: true,
   },
 };
 
-// With Disabled Option
+// ============================================================================
+// WITH DISABLED OPTION
+// ============================================================================
+
 export const WithDisabledOption: Story = {
   args: {
-    label: 'Game Type',
+    label: 'Experiment Type',
     options: [
-      { value: 'standard', label: 'Standard' },
-      { value: 'blitz', label: 'Blitz' },
-      { value: 'tournament', label: 'Tournament (Coming Soon)', disabled: true },
+      { value: 'transmutation', label: 'Transmutation' },
+      { value: 'distillation', label: 'Distillation' },
+      { value: 'forbidden', label: 'Forbidden Arts (Sealed)', disabled: true },
     ],
   },
 };
 
-// Pre-selected Value
+// ============================================================================
+// PRE-SELECTED VALUE
+// ============================================================================
+
 export const WithValue: Story = {
   args: {
-    label: 'Bot Difficulty',
+    label: 'Familiar Difficulty',
     options: difficultyOptions,
-    value: 'hard',
+    value: 'master',
   },
 };
 
-// Full Width
+// ============================================================================
+// FULL WIDTH
+// ============================================================================
+
 export const FullWidth: Story = {
   args: {
-    label: 'Full Width Select',
-    options: regionOptions,
-    placeholder: 'Select region',
+    label: 'Full Width Selection',
+    options: realmOptions,
+    placeholder: 'Select realm',
     fullWidth: true,
   },
   decorators: [
@@ -208,21 +270,27 @@ export const FullWidth: Story = {
   ],
 };
 
-// Without Label
+// ============================================================================
+// WITHOUT LABEL
+// ============================================================================
+
 export const WithoutLabel: Story = {
   args: {
     options: difficultyOptions,
-    placeholder: 'Select difficulty',
+    placeholder: 'Select mastery level',
   },
 };
 
-// Showcase: All Variants
+// ============================================================================
+// ALL VARIANTS
+// ============================================================================
+
 export const AllVariants: Story = {
   args: {
     options: [],
   },
   render: () => (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
       <Select
         variant="default"
         label="Default Variant"
@@ -245,68 +313,100 @@ export const AllVariants: Story = {
   ),
 };
 
-// Showcase: All Sizes
+// ============================================================================
+// ALL SIZES
+// ============================================================================
+
 export const AllSizes: Story = {
   args: {
     options: [],
   },
   render: () => (
-    <div className="space-y-4">
-      <Select size="sm" label="Small" options={difficultyOptions} value="easy" />
-      <Select size="md" label="Medium" options={difficultyOptions} value="medium" />
-      <Select size="lg" label="Large" options={difficultyOptions} value="hard" />
+    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
+      <Select size="sm" label="Small" options={difficultyOptions} value="apprentice" />
+      <Select size="md" label="Medium" options={difficultyOptions} value="journeyman" />
+      <Select size="lg" label="Large" options={difficultyOptions} value="master" />
     </div>
   ),
 };
 
-// Showcase: Form Example
-export const FormExample: Story = {
+// ============================================================================
+// EXPERIMENT SETTINGS
+// ============================================================================
+
+export const ExperimentSettings: Story = {
   args: {
     options: [],
   },
   render: () => (
-    <div className="space-y-4 p-4 bg-parchment-100 dark:bg-gray-800 rounded-lg w-80">
-      <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100 mb-4">Game Settings</h3>
+    <div
+      className="space-y-4 p-6 rounded-xl w-80"
+      style={{
+        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-lg font-bold mb-4"
+        style={{
+          fontFamily: '"Cinzel", Georgia, serif',
+          color: '#D4A574',
+          textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
+        }}
+      >
+        Experiment Settings
+      </h3>
 
       <Select
-        label="Game Mode"
+        label="Experiment Mode"
         options={[
-          { value: 'casual', label: 'Casual' },
+          { value: 'practice', label: 'Practice' },
           { value: 'ranked', label: 'Ranked' },
         ]}
-        value="casual"
-        leftIcon={<span>🎮</span>}
+        value="practice"
+        leftIcon={<span>⚗</span>}
       />
 
       <Select
-        label="Bot Difficulty"
+        label="Familiar Difficulty"
         options={difficultyOptions}
-        value="medium"
-        helperText="Affects AI opponent skill level"
-        leftIcon={<span>🤖</span>}
+        value="journeyman"
+        helperText="Affects the skill of spirit companions"
+        leftIcon={<span>🔮</span>}
       />
 
       <Select
-        label="Region"
-        options={regionOptions}
-        placeholder="Select region"
-        leftIcon={<span>🌍</span>}
+        label="Realm"
+        options={realmOptions}
+        placeholder="Select realm"
+        leftIcon={<span>🌙</span>}
       />
 
-      <button className="w-full py-2 mt-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600">
-        Create Game
+      <button
+        className="w-full py-3 rounded-lg font-semibold uppercase tracking-widest mt-2"
+        style={{
+          fontFamily: '"Cinzel", Georgia, serif',
+          background: 'linear-gradient(180deg, #C17F59 0%, rgba(193, 127, 89, 0.8) 100%)',
+          color: '#0B0E14',
+          boxShadow: '0 4px 20px rgba(193, 127, 89, 0.4)',
+        }}
+      >
+        Begin Experiment
       </button>
     </div>
   ),
 };
 
-// Showcase: Comparison with States
+// ============================================================================
+// COMPARISON STATES
+// ============================================================================
+
 export const ComparisonStates: Story = {
   args: {
     options: [],
   },
   render: () => (
-    <div className="space-y-4 w-80">
+    <div className="space-y-4 w-80 p-6 bg-[#0B0E14] rounded-xl">
       <Select
         label="Normal"
         options={difficultyOptions}
@@ -315,25 +415,79 @@ export const ComparisonStates: Story = {
       <Select
         label="With Value"
         options={difficultyOptions}
-        value="medium"
+        value="journeyman"
       />
       <Select
         label="With Helper"
         options={difficultyOptions}
-        value="hard"
-        helperText="This affects game challenge"
+        value="master"
+        helperText="This affects experiment challenge"
       />
       <Select
         label="With Error"
         options={difficultyOptions}
-        error="Selection is required"
+        error="Selection is required by the Council"
       />
       <Select
-        label="Disabled"
+        label="Sealed"
         options={difficultyOptions}
-        value="easy"
+        value="apprentice"
         disabled
       />
+    </div>
+  ),
+};
+
+// ============================================================================
+// ELEMENT SELECTOR
+// ============================================================================
+
+export const ElementSelector: Story = {
+  args: {
+    options: [],
+  },
+  render: () => (
+    <div
+      className="p-6 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-lg font-bold mb-4"
+        style={{
+          fontFamily: '"Cinzel", Georgia, serif',
+          color: '#E8E4DC',
+        }}
+      >
+        Choose Your Element
+      </h3>
+
+      <div className="grid grid-cols-2 gap-4">
+        <Select
+          label="Primary"
+          options={elementOptions}
+          value="fire"
+          leftIcon={<span style={{ color: '#EF4444' }}>△</span>}
+        />
+        <Select
+          label="Secondary"
+          options={elementOptions}
+          placeholder="Optional"
+          leftIcon={<span style={{ color: '#3B82F6' }}>▽</span>}
+        />
+      </div>
+
+      <p
+        className="text-sm mt-4 italic"
+        style={{
+          fontFamily: '"Cormorant Garamond", Georgia, serif',
+          color: '#6B7280',
+        }}
+      >
+        Your elemental affinity shapes your transmutation abilities.
+      </p>
     </div>
   ),
 };

@@ -1,28 +1,26 @@
 /**
- * Spinner Component
- * Storybook UI Component
+ * Spinner Component - Midnight Alchemy Edition
  *
- * Unified loading spinner with multiple sizes and variants.
- * Used for indeterminate loading states across the application.
+ * Mystical loading spinners with ethereal glows and alchemical animations.
+ * Features transmutation-style effects and brass accents.
  *
  * Features:
  * - 4 sizes: xs, sm, md, lg
- * - 3 variants: default (ring), dots, pulse
- * - Color themes
- * - Dark mode support
+ * - 4 variants: default (ring), dots, pulse, arcane (sacred geometry)
+ * - Color themes with elemental glows
  * - Accessible (role="status", aria-label)
  *
  * Usage:
  * ```tsx
  * <Spinner />
- * <Spinner size="lg" color="primary" />
- * <Spinner variant="dots" />
+ * <Spinner size="lg" color="accent" />
+ * <Spinner variant="arcane" />
  * ```
  */
 
 export type SpinnerSize = 'xs' | 'sm' | 'md' | 'lg';
-export type SpinnerVariant = 'default' | 'dots' | 'pulse';
-export type SpinnerColor = 'primary' | 'white' | 'gray' | 'success' | 'warning' | 'error';
+export type SpinnerVariant = 'default' | 'dots' | 'pulse' | 'arcane';
+export type SpinnerColor = 'accent' | 'primary' | 'white' | 'muted' | 'success' | 'warning' | 'error';
 
 export interface SpinnerProps {
   /** Spinner size */
@@ -38,48 +36,53 @@ export interface SpinnerProps {
 }
 
 const sizeClasses: Record<SpinnerSize, { ring: string; dots: string; dotSize: string }> = {
-  xs: { ring: 'h-4 w-4 border-2', dots: 'gap-1', dotSize: 'h-1 w-1' },
-  sm: { ring: 'h-6 w-6 border-2', dots: 'gap-1', dotSize: 'h-1.5 w-1.5' },
-  md: { ring: 'h-8 w-8 border-2', dots: 'gap-1.5', dotSize: 'h-2 w-2' },
-  lg: { ring: 'h-12 w-12 border-3', dots: 'gap-2', dotSize: 'h-3 w-3' },
+  xs: { ring: 'h-4 w-4', dots: 'gap-1', dotSize: 'h-1 w-1' },
+  sm: { ring: 'h-6 w-6', dots: 'gap-1', dotSize: 'h-1.5 w-1.5' },
+  md: { ring: 'h-8 w-8', dots: 'gap-1.5', dotSize: 'h-2 w-2' },
+  lg: { ring: 'h-12 w-12', dots: 'gap-2', dotSize: 'h-3 w-3' },
 };
 
-const colorClasses: Record<SpinnerColor, { ring: string; dot: string }> = {
+// Color styles with Midnight Alchemy ethereal glows
+const colorStyles: Record<SpinnerColor, { color: string; glow: string }> = {
+  accent: {
+    color: '#C17F59',
+    glow: 'rgba(193, 127, 89, 0.5)',
+  },
   primary: {
-    ring: 'border-blue-500 dark:border-blue-400 border-t-transparent dark:border-t-transparent',
-    dot: 'bg-blue-500 dark:bg-blue-400',
+    color: '#D4A574',
+    glow: 'rgba(212, 165, 116, 0.4)',
   },
   white: {
-    ring: 'border-white border-t-transparent',
-    dot: 'bg-white',
+    color: '#E8E4DC',
+    glow: 'rgba(232, 228, 220, 0.3)',
   },
-  gray: {
-    ring: 'border-gray-500 dark:border-gray-400 border-t-transparent dark:border-t-transparent',
-    dot: 'bg-gray-500 dark:bg-gray-400',
+  muted: {
+    color: '#6B7280',
+    glow: 'rgba(107, 114, 128, 0.3)',
   },
   success: {
-    ring: 'border-green-500 dark:border-green-400 border-t-transparent dark:border-t-transparent',
-    dot: 'bg-green-500 dark:bg-green-400',
+    color: '#4A9C6D',
+    glow: 'rgba(74, 156, 109, 0.5)',
   },
   warning: {
-    ring: 'border-yellow-500 dark:border-yellow-400 border-t-transparent dark:border-t-transparent',
-    dot: 'bg-yellow-500 dark:bg-yellow-400',
+    color: '#D4A574',
+    glow: 'rgba(212, 165, 116, 0.5)',
   },
   error: {
-    ring: 'border-red-500 dark:border-red-400 border-t-transparent dark:border-t-transparent',
-    dot: 'bg-red-500 dark:bg-red-400',
+    color: '#A63D3D',
+    glow: 'rgba(166, 61, 61, 0.5)',
   },
 };
 
 export function Spinner({
   size = 'md',
   variant = 'default',
-  color = 'primary',
-  label = 'Loading...',
+  color = 'accent',
+  label = 'Transmuting...',
   className = '',
 }: SpinnerProps) {
   const sizeStyle = sizeClasses[size];
-  const colorStyle = colorClasses[color];
+  const colorStyle = colorStyles[color];
 
   // Default ring spinner
   if (variant === 'default') {
@@ -91,16 +94,22 @@ export function Spinner({
           inline-block rounded-full
           animate-spin
           ${sizeStyle.ring}
-          ${colorStyle.ring}
           ${className}
         `}
+        style={{
+          borderWidth: size === 'lg' ? '3px' : '2px',
+          borderStyle: 'solid',
+          borderColor: colorStyle.color,
+          borderTopColor: 'transparent',
+          filter: `drop-shadow(0 0 6px ${colorStyle.glow})`,
+        }}
       >
         <span className="sr-only">{label}</span>
       </div>
     );
   }
 
-  // Dots spinner (bouncing dots)
+  // Dots spinner (bouncing alchemical orbs)
   if (variant === 'dots') {
     return (
       <div
@@ -114,10 +123,13 @@ export function Spinner({
             className={`
               ${sizeStyle.dotSize}
               rounded-full
-              ${colorStyle.dot}
               animate-bounce
             `}
-            style={{ animationDelay: `${i * 0.15}s` }}
+            style={{
+              backgroundColor: colorStyle.color,
+              boxShadow: `0 0 8px ${colorStyle.glow}`,
+              animationDelay: `${i * 0.15}s`,
+            }}
           />
         ))}
         <span className="sr-only">{label}</span>
@@ -125,7 +137,7 @@ export function Spinner({
     );
   }
 
-  // Pulse spinner (pulsing circle)
+  // Pulse spinner (pulsing ethereal orb)
   if (variant === 'pulse') {
     return (
       <div
@@ -135,10 +147,88 @@ export function Spinner({
           inline-block rounded-full
           animate-pulse
           ${sizeStyle.ring}
-          ${colorStyle.dot}
           ${className}
         `}
+        style={{
+          backgroundColor: colorStyle.color,
+          boxShadow: `0 0 20px ${colorStyle.glow}, 0 0 40px ${colorStyle.glow}`,
+        }}
       >
+        <span className="sr-only">{label}</span>
+      </div>
+    );
+  }
+
+  // Arcane spinner (sacred geometry - rotating alchemical symbol)
+  if (variant === 'arcane') {
+    const arcaneSize = {
+      xs: 16,
+      sm: 24,
+      md: 32,
+      lg: 48,
+    }[size];
+
+    return (
+      <div
+        role="status"
+        aria-label={label}
+        className={`
+          inline-flex items-center justify-center
+          ${sizeStyle.ring}
+          ${className}
+        `}
+        style={{
+          animation: 'spin 3s linear infinite',
+        }}
+      >
+        <svg
+          width={arcaneSize}
+          height={arcaneSize}
+          viewBox="0 0 48 48"
+          fill="none"
+          style={{
+            filter: `drop-shadow(0 0 8px ${colorStyle.glow})`,
+          }}
+        >
+          {/* Outer circle */}
+          <circle
+            cx="24"
+            cy="24"
+            r="22"
+            stroke={colorStyle.color}
+            strokeWidth="1.5"
+            strokeDasharray="4 2"
+            opacity="0.6"
+          />
+          {/* Inner triangle (Fire) */}
+          <path
+            d="M24 8 L40 36 L8 36 Z"
+            stroke={colorStyle.color}
+            strokeWidth="2"
+            fill="none"
+            style={{
+              animation: 'ethereal-pulse 2s ease-in-out infinite',
+            }}
+          />
+          {/* Inverted triangle (Water) */}
+          <path
+            d="M24 40 L40 12 L8 12 Z"
+            stroke={colorStyle.color}
+            strokeWidth="1"
+            fill="none"
+            opacity="0.4"
+          />
+          {/* Center circle */}
+          <circle
+            cx="24"
+            cy="24"
+            r="4"
+            fill={colorStyle.color}
+            style={{
+              animation: 'pulse 1.5s ease-in-out infinite',
+            }}
+          />
+        </svg>
         <span className="sr-only">{label}</span>
       </div>
     );
@@ -146,3 +236,26 @@ export function Spinner({
 
   return null;
 }
+
+// ============================================================================
+// PRESET SPINNER COMPONENTS
+// ============================================================================
+
+export interface PresetSpinnerProps extends Omit<SpinnerProps, 'variant'> {}
+
+/** Arcane spinner with sacred geometry */
+export const ArcaneSpinner = (props: PresetSpinnerProps) => (
+  <Spinner variant="arcane" {...props} />
+);
+
+/** Dots spinner for subtle loading */
+export const DotsSpinner = (props: PresetSpinnerProps) => (
+  <Spinner variant="dots" {...props} />
+);
+
+/** Pulse spinner for prominent loading */
+export const PulseSpinner = (props: PresetSpinnerProps) => (
+  <Spinner variant="pulse" {...props} />
+);
+
+export default Spinner;

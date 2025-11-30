@@ -1,43 +1,53 @@
 /**
- * Modal Component Stories - Retro Gaming Edition
+ * Modal Component Stories - Midnight Alchemy Edition
  *
- * Showcases the arcade-inspired modal system with neon borders,
- * scanline effects, and multiple theme presets.
+ * Showcases the mystical modal system with ethereal glows,
+ * sacred geometry corners, and alchemical theme presets.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import {
   Modal,
-  NeonModal,
-  ArcadeModal,
-  TerminalModal,
-  HologramModal,
-  ClassicModal,
+  ArcaneModal,
+  MidnightModal,
+  EmberModal,
+  TealModal,
 } from '../Modal';
-import { Button, NeonButton, SuccessButton, DangerButton } from '../Button';
+import { Button, ArcaneButton, DangerButton, SuccessButton } from '../Button';
 
 const meta = {
-  title: 'UI/Modal',
+  title: 'Midnight Alchemy/Modal',
   component: Modal,
   parameters: {
     layout: 'fullscreen',
+    backgrounds: {
+      default: 'midnight',
+      values: [
+        { name: 'midnight', value: '#0B0E14' },
+        { name: 'chamber', value: '#131824' },
+      ],
+    },
     docs: {
       description: {
         component: `
-Arcade-inspired modal component with multiple themes and special effects.
+# Midnight Alchemy Modals
+
+Mystical modal dialogs with brass frame aesthetics and ethereal glow effects.
+Each theme evokes a different aspect of the alchemist's study.
 
 ## Themes
-- **neon**: Cyan/pink neon glow (default retro gaming style)
-- **arcade**: Classic arcade cabinet aesthetic
-- **terminal**: Green terminal/hacker style
-- **hologram**: Futuristic holographic effect
-- **classic**: Traditional parchment style
+- **arcane**: Copper/rose gold glow (default mystical style)
+- **midnight**: Deep blue chamber aesthetic
+- **ember**: Warm fire-like orange glow
+- **void**: Dark cosmic purple essence
+- **parchment**: Ancient manuscript style
+- **teal**: Ethereal teal/cyan glow
 
 ## Features
 - 5 sizes: sm, md, lg, xl, full
-- Scanline overlay effect
-- Glow animation
+- Sacred geometry corner decorations
+- Ethereal glow animation
 - Mobile full-screen optimization
 - ESC to close, backdrop click to close
         `,
@@ -48,21 +58,13 @@ Arcade-inspired modal component with multiple themes and special effects.
   argTypes: {
     theme: {
       control: 'select',
-      options: ['neon', 'arcade', 'terminal', 'hologram', 'classic'],
+      options: ['arcane', 'midnight', 'ember', 'void', 'parchment', 'teal'],
       description: 'Visual theme preset',
     },
     size: {
       control: 'select',
       options: ['sm', 'md', 'lg', 'xl', 'full'],
       description: 'Modal size',
-    },
-    scanlines: {
-      control: 'boolean',
-      description: 'Enable CRT scanline effect',
-    },
-    glowAnimation: {
-      control: 'boolean',
-      description: 'Enable glow animation on border',
     },
     showCloseButton: {
       control: 'boolean',
@@ -85,17 +87,17 @@ Arcade-inspired modal component with multiple themes and special effects.
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-type RenderOnlyStory = StoryObj<typeof Modal>; // For render-only stories without args
+type RenderOnlyStory = StoryObj<typeof Modal>;
 
 // Wrapper component to handle modal state
 const ModalWrapper = (args: any) => {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)] p-8">
-      <Button onClick={() => setIsOpen(true)} variant="neon" glow>
+    <div className="min-h-screen bg-[#0B0E14] p-8">
+      <ArcaneButton onClick={() => setIsOpen(true)} glow>
         Open Modal
-      </Button>
+      </ArcaneButton>
       <Modal
         {...args}
         isOpen={isOpen}
@@ -111,28 +113,41 @@ const ModalWrapper = (args: any) => {
 // THEMES
 // ============================================================================
 
-export const NeonTheme: Story = {
+export const ArcaneTheme: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Neon Theme',
-    subtitle: 'The signature retro gaming style',
-    icon: '🕹️',
-    theme: 'neon',
-    glowAnimation: true,
+    title: 'Arcane Mysteries',
+    subtitle: 'The signature alchemical style',
+    icon: '⚗',
+    theme: 'arcane',
     children: (
       <div className="space-y-4">
-        <p className="text-[var(--color-text-secondary)] font-body">
-          This is the default neon theme with cyan and pink glow effects.
-          Perfect for that retro arcade aesthetic.
+        <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+          This is the default arcane theme with copper and rose gold ethereal glow effects.
+          Perfect for that mystical alchemist's study aesthetic.
         </p>
         <div className="flex gap-2">
-          <span className="px-3 py-1 bg-[var(--color-bg-accent)]/20 rounded-full text-[var(--color-text-accent)] text-sm font-display">
-            Neon Glow
+          <span
+            className="px-3 py-1 rounded-full text-sm"
+            style={{
+              backgroundColor: 'rgba(193, 127, 89, 0.2)',
+              color: '#D4A574',
+              fontFamily: '"Cinzel", Georgia, serif',
+            }}
+          >
+            Copper Glow
           </span>
-          <span className="px-3 py-1 bg-[var(--color-team2-primary)]/20 rounded-full text-[var(--color-team2-primary)] text-sm font-display">
-            Pink Accents
+          <span
+            className="px-3 py-1 rounded-full text-sm"
+            style={{
+              backgroundColor: 'rgba(212, 165, 116, 0.2)',
+              color: '#D4A574',
+              fontFamily: '"Cinzel", Georgia, serif',
+            }}
+          >
+            Rose Gold
           </span>
         </div>
       </div>
@@ -141,91 +156,97 @@ export const NeonTheme: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Default neon theme with cyan/pink glow - the signature retro gaming style.',
+        story: 'Default arcane theme with copper/rose gold ethereal glow - the signature mystical style.',
       },
     },
   },
 };
 
-export const ArcadeTheme: Story = {
+export const MidnightTheme: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Arcade Theme',
-    subtitle: 'Classic cabinet style',
-    icon: '🎮',
-    theme: 'arcade',
-    glowAnimation: true,
+    title: 'Midnight Chamber',
+    subtitle: 'Deep within the laboratory',
+    icon: '☽',
+    theme: 'midnight',
     children: (
-      <p className="text-gray-300 font-body">
-        The arcade theme brings back memories of classic arcade cabinets
-        with warm orange and gold accents.
+      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+        The midnight theme evokes the depths of the alchemist's laboratory,
+        with deep blue accents and subtle silver highlights.
       </p>
     ),
   },
 };
 
-export const TerminalTheme: Story = {
+export const EmberTheme: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Terminal Theme',
-    subtitle: 'Access granted',
-    icon: '>_',
-    theme: 'terminal',
-    scanlines: true,
+    title: 'Ember Crucible',
+    subtitle: 'Forged in flame',
+    icon: '△',
+    theme: 'ember',
     children: (
-      <div className="font-mono text-[#00ff00] space-y-2">
-        <p>&gt; Initializing system...</p>
-        <p>&gt; Loading game data...</p>
-        <p>&gt; Connection established.</p>
-        <p className="animate-pulse">&gt; _</p>
-      </div>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Terminal/hacker theme with green monospace text and scanlines.',
-      },
-    },
-  },
-};
-
-export const HologramTheme: Story = {
-  render: (args) => <ModalWrapper {...args} />,
-  args: {
-    isOpen: true,
-    onClose: () => {},
-    title: 'Hologram Theme',
-    subtitle: 'Futuristic interface',
-    icon: '💠',
-    theme: 'hologram',
-    glowAnimation: true,
-    children: (
-      <p className="text-gray-300 font-body">
-        The hologram theme offers a futuristic aesthetic with
-        cyan to purple gradients and ethereal glow effects.
+      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+        The ember theme brings the warmth of the alchemist's furnace,
+        with fiery orange and gold accents.
       </p>
     ),
   },
 };
 
-export const ClassicTheme: Story = {
+export const VoidTheme: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Classic Theme',
-    subtitle: 'Traditional style',
+    title: 'Void Essence',
+    subtitle: 'Beyond the veil',
+    icon: '☿',
+    theme: 'void',
+    children: (
+      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+        The void theme represents the cosmic mysteries,
+        with deep purple gradients and otherworldly energy.
+      </p>
+    ),
+  },
+};
+
+export const ParchmentTheme: Story = {
+  render: (args) => <ModalWrapper {...args} />,
+  args: {
+    isOpen: true,
+    onClose: () => {},
+    title: 'Ancient Tome',
+    subtitle: 'Knowledge of the ages',
     icon: '📜',
-    theme: 'classic',
+    theme: 'parchment',
     children: (
-      <p className="text-gray-700 dark:text-gray-300 font-body">
-        The classic theme provides a more traditional parchment-style
-        appearance for a different aesthetic.
+      <p style={{ color: '#6B7280', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+        The parchment theme channels ancient manuscripts,
+        with warm cream tones and weathered aesthetics.
+      </p>
+    ),
+  },
+};
+
+export const TealTheme: Story = {
+  render: (args) => <ModalWrapper {...args} />,
+  args: {
+    isOpen: true,
+    onClose: () => {},
+    title: 'Ethereal Waters',
+    subtitle: 'Element of transformation',
+    icon: '▽',
+    theme: 'teal',
+    children: (
+      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+        The teal theme represents the water element,
+        with ethereal cyan glow and transformative energy.
       </p>
     ),
   },
@@ -240,16 +261,24 @@ export const AllThemes: RenderOnlyStory = {
     const [activeTheme, setActiveTheme] = useState<string | null>(null);
 
     const themes = [
-      { id: 'neon', label: 'Neon', icon: '🕹️', color: '#00fff5' },
-      { id: 'arcade', label: 'Arcade', icon: '🎮', color: '#ffbe0b' },
-      { id: 'terminal', label: 'Terminal', icon: '>_', color: '#00ff00' },
-      { id: 'hologram', label: 'Hologram', icon: '💠', color: '#00d4ff' },
-      { id: 'classic', label: 'Classic', icon: '📜', color: '#d4a373' },
+      { id: 'arcane', label: 'Arcane', icon: '⚗', color: '#C17F59' },
+      { id: 'midnight', label: 'Midnight', icon: '☽', color: '#4682B4' },
+      { id: 'ember', label: 'Ember', icon: '△', color: '#D97706' },
+      { id: 'void', label: 'Void', icon: '☿', color: '#7C3AED' },
+      { id: 'parchment', label: 'Parchment', icon: '📜', color: '#D4A574' },
+      { id: 'teal', label: 'Teal', icon: '▽', color: '#2DD4BF' },
     ] as const;
 
     return (
-      <div className="min-h-screen bg-[var(--color-bg-primary)] p-8">
-        <h2 className="font-display text-[var(--color-text-primary)] text-xl uppercase tracking-wider mb-6">
+      <div className="min-h-screen bg-[#0B0E14] p-8">
+        <h2
+          className="text-xl uppercase tracking-[0.15em] mb-6"
+          style={{
+            fontFamily: '"Cinzel Decorative", Georgia, serif',
+            color: '#D4A574',
+            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
+          }}
+        >
           Modal Themes
         </h2>
         <div className="flex flex-wrap gap-4">
@@ -257,22 +286,15 @@ export const AllThemes: RenderOnlyStory = {
             <button
               key={theme.id}
               onClick={() => setActiveTheme(theme.id)}
-              className="
-                px-6 py-4
-                rounded-[var(--radius-lg)]
-                border-2
-                bg-[var(--color-bg-secondary)]
-                font-display uppercase tracking-wider
-                transition-all duration-[var(--duration-fast)]
-                hover:scale-105
-              "
+              className="px-6 py-4 rounded-lg border-2 bg-[#131824] uppercase tracking-wider transition-all duration-300 hover:scale-105"
               style={{
+                fontFamily: '"Cinzel", Georgia, serif',
                 borderColor: theme.color,
-                boxShadow: `0 0 15px ${theme.color}40`,
+                boxShadow: `0 0 20px ${theme.color}40`,
               }}
             >
               <span className="text-2xl block mb-2">{theme.icon}</span>
-              <span className="text-[var(--color-text-primary)]">{theme.label}</span>
+              <span style={{ color: '#E8E4DC' }}>{theme.label}</span>
             </button>
           ))}
         </div>
@@ -285,12 +307,10 @@ export const AllThemes: RenderOnlyStory = {
             subtitle="Click X or backdrop to close"
             icon={themes.find(t => t.id === activeTheme)?.icon}
             theme={activeTheme as any}
-            glowAnimation
-            scanlines={activeTheme === 'terminal'}
           >
-            <p className="text-[var(--color-text-secondary)] font-body">
+            <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
               This is the {activeTheme} theme modal. Each theme has its own
-              unique color palette and visual style.
+              unique color palette and ethereal glow effect.
             </p>
           </Modal>
         )}
@@ -317,10 +337,10 @@ export const SmallSize: Story = {
     onClose: () => {},
     title: 'Small Modal',
     size: 'sm',
-    theme: 'neon',
+    theme: 'arcane',
     children: (
-      <p className="text-[var(--color-text-secondary)] font-body">
-        A compact modal for simple confirmations.
+      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+        A compact modal for simple confirmations or brief messages.
       </p>
     ),
   },
@@ -332,47 +352,42 @@ export const LargeSize: Story = {
     isOpen: true,
     onClose: () => {},
     title: 'Large Modal',
-    subtitle: 'More space for content',
+    subtitle: 'More space for complex rituals',
     size: 'lg',
-    theme: 'neon',
+    theme: 'arcane',
     children: (
       <div className="space-y-4">
-        <p className="text-[var(--color-text-secondary)] font-body">
+        <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
           Large modals provide ample space for complex content,
-          forms, or detailed information displays.
-        </p>
-        <p className="text-[var(--color-text-secondary)] font-body">
-          They maintain readability while allowing for more
-          comprehensive layouts.
+          detailed formulae, or comprehensive displays.
         </p>
         <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="p-4 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)]">
-            <div className="text-[var(--color-text-accent)] text-2xl font-display">42</div>
-            <div className="text-[var(--color-text-muted)] text-sm">Games Won</div>
+          <div
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: '#1A1F2E' }}
+          >
+            <div
+              className="text-2xl"
+              style={{ color: '#D4A574', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
+            >
+              42
+            </div>
+            <div style={{ color: '#6B7280', fontSize: '0.875rem' }}>Transmutations</div>
           </div>
-          <div className="p-4 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)]">
-            <div className="text-[var(--color-team2-primary)] text-2xl font-display">1337</div>
-            <div className="text-[var(--color-text-muted)] text-sm">Total Points</div>
+          <div
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: '#1A1F2E' }}
+          >
+            <div
+              className="text-2xl"
+              style={{ color: '#4A9C6D', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
+            >
+              1337
+            </div>
+            <div style={{ color: '#6B7280', fontSize: '0.875rem' }}>Essence Points</div>
           </div>
         </div>
       </div>
-    ),
-  },
-};
-
-export const ExtraLargeSize: Story = {
-  render: (args) => <ModalWrapper {...args} />,
-  args: {
-    isOpen: true,
-    onClose: () => {},
-    title: 'Extra Large Modal',
-    size: 'xl',
-    theme: 'neon',
-    children: (
-      <p className="text-[var(--color-text-secondary)] font-body">
-        XL modals are great for detailed content like game statistics,
-        leaderboards, or complex forms.
-      </p>
     ),
   },
 };
@@ -386,19 +401,19 @@ export const WithFooter: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Confirm Action',
-    icon: '⚠️',
-    theme: 'neon',
+    title: 'Confirm Transmutation',
+    icon: '⚠',
+    theme: 'arcane',
     children: (
-      <p className="text-[var(--color-text-secondary)] font-body">
-        Are you sure you want to leave the current game?
-        Your progress will be lost.
+      <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+        Are you sure you want to begin this transmutation?
+        The process cannot be reversed once started.
       </p>
     ),
     footer: (
       <>
         <Button variant="ghost">Cancel</Button>
-        <DangerButton>Leave Game</DangerButton>
+        <DangerButton>Begin Transmutation</DangerButton>
       </>
     ),
   },
@@ -409,68 +424,23 @@ export const ConfirmationDialog: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Start New Game?',
-    icon: '🎮',
-    theme: 'neon',
+    title: 'Begin the Great Work?',
+    icon: '⚗',
+    theme: 'arcane',
     size: 'sm',
     children: (
-      <p className="text-[var(--color-text-secondary)] font-body text-center">
-        Ready to begin a new adventure?
+      <p
+        className="text-center"
+        style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}
+      >
+        Ready to embark on your alchemical journey?
       </p>
     ),
     footer: (
       <>
-        <Button variant="secondary" fullWidth>Cancel</Button>
-        <SuccessButton fullWidth>Start Game</SuccessButton>
+        <Button variant="secondary" fullWidth>Retreat</Button>
+        <SuccessButton fullWidth>Begin</SuccessButton>
       </>
-    ),
-  },
-};
-
-// ============================================================================
-// SPECIAL EFFECTS
-// ============================================================================
-
-export const WithScanlines: Story = {
-  render: (args) => <ModalWrapper {...args} />,
-  args: {
-    isOpen: true,
-    onClose: () => {},
-    title: 'CRT Effect',
-    subtitle: 'Old school vibes',
-    icon: '📺',
-    theme: 'neon',
-    scanlines: true,
-    children: (
-      <p className="text-[var(--color-text-secondary)] font-body">
-        The scanline effect adds a retro CRT monitor aesthetic
-        to the modal for extra nostalgia.
-      </p>
-    ),
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Modal with CRT scanline overlay effect.',
-      },
-    },
-  },
-};
-
-export const WithGlowAnimation: Story = {
-  render: (args) => <ModalWrapper {...args} />,
-  args: {
-    isOpen: true,
-    onClose: () => {},
-    title: 'Glowing Border',
-    icon: '✨',
-    theme: 'neon',
-    glowAnimation: true,
-    children: (
-      <p className="text-[var(--color-text-secondary)] font-body">
-        The glow animation adds a pulsing neon effect to the
-        modal border for extra visual appeal.
-      </p>
     ),
   },
 };
@@ -484,23 +454,29 @@ export const PresetModals: RenderOnlyStory = {
     const [activePreset, setActivePreset] = useState<string | null>(null);
 
     const presets = [
-      { id: 'neon', Component: NeonModal, label: 'Neon Modal' },
-      { id: 'arcade', Component: ArcadeModal, label: 'Arcade Modal' },
-      { id: 'terminal', Component: TerminalModal, label: 'Terminal Modal' },
-      { id: 'hologram', Component: HologramModal, label: 'Hologram Modal' },
-      { id: 'classic', Component: ClassicModal, label: 'Classic Modal' },
+      { id: 'arcane', Component: ArcaneModal, label: 'Arcane Modal' },
+      { id: 'midnight', Component: MidnightModal, label: 'Midnight Modal' },
+      { id: 'ember', Component: EmberModal, label: 'Ember Modal' },
+      { id: 'teal', Component: TealModal, label: 'Teal Modal' },
     ];
 
     return (
-      <div className="min-h-screen bg-[var(--color-bg-primary)] p-8">
-        <h2 className="font-display text-[var(--color-text-primary)] text-xl uppercase tracking-wider mb-6">
+      <div className="min-h-screen bg-[#0B0E14] p-8">
+        <h2
+          className="text-xl uppercase tracking-[0.15em] mb-6"
+          style={{
+            fontFamily: '"Cinzel Decorative", Georgia, serif',
+            color: '#D4A574',
+            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
+          }}
+        >
           Preset Modal Components
         </h2>
         <div className="flex flex-wrap gap-4">
           {presets.map((preset) => (
-            <NeonButton key={preset.id} onClick={() => setActivePreset(preset.id)}>
+            <ArcaneButton key={preset.id} onClick={() => setActivePreset(preset.id)}>
               {preset.label}
-            </NeonButton>
+            </ArcaneButton>
           ))}
         </div>
 
@@ -511,9 +487,9 @@ export const PresetModals: RenderOnlyStory = {
             onClose={() => setActivePreset(null)}
             title={preset.label}
             subtitle="Pre-configured component"
-            icon="🎯"
+            icon="⚗"
           >
-            <p className="text-[var(--color-text-secondary)] font-body">
+            <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
               This is a pre-configured {preset.label.toLowerCase()} with optimal
               settings for the {preset.id} theme.
             </p>
@@ -540,123 +516,178 @@ export const VictoryModal: Story = {
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Victory!',
-    subtitle: 'Team 1 Wins!',
-    icon: '🏆',
-    theme: 'neon',
-    glowAnimation: true,
+    title: 'Transmutation Complete!',
+    subtitle: 'The Great Work Succeeds',
+    icon: '☉',
+    theme: 'arcane',
     size: 'md',
     children: (
       <div className="text-center space-y-6">
-        <div className="text-6xl animate-bounce">🎉</div>
+        <div className="text-6xl animate-bounce">🏆</div>
         <div className="space-y-2">
-          <div className="text-[var(--color-text-accent)] text-4xl font-display">
+          <div
+            className="text-4xl"
+            style={{
+              color: '#D4A574',
+              fontFamily: '"Cinzel Decorative", Georgia, serif',
+              textShadow: '0 0 20px rgba(212, 165, 116, 0.5)',
+            }}
+          >
             41 - 28
           </div>
-          <div className="text-[var(--color-text-muted)] text-sm uppercase tracking-wider">
+          <div
+            className="text-sm uppercase tracking-wider"
+            style={{ color: '#6B7280' }}
+          >
             Final Score
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="p-3 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)]">
-            <div className="text-[var(--color-success)] font-display">+15</div>
-            <div className="text-[var(--color-text-muted)]">Points Earned</div>
+          <div className="p-3 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
+            <div style={{ color: '#4A9C6D', fontFamily: '"Cinzel", Georgia, serif' }}>+15</div>
+            <div style={{ color: '#6B7280' }}>Essence Gained</div>
           </div>
-          <div className="p-3 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)]">
-            <div className="text-[var(--color-warning)] font-display">5</div>
-            <div className="text-[var(--color-text-muted)]">Win Streak</div>
+          <div className="p-3 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
+            <div style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}>5</div>
+            <div style={{ color: '#6B7280' }}>Win Streak</div>
           </div>
         </div>
       </div>
     ),
     footer: (
       <>
-        <Button variant="ghost">Back to Lobby</Button>
-        <SuccessButton glow>Play Again</SuccessButton>
+        <Button variant="ghost">Return to Laboratory</Button>
+        <SuccessButton glow>Begin Anew</SuccessButton>
       </>
     ),
   },
   parameters: {
     docs: {
       description: {
-        story: 'Victory screen modal showing game results.',
+        story: 'Victory screen modal showing game results with alchemical theming.',
       },
     },
   },
 };
 
-export const GameOverModal: Story = {
+export const DefeatModal: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Game Over',
-    subtitle: 'Better luck next time!',
-    icon: '💀',
-    theme: 'neon',
+    title: 'Transmutation Failed',
+    subtitle: 'The mixture was unstable',
+    icon: '☠',
+    theme: 'arcane',
     size: 'md',
     children: (
       <div className="text-center space-y-6">
-        <div className="text-[var(--color-error)] text-4xl font-display">
+        <div
+          className="text-4xl"
+          style={{
+            color: '#A63D3D',
+            fontFamily: '"Cinzel Decorative", Georgia, serif',
+          }}
+        >
           28 - 41
         </div>
-        <p className="text-[var(--color-text-secondary)] font-body">
-          Don't give up! Every loss is a chance to learn and improve.
+        <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
+          Even the greatest alchemists face setbacks. Study your failures,
+          for they contain the seeds of future success.
         </p>
       </div>
     ),
     footer: (
       <>
-        <Button variant="ghost">Quit</Button>
-        <NeonButton>Rematch</NeonButton>
+        <Button variant="ghost">Retreat</Button>
+        <ArcaneButton glow>Try Again</ArcaneButton>
       </>
     ),
   },
 };
 
-export const PlayerStatsModal: Story = {
+export const AlchemistProfile: Story = {
   render: (args) => <ModalWrapper {...args} />,
   args: {
     isOpen: true,
     onClose: () => {},
-    title: 'Player Stats',
-    subtitle: 'RetroGamer42',
-    icon: '📊',
-    theme: 'neon',
+    title: 'Alchemist Profile',
+    subtitle: 'MysticSage42',
+    icon: '☿',
+    theme: 'arcane',
     size: 'lg',
     children: (
       <div className="space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="p-4 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)] text-center">
-            <div className="text-[var(--color-success)] text-2xl font-display">156</div>
-            <div className="text-[var(--color-text-muted)] text-xs uppercase">Wins</div>
+          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#1A1F2E' }}>
+            <div
+              className="text-2xl"
+              style={{ color: '#4A9C6D', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
+            >
+              156
+            </div>
+            <div
+              className="text-xs uppercase"
+              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
+            >
+              Victories
+            </div>
           </div>
-          <div className="p-4 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)] text-center">
-            <div className="text-[var(--color-error)] text-2xl font-display">89</div>
-            <div className="text-[var(--color-text-muted)] text-xs uppercase">Losses</div>
+          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#1A1F2E' }}>
+            <div
+              className="text-2xl"
+              style={{ color: '#A63D3D', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
+            >
+              89
+            </div>
+            <div
+              className="text-xs uppercase"
+              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
+            >
+              Defeats
+            </div>
           </div>
-          <div className="p-4 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)] text-center">
-            <div className="text-[var(--color-text-accent)] text-2xl font-display">64%</div>
-            <div className="text-[var(--color-text-muted)] text-xs uppercase">Win Rate</div>
+          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#1A1F2E' }}>
+            <div
+              className="text-2xl"
+              style={{ color: '#D4A574', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
+            >
+              64%
+            </div>
+            <div
+              className="text-xs uppercase"
+              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
+            >
+              Success Rate
+            </div>
           </div>
         </div>
 
-        {/* Recent Games */}
+        {/* Recent Transmutations */}
         <div>
-          <h3 className="text-[var(--color-text-primary)] font-display text-sm uppercase tracking-wider mb-3">
-            Recent Games
+          <h3
+            className="text-sm uppercase tracking-wider mb-3"
+            style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}
+          >
+            Recent Transmutations
           </h3>
           <div className="space-y-2">
             {['W', 'W', 'L', 'W', 'W'].map((result, i) => (
               <div
                 key={i}
-                className="flex items-center justify-between p-3 bg-[var(--color-bg-tertiary)] rounded-[var(--radius-md)]"
+                className="flex items-center justify-between p-3 rounded-lg"
+                style={{ backgroundColor: '#1A1F2E' }}
               >
-                <span className={`font-display ${result === 'W' ? 'text-[var(--color-success)]' : 'text-[var(--color-error)]'}`}>
-                  {result === 'W' ? 'Victory' : 'Defeat'}
+                <span
+                  style={{
+                    fontFamily: '"Cinzel", Georgia, serif',
+                    color: result === 'W' ? '#4A9C6D' : '#A63D3D',
+                  }}
+                >
+                  {result === 'W' ? 'Success' : 'Failure'}
                 </span>
-                <span className="text-[var(--color-text-muted)] text-sm">
+                <span style={{ color: '#6B7280', fontSize: '0.875rem' }}>
                   {41 - i * 3} - {28 + i * 2}
                 </span>
               </div>
@@ -666,13 +697,98 @@ export const PlayerStatsModal: Story = {
       </div>
     ),
     footer: (
-      <Button variant="secondary" fullWidth>Close</Button>
+      <Button variant="secondary" fullWidth>Close Tome</Button>
     ),
   },
   parameters: {
     docs: {
       description: {
-        story: 'Player statistics modal with game history.',
+        story: 'Player profile modal with statistics and game history.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// ALCHEMIST'S STUDY SHOWCASE
+// ============================================================================
+
+export const AlchemistStudy: RenderOnlyStory = {
+  render: () => {
+    const [isOpen, setIsOpen] = useState(true);
+
+    return (
+      <div className="min-h-screen bg-[#0B0E14] p-8">
+        <ArcaneButton onClick={() => setIsOpen(true)} glow>
+          Enter the Study
+        </ArcaneButton>
+
+        <Modal
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          title="The Alchemist's Study"
+          subtitle="Where mysteries unfold"
+          icon="⚗"
+          theme="arcane"
+          size="lg"
+        >
+          <div className="space-y-6">
+            <p
+              className="text-center italic"
+              style={{
+                color: '#9CA3AF',
+                fontFamily: '"Cormorant Garamond", Georgia, serif',
+                fontSize: '1.125rem',
+              }}
+            >
+              "As above, so below. As within, so without."
+            </p>
+
+            <div className="flex justify-center gap-8">
+              <div className="text-center">
+                <div className="text-4xl mb-2">△</div>
+                <div style={{ color: '#A63D3D', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Fire</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-2">▽</div>
+                <div style={{ color: '#4682B4', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Water</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-2">◇</div>
+                <div style={{ color: '#4A9C6D', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Earth</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl mb-2">○</div>
+                <div style={{ color: '#E8E4DC', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Air</div>
+              </div>
+            </div>
+
+            <div
+              className="p-4 rounded-lg text-center"
+              style={{
+                backgroundColor: '#0B0E14',
+                border: '1px solid #C17F59',
+              }}
+            >
+              <div
+                className="text-lg uppercase tracking-wider"
+                style={{
+                  color: '#D4A574',
+                  fontFamily: '"Cinzel Decorative", Georgia, serif',
+                }}
+              >
+                The Great Work Awaits
+              </div>
+            </div>
+          </div>
+        </Modal>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Full Midnight Alchemy showcase demonstrating the mystical modal design.',
       },
     },
   },

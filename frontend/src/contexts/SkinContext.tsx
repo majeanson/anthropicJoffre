@@ -189,9 +189,9 @@ export function useTheme(): ThemeContextType {
   const setTheme = useCallback(
     (theme: 'historic' | 'dark') => {
       if (theme === 'dark') {
-        setSkin('retro-gaming'); // Default dark skin
+        setSkin('tavern-noir'); // Default dark skin
       } else {
-        setSkin('classic-historic'); // Light historic skin
+        setSkin('classic-parchment'); // Light historic skin
       }
     },
     [setSkin]

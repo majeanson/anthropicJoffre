@@ -1,8 +1,8 @@
 /**
- * Button Component Stories - Retro Gaming Edition
+ * Button Component Stories - Midnight Alchemy Edition
  *
- * Showcases the arcade-inspired button system with neon glows,
- * pixel-perfect borders, and satisfying press effects.
+ * Showcases the mystical button system with ethereal glows,
+ * mechanical press effects, and alchemical aesthetics.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -12,27 +12,39 @@ import {
   SecondaryButton,
   SuccessButton,
   DangerButton,
-  NeonButton,
+  ElegantButton,
+  ArcaneButton,
   GhostButton,
 } from '../Button';
 
 const meta = {
-  title: 'UI/Button',
+  title: 'Midnight Alchemy/Button',
   component: Button,
   parameters: {
     layout: 'centered',
+    backgrounds: {
+      default: 'midnight',
+      values: [
+        { name: 'midnight', value: '#0B0E14' },
+        { name: 'chamber', value: '#131824' },
+      ],
+    },
     docs: {
       description: {
         component: `
-Arcade-inspired button component with multiple variants, sizes, and special effects.
+# Midnight Alchemy Buttons
+
+Mystical buttons with alchemical aesthetics - copper accents, ethereal glows, and brass mechanical textures.
 
 ## Features
-- **8 variants**: primary, secondary, success, warning, danger, ghost, link, neon
+- **9 variants**: primary, secondary, success, warning, danger, ghost, link, elegant, arcane
 - **5 sizes**: xs, sm, md, lg, xl
-- **Arcade mode**: Press-down effect like real arcade buttons
-- **Glow mode**: Pulsing neon glow animation
-- **Icon support**: Left and right icon slots
-- **Loading state**: Retro-styled spinner
+- **Mechanical press**: Steampunk-inspired depth effect
+- **Ethereal glow**: Pulsing copper/rose gold animation
+- **Alchemical shimmer**: Subtle light sweep on hover
+
+## Typography
+Uses **Cinzel Decorative** for that mystical manuscript feel with wide letter-spacing.
         `,
       },
     },
@@ -41,7 +53,7 @@ Arcade-inspired button component with multiple variants, sizes, and special effe
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'success', 'warning', 'danger', 'ghost', 'link', 'neon'],
+      options: ['primary', 'secondary', 'success', 'warning', 'danger', 'ghost', 'link', 'elegant', 'arcane'],
       description: 'Visual style variant',
     },
     size: {
@@ -51,11 +63,11 @@ Arcade-inspired button component with multiple variants, sizes, and special effe
     },
     arcade: {
       control: 'boolean',
-      description: 'Enable arcade-style press effect',
+      description: 'Enable mechanical press effect',
     },
     glow: {
       control: 'boolean',
-      description: 'Enable pulsing glow animation',
+      description: 'Enable ethereal pulsing glow',
     },
     disabled: {
       control: 'boolean',
@@ -63,7 +75,7 @@ Arcade-inspired button component with multiple variants, sizes, and special effe
     },
     loading: {
       control: 'boolean',
-      description: 'Loading state with spinner',
+      description: 'Loading state with alchemical spinner',
     },
     fullWidth: {
       control: 'boolean',
@@ -81,57 +93,65 @@ type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
   args: {
-    children: 'Primary Button',
+    children: 'Transmute',
     variant: 'primary',
   },
 };
 
 export const Secondary: Story = {
   args: {
-    children: 'Secondary Button',
+    children: 'Observe',
     variant: 'secondary',
   },
 };
 
 export const Success: Story = {
   args: {
-    children: 'Success Button',
+    children: 'Transformation Complete',
     variant: 'success',
   },
 };
 
 export const Warning: Story = {
   args: {
-    children: 'Warning Button',
+    children: 'Unstable Mixture',
     variant: 'warning',
   },
 };
 
 export const Danger: Story = {
   args: {
-    children: 'Danger Button',
+    children: 'Volatile Reaction',
     variant: 'danger',
   },
 };
 
 export const Ghost: Story = {
   args: {
-    children: 'Ghost Button',
+    children: 'Whisper',
     variant: 'ghost',
   },
 };
 
 export const Link: Story = {
   args: {
-    children: 'Link Button',
+    children: 'Ancient Tome',
     variant: 'link',
   },
 };
 
-export const Neon: Story = {
+export const Elegant: Story = {
   args: {
-    children: 'Neon Button',
-    variant: 'neon',
+    children: 'Refined Elixir',
+    variant: 'elegant',
+  },
+};
+
+export const Arcane: Story = {
+  args: {
+    children: 'Invoke the Arcane',
+    variant: 'arcane',
+    glow: true,
   },
 };
 
@@ -141,7 +161,7 @@ export const Neon: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-4">
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="success">Success</Button>
@@ -149,13 +169,14 @@ export const AllVariants: Story = {
       <Button variant="danger">Danger</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="link">Link</Button>
-      <Button variant="neon">Neon</Button>
+      <Button variant="elegant">Elegant</Button>
+      <Button variant="arcane" glow>Arcane</Button>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'All available button variants with their unique neon glow effects.',
+        story: 'All available button variants with their unique ethereal glow effects.',
       },
     },
   },
@@ -165,23 +186,9 @@ export const AllVariants: Story = {
 // SIZES
 // ============================================================================
 
-export const Small: Story = {
-  args: {
-    children: 'Small Button',
-    size: 'sm',
-  },
-};
-
-export const Large: Story = {
-  args: {
-    children: 'Large Button',
-    size: 'lg',
-  },
-};
-
 export const AllSizes: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-4">
+    <div className="flex flex-wrap gap-4 items-end p-6 bg-[#0B0E14] rounded-xl">
       <Button size="xs">Extra Small</Button>
       <Button size="sm">Small</Button>
       <Button size="md">Medium</Button>
@@ -195,9 +202,9 @@ export const AllSizes: Story = {
 // SPECIAL EFFECTS
 // ============================================================================
 
-export const ArcadeMode: Story = {
+export const MechanicalPress: Story = {
   args: {
-    children: 'Press Me!',
+    children: 'Activate Mechanism',
     variant: 'primary',
     arcade: true,
     size: 'lg',
@@ -205,52 +212,58 @@ export const ArcadeMode: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Arcade mode adds a satisfying press-down effect like real arcade cabinet buttons.',
+        story: 'Mechanical press mode adds a steampunk-inspired depth effect with satisfying tactile feedback.',
       },
     },
   },
 };
 
-export const GlowingButton: Story = {
+export const EtherealGlow: Story = {
   args: {
-    children: 'Glowing',
-    variant: 'neon',
+    children: 'Channel Energy',
+    variant: 'arcane',
     glow: true,
     size: 'lg',
   },
   parameters: {
     docs: {
       description: {
-        story: 'Glow mode adds a pulsing neon glow animation to draw attention.',
+        story: 'Ethereal glow adds a pulsing copper/rose gold animation like mystical energy.',
       },
     },
   },
 };
 
 // ============================================================================
-// WITH ICONS
+// WITH ICONS (Alchemical Symbols)
 // ============================================================================
 
-export const WithLeftIcon: Story = {
-  args: {
-    children: 'Play Now',
-    leftIcon: <span>🎮</span>,
-  },
-};
-
-export const WithRightIcon: Story = {
-  args: {
-    children: 'Continue',
-    rightIcon: <span>→</span>,
-  },
-};
-
-export const WithBothIcons: Story = {
-  args: {
-    children: 'Start Game',
-    leftIcon: <span>🎮</span>,
-    rightIcon: <span>→</span>,
-    variant: 'success',
+export const WithAlchemicalSymbols: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
+      <Button variant="primary" leftIcon={<span>△</span>}>
+        Fire
+      </Button>
+      <Button variant="secondary" leftIcon={<span>▽</span>}>
+        Water
+      </Button>
+      <Button variant="success" leftIcon={<span>◇</span>}>
+        Earth
+      </Button>
+      <Button variant="warning" leftIcon={<span>☿</span>}>
+        Mercury
+      </Button>
+      <Button variant="arcane" leftIcon={<span>☉</span>} rightIcon={<span>→</span>} glow>
+        Transmute
+      </Button>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Buttons with alchemical symbols as icons for thematic consistency.',
+      },
+    },
   },
 };
 
@@ -260,32 +273,38 @@ export const WithBothIcons: Story = {
 
 export const Loading: Story = {
   args: {
-    children: 'Loading...',
+    children: 'Transmuting...',
     loading: true,
+    variant: 'primary',
+    size: 'lg',
   },
 };
 
 export const Disabled: Story = {
   args: {
-    children: 'Disabled Button',
+    children: 'Sealed',
     disabled: true,
   },
 };
 
 export const DisabledVariants: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-4">
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
       <Button variant="primary" disabled>Primary</Button>
       <Button variant="secondary" disabled>Secondary</Button>
-      <Button variant="neon" disabled>Neon</Button>
+      <Button variant="arcane" disabled>Arcane</Button>
+      <Button variant="success" disabled>Success</Button>
     </div>
   ),
 };
 
 export const FullWidth: Story = {
   args: {
-    children: 'Full Width Button',
+    children: 'Begin the Great Work',
     fullWidth: true,
+    variant: 'arcane',
+    glow: true,
+    size: 'lg',
   },
   parameters: {
     layout: 'padded',
@@ -298,12 +317,13 @@ export const FullWidth: Story = {
 
 export const PresetButtons: Story = {
   render: () => (
-    <div className="flex flex-wrap gap-4 items-center p-4">
+    <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
       <PrimaryButton>Primary</PrimaryButton>
       <SecondaryButton>Secondary</SecondaryButton>
       <SuccessButton>Success</SuccessButton>
       <DangerButton>Danger</DangerButton>
-      <NeonButton>Neon</NeonButton>
+      <ElegantButton>Elegant</ElegantButton>
+      <ArcaneButton>Arcane</ArcaneButton>
       <GhostButton>Ghost</GhostButton>
     </div>
   ),
@@ -317,39 +337,166 @@ export const PresetButtons: Story = {
 };
 
 // ============================================================================
-// GAME UI EXAMPLE
+// ALCHEMIST'S LABORATORY
 // ============================================================================
 
-export const GameMenuExample: Story = {
+export const AlchemistLaboratory: Story = {
   render: () => (
-    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)] space-y-6 min-w-80">
-      <h2 className="font-display text-[var(--color-text-primary)] text-xl uppercase tracking-wider text-center">
-        Game Menu
-      </h2>
+    <div
+      className="p-8 rounded-xl space-y-6 min-w-96"
+      style={{
+        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+        border: '2px solid #C17F59',
+        boxShadow: '0 0 50px rgba(193, 127, 89, 0.15), 0 8px 32px rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      {/* Sacred geometry corners */}
+      <div className="relative">
+        <div className="absolute -top-6 -left-6 w-4 h-4 border-l-2 border-t-2 border-[#C17F59] opacity-60" />
+        <div className="absolute -top-6 -right-6 w-4 h-4 border-r-2 border-t-2 border-[#C17F59] opacity-60" />
+
+        <h2
+          className="text-2xl text-center uppercase tracking-[0.2em] mb-2"
+          style={{
+            fontFamily: '"Cinzel Decorative", Georgia, serif',
+            color: '#D4A574',
+            textShadow: '0 0 20px rgba(212, 165, 116, 0.5)',
+          }}
+        >
+          The Alchemist's Study
+        </h2>
+        <p
+          className="text-center text-sm italic opacity-70 mb-6"
+          style={{
+            fontFamily: '"Cormorant Garamond", Georgia, serif',
+            color: '#9CA3AF',
+          }}
+        >
+          Choose your path of transmutation
+        </p>
+      </div>
 
       <div className="space-y-3">
         <Button variant="primary" fullWidth arcade size="lg">
-          Quick Play
+          Quick Transmutation
         </Button>
         <Button variant="secondary" fullWidth size="lg">
-          Create Game
+          Create Experiment
         </Button>
-        <Button variant="neon" fullWidth size="lg" glow>
-          Join Game
+        <Button variant="arcane" fullWidth size="lg" glow>
+          Join the Great Work
         </Button>
       </div>
 
-      <div className="flex gap-3 justify-center pt-4 border-t border-[var(--color-border-default)]">
-        <Button variant="ghost" size="sm">Settings</Button>
-        <Button variant="ghost" size="sm">Help</Button>
-        <Button variant="link" size="sm">Logout</Button>
+      <div
+        className="flex gap-3 justify-center pt-6 mt-6"
+        style={{ borderTop: '1px solid #2D3548' }}
+      >
+        <Button variant="ghost" size="sm">Ancient Texts</Button>
+        <Button variant="ghost" size="sm">Ingredients</Button>
+        <Button variant="link" size="sm">Philosopher's Notes</Button>
+      </div>
+
+      {/* Bottom corners */}
+      <div className="relative h-2">
+        <div className="absolute -bottom-6 -left-6 w-4 h-4 border-l-2 border-b-2 border-[#C17F59] opacity-60" />
+        <div className="absolute -bottom-6 -right-6 w-4 h-4 border-r-2 border-b-2 border-[#C17F59] opacity-60" />
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Example of buttons used in a game menu context with the retro gaming skin.',
+        story: 'Example of buttons used in a game menu context with the Midnight Alchemy aesthetic.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// CARD GAME ACTIONS
+// ============================================================================
+
+export const CardGameActions: Story = {
+  render: () => (
+    <div
+      className="p-6 rounded-lg space-y-4"
+      style={{
+        background: 'linear-gradient(180deg, #1A1F2E 0%, #131824 100%)',
+        boxShadow: 'inset 0 2px 8px rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      <div className="flex gap-3 justify-center">
+        <Button variant="primary" size="lg" arcade leftIcon={<span>♠</span>}>
+          Place Bet
+        </Button>
+        <Button variant="warning" size="lg" leftIcon={<span>⏭</span>}>
+          Skip Turn
+        </Button>
+      </div>
+      <div className="flex gap-2 justify-center">
+        <Button variant="ghost" size="sm">View Rules</Button>
+        <Button variant="ghost" size="sm">Chat</Button>
+        <Button variant="danger" size="sm">Leave Game</Button>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Button combinations for card game betting and actions.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// ELEMENTAL QUARTET
+// ============================================================================
+
+export const ElementalQuartet: Story = {
+  render: () => (
+    <div className="grid grid-cols-2 gap-4 p-6 bg-[#0B0E14] rounded-xl max-w-md">
+      <Button
+        variant="danger"
+        size="lg"
+        fullWidth
+        leftIcon={<span className="text-xl">🔥</span>}
+      >
+        Fire
+      </Button>
+      <Button
+        variant="secondary"
+        size="lg"
+        fullWidth
+        leftIcon={<span className="text-xl">💧</span>}
+        style={{ borderColor: '#3B82F6' }}
+      >
+        Water
+      </Button>
+      <Button
+        variant="success"
+        size="lg"
+        fullWidth
+        leftIcon={<span className="text-xl">🌿</span>}
+      >
+        Earth
+      </Button>
+      <Button
+        variant="ghost"
+        size="lg"
+        fullWidth
+        leftIcon={<span className="text-xl">💨</span>}
+        style={{ color: '#E8E4DC' }}
+      >
+        Air
+      </Button>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'The four classical elements represented as action buttons.',
       },
     },
   },

@@ -1,29 +1,28 @@
 /**
- * Tooltip Component
- * Storybook UI Component
+ * Tooltip Component - Midnight Alchemy Edition
  *
- * Lightweight tooltip for additional context on hover/focus.
- * Uses CSS-only approach for performance.
+ * Mystical tooltip with brass frame aesthetics and ethereal glow.
+ * Features arcane styling and smooth transmutation animations.
  *
  * Features:
  * - 4 positions: top, bottom, left, right
- * - 3 variants: dark, light, colored
- * - Delay support
- * - Dark mode support
+ * - Multiple variants with alchemical color schemes
+ * - Delay support for intentional reveals
+ * - Sacred geometry arrow styling
  * - Full accessibility (aria-describedby)
  *
  * Usage:
  * ```tsx
- * <Tooltip content="This is helpful info">
- *   <Button>Hover me</Button>
+ * <Tooltip content="Ancient knowledge awaits">
+ *   <Button>Hover to reveal</Button>
  * </Tooltip>
  *
  * <Tooltip
- *   content="Click to copy game link"
+ *   content="Copy the arcane seal"
  *   position="bottom"
- *   variant="light"
+ *   variant="arcane"
  * >
- *   <span>Game ID: ABC123</span>
+ *   <span>Seal ID: ⚗ABC123</span>
  * </Tooltip>
  * ```
  */
@@ -31,7 +30,7 @@
 import { ReactNode, useState, useRef, useEffect } from 'react';
 
 export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
-export type TooltipVariant = 'dark' | 'light' | 'info' | 'success' | 'warning' | 'error';
+export type TooltipVariant = 'dark' | 'light' | 'arcane' | 'success' | 'warning' | 'error';
 
 export interface TooltipProps {
   /** Tooltip content */
@@ -53,29 +52,65 @@ export interface TooltipProps {
 const positionClasses: Record<TooltipPosition, { container: string; arrow: string }> = {
   top: {
     container: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-    arrow: 'top-full left-1/2 -translate-x-1/2 border-t-current border-x-transparent border-b-transparent',
+    arrow: 'top-full left-1/2 -translate-x-1/2',
   },
   bottom: {
     container: 'top-full left-1/2 -translate-x-1/2 mt-2',
-    arrow: 'bottom-full left-1/2 -translate-x-1/2 border-b-current border-x-transparent border-t-transparent',
+    arrow: 'bottom-full left-1/2 -translate-x-1/2',
   },
   left: {
     container: 'right-full top-1/2 -translate-y-1/2 mr-2',
-    arrow: 'left-full top-1/2 -translate-y-1/2 border-l-current border-y-transparent border-r-transparent',
+    arrow: 'left-full top-1/2 -translate-y-1/2',
   },
   right: {
     container: 'left-full top-1/2 -translate-y-1/2 ml-2',
-    arrow: 'right-full top-1/2 -translate-y-1/2 border-r-current border-y-transparent border-l-transparent',
+    arrow: 'right-full top-1/2 -translate-y-1/2',
   },
 };
 
-const variantClasses: Record<TooltipVariant, string> = {
-  dark: 'bg-gray-900 text-white dark:bg-gray-800 dark:text-gray-100',
-  light: 'bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-100 shadow-lg border border-gray-200 dark:border-gray-600',
-  info: 'bg-blue-600 text-white',
-  success: 'bg-green-600 text-white',
-  warning: 'bg-orange-500 text-white',
-  error: 'bg-red-600 text-white',
+// Variant styles with Midnight Alchemy theming
+const variantStyles: Record<TooltipVariant, {
+  bg: string;
+  text: string;
+  border: string;
+  shadow: string;
+}> = {
+  dark: {
+    bg: '#0B0E14',
+    text: '#E8E4DC',
+    border: '#2D3548',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(45, 53, 72, 0.5)',
+  },
+  light: {
+    bg: '#1A1F2E',
+    text: '#E8E4DC',
+    border: '#C17F59',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(193, 127, 89, 0.15)',
+  },
+  arcane: {
+    bg: 'linear-gradient(180deg, #1A1F2E 0%, #131824 100%)',
+    text: '#D4A574',
+    border: '#C17F59',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.5), 0 0 25px rgba(193, 127, 89, 0.25)',
+  },
+  success: {
+    bg: '#1A2E23',
+    text: '#4A9C6D',
+    border: '#4A9C6D',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(74, 156, 109, 0.2)',
+  },
+  warning: {
+    bg: '#2E2A1A',
+    text: '#D4A574',
+    border: '#D4A574',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 165, 116, 0.2)',
+  },
+  error: {
+    bg: '#2E1A1A',
+    text: '#A63D3D',
+    border: '#8B3D3D',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(166, 61, 61, 0.2)',
+  },
 };
 
 export function Tooltip({
@@ -116,7 +151,7 @@ export function Tooltip({
     }
     setIsVisible(false);
     // Wait for animation to complete
-    setTimeout(() => setShouldRender(false), 150);
+    setTimeout(() => setShouldRender(false), 200);
   };
 
   // Cleanup on unmount
@@ -129,6 +164,31 @@ export function Tooltip({
   }, []);
 
   const positionStyle = positionClasses[position];
+  const variantStyle = variantStyles[variant];
+
+  // Arrow direction based on position
+  const getArrowStyle = (): React.CSSProperties => {
+    const baseStyle: React.CSSProperties = {
+      width: 0,
+      height: 0,
+      borderWidth: '6px',
+      borderStyle: 'solid',
+      borderColor: 'transparent',
+    };
+
+    const arrowColor = variant === 'arcane' ? '#1A1F2E' : variantStyle.bg;
+
+    switch (position) {
+      case 'top':
+        return { ...baseStyle, borderTopColor: arrowColor };
+      case 'bottom':
+        return { ...baseStyle, borderBottomColor: arrowColor };
+      case 'left':
+        return { ...baseStyle, borderLeftColor: arrowColor };
+      case 'right':
+        return { ...baseStyle, borderRightColor: arrowColor };
+    }
+  };
 
   return (
     <div
@@ -153,32 +213,70 @@ export function Tooltip({
             ${positionStyle.container}
             px-3 py-2
             text-sm font-medium
-            rounded-lg
+            rounded-md
             whitespace-nowrap
             pointer-events-none
-            transition-all duration-150
-            ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}
-            ${variantClasses[variant]}
+            transition-all duration-200
+            ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-1 scale-95'}
             ${className}
           `}
+          style={{
+            background: variantStyle.bg,
+            color: variantStyle.text,
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderColor: variantStyle.border,
+            boxShadow: variantStyle.shadow,
+            fontFamily: '"Cormorant Garamond", Georgia, serif',
+          }}
         >
+          {/* Arcane corner accents */}
+          {variant === 'arcane' && (
+            <>
+              <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-[#C17F59] opacity-60 rounded-tl-sm" />
+              <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-[#C17F59] opacity-60 rounded-tr-sm" />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-[#C17F59] opacity-60 rounded-bl-sm" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-[#C17F59] opacity-60 rounded-br-sm" />
+            </>
+          )}
+
           {content}
 
           {/* Arrow */}
           <div
-            className={`
-              absolute
-              w-0 h-0
-              border-4
-              ${positionStyle.arrow}
-              ${variant === 'light' ? 'text-white dark:text-gray-700' : variantClasses[variant].split(' ')[0].replace('bg-', 'text-')}
-            `}
-            style={{
-              borderColor: variant === 'dark' ? '#111827' : undefined,
-            }}
+            className={`absolute ${positionStyle.arrow}`}
+            style={getArrowStyle()}
           />
         </div>
       )}
     </div>
   );
 }
+
+// ============================================================================
+// PRESET TOOLTIP COMPONENTS
+// ============================================================================
+
+export interface PresetTooltipProps extends Omit<TooltipProps, 'variant'> {}
+
+/** Arcane tooltip with copper glow */
+export const ArcaneTooltip = (props: PresetTooltipProps) => (
+  <Tooltip variant="arcane" {...props} />
+);
+
+/** Success tooltip for positive feedback */
+export const SuccessTooltip = (props: PresetTooltipProps) => (
+  <Tooltip variant="success" {...props} />
+);
+
+/** Warning tooltip for cautions */
+export const WarningTooltip = (props: PresetTooltipProps) => (
+  <Tooltip variant="warning" {...props} />
+);
+
+/** Error tooltip for critical information */
+export const ErrorTooltip = (props: PresetTooltipProps) => (
+  <Tooltip variant="error" {...props} />
+);
+
+export default Tooltip;

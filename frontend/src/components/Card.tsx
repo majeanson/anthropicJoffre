@@ -1,15 +1,15 @@
 /**
- * Card Component - Retro Gaming Edition
+ * Card Component - Midnight Alchemy Edition
  *
- * Playing card component with distinctive retro arcade aesthetics.
- * Features neon glow effects for each suit color, pixel-perfect borders,
- * and satisfying hover/selection animations.
+ * Playing cards as ancient alchemical artifacts. Each card appears as an
+ * illuminated manuscript page with mystical glow effects and copper accents.
  *
  * Design Philosophy:
- * - Each suit has its own neon color that glows on hover
- * - Special cards (Red 0, Brown 0) have extra visual flair
- * - Playable cards pulse with inviting glow
- * - Non-playable cards are clearly dimmed
+ * - Cards have parchment-like backgrounds with aged texture
+ * - Each suit glows with its elemental color on hover
+ * - Special cards (Red 0, Brown 0) pulse with mystical energy
+ * - Playable cards levitate with ethereal lighting
+ * - Non-playable cards fade into shadow with arcane seal
  *
  * Accessibility:
  * - Full keyboard navigation support
@@ -31,40 +31,50 @@ interface CardProps {
   faceDown?: boolean;
 }
 
-// Neon colors for each suit (matches skin CSS variables)
-const suitNeonColors: Record<CardColor, {
+// Alchemical element colors for each suit
+const suitStyles: Record<CardColor, {
   border: string;
   text: string;
-  glow: string;
-  glowHover: string;
+  shadow: string;
+  shadowHover: string;
+  innerGlow: string;
+  elementName: string;
 }> = {
   red: {
     border: 'var(--color-suit-red)',
     text: 'var(--color-suit-red)',
-    glow: '0 0 10px var(--color-suit-red)',
-    glowHover: '0 0 20px var(--color-suit-red), 0 0 40px var(--color-suit-red)',
+    shadow: '0 4px 16px rgba(220, 38, 38, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+    shadowHover: '0 8px 32px rgba(220, 38, 38, 0.4), 0 0 40px rgba(220, 38, 38, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+    innerGlow: 'rgba(220, 38, 38, 0.12)',
+    elementName: 'Fire',
   },
   brown: {
     border: 'var(--color-suit-brown)',
     text: 'var(--color-suit-brown)',
-    glow: '0 0 10px var(--color-suit-brown)',
-    glowHover: '0 0 20px var(--color-suit-brown), 0 0 40px var(--color-suit-brown)',
+    shadow: '0 4px 16px rgba(180, 83, 9, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+    shadowHover: '0 8px 32px rgba(180, 83, 9, 0.4), 0 0 40px rgba(180, 83, 9, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+    innerGlow: 'rgba(180, 83, 9, 0.12)',
+    elementName: 'Earth',
   },
   green: {
     border: 'var(--color-suit-green)',
     text: 'var(--color-suit-green)',
-    glow: '0 0 10px var(--color-suit-green)',
-    glowHover: '0 0 20px var(--color-suit-green), 0 0 40px var(--color-suit-green)',
+    shadow: '0 4px 16px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+    shadowHover: '0 8px 32px rgba(5, 150, 105, 0.4), 0 0 40px rgba(5, 150, 105, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+    innerGlow: 'rgba(5, 150, 105, 0.12)',
+    elementName: 'Nature',
   },
   blue: {
     border: 'var(--color-suit-blue)',
     text: 'var(--color-suit-blue)',
-    glow: '0 0 10px var(--color-suit-blue)',
-    glowHover: '0 0 20px var(--color-suit-blue), 0 0 40px var(--color-suit-blue)',
+    shadow: '0 4px 16px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+    shadowHover: '0 8px 32px rgba(37, 99, 235, 0.4), 0 0 40px rgba(37, 99, 235, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+    innerGlow: 'rgba(37, 99, 235, 0.12)',
+    elementName: 'Water',
   },
 };
 
-// Size configurations
+// Size configurations with golden ratio proportions
 const sizeStyles = {
   tiny: {
     container: 'w-14 h-20 sm:w-12 sm:h-20',
@@ -73,6 +83,8 @@ const sizeStyles = {
     emblem: 'w-7 h-7 sm:w-6 sm:h-6',
     badge: 'text-[8px] px-0.5',
     borderWidth: '2px',
+    cornerOffset: 'top-0.5 left-1',
+    cornerOffsetBottom: 'bottom-0.5 right-1',
   },
   small: {
     container: 'w-20 h-32 md:w-16 md:h-28',
@@ -80,7 +92,9 @@ const sizeStyles = {
     cornerText: 'text-xs',
     emblem: 'w-12 h-12 md:w-10 md:h-10',
     badge: 'text-[9px] px-0.5',
-    borderWidth: '3px',
+    borderWidth: '2px',
+    cornerOffset: 'top-1 left-1.5',
+    cornerOffsetBottom: 'bottom-1 right-1.5',
   },
   medium: {
     container: 'w-24 h-36 md:w-20 md:h-32',
@@ -88,7 +102,9 @@ const sizeStyles = {
     cornerText: 'text-sm',
     emblem: 'w-14 h-14 md:w-12 md:h-12',
     badge: 'text-xs px-1',
-    borderWidth: '4px',
+    borderWidth: '2px',
+    cornerOffset: 'top-1 left-1.5',
+    cornerOffsetBottom: 'bottom-1 right-1.5',
   },
   large: {
     container: 'w-28 h-40 md:w-24 md:h-36',
@@ -96,7 +112,9 @@ const sizeStyles = {
     cornerText: 'text-base',
     emblem: 'w-18 h-18 md:w-16 md:h-16',
     badge: 'text-sm px-1.5',
-    borderWidth: '4px',
+    borderWidth: '3px',
+    cornerOffset: 'top-1.5 left-2',
+    cornerOffsetBottom: 'bottom-1.5 right-2',
   },
 };
 
@@ -115,7 +133,7 @@ function CardComponent({
     [card.color, card.value]
   );
 
-  const suitStyle = suitNeonColors[card.color];
+  const suitStyle = suitStyles[card.color];
   const sizeConfig = sizeStyles[size];
 
   // Determine which image to show
@@ -131,33 +149,69 @@ function CardComponent({
     ? `${card.color} special card (${card.color === 'red' ? '+5 points' : '-2 points'})`
     : `${card.color} ${card.value}`;
 
-  // Card back design
+  // Card back design - Alchemical grimoire pattern
   if (faceDown) {
     return (
       <div
         className={`
           ${sizeConfig.container}
           rounded-[var(--radius-lg)]
-          bg-[var(--color-bg-tertiary)]
-          border-[length:${sizeConfig.borderWidth}]
-          border-[var(--color-border-default)]
           flex items-center justify-center
           relative overflow-hidden
         `}
         style={{
+          backgroundColor: 'var(--color-bg-tertiary)',
+          borderWidth: sizeConfig.borderWidth,
+          borderStyle: 'solid',
+          borderColor: 'var(--color-border-accent)',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
           background: `
-            repeating-linear-gradient(
-              45deg,
-              var(--color-bg-tertiary),
-              var(--color-bg-tertiary) 10px,
-              var(--color-bg-secondary) 10px,
-              var(--color-bg-secondary) 20px
+            linear-gradient(135deg,
+              var(--color-bg-tertiary) 0%,
+              var(--color-bg-secondary) 50%,
+              var(--color-bg-tertiary) 100%
             )
           `,
         }}
       >
-        <div className="absolute inset-2 border-2 border-[var(--color-border-default)] rounded-[var(--radius-md)] opacity-50" />
-        <span className="text-2xl opacity-30">?</span>
+        {/* Alchemical circle pattern */}
+        <div
+          className="absolute inset-3 rounded-full border opacity-20"
+          style={{
+            borderColor: 'var(--color-border-accent)',
+          }}
+        />
+        <div
+          className="absolute inset-5 rounded-full border opacity-15"
+          style={{
+            borderColor: 'var(--color-border-accent)',
+          }}
+        />
+
+        {/* Sacred geometry corners */}
+        <div className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 border-[var(--color-border-accent)] opacity-50" />
+        <div className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 border-[var(--color-border-accent)] opacity-50" />
+        <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-[var(--color-border-accent)] opacity-50" />
+        <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-[var(--color-border-accent)] opacity-50" />
+
+        {/* Center alchemical symbol */}
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center relative"
+          style={{
+            background: 'linear-gradient(135deg, var(--color-bg-accent) 0%, rgba(193, 127, 89, 0.8) 100%)',
+            boxShadow: '0 2px 12px rgba(212, 165, 116, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+          }}
+        >
+          {/* Triangle inside circle (alchemical symbol) */}
+          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M12 4L21 20H3L12 4Z"
+              stroke="var(--color-text-inverse)"
+              strokeWidth="2"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
       </div>
     );
   }
@@ -175,10 +229,10 @@ function CardComponent({
         rounded-[var(--radius-lg)]
         font-display
         flex flex-col items-center justify-center gap-1
-        transition-all duration-[var(--duration-fast)]
+        transition-all duration-[var(--duration-normal)] ease-[var(--easing)]
         relative overflow-hidden
         ${!disabled && onClick ? 'cursor-pointer' : 'cursor-default'}
-        ${disabled ? 'opacity-40 grayscale' : ''}
+        ${disabled ? 'opacity-50' : ''}
         ${isKeyboardSelected ? 'ring-[var(--input-focus-ring-width)] ring-[var(--color-text-accent)] ring-offset-2 ring-offset-[var(--color-bg-primary)]' : ''}
         focus-visible:outline-none
         focus-visible:ring-[var(--input-focus-ring-width)]
@@ -192,46 +246,56 @@ function CardComponent({
         borderStyle: 'solid',
         borderColor: suitStyle.border,
         boxShadow: isPlayable && !disabled
-          ? suitStyle.glowHover
+          ? suitStyle.shadowHover
           : disabled
-            ? 'none'
-            : suitStyle.glow,
-        transform: isPlayable && !disabled ? 'translateY(-4px)' : undefined,
+            ? '0 2px 4px rgba(0, 0, 0, 0.2)'
+            : suitStyle.shadow,
+        transform: isPlayable && !disabled ? 'translateY(-6px)' : undefined,
       }}
       onMouseEnter={(e) => {
         if (!disabled && onClick) {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = suitStyle.glowHover;
-          (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-8px) scale(1.05)';
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = suitStyle.shadowHover;
+          (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-8px) scale(1.03)';
         }
       }}
       onMouseLeave={(e) => {
         if (!disabled) {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = isPlayable ? suitStyle.glowHover : suitStyle.glow;
-          (e.currentTarget as HTMLButtonElement).style.transform = isPlayable ? 'translateY(-4px)' : '';
+          (e.currentTarget as HTMLButtonElement).style.boxShadow = isPlayable ? suitStyle.shadowHover : suitStyle.shadow;
+          (e.currentTarget as HTMLButtonElement).style.transform = isPlayable ? 'translateY(-6px)' : '';
         }
       }}
     >
-      {/* Playable indicator glow pulse */}
+      {/* Parchment texture overlay */}
+      <div
+        className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none opacity-40"
+        style={{
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.08) 100%)',
+        }}
+      />
+
+      {/* Ethereal glow for playable cards */}
       {isPlayable && !disabled && (
         <div
-          className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none animate-pulse"
+          className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none"
           style={{
-            boxShadow: `inset 0 0 20px ${suitStyle.border}`,
-            opacity: 0.3,
+            background: `radial-gradient(ellipse at center, ${suitStyle.innerGlow} 0%, transparent 65%)`,
+            animation: 'ethereal-pulse 2.5s ease-in-out infinite',
           }}
         />
       )}
 
-      {/* Top-left value */}
+      {/* Top-left value with mystical typography */}
       {!isSpecial && (
         <span
           className={`
-            absolute top-1 left-1.5
+            absolute ${sizeConfig.cornerOffset}
             font-display font-bold
             ${sizeConfig.cornerText}
-            drop-shadow-lg
           `}
-          style={{ color: suitStyle.text }}
+          style={{
+            color: suitStyle.text,
+            textShadow: `0 1px 3px rgba(0, 0, 0, 0.4), 0 0 8px ${suitStyle.innerGlow}`,
+          }}
         >
           {card.value}
         </span>
@@ -246,28 +310,32 @@ function CardComponent({
         className={`
           ${sizeConfig.emblem}
           object-contain
-          ${isSpecial ? '' : 'opacity-90'}
-          drop-shadow-lg
+          ${isSpecial ? '' : 'opacity-85'}
         `}
+        style={{
+          filter: `drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)) ${isPlayable ? 'brightness(1.05)' : ''}`,
+        }}
       />
 
       {/* Bottom-right value (rotated) */}
       {!isSpecial && (
         <span
           className={`
-            absolute bottom-1 right-1.5
+            absolute ${sizeConfig.cornerOffsetBottom}
             font-display font-bold
             ${sizeConfig.cornerText}
             rotate-180
-            drop-shadow-lg
           `}
-          style={{ color: suitStyle.text }}
+          style={{
+            color: suitStyle.text,
+            textShadow: `0 1px 3px rgba(0, 0, 0, 0.4), 0 0 8px ${suitStyle.innerGlow}`,
+          }}
         >
           {card.value}
         </span>
       )}
 
-      {/* Special card badge */}
+      {/* Special card badge with transmutation glow */}
       {isSpecial && (
         <span
           className={`
@@ -275,22 +343,46 @@ function CardComponent({
             ${sizeConfig.badge}
             font-display font-bold
             rounded-[var(--radius-sm)]
-            ${card.color === 'red'
-              ? 'bg-[var(--color-warning)] text-black shadow-[0_0_10px_var(--color-warning)]'
-              : 'bg-[var(--color-error)] text-white shadow-[0_0_10px_var(--color-error)]'
-            }
           `}
+          style={{
+            backgroundColor: card.color === 'red'
+              ? 'var(--color-success)'
+              : 'var(--color-error)',
+            color: card.color === 'red'
+              ? '#0B0E14'
+              : '#FEF2F2',
+            boxShadow: card.color === 'red'
+              ? '0 2px 10px rgba(45, 212, 191, 0.6)'
+              : '0 2px 10px rgba(220, 38, 38, 0.6)',
+          }}
         >
           {card.color === 'red' ? '+5' : '-2'}
         </span>
       )}
 
-      {/* Disabled overlay with X mark */}
+      {/* Disabled overlay with arcane seal */}
       {disabled && onClick && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-[var(--radius-lg)]">
-          <span className="text-[var(--color-error)] text-2xl font-display drop-shadow-lg">
-            X
-          </span>
+        <div
+          className="absolute inset-0 flex items-center justify-center rounded-[var(--radius-lg)]"
+          style={{
+            backgroundColor: 'rgba(11, 14, 20, 0.6)',
+            backdropFilter: 'grayscale(90%) brightness(0.7)',
+          }}
+        >
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.8), rgba(127, 29, 29, 0.8))',
+              boxShadow: '0 0 15px rgba(220, 38, 38, 0.4)',
+            }}
+          >
+            <span
+              className="font-display text-xl font-bold text-white"
+              style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}
+            >
+              ✕
+            </span>
+          </div>
         </div>
       )}
     </button>
@@ -332,6 +424,11 @@ export function CardBack({ size = 'medium', teamColor }: CardBackProps) {
     2: 'var(--color-team2-primary)',
   };
 
+  const teamGlows = {
+    1: 'rgba(180, 83, 9, 0.3)',
+    2: 'rgba(124, 58, 237, 0.3)',
+  };
+
   return (
     <div
       className={`
@@ -344,41 +441,65 @@ export function CardBack({ size = 'medium', teamColor }: CardBackProps) {
         backgroundColor: 'var(--color-bg-tertiary)',
         borderWidth: sizeConfig.borderWidth,
         borderStyle: 'solid',
-        borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-default)',
+        borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)',
+        boxShadow: teamColor
+          ? `0 4px 20px rgba(0, 0, 0, 0.5), 0 0 25px ${teamGlows[teamColor]}`
+          : '0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
         background: `
-          repeating-linear-gradient(
-            45deg,
-            var(--color-bg-tertiary),
-            var(--color-bg-tertiary) 8px,
-            var(--color-bg-secondary) 8px,
-            var(--color-bg-secondary) 16px
+          linear-gradient(135deg,
+            var(--color-bg-tertiary) 0%,
+            var(--color-bg-secondary) 50%,
+            var(--color-bg-tertiary) 100%
           )
         `,
-        boxShadow: teamColor
-          ? `0 0 10px ${teamColors[teamColor]}`
-          : '0 0 5px var(--color-shadow)',
       }}
     >
-      {/* Inner border */}
+      {/* Alchemical circle pattern */}
       <div
-        className="absolute inset-2 border-2 rounded-[var(--radius-md)]"
+        className="absolute inset-3 rounded-full border opacity-20"
         style={{
-          borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-default)',
-          opacity: 0.5,
+          borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)',
         }}
       />
 
-      {/* Center icon */}
+      {/* Sacred geometry corners */}
       <div
-        className="w-8 h-8 rounded-full flex items-center justify-center"
+        className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 opacity-50"
+        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+      />
+      <div
+        className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 opacity-50"
+        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+      />
+      <div
+        className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 opacity-50"
+        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+      />
+      <div
+        className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 opacity-50"
+        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+      />
+
+      {/* Center symbol */}
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center"
         style={{
-          backgroundColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)',
+          background: teamColor
+            ? `linear-gradient(135deg, ${teamColors[teamColor]}, color-mix(in srgb, ${teamColors[teamColor]} 80%, black))`
+            : 'linear-gradient(135deg, var(--color-bg-accent) 0%, rgba(193, 127, 89, 0.8) 100%)',
           boxShadow: teamColor
-            ? `0 0 15px ${teamColors[teamColor]}`
-            : '0 0 10px var(--color-glow)',
+            ? `0 2px 12px ${teamGlows[teamColor]}`
+            : '0 2px 12px rgba(212, 165, 116, 0.5)',
         }}
       >
-        <span className="text-white font-display text-lg">J</span>
+        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 4L21 20H3L12 4Z"
+            stroke="var(--color-text-inverse)"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
       </div>
     </div>
   );
@@ -413,19 +534,49 @@ export function CardStack({ count, size = 'medium', maxVisible = 5 }: CardStackP
         </div>
       ))}
 
-      {/* Card count badge */}
+      {/* Card count badge with copper accent */}
       {count > 0 && (
         <div
-          className="absolute -top-2 -right-2 z-10 w-6 h-6 rounded-full flex items-center justify-center font-display text-xs"
+          className="absolute -top-2 -right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center font-display text-xs font-bold"
           style={{
-            backgroundColor: 'var(--color-bg-accent)',
-            color: 'white',
-            boxShadow: '0 0 10px var(--color-bg-accent)',
+            background: 'linear-gradient(135deg, var(--color-bg-accent), rgba(193, 127, 89, 0.9))',
+            color: 'var(--color-text-inverse)',
+            boxShadow: '0 2px 10px rgba(212, 165, 116, 0.5)',
           }}
         >
           {count}
         </div>
       )}
+    </div>
+  );
+}
+
+// ============================================================================
+// ELEGANT CARD DISPLAY (for showcasing single cards)
+// ============================================================================
+
+interface ElegantCardDisplayProps {
+  card: CardType;
+  size?: 'small' | 'medium' | 'large';
+  /** Add dramatic spotlight effect */
+  spotlight?: boolean;
+}
+
+export function ElegantCardDisplay({ card, size = 'medium', spotlight = false }: ElegantCardDisplayProps) {
+  return (
+    <div className="relative inline-block">
+      {/* Mystical spotlight effect */}
+      {spotlight && (
+        <div
+          className="absolute -inset-10 rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(212, 165, 116, 0.15) 0%, rgba(193, 127, 89, 0.08) 30%, transparent 60%)',
+            filter: 'blur(12px)',
+            animation: 'ethereal-pulse 3s ease-in-out infinite',
+          }}
+        />
+      )}
+      <Card card={card} size={size} />
     </div>
   );
 }

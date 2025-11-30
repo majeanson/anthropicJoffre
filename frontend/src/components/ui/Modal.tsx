@@ -1,24 +1,25 @@
 /**
- * Modal Component - Retro Gaming Edition
+ * Modal Component - Midnight Alchemy Edition
  *
- * A distinctive modal system with arcade-inspired aesthetics.
- * Features neon borders, scanline effects, and satisfying animations.
+ * Mystical modal system with ethereal lighting and brass frame aesthetics.
+ * Each modal feels like opening an ancient grimoire or alchemist's cabinet.
  *
  * Themes:
- * - neon: Cyan/pink neon glow (default for retro gaming)
- * - arcade: Classic arcade cabinet style
- * - terminal: Green terminal/hacker aesthetic
- * - hologram: Futuristic holographic effect
- * - classic: Fallback to original parchment style
+ * - arcane: Copper accents with mystical glow (default)
+ * - midnight: Deep blue celestial atmosphere
+ * - ember: Warm orange transmutation glow
+ * - void: Pure darkness with subtle starlight
+ * - parchment: Classic manuscript appearance
+ * - teal: Alchemical teal transformation
  *
  * Features:
  * - Multiple size variants (sm, md, lg, xl, full)
- * - Neon glow effects
- * - Scanline overlay option
+ * - Ethereal shadow and copper glow effects
  * - Mobile full-screen optimization
  * - Keyboard handling (ESC to close)
  * - Body scroll lock
  * - Stacking support for nested modals
+ * - Sacred geometry corner decorations
  */
 
 import { ReactNode, useEffect, useRef } from 'react';
@@ -26,10 +27,11 @@ import { getModalZIndex } from '../../config/zIndex';
 import { sizes } from '../../config/layout';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
-// New retro gaming themes + backward compatible legacy themes
 export type ModalTheme =
-  | 'neon' | 'arcade' | 'terminal' | 'hologram' | 'classic'  // New themes
-  | 'parchment' | 'blue' | 'purple' | 'green' | 'orange' | 'red';  // Legacy themes (mapped to new)
+  | 'arcane' | 'midnight' | 'ember' | 'void' | 'parchment' | 'teal'
+  // Legacy themes for backward compatibility
+  | 'elegant' | 'velvet' | 'neon' | 'arcade' | 'hologram' | 'classic' | 'terminal'
+  | 'blue' | 'purple' | 'green' | 'orange' | 'red';
 
 export interface ModalProps {
   /** Whether modal is open */
@@ -92,7 +94,7 @@ export interface ModalProps {
   testId?: string;
 }
 
-// Theme configurations
+// Theme configurations - Midnight Alchemy aesthetic
 const themeConfigs: Record<ModalTheme, {
   backdrop: string;
   container: string;
@@ -103,116 +105,186 @@ const themeConfigs: Record<ModalTheme, {
   footer: string;
   glow: string;
 }> = {
+  arcane: {
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#131824] via-[#1A1F2E] to-[#0B0E14]',
+    header: 'bg-gradient-to-r from-[#1A1F2E] via-[#2D3548] to-[#1A1F2E]',
+    border: 'border-[#C17F59]',
+    title: 'text-[#D4A574]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444] hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]',
+    footer: 'bg-[#0B0E14]',
+    glow: '0 0 50px rgba(193, 127, 89, 0.2), 0 0 100px rgba(212, 165, 116, 0.1), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  midnight: {
+    backdrop: 'bg-[rgba(11,14,20,0.96)]',
+    container: 'bg-gradient-to-b from-[#0F172A] via-[#1E293B] to-[#0F172A]',
+    header: 'bg-gradient-to-r from-[#1E3A5F] via-[#2563EB] to-[#1E3A5F]',
+    border: 'border-[#3B82F6]',
+    title: 'text-[#93C5FD]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444] hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]',
+    footer: 'bg-[#0F172A]',
+    glow: '0 0 50px rgba(59, 130, 246, 0.25), 0 0 100px rgba(37, 99, 235, 0.1), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  ember: {
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#1C1410] via-[#2A1F18] to-[#0D0806]',
+    header: 'bg-gradient-to-r from-[#B45309] via-[#F59E0B] to-[#B45309]',
+    border: 'border-[#D97706]',
+    title: 'text-[#0B0E14]',
+    closeButton: 'bg-[#7F1D1D] hover:bg-[#991B1B] hover:shadow-[0_0_20px_rgba(127,29,29,0.5)]',
+    footer: 'bg-[#0D0806]',
+    glow: '0 0 50px rgba(245, 158, 11, 0.25), 0 0 100px rgba(217, 119, 6, 0.1), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  void: {
+    backdrop: 'bg-[rgba(0,0,0,0.98)]',
+    container: 'bg-[#050505]',
+    header: 'bg-gradient-to-r from-[#1F2937] via-[#374151] to-[#1F2937]',
+    border: 'border-[#4B5563]',
+    title: 'text-[#9CA3AF]',
+    closeButton: 'bg-[#374151] hover:bg-[#4B5563] hover:shadow-[0_0_15px_rgba(75,85,99,0.5)]',
+    footer: 'bg-[#050505]',
+    glow: '0 0 30px rgba(75, 85, 99, 0.15), 0 8px 32px rgba(0, 0, 0, 0.9)',
+  },
+  parchment: {
+    backdrop: 'bg-[rgba(0,0,0,0.75)]',
+    container: 'bg-gradient-to-b from-[#F5F0E6] to-[#E8E4DC]',
+    header: 'bg-gradient-to-r from-[#5e5344] via-[#3d3428] to-[#5e5344]',
+    border: 'border-[#B45309]',
+    title: 'text-[#F5F0E6]',
+    closeButton: 'bg-[#B45309] hover:bg-[#D97706] hover:shadow-[0_0_15px_rgba(180,83,9,0.5)]',
+    footer: 'bg-[#E8E4DC]',
+    glow: '0 0 40px rgba(180, 83, 9, 0.15), 0 8px 32px rgba(0, 0, 0, 0.3)',
+  },
+  teal: {
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#0D1F1F] via-[#134E4A] to-[#0D1F1F]',
+    header: 'bg-gradient-to-r from-[#115E59] via-[#2DD4BF] to-[#115E59]',
+    border: 'border-[#2DD4BF]',
+    title: 'text-[#0B0E14]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444] hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]',
+    footer: 'bg-[#0D1F1F]',
+    glow: '0 0 50px rgba(45, 212, 191, 0.25), 0 0 100px rgba(45, 212, 191, 0.1), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  // Legacy theme mappings
+  elegant: {
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#131824] via-[#1A1F2E] to-[#0B0E14]',
+    header: 'bg-gradient-to-r from-[#1A1F2E] via-[#2D3548] to-[#1A1F2E]',
+    border: 'border-[#C17F59]',
+    title: 'text-[#D4A574]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#0B0E14]',
+    glow: '0 0 50px rgba(193, 127, 89, 0.2), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  velvet: {
+    backdrop: 'bg-black/90',
+    container: 'bg-gradient-to-b from-[#2a1a1a] to-[#1a0f0f]',
+    header: 'bg-gradient-to-r from-[#4a1a1a] via-[#6a2a2a] to-[#4a1a1a]',
+    border: 'border-[#8a3a3a]',
+    title: 'text-[#f0d0d0]',
+    closeButton: 'bg-[#6a2a2a] hover:bg-[#8a3a3a]',
+    footer: 'bg-[#1a0f0f]',
+    glow: '0 0 40px rgba(138, 58, 58, 0.2), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
   neon: {
-    backdrop: 'bg-[var(--color-bg-overlay)]',
-    container: 'bg-[var(--color-bg-secondary)]',
-    header: 'bg-gradient-to-r from-[var(--color-bg-accent)] to-[var(--color-team2-primary)]',
-    border: 'border-[var(--color-border-accent)]',
-    title: 'text-[var(--color-text-primary)]',
-    closeButton: 'bg-[var(--color-error)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_var(--color-error)]',
-    footer: 'bg-[var(--color-bg-tertiary)]',
-    glow: '0 0 30px var(--color-glow), 0 0 60px var(--color-glow)',
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#131824] to-[#0B0E14]',
+    header: 'bg-gradient-to-r from-[#1A1F2E] via-[#2D3548] to-[#1A1F2E]',
+    border: 'border-[#C17F59]',
+    title: 'text-[#D4A574]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#0B0E14]',
+    glow: '0 0 50px rgba(193, 127, 89, 0.2), 0 8px 32px rgba(0, 0, 0, 0.7)',
   },
   arcade: {
-    backdrop: 'bg-black/90',
-    container: 'bg-[#1a1a2e]',
-    header: 'bg-gradient-to-r from-[#ff6b35] to-[#f7931a]',
-    border: 'border-[#ffbe0b]',
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#131824] to-[#0B0E14]',
+    header: 'bg-gradient-to-r from-[#B45309] to-[#F59E0B]',
+    border: 'border-[#F59E0B]',
+    title: 'text-[#0B0E14]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#0B0E14]',
+    glow: '0 0 40px rgba(245, 158, 11, 0.25), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  hologram: {
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#131824] to-[#0B0E14]',
+    header: 'bg-gradient-to-r from-[#60A5FA] to-[#3B82F6]',
+    border: 'border-[#60A5FA]',
     title: 'text-white',
-    closeButton: 'bg-red-600 hover:bg-red-500 hover:shadow-[0_0_15px_#ff0000]',
-    footer: 'bg-[#0f0f23]',
-    glow: '0 0 20px #ffbe0b, 0 0 40px #ffbe0b',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#0B0E14]',
+    glow: '0 0 40px rgba(96, 165, 250, 0.25), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  classic: {
+    backdrop: 'bg-black/70',
+    container: 'bg-gradient-to-b from-[#F5F0E6] to-[#E8E4DC]',
+    header: 'bg-gradient-to-r from-[#5e5344] via-[#3d3428] to-[#5e5344]',
+    border: 'border-[#B45309]',
+    title: 'text-[#F5F0E6]',
+    closeButton: 'bg-[#B45309] hover:bg-[#D97706]',
+    footer: 'bg-[#E8E4DC]',
+    glow: '0 0 30px rgba(180, 83, 9, 0.15), 0 8px 32px rgba(0, 0, 0, 0.3)',
   },
   terminal: {
     backdrop: 'bg-black/95',
     container: 'bg-[#0a0a0a]',
-    header: 'bg-[#001100]',
-    border: 'border-[#00ff00]',
-    title: 'text-[#00ff00]',
-    closeButton: 'bg-[#003300] hover:bg-[#004400] text-[#00ff00] hover:shadow-[0_0_15px_#00ff00]',
-    footer: 'bg-[#001100]',
-    glow: '0 0 20px #00ff00, 0 0 40px #00ff00',
-  },
-  hologram: {
-    backdrop: 'bg-black/80',
-    container: 'bg-gradient-to-br from-[#1a1a2e]/95 to-[#16213e]/95',
-    header: 'bg-gradient-to-r from-[#00d4ff] to-[#9d4edd]',
-    border: 'border-[#00d4ff]',
-    title: 'text-white',
-    closeButton: 'bg-[#ff006e] hover:bg-[#ff2a6d] hover:shadow-[0_0_20px_#ff006e]',
-    footer: 'bg-[#0f0f23]/80',
-    glow: '0 0 30px #00d4ff, 0 0 60px #9d4edd',
-  },
-  classic: {
-    backdrop: 'bg-black/70',
-    container: 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-gray-800 dark:to-gray-900',
-    header: 'bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-800',
-    border: 'border-amber-900 dark:border-gray-600',
-    title: 'text-amber-50',
-    closeButton: 'bg-red-600 hover:bg-red-700',
-    footer: 'bg-gray-100 dark:bg-gray-800',
-    glow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-  },
-  // Legacy themes (backward compatible - mapped to skin-aware neon style with color accents)
-  parchment: {
-    backdrop: 'bg-[var(--color-bg-overlay)]',
-    container: 'bg-[var(--color-bg-secondary)]',
-    header: 'bg-gradient-to-r from-amber-700 to-orange-700',
-    border: 'border-amber-600',
-    title: 'text-amber-50',
-    closeButton: 'bg-[var(--color-error)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_var(--color-error)]',
-    footer: 'bg-[var(--color-bg-tertiary)]',
-    glow: '0 0 20px rgba(245, 158, 11, 0.3)',
+    header: 'bg-[#0a1a0a]',
+    border: 'border-[#2DD4BF]',
+    title: 'text-[#2DD4BF]',
+    closeButton: 'bg-[#1a3a1a] hover:bg-[#2a4a2a] text-[#2DD4BF]',
+    footer: 'bg-[#0a1a0a]',
+    glow: '0 0 30px rgba(45, 212, 191, 0.2), 0 8px 32px rgba(0, 0, 0, 0.8)',
   },
   blue: {
-    backdrop: 'bg-[var(--color-bg-overlay)]',
-    container: 'bg-[var(--color-bg-secondary)]',
-    header: 'bg-gradient-to-r from-blue-600 to-cyan-500',
-    border: 'border-blue-500',
-    title: 'text-white',
-    closeButton: 'bg-[var(--color-error)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_var(--color-error)]',
-    footer: 'bg-[var(--color-bg-tertiary)]',
-    glow: '0 0 20px rgba(59, 130, 246, 0.4)',
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#0F172A] to-[#1E293B]',
+    header: 'bg-gradient-to-r from-[#1E3A5F] to-[#2563EB]',
+    border: 'border-[#3B82F6]',
+    title: 'text-[#E8E4DC]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#0F172A]',
+    glow: '0 0 40px rgba(59, 130, 246, 0.2), 0 8px 32px rgba(0, 0, 0, 0.7)',
   },
   purple: {
-    backdrop: 'bg-[var(--color-bg-overlay)]',
-    container: 'bg-[var(--color-bg-secondary)]',
-    header: 'bg-gradient-to-r from-purple-600 to-pink-500',
-    border: 'border-purple-500',
-    title: 'text-white',
-    closeButton: 'bg-[var(--color-error)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_var(--color-error)]',
-    footer: 'bg-[var(--color-bg-tertiary)]',
-    glow: '0 0 20px rgba(168, 85, 247, 0.4)',
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#1E1B2E] to-[#0F0D1A]',
+    header: 'bg-gradient-to-r from-[#5B21B6] to-[#7C3AED]',
+    border: 'border-[#8B5CF6]',
+    title: 'text-[#E8E4DC]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#0F0D1A]',
+    glow: '0 0 40px rgba(139, 92, 246, 0.25), 0 8px 32px rgba(0, 0, 0, 0.7)',
   },
   green: {
-    backdrop: 'bg-[var(--color-bg-overlay)]',
-    container: 'bg-[var(--color-bg-secondary)]',
-    header: 'bg-gradient-to-r from-green-600 to-emerald-500',
-    border: 'border-green-500',
-    title: 'text-white',
-    closeButton: 'bg-[var(--color-error)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_var(--color-error)]',
-    footer: 'bg-[var(--color-bg-tertiary)]',
-    glow: '0 0 20px rgba(34, 197, 94, 0.4)',
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#0D1F1F] to-[#052E16]',
+    header: 'bg-gradient-to-r from-[#047857] to-[#059669]',
+    border: 'border-[#10B981]',
+    title: 'text-[#E8E4DC]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#052E16]',
+    glow: '0 0 40px rgba(16, 185, 129, 0.25), 0 8px 32px rgba(0, 0, 0, 0.7)',
   },
   orange: {
-    backdrop: 'bg-[var(--color-bg-overlay)]',
-    container: 'bg-[var(--color-bg-secondary)]',
-    header: 'bg-gradient-to-r from-orange-600 to-amber-500',
-    border: 'border-orange-500',
-    title: 'text-white',
-    closeButton: 'bg-[var(--color-error)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_var(--color-error)]',
-    footer: 'bg-[var(--color-bg-tertiary)]',
-    glow: '0 0 20px rgba(249, 115, 22, 0.4)',
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#1C1410] to-[#0D0806]',
+    header: 'bg-gradient-to-r from-[#B45309] to-[#D97706]',
+    border: 'border-[#F59E0B]',
+    title: 'text-[#E8E4DC]',
+    closeButton: 'bg-[#DC2626] hover:bg-[#EF4444]',
+    footer: 'bg-[#0D0806]',
+    glow: '0 0 40px rgba(245, 158, 11, 0.25), 0 8px 32px rgba(0, 0, 0, 0.7)',
   },
   red: {
-    backdrop: 'bg-[var(--color-bg-overlay)]',
-    container: 'bg-[var(--color-bg-secondary)]',
-    header: 'bg-gradient-to-r from-red-600 to-rose-500',
-    border: 'border-red-500',
-    title: 'text-white',
-    closeButton: 'bg-[var(--color-error)] hover:bg-[var(--color-error)] hover:shadow-[0_0_20px_var(--color-error)]',
-    footer: 'bg-[var(--color-bg-tertiary)]',
-    glow: '0 0 20px rgba(239, 68, 68, 0.4)',
+    backdrop: 'bg-[rgba(11,14,20,0.94)]',
+    container: 'bg-gradient-to-b from-[#1F1212] to-[#0D0606]',
+    header: 'bg-gradient-to-r from-[#B91C1C] to-[#DC2626]',
+    border: 'border-[#EF4444]',
+    title: 'text-[#E8E4DC]',
+    closeButton: 'bg-[#7F1D1D] hover:bg-[#991B1B]',
+    footer: 'bg-[#0D0606]',
+    glow: '0 0 40px rgba(220, 38, 38, 0.25), 0 8px 32px rgba(0, 0, 0, 0.7)',
   },
 };
 
@@ -223,7 +295,7 @@ export function Modal({
   title,
   subtitle,
   icon,
-  theme = 'neon',
+  theme = 'arcane',
   size = 'md',
   footer,
   showCloseButton = true,
@@ -307,14 +379,16 @@ export function Modal({
       data-testid={`${testId}-backdrop`}
       onKeyDown={handleKeyDown}
     >
-      {/* Backdrop */}
+      {/* Backdrop with mystical blur */}
       <div
         className={`
           absolute inset-0
           ${config.backdrop}
           backdrop-blur-[var(--modal-backdrop-blur)]
-          animate-fadeIn
         `}
+        style={{
+          animation: 'fade-in var(--duration-normal) var(--easing)',
+        }}
         onClick={handleBackdropClick}
         aria-hidden="true"
       />
@@ -334,11 +408,11 @@ export function Modal({
           ${mobileClasses}
           overflow-hidden
           ${customHeight || ''}
-          animate-slideUp
           ${glowAnimation ? 'transition-shadow duration-[var(--duration-normal)]' : ''}
         `}
         style={{
           boxShadow: glowAnimation ? config.glow : undefined,
+          animation: 'scale-in var(--duration-normal) var(--easing)',
         }}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -347,12 +421,18 @@ export function Modal({
         aria-labelledby={title ? `${testId}-title` : undefined}
         data-testid={`${testId}-content`}
       >
+        {/* Sacred geometry corner decorations */}
+        <div className="absolute top-0 left-0 w-6 h-6 border-l-2 border-t-2 border-[var(--color-text-accent)] opacity-60 rounded-tl-[var(--radius-xl)]" />
+        <div className="absolute top-0 right-0 w-6 h-6 border-r-2 border-t-2 border-[var(--color-text-accent)] opacity-60 rounded-tr-[var(--radius-xl)]" />
+        <div className="absolute bottom-0 left-0 w-6 h-6 border-l-2 border-b-2 border-[var(--color-text-accent)] opacity-60 rounded-bl-[var(--radius-xl)]" />
+        <div className="absolute bottom-0 right-0 w-6 h-6 border-r-2 border-b-2 border-[var(--color-text-accent)] opacity-60 rounded-br-[var(--radius-xl)]" />
+
         {/* Scanline overlay */}
         {scanlines && (
           <div
             className="absolute inset-0 pointer-events-none z-50"
             style={{
-              background: 'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 2px)',
+              background: 'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 3px)',
             }}
           />
         )}
@@ -363,7 +443,7 @@ export function Modal({
             className={`
               sticky top-0
               ${config.header}
-              px-6 py-4
+              px-6 py-5
               flex items-center justify-between
               border-b-[var(--modal-border-width)]
               ${config.border}
@@ -371,9 +451,9 @@ export function Modal({
               ${mobileFullScreen ? 'sm:rounded-t-[calc(var(--radius-xl)-var(--modal-border-width))] max-sm:rounded-t-none' : 'rounded-t-[calc(var(--radius-xl)-var(--modal-border-width))]'}
             `}
           >
-            <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="flex items-center gap-4 flex-1 min-w-0">
               {icon && (
-                <span className="text-4xl flex-shrink-0 drop-shadow-lg">
+                <span className="text-3xl flex-shrink-0 drop-shadow-[0_0_8px_rgba(212,165,116,0.5)]">
                   {icon}
                 </span>
               )}
@@ -384,7 +464,7 @@ export function Modal({
                     className={`
                       text-xl md:text-2xl
                       font-display
-                      uppercase
+                      font-bold
                       tracking-wider
                       ${config.title}
                       drop-shadow-lg
@@ -394,7 +474,7 @@ export function Modal({
                   </h2>
                 )}
                 {subtitle && (
-                  <p className="text-sm md:text-base text-white/80 font-body truncate">
+                  <p className="text-sm md:text-base opacity-75 font-body italic truncate mt-1">
                     {subtitle}
                   </p>
                 )}
@@ -408,28 +488,32 @@ export function Modal({
                   ml-4
                   ${config.closeButton}
                   text-white
-                  w-10 h-10
+                  w-11 h-11
                   rounded-[var(--radius-md)]
                   font-display
+                  font-bold
                   text-xl
                   transition-all duration-[var(--duration-fast)]
                   hover:scale-110
                   active:scale-95
                   flex-shrink-0
                   flex items-center justify-center
-                  border-2 border-white/20
+                  border border-white/20
                 `}
                 aria-label="Close modal"
                 data-testid={`${testId}-close`}
               >
-                X
+                ×
               </button>
             )}
           </div>
         )}
 
         {/* Body */}
-        <div className={contentClassName || 'flex-1 overflow-y-auto p-6'}>
+        <div
+          className={contentClassName || 'flex-1 overflow-y-auto p-6'}
+          style={{ color: 'var(--color-text-primary)' }}
+        >
           {children}
         </div>
 
@@ -438,7 +522,7 @@ export function Modal({
           <div
             className={`
               ${config.footer}
-              p-4
+              p-5
               border-t-[var(--modal-border-width)]
               ${config.border}
               ${mobileFullScreen ? 'sm:rounded-b-[calc(var(--radius-xl)-var(--modal-border-width))] max-sm:rounded-b-none' : 'rounded-b-[calc(var(--radius-xl)-var(--modal-border-width))]'}
@@ -459,14 +543,29 @@ export function Modal({
 
 export interface PresetModalProps extends Omit<ModalProps, 'theme'> {}
 
-/** Neon-styled modal (default retro gaming) */
-export const NeonModal = (props: PresetModalProps) => (
-  <Modal theme="neon" glowAnimation scanlines {...props} />
+/** Arcane copper-accented modal (default) */
+export const ArcaneModal = (props: PresetModalProps) => (
+  <Modal theme="arcane" glowAnimation {...props} />
 );
 
-/** Arcade cabinet styled modal */
-export const ArcadeModal = (props: PresetModalProps) => (
-  <Modal theme="arcade" glowAnimation {...props} />
+/** Deep midnight celestial modal */
+export const MidnightModal = (props: PresetModalProps) => (
+  <Modal theme="midnight" glowAnimation {...props} />
+);
+
+/** Warm ember transmutation modal */
+export const EmberModal = (props: PresetModalProps) => (
+  <Modal theme="ember" glowAnimation {...props} />
+);
+
+/** Alchemical teal transformation modal */
+export const TealModal = (props: PresetModalProps) => (
+  <Modal theme="teal" glowAnimation {...props} />
+);
+
+/** Classic parchment styled modal */
+export const ClassicModal = (props: PresetModalProps) => (
+  <Modal theme="parchment" {...props} />
 );
 
 /** Terminal/hacker styled modal */
@@ -474,14 +573,17 @@ export const TerminalModal = (props: PresetModalProps) => (
   <Modal theme="terminal" scanlines {...props} />
 );
 
-/** Holographic styled modal */
+// Legacy exports for backward compatibility
+export const ElegantModal = ArcaneModal;
+export const NeonModal = ArcaneModal;
+export const VelvetModal = (props: PresetModalProps) => (
+  <Modal theme="velvet" glowAnimation {...props} />
+);
+export const ArcadeModal = (props: PresetModalProps) => (
+  <Modal theme="arcade" glowAnimation {...props} />
+);
 export const HologramModal = (props: PresetModalProps) => (
   <Modal theme="hologram" glowAnimation {...props} />
-);
-
-/** Classic parchment styled modal (backward compatible) */
-export const ClassicModal = (props: PresetModalProps) => (
-  <Modal theme="classic" {...props} />
 );
 
 export default Modal;

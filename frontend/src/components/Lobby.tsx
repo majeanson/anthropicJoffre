@@ -507,7 +507,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       <Button
                         data-keyboard-nav="login-btn"
                         onClick={onShowLogin}
-                        variant="neon"
+                        variant="elegant"
                         size="sm"
                       >
                         Login

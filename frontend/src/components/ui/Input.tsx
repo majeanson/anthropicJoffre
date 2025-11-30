@@ -1,22 +1,22 @@
 /**
- * Input Component - Retro Gaming Edition
+ * Input Component - Midnight Alchemy Edition
  *
- * A distinctive input field with arcade-inspired aesthetics.
- * Features neon focus states, pixel-perfect borders, and glowing effects.
+ * Mystical input fields with brass frame aesthetics and ethereal focus states.
+ * Each keystroke feels like inscribing ancient runes.
  *
  * Features:
- * - 3 variants: default, filled, neon
+ * - 3 variants: default, filled, arcane
  * - 3 sizes: sm, md, lg
- * - Error state with glitch effect
+ * - Error state with dragon's blood accent
  * - Icon support (left/right)
- * - Password visibility toggle
- * - Neon glow on focus
- * - Full accessibility
+ * - Password visibility toggle with eye of seeing
+ * - Ethereal glow on focus
+ * - Copper accent underline animation
  *
  * Usage:
  * ```tsx
  * <Input
- *   label="PLAYER NAME"
+ *   label="Alchemist Name"
  *   value={name}
  *   onChange={(e) => setName(e.target.value)}
  *   placeholder="Enter your name..."
@@ -26,7 +26,7 @@
 
 import { InputHTMLAttributes, forwardRef, useState, ReactNode } from 'react';
 
-export type InputVariant = 'default' | 'filled' | 'neon';
+export type InputVariant = 'default' | 'filled' | 'elegant' | 'arcane';
 export type InputSize = 'sm' | 'md' | 'lg';
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
@@ -57,15 +57,15 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 }
 
 const sizeClasses: Record<InputSize, string> = {
-  sm: 'px-3 py-2 text-sm',
-  md: 'px-4 py-3 text-base',
-  lg: 'px-5 py-4 text-lg',
+  sm: 'px-3 py-2.5 text-sm',
+  md: 'px-4 py-3.5 text-base',
+  lg: 'px-5 py-4.5 text-lg',
 };
 
 const labelSizeClasses: Record<InputSize, string> = {
-  sm: 'text-xs mb-1.5',
-  md: 'text-sm mb-2',
-  lg: 'text-base mb-2.5',
+  sm: 'text-xs mb-2',
+  md: 'text-sm mb-2.5',
+  lg: 'text-base mb-3',
 };
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
@@ -96,9 +96,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
   const actualType = type === 'password' && showPassword ? 'text' : type;
 
   // Icon padding
-  const leftPaddingClass = leftIcon ? (size === 'sm' ? 'pl-9' : size === 'lg' ? 'pl-14' : 'pl-11') : '';
+  const leftPaddingClass = leftIcon ? (size === 'sm' ? 'pl-10' : size === 'lg' ? 'pl-14' : 'pl-12') : '';
   const rightPaddingClass = (rightIcon || (type === 'password' && showPasswordToggle))
-    ? (size === 'sm' ? 'pr-9' : size === 'lg' ? 'pr-14' : 'pr-11')
+    ? (size === 'sm' ? 'pr-10' : size === 'lg' ? 'pr-14' : 'pr-12')
     : '';
 
   // Variant-specific styles
@@ -107,37 +107,46 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
       bg-[var(--color-bg-secondary)]
       border-[var(--input-border-width)] border-[var(--color-border-default)]
       ${!error && isFocused ? 'border-[var(--color-text-accent)]' : ''}
-      ${glowOnFocus && isFocused && !error ? 'shadow-[0_0_15px_var(--color-glow)]' : ''}
+      ${glowOnFocus && isFocused && !error ? 'shadow-[0_0_20px_rgba(212,165,116,0.2),inset_0_0_15px_rgba(193,127,89,0.05)]' : ''}
     `,
     filled: `
       bg-[var(--color-bg-tertiary)]
       border-[var(--input-border-width)] border-transparent
       ${!error && isFocused ? 'border-[var(--color-text-accent)]' : ''}
-      ${glowOnFocus && isFocused && !error ? 'shadow-[0_0_15px_var(--color-glow)]' : ''}
+      ${glowOnFocus && isFocused && !error ? 'shadow-[0_0_20px_rgba(212,165,116,0.2),inset_0_0_15px_rgba(193,127,89,0.05)]' : ''}
     `,
-    neon: `
-      bg-transparent
-      border-[var(--input-border-width)] border-[var(--color-glow)]
-      ${isFocused && !error ? 'shadow-[inset_0_0_10px_var(--color-glow),0_0_20px_var(--color-glow)]' : 'shadow-[0_0_5px_var(--color-glow)]'}
+    elegant: `
+      bg-[var(--color-bg-primary)]
+      border-[var(--input-border-width)] border-[var(--color-border-accent)]
+      shadow-[inset_0_2px_6px_rgba(0,0,0,0.4)]
+      ${isFocused && !error ? 'shadow-[inset_0_2px_6px_rgba(0,0,0,0.4),0_0_25px_rgba(212,165,116,0.25)]' : ''}
+    `,
+    arcane: `
+      bg-gradient-to-b from-[var(--color-bg-secondary)] to-[var(--color-bg-primary)]
+      border-[var(--input-border-width)] border-[var(--color-border-accent)]
+      shadow-[inset_0_2px_8px_rgba(0,0,0,0.5),0_0_10px_rgba(193,127,89,0.1)]
+      ${isFocused && !error ? 'shadow-[inset_0_2px_8px_rgba(0,0,0,0.5),0_0_30px_rgba(212,165,116,0.3),0_0_50px_rgba(193,127,89,0.1)]' : ''}
     `,
   };
 
   // Error styles
   const errorStyles = error
-    ? 'border-[var(--color-error)] shadow-[0_0_10px_var(--color-error)]'
+    ? 'border-[var(--color-error)] shadow-[0_0_15px_rgba(220,38,38,0.25),inset_0_0_10px_rgba(220,38,38,0.05)]'
     : '';
 
   return (
     <div className={`${fullWidth ? 'w-full' : ''} ${containerClassName}`}>
-      {/* Label */}
+      {/* Label with mystical styling */}
       {label && (
         <label
           htmlFor={inputId}
           className={`
-            block font-display uppercase tracking-wider
+            block font-display font-medium tracking-wider uppercase
             text-[var(--color-text-secondary)]
             ${labelSizeClasses[size]}
             ${error ? 'text-[var(--color-error)]' : ''}
+            ${isFocused && !error ? 'text-[var(--color-text-accent)]' : ''}
+            transition-colors duration-[var(--duration-fast)]
           `}
         >
           {label}
@@ -145,16 +154,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
       )}
 
       {/* Input Container */}
-      <div className="relative">
+      <div className="relative group">
         {/* Left Icon */}
         {leftIcon && (
           <div className={`
-            absolute left-3 top-1/2 -translate-y-1/2
+            absolute left-3.5 top-1/2 -translate-y-1/2
             text-[var(--color-text-muted)]
             pointer-events-none
             ${isFocused ? 'text-[var(--color-text-accent)]' : ''}
             ${size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base'}
-            transition-colors duration-[var(--duration-fast)]
+            transition-all duration-[var(--duration-fast)]
+            ${isFocused ? 'drop-shadow-[0_0_4px_rgba(212,165,116,0.5)]' : ''}
           `}>
             {leftIcon}
           </div>
@@ -176,12 +186,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
           }}
           className={`
             w-full
-            font-body
+            font-body text-[1.1em]
             text-[var(--color-text-primary)]
             placeholder:text-[var(--color-text-muted)]
-            placeholder:font-body
+            placeholder:font-body placeholder:italic
             rounded-[var(--radius-md)]
-            transition-all duration-[var(--duration-fast)]
+            transition-all duration-[var(--duration-normal)]
             focus:outline-none
             ${sizeClasses[size]}
             ${leftPaddingClass}
@@ -197,7 +207,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
         {/* Right Icon or Password Toggle */}
         {(rightIcon || (type === 'password' && showPasswordToggle)) && (
           <div className={`
-            absolute right-3 top-1/2 -translate-y-1/2
+            absolute right-3.5 top-1/2 -translate-y-1/2
             ${size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base'}
           `}>
             {type === 'password' && showPasswordToggle ? (
@@ -207,24 +217,28 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
                 className={`
                   text-[var(--color-text-muted)]
                   hover:text-[var(--color-text-accent)]
-                  transition-colors duration-[var(--duration-fast)]
+                  transition-all duration-[var(--duration-fast)]
                   focus:outline-none
                   focus-visible:ring-[var(--input-focus-ring-width)]
                   focus-visible:ring-[var(--color-text-accent)]
                   rounded-[var(--radius-sm)]
-                  p-1
+                  p-1.5
+                  hover:bg-[rgba(193,127,89,0.1)]
+                  ${showPassword ? 'text-[var(--color-text-accent)]' : ''}
                 `}
                 disabled={disabled}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  // Eye with slash (hidden)
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  // Eye (visible)
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 )}
               </button>
@@ -232,8 +246,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
               <div className={`
                 text-[var(--color-text-muted)]
                 pointer-events-none
-                ${isFocused ? 'text-[var(--color-text-accent)]' : ''}
-                transition-colors duration-[var(--duration-fast)]
+                ${isFocused ? 'text-[var(--color-text-accent)] drop-shadow-[0_0_4px_rgba(212,165,116,0.5)]' : ''}
+                transition-all duration-[var(--duration-fast)]
               `}>
                 {rightIcon}
               </div>
@@ -241,31 +255,57 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
           </div>
         )}
 
-        {/* Focus glow effect (additional decorative element) */}
-        {isFocused && glowOnFocus && !error && (
+        {/* Focus underline accent (for arcane and elegant variants) */}
+        {(variant === 'elegant' || variant === 'arcane') && (
           <div
-            className="absolute inset-0 rounded-[var(--radius-md)] pointer-events-none"
-            style={{
-              background: `linear-gradient(90deg, transparent, var(--color-glow), transparent)`,
-              opacity: 0.1,
-              animation: 'loading-shimmer 2s ease-in-out infinite',
-            }}
+            className={`
+              absolute -bottom-px left-1/2 -translate-x-1/2 h-[2px]
+              bg-gradient-to-r from-transparent via-[var(--color-border-accent)] to-transparent
+              transition-all duration-[var(--duration-normal)]
+              ${isFocused && !error ? 'w-full opacity-100' : 'w-0 opacity-0'}
+            `}
           />
+        )}
+
+        {/* Corner accents for arcane variant */}
+        {variant === 'arcane' && (
+          <>
+            <div className={`
+              absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 rounded-tl-[var(--radius-md)]
+              transition-all duration-[var(--duration-normal)]
+              ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+            `} />
+            <div className={`
+              absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 rounded-tr-[var(--radius-md)]
+              transition-all duration-[var(--duration-normal)]
+              ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+            `} />
+            <div className={`
+              absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 rounded-bl-[var(--radius-md)]
+              transition-all duration-[var(--duration-normal)]
+              ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+            `} />
+            <div className={`
+              absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 rounded-br-[var(--radius-md)]
+              transition-all duration-[var(--duration-normal)]
+              ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+            `} />
+          </>
         )}
       </div>
 
       {/* Helper Text or Error Message */}
       {(helperText || error) && (
         <p className={`
-          mt-1.5
+          mt-2.5
           text-sm
-          font-body
+          font-body italic
           ${error
-            ? 'text-[var(--color-error)] animate-pulse'
+            ? 'text-[var(--color-error)]'
             : 'text-[var(--color-text-muted)]'
           }
         `}>
-          {error ? `> ${error}` : helperText}
+          {error || helperText}
         </p>
       )}
     </div>
@@ -284,13 +324,13 @@ export const SearchInput = forwardRef<HTMLInputElement, SpecializedInputProps>(
     <Input
       ref={ref}
       type="search"
-      variant="default"
+      variant="filled"
       leftIcon={
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
       }
-      placeholder="Search..."
+      placeholder="Search the archives..."
       {...props}
     />
   )
@@ -305,8 +345,8 @@ export const PasswordInput = forwardRef<HTMLInputElement, SpecializedInputProps>
       type="password"
       showPasswordToggle
       leftIcon={
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
         </svg>
       }
       {...props}
@@ -315,17 +355,30 @@ export const PasswordInput = forwardRef<HTMLInputElement, SpecializedInputProps>
 );
 PasswordInput.displayName = 'PasswordInput';
 
-/** Neon-styled input for special forms */
-export const NeonInput = forwardRef<HTMLInputElement, SpecializedInputProps>(
+/** Arcane-styled input for special forms */
+export const ArcaneInput = forwardRef<HTMLInputElement, SpecializedInputProps>(
   (props, ref) => (
     <Input
       ref={ref}
-      variant="neon"
+      variant="arcane"
       glowOnFocus
       {...props}
     />
   )
 );
-NeonInput.displayName = 'NeonInput';
+ArcaneInput.displayName = 'ArcaneInput';
+
+/** Elegant-styled input for forms */
+export const ElegantInput = forwardRef<HTMLInputElement, SpecializedInputProps>(
+  (props, ref) => (
+    <Input
+      ref={ref}
+      variant="elegant"
+      glowOnFocus
+      {...props}
+    />
+  )
+);
+ElegantInput.displayName = 'ElegantInput';
 
 export default Input;

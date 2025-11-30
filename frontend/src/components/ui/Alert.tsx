@@ -1,22 +1,21 @@
 /**
- * Alert Component
- * Storybook UI Component
+ * Alert Component - Midnight Alchemy Edition
  *
- * Contextual feedback messages for user actions.
- * Supports multiple variants and dismissibility.
+ * Mystical contextual feedback messages with ethereal styling.
+ * Features brass accents and alchemical iconography.
  *
  * Features:
- * - 5 variants: info, success, warning, error, neutral
- * - Dismissible option
- * - Icon customization
+ * - 5 variants: info, success, warning, error, arcane
+ * - Dismissible option with elegant close button
+ * - Icon customization with element theming
  * - Title + description support
- * - Dark mode support
+ * - Sacred geometry corner decorations
  * - Full accessibility
  *
  * Usage:
  * ```tsx
- * <Alert variant="error" title="Login Failed">
- *   Invalid username or password
+ * <Alert variant="error" title="Volatile Reaction">
+ *   The mixture has become unstable. Handle with care.
  * </Alert>
  *
  * <Alert
@@ -24,14 +23,14 @@
  *   dismissible
  *   onDismiss={() => setShowAlert(false)}
  * >
- *   Your changes have been saved!
+ *   The transmutation was successful!
  * </Alert>
  * ```
  */
 
 import { ReactNode } from 'react';
 
-export type AlertVariant = 'info' | 'success' | 'warning' | 'error' | 'neutral';
+export type AlertVariant = 'info' | 'success' | 'warning' | 'error' | 'arcane';
 
 export interface AlertProps {
   /** Alert variant */
@@ -50,40 +49,81 @@ export interface AlertProps {
   className?: string;
 }
 
-const variantClasses: Record<AlertVariant, { container: string; icon: string; title: string }> = {
+// Midnight Alchemy themed variants
+const variantStyles: Record<AlertVariant, {
+  bg: string;
+  border: string;
+  text: string;
+  icon: string;
+  title: string;
+  shadow: string;
+}> = {
   info: {
-    container: 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200',
-    icon: 'text-blue-500 dark:text-blue-400',
-    title: 'text-blue-900 dark:text-blue-100',
+    bg: 'linear-gradient(135deg, rgba(70, 130, 180, 0.1) 0%, #131824 100%)',
+    border: '#4682B4',
+    text: '#9CA3AF',
+    icon: '#4682B4',
+    title: '#E8E4DC',
+    shadow: '0 4px 20px rgba(70, 130, 180, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
   },
   success: {
-    container: 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-800 dark:text-green-200',
-    icon: 'text-green-500 dark:text-green-400',
-    title: 'text-green-900 dark:text-green-100',
+    bg: 'linear-gradient(135deg, rgba(74, 156, 109, 0.1) 0%, #131824 100%)',
+    border: '#4A9C6D',
+    text: '#9CA3AF',
+    icon: '#4A9C6D',
+    title: '#E8E4DC',
+    shadow: '0 4px 20px rgba(74, 156, 109, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
   },
   warning: {
-    container: 'bg-amber-50 dark:bg-amber-900/30 border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200',
-    icon: 'text-amber-500 dark:text-amber-400',
-    title: 'text-amber-900 dark:text-amber-100',
+    bg: 'linear-gradient(135deg, rgba(212, 165, 116, 0.1) 0%, #131824 100%)',
+    border: '#D4A574',
+    text: '#9CA3AF',
+    icon: '#D4A574',
+    title: '#E8E4DC',
+    shadow: '0 4px 20px rgba(212, 165, 116, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
   },
   error: {
-    container: 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-800 text-red-800 dark:text-red-200',
-    icon: 'text-red-500 dark:text-red-400',
-    title: 'text-red-900 dark:text-red-100',
+    bg: 'linear-gradient(135deg, rgba(166, 61, 61, 0.1) 0%, #131824 100%)',
+    border: '#8B3D3D',
+    text: '#9CA3AF',
+    icon: '#A63D3D',
+    title: '#E8E4DC',
+    shadow: '0 4px 20px rgba(166, 61, 61, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
   },
-  neutral: {
-    container: 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300',
-    icon: 'text-gray-500 dark:text-gray-400',
-    title: 'text-gray-900 dark:text-gray-100',
+  arcane: {
+    bg: 'linear-gradient(135deg, rgba(193, 127, 89, 0.1) 0%, #131824 100%)',
+    border: '#C17F59',
+    text: '#9CA3AF',
+    icon: '#D4A574',
+    title: '#D4A574',
+    shadow: '0 4px 20px rgba(193, 127, 89, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
   },
 };
 
-const defaultIcons: Record<AlertVariant, string> = {
-  info: 'ℹ️',
-  success: '✓',
-  warning: '⚠️',
-  error: '✕',
-  neutral: '📌',
+const defaultIcons: Record<AlertVariant, ReactNode> = {
+  info: (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+    </svg>
+  ),
+  success: (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+    </svg>
+  ),
+  warning: (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+    </svg>
+  ),
+  error: (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+    </svg>
+  ),
+  arcane: (
+    <span className="text-lg">⚗</span>
+  ),
 };
 
 export function Alert({
@@ -95,7 +135,7 @@ export function Alert({
   onDismiss,
   className = '',
 }: AlertProps) {
-  const variantStyle = variantClasses[variant];
+  const style = variantStyles[variant];
   const defaultIcon = defaultIcons[variant];
 
   return (
@@ -104,42 +144,77 @@ export function Alert({
       className={`
         flex gap-3
         p-4
-        border-2 rounded-lg
-        ${variantStyle.container}
+        rounded-lg
+        relative overflow-hidden
+        transition-all duration-300
         ${className}
       `}
+      style={{
+        background: style.bg,
+        borderWidth: '2px',
+        borderStyle: 'solid',
+        borderColor: style.border,
+        boxShadow: style.shadow,
+        color: style.text,
+        fontFamily: '"Cormorant Garamond", Georgia, serif',
+      }}
     >
-      {/* Icon */}
-      <div className={`flex-shrink-0 text-xl ${variantStyle.icon}`} aria-hidden="true">
+      {/* Sacred geometry corner accents */}
+      <div className="absolute top-1 left-1 w-3 h-3 border-l border-t opacity-40" style={{ borderColor: style.border }} />
+      <div className="absolute top-1 right-1 w-3 h-3 border-r border-t opacity-40" style={{ borderColor: style.border }} />
+      <div className="absolute bottom-1 left-1 w-3 h-3 border-l border-b opacity-40" style={{ borderColor: style.border }} />
+      <div className="absolute bottom-1 right-1 w-3 h-3 border-r border-b opacity-40" style={{ borderColor: style.border }} />
+
+      {/* Icon with ethereal glow */}
+      <div
+        className="flex-shrink-0 text-xl"
+        aria-hidden="true"
+        style={{
+          color: style.icon,
+          filter: `drop-shadow(0 0 6px ${style.icon})`,
+        }}
+      >
         {icon || defaultIcon}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
         {title && (
-          <h4 className={`font-bold mb-1 ${variantStyle.title}`}>
+          <h4
+            className="font-semibold mb-1 tracking-wide uppercase text-sm"
+            style={{
+              color: style.title,
+              fontFamily: '"Cinzel", Georgia, serif',
+            }}
+          >
             {title}
           </h4>
         )}
-        <div className="text-sm">
+        <div className="text-sm leading-relaxed">
           {children}
         </div>
       </div>
 
-      {/* Dismiss Button */}
+      {/* Dismiss Button with brass styling */}
       {dismissible && (
         <button
           type="button"
           onClick={onDismiss}
-          className={`
+          className="
             flex-shrink-0
             -mt-1 -mr-1
-            p-1
-            rounded-full
+            p-1.5
+            rounded-md
             opacity-60 hover:opacity-100
-            transition-opacity
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-current
-          `}
+            transition-all duration-200
+            focus:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-[#C17F59]
+            focus-visible:ring-offset-2
+            focus-visible:ring-offset-[#131824]
+            hover:bg-[#2D3548]
+          "
+          style={{ color: style.icon }}
           aria-label="Dismiss"
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -154,3 +229,36 @@ export function Alert({
     </div>
   );
 }
+
+// ============================================================================
+// PRESET ALERT COMPONENTS
+// ============================================================================
+
+export interface PresetAlertProps extends Omit<AlertProps, 'variant'> {}
+
+/** Info alert - Ancient knowledge */
+export const InfoAlert = (props: PresetAlertProps) => (
+  <Alert variant="info" {...props} />
+);
+
+/** Success alert - Transmutation complete */
+export const SuccessAlert = (props: PresetAlertProps) => (
+  <Alert variant="success" {...props} />
+);
+
+/** Warning alert - Unstable mixture */
+export const WarningAlert = (props: PresetAlertProps) => (
+  <Alert variant="warning" {...props} />
+);
+
+/** Error alert - Volatile reaction */
+export const ErrorAlert = (props: PresetAlertProps) => (
+  <Alert variant="error" {...props} />
+);
+
+/** Arcane alert - Mystical message */
+export const ArcaneAlert = (props: PresetAlertProps) => (
+  <Alert variant="arcane" {...props} />
+);
+
+export default Alert;

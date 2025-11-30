@@ -1,32 +1,47 @@
 /**
- * Card Component Stories - Retro Gaming Edition
+ * Card Component Stories - Midnight Alchemy Edition
  *
- * Showcases the playing card component with distinctive neon glow effects
- * for each suit color, pixel-perfect borders, and arcade-style animations.
+ * Showcases the playing card component with alchemical aesthetics,
+ * elemental color theming, and ethereal glow effects.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { Card, CardBack, CardStack } from '../../Card';
+import { Card, CardBack, CardStack, ElegantCardDisplay } from '../../Card';
 import { CardColor, CardValue, Card as CardType } from '../../../types/game';
 
 const meta = {
-  title: 'Game/Card',
+  title: 'Midnight Alchemy/Card',
   component: Card,
   parameters: {
     layout: 'centered',
+    backgrounds: {
+      default: 'midnight',
+      values: [
+        { name: 'midnight', value: '#0B0E14' },
+        { name: 'chamber', value: '#131824' },
+      ],
+    },
     docs: {
       description: {
         component: `
-Playing card component with retro arcade aesthetics and neon glow effects.
+# Midnight Alchemy Playing Cards
+
+Mystical playing cards with alchemical aesthetics and elemental color theming.
 
 ## Features
-- **4 suit colors**: Red, Brown, Green, Blue - each with unique neon glow
+- **4 elemental suits**: Fire (Red), Earth (Brown), Nature (Green), Water (Blue)
 - **4 sizes**: tiny, small, medium, large
-- **Special cards**: Red 0 (+5 points), Brown 0 (-2 points)
-- **Playable state**: Glowing pulse animation for valid plays
-- **Keyboard navigation**: Focus ring support for accessibility
-- **Card back**: Patterned design for opponent hands
-- **Card stack**: Deck visualization component
+- **Special cards**: Fire Zero (+5 essence), Earth Zero (-2 essence)
+- **Playable state**: Ethereal pulse animation for valid plays
+- **Keyboard navigation**: Sacred geometry focus ring
+- **Card back**: Alchemical circle pattern
+- **Card stack**: Mystical deck visualization
+
+## Elemental Correspondences
+- 🔥 **Fire (Red)**: Passion, transformation, energy
+- 🌍 **Earth (Brown)**: Stability, grounding, material
+- 🌿 **Nature (Green)**: Growth, harmony, life force
+- 💧 **Water (Blue)**: Intuition, emotion, flow
         `,
       },
     },
@@ -44,28 +59,28 @@ Playing card component with retro arcade aesthetics and neon glow effects.
     },
     isPlayable: {
       control: 'boolean',
-      description: 'Show playable glow animation',
+      description: 'Show playable ethereal glow animation',
     },
     isKeyboardSelected: {
       control: 'boolean',
-      description: 'Keyboard selection ring',
+      description: 'Sacred geometry keyboard selection ring',
     },
     faceDown: {
       control: 'boolean',
-      description: 'Show card back instead of face',
+      description: 'Show alchemical card back',
     },
   },
 } satisfies Meta<typeof Card>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-type RenderOnlyStory = StoryObj<typeof Card>; // For render-only stories without args
+type RenderOnlyStory = StoryObj<typeof Card>;
 
 // ============================================================================
-// SUIT COLORS
+// ELEMENTAL SUITS
 // ============================================================================
 
-export const RedCard: Story = {
+export const FireElement: Story = {
   args: {
     card: { color: 'red', value: 7 },
     size: 'medium',
@@ -73,13 +88,13 @@ export const RedCard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Red suit card with pink neon glow effect.',
+        story: 'Fire element card (Red) - Represents passion and transformation with crimson ethereal glow.',
       },
     },
   },
 };
 
-export const BrownCard: Story = {
+export const EarthElement: Story = {
   args: {
     card: { color: 'brown', value: 7 },
     size: 'medium',
@@ -87,13 +102,13 @@ export const BrownCard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Brown suit card with amber neon glow effect.',
+        story: 'Earth element card (Brown) - Represents stability and grounding with amber glow.',
       },
     },
   },
 };
 
-export const GreenCard: Story = {
+export const NatureElement: Story = {
   args: {
     card: { color: 'green', value: 7 },
     size: 'medium',
@@ -101,13 +116,13 @@ export const GreenCard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Green suit card with mint neon glow effect.',
+        story: 'Nature element card (Green) - Represents growth and harmony with emerald glow.',
       },
     },
   },
 };
 
-export const BlueCard: Story = {
+export const WaterElement: Story = {
   args: {
     card: { color: 'blue', value: 7 },
     size: 'medium',
@@ -115,44 +130,80 @@ export const BlueCard: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Blue suit card with cyan neon glow effect.',
+        story: 'Water element card (Blue) - Represents intuition and flow with sapphire glow.',
       },
     },
   },
 };
 
 // ============================================================================
-// ALL COLORS SHOWCASE
+// ALL ELEMENTS SHOWCASE
 // ============================================================================
 
-export const AllColors: Story = {
+export const ElementalQuartet: Story = {
   args: {
     card: { color: 'red', value: 7 },
   },
   render: () => {
-    const colors: CardColor[] = ['red', 'brown', 'green', 'blue'];
+    const elements: { color: CardColor; symbol: string; name: string }[] = [
+      { color: 'red', symbol: '△', name: 'Fire' },
+      { color: 'brown', symbol: '◇', name: 'Earth' },
+      { color: 'green', symbol: '☘', name: 'Nature' },
+      { color: 'blue', symbol: '▽', name: 'Water' },
+    ];
+
     return (
-      <div className="flex gap-6 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-        {colors.map((color) => (
-          <Card key={color} card={{ color, value: 7 }} size="medium" />
-        ))}
+      <div
+        className="p-8 rounded-xl"
+        style={{
+          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+          border: '2px solid #C17F59',
+          boxShadow: '0 0 40px rgba(193, 127, 89, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+        }}
+      >
+        <h3
+          className="text-center uppercase tracking-[0.15em] mb-6"
+          style={{
+            fontFamily: '"Cinzel Decorative", Georgia, serif',
+            color: '#D4A574',
+            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
+          }}
+        >
+          The Four Elements
+        </h3>
+        <div className="flex gap-6">
+          {elements.map(({ color, symbol, name }) => (
+            <div key={color} className="flex flex-col items-center gap-3">
+              <Card card={{ color, value: 7 }} size="medium" />
+              <div className="text-center">
+                <div className="text-2xl mb-1">{symbol}</div>
+                <span
+                  className="text-xs uppercase tracking-wider"
+                  style={{ color: '#9CA3AF', fontFamily: '"Cinzel", Georgia, serif' }}
+                >
+                  {name}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   },
   parameters: {
     docs: {
       description: {
-        story: 'All four suit colors with their unique neon glow effects.',
+        story: 'All four elemental suits with their alchemical symbols.',
       },
     },
   },
 };
 
 // ============================================================================
-// SPECIAL CARDS
+// SPECIAL CARDS (ARCANA)
 // ============================================================================
 
-export const RedSpecial: Story = {
+export const FireArcana: Story = {
   args: {
     card: { color: 'red', value: 0 },
     size: 'medium',
@@ -160,13 +211,13 @@ export const RedSpecial: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Red 0 - Special card that awards +5 bonus points when won in a trick.',
+        story: 'Fire Zero (The Phoenix) - Arcana card that awards +5 essence when captured.',
       },
     },
   },
 };
 
-export const BrownSpecial: Story = {
+export const EarthArcana: Story = {
   args: {
     card: { color: 'brown', value: 0 },
     size: 'medium',
@@ -174,32 +225,79 @@ export const BrownSpecial: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Brown 0 - Special card that deducts -2 points when won in a trick.',
+        story: 'Earth Zero (The Void) - Arcana card that deducts -2 essence when captured.',
       },
     },
   },
 };
 
-export const SpecialCards: Story = {
+export const ArcanaCards: Story = {
   args: {
     card: { color: 'red', value: 0 },
   },
   render: () => (
-    <div className="flex gap-8 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <div className="flex flex-col items-center gap-3">
-        <Card card={{ color: 'red', value: 0 }} size="large" />
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-[var(--color-warning)] text-black text-xs font-display rounded-full shadow-[0_0_10px_var(--color-warning)]">
-            +5 Points
-          </span>
+    <div
+      className="p-8 rounded-xl"
+      style={{
+        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+        border: '2px solid #C17F59',
+        boxShadow: '0 0 40px rgba(193, 127, 89, 0.15)',
+      }}
+    >
+      <h3
+        className="text-center uppercase tracking-[0.15em] mb-6"
+        style={{
+          fontFamily: '"Cinzel Decorative", Georgia, serif',
+          color: '#D4A574',
+          textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
+        }}
+      >
+        The Arcana
+      </h3>
+      <div className="flex gap-12 justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <ElegantCardDisplay card={{ color: 'red', value: 0 }} size="large" spotlight />
+          <div className="text-center">
+            <div
+              className="text-sm uppercase tracking-wider mb-1"
+              style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}
+            >
+              The Phoenix
+            </div>
+            <span
+              className="px-3 py-1 rounded-full text-xs inline-block"
+              style={{
+                backgroundColor: '#4A9C6D',
+                color: '#0B0E14',
+                fontFamily: '"Cinzel", Georgia, serif',
+                boxShadow: '0 2px 10px rgba(74, 156, 109, 0.4)',
+              }}
+            >
+              +5 Essence
+            </span>
+          </div>
         </div>
-      </div>
-      <div className="flex flex-col items-center gap-3">
-        <Card card={{ color: 'brown', value: 0 }} size="large" />
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-[var(--color-error)] text-white text-xs font-display rounded-full shadow-[0_0_10px_var(--color-error)]">
-            -2 Points
-          </span>
+        <div className="flex flex-col items-center gap-4">
+          <ElegantCardDisplay card={{ color: 'brown', value: 0 }} size="large" spotlight />
+          <div className="text-center">
+            <div
+              className="text-sm uppercase tracking-wider mb-1"
+              style={{ color: '#D4A574', fontFamily: '"Cinzel", Georgia, serif' }}
+            >
+              The Void
+            </div>
+            <span
+              className="px-3 py-1 rounded-full text-xs inline-block"
+              style={{
+                backgroundColor: '#A63D3D',
+                color: '#E8E4DC',
+                fontFamily: '"Cinzel", Georgia, serif',
+                boxShadow: '0 2px 10px rgba(166, 61, 61, 0.4)',
+              }}
+            >
+              -2 Essence
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -207,7 +305,7 @@ export const SpecialCards: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Both special cards with their point value indicators.',
+        story: 'Both Arcana cards with their essence values and mystical spotlight effects.',
       },
     },
   },
@@ -217,52 +315,27 @@ export const SpecialCards: Story = {
 // SIZES
 // ============================================================================
 
-export const TinySize: Story = {
-  args: {
-    card: { color: 'blue', value: 5 },
-    size: 'tiny',
-  },
-};
-
-export const SmallSize: Story = {
-  args: {
-    card: { color: 'green', value: 5 },
-    size: 'small',
-  },
-};
-
-export const MediumSize: Story = {
-  args: {
-    card: { color: 'red', value: 5 },
-    size: 'medium',
-  },
-};
-
-export const LargeSize: Story = {
-  args: {
-    card: { color: 'brown', value: 5 },
-    size: 'large',
-  },
-};
-
 export const AllSizes: RenderOnlyStory = {
   render: () => (
-    <div className="flex items-end gap-4 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <div className="flex flex-col items-center gap-2">
-        <Card card={{ color: 'blue', value: 5 }} size="tiny" />
-        <span className="text-[var(--color-text-muted)] text-xs font-display">Tiny</span>
-      </div>
-      <div className="flex flex-col items-center gap-2">
-        <Card card={{ color: 'green', value: 5 }} size="small" />
-        <span className="text-[var(--color-text-muted)] text-xs font-display">Small</span>
-      </div>
-      <div className="flex flex-col items-center gap-2">
-        <Card card={{ color: 'red', value: 5 }} size="medium" />
-        <span className="text-[var(--color-text-muted)] text-xs font-display">Medium</span>
-      </div>
-      <div className="flex flex-col items-center gap-2">
-        <Card card={{ color: 'brown', value: 5 }} size="large" />
-        <span className="text-[var(--color-text-muted)] text-xs font-display">Large</span>
+    <div
+      className="p-8 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <div className="flex items-end gap-6">
+        {(['tiny', 'small', 'medium', 'large'] as const).map((size) => (
+          <div key={size} className="flex flex-col items-center gap-3">
+            <Card card={{ color: 'blue', value: 5 }} size={size} />
+            <span
+              className="text-xs uppercase tracking-wider"
+              style={{ color: '#6B7280', fontFamily: '"Cinzel", Georgia, serif' }}
+            >
+              {size}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   ),
@@ -284,12 +357,12 @@ export const Playable: Story = {
     card: { color: 'green', value: 5 },
     size: 'medium',
     isPlayable: true,
-    onClick: () => console.log('Card played!'),
+    onClick: () => console.log('Card channeled!'),
   },
   parameters: {
     docs: {
       description: {
-        story: 'Playable state with pulsing glow animation - indicates the card can be played this turn.',
+        story: 'Playable state with ethereal pulse animation - indicates the card can be channeled this turn.',
       },
     },
   },
@@ -304,29 +377,29 @@ export const KeyboardSelected: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Keyboard selection ring for accessibility - used during keyboard navigation.',
+        story: 'Sacred geometry keyboard selection ring for accessibility navigation.',
       },
     },
   },
 };
 
-export const Disabled: Story = {
+export const Sealed: Story = {
   args: {
     card: { color: 'red', value: 7 },
     size: 'medium',
     disabled: true,
-    onClick: () => console.log('Card clicked'),
+    onClick: () => console.log('Card is sealed'),
   },
   parameters: {
     docs: {
       description: {
-        story: 'Disabled state with X overlay - cannot be played (e.g., wrong suit).',
+        story: 'Sealed state with arcane seal overlay - cannot be played.',
       },
     },
   },
 };
 
-export const FaceDown: Story = {
+export const Hidden: Story = {
   args: {
     card: { color: 'red', value: 7 },
     size: 'medium',
@@ -335,7 +408,7 @@ export const FaceDown: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Face-down card showing the back pattern.',
+        story: 'Face-down card showing the alchemical circle pattern.',
       },
     },
   },
@@ -345,11 +418,24 @@ export const FaceDown: Story = {
 // ALL VALUES
 // ============================================================================
 
-export const AllValues: RenderOnlyStory = {
+export const WaterSuit: RenderOnlyStory = {
   render: () => (
-    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <h3 className="font-display text-[var(--color-text-primary)] text-sm uppercase tracking-wider mb-4">
-        Blue Suit (0-7)
+    <div
+      className="p-8 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="uppercase tracking-wider mb-4"
+        style={{
+          color: '#4682B4',
+          fontFamily: '"Cinzel", Georgia, serif',
+          textShadow: '0 0 10px rgba(70, 130, 180, 0.5)',
+        }}
+      >
+        Water Suit (0-7)
       </h3>
       <div className="flex flex-wrap gap-2">
         {([0, 1, 2, 3, 4, 5, 6, 7] as const).map((value) => (
@@ -361,7 +447,7 @@ export const AllValues: RenderOnlyStory = {
   parameters: {
     docs: {
       description: {
-        story: 'All card values (0-7) for a single suit.',
+        story: 'All card values (0-7) for the Water (Blue) suit.',
       },
     },
   },
@@ -371,38 +457,82 @@ export const AllValues: RenderOnlyStory = {
 // CARD BACK COMPONENT
 // ============================================================================
 
-export const CardBackDefault: RenderOnlyStory = {
+export const AlchemicalBack: RenderOnlyStory = {
   render: () => (
-    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <CardBack size="medium" />
+    <div
+      className="p-8 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-center uppercase tracking-wider mb-4"
+        style={{
+          color: '#D4A574',
+          fontFamily: '"Cinzel", Georgia, serif',
+        }}
+      >
+        Alchemical Seal
+      </h3>
+      <div className="flex justify-center">
+        <CardBack size="large" />
+      </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Default card back design for opponent hands.',
+        story: 'Card back with alchemical circle pattern and sacred geometry.',
       },
     },
   },
 };
 
-export const CardBackTeamColors: RenderOnlyStory = {
+export const GuildCards: RenderOnlyStory = {
   render: () => (
-    <div className="flex gap-6 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <div className="flex flex-col items-center gap-2">
-        <CardBack size="medium" teamColor={1} />
-        <span className="text-[var(--color-team1-primary)] text-xs font-display">Team 1</span>
-      </div>
-      <div className="flex flex-col items-center gap-2">
-        <CardBack size="medium" teamColor={2} />
-        <span className="text-[var(--color-team2-primary)] text-xs font-display">Team 2</span>
+    <div
+      className="p-8 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-center uppercase tracking-wider mb-4"
+        style={{
+          color: '#D4A574',
+          fontFamily: '"Cinzel", Georgia, serif',
+        }}
+      >
+        Guild Allegiances
+      </h3>
+      <div className="flex gap-8 justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <CardBack size="medium" teamColor={1} />
+          <span
+            className="text-xs uppercase"
+            style={{ color: '#d97706', fontFamily: '"Cinzel", Georgia, serif' }}
+          >
+            Solar Guild
+          </span>
+        </div>
+        <div className="flex flex-col items-center gap-3">
+          <CardBack size="medium" teamColor={2} />
+          <span
+            className="text-xs uppercase"
+            style={{ color: '#7c3aed', fontFamily: '"Cinzel", Georgia, serif' }}
+          >
+            Lunar Guild
+          </span>
+        </div>
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Card backs with team color tinting.',
+        story: 'Card backs with guild (team) color tinting.',
       },
     },
   },
@@ -412,61 +542,71 @@ export const CardBackTeamColors: RenderOnlyStory = {
 // CARD STACK COMPONENT
 // ============================================================================
 
-export const CardStackDefault: RenderOnlyStory = {
+export const MysticalDeck: RenderOnlyStory = {
   render: () => (
-    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <CardStack count={8} size="medium" />
-    </div>
-  ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Card stack showing deck with count indicator.',
-      },
-    },
-  },
-};
-
-export const CardStackSizes: RenderOnlyStory = {
-  render: () => (
-    <div className="flex gap-12 items-end p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <div className="flex flex-col items-center gap-4">
-        <CardStack count={12} size="small" />
-        <span className="text-[var(--color-text-muted)] text-xs font-display">Small</span>
-      </div>
-      <div className="flex flex-col items-center gap-4">
-        <CardStack count={24} size="medium" />
-        <span className="text-[var(--color-text-muted)] text-xs font-display">Medium</span>
-      </div>
-      <div className="flex flex-col items-center gap-4">
-        <CardStack count={32} size="large" />
-        <span className="text-[var(--color-text-muted)] text-xs font-display">Large</span>
+    <div
+      className="p-8 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-center uppercase tracking-wider mb-4"
+        style={{
+          color: '#D4A574',
+          fontFamily: '"Cinzel", Georgia, serif',
+        }}
+      >
+        The Deck
+      </h3>
+      <div className="flex justify-center">
+        <CardStack count={32} size="medium" />
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Card stacks in different sizes.',
+        story: 'Card stack showing deck with ethereal count indicator.',
       },
     },
   },
 };
 
 // ============================================================================
-// INTERACTIVE EXAMPLES
+// ELEGANT DISPLAY COMPONENT
 // ============================================================================
 
-export const Interactive: Story = {
-  args: {
-    card: { color: 'green', value: 5 },
-    size: 'large',
-    onClick: () => alert('Card clicked!'),
-  },
+export const SpotlightDisplay: RenderOnlyStory = {
+  render: () => (
+    <div
+      className="p-8 rounded-xl"
+      style={{
+        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+        border: '2px solid #C17F59',
+        boxShadow: '0 0 40px rgba(193, 127, 89, 0.15)',
+      }}
+    >
+      <h3
+        className="text-center uppercase tracking-[0.15em] mb-6"
+        style={{
+          fontFamily: '"Cinzel Decorative", Georgia, serif',
+          color: '#D4A574',
+          textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
+        }}
+      >
+        Featured Artifact
+      </h3>
+      <div className="flex justify-center">
+        <ElegantCardDisplay card={{ color: 'red', value: 7 }} size="large" spotlight />
+      </div>
+    </div>
+  ),
   parameters: {
     docs: {
       description: {
-        story: 'Interactive card with click handler - hover for glow effect.',
+        story: 'Elegant card display with dramatic ethereal spotlight effect.',
       },
     },
   },
@@ -476,7 +616,7 @@ export const Interactive: Story = {
 // GAME UI EXAMPLES
 // ============================================================================
 
-export const PlayerHand: RenderOnlyStory = {
+export const AlchemistHand: RenderOnlyStory = {
   render: () => {
     const hand: CardType[] = [
       { color: 'red', value: 3 as CardValue },
@@ -488,13 +628,26 @@ export const PlayerHand: RenderOnlyStory = {
       { color: 'green', value: 1 as CardValue },
       { color: 'brown', value: 6 as CardValue },
     ];
-    const playableIndices = [1, 5]; // Blue cards are playable (led suit)
+    const playableIndices = [1, 5]; // Water cards are playable (led suit)
 
     return (
-      <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <div
+        className="p-8 rounded-xl"
+        style={{
+          background: '#0B0E14',
+          border: '1px solid #2D3548',
+        }}
+      >
         <div className="flex items-center gap-2 mb-4">
-          <span className="text-[var(--color-text-accent)] text-sm font-display uppercase">
-            Led Suit: Blue
+          <span
+            className="text-sm uppercase tracking-wider"
+            style={{
+              color: '#4682B4',
+              fontFamily: '"Cinzel", Georgia, serif',
+              textShadow: '0 0 10px rgba(70, 130, 180, 0.5)',
+            }}
+          >
+            Led Element: Water ▽
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -505,7 +658,7 @@ export const PlayerHand: RenderOnlyStory = {
               size="small"
               isPlayable={playableIndices.includes(i)}
               disabled={!playableIndices.includes(i)}
-              onClick={() => console.log(`Played ${card.color} ${card.value}`)}
+              onClick={() => console.log(`Channeled ${card.color} ${card.value}`)}
             />
           ))}
         </div>
@@ -515,37 +668,64 @@ export const PlayerHand: RenderOnlyStory = {
   parameters: {
     docs: {
       description: {
-        story: 'Example player hand showing playable cards (following suit rule).',
+        story: 'Example alchemist hand showing playable cards (following element rule).',
       },
     },
   },
 };
 
-export const TrickInProgress: RenderOnlyStory = {
+export const RitualInProgress: RenderOnlyStory = {
   render: () => {
-    const trick: { card: CardType; player: string }[] = [
-      { card: { color: 'blue', value: 5 as CardValue }, player: 'Player 1' },
-      { card: { color: 'blue', value: 7 as CardValue }, player: 'Player 2' },
-      { card: { color: 'green', value: 3 as CardValue }, player: 'Player 3' },
+    const ritual: { card: CardType; player: string }[] = [
+      { card: { color: 'blue', value: 5 as CardValue }, player: 'Sage' },
+      { card: { color: 'blue', value: 7 as CardValue }, player: 'Mystic' },
+      { card: { color: 'green', value: 3 as CardValue }, player: 'Oracle' },
     ];
 
     return (
-      <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-        <h3 className="font-display text-[var(--color-text-primary)] text-sm uppercase tracking-wider mb-4 text-center">
-          Current Trick
+      <div
+        className="p-8 rounded-xl"
+        style={{
+          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+          border: '2px solid #C17F59',
+          boxShadow: '0 0 40px rgba(193, 127, 89, 0.15)',
+        }}
+      >
+        <h3
+          className="text-center uppercase tracking-[0.15em] mb-6"
+          style={{
+            fontFamily: '"Cinzel Decorative", Georgia, serif',
+            color: '#D4A574',
+            textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
+          }}
+        >
+          Current Ritual
         </h3>
         <div className="flex justify-center gap-4">
-          {trick.map(({ card, player }, i) => (
-            <div key={i} className="flex flex-col items-center gap-2">
+          {ritual.map(({ card, player }, i) => (
+            <div key={i} className="flex flex-col items-center gap-3">
               <Card card={card} size="medium" />
-              <span className="text-[var(--color-text-muted)] text-xs">{player}</span>
+              <span
+                className="text-xs"
+                style={{ color: '#6B7280', fontFamily: '"Cormorant Garamond", Georgia, serif' }}
+              >
+                {player}
+              </span>
             </div>
           ))}
-          <div className="flex flex-col items-center gap-2 opacity-50">
-            <div className="w-24 h-36 rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--color-border-default)] flex items-center justify-center">
-              <span className="text-[var(--color-text-muted)] text-2xl">?</span>
+          <div className="flex flex-col items-center gap-3 opacity-50">
+            <div
+              className="w-24 h-36 rounded-lg border-2 border-dashed flex items-center justify-center"
+              style={{ borderColor: '#C17F59' }}
+            >
+              <span style={{ color: '#6B7280' }} className="text-2xl">?</span>
             </div>
-            <span className="text-[var(--color-text-muted)] text-xs">Waiting...</span>
+            <span
+              className="text-xs"
+              style={{ color: '#6B7280', fontFamily: '"Cormorant Garamond", Georgia, serif' }}
+            >
+              Awaiting...
+            </span>
           </div>
         </div>
       </div>
@@ -554,34 +734,89 @@ export const TrickInProgress: RenderOnlyStory = {
   parameters: {
     docs: {
       description: {
-        story: 'Example trick in progress showing played cards.',
+        story: 'Example ritual (trick) in progress showing channeled cards.',
       },
     },
   },
 };
 
-export const OpponentHand: RenderOnlyStory = {
+// ============================================================================
+// MIDNIGHT ALCHEMY SHOWCASE
+// ============================================================================
+
+export const MidnightAlchemyShowcase: RenderOnlyStory = {
   render: () => (
-    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
-      <div className="flex items-center gap-2 mb-4">
-        <span className="text-[var(--color-text-primary)] font-display text-sm">
-          Opponent (Team 2)
-        </span>
-        <span className="text-[var(--color-text-muted)] text-xs">
-          5 cards
-        </span>
+    <div
+      className="p-10 rounded-xl relative"
+      style={{
+        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+        border: '2px solid #C17F59',
+        boxShadow: '0 0 60px rgba(193, 127, 89, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+      }}
+    >
+      {/* Sacred geometry corners */}
+      <div className="absolute top-2 left-2 w-6 h-6 border-l-2 border-t-2 border-[#C17F59] opacity-60" />
+      <div className="absolute top-2 right-2 w-6 h-6 border-r-2 border-t-2 border-[#C17F59] opacity-60" />
+      <div className="absolute bottom-2 left-2 w-6 h-6 border-l-2 border-b-2 border-[#C17F59] opacity-60" />
+      <div className="absolute bottom-2 right-2 w-6 h-6 border-r-2 border-b-2 border-[#C17F59] opacity-60" />
+
+      <h2
+        className="text-2xl text-center uppercase tracking-[0.2em] mb-8"
+        style={{
+          fontFamily: '"Cinzel Decorative", Georgia, serif',
+          color: '#D4A574',
+          textShadow: '0 0 20px rgba(212, 165, 116, 0.5)',
+        }}
+      >
+        The Alchemist's Deck
+      </h2>
+
+      {/* Feature cards with spotlight */}
+      <div className="flex justify-center gap-8 mb-8">
+        <ElegantCardDisplay card={{ color: 'red', value: 0 }} size="large" spotlight />
+        <ElegantCardDisplay card={{ color: 'green', value: 7 }} size="large" spotlight />
+        <ElegantCardDisplay card={{ color: 'brown', value: 0 }} size="large" spotlight />
       </div>
-      <div className="flex gap-1">
-        {[...Array(5)].map((_, i) => (
-          <CardBack key={i} size="small" teamColor={2} />
+
+      {/* Decorative divider */}
+      <div className="flex items-center gap-4 my-6">
+        <div className="flex-1 h-px bg-[#C17F59] opacity-40"></div>
+        <span
+          className="text-sm"
+          style={{
+            color: '#D4A574',
+            fontFamily: '"Cinzel Decorative", Georgia, serif',
+          }}
+        >
+          △ ▽ ◇ ○
+        </span>
+        <div className="flex-1 h-px bg-[#C17F59] opacity-40"></div>
+      </div>
+
+      {/* All elements row */}
+      <div className="flex justify-center gap-4">
+        {(['red', 'brown', 'green', 'blue'] as CardColor[]).map((color) => (
+          <Card key={color} card={{ color, value: 5 }} size="small" />
         ))}
       </div>
+
+      {/* Quote */}
+      <p
+        className="text-center mt-8 italic"
+        style={{
+          color: '#6B7280',
+          fontFamily: '"Cormorant Garamond", Georgia, serif',
+          fontSize: '0.875rem',
+        }}
+      >
+        "In the dance of elements, the wise alchemist finds truth."
+      </p>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Opponent hand display with team-colored card backs.',
+        story: 'Full Midnight Alchemy showcase demonstrating the mystical card design system.',
       },
     },
   },

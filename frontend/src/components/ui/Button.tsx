@@ -1,23 +1,23 @@
 /**
- * Button Component - Retro Gaming Edition
+ * Button Component - Midnight Alchemy Edition
  *
- * A distinctive button system with arcade-inspired aesthetics.
- * Features neon glows, pixel-perfect borders, and satisfying press effects.
+ * Mystical buttons with alchemical aesthetics - copper accents, ethereal glows,
+ * and brass mechanical textures. Each interaction feels like activating ancient machinery.
  *
  * Variants:
- * - primary: Hot pink neon with cyan glow
- * - secondary: Outlined with subtle glow
- * - success: Neon green arcade style
- * - warning: Arcade yellow
- * - danger: Hot pink-red with glitch effect on hover
- * - ghost: Transparent with neon border on hover
- * - link: Neon underline effect
+ * - primary: Burnished copper with rose gold glow
+ * - secondary: Brass outline with ethereal hover
+ * - success: Alchemical teal (transmutation complete)
+ * - warning: Molten gold (caution)
+ * - danger: Dragon's blood crimson
+ * - ghost: Transparent with mystic reveal
+ * - link: Underlined accent text
+ * - arcane: Sacred geometry borders with mystical glow
  *
  * Special Effects:
- * - Arcade button press (translateY effect)
- * - Neon glow on hover
- * - Pixel-perfect borders (for retro skin)
- * - Scanline overlay on focus
+ * - Mechanical press with gear-like precision
+ * - Copper glow pulse animation
+ * - Alchemical shimmer on hover
  */
 
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from 'react';
@@ -31,7 +31,8 @@ export type ButtonVariant =
   | 'danger'
   | 'ghost'
   | 'link'
-  | 'neon';
+  | 'elegant'
+  | 'arcane';
 
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -52,16 +53,16 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   disabled?: boolean;
   /** Make button full width */
   fullWidth?: boolean;
-  /** Enable arcade-style press effect */
+  /** Enable mechanical press effect with shadow */
   arcade?: boolean;
-  /** Enable pulsing glow effect */
+  /** Enable pulsing ethereal glow effect */
   glow?: boolean;
   /** Additional custom classes */
   className?: string;
 }
 
-// Retro-styled spinner
-const RetroSpinner = () => (
+// Alchemical spinner with mystical animation
+const AlchemicalSpinner = () => (
   <svg
     className="animate-spin h-5 w-5"
     viewBox="0 0 24 24"
@@ -72,10 +73,18 @@ const RetroSpinner = () => (
       cy="12"
       r="10"
       stroke="currentColor"
-      strokeWidth="3"
-      strokeDasharray="31.4 31.4"
-      strokeLinecap="square"
+      strokeWidth="2"
+      strokeOpacity="0.2"
+      strokeDasharray="4 2"
     />
+    <path
+      d="M12 2a10 10 0 0 1 10 10"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+    {/* Alchemical symbol hint */}
+    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1" strokeOpacity="0.5" />
   </svg>
 );
 
@@ -100,88 +109,102 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   useSkin(); // Provides skin context for CSS variables
   const isDisabled = disabled || loading;
 
-  // Size classes
+  // Size classes with alchemical proportions (golden ratio inspired)
   const sizeClasses: Record<ButtonSize, string> = {
     xs: 'px-3 py-1.5 text-xs gap-1.5',
     sm: 'px-4 py-2 text-sm gap-2',
-    md: 'px-6 py-3 text-base gap-2',
+    md: 'px-6 py-3 text-base gap-2.5',
     lg: 'px-8 py-4 text-lg gap-3',
     xl: 'px-10 py-5 text-xl gap-3',
   };
 
-  // Base styles that apply to all variants
+  // Base styles with mystical typography
   const baseClasses = `
     inline-flex items-center justify-center
-    font-display tracking-wider
+    font-display font-semibold
+    tracking-[var(--button-letter-spacing)]
     border-[length:var(--button-border-width)]
-    rounded-[var(--radius-lg)]
-    transition-all duration-[var(--duration-fast)]
+    rounded-[var(--radius-md)]
+    transition-all duration-[var(--duration-normal)] ease-[var(--easing)]
     focus-visible:outline-none focus-visible:ring-[var(--input-focus-ring-width)]
     focus-visible:ring-[var(--color-text-accent)] focus-visible:ring-offset-2
     focus-visible:ring-offset-[var(--color-bg-primary)]
-    uppercase
+    relative overflow-hidden
     ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
     ${fullWidth ? 'w-full' : ''}
-    ${arcade && !isDisabled ? 'arcade-button' : ''}
-    ${glow && !isDisabled ? 'pulse-glow' : ''}
+    ${arcade && !isDisabled ? 'mechanical-press' : ''}
+    ${glow && !isDisabled ? 'ethereal-pulse' : ''}
   `;
 
-  // Variant-specific styles
+  // Variant-specific styles with alchemical aesthetics
   const variantClasses: Record<ButtonVariant, string> = {
     primary: `
-      bg-[var(--color-bg-accent)]
-      border-[var(--color-highlight)]
-      text-[var(--color-text-primary)]
-      shadow-[0_0_10px_var(--color-bg-accent)]
+      bg-gradient-to-b from-[var(--color-bg-accent)] to-[color-mix(in_srgb,var(--color-bg-accent)_80%,black)]
+      border-[color-mix(in_srgb,var(--color-bg-accent)_70%,black)]
+      text-[var(--color-text-inverse)]
+      shadow-[0_4px_16px_rgba(193,127,89,0.3),inset_0_1px_0_rgba(255,255,255,0.15)]
       ${!isDisabled ? `
-        hover:shadow-[0_0_20px_var(--color-bg-accent),0_0_40px_var(--color-bg-accent)]
-        hover:scale-105
-        active:scale-95
+        hover:from-[color-mix(in_srgb,var(--color-bg-accent)_110%,white)]
+        hover:to-[var(--color-bg-accent)]
+        hover:shadow-[0_6px_24px_rgba(193,127,89,0.45),0_0_40px_rgba(212,165,116,0.2),inset_0_1px_0_rgba(255,255,255,0.2)]
+        hover:-translate-y-0.5
+        active:translate-y-0.5
+        active:shadow-[0_2px_8px_rgba(193,127,89,0.3),inset_0_2px_4px_rgba(0,0,0,0.2)]
       ` : ''}
     `,
     secondary: `
       bg-transparent
       border-[var(--color-border-accent)]
       text-[var(--color-text-accent)]
+      shadow-[0_0_0_1px_rgba(193,127,89,0.1)]
       ${!isDisabled ? `
-        hover:bg-[var(--color-bg-tertiary)]
-        hover:shadow-[0_0_15px_var(--color-glow)]
-        hover:scale-105
-        active:scale-95
+        hover:bg-[rgba(193,127,89,0.1)]
+        hover:border-[var(--color-text-accent)]
+        hover:shadow-[0_0_24px_rgba(212,165,116,0.2),0_0_0_1px_rgba(193,127,89,0.3)]
+        hover:-translate-y-0.5
+        active:translate-y-0
+        active:bg-[rgba(193,127,89,0.15)]
       ` : ''}
     `,
     success: `
-      bg-[var(--color-success)]
-      border-[var(--color-success)]
-      text-[var(--color-text-inverse)]
-      shadow-[0_0_10px_var(--color-success)]
+      bg-gradient-to-b from-[var(--color-success)] to-[color-mix(in_srgb,var(--color-success)_75%,black)]
+      border-[color-mix(in_srgb,var(--color-success)_60%,black)]
+      text-[#0B0E14]
+      font-bold
+      shadow-[0_4px_16px_rgba(45,212,191,0.35),inset_0_1px_0_rgba(255,255,255,0.2)]
       ${!isDisabled ? `
-        hover:shadow-[0_0_20px_var(--color-success),0_0_40px_var(--color-success)]
-        hover:scale-105
-        active:scale-95
+        hover:from-[color-mix(in_srgb,var(--color-success)_115%,white)]
+        hover:to-[var(--color-success)]
+        hover:shadow-[0_6px_24px_rgba(45,212,191,0.5),0_0_50px_rgba(45,212,191,0.2)]
+        hover:-translate-y-0.5
+        active:translate-y-0.5
       ` : ''}
     `,
     warning: `
-      bg-[var(--color-warning)]
-      border-[var(--color-warning)]
-      text-[var(--color-text-inverse)]
-      shadow-[0_0_10px_var(--color-warning)]
+      bg-gradient-to-b from-[var(--color-warning)] to-[color-mix(in_srgb,var(--color-warning)_75%,black)]
+      border-[color-mix(in_srgb,var(--color-warning)_60%,black)]
+      text-[#0B0E14]
+      font-bold
+      shadow-[0_4px_16px_rgba(245,158,11,0.35),inset_0_1px_0_rgba(255,255,255,0.2)]
       ${!isDisabled ? `
-        hover:shadow-[0_0_20px_var(--color-warning),0_0_40px_var(--color-warning)]
-        hover:scale-105
-        active:scale-95
+        hover:from-[color-mix(in_srgb,var(--color-warning)_115%,white)]
+        hover:to-[var(--color-warning)]
+        hover:shadow-[0_6px_24px_rgba(245,158,11,0.5),0_0_50px_rgba(245,158,11,0.2)]
+        hover:-translate-y-0.5
+        active:translate-y-0.5
       ` : ''}
     `,
     danger: `
-      bg-[var(--color-error)]
-      border-[var(--color-error)]
-      text-[var(--color-text-primary)]
-      shadow-[0_0_10px_var(--color-error)]
+      bg-gradient-to-b from-[var(--color-error)] to-[color-mix(in_srgb,var(--color-error)_70%,black)]
+      border-[color-mix(in_srgb,var(--color-error)_50%,black)]
+      text-[#FEF2F2]
+      shadow-[0_4px_16px_rgba(220,38,38,0.35),inset_0_1px_0_rgba(255,255,255,0.1)]
       ${!isDisabled ? `
-        hover:shadow-[0_0_20px_var(--color-error),0_0_40px_var(--color-error)]
-        hover:scale-105
-        hover:animate-pulse
-        active:scale-95
+        hover:from-[color-mix(in_srgb,var(--color-error)_115%,white)]
+        hover:to-[var(--color-error)]
+        hover:shadow-[0_6px_24px_rgba(220,38,38,0.5),0_0_40px_rgba(220,38,38,0.15)]
+        hover:-translate-y-0.5
+        active:translate-y-0.5
       ` : ''}
     `,
     ghost: `
@@ -190,9 +213,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       text-[var(--color-text-secondary)]
       ${!isDisabled ? `
         hover:text-[var(--color-text-accent)]
-        hover:border-[var(--color-border-accent)]
-        hover:bg-[var(--color-bg-secondary)]
-        active:scale-95
+        hover:bg-[rgba(193,127,89,0.08)]
+        hover:shadow-[inset_0_0_20px_rgba(193,127,89,0.05)]
+        active:bg-[rgba(193,127,89,0.12)]
       ` : ''}
     `,
     link: `
@@ -200,26 +223,45 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       border-transparent
       text-[var(--color-text-accent)]
       underline underline-offset-4
-      decoration-2 decoration-[var(--color-text-accent)]
+      decoration-1 decoration-[var(--color-text-accent)]/50
       p-0
       ${!isDisabled ? `
-        hover:decoration-[var(--color-bg-accent)]
-        hover:text-[var(--color-bg-accent)]
+        hover:decoration-2
+        hover:decoration-[var(--color-text-accent)]
+        hover:text-[color-mix(in_srgb,var(--color-text-accent)_85%,white)]
       ` : ''}
     `,
-    neon: `
-      bg-transparent
-      border-[var(--color-glow)]
-      text-[var(--color-glow)]
-      shadow-[inset_0_0_10px_var(--color-glow),0_0_10px_var(--color-glow)]
+    elegant: `
+      bg-gradient-to-b from-[var(--color-bg-secondary)] to-[var(--color-bg-tertiary)]
+      border-[var(--color-border-accent)]
+      text-[var(--color-text-accent)]
+      shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_4px_16px_rgba(0,0,0,0.4)]
       ${!isDisabled ? `
-        hover:bg-[var(--color-glow)]
-        hover:text-[var(--color-text-inverse)]
-        hover:shadow-[inset_0_0_20px_var(--color-glow),0_0_30px_var(--color-glow),0_0_60px_var(--color-glow)]
-        active:scale-95
+        hover:from-[var(--color-bg-tertiary)]
+        hover:to-[color-mix(in_srgb,var(--color-bg-tertiary)_90%,black)]
+        hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_6px_24px_rgba(0,0,0,0.5),0_0_30px_rgba(212,165,116,0.1)]
+        hover:-translate-y-0.5
+        active:translate-y-0
+      ` : ''}
+    `,
+    arcane: `
+      bg-[var(--color-bg-primary)]
+      border-[var(--color-border-accent)]
+      text-[var(--color-text-accent)]
+      shadow-[0_0_20px_rgba(212,165,116,0.15),inset_0_0_30px_rgba(193,127,89,0.05)]
+      ${!isDisabled ? `
+        hover:bg-[color-mix(in_srgb,var(--color-bg-primary)_95%,var(--color-bg-accent))]
+        hover:shadow-[0_0_35px_rgba(212,165,116,0.3),0_0_60px_rgba(193,127,89,0.15),inset_0_0_40px_rgba(193,127,89,0.08)]
+        hover:-translate-y-1
+        active:translate-y-0
       ` : ''}
     `,
   };
+
+  // Text transform based on variant
+  const textTransform = variant === 'link' || variant === 'ghost'
+    ? ''
+    : 'uppercase';
 
   return (
     <button
@@ -230,17 +272,30 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         ${baseClasses}
         ${sizeClasses[size]}
         ${variantClasses[variant]}
+        ${textTransform}
         ${className}
       `}
       {...props}
     >
+      {/* Alchemical shimmer overlay */}
+      {!isDisabled && variant !== 'ghost' && variant !== 'link' && (
+        <span
+          className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.08) 55%, transparent 60%)',
+            backgroundSize: '200% 100%',
+            animation: 'shimmer-slide 3s ease-in-out infinite',
+          }}
+        />
+      )}
+
       {loading ? (
-        <RetroSpinner />
+        <AlchemicalSpinner />
       ) : (
         <>
-          {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-          {children && <span>{children}</span>}
-          {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+          {leftIcon && <span className="flex-shrink-0 drop-shadow-sm">{leftIcon}</span>}
+          {children && <span className="relative z-10">{children}</span>}
+          {rightIcon && <span className="flex-shrink-0 drop-shadow-sm">{rightIcon}</span>}
         </>
       )}
     </button>
@@ -253,7 +308,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 
 export interface PresetButtonProps extends Omit<ButtonProps, 'variant'> {}
 
-/** Primary action button with arcade effect */
+/** Primary action button with mechanical press effect */
 export const PrimaryButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
   (props, ref) => <Button ref={ref} variant="primary" arcade {...props} />
 );
@@ -265,7 +320,7 @@ export const SecondaryButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
 );
 SecondaryButton.displayName = 'SecondaryButton';
 
-/** Success/confirm button with glow */
+/** Success/confirm button with ethereal glow */
 export const SuccessButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
   (props, ref) => <Button ref={ref} variant="success" glow {...props} />
 );
@@ -277,16 +332,26 @@ export const DangerButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
 );
 DangerButton.displayName = 'DangerButton';
 
-/** Full neon glow button */
-export const NeonButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
-  (props, ref) => <Button ref={ref} variant="neon" {...props} />
+/** Elegant styled button */
+export const ElegantButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="elegant" {...props} />
 );
-NeonButton.displayName = 'NeonButton';
+ElegantButton.displayName = 'ElegantButton';
+
+/** Arcane mystical button with sacred geometry */
+export const ArcaneButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="arcane" glow {...props} />
+);
+ArcaneButton.displayName = 'ArcaneButton';
 
 /** Ghost button for subtle actions */
 export const GhostButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
   (props, ref) => <Button ref={ref} variant="ghost" {...props} />
 );
 GhostButton.displayName = 'GhostButton';
+
+// Legacy alias for backward compatibility
+/** @deprecated Use ElegantButton or ArcaneButton instead */
+export const NeonButton = ElegantButton;
 
 export default Button;

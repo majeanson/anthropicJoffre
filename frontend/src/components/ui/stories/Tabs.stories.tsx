@@ -1,6 +1,8 @@
 /**
- * Tabs Component Stories
- * Comprehensive Storybook stories for the Tabs component
+ * Tabs Component Stories - Midnight Alchemy Edition
+ *
+ * Mystical navigation tabs for exploring different sections
+ * of the alchemist's laboratory and archives.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -8,10 +10,38 @@ import { useState } from 'react';
 import { Tabs, TabPanel } from '../Tabs';
 
 const meta = {
-  title: 'UI/Tabs',
+  title: 'Midnight Alchemy/Tabs',
   component: Tabs,
   parameters: {
     layout: 'centered',
+    backgrounds: {
+      default: 'midnight',
+      values: [
+        { name: 'midnight', value: '#0B0E14' },
+        { name: 'chamber', value: '#131824' },
+      ],
+    },
+    docs: {
+      description: {
+        component: `
+# Midnight Alchemy Tabs
+
+Mystical navigation tabs for exploring different sections
+of the alchemist's laboratory and archives.
+
+## Features
+- **3 variants**: underline, pills, boxed
+- **3 sizes**: sm, md, lg
+- **Icons**: Alchemical symbols
+- **Badges**: Notification counts
+- **Full width**: Stretch to fill container
+
+## Alchemical Usage
+Navigate between guild members, experiment logs,
+and archived formulas.
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -42,15 +72,18 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Basic Variants
+// ============================================================================
+// BASIC VARIANTS
+// ============================================================================
+
 export const Underline: Story = {
   args: {
     variant: 'underline',
-    activeTab: 'friends',
+    activeTab: 'guild',
     tabs: [
-      { id: 'friends', label: 'Friends' },
-      { id: 'requests', label: 'Requests' },
-      { id: 'search', label: 'Search' },
+      { id: 'guild', label: 'Guild' },
+      { id: 'scrolls', label: 'Scrolls' },
+      { id: 'archives', label: 'Archives' },
     ],
     onChange: () => {},
   },
@@ -59,11 +92,11 @@ export const Underline: Story = {
 export const Pills: Story = {
   args: {
     variant: 'pills',
-    activeTab: 'friends',
+    activeTab: 'guild',
     tabs: [
-      { id: 'friends', label: 'Friends' },
-      { id: 'requests', label: 'Requests' },
-      { id: 'search', label: 'Search' },
+      { id: 'guild', label: 'Guild' },
+      { id: 'scrolls', label: 'Scrolls' },
+      { id: 'archives', label: 'Archives' },
     ],
     onChange: () => {},
   },
@@ -72,25 +105,28 @@ export const Pills: Story = {
 export const Boxed: Story = {
   args: {
     variant: 'boxed',
-    activeTab: 'friends',
+    activeTab: 'guild',
     tabs: [
-      { id: 'friends', label: 'Friends' },
-      { id: 'requests', label: 'Requests' },
-      { id: 'search', label: 'Search' },
+      { id: 'guild', label: 'Guild' },
+      { id: 'scrolls', label: 'Scrolls' },
+      { id: 'archives', label: 'Archives' },
     ],
     onChange: () => {},
   },
 };
 
-// Sizes
+// ============================================================================
+// SIZES
+// ============================================================================
+
 export const Small: Story = {
   args: {
     size: 'sm',
     activeTab: 'tab1',
     tabs: [
-      { id: 'tab1', label: 'Tab 1' },
-      { id: 'tab2', label: 'Tab 2' },
-      { id: 'tab3', label: 'Tab 3' },
+      { id: 'tab1', label: 'Formulas' },
+      { id: 'tab2', label: 'Catalysts' },
+      { id: 'tab3', label: 'Results' },
     ],
     onChange: () => {},
   },
@@ -101,9 +137,9 @@ export const Medium: Story = {
     size: 'md',
     activeTab: 'tab1',
     tabs: [
-      { id: 'tab1', label: 'Tab 1' },
-      { id: 'tab2', label: 'Tab 2' },
-      { id: 'tab3', label: 'Tab 3' },
+      { id: 'tab1', label: 'Formulas' },
+      { id: 'tab2', label: 'Catalysts' },
+      { id: 'tab3', label: 'Results' },
     ],
     onChange: () => {},
   },
@@ -114,81 +150,99 @@ export const Large: Story = {
     size: 'lg',
     activeTab: 'tab1',
     tabs: [
-      { id: 'tab1', label: 'Tab 1' },
-      { id: 'tab2', label: 'Tab 2' },
-      { id: 'tab3', label: 'Tab 3' },
+      { id: 'tab1', label: 'Formulas' },
+      { id: 'tab2', label: 'Catalysts' },
+      { id: 'tab3', label: 'Results' },
     ],
     onChange: () => {},
   },
 };
 
-// With Icons
+// ============================================================================
+// WITH ICONS (Alchemical Symbols)
+// ============================================================================
+
 export const WithIcons: Story = {
   args: {
-    activeTab: 'friends',
+    activeTab: 'guild',
     tabs: [
-      { id: 'friends', label: 'Friends', icon: '👥' },
-      { id: 'requests', label: 'Requests', icon: '📩' },
-      { id: 'search', label: 'Search', icon: '🔍' },
+      { id: 'guild', label: 'Guild', icon: '⚗' },
+      { id: 'scrolls', label: 'Scrolls', icon: '📜' },
+      { id: 'archives', label: 'Archives', icon: '📚' },
     ],
     onChange: () => {},
   },
 };
 
-// With Badges
+// ============================================================================
+// WITH BADGES
+// ============================================================================
+
 export const WithBadges: Story = {
   args: {
-    activeTab: 'friends',
+    activeTab: 'guild',
     tabs: [
-      { id: 'friends', label: 'Friends', badge: 12 },
-      { id: 'requests', label: 'Requests', badge: 3 },
-      { id: 'messages', label: 'Messages', badge: 99 },
+      { id: 'guild', label: 'Guild', badge: 12 },
+      { id: 'scrolls', label: 'Scrolls', badge: 3 },
+      { id: 'formulas', label: 'Formulas', badge: 99 },
     ],
     onChange: () => {},
   },
 };
 
-// With Icons and Badges
+// ============================================================================
+// WITH ICONS AND BADGES
+// ============================================================================
+
 export const WithIconsAndBadges: Story = {
   args: {
-    activeTab: 'friends',
+    activeTab: 'guild',
     tabs: [
-      { id: 'friends', label: 'Friends', icon: '👥', badge: 12 },
-      { id: 'requests', label: 'Requests', icon: '📩', badge: 3 },
-      { id: 'messages', label: 'Messages', icon: '💬', badge: 150 },
+      { id: 'guild', label: 'Guild', icon: '⚗', badge: 12 },
+      { id: 'scrolls', label: 'Scrolls', icon: '📜', badge: 3 },
+      { id: 'formulas', label: 'Formulas', icon: '☿', badge: 150 },
     ],
     onChange: () => {},
   },
 };
 
-// Disabled Tab
+// ============================================================================
+// DISABLED TAB
+// ============================================================================
+
 export const WithDisabledTab: Story = {
   args: {
     activeTab: 'tab1',
     tabs: [
-      { id: 'tab1', label: 'Active' },
+      { id: 'tab1', label: 'Unlocked' },
       { id: 'tab2', label: 'Available' },
-      { id: 'tab3', label: 'Locked', disabled: true },
+      { id: 'tab3', label: 'Forbidden', disabled: true },
     ],
     onChange: () => {},
   },
 };
 
-// Full Width
+// ============================================================================
+// FULL WIDTH
+// ============================================================================
+
 export const FullWidth: Story = {
   args: {
     fullWidth: true,
     activeTab: 'tab1',
     tabs: [
-      { id: 'tab1', label: 'Tab 1' },
-      { id: 'tab2', label: 'Tab 2' },
-      { id: 'tab3', label: 'Tab 3' },
+      { id: 'tab1', label: 'Fire △' },
+      { id: 'tab2', label: 'Water ▽' },
+      { id: 'tab3', label: 'Earth ◇' },
     ],
     onChange: () => {},
   },
 };
 
-// Full Width Pills
+// ============================================================================
+// FULL WIDTH PILLS
+// ============================================================================
+
 export const FullWidthPills: Story = {
   args: {
     variant: 'pills',
@@ -197,13 +251,16 @@ export const FullWidthPills: Story = {
     tabs: [
       { id: 'tab1', label: 'Active' },
       { id: 'tab2', label: 'Recent' },
-      { id: 'tab3', label: 'All' },
+      { id: 'tab3', label: 'Archived' },
     ],
     onChange: () => {},
   },
 };
 
-// Showcase: All Variants
+// ============================================================================
+// ALL VARIANTS
+// ============================================================================
+
 export const AllVariants: Story = {
   args: {
     tabs: [],
@@ -212,23 +269,38 @@ export const AllVariants: Story = {
   },
   render: () => {
     const tabs = [
-      { id: 'tab1', label: 'First' },
-      { id: 'tab2', label: 'Second' },
-      { id: 'tab3', label: 'Third' },
+      { id: 'tab1', label: 'Mercury' },
+      { id: 'tab2', label: 'Sulfur' },
+      { id: 'tab3', label: 'Salt' },
     ];
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 p-6 bg-[#0B0E14] rounded-xl">
         <div>
-          <h4 className="text-sm font-medium text-gray-500 mb-2">Underline</h4>
+          <h4
+            className="text-sm font-medium mb-2"
+            style={{ color: '#6B7280' }}
+          >
+            Underline
+          </h4>
           <Tabs variant="underline" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
         <div>
-          <h4 className="text-sm font-medium text-gray-500 mb-2">Pills</h4>
+          <h4
+            className="text-sm font-medium mb-2"
+            style={{ color: '#6B7280' }}
+          >
+            Pills
+          </h4>
           <Tabs variant="pills" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
         <div>
-          <h4 className="text-sm font-medium text-gray-500 mb-2">Boxed</h4>
+          <h4
+            className="text-sm font-medium mb-2"
+            style={{ color: '#6B7280' }}
+          >
+            Boxed
+          </h4>
           <Tabs variant="boxed" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
       </div>
@@ -236,7 +308,10 @@ export const AllVariants: Story = {
   },
 };
 
-// Interactive Example
+// ============================================================================
+// INTERACTIVE EXAMPLE
+// ============================================================================
+
 export const Interactive: Story = {
   args: {
     tabs: [],
@@ -244,36 +319,45 @@ export const Interactive: Story = {
     onChange: () => {},
   },
   render: () => {
-    const [activeTab, setActiveTab] = useState('friends');
+    const [activeTab, setActiveTab] = useState('guild');
 
     return (
-      <div className="p-4 bg-parchment-100 dark:bg-gray-800 rounded-lg">
+      <div
+        className="p-4 rounded-xl"
+        style={{
+          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+          border: '1px solid #2D3548',
+        }}
+      >
         <Tabs
           tabs={[
-            { id: 'friends', label: 'Friends', icon: '👥', badge: 5 },
-            { id: 'requests', label: 'Requests', icon: '📩', badge: 2 },
-            { id: 'search', label: 'Search', icon: '🔍' },
+            { id: 'guild', label: 'Guild', icon: '⚗', badge: 5 },
+            { id: 'scrolls', label: 'Scrolls', icon: '📜', badge: 2 },
+            { id: 'archives', label: 'Archives', icon: '📚' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
         />
 
-        <div className="mt-4 p-4 bg-white dark:bg-gray-700 rounded-lg min-h-[100px]">
-          <TabPanel tabId="friends" activeTab={activeTab}>
-            <p className="text-umber-800 dark:text-gray-200">
-              Your friends list will appear here.
+        <div
+          className="mt-4 p-4 rounded-lg min-h-[100px]"
+          style={{ background: '#0B0E14' }}
+        >
+          <TabPanel tabId="guild" activeTab={activeTab}>
+            <p style={{ color: '#E8E4DC' }}>
+              Your fellow alchemists await in the guild hall.
             </p>
           </TabPanel>
 
-          <TabPanel tabId="requests" activeTab={activeTab}>
-            <p className="text-umber-800 dark:text-gray-200">
-              Friend requests will appear here.
+          <TabPanel tabId="scrolls" activeTab={activeTab}>
+            <p style={{ color: '#E8E4DC' }}>
+              Unread scrolls containing new discoveries.
             </p>
           </TabPanel>
 
-          <TabPanel tabId="search" activeTab={activeTab}>
-            <p className="text-umber-800 dark:text-gray-200">
-              Search for players here.
+          <TabPanel tabId="archives" activeTab={activeTab}>
+            <p style={{ color: '#E8E4DC' }}>
+              Ancient formulas preserved for eternity.
             </p>
           </TabPanel>
         </div>
@@ -282,8 +366,11 @@ export const Interactive: Story = {
   },
 };
 
-// Social Panel Example
-export const SocialPanelExample: Story = {
+// ============================================================================
+// GUILD PANEL
+// ============================================================================
+
+export const GuildPanel: Story = {
   args: {
     tabs: [],
     activeTab: '',
@@ -293,16 +380,31 @@ export const SocialPanelExample: Story = {
     const [activeTab, setActiveTab] = useState('online');
 
     return (
-      <div className="p-4 bg-parchment-200 dark:bg-gray-900 rounded-lg w-80">
-        <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100 mb-4">Social</h3>
+      <div
+        className="p-4 rounded-xl w-80"
+        style={{
+          background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+          border: '1px solid #2D3548',
+        }}
+      >
+        <h3
+          className="text-lg font-bold mb-4"
+          style={{
+            fontFamily: '"Cinzel", Georgia, serif',
+            color: '#D4A574',
+            textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
+          }}
+        >
+          Guild Members
+        </h3>
 
         <Tabs
           variant="pills"
           fullWidth
           tabs={[
-            { id: 'online', label: 'Online', badge: 8 },
-            { id: 'all', label: 'All Friends' },
-            { id: 'blocked', label: 'Blocked' },
+            { id: 'online', label: 'Active', badge: 8 },
+            { id: 'all', label: 'All Members' },
+            { id: 'blocked', label: 'Exiled' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
@@ -310,26 +412,36 @@ export const SocialPanelExample: Story = {
 
         <div className="mt-4 space-y-2">
           <TabPanel tabId="online" activeTab={activeTab}>
-            {['Alice', 'Bob', 'Charlie'].map((name) => (
+            {['Aurelia', 'Magnus', 'Isolde'].map((name) => (
               <div
                 key={name}
-                className="p-2 bg-white dark:bg-gray-800 rounded flex items-center gap-2"
+                className="p-2 rounded flex items-center gap-2"
+                style={{ background: '#0B0E14' }}
               >
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
-                <span className="text-umber-800 dark:text-gray-200">{name}</span>
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: '#10B981' }}
+                />
+                <span style={{ color: '#E8E4DC' }}>{name}</span>
               </div>
             ))}
           </TabPanel>
 
           <TabPanel tabId="all" activeTab={activeTab}>
-            <p className="text-umber-600 dark:text-gray-400 text-center py-4">
-              Showing all friends...
+            <p
+              className="text-center py-4"
+              style={{ color: '#6B7280' }}
+            >
+              Showing all guild members...
             </p>
           </TabPanel>
 
           <TabPanel tabId="blocked" activeTab={activeTab}>
-            <p className="text-umber-600 dark:text-gray-400 text-center py-4">
-              No blocked users
+            <p
+              className="text-center py-4"
+              style={{ color: '#6B7280' }}
+            >
+              No exiled members
             </p>
           </TabPanel>
         </div>
@@ -338,15 +450,18 @@ export const SocialPanelExample: Story = {
   },
 };
 
-// Game Mode Selector
-export const GameModeSelector: Story = {
+// ============================================================================
+// EXPERIMENT MODE SELECTOR
+// ============================================================================
+
+export const ExperimentModeSelector: Story = {
   args: {
     tabs: [],
     activeTab: '',
     onChange: () => {},
   },
   render: () => {
-    const [activeTab, setActiveTab] = useState('casual');
+    const [activeTab, setActiveTab] = useState('practice');
 
     return (
       <div className="p-4">
@@ -355,30 +470,120 @@ export const GameModeSelector: Story = {
           fullWidth
           size="lg"
           tabs={[
-            { id: 'casual', label: 'Casual', icon: '🎮' },
+            { id: 'practice', label: 'Practice', icon: '⚗' },
             { id: 'ranked', label: 'Ranked', icon: '🏆' },
-            { id: 'custom', label: 'Custom', icon: '⚙️' },
+            { id: 'custom', label: 'Custom', icon: '☿' },
           ]}
           activeTab={activeTab}
           onChange={setActiveTab}
         />
 
-        <div className="mt-4 p-4 bg-parchment-100 dark:bg-gray-800 rounded-lg text-center">
-          {activeTab === 'casual' && (
-            <p className="text-umber-800 dark:text-gray-200">
-              Play for fun with no rank impact
+        <div
+          className="mt-4 p-4 rounded-lg text-center"
+          style={{
+            background: '#0B0E14',
+            border: '1px solid #2D3548',
+          }}
+        >
+          {activeTab === 'practice' && (
+            <p style={{ color: '#E8E4DC' }}>
+              Experiment freely with no guild standing impact
             </p>
           )}
           {activeTab === 'ranked' && (
-            <p className="text-umber-800 dark:text-gray-200">
-              Compete to climb the leaderboard
+            <p style={{ color: '#E8E4DC' }}>
+              Compete to climb the Grand Alchemist rankings
             </p>
           )}
           {activeTab === 'custom' && (
-            <p className="text-umber-800 dark:text-gray-200">
-              Create a game with custom rules
+            <p style={{ color: '#E8E4DC' }}>
+              Configure custom experiment parameters
             </p>
           )}
+        </div>
+      </div>
+    );
+  },
+};
+
+// ============================================================================
+// ELEMENTAL TABS
+// ============================================================================
+
+export const ElementalTabs: Story = {
+  args: {
+    tabs: [],
+    activeTab: '',
+    onChange: () => {},
+  },
+  render: () => {
+    const [activeTab, setActiveTab] = useState('fire');
+
+    const elementColors: Record<string, string> = {
+      fire: '#EF4444',
+      water: '#3B82F6',
+      earth: '#84CC16',
+      air: '#E8E4DC',
+    };
+
+    return (
+      <div
+        className="p-6 rounded-xl"
+        style={{
+          background: '#0B0E14',
+          border: '1px solid #2D3548',
+        }}
+      >
+        <h3
+          className="text-lg font-bold mb-4 text-center"
+          style={{
+            fontFamily: '"Cinzel", Georgia, serif',
+            color: '#D4A574',
+          }}
+        >
+          Choose Your Element
+        </h3>
+
+        <Tabs
+          variant="pills"
+          fullWidth
+          tabs={[
+            { id: 'fire', label: '△ Fire' },
+            { id: 'water', label: '▽ Water' },
+            { id: 'earth', label: '◇ Earth' },
+            { id: 'air', label: '○ Air' },
+          ]}
+          activeTab={activeTab}
+          onChange={setActiveTab}
+        />
+
+        <div
+          className="mt-4 p-4 rounded-lg text-center transition-colors"
+          style={{
+            background: '#131824',
+            borderLeft: `3px solid ${elementColors[activeTab]}`,
+          }}
+        >
+          <span
+            className="text-3xl block mb-2"
+          >
+            {activeTab === 'fire' && '🔥'}
+            {activeTab === 'water' && '💧'}
+            {activeTab === 'earth' && '🌿'}
+            {activeTab === 'air' && '💨'}
+          </span>
+          <p
+            className="italic"
+            style={{
+              fontFamily: '"Cormorant Garamond", Georgia, serif',
+              color: '#9CA3AF',
+            }}
+          >
+            {activeTab === 'fire' && 'The flame of transformation'}
+            {activeTab === 'water' && 'The flow of purification'}
+            {activeTab === 'earth' && 'The foundation of stability'}
+            {activeTab === 'air' && 'The breath of inspiration'}
+          </p>
         </div>
       </div>
     );

@@ -1,16 +1,48 @@
 /**
- * Alert Component Stories
- * Comprehensive Storybook stories for the Alert component
+ * Alert Component Stories - Midnight Alchemy Edition
+ *
+ * Mystical notification scrolls with alchemical warnings,
+ * arcane discoveries, and transmutation results.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { Alert } from '../Alert';
 
 const meta = {
-  title: 'UI/Alert',
+  title: 'Midnight Alchemy/Alert',
   component: Alert,
   parameters: {
     layout: 'centered',
+    backgrounds: {
+      default: 'midnight',
+      values: [
+        { name: 'midnight', value: '#0B0E14' },
+        { name: 'chamber', value: '#131824' },
+      ],
+    },
+    docs: {
+      description: {
+        component: `
+# Midnight Alchemy Alerts
+
+Mystical notification scrolls for conveying important messages.
+Each alert type represents a different alchemical state.
+
+## Features
+- **5 variants**: info, success, warning, error, neutral
+- **Dismissible**: Optional close button
+- **Custom icons**: Alchemical symbols
+- **Title support**: For formal proclamations
+
+## Alchemical Meanings
+- **Info**: Arcane knowledge revealed
+- **Success**: Transmutation complete
+- **Warning**: Volatile mixture detected
+- **Error**: Failed experiment
+- **Neutral**: Ancient inscription
+        `,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -36,343 +68,394 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Basic Variants
+// ============================================================================
+// VARIANTS
+// ============================================================================
+
 export const Info: Story = {
   args: {
     variant: 'info',
-    children: 'This is an informational message.',
+    children: 'The ancient texts speak of a hidden ingredient.',
   },
 };
 
 export const Success: Story = {
   args: {
     variant: 'success',
-    children: 'Your changes have been saved successfully!',
+    children: 'The transmutation was successful! Gold has been created.',
   },
 };
 
 export const Warning: Story = {
   args: {
     variant: 'warning',
-    children: 'Please review your settings before continuing.',
+    children: 'Caution: This mixture is highly volatile.',
   },
 };
 
 export const Error: Story = {
   args: {
     variant: 'error',
-    children: 'An error occurred. Please try again.',
+    children: 'The experiment has failed. Check your calculations.',
   },
 };
 
 export const Neutral: Story = {
   args: {
     variant: 'neutral',
-    children: 'This is a neutral notification message.',
+    children: 'An inscription on weathered parchment.',
   },
 };
 
-// With Title
+// ============================================================================
+// WITH TITLE
+// ============================================================================
+
 export const WithTitle: Story = {
   args: {
     variant: 'info',
-    title: 'Did you know?',
-    children: 'You can customize your game settings at any time.',
+    title: 'Arcane Discovery',
+    children: 'A new formula has been uncovered in the ancient manuscripts.',
   },
 };
 
 export const ErrorWithTitle: Story = {
   args: {
     variant: 'error',
-    title: 'Login Failed',
-    children: 'Invalid username or password. Please check your credentials and try again.',
+    title: 'Transmutation Failed',
+    children: 'The base metals rejected the philosophers stone. Review your technique.',
   },
 };
 
 export const SuccessWithTitle: Story = {
   args: {
     variant: 'success',
-    title: 'Game Created!',
-    children: 'Share the game code with your friends to start playing.',
+    title: 'The Great Work Complete!',
+    children: 'Share this elixir recipe with your fellow alchemists.',
   },
 };
 
 export const WarningWithTitle: Story = {
   args: {
     variant: 'warning',
-    title: 'Connection Unstable',
-    children: 'Your connection appears to be slow. This may affect gameplay.',
+    title: 'Essence Instability',
+    children: 'The ethereal connection wavers. This may affect your experiments.',
   },
 };
 
-// Dismissible
+// ============================================================================
+// DISMISSIBLE
+// ============================================================================
+
 export const Dismissible: Story = {
   args: {
     variant: 'success',
-    children: 'Click the X to dismiss this alert.',
+    children: 'Seal this scroll to dismiss.',
     dismissible: true,
-    onDismiss: () => console.log('Alert dismissed'),
+    onDismiss: () => console.log('Scroll sealed'),
   },
 };
 
 export const DismissibleWithTitle: Story = {
   args: {
     variant: 'info',
-    title: 'New Feature',
-    children: 'We\'ve added dark mode! Try it in settings.',
+    title: 'New Technique Discovered',
+    children: 'The Council has approved a new distillation method.',
     dismissible: true,
-    onDismiss: () => console.log('Alert dismissed'),
+    onDismiss: () => console.log('Scroll sealed'),
   },
 };
 
-// Custom Icon
+// ============================================================================
+// CUSTOM ICONS (Alchemical Symbols)
+// ============================================================================
+
 export const CustomIcon: Story = {
   args: {
     variant: 'info',
-    icon: <span>🎮</span>,
-    title: 'Game Tip',
-    children: 'Remember to follow suit if you have a matching card!',
+    icon: <span>☿</span>,
+    title: 'Mercury Rising',
+    children: 'The quicksilver responds to lunar influence tonight.',
   },
 };
 
 export const TrophyIcon: Story = {
   args: {
     variant: 'success',
-    icon: <span>🏆</span>,
-    title: 'Achievement Unlocked!',
-    children: 'You\'ve won 10 games in a row!',
+    icon: <span>⚗</span>,
+    title: 'Mastery Achieved!',
+    children: 'You have completed 10 successful transmutations in succession!',
   },
 };
 
-// Long Content
+// ============================================================================
+// LONG CONTENT
+// ============================================================================
+
 export const LongContent: Story = {
   args: {
     variant: 'info',
-    title: 'Game Rules',
-    children: 'In this trick-taking game, players must follow suit if possible. The highest card of the led suit wins the trick, unless a trump card is played. Points are scored based on tricks won and special cards collected.',
+    title: 'The Laws of Transmutation',
+    children: 'In this sacred art, practitioners must follow the cardinal rule: equivalent exchange. Points are scored based on successful reactions and special catalysts discovered. The red catalyst grants +5 points while the brown catalyst deducts -2 points.',
   },
 };
 
-// Showcase: All Variants
+// ============================================================================
+// ALL VARIANTS
+// ============================================================================
+
 export const AllVariants: Story = {
   args: {
     children: '',
   },
   render: () => (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
       <Alert variant="info">
-        Info: This is an informational message.
+        ☿ Mercury: Knowledge flows like quicksilver.
       </Alert>
       <Alert variant="success">
-        Success: Operation completed successfully!
+        ☉ Gold: The transmutation is complete!
       </Alert>
       <Alert variant="warning">
-        Warning: Please proceed with caution.
+        △ Fire: Proceed with extreme caution.
       </Alert>
       <Alert variant="error">
-        Error: Something went wrong.
+        ☠ Void: The mixture has destabilized.
       </Alert>
       <Alert variant="neutral">
-        Neutral: This is a neutral message.
+        ◇ Salt: An observation recorded.
       </Alert>
     </div>
   ),
 };
 
-// Showcase: All With Titles
-export const AllWithTitles: Story = {
-  args: {
-    children: '',
-  },
-  render: () => (
-    <div className="space-y-4">
-      <Alert variant="info" title="Information">
-        Here's some helpful information for you.
-      </Alert>
-      <Alert variant="success" title="Success!">
-        Your action was completed successfully.
-      </Alert>
-      <Alert variant="warning" title="Warning">
-        Please be aware of this important notice.
-      </Alert>
-      <Alert variant="error" title="Error">
-        An error occurred while processing your request.
-      </Alert>
-      <Alert variant="neutral" title="Note">
-        This is a general notification.
-      </Alert>
-    </div>
-  ),
-};
+// ============================================================================
+// ALCHEMIST'S LABORATORY
+// ============================================================================
 
-// Showcase: Dismissible Alerts
-export const AllDismissible: Story = {
+export const LaboratoryNotifications: Story = {
   args: {
     children: '',
   },
   render: () => (
-    <div className="space-y-4">
-      <Alert variant="info" title="Update Available" dismissible>
-        A new version is available. Refresh to update.
-      </Alert>
-      <Alert variant="success" title="Saved" dismissible>
-        Your preferences have been saved.
-      </Alert>
-      <Alert variant="warning" title="Session Expiring" dismissible>
-        Your session will expire in 5 minutes.
-      </Alert>
-    </div>
-  ),
-};
+    <div
+      className="space-y-4 p-6 rounded-xl min-w-[400px]"
+      style={{
+        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-lg uppercase tracking-widest text-center mb-4"
+        style={{
+          fontFamily: '"Cinzel", Georgia, serif',
+          color: '#D4A574',
+          textShadow: '0 0 10px rgba(212, 165, 116, 0.3)',
+        }}
+      >
+        Laboratory Scrolls
+      </h3>
 
-// Showcase: Game Notifications
-export const GameNotifications: Story = {
-  args: {
-    children: '',
-  },
-  render: () => (
-    <div className="space-y-4">
       <Alert
         variant="info"
-        icon={<span>🎯</span>}
+        icon={<span>⚗</span>}
         title="Your Turn"
       >
-        It's your turn to play. Select a card to continue.
+        The Great Work awaits your contribution. Select a catalyst.
       </Alert>
 
       <Alert
         variant="success"
-        icon={<span>🏆</span>}
-        title="Trick Won!"
+        icon={<span>☉</span>}
+        title="Reaction Won!"
       >
-        You won the trick and earned 6 points!
+        Your formula prevailed. +6 points of pure essence collected!
       </Alert>
 
       <Alert
         variant="warning"
-        icon={<span>⏱️</span>}
-        title="Time Running Low"
+        icon={<span>⏳</span>}
+        title="Time Flows"
       >
-        You have 10 seconds to make your move.
+        10 seconds remain before the mixture settles.
       </Alert>
 
       <Alert
         variant="error"
-        icon={<span>❌</span>}
-        title="Invalid Move"
+        icon={<span>✕</span>}
+        title="Invalid Catalyst"
       >
-        You must follow suit if you have a matching card.
+        You must use the same element if you possess one.
       </Alert>
     </div>
   ),
 };
 
-// Showcase: System Messages
+// ============================================================================
+// SYSTEM MESSAGES
+// ============================================================================
+
 export const SystemMessages: Story = {
   args: {
     children: '',
   },
   render: () => (
-    <div className="space-y-4">
+    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
       <Alert
         variant="warning"
-        icon={<span>🔌</span>}
-        title="Connection Lost"
+        icon={<span>🔮</span>}
+        title="Ethereal Link Severed"
         dismissible
       >
-        Attempting to reconnect... Please wait.
+        Attempting to restore connection... Please wait.
       </Alert>
 
       <Alert
         variant="success"
         icon={<span>✓</span>}
-        title="Reconnected"
+        title="Bond Restored"
         dismissible
       >
-        Connection restored. You're back in the game!
+        The ethereal link has been reestablished. Continue your work!
       </Alert>
 
       <Alert
         variant="info"
-        icon={<span>👥</span>}
-        title="Player Joined"
+        icon={<span>👤</span>}
+        title="Alchemist Arrived"
         dismissible
       >
-        Alice has joined the game lobby.
+        Aurelia has entered the laboratory.
       </Alert>
     </div>
   ),
 };
 
-// Showcase: Form Validation
+// ============================================================================
+// FORM VALIDATION
+// ============================================================================
+
 export const FormValidation: Story = {
   args: {
     children: '',
   },
   render: () => (
-    <div className="space-y-4 p-4 bg-parchment-100 dark:bg-gray-800 rounded-lg">
-      <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100 mb-4">
-        Create Account
+    <div
+      className="space-y-4 p-6 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-lg font-bold mb-4"
+        style={{
+          fontFamily: '"Cinzel", Georgia, serif',
+          color: '#E8E4DC',
+        }}
+      >
+        Register as Alchemist
       </h3>
 
       <div className="space-y-3">
         <div>
-          <label className="block text-sm font-medium text-umber-700 dark:text-gray-300 mb-1">
-            Username
+          <label
+            className="block text-sm font-medium mb-1"
+            style={{ color: '#9CA3AF' }}
+          >
+            Alchemist Name
           </label>
           <input
             type="text"
-            className="w-full px-3 py-2 border rounded-lg"
-            defaultValue="ab"
+            className="w-full px-3 py-2 rounded-lg"
+            style={{
+              background: '#131824',
+              border: '1px solid #2D3548',
+              color: '#E8E4DC',
+            }}
+            defaultValue="Al"
           />
         </div>
 
         <Alert variant="error">
-          Username must be at least 3 characters long.
+          Name must contain at least 3 runes.
         </Alert>
 
         <div>
-          <label className="block text-sm font-medium text-umber-700 dark:text-gray-300 mb-1">
-            Email
+          <label
+            className="block text-sm font-medium mb-1"
+            style={{ color: '#9CA3AF' }}
+          >
+            Sigil of Contact
           </label>
           <input
             type="email"
-            className="w-full px-3 py-2 border rounded-lg"
-            defaultValue="user@example.com"
+            className="w-full px-3 py-2 rounded-lg"
+            style={{
+              background: '#131824',
+              border: '1px solid #2D3548',
+              color: '#E8E4DC',
+            }}
+            defaultValue="alchemist@guild.arcane"
           />
         </div>
 
         <Alert variant="success" icon={<span>✓</span>}>
-          Email format is valid.
+          Sigil format is valid.
         </Alert>
       </div>
     </div>
   ),
 };
 
-// Showcase: Inline Usage
-export const InlineAlerts: Story = {
+// ============================================================================
+// BETTING PHASE
+// ============================================================================
+
+export const BettingPhaseAlerts: Story = {
   args: {
     children: '',
   },
   render: () => (
-    <div className="p-4 bg-white dark:bg-gray-900 rounded-lg">
-      <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100 mb-4">
-        Betting Phase
+    <div
+      className="p-6 rounded-xl"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-lg font-bold mb-4"
+        style={{
+          fontFamily: '"Cinzel", Georgia, serif',
+          color: '#D4A574',
+        }}
+      >
+        Wager Your Essence
       </h3>
 
       <Alert variant="info" className="mb-4">
-        Place your bet. Minimum is 7 points.
+        Declare your wager. Minimum is 7 essence points.
       </Alert>
 
       <div className="flex gap-2 mb-4">
-        <button className="px-4 py-2 bg-blue-500 text-white rounded">7</button>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded">8</button>
-        <button className="px-4 py-2 bg-blue-500 text-white rounded">9</button>
+        {[7, 8, 9, 10, 11, 12].map((n) => (
+          <button
+            key={n}
+            className="px-4 py-2 rounded transition-colors"
+            style={{
+              background: n === 9 ? '#C17F59' : '#1A1F2E',
+              color: n === 9 ? '#0B0E14' : '#9CA3AF',
+              border: '1px solid #2D3548',
+            }}
+          >
+            {n}
+          </button>
+        ))}
       </div>
 
       <Alert variant="warning">
-        You must raise the bet. Current highest is 8.
+        You must raise the wager. Current highest is 8.
       </Alert>
     </div>
   ),

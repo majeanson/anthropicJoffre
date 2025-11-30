@@ -1,35 +1,43 @@
 /**
- * Input Component Stories - Retro Gaming Edition
+ * Input Component Stories - Midnight Alchemy Edition
  *
- * Showcases the arcade-inspired input system with neon borders,
- * glowing focus states, and cyberpunk aesthetics.
+ * Showcases mystical input fields with brass frame aesthetics,
+ * ethereal focus states, and arcane corner decorations.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  Input,
-  SearchInput,
-  PasswordInput,
-  NeonInput,
-} from '../Input';
+import { Input, SearchInput, PasswordInput, ArcaneInput, ElegantInput } from '../Input';
 
 const meta = {
-  title: 'UI/Input',
+  title: 'Midnight Alchemy/Input',
   component: Input,
   parameters: {
     layout: 'centered',
+    backgrounds: {
+      default: 'midnight',
+      values: [
+        { name: 'midnight', value: '#0B0E14' },
+        { name: 'chamber', value: '#131824' },
+      ],
+    },
     docs: {
       description: {
         component: `
-Arcade-inspired input component with neon glow effects and retro styling.
+# Midnight Alchemy Inputs
+
+Mystical input fields with brass frame aesthetics and ethereal focus states.
+Each keystroke feels like inscribing ancient runes.
 
 ## Features
-- **3 variants**: default, filled, neon
+- **4 variants**: default, filled, elegant, arcane
 - **3 sizes**: sm, md, lg
-- **Glow on focus**: Neon glow animation when focused
-- **Icon support**: Left and right icon slots
-- **Password toggle**: Built-in visibility toggle
-- **Error states**: Red neon glow for validation errors
+- **Ethereal glow**: Copper glow on focus
+- **Arcane corners**: Sacred geometry decorations
+- **Icon support**: Left and right icons
+- **Password toggle**: Eye of Seeing reveal
+
+## Typography
+Uses **Cormorant Garamond** for elegant italic placeholders.
         `,
       },
     },
@@ -38,7 +46,7 @@ Arcade-inspired input component with neon glow effects and retro styling.
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'filled', 'neon'],
+      options: ['default', 'filled', 'elegant', 'arcane'],
       description: 'Visual style variant',
     },
     size: {
@@ -46,35 +54,27 @@ Arcade-inspired input component with neon glow effects and retro styling.
       options: ['sm', 'md', 'lg'],
       description: 'Input size',
     },
-    type: {
-      control: 'select',
-      options: ['text', 'email', 'password', 'search', 'number', 'tel', 'url'],
-      description: 'Input type',
+    label: {
+      control: 'text',
+      description: 'Label text',
+    },
+    error: {
+      control: 'text',
+      description: 'Error message',
+    },
+    helperText: {
+      control: 'text',
+      description: 'Helper text',
     },
     disabled: {
       control: 'boolean',
       description: 'Disabled state',
     },
-    fullWidth: {
-      control: 'boolean',
-      description: 'Full width input',
-    },
     glowOnFocus: {
       control: 'boolean',
-      description: 'Enable neon glow on focus',
-    },
-    showPasswordToggle: {
-      control: 'boolean',
-      description: 'Show password visibility toggle (password inputs only)',
+      description: 'Enable ethereal glow on focus',
     },
   },
-  decorators: [
-    (Story) => (
-      <div style={{ width: '320px' }}>
-        <Story />
-      </div>
-    ),
-  ],
 } satisfies Meta<typeof Input>;
 
 export default meta;
@@ -86,187 +86,78 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: 'Username',
-    placeholder: 'Enter your username',
-    variant: 'default',
+    placeholder: 'Enter the sacred words...',
+    label: 'Incantation',
   },
 };
 
 export const Filled: Story = {
   args: {
-    label: 'Username',
-    placeholder: 'Enter your username',
     variant: 'filled',
+    placeholder: 'Search the ancient tomes...',
+    label: 'Query',
   },
 };
 
-export const Neon: Story = {
+export const Elegant: Story = {
   args: {
-    label: 'Username',
-    placeholder: 'Enter your username',
-    variant: 'neon',
+    variant: 'elegant',
+    placeholder: 'Inscribe your name...',
+    label: 'Alchemist Name',
   },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Neon variant with cyan border and glow effects - the signature retro gaming style.',
-      },
-    },
+};
+
+export const Arcane: Story = {
+  args: {
+    variant: 'arcane',
+    placeholder: 'Whisper the secret...',
+    label: 'Arcane Formula',
   },
 };
 
 // ============================================================================
-// ALL VARIANTS SHOWCASE
+// ALL VARIANTS
 // ============================================================================
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="space-y-4">
-      <Input variant="default" label="Default" placeholder="Default styling" />
-      <Input variant="filled" label="Filled" placeholder="Filled background" />
-      <Input variant="neon" label="Neon" placeholder="Neon glow effect" />
+    <div className="space-y-6 p-6 bg-[#0B0E14] rounded-xl min-w-96">
+      <Input
+        variant="default"
+        label="Default"
+        placeholder="Standard input field..."
+      />
+      <Input
+        variant="filled"
+        label="Filled"
+        placeholder="Filled background variant..."
+      />
+      <Input
+        variant="elegant"
+        label="Elegant"
+        placeholder="With focus underline..."
+      />
+      <Input
+        variant="arcane"
+        label="Arcane"
+        placeholder="Sacred geometry corners..."
+      />
     </div>
   ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'All available input variants with their unique styling.',
-      },
-    },
-  },
 };
 
 // ============================================================================
 // SIZES
 // ============================================================================
 
-export const Small: Story = {
-  args: {
-    label: 'Small Input',
-    placeholder: 'Small size',
-    size: 'sm',
-  },
-};
-
-export const Medium: Story = {
-  args: {
-    label: 'Medium Input',
-    placeholder: 'Medium size (default)',
-    size: 'md',
-  },
-};
-
-export const Large: Story = {
-  args: {
-    label: 'Large Input',
-    placeholder: 'Large size',
-    size: 'lg',
-  },
-};
-
 export const AllSizes: Story = {
   render: () => (
-    <div className="space-y-4">
-      <Input size="sm" label="Small" placeholder="Small input" />
-      <Input size="md" label="Medium" placeholder="Medium input" />
-      <Input size="lg" label="Large" placeholder="Large input" />
+    <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl min-w-96">
+      <Input size="sm" label="Small" placeholder="Compact text..." />
+      <Input size="md" label="Medium" placeholder="Standard size..." />
+      <Input size="lg" label="Large" placeholder="Prominent input..." />
     </div>
   ),
-};
-
-// ============================================================================
-// INPUT TYPES
-// ============================================================================
-
-export const Email: Story = {
-  args: {
-    label: 'Email Address',
-    type: 'email',
-    placeholder: 'player@arcade.com',
-    leftIcon: <span>@</span>,
-  },
-};
-
-export const Password: Story = {
-  args: {
-    label: 'Password',
-    type: 'password',
-    placeholder: 'Enter your password',
-    showPasswordToggle: true,
-  },
-};
-
-export const Search: Story = {
-  args: {
-    label: 'Search',
-    type: 'search',
-    placeholder: 'Search players...',
-    leftIcon: <span className="text-[var(--color-text-muted)]">🔍</span>,
-  },
-};
-
-export const NumberInput: Story = {
-  args: {
-    label: 'Bet Amount',
-    type: 'number',
-    placeholder: '0',
-    min: 7,
-    max: 12,
-    leftIcon: <span className="text-[var(--color-warning)]">💰</span>,
-  },
-};
-
-// ============================================================================
-// STATES
-// ============================================================================
-
-export const WithHelperText: Story = {
-  args: {
-    label: 'Player Name',
-    placeholder: 'Enter name',
-    helperText: 'This will be displayed to other players',
-  },
-};
-
-export const WithError: Story = {
-  args: {
-    label: 'Email',
-    type: 'email',
-    value: 'invalid-email',
-    error: 'Please enter a valid email address',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Error state with red neon glow effect.',
-      },
-    },
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    label: 'Disabled Input',
-    placeholder: 'Cannot edit',
-    value: 'Disabled value',
-    disabled: true,
-  },
-};
-
-export const GlowOnFocus: Story = {
-  args: {
-    label: 'Click to Focus',
-    placeholder: 'Watch the glow!',
-    glowOnFocus: true,
-    variant: 'default',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Input with animated neon glow when focused.',
-      },
-    },
-  },
 };
 
 // ============================================================================
@@ -275,178 +166,238 @@ export const GlowOnFocus: Story = {
 
 export const WithLeftIcon: Story = {
   args: {
-    label: 'Game ID',
-    placeholder: 'Enter game ID',
-    leftIcon: <span>🎮</span>,
+    label: 'Search Archives',
+    placeholder: 'Query the ancient knowledge...',
+    leftIcon: (
+      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+      </svg>
+    ),
   },
 };
 
 export const WithRightIcon: Story = {
   args: {
-    label: 'Points',
-    type: 'number',
-    placeholder: '0',
-    rightIcon: <span className="text-[var(--color-text-muted)] text-xs">PTS</span>,
+    label: 'Ingredient Weight',
+    placeholder: 'Enter amount...',
+    rightIcon: <span className="text-sm">grams</span>,
   },
 };
 
-export const WithBothIcons: Story = {
+// ============================================================================
+// STATES
+// ============================================================================
+
+export const WithError: Story = {
   args: {
-    label: 'Bet Amount',
-    type: 'number',
-    placeholder: '0',
-    leftIcon: <span>💎</span>,
-    rightIcon: <span className="text-[var(--color-success)] text-xs">CHIPS</span>,
-    variant: 'neon',
+    label: 'Forbidden Formula',
+    placeholder: 'This field has an error...',
+    error: 'The ingredients are volatile. Check your measurements.',
+    value: 'Unstable mixture',
+  },
+};
+
+export const WithHelperText: Story = {
+  args: {
+    label: "Philosopher's Stone Formula",
+    placeholder: 'Enter the secret...',
+    helperText: 'Only known to the initiated. Handle with care.',
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    label: 'Sealed Knowledge',
+    placeholder: 'This input is sealed...',
+    disabled: true,
+    value: 'Ancient secrets',
   },
 };
 
 // ============================================================================
-// PRESET COMPONENTS
+// SPECIALIZED INPUTS
 // ============================================================================
 
-export const PresetInputs: Story = {
+export const SearchInputExample: Story = {
   render: () => (
-    <div className="space-y-4">
-      <SearchInput placeholder="Search for games..." />
-      <PasswordInput label="Password" placeholder="Enter password" />
-      <NeonInput label="Neon Input" placeholder="Glowing input" />
+    <div className="p-6 bg-[#0B0E14] rounded-xl min-w-96">
+      <SearchInput label="Search the Archives" />
     </div>
   ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Pre-configured input components for common use cases.',
-      },
-    },
-  },
+};
+
+export const PasswordInputExample: Story = {
+  render: () => (
+    <div className="p-6 bg-[#0B0E14] rounded-xl min-w-96">
+      <PasswordInput label="Secret Passphrase" placeholder="Enter the hidden word..." />
+    </div>
+  ),
+};
+
+export const ArcaneInputExample: Story = {
+  render: () => (
+    <div className="p-6 bg-[#0B0E14] rounded-xl min-w-96">
+      <ArcaneInput
+        label="Arcane Inscription"
+        placeholder="Channel the mystical energy..."
+        helperText="Focus your intent as you type."
+      />
+    </div>
+  ),
 };
 
 // ============================================================================
-// GAME UI EXAMPLE
+// ALCHEMIST'S WORKBENCH
 // ============================================================================
 
-export const JoinGameForm: Story = {
+export const AlchemistForm: Story = {
   render: () => (
-    <div className="p-6 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)] border-2 border-[var(--color-border-accent)] space-y-4 min-w-80">
-      <h2 className="font-display text-[var(--color-text-primary)] text-lg uppercase tracking-wider text-center mb-6">
-        Join Game
+    <div
+      className="p-8 rounded-xl space-y-6 min-w-[400px] relative"
+      style={{
+        background: 'linear-gradient(180deg, #131824 0%, #0B0E14 100%)',
+        border: '2px solid #C17F59',
+        boxShadow: '0 0 50px rgba(193, 127, 89, 0.15), 0 8px 32px rgba(0, 0, 0, 0.5)',
+      }}
+    >
+      {/* Sacred geometry corners */}
+      <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-[#C17F59] opacity-60" />
+      <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-[#C17F59] opacity-60" />
+
+      <h2
+        className="text-xl text-center uppercase tracking-[0.15em]"
+        style={{
+          fontFamily: '"Cinzel Decorative", Georgia, serif',
+          color: '#D4A574',
+          textShadow: '0 0 15px rgba(212, 165, 116, 0.5)',
+        }}
+      >
+        Register as Alchemist
       </h2>
 
-      <Input
-        label="Player Name"
-        placeholder="Enter your name"
-        leftIcon={<span>👤</span>}
-        helperText="2-16 characters"
-        variant="default"
-      />
-
-      <Input
-        label="Game Code"
-        placeholder="ABC123"
-        leftIcon={<span>🎮</span>}
-        helperText="6-character game code"
-        variant="neon"
-        glowOnFocus
-      />
+      <div className="space-y-4">
+        <Input
+          variant="arcane"
+          label="Alchemist Name"
+          placeholder="Your mystical identity..."
+          leftIcon={<span>☿</span>}
+        />
+        <Input
+          variant="arcane"
+          label="Realm of Study"
+          placeholder="Transmutation, Potions, etc..."
+          leftIcon={<span>⚗</span>}
+        />
+        <PasswordInput
+          label="Secret Passphrase"
+          placeholder="Guard it well..."
+        />
+        <Input
+          variant="arcane"
+          label="Years of Practice"
+          type="number"
+          placeholder="How long have you studied?"
+          helperText="Apprentices welcome."
+        />
+      </div>
 
       <button
-        className="
-          w-full py-3 mt-4
-          bg-[var(--color-success)]
-          text-black font-display
-          uppercase tracking-wider
-          rounded-[var(--radius-lg)]
-          border-2 border-[var(--color-success)]
-          shadow-[0_0_20px_var(--color-success)]
-          hover:shadow-[0_0_30px_var(--color-success),0_0_60px_var(--color-success)]
-          transition-all duration-[var(--duration-normal)]
-          active:translate-y-0.5
-        "
+        className="w-full py-4 rounded-lg text-center uppercase tracking-widest font-semibold"
+        style={{
+          fontFamily: '"Cinzel Decorative", Georgia, serif',
+          background: 'linear-gradient(180deg, #C17F59 0%, rgba(193, 127, 89, 0.8) 100%)',
+          color: '#0B0E14',
+          boxShadow: '0 4px 20px rgba(193, 127, 89, 0.4)',
+        }}
       >
-        Join Game
+        Begin the Great Work
       </button>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Example of inputs used in a game join form with the retro gaming skin.',
+        story: 'Complete form example with the Midnight Alchemy aesthetic.',
       },
     },
   },
 };
 
 // ============================================================================
-// LOGIN FORM EXAMPLE
+// DARK LABORATORY
 // ============================================================================
 
-export const LoginForm: Story = {
+export const DarkLaboratory: Story = {
   render: () => (
-    <div className="p-6 bg-[var(--color-bg-secondary)] rounded-[var(--radius-xl)] border-2 border-[var(--color-border-default)] space-y-4 min-w-80">
-      <div className="text-center mb-6">
-        <span className="text-4xl mb-2 block">🕹️</span>
-        <h2 className="font-display text-[var(--color-text-primary)] text-lg uppercase tracking-wider">
-          Player Login
-        </h2>
+    <div
+      className="p-8 rounded-xl space-y-6 min-w-[450px]"
+      style={{
+        background: '#0B0E14',
+        border: '1px solid #2D3548',
+      }}
+    >
+      <h3
+        className="text-lg uppercase tracking-widest text-center mb-6"
+        style={{
+          fontFamily: '"Cinzel", Georgia, serif',
+          color: '#9CA3AF',
+        }}
+      >
+        Ingredient Search
+      </h3>
+
+      <SearchInput placeholder="Search for ingredients..." fullWidth />
+
+      <div className="grid grid-cols-2 gap-4">
+        <Input
+          variant="filled"
+          label="Element Type"
+          placeholder="Fire, Water..."
+          size="sm"
+        />
+        <Input
+          variant="filled"
+          label="Potency Level"
+          placeholder="1-10"
+          type="number"
+          size="sm"
+        />
       </div>
 
-      <Input
-        label="Email"
-        type="email"
-        placeholder="player@arcade.com"
-        leftIcon={<span className="text-[var(--color-text-muted)]">@</span>}
-        variant="filled"
+      <ElegantInput
+        label="Notes"
+        placeholder="Additional observations about the ingredient..."
+        helperText="Describe any unusual properties."
       />
-
-      <Input
-        label="Password"
-        type="password"
-        placeholder="••••••••"
-        showPasswordToggle
-        variant="filled"
-      />
-
-      <div className="flex gap-3 pt-4">
-        <button
-          className="
-            flex-1 py-2
-            bg-transparent
-            text-[var(--color-text-secondary)]
-            font-display text-sm
-            uppercase tracking-wider
-            rounded-[var(--radius-md)]
-            border border-[var(--color-border-default)]
-            hover:border-[var(--color-border-accent)]
-            hover:text-[var(--color-text-primary)]
-            transition-all duration-[var(--duration-fast)]
-          "
-        >
-          Register
-        </button>
-        <button
-          className="
-            flex-1 py-2
-            bg-[var(--color-bg-accent)]
-            text-white font-display text-sm
-            uppercase tracking-wider
-            rounded-[var(--radius-md)]
-            border-2 border-[var(--color-bg-accent)]
-            shadow-[0_0_15px_var(--color-glow)]
-            hover:shadow-[0_0_25px_var(--color-glow)]
-            transition-all duration-[var(--duration-fast)]
-          "
-        >
-          Login
-        </button>
-      </div>
     </div>
   ),
-  parameters: {
-    docs: {
-      description: {
-        story: 'Example login form with retro gaming aesthetics.',
-      },
-    },
-  },
+};
+
+// ============================================================================
+// VALIDATION STATES
+// ============================================================================
+
+export const ValidationStates: Story = {
+  render: () => (
+    <div className="space-y-6 p-6 bg-[#0B0E14] rounded-xl min-w-96">
+      <Input
+        variant="arcane"
+        label="Valid Formula"
+        value="Aqua Vitae + Sulfur"
+        helperText="✓ Formula verified by the Council"
+      />
+      <Input
+        variant="arcane"
+        label="Invalid Formula"
+        value="Mercury + ??? "
+        error="Unknown ingredient detected. The mixture is unstable."
+      />
+      <Input
+        variant="arcane"
+        label="Required Field"
+        placeholder="This field cannot be empty..."
+        error="The Great Work cannot proceed without this ingredient."
+      />
+    </div>
+  ),
 };
