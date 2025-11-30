@@ -192,16 +192,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setError(null);
   }, []);
 
-  // Get user profile
+  // Get user profile with full settings (bio, visibility, preferences, etc.)
   const getUserProfile = useCallback(async () => {
     const token = getAccessToken();
     if (!token) return null;
 
     try {
-      const response = await fetch(API_ENDPOINTS.authProfile(), {
+      const response = await fetch(API_ENDPOINTS.userProfile(), {
         headers: {
           'Authorization': `Bearer ${token}`
-        }
+        },
+        credentials: 'include'
       });
 
       if (!response.ok) {
@@ -224,7 +225,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     setError(null);
     try {
-      const response = await fetchWithCsrf(API_ENDPOINTS.authProfile(), {
+      const response = await fetchWithCsrf(API_ENDPOINTS.userProfile(), {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`

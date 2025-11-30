@@ -33,7 +33,7 @@ export function ProfileEditorModal({
         const data = await getUserProfile();
         if (data?.profile) {
           setProfileData({
-            avatar_id: data.profile.user_id ? user.avatar_url || undefined : undefined,
+            avatar_id: user.avatar_url || undefined,
             bio: data.profile.bio || undefined,
             country: data.profile.country || undefined,
             favorite_team: data.profile.favorite_team || null,
@@ -42,8 +42,9 @@ export function ProfileEditorModal({
             allow_friend_requests: data.profile.allow_friend_requests !== false,
           });
         } else {
-          // No profile yet, use defaults
+          // No profile yet, use defaults with user avatar
           setProfileData({
+            avatar_id: user.avatar_url || undefined,
             visibility: 'public',
             show_online_status: true,
             allow_friend_requests: true,
@@ -51,8 +52,9 @@ export function ProfileEditorModal({
         }
       } catch (error) {
         logger.error('Failed to fetch profile:', error);
-        // Use defaults on error
+        // Use defaults on error with user avatar
         setProfileData({
+          avatar_id: user.avatar_url || undefined,
           visibility: 'public',
           show_online_status: true,
           allow_friend_requests: true,
