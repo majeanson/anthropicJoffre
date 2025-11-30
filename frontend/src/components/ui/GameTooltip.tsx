@@ -120,18 +120,12 @@ export function GameTooltip({
       className={`
         fixed
 
-        /* Mobile: top sheet style */
-        top-0 left-0 right-0
-        sm:top-auto sm:left-auto sm:right-auto
+        /* Mobile: top sheet style - full width, no transform */
+        inset-x-0 top-0
 
         /* Desktop: centered in viewport */
-        sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2
-
-        /* Sizing */
-        w-full sm:w-auto sm:min-w-[320px] sm:max-w-[400px]
-
-        /* Animation */
-        animate-slideDown sm:animate-fadeIn
+        sm:inset-x-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2
+        sm:w-auto sm:min-w-[320px] sm:max-w-[400px]
 
         ${className}
       `}
@@ -139,12 +133,12 @@ export function GameTooltip({
     >
       {/* Backdrop for mobile */}
       <div
-        className="fixed inset-0 bg-black/40 sm:hidden -z-10"
+        className="fixed inset-0 bg-black/40 sm:hidden -z-10 animate-fadeIn"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Tooltip content */}
+      {/* Tooltip content - animation applied here for proper full-width on mobile */}
       <div
         className={`
           bg-gradient-to-br ${styles.gradient}
@@ -157,6 +151,9 @@ export function GameTooltip({
           /* Safe area for mobile notch/status bar */
           pt-[max(1rem,env(safe-area-inset-top))]
           sm:pt-5
+
+          /* Animation on content, not container */
+          animate-slideDown sm:animate-fadeIn
         `}
       >
         {/* Header */}
