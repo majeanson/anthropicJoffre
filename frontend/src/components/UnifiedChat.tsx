@@ -166,7 +166,7 @@ export function UnifiedChat({
 
   const containerClasses = {
     panel: 'fixed right-4 bottom-4 w-80 md:w-80 rounded-[var(--radius-lg)] shadow-2xl border-2 flex flex-col max-h-96 z-50',
-    floating: 'fixed bottom-4 right-4 w-[90vw] sm:w-80 max-w-[calc(100vw-2rem)] max-h-[80vh] sm:max-h-[500px] border-2 rounded-[var(--radius-lg)] shadow-2xl z-40 flex flex-col animate-slide-in',
+    floating: 'fixed bottom-4 right-4 w-72 sm:w-80 max-w-[calc(100vw-2rem)] max-h-[60vh] sm:max-h-[500px] border-2 rounded-[var(--radius-lg)] shadow-2xl z-40 flex flex-col animate-slide-in',
     embedded: 'w-full border-2 rounded-[var(--radius-lg)] flex flex-col',
     modal: 'fixed inset-0 flex items-center justify-center z-50 p-4'
   }[mode];

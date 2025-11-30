@@ -1,9 +1,10 @@
 /**
- * SettingsContent Component - Retro Gaming Edition
+ * SettingsContent Component - Unified Preferences Edition
  *
- * Settings panel with retro gaming aesthetic:
- * - Theme/Skin selection
- * - Sound settings
+ * Settings panel with consolidated preferences:
+ * - Visual Theme/Skin selection
+ * - Sound settings with volume control
+ * - Animation toggle
  * - Keyboard navigation hints
  * - Debug options
  */
@@ -20,9 +21,62 @@ interface SettingsContentProps {
   onShowDebug: () => void;
 }
 
+// Toggle Switch Component for reusability
+function ToggleSwitch({
+  enabled,
+  onChange,
+  label,
+  description,
+}: {
+  enabled: boolean;
+  onChange: (enabled: boolean) => void;
+  label: string;
+  description?: string;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <div className="flex-1">
+        <span className="text-sm text-[var(--color-text-secondary)] font-body">{label}</span>
+        {description && (
+          <p className="text-xs text-[var(--color-text-muted)] mt-0.5">{description}</p>
+        )}
+      </div>
+      <button
+        onClick={() => onChange(!enabled)}
+        className={`
+          w-12 h-6
+          rounded-full
+          relative
+          transition-all duration-[var(--duration-fast)]
+          flex-shrink-0 ml-3
+          ${enabled
+            ? 'bg-[var(--color-success)]'
+            : 'bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)]'
+          }
+        `}
+        style={{
+          boxShadow: enabled ? '0 0 10px var(--color-success)' : 'none',
+        }}
+        aria-label={label}
+        aria-pressed={enabled}
+      >
+        <div
+          className={`
+            absolute top-1 w-4 h-4
+            rounded-full
+            bg-white
+            transition-all duration-[var(--duration-fast)]
+            ${enabled ? 'right-1' : 'left-1'}
+          `}
+        />
+      </button>
+    </div>
+  );
+}
+
 export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentProps) {
-  useSettings(); // Provides theme context
-  useSkin(); // Provides skin context
+  const { animationsEnabled, setAnimationsEnabled } = useSettings();
+  useSkin();
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
 
@@ -44,10 +98,108 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
             textShadow: '0 0 10px var(--color-glow)',
           }}
         >
-          Settings
+          Preferences
         </h3>
 
         <div className="space-y-5">
+          {/* Visual Theme / Skin */}
+          <div>
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+              🎨 Visual Theme
+            </label>
+            <SkinSelectorDropdown />
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[var(--color-border-subtle)]" />
+
+          {/* Sound & Animation Settings */}
+          <div>
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-3">
+              🔊 Audio & Effects
+            </label>
+            <div
+              className="
+                p-4
+                rounded-[var(--radius-md)]
+                border border-[var(--color-border-default)]
+                bg-[var(--color-bg-secondary)]
+                space-y-4
+              "
+            >
+              {/* Sound Toggle */}
+              <ToggleSwitch
+                enabled={soundEnabled}
+                onChange={(enabled) => {
+                  sounds.setEnabled(enabled);
+                  setSoundEnabled(enabled);
+                  if (enabled) sounds.buttonClick();
+                }}
+                label="Sound Effects"
+                description="Card plays, notifications, UI feedback"
+              />
+
+              {/* Volume Slider */}
+              {soundEnabled && (
+                <div className="pt-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-[var(--color-text-muted)] font-body">Volume</span>
+                    <span className="text-xs text-[var(--color-text-accent)] font-display">
+                      {Math.round(soundVolume * 100)}%
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={Math.round(soundVolume * 100)}
+                    onChange={(e) => {
+                      const newVolume = parseInt(e.target.value) / 100;
+                      sounds.setVolume(newVolume);
+                      setSoundVolume(newVolume);
+                    }}
+                    className="
+                      w-full h-2
+                      rounded-full
+                      appearance-none
+                      cursor-pointer
+                      bg-[var(--color-bg-tertiary)]
+                      [&::-webkit-slider-thumb]:appearance-none
+                      [&::-webkit-slider-thumb]:w-4
+                      [&::-webkit-slider-thumb]:h-4
+                      [&::-webkit-slider-thumb]:rounded-full
+                      [&::-webkit-slider-thumb]:bg-[var(--color-text-accent)]
+                      [&::-webkit-slider-thumb]:shadow-[0_0_10px_var(--color-glow)]
+                      [&::-webkit-slider-thumb]:cursor-pointer
+                      [&::-moz-range-thumb]:w-4
+                      [&::-moz-range-thumb]:h-4
+                      [&::-moz-range-thumb]:rounded-full
+                      [&::-moz-range-thumb]:bg-[var(--color-text-accent)]
+                      [&::-moz-range-thumb]:border-none
+                      [&::-moz-range-thumb]:cursor-pointer
+                    "
+                    style={{
+                      background: `linear-gradient(to right, var(--color-text-accent) 0%, var(--color-text-accent) ${soundVolume * 100}%, var(--color-bg-tertiary) ${soundVolume * 100}%, var(--color-bg-tertiary) 100%)`,
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Animation Toggle */}
+              <div className="border-t border-[var(--color-border-subtle)] pt-4">
+                <ToggleSwitch
+                  enabled={animationsEnabled}
+                  onChange={setAnimationsEnabled}
+                  label="Animations"
+                  description="Card animations, glows, transitions"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[var(--color-border-subtle)]" />
+
           {/* Keyboard Navigation Hint - hidden on mobile */}
           <div
             className="
@@ -62,45 +214,21 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
               <span>⌨️</span>
               <span>Keyboard Navigation</span>
             </h4>
-            <div className="space-y-2">
-              <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
-                <kbd
-                  className="
-                    px-2 py-1
-                    bg-[var(--color-bg-secondary)]
-                    border border-[var(--color-border-default)]
-                    rounded-[var(--radius-sm)]
-                    font-mono text-[var(--color-text-muted)]
-                  "
-                >
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="flex items-center gap-2 text-[var(--color-text-secondary)]">
+                <kbd className="px-2 py-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border-default)] rounded-[var(--radius-sm)] font-mono text-[var(--color-text-muted)]">
                   ← →
                 </kbd>
-                <span className="font-body">Switch tabs</span>
+                <span className="font-body">Tabs</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
-                <kbd
-                  className="
-                    px-2 py-1
-                    bg-[var(--color-bg-secondary)]
-                    border border-[var(--color-border-default)]
-                    rounded-[var(--radius-sm)]
-                    font-mono text-[var(--color-text-muted)]
-                  "
-                >
+              <div className="flex items-center gap-2 text-[var(--color-text-secondary)]">
+                <kbd className="px-2 py-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border-default)] rounded-[var(--radius-sm)] font-mono text-[var(--color-text-muted)]">
                   ↑ ↓
                 </kbd>
-                <span className="font-body">Navigate buttons</span>
+                <span className="font-body">Navigate</span>
               </div>
-              <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
-                <kbd
-                  className="
-                    px-2 py-1
-                    bg-[var(--color-bg-secondary)]
-                    border border-[var(--color-border-default)]
-                    rounded-[var(--radius-sm)]
-                    font-mono text-[var(--color-text-muted)]
-                  "
-                >
+              <div className="flex items-center gap-2 text-[var(--color-text-secondary)]">
+                <kbd className="px-2 py-1 bg-[var(--color-bg-secondary)] border border-[var(--color-border-default)] rounded-[var(--radius-sm)] font-mono text-[var(--color-text-muted)]">
                   Enter
                 </kbd>
                 <span className="font-body">Activate</span>
@@ -108,114 +236,8 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
             </div>
           </div>
 
-          {/* Visual Theme / Skin */}
-          <div>
-            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
-              Visual Theme
-            </label>
-            <SkinSelectorDropdown />
-          </div>
-
-          {/* Sound Effects */}
-          <div>
-            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
-              Sound Effects
-            </label>
-            <div
-              className="
-                p-4
-                rounded-[var(--radius-md)]
-                border border-[var(--color-border-default)]
-                bg-[var(--color-bg-secondary)]
-                space-y-4
-              "
-            >
-              {/* Sound Toggle */}
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-[var(--color-text-secondary)] font-body">Enable Sounds</span>
-                <button
-                  onClick={() => {
-                    const newEnabled = !soundEnabled;
-                    sounds.setEnabled(newEnabled);
-                    setSoundEnabled(newEnabled);
-                    if (newEnabled) sounds.buttonClick();
-                  }}
-                  className={`
-                    w-12 h-6
-                    rounded-full
-                    relative
-                    transition-all duration-[var(--duration-fast)]
-                    ${soundEnabled
-                      ? 'bg-[var(--color-success)]'
-                      : 'bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)]'
-                    }
-                  `}
-                  style={{
-                    boxShadow: soundEnabled ? '0 0 10px var(--color-success)' : 'none',
-                  }}
-                  aria-label="Enable Sounds"
-                  aria-pressed={soundEnabled}
-                >
-                  <div
-                    className={`
-                      absolute top-1 w-4 h-4
-                      rounded-full
-                      bg-white
-                      transition-all duration-[var(--duration-fast)]
-                      ${soundEnabled ? 'right-1' : 'left-1'}
-                    `}
-                  />
-                </button>
-              </div>
-
-              {/* Volume Slider */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-[var(--color-text-muted)] font-body">Volume</span>
-                  <span className="text-xs text-[var(--color-text-accent)] font-display">
-                    {Math.round(soundVolume * 100)}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={Math.round(soundVolume * 100)}
-                  onChange={(e) => {
-                    const newVolume = parseInt(e.target.value) / 100;
-                    sounds.setVolume(newVolume);
-                    setSoundVolume(newVolume);
-                  }}
-                  className="
-                    w-full h-2
-                    rounded-full
-                    appearance-none
-                    cursor-pointer
-                    bg-[var(--color-bg-tertiary)]
-                    [&::-webkit-slider-thumb]:appearance-none
-                    [&::-webkit-slider-thumb]:w-4
-                    [&::-webkit-slider-thumb]:h-4
-                    [&::-webkit-slider-thumb]:rounded-full
-                    [&::-webkit-slider-thumb]:bg-[var(--color-text-accent)]
-                    [&::-webkit-slider-thumb]:shadow-[0_0_10px_var(--color-glow)]
-                    [&::-webkit-slider-thumb]:cursor-pointer
-                    [&::-moz-range-thumb]:w-4
-                    [&::-moz-range-thumb]:h-4
-                    [&::-moz-range-thumb]:rounded-full
-                    [&::-moz-range-thumb]:bg-[var(--color-text-accent)]
-                    [&::-moz-range-thumb]:border-none
-                    [&::-moz-range-thumb]:cursor-pointer
-                  "
-                  style={{
-                    background: `linear-gradient(to right, var(--color-text-accent) 0%, var(--color-text-accent) ${soundVolume * 100}%, var(--color-bg-tertiary) ${soundVolume * 100}%, var(--color-bg-tertiary) 100%)`,
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Divider */}
-          <div className="border-t border-[var(--color-border-subtle)] my-4" />
+          <div className="border-t border-[var(--color-border-subtle)]" />
 
           {/* How to Play */}
           <NeonButton
@@ -228,9 +250,6 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
           >
             How to Play
           </NeonButton>
-
-          {/* Divider */}
-          <div className="border-t border-[var(--color-border-subtle)] my-4" />
 
           {/* About */}
           <div className="text-center py-2">
@@ -247,9 +266,6 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
               A 4-player trick-taking card game
             </p>
           </div>
-
-          {/* Divider */}
-          <div className="border-t border-[var(--color-border-subtle)] my-4" />
 
           {/* Debug Fun */}
           <Button
