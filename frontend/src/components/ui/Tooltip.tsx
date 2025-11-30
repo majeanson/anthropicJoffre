@@ -30,7 +30,7 @@
 import { ReactNode, useState, useRef, useEffect } from 'react';
 
 export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
-export type TooltipVariant = 'dark' | 'light' | 'arcane' | 'success' | 'warning' | 'error';
+export type TooltipVariant = 'dark' | 'light' | 'arcane' | 'success' | 'warning' | 'error' | 'info';
 
 export interface TooltipProps {
   /** Tooltip content */
@@ -110,6 +110,12 @@ const variantStyles: Record<TooltipVariant, {
     text: '#A63D3D',
     border: '#8B3D3D',
     shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(166, 61, 61, 0.2)',
+  },
+  info: {
+    bg: '#1A232E',
+    text: '#4682B4',
+    border: '#4682B4',
+    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(70, 130, 180, 0.2)',
   },
 };
 

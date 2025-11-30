@@ -20,7 +20,7 @@
 
 export type SpinnerSize = 'xs' | 'sm' | 'md' | 'lg';
 export type SpinnerVariant = 'default' | 'dots' | 'pulse' | 'arcane';
-export type SpinnerColor = 'accent' | 'primary' | 'white' | 'muted' | 'success' | 'warning' | 'error';
+export type SpinnerColor = 'accent' | 'primary' | 'white' | 'muted' | 'success' | 'warning' | 'error' | 'gray';
 
 export interface SpinnerProps {
   /** Spinner size */
@@ -71,6 +71,10 @@ const colorStyles: Record<SpinnerColor, { color: string; glow: string }> = {
   error: {
     color: '#A63D3D',
     glow: 'rgba(166, 61, 61, 0.5)',
+  },
+  gray: {
+    color: '#6B7280',
+    glow: 'rgba(107, 114, 128, 0.3)',
   },
 };
 

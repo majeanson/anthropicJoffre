@@ -26,9 +26,9 @@
  * ```
  */
 
-export type ProgressBarVariant = 'default' | 'gradient' | 'arcane';
+export type ProgressBarVariant = 'default' | 'gradient' | 'arcane' | 'striped';
 export type ProgressBarSize = 'sm' | 'md' | 'lg';
-export type ProgressBarColor = 'accent' | 'success' | 'warning' | 'error' | 'info' | 'muted';
+export type ProgressBarColor = 'accent' | 'success' | 'warning' | 'error' | 'info' | 'muted' | 'primary' | 'gray';
 
 export interface ProgressBarProps {
   /** Current value */
@@ -97,6 +97,18 @@ const colorStyles: Record<ProgressBarColor, {
     gradient: 'linear-gradient(90deg, #3D6B8B, #4682B4, #5A9FD4)',
   },
   muted: {
+    fill: '#6B7280',
+    track: '#1A1F2E',
+    glow: 'rgba(107, 114, 128, 0.3)',
+    gradient: 'linear-gradient(90deg, #4A4A4A, #6B7280, #8A8A8A)',
+  },
+  primary: {
+    fill: '#C17F59',
+    track: '#1A1F2E',
+    glow: 'rgba(193, 127, 89, 0.5)',
+    gradient: 'linear-gradient(90deg, #C17F59, #D4A574, #C17F59)',
+  },
+  gray: {
     fill: '#6B7280',
     track: '#1A1F2E',
     glow: 'rgba(107, 114, 128, 0.3)',

@@ -30,7 +30,7 @@
 
 import { ReactNode } from 'react';
 
-export type AlertVariant = 'info' | 'success' | 'warning' | 'error' | 'arcane';
+export type AlertVariant = 'info' | 'success' | 'warning' | 'error' | 'arcane' | 'neutral';
 
 export interface AlertProps {
   /** Alert variant */
@@ -98,6 +98,14 @@ const variantStyles: Record<AlertVariant, {
     title: '#D4A574',
     shadow: '0 4px 20px rgba(193, 127, 89, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
   },
+  neutral: {
+    bg: 'linear-gradient(135deg, rgba(107, 114, 128, 0.1) 0%, #131824 100%)',
+    border: '#6B7280',
+    text: '#9CA3AF',
+    icon: '#6B7280',
+    title: '#E8E4DC',
+    shadow: '0 4px 20px rgba(107, 114, 128, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+  },
 };
 
 const defaultIcons: Record<AlertVariant, ReactNode> = {
@@ -123,6 +131,11 @@ const defaultIcons: Record<AlertVariant, ReactNode> = {
   ),
   arcane: (
     <span className="text-lg">⚗</span>
+  ),
+  neutral: (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+    </svg>
   ),
 };
 

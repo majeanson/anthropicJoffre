@@ -30,7 +30,7 @@
 
 import { SelectHTMLAttributes, forwardRef, ReactNode, useState } from 'react';
 
-export type SelectVariant = 'default' | 'filled' | 'arcane';
+export type SelectVariant = 'default' | 'filled' | 'arcane' | 'outlined';
 export type SelectSize = 'sm' | 'md' | 'lg';
 
 export interface SelectOption {

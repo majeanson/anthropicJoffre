@@ -28,7 +28,7 @@
 
 import React, { ReactNode } from 'react';
 
-export type UIBadgeVariant = 'solid' | 'outline' | 'subtle' | 'arcane';
+export type UIBadgeVariant = 'solid' | 'outline' | 'subtle' | 'arcane' | 'translucent';
 export type UIBadgeColor =
   | 'team1'
   | 'team2'
@@ -37,7 +37,9 @@ export type UIBadgeColor =
   | 'error'
   | 'info'
   | 'muted'
-  | 'accent';
+  | 'accent'
+  | 'gray'
+  | 'primary';
 export type UIBadgeSize = 'xs' | 'sm' | 'md';
 export type UIBadgeShape = 'rounded' | 'pill';
 
@@ -73,54 +75,77 @@ const colorStyles: Record<UIBadgeColor, {
   outline: { border: string; text: string };
   subtle: { bg: string; text: string };
   arcane: { bg: string; border: string; text: string; shadow: string };
+  translucent: { bg: string; text: string };
 }> = {
   team1: {
     solid: { bg: '#d97706', text: '#0B0E14', shadow: 'rgba(217, 119, 6, 0.5)' },
     outline: { border: '#d97706', text: '#d97706' },
     subtle: { bg: 'rgba(217, 119, 6, 0.15)', text: '#d97706' },
     arcane: { bg: 'rgba(217, 119, 6, 0.1)', border: '#d97706', text: '#d97706', shadow: 'rgba(217, 119, 6, 0.3)' },
+    translucent: { bg: 'rgba(217, 119, 6, 0.2)', text: '#d97706' },
   },
   team2: {
     solid: { bg: '#7c3aed', text: '#E8E4DC', shadow: 'rgba(124, 58, 237, 0.5)' },
     outline: { border: '#7c3aed', text: '#7c3aed' },
     subtle: { bg: 'rgba(124, 58, 237, 0.15)', text: '#7c3aed' },
     arcane: { bg: 'rgba(124, 58, 237, 0.1)', border: '#7c3aed', text: '#7c3aed', shadow: 'rgba(124, 58, 237, 0.3)' },
+    translucent: { bg: 'rgba(124, 58, 237, 0.2)', text: '#7c3aed' },
   },
   success: {
     solid: { bg: '#4A9C6D', text: '#0B0E14', shadow: 'rgba(74, 156, 109, 0.5)' },
     outline: { border: '#4A9C6D', text: '#4A9C6D' },
     subtle: { bg: 'rgba(74, 156, 109, 0.15)', text: '#4A9C6D' },
     arcane: { bg: 'rgba(74, 156, 109, 0.1)', border: '#4A9C6D', text: '#4A9C6D', shadow: 'rgba(74, 156, 109, 0.3)' },
+    translucent: { bg: 'rgba(74, 156, 109, 0.2)', text: '#4A9C6D' },
   },
   warning: {
     solid: { bg: '#D4A574', text: '#0B0E14', shadow: 'rgba(212, 165, 116, 0.5)' },
     outline: { border: '#D4A574', text: '#D4A574' },
     subtle: { bg: 'rgba(212, 165, 116, 0.15)', text: '#D4A574' },
     arcane: { bg: 'rgba(212, 165, 116, 0.1)', border: '#D4A574', text: '#D4A574', shadow: 'rgba(212, 165, 116, 0.3)' },
+    translucent: { bg: 'rgba(212, 165, 116, 0.2)', text: '#D4A574' },
   },
   error: {
     solid: { bg: '#A63D3D', text: '#E8E4DC', shadow: 'rgba(166, 61, 61, 0.5)' },
     outline: { border: '#A63D3D', text: '#A63D3D' },
     subtle: { bg: 'rgba(166, 61, 61, 0.15)', text: '#A63D3D' },
     arcane: { bg: 'rgba(166, 61, 61, 0.1)', border: '#8B3D3D', text: '#A63D3D', shadow: 'rgba(166, 61, 61, 0.3)' },
+    translucent: { bg: 'rgba(166, 61, 61, 0.2)', text: '#A63D3D' },
   },
   info: {
     solid: { bg: '#4682B4', text: '#E8E4DC', shadow: 'rgba(70, 130, 180, 0.5)' },
     outline: { border: '#4682B4', text: '#4682B4' },
     subtle: { bg: 'rgba(70, 130, 180, 0.15)', text: '#4682B4' },
     arcane: { bg: 'rgba(70, 130, 180, 0.1)', border: '#4682B4', text: '#4682B4', shadow: 'rgba(70, 130, 180, 0.3)' },
+    translucent: { bg: 'rgba(70, 130, 180, 0.2)', text: '#4682B4' },
   },
   muted: {
     solid: { bg: '#6B7280', text: '#E8E4DC', shadow: 'rgba(107, 114, 128, 0.4)' },
     outline: { border: '#6B7280', text: '#6B7280' },
     subtle: { bg: 'rgba(107, 114, 128, 0.15)', text: '#9CA3AF' },
     arcane: { bg: 'rgba(107, 114, 128, 0.1)', border: '#6B7280', text: '#9CA3AF', shadow: 'rgba(107, 114, 128, 0.2)' },
+    translucent: { bg: 'rgba(107, 114, 128, 0.2)', text: '#9CA3AF' },
   },
   accent: {
     solid: { bg: '#C17F59', text: '#0B0E14', shadow: 'rgba(193, 127, 89, 0.5)' },
     outline: { border: '#C17F59', text: '#D4A574' },
     subtle: { bg: 'rgba(193, 127, 89, 0.15)', text: '#D4A574' },
     arcane: { bg: 'rgba(193, 127, 89, 0.1)', border: '#C17F59', text: '#D4A574', shadow: 'rgba(193, 127, 89, 0.3)' },
+    translucent: { bg: 'rgba(193, 127, 89, 0.2)', text: '#D4A574' },
+  },
+  gray: {
+    solid: { bg: '#6B7280', text: '#E8E4DC', shadow: 'rgba(107, 114, 128, 0.4)' },
+    outline: { border: '#6B7280', text: '#6B7280' },
+    subtle: { bg: 'rgba(107, 114, 128, 0.15)', text: '#9CA3AF' },
+    arcane: { bg: 'rgba(107, 114, 128, 0.1)', border: '#6B7280', text: '#9CA3AF', shadow: 'rgba(107, 114, 128, 0.2)' },
+    translucent: { bg: 'rgba(107, 114, 128, 0.2)', text: '#9CA3AF' },
+  },
+  primary: {
+    solid: { bg: '#C17F59', text: '#0B0E14', shadow: 'rgba(193, 127, 89, 0.5)' },
+    outline: { border: '#C17F59', text: '#D4A574' },
+    subtle: { bg: 'rgba(193, 127, 89, 0.15)', text: '#D4A574' },
+    arcane: { bg: 'rgba(193, 127, 89, 0.1)', border: '#C17F59', text: '#D4A574', shadow: 'rgba(193, 127, 89, 0.3)' },
+    translucent: { bg: 'rgba(193, 127, 89, 0.2)', text: '#D4A574' },
   },
 };
 
@@ -176,6 +201,17 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
           borderColor: (colorStyle as typeof colorStyles.accent.arcane).border,
           color: (colorStyle as typeof colorStyles.accent.arcane).text,
           boxShadow: `0 0 15px ${(colorStyle as typeof colorStyles.accent.arcane).shadow}`,
+        };
+      case 'translucent':
+        return {
+          backgroundColor: (colorStyle as typeof colorStyles.accent.translucent).bg,
+          color: (colorStyle as typeof colorStyles.accent.translucent).text,
+          backdropFilter: 'blur(4px)',
+        };
+      default:
+        return {
+          backgroundColor: (colorStyle as typeof colorStyles.accent.solid).bg,
+          color: (colorStyle as typeof colorStyles.accent.solid).text,
         };
     }
   };

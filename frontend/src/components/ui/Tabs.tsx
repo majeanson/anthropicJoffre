@@ -28,7 +28,7 @@
 
 import { ReactNode } from 'react';
 
-export type TabVariant = 'underline' | 'pills' | 'arcane';
+export type TabVariant = 'underline' | 'pills' | 'arcane' | 'boxed';
 export type TabSize = 'sm' | 'md' | 'lg';
 
 export interface Tab {
@@ -95,6 +95,7 @@ export function Tabs({
     underline: 'border-b-2 border-[#2D3548]',
     pills: 'gap-2',
     arcane: 'gap-1 p-1 bg-[#0B0E14]/50 rounded-lg border border-[#2D3548]',
+    boxed: 'gap-1 p-1 bg-[#0B0E14]/50 rounded-lg border border-[#2D3548]',
   };
 
   return (
@@ -150,6 +151,26 @@ export function Tabs({
                   text-[#6B7280]
                   hover:text-[#9CA3AF] hover:bg-[#131824]/50
                 `,
+              };
+            case 'boxed':
+              return {
+                base: 'rounded-md transition-all duration-300 relative border',
+                active: `
+                  bg-gradient-to-b from-[#1A1F2E] to-[#131824]
+                  text-[#D4A574]
+                  shadow-[0_4px_15px_rgba(193,127,89,0.2)]
+                  border-[#C17F59]/40
+                `,
+                inactive: `
+                  text-[#6B7280] border-transparent
+                  hover:text-[#9CA3AF] hover:bg-[#131824]/50 hover:border-[#2D3548]
+                `,
+              };
+            default:
+              return {
+                base: 'border-b-2 -mb-[2px] transition-all duration-300',
+                active: 'border-[#C17F59] text-[#D4A574]',
+                inactive: 'border-transparent text-[#9CA3AF] hover:text-[#E8E4DC] hover:border-[#C17F59]/50',
               };
           }
         };
