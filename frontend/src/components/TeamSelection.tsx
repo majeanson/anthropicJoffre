@@ -357,7 +357,7 @@ export function TeamSelection({
         {/* Team Selection */}
         <div className="grid grid-cols-2 gap-8 mb-8">
           {/* Team 1 */}
-          <UICard variant="bordered" size="lg" className="border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-900/40" data-testid="team-1-container">
+          <UICard variant="bordered" size="lg" className="border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-900" data-testid="team-1-container">
             <h3 className="text-xl font-bold text-orange-800 dark:text-orange-200 mb-4 text-center">Team 1</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
@@ -471,7 +471,7 @@ export function TeamSelection({
           </UICard>
 
           {/* Team 2 */}
-          <UICard variant="bordered" size="lg" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/40" data-testid="team-2-container">
+          <UICard variant="bordered" size="lg" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900" data-testid="team-2-container">
             <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-4 text-center">Team 2</h3>
             <div className="space-y-3">
               {[0, 1].map((position) => {
