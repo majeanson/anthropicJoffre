@@ -6,9 +6,11 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSettings } from '../contexts/SettingsContext';
+import { useSkin } from '../contexts/SkinContext';
+import { SkinId } from '../config/skins';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
-import { Button, UIToggle, UIDivider, Tabs, Tab } from './ui';
+import { Button, UIToggle, UIDivider, Tabs, Tab, Select } from './ui';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -25,7 +27,7 @@ interface SettingsPanelProps {
   connectionStats?: ConnectionStats;
 }
 
-type SettingsTab = 'settings' | 'advanced';
+type SettingsTab = 'settings' | 'preferences' | 'advanced';
 
 export function SettingsPanel({
   isOpen,
@@ -42,6 +44,7 @@ export function SettingsPanel({
   connectionStats
 }: SettingsPanelProps) {
   const { darkMode, setDarkMode, animationsEnabled, setAnimationsEnabled, beginnerMode, setBeginnerMode } = useSettings();
+  const { skinId, setSkin, availableSkins } = useSkin();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
   if (!isOpen) return null;
@@ -63,8 +66,15 @@ export function SettingsPanel({
 
   const settingsTabs: Tab[] = [
     { id: 'settings', label: 'Settings', icon: '⚙️' },
+    { id: 'preferences', label: 'Theme', icon: '🎨' },
     { id: 'advanced', label: 'Advanced', icon: '🔧' },
   ];
+
+  // Convert skins to Select options
+  const skinOptions = availableSkins.map(skin => ({
+    value: skin.id,
+    label: `${skin.isDark ? '🌙' : '☀️'} ${skin.name}`,
+  }));
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -76,7 +86,7 @@ export function SettingsPanel({
               <div className="flex items-center justify-between" data-testid="settings-sound">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{soundEnabled ? '🔊' : '🔇'}</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Sound</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold">Sound</span>
                 </div>
                 <UIToggle enabled={soundEnabled} onChange={() => onSoundToggle()} label="Sound" />
               </div>
@@ -87,9 +97,9 @@ export function SettingsPanel({
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🎓</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Beginner Mode</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold">Beginner Mode</span>
                 </div>
-                <span className="text-xs text-umber-600 dark:text-gray-400 ml-8">
+                <span className="text-xs text-[var(--color-text-muted)] ml-8">
                   Tutorial tips + 2x timeout (120s)
                 </span>
               </div>
@@ -101,7 +111,7 @@ export function SettingsPanel({
               <div className="flex items-center justify-between" data-testid="settings-autoplay">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">{autoplayEnabled ? '⚡' : '🎮'}</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Autoplay</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold">Autoplay</span>
                 </div>
                 <UIToggle enabled={autoplayEnabled} onChange={() => onAutoplayToggle()} label="Autoplay" />
               </div>
@@ -143,10 +153,54 @@ export function SettingsPanel({
           </div>
         );
 
+      case 'preferences':
+        return (
+          <div className="space-y-4">
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">
+              Customize the visual appearance
+            </p>
+
+            {/* Skin/Theme Selector */}
+            <div data-testid="settings-skin">
+              <Select
+                label="Visual Theme"
+                options={skinOptions}
+                value={skinId}
+                onChange={(e) => setSkin(e.target.value as SkinId)}
+                fullWidth
+                variant="arcane"
+              />
+              <p className="text-xs text-[var(--color-text-muted)] mt-2 ml-1">
+                {availableSkins.find(s => s.id === skinId)?.description}
+              </p>
+            </div>
+
+            {/* Animations Toggle */}
+            <div className="flex items-center justify-between" data-testid="settings-animations-pref">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">✨</span>
+                <span className="text-[var(--color-text-primary)] font-semibold">Animations</span>
+              </div>
+              <UIToggle enabled={animationsEnabled} onChange={(v) => setAnimationsEnabled(v)} label="Animations" />
+            </div>
+
+            {/* Sound Toggle (if available) */}
+            {onSoundToggle && (
+              <div className="flex items-center justify-between" data-testid="settings-sound-pref">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{soundEnabled ? '🔊' : '🔇'}</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold">Sound</span>
+                </div>
+                <UIToggle enabled={soundEnabled} onChange={() => onSoundToggle()} label="Sound" />
+              </div>
+            )}
+          </div>
+        );
+
       case 'advanced':
         return (
           <div className="space-y-3">
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            <p className="text-sm text-[var(--color-text-muted)] mb-3">
               Advanced settings for power users
             </p>
 
@@ -154,7 +208,7 @@ export function SettingsPanel({
             <div className="flex items-center justify-between" data-testid="settings-dark-mode">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">{darkMode ? '🌙' : '☀️'}</span>
-                <span className="text-umber-900 dark:text-gray-100 font-semibold">Dark Mode</span>
+                <span className="text-[var(--color-text-primary)] font-semibold">Dark Mode</span>
               </div>
               <UIToggle enabled={darkMode} onChange={(v) => setDarkMode(v)} label="Dark Mode" />
             </div>
@@ -163,7 +217,7 @@ export function SettingsPanel({
             <div className="flex items-center justify-between" data-testid="settings-animations">
               <div className="flex items-center gap-2">
                 <span className="text-2xl">✨</span>
-                <span className="text-umber-900 dark:text-gray-100 font-semibold">Animations</span>
+                <span className="text-[var(--color-text-primary)] font-semibold">Animations</span>
               </div>
               <UIToggle enabled={animationsEnabled} onChange={(v) => setAnimationsEnabled(v)} label="Animations" />
             </div>
@@ -173,7 +227,7 @@ export function SettingsPanel({
               <div className="flex items-center justify-between" data-testid="settings-connection">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">📡</span>
-                  <span className="text-umber-900 dark:text-gray-100 font-semibold">Connection</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold">Connection</span>
                 </div>
                 <ConnectionQualityBadge stats={connectionStats} />
               </div>
@@ -193,7 +247,7 @@ export function SettingsPanel({
                   <span className="text-2xl">🤖</span>
                   <span>Bot Management</span>
                 </div>
-                <span className="text-umber-700 dark:text-gray-300 text-sm">({botCount}/3)</span>
+                <span className="text-[var(--color-text-secondary)] text-sm">({botCount}/3)</span>
               </Button>
             )}
 
@@ -232,13 +286,23 @@ export function SettingsPanel({
 
       {/* Settings Panel - Increased width for tabs */}
       <div
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 bg-parchment-100 dark:bg-gray-800 border-2 border-amber-700 dark:border-gray-600 rounded-lg shadow-2xl z-[10001] w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 border-2 rounded-lg shadow-2xl z-[10001] w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
+        style={{
+          backgroundColor: 'var(--color-bg-secondary)',
+          borderColor: 'var(--color-border-accent)',
+        }}
         onClick={(e) => e.stopPropagation()}
         data-testid="settings-panel"
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 px-4 py-2 rounded-t-md border-b-2 border-amber-800 dark:border-gray-600 flex items-center justify-between">
-          <h2 className="text-white font-bold text-lg flex items-center gap-2">
+        <div
+          className="px-4 py-2 rounded-t-md border-b-2 flex items-center justify-between"
+          style={{
+            background: `linear-gradient(to right, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 80%, var(--color-text-accent)))`,
+            borderColor: 'var(--color-border-accent)',
+          }}
+        >
+          <h2 className="font-bold text-lg flex items-center gap-2" style={{ color: 'var(--color-text-inverse)' }}>
             <span>⚙️</span>
             <span>Settings</span>
           </h2>
@@ -246,7 +310,8 @@ export function SettingsPanel({
             onClick={onClose}
             variant="ghost"
             size="sm"
-            className="!text-white hover:!text-red-300"
+            className="hover:opacity-80"
+            style={{ color: 'var(--color-text-inverse)' }}
             title="Close Settings"
             data-testid="settings-close-button"
           >
@@ -262,7 +327,7 @@ export function SettingsPanel({
           variant="underline"
           size="sm"
           fullWidth
-          className="border-b border-amber-700/30 dark:border-gray-600"
+          className="border-b border-[var(--color-border-default)]"
         />
 
         {/* Tab Content */}

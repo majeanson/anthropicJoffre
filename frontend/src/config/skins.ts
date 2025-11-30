@@ -460,16 +460,16 @@ export const modernMinimalSkin: Skin = {
   id: 'modern-minimal',
   name: 'Modern Minimal',
   description: 'Clean lines, generous whitespace, and refined simplicity',
-  preview: 'linear-gradient(135deg, #fafaf9 0%, #f5f5f4 50%, #e7e5e4 100%)',
+  preview: 'linear-gradient(135deg, #f0eeec 0%, #e8e6e3 50%, #dddad6 100%)',
   isDark: false,
 
   colors: {
     bg: {
-      primary: '#fafaf9',
-      secondary: '#f5f5f4',
-      tertiary: '#e7e5e4',
-      accent: '#18181b',
-      overlay: 'rgba(250, 250, 249, 0.98)',
+      primary: '#f0eeec',           // Warm off-white (less harsh)
+      secondary: '#f5f3f1',         // Slightly warmer white
+      tertiary: '#e8e6e3',          // Light warm gray
+      accent: '#18181b',            // Keep dark accent
+      overlay: 'rgba(240, 238, 236, 0.98)',
     },
 
     text: {
@@ -571,7 +571,7 @@ export const modernMinimalSkin: Skin = {
     },
     card: {
       borderWidth: '1px',
-      bgColor: '#ffffff',
+      bgColor: '#fafaf8',           // Warm off-white for cards
       cornerRadius: '10px',
     },
     modal: {
@@ -737,30 +737,30 @@ export const classicParchmentSkin: Skin = {
   id: 'classic-parchment',
   name: 'Classic Parchment',
   description: 'Traditional elegance with aged paper textures and classic typography',
-  preview: 'linear-gradient(135deg, #f7f3eb 0%, #ebe5d9 50%, #ddd5c3 100%)',
+  preview: 'linear-gradient(135deg, #e8dcc8 0%, #d9ccb4 50%, #c9bea8 100%)',
   isDark: false,
 
   colors: {
     bg: {
-      primary: '#f7f3eb',
-      secondary: '#fdfbf7',
-      tertiary: '#ebe5d9',
-      accent: '#8b2323',
-      overlay: 'rgba(247, 243, 235, 0.98)',
+      primary: '#e8dcc8',           // Warm aged parchment (was too white)
+      secondary: '#efe5d6',         // Slightly lighter parchment
+      tertiary: '#d9ccb4',          // Darker aged paper
+      accent: '#8b2323',            // Burgundy ink
+      overlay: 'rgba(232, 220, 200, 0.98)',
     },
 
     text: {
-      primary: '#3d3428',
-      secondary: '#5e5344',
-      accent: '#8b2323',
-      inverse: '#fdfbf7',
-      muted: '#8a7e6c',
+      primary: '#2a2318',           // Dark sepia ink
+      secondary: '#4a4035',         // Medium sepia
+      accent: '#8b2323',            // Burgundy accent
+      inverse: '#efe5d6',           // Light parchment
+      muted: '#7a6e5c',             // Faded ink
     },
 
     border: {
-      default: '#c9bea8',
-      accent: '#8b2323',
-      subtle: '#ddd5c3',
+      default: '#b5a890',           // Aged paper edge
+      accent: '#8b2323',            // Burgundy
+      subtle: '#c9bea8',            // Light border
     },
 
     success: '#2d6a4f',
@@ -848,7 +848,7 @@ export const classicParchmentSkin: Skin = {
     },
     card: {
       borderWidth: '2px',
-      bgColor: '#fdfbf7',
+      bgColor: '#f5efe0',           // Warm cream parchment for cards
       cornerRadius: '8px',
     },
     modal: {

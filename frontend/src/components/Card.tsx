@@ -297,13 +297,17 @@ function CardComponent({
           style={{
             color: suitStyle.text,
             textShadow: `
-              -1px -1px 0 var(--card-bg-color),
-              1px -1px 0 var(--card-bg-color),
-              -1px 1px 0 var(--card-bg-color),
-              1px 1px 0 var(--card-bg-color),
-              0 2px 4px rgba(0, 0, 0, 0.5)
+              -1px -1px 0 rgba(255, 255, 255, 0.9),
+              1px -1px 0 rgba(255, 255, 255, 0.9),
+              -1px 1px 0 rgba(255, 255, 255, 0.9),
+              1px 1px 0 rgba(255, 255, 255, 0.9),
+              -2px -2px 0 rgba(0, 0, 0, 0.15),
+              2px -2px 0 rgba(0, 0, 0, 0.15),
+              -2px 2px 0 rgba(0, 0, 0, 0.15),
+              2px 2px 0 rgba(0, 0, 0, 0.15),
+              0 2px 4px rgba(0, 0, 0, 0.4)
             `,
-            WebkitTextStroke: '0.5px var(--card-bg-color)',
+            WebkitTextStroke: '1px rgba(255, 255, 255, 0.85)',
           }}
         >
           {card.value}
@@ -339,13 +343,17 @@ function CardComponent({
           style={{
             color: suitStyle.text,
             textShadow: `
-              -1px -1px 0 var(--card-bg-color),
-              1px -1px 0 var(--card-bg-color),
-              -1px 1px 0 var(--card-bg-color),
-              1px 1px 0 var(--card-bg-color),
-              0 2px 4px rgba(0, 0, 0, 0.5)
+              -1px -1px 0 rgba(255, 255, 255, 0.9),
+              1px -1px 0 rgba(255, 255, 255, 0.9),
+              -1px 1px 0 rgba(255, 255, 255, 0.9),
+              1px 1px 0 rgba(255, 255, 255, 0.9),
+              -2px -2px 0 rgba(0, 0, 0, 0.15),
+              2px -2px 0 rgba(0, 0, 0, 0.15),
+              -2px 2px 0 rgba(0, 0, 0, 0.15),
+              2px 2px 0 rgba(0, 0, 0, 0.15),
+              0 2px 4px rgba(0, 0, 0, 0.4)
             `,
-            WebkitTextStroke: '0.5px var(--card-bg-color)',
+            WebkitTextStroke: '1px rgba(255, 255, 255, 0.85)',
           }}
         >
           {card.value}
