@@ -6,6 +6,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { GameHeader } from '../../GameHeader';
+import { SettingsProvider } from '../../../contexts/SettingsContext';
 
 const meta: Meta<typeof GameHeader> = {
   title: 'Components/GameHeader',
@@ -40,14 +41,16 @@ The GameHeader displays game information and action buttons.
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <div className="min-h-[200px] bg-gray-200 dark:bg-gray-900">
-        <Story />
-        <div className="p-4 mt-4 bg-parchment-100 dark:bg-gray-800 rounded m-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            Content below header - score animations should appear above this
-          </p>
+      <SettingsProvider>
+        <div className="min-h-[200px] bg-gray-200 dark:bg-gray-900">
+          <Story />
+          <div className="p-4 mt-4 bg-parchment-100 dark:bg-gray-800 rounded m-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Content below header - score animations should appear above this
+            </p>
+          </div>
         </div>
-      </div>
+      </SettingsProvider>
     ),
   ],
 };
@@ -102,44 +105,46 @@ export const WithScoreAnimation: Story = {
     const [team2Score, setTeam2Score] = useState(15);
 
     return (
-      <div>
-        <GameHeader
-          gameId="SCORE123"
-          roundNumber={5}
-          team1Score={team1Score}
-          team2Score={team2Score}
-          onOpenChat={() => {}}
-          onOpenLeaderboard={() => {}}
-          onOpenAchievements={() => {}}
-          onOpenFriends={() => {}}
-          highestBet={{ amount: 10, withoutTrump: true, playerId: 'p1' }}
-          trump="blue"
-          bettingTeamId={2}
-        />
-        <div className="p-4 flex gap-4 justify-center">
-          <button
-            onClick={() => setTeam1Score(s => s + 5)}
-            className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-          >
-            +5 Team 1
-          </button>
-          <button
-            onClick={() => setTeam2Score(s => s + 3)}
-            className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
-          >
-            +3 Team 2
-          </button>
-          <button
-            onClick={() => setTeam1Score(s => s - 2)}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            -2 Team 1
-          </button>
+      <SettingsProvider>
+        <div>
+          <GameHeader
+            gameId="SCORE123"
+            roundNumber={5}
+            team1Score={team1Score}
+            team2Score={team2Score}
+            onOpenChat={() => {}}
+            onOpenLeaderboard={() => {}}
+            onOpenAchievements={() => {}}
+            onOpenFriends={() => {}}
+            highestBet={{ amount: 10, withoutTrump: true, playerId: 'p1' }}
+            trump="blue"
+            bettingTeamId={2}
+          />
+          <div className="p-4 flex gap-4 justify-center">
+            <button
+              onClick={() => setTeam1Score(s => s + 5)}
+              className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+            >
+              +5 Team 1
+            </button>
+            <button
+              onClick={() => setTeam2Score(s => s + 3)}
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
+            >
+              +3 Team 2
+            </button>
+            <button
+              onClick={() => setTeam1Score(s => s - 2)}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              -2 Team 1
+            </button>
+          </div>
+          <p className="text-center text-sm text-gray-500 mt-2">
+            Click buttons above to see score change animations (should appear above everything)
+          </p>
         </div>
-        <p className="text-center text-sm text-gray-500 mt-2">
-          Click buttons above to see score change animations (should appear above everything)
-        </p>
-      </div>
+      </SettingsProvider>
     );
   },
 };
@@ -207,14 +212,16 @@ export const DarkMode: Story = {
   },
   decorators: [
     (Story) => (
-      <div className="dark min-h-[200px] bg-gray-900">
-        <Story />
-        <div className="p-4 mt-4 bg-gray-800 rounded m-4">
-          <p className="text-sm text-gray-400">
-            Dark mode content below header
-          </p>
+      <SettingsProvider>
+        <div className="dark min-h-[200px] bg-gray-900">
+          <Story />
+          <div className="p-4 mt-4 bg-gray-800 rounded m-4">
+            <p className="text-sm text-gray-400">
+              Dark mode content below header
+            </p>
+          </div>
         </div>
-      </div>
+      </SettingsProvider>
     ),
   ],
 };
