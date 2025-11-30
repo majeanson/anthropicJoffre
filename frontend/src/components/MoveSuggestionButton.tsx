@@ -6,7 +6,7 @@
  * User controls when to see beginner mode hints
  */
 
-import { GameTooltip, GameTooltipTrigger, UICard } from './ui';
+import { GameTooltip, GameTooltipTrigger } from './ui';
 
 export interface MoveSuggestionButtonProps {
   /** The main suggestion text */
@@ -31,25 +31,12 @@ export function MoveSuggestionButton({
   alternatives,
   isOpen,
   onToggle,
-  showTutorial = false,
+  // showTutorial kept for API compatibility but no longer used
+  showTutorial: _showTutorial = false,
 }: MoveSuggestionButtonProps) {
   return (
     <>
       <div className="relative inline-flex motion-safe:animate-fade-in-scale">
-        {/* Tutorial Tooltip - Shows on first appearance */}
-        {showTutorial && !isOpen && (
-          <div className="absolute -top-14 left-1/2 -translate-x-1/2 z-[10001] pointer-events-none animate-bounce-once">
-            <UICard
-              variant="elevated"
-              size="sm"
-              className="!bg-gray-900 dark:!bg-gray-800 text-white !px-3 !py-2 text-xs whitespace-nowrap !border-gray-700"
-            >
-              Tap to see hint
-              <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 dark:bg-gray-800 rotate-45 border-r border-b border-gray-700" />
-            </UICard>
-          </div>
-        )}
-
         {/* Toggle Button */}
         <GameTooltipTrigger
           isOpen={isOpen}
