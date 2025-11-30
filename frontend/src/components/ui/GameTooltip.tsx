@@ -120,9 +120,9 @@ export function GameTooltip({
       className={`
         fixed
 
-        /* Mobile: bottom sheet style */
-        bottom-0 left-0 right-0
-        sm:bottom-auto sm:left-auto sm:right-auto
+        /* Mobile: top sheet style */
+        top-0 left-0 right-0
+        sm:top-auto sm:left-auto sm:right-auto
 
         /* Desktop: centered in viewport */
         sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2
@@ -131,7 +131,7 @@ export function GameTooltip({
         w-full sm:w-auto sm:min-w-[320px] sm:max-w-[400px]
 
         /* Animation */
-        animate-slideUp sm:animate-fadeIn
+        animate-slideDown sm:animate-fadeIn
 
         ${className}
       `}
@@ -150,13 +150,13 @@ export function GameTooltip({
           bg-gradient-to-br ${styles.gradient}
           text-white
           border-2 ${styles.border}
-          rounded-t-2xl sm:rounded-2xl
+          rounded-b-2xl sm:rounded-2xl
           shadow-2xl
           p-4 sm:p-5
 
-          /* Safe area for mobile notch/home indicator */
-          pb-[max(1rem,env(safe-area-inset-bottom))]
-          sm:pb-5
+          /* Safe area for mobile notch/status bar */
+          pt-[max(1rem,env(safe-area-inset-top))]
+          sm:pt-5
         `}
       >
         {/* Header */}
