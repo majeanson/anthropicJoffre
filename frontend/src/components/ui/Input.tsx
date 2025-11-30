@@ -107,31 +107,31 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
       bg-[var(--color-bg-secondary)]
       border-[var(--input-border-width)] border-[var(--color-border-default)]
       ${!error && isFocused ? 'border-[var(--color-text-accent)]' : ''}
-      ${glowOnFocus && isFocused && !error ? 'shadow-[0_0_20px_rgba(212,165,116,0.2),inset_0_0_15px_rgba(193,127,89,0.05)]' : ''}
+      ${glowOnFocus && isFocused && !error ? 'shadow-[var(--shadow-glow)]' : ''}
     `,
     filled: `
       bg-[var(--color-bg-tertiary)]
       border-[var(--input-border-width)] border-transparent
       ${!error && isFocused ? 'border-[var(--color-text-accent)]' : ''}
-      ${glowOnFocus && isFocused && !error ? 'shadow-[0_0_20px_rgba(212,165,116,0.2),inset_0_0_15px_rgba(193,127,89,0.05)]' : ''}
+      ${glowOnFocus && isFocused && !error ? 'shadow-[var(--shadow-glow)]' : ''}
     `,
     elegant: `
       bg-[var(--color-bg-primary)]
       border-[var(--input-border-width)] border-[var(--color-border-accent)]
-      shadow-[inset_0_2px_6px_rgba(0,0,0,0.4)]
-      ${isFocused && !error ? 'shadow-[inset_0_2px_6px_rgba(0,0,0,0.4),0_0_25px_rgba(212,165,116,0.25)]' : ''}
+      shadow-[var(--shadow-inset)]
+      ${isFocused && !error ? 'shadow-[var(--shadow-inset),var(--shadow-glow)]' : ''}
     `,
     arcane: `
       bg-gradient-to-b from-[var(--color-bg-secondary)] to-[var(--color-bg-primary)]
       border-[var(--input-border-width)] border-[var(--color-border-accent)]
-      shadow-[inset_0_2px_8px_rgba(0,0,0,0.5),0_0_10px_rgba(193,127,89,0.1)]
-      ${isFocused && !error ? 'shadow-[inset_0_2px_8px_rgba(0,0,0,0.5),0_0_30px_rgba(212,165,116,0.3),0_0_50px_rgba(193,127,89,0.1)]' : ''}
+      shadow-[var(--shadow-inset)]
+      ${isFocused && !error ? 'shadow-[var(--shadow-inset),var(--shadow-glow)]' : ''}
     `,
   };
 
   // Error styles
   const errorStyles = error
-    ? 'border-[var(--color-error)] shadow-[0_0_15px_rgba(220,38,38,0.25),inset_0_0_10px_rgba(220,38,38,0.05)]'
+    ? 'border-[var(--color-error)]'
     : '';
 
   return (
@@ -223,7 +223,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
                   focus-visible:ring-[var(--color-text-accent)]
                   rounded-[var(--radius-sm)]
                   p-1.5
-                  hover:bg-[rgba(193,127,89,0.1)]
+                  hover:bg-[color-mix(in_srgb,var(--color-text-accent)_10%,transparent)]
                   ${showPassword ? 'text-[var(--color-text-accent)]' : ''}
                 `}
                 disabled={disabled}

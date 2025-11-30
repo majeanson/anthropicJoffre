@@ -1,31 +1,15 @@
 /**
- * Alert Component - Midnight Alchemy Edition
+ * Alert Component - Multi-Skin Edition
  *
- * Mystical contextual feedback messages with ethereal styling.
- * Features brass accents and alchemical iconography.
+ * Contextual feedback messages with proper CSS variable support.
+ * Works correctly across all light and dark themes.
  *
  * Features:
- * - 5 variants: info, success, warning, error, arcane
+ * - 6 variants: info, success, warning, error, arcane, neutral
  * - Dismissible option with elegant close button
- * - Icon customization with element theming
+ * - Icon customization
  * - Title + description support
- * - Sacred geometry corner decorations
  * - Full accessibility
- *
- * Usage:
- * ```tsx
- * <Alert variant="error" title="Volatile Reaction">
- *   The mixture has become unstable. Handle with care.
- * </Alert>
- *
- * <Alert
- *   variant="success"
- *   dismissible
- *   onDismiss={() => setShowAlert(false)}
- * >
- *   The transmutation was successful!
- * </Alert>
- * ```
  */
 
 import { ReactNode } from 'react';
@@ -49,62 +33,48 @@ export interface AlertProps {
   className?: string;
 }
 
-// Midnight Alchemy themed variants
-const variantStyles: Record<AlertVariant, {
-  bg: string;
+// CSS variable-based variant styles
+const variantClasses: Record<AlertVariant, {
   border: string;
-  text: string;
-  icon: string;
-  title: string;
-  shadow: string;
+  bg: string;
+  iconColor: string;
+  titleColor: string;
 }> = {
   info: {
-    bg: 'linear-gradient(135deg, rgba(70, 130, 180, 0.1) 0%, #131824 100%)',
-    border: '#4682B4',
-    text: '#9CA3AF',
-    icon: '#4682B4',
-    title: '#E8E4DC',
-    shadow: '0 4px 20px rgba(70, 130, 180, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+    border: 'border-[var(--color-info)]',
+    bg: 'bg-[color-mix(in_srgb,var(--color-info)_10%,var(--color-bg-secondary))]',
+    iconColor: 'text-[var(--color-info)]',
+    titleColor: 'text-[var(--color-text-primary)]',
   },
   success: {
-    bg: 'linear-gradient(135deg, rgba(74, 156, 109, 0.1) 0%, #131824 100%)',
-    border: '#4A9C6D',
-    text: '#9CA3AF',
-    icon: '#4A9C6D',
-    title: '#E8E4DC',
-    shadow: '0 4px 20px rgba(74, 156, 109, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+    border: 'border-[var(--color-success)]',
+    bg: 'bg-[color-mix(in_srgb,var(--color-success)_10%,var(--color-bg-secondary))]',
+    iconColor: 'text-[var(--color-success)]',
+    titleColor: 'text-[var(--color-text-primary)]',
   },
   warning: {
-    bg: 'linear-gradient(135deg, rgba(212, 165, 116, 0.1) 0%, #131824 100%)',
-    border: '#D4A574',
-    text: '#9CA3AF',
-    icon: '#D4A574',
-    title: '#E8E4DC',
-    shadow: '0 4px 20px rgba(212, 165, 116, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+    border: 'border-[var(--color-warning)]',
+    bg: 'bg-[color-mix(in_srgb,var(--color-warning)_10%,var(--color-bg-secondary))]',
+    iconColor: 'text-[var(--color-warning)]',
+    titleColor: 'text-[var(--color-text-primary)]',
   },
   error: {
-    bg: 'linear-gradient(135deg, rgba(166, 61, 61, 0.1) 0%, #131824 100%)',
-    border: '#8B3D3D',
-    text: '#9CA3AF',
-    icon: '#A63D3D',
-    title: '#E8E4DC',
-    shadow: '0 4px 20px rgba(166, 61, 61, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+    border: 'border-[var(--color-error)]',
+    bg: 'bg-[color-mix(in_srgb,var(--color-error)_10%,var(--color-bg-secondary))]',
+    iconColor: 'text-[var(--color-error)]',
+    titleColor: 'text-[var(--color-text-primary)]',
   },
   arcane: {
-    bg: 'linear-gradient(135deg, rgba(193, 127, 89, 0.1) 0%, #131824 100%)',
-    border: '#C17F59',
-    text: '#9CA3AF',
-    icon: '#D4A574',
-    title: '#D4A574',
-    shadow: '0 4px 20px rgba(193, 127, 89, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+    border: 'border-[var(--color-text-accent)]',
+    bg: 'bg-[color-mix(in_srgb,var(--color-text-accent)_10%,var(--color-bg-secondary))]',
+    iconColor: 'text-[var(--color-text-accent)]',
+    titleColor: 'text-[var(--color-text-accent)]',
   },
   neutral: {
-    bg: 'linear-gradient(135deg, rgba(107, 114, 128, 0.1) 0%, #131824 100%)',
-    border: '#6B7280',
-    text: '#9CA3AF',
-    icon: '#6B7280',
-    title: '#E8E4DC',
-    shadow: '0 4px 20px rgba(107, 114, 128, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
+    border: 'border-[var(--color-border-default)]',
+    bg: 'bg-[var(--color-bg-tertiary)]',
+    iconColor: 'text-[var(--color-text-muted)]',
+    titleColor: 'text-[var(--color-text-primary)]',
   },
 };
 
@@ -148,7 +118,7 @@ export function Alert({
   onDismiss,
   className = '',
 }: AlertProps) {
-  const style = variantStyles[variant];
+  const style = variantClasses[variant];
   const defaultIcon = defaultIcons[variant];
 
   return (
@@ -157,35 +127,28 @@ export function Alert({
       className={`
         flex gap-3
         p-4
-        rounded-lg
+        rounded-[var(--radius-lg)]
         relative overflow-hidden
-        transition-all duration-300
+        transition-all duration-[var(--duration-normal)]
+        border-2
+        ${style.border}
+        ${style.bg}
         ${className}
       `}
       style={{
-        background: style.bg,
-        borderWidth: '2px',
-        borderStyle: 'solid',
-        borderColor: style.border,
-        boxShadow: style.shadow,
-        color: style.text,
-        fontFamily: '"Cormorant Garamond", Georgia, serif',
+        boxShadow: 'var(--shadow-md)',
       }}
     >
-      {/* Sacred geometry corner accents */}
-      <div className="absolute top-1 left-1 w-3 h-3 border-l border-t opacity-40" style={{ borderColor: style.border }} />
-      <div className="absolute top-1 right-1 w-3 h-3 border-r border-t opacity-40" style={{ borderColor: style.border }} />
-      <div className="absolute bottom-1 left-1 w-3 h-3 border-l border-b opacity-40" style={{ borderColor: style.border }} />
-      <div className="absolute bottom-1 right-1 w-3 h-3 border-r border-b opacity-40" style={{ borderColor: style.border }} />
+      {/* Corner accents */}
+      <div className={`absolute top-1 left-1 w-3 h-3 border-l border-t opacity-40 ${style.border}`} />
+      <div className={`absolute top-1 right-1 w-3 h-3 border-r border-t opacity-40 ${style.border}`} />
+      <div className={`absolute bottom-1 left-1 w-3 h-3 border-l border-b opacity-40 ${style.border}`} />
+      <div className={`absolute bottom-1 right-1 w-3 h-3 border-r border-b opacity-40 ${style.border}`} />
 
-      {/* Icon with ethereal glow */}
+      {/* Icon */}
       <div
-        className="flex-shrink-0 text-xl"
+        className={`flex-shrink-0 text-xl ${style.iconColor}`}
         aria-hidden="true"
-        style={{
-          color: style.icon,
-          filter: `drop-shadow(0 0 6px ${style.icon})`,
-        }}
       >
         {icon || defaultIcon}
       </div>
@@ -194,40 +157,36 @@ export function Alert({
       <div className="flex-1 min-w-0">
         {title && (
           <h4
-            className="font-semibold mb-1 tracking-wide uppercase text-sm"
-            style={{
-              color: style.title,
-              fontFamily: '"Cinzel", Georgia, serif',
-            }}
+            className={`font-display font-semibold mb-1 tracking-wide uppercase text-sm ${style.titleColor}`}
           >
             {title}
           </h4>
         )}
-        <div className="text-sm leading-relaxed">
+        <div className="text-sm leading-relaxed text-[var(--color-text-secondary)] font-body">
           {children}
         </div>
       </div>
 
-      {/* Dismiss Button with brass styling */}
+      {/* Dismiss Button */}
       {dismissible && (
         <button
           type="button"
           onClick={onDismiss}
-          className="
+          className={`
             flex-shrink-0
             -mt-1 -mr-1
             p-1.5
-            rounded-md
+            rounded-[var(--radius-md)]
             opacity-60 hover:opacity-100
-            transition-all duration-200
+            transition-all duration-[var(--duration-fast)]
             focus:outline-none
             focus-visible:ring-2
-            focus-visible:ring-[#C17F59]
+            focus-visible:ring-[var(--color-text-accent)]
             focus-visible:ring-offset-2
-            focus-visible:ring-offset-[#131824]
-            hover:bg-[#2D3548]
-          "
-          style={{ color: style.icon }}
+            focus-visible:ring-offset-[var(--color-bg-secondary)]
+            hover:bg-[var(--color-bg-tertiary)]
+            ${style.iconColor}
+          `}
           aria-label="Dismiss"
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -249,27 +208,27 @@ export function Alert({
 
 export interface PresetAlertProps extends Omit<AlertProps, 'variant'> {}
 
-/** Info alert - Ancient knowledge */
+/** Info alert */
 export const InfoAlert = (props: PresetAlertProps) => (
   <Alert variant="info" {...props} />
 );
 
-/** Success alert - Transmutation complete */
+/** Success alert */
 export const SuccessAlert = (props: PresetAlertProps) => (
   <Alert variant="success" {...props} />
 );
 
-/** Warning alert - Unstable mixture */
+/** Warning alert */
 export const WarningAlert = (props: PresetAlertProps) => (
   <Alert variant="warning" {...props} />
 );
 
-/** Error alert - Volatile reaction */
+/** Error alert */
 export const ErrorAlert = (props: PresetAlertProps) => (
   <Alert variant="error" {...props} />
 );
 
-/** Arcane alert - Mystical message */
+/** Arcane alert */
 export const ArcaneAlert = (props: PresetAlertProps) => (
   <Alert variant="arcane" {...props} />
 );

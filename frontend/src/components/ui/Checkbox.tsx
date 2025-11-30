@@ -1,33 +1,14 @@
 /**
- * Checkbox Component - Midnight Alchemy Edition
+ * Checkbox Component - Multi-Skin Edition
  *
- * Mystical checkbox and toggle switch with brass accents.
- * Features ethereal glow states and alchemical transitions.
+ * Checkbox and toggle switch with proper CSS variable support.
  *
  * Features:
  * - 2 variants: checkbox, toggle (switch)
  * - 3 sizes: sm, md, lg
  * - Label and description support
- * - Indeterminate state with arcane styling
- * - Copper glow on checked states
+ * - Indeterminate state
  * - Full accessibility
- *
- * Usage:
- * ```tsx
- * <Checkbox
- *   label="Remember the incantation"
- *   checked={remember}
- *   onChange={(e) => setRemember(e.target.checked)}
- * />
- *
- * <Checkbox
- *   variant="toggle"
- *   label="Dark Laboratory Mode"
- *   description="Enable the midnight aesthetic"
- *   checked={darkMode}
- *   onChange={(e) => setDarkMode(e.target.checked)}
- * />
- * ```
  */
 
 import { InputHTMLAttributes, forwardRef, ReactNode } from 'react';
@@ -134,18 +115,17 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             className={`
               ${toggleSize.container}
               rounded-full
-              transition-all duration-300
+              transition-all duration-[var(--duration-normal)]
+              border-2
+              ${checked
+                ? 'bg-[var(--color-success)] border-[var(--color-success)]'
+                : 'bg-[var(--color-bg-tertiary)] border-[var(--color-border-default)]'
+              }
             `}
             style={{
-              backgroundColor: checked
-                ? '#4A9C6D'
-                : '#1A1F2E',
-              borderWidth: '2px',
-              borderStyle: 'solid',
-              borderColor: checked ? '#4A9C6D' : '#2D3548',
               boxShadow: checked
-                ? '0 0 15px rgba(74, 156, 109, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-                : 'inset 0 2px 4px rgba(0, 0, 0, 0.3)',
+                ? '0 0 15px color-mix(in srgb, var(--color-success) 40%, transparent)'
+                : 'var(--shadow-inset)',
             }}
           >
             <div
@@ -153,16 +133,15 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
                 ${toggleSize.knob}
                 absolute top-0.5 left-0.5
                 rounded-full
-                transition-all duration-300
+                transition-all duration-[var(--duration-normal)]
                 ${checked ? toggleSize.translate : 'translate-x-0'}
+                ${checked
+                  ? 'bg-[var(--color-text-primary)]'
+                  : 'bg-[var(--color-text-muted)]'
+                }
               `}
               style={{
-                backgroundColor: checked
-                  ? '#E8E4DC'
-                  : '#6B7280',
-                boxShadow: checked
-                  ? '0 2px 8px rgba(0, 0, 0, 0.3), 0 0 8px rgba(74, 156, 109, 0.3)'
-                  : '0 2px 4px rgba(0, 0, 0, 0.3)',
+                boxShadow: 'var(--shadow-sm)',
               }}
             />
           </div>
@@ -173,23 +152,13 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           <div className="flex flex-col">
             {label && (
               <span
-                className={`font-medium tracking-wide ${labelSizeClasses[size]}`}
-                style={{
-                  color: '#E8E4DC',
-                  fontFamily: '"Cormorant Garamond", Georgia, serif',
-                }}
+                className={`font-body font-medium tracking-wide text-[var(--color-text-primary)] ${labelSizeClasses[size]}`}
               >
                 {label}
               </span>
             )}
             {description && (
-              <span
-                className="text-sm mt-0.5"
-                style={{
-                  color: '#6B7280',
-                  fontFamily: '"Cormorant Garamond", Georgia, serif',
-                }}
-              >
+              <span className="text-sm mt-0.5 font-body text-[var(--color-text-muted)]">
                 {description}
               </span>
             )}
@@ -219,41 +188,34 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         <div
           className={`
             ${checkboxSizeClasses[size]}
-            rounded-md
-            transition-all duration-200
+            rounded-[var(--radius-md)]
+            transition-all duration-[var(--duration-fast)]
             flex items-center justify-center
             peer-focus-visible:ring-2
-            peer-focus-visible:ring-[#C17F59]
+            peer-focus-visible:ring-[var(--color-text-accent)]
             peer-focus-visible:ring-offset-2
-            peer-focus-visible:ring-offset-[#0B0E14]
+            peer-focus-visible:ring-offset-[var(--color-bg-primary)]
+            border-2
+            ${checked
+              ? 'bg-[var(--color-text-accent)] border-[var(--color-text-accent)]'
+              : 'bg-[var(--color-bg-primary)] border-[var(--color-border-default)]'
+            }
             ${className}
           `}
           style={{
-            backgroundColor: checked
-              ? '#C17F59'
-              : '#0B0E14',
-            borderWidth: '2px',
-            borderStyle: 'solid',
-            borderColor: checked
-              ? '#D4A574'
-              : '#2D3548',
             boxShadow: checked
-              ? '0 0 15px rgba(193, 127, 89, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
-              : 'inset 0 2px 4px rgba(0, 0, 0, 0.3)',
+              ? '0 0 15px color-mix(in srgb, var(--color-text-accent) 40%, transparent)'
+              : 'var(--shadow-inset)',
           }}
         >
-          {/* Checkmark with ethereal glow */}
+          {/* Checkmark */}
           {checked && (
             <svg
-              className="w-3 h-3"
+              className="w-3 h-3 text-[var(--color-text-inverse)]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={3}
-              style={{
-                color: '#0B0E14',
-                filter: 'drop-shadow(0 0 2px rgba(255, 255, 255, 0.3))',
-              }}
             >
               <path
                 strokeLinecap="round"
@@ -262,13 +224,12 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
               />
             </svg>
           )}
-          {/* Indeterminate dash with copper accent */}
+          {/* Indeterminate dash */}
           {!checked && indeterminate && (
             <div
-              className="w-2.5 h-0.5 rounded-full"
+              className="w-2.5 h-0.5 rounded-full bg-[var(--color-text-accent)]"
               style={{
-                backgroundColor: '#C17F59',
-                boxShadow: '0 0 4px rgba(193, 127, 89, 0.6)',
+                boxShadow: '0 0 4px var(--color-glow)',
               }}
             />
           )}
@@ -280,23 +241,13 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         <div className="flex flex-col">
           {label && (
             <span
-              className={`font-medium ${labelSizeClasses[size]}`}
-              style={{
-                color: '#E8E4DC',
-                fontFamily: '"Cormorant Garamond", Georgia, serif',
-              }}
+              className={`font-body font-medium text-[var(--color-text-primary)] ${labelSizeClasses[size]}`}
             >
               {label}
             </span>
           )}
           {description && (
-            <span
-              className="text-sm mt-0.5"
-              style={{
-                color: '#6B7280',
-                fontFamily: '"Cormorant Garamond", Georgia, serif',
-              }}
-            >
+            <span className="text-sm mt-0.5 font-body text-[var(--color-text-muted)]">
               {description}
             </span>
           )}

@@ -1,29 +1,14 @@
 /**
- * Tabs Component - Midnight Alchemy Edition
+ * Tabs Component - Multi-Skin Edition
  *
- * Mystical tab navigation with brass frame aesthetics and ethereal transitions.
- * Features arcane underlines and sacred geometry accents.
+ * Tab navigation with proper CSS variable support for all themes.
  *
  * Features:
- * - 3 variants: underline, pills, arcane
+ * - 4 variants: underline, pills, arcane, boxed
  * - 3 sizes: sm, md, lg
- * - Ethereal glow on active states
- * - Badge support with copper accents
+ * - Badge support
  * - Full width option
  * - Full accessibility (ARIA tabs pattern)
- *
- * Usage:
- * ```tsx
- * <Tabs
- *   tabs={[
- *     { id: 'grimoire', label: 'Grimoire', icon: '📖' },
- *     { id: 'potions', label: 'Potions', badge: 3 },
- *     { id: 'runes', label: 'Runes' },
- *   ]}
- *   activeTab={activeTab}
- *   onChange={setActiveTab}
- * />
- * ```
  */
 
 import { ReactNode } from 'react';
@@ -90,12 +75,12 @@ export function Tabs({
 }: TabsProps) {
   const sizeStyle = sizeClasses[size];
 
-  // Variant-specific container styles
+  // Variant-specific container styles using CSS variables
   const containerStyles: Record<TabVariant, string> = {
-    underline: 'border-b-2 border-[#2D3548]',
+    underline: 'border-b-2 border-[var(--color-border-default)]',
     pills: 'gap-2',
-    arcane: 'gap-1 p-1 bg-[#0B0E14]/50 rounded-lg border border-[#2D3548]',
-    boxed: 'gap-1 p-1 bg-[#0B0E14]/50 rounded-lg border border-[#2D3548]',
+    arcane: 'gap-1 p-1 bg-[var(--color-bg-tertiary)]/50 rounded-[var(--radius-lg)] border border-[var(--color-border-default)]',
+    boxed: 'gap-1 p-1 bg-[var(--color-bg-tertiary)]/50 rounded-[var(--radius-lg)] border border-[var(--color-border-default)]',
   };
 
   return (
@@ -111,66 +96,66 @@ export function Tabs({
         const isActive = tab.id === activeTab;
         const isDisabled = tab.disabled;
 
-        // Variant-specific tab button styles
+        // Variant-specific tab button styles using CSS variables
         const getTabStyles = () => {
           switch (variant) {
             case 'underline':
               return {
-                base: 'border-b-2 -mb-[2px] transition-all duration-300',
+                base: 'border-b-2 -mb-[2px] transition-all duration-[var(--duration-normal)]',
                 active: `
-                  border-[#C17F59] text-[#D4A574]
+                  border-[var(--color-text-accent)] text-[var(--color-text-accent)]
                 `,
                 inactive: `
-                  border-transparent text-[#9CA3AF]
-                  hover:text-[#E8E4DC] hover:border-[#C17F59]/50
+                  border-transparent text-[var(--color-text-secondary)]
+                  hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-accent)]/50
                 `,
               };
             case 'pills':
               return {
-                base: 'rounded-full transition-all duration-300',
+                base: 'rounded-full transition-all duration-[var(--duration-normal)]',
                 active: `
-                  bg-gradient-to-r from-[#C17F59] to-[#D4A574]
-                  text-[#0B0E14] font-semibold
-                  shadow-[0_4px_20px_rgba(193,127,89,0.4),0_0_30px_rgba(212,165,116,0.2)]
+                  bg-gradient-to-r from-[var(--color-bg-accent)] to-[color-mix(in_srgb,var(--color-bg-accent)_80%,var(--color-text-accent))]
+                  text-[var(--color-text-inverse)] font-semibold
+                  shadow-[var(--shadow-glow)]
                 `,
                 inactive: `
-                  bg-[#1A1F2E] text-[#9CA3AF]
-                  hover:bg-[#2D3548] hover:text-[#E8E4DC]
+                  bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)]
+                  hover:bg-[var(--color-bg-tertiary)] hover:text-[var(--color-text-primary)]
                 `,
               };
             case 'arcane':
               return {
-                base: 'rounded-md transition-all duration-300 relative',
+                base: 'rounded-[var(--radius-md)] transition-all duration-[var(--duration-normal)] relative',
                 active: `
-                  bg-gradient-to-b from-[#1A1F2E] to-[#131824]
-                  text-[#D4A574]
-                  shadow-[0_4px_15px_rgba(193,127,89,0.2),inset_0_1px_0_rgba(212,165,116,0.1)]
-                  border border-[#C17F59]/40
+                  bg-gradient-to-b from-[var(--color-bg-secondary)] to-[var(--color-bg-tertiary)]
+                  text-[var(--color-text-accent)]
+                  shadow-[var(--shadow-md)]
+                  border border-[var(--color-text-accent)]/40
                 `,
                 inactive: `
-                  text-[#6B7280]
-                  hover:text-[#9CA3AF] hover:bg-[#131824]/50
+                  text-[var(--color-text-muted)]
+                  hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]/50
                 `,
               };
             case 'boxed':
               return {
-                base: 'rounded-md transition-all duration-300 relative border',
+                base: 'rounded-[var(--radius-md)] transition-all duration-[var(--duration-normal)] relative border',
                 active: `
-                  bg-gradient-to-b from-[#1A1F2E] to-[#131824]
-                  text-[#D4A574]
-                  shadow-[0_4px_15px_rgba(193,127,89,0.2)]
-                  border-[#C17F59]/40
+                  bg-gradient-to-b from-[var(--color-bg-secondary)] to-[var(--color-bg-tertiary)]
+                  text-[var(--color-text-accent)]
+                  shadow-[var(--shadow-md)]
+                  border-[var(--color-text-accent)]/40
                 `,
                 inactive: `
-                  text-[#6B7280] border-transparent
-                  hover:text-[#9CA3AF] hover:bg-[#131824]/50 hover:border-[#2D3548]
+                  text-[var(--color-text-muted)] border-transparent
+                  hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]/50 hover:border-[var(--color-border-default)]
                 `,
               };
             default:
               return {
-                base: 'border-b-2 -mb-[2px] transition-all duration-300',
-                active: 'border-[#C17F59] text-[#D4A574]',
-                inactive: 'border-transparent text-[#9CA3AF] hover:text-[#E8E4DC] hover:border-[#C17F59]/50',
+                base: 'border-b-2 -mb-[2px] transition-all duration-[var(--duration-normal)]',
+                active: 'border-[var(--color-text-accent)] text-[var(--color-text-accent)]',
+                inactive: 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-accent)]/50',
               };
           }
         };
@@ -194,25 +179,19 @@ export function Tabs({
               ${fullWidth ? 'flex-1' : ''}
               ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               inline-flex items-center justify-center gap-2
-              font-medium tracking-wide
+              font-display font-medium tracking-wide
               focus:outline-none
               focus-visible:ring-2
-              focus-visible:ring-[#C17F59]
+              focus-visible:ring-[var(--color-text-accent)]
               focus-visible:ring-offset-2
-              focus-visible:ring-offset-[#0B0E14]
+              focus-visible:ring-offset-[var(--color-bg-primary)]
             `}
-            style={{
-              fontFamily: '"Cinzel", Georgia, serif',
-            }}
           >
-            {/* Icon with ethereal glow */}
+            {/* Icon */}
             {tab.icon && (
               <span
                 className={sizeStyle.icon}
                 aria-hidden="true"
-                style={{
-                  filter: isActive ? 'drop-shadow(0 0 6px rgba(212, 165, 116, 0.6))' : undefined,
-                }}
               >
                 {tab.icon}
               </span>
@@ -221,27 +200,22 @@ export function Tabs({
             {/* Label */}
             <span className="uppercase">{tab.label}</span>
 
-            {/* Badge with alchemical styling */}
+            {/* Badge */}
             {tab.badge !== undefined && tab.badge > 0 && (
               <span
                 className={`
                   ${sizeStyle.badge}
                   inline-flex items-center justify-center
-                  rounded-full font-bold
+                  rounded-full font-display font-bold
+                  ${isActive
+                    ? 'bg-[var(--color-text-accent)] text-[var(--color-text-inverse)]'
+                    : 'bg-[var(--color-error)] text-white'
+                  }
                 `}
                 style={{
-                  fontFamily: '"Cinzel", Georgia, serif',
-                  backgroundColor: isActive
-                    ? variant === 'pills'
-                      ? 'rgba(11, 14, 20, 0.4)'
-                      : '#C17F59'
-                    : '#8B3D3D',
-                  color: isActive && variant !== 'pills'
-                    ? '#0B0E14'
-                    : '#E8E4DC',
                   boxShadow: isActive
-                    ? '0 2px 8px rgba(193, 127, 89, 0.4)'
-                    : '0 2px 8px rgba(139, 61, 61, 0.4)',
+                    ? '0 2px 8px var(--color-glow)'
+                    : '0 2px 8px color-mix(in srgb, var(--color-error) 40%, transparent)',
                 }}
               >
                 {tab.badge > 99 ? '99+' : tab.badge}
@@ -251,10 +225,10 @@ export function Tabs({
             {/* Arcane corner accents for active arcane variant */}
             {variant === 'arcane' && isActive && (
               <>
-                <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-[#C17F59] rounded-tl-sm opacity-60" />
-                <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-[#C17F59] rounded-tr-sm opacity-60" />
-                <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-[#C17F59] rounded-bl-sm opacity-60" />
-                <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-[#C17F59] rounded-br-sm opacity-60" />
+                <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-[var(--color-text-accent)] rounded-tl-sm opacity-60" />
+                <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-[var(--color-text-accent)] rounded-tr-sm opacity-60" />
+                <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-[var(--color-text-accent)] rounded-bl-sm opacity-60" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-[var(--color-text-accent)] rounded-br-sm opacity-60" />
               </>
             )}
           </button>
@@ -266,7 +240,7 @@ export function Tabs({
 
 /**
  * TabPanel Component
- * Content panel for a tab with mystical fade animation
+ * Content panel for a tab
  */
 export interface TabPanelProps {
   /** Tab ID this panel corresponds to */
@@ -288,9 +262,6 @@ export function TabPanel({ tabId, activeTab, children, className = '' }: TabPane
       id={`tabpanel-${tabId}`}
       aria-labelledby={`tab-${tabId}`}
       className={`animate-fade-in ${className}`}
-      style={{
-        animation: 'fade-in 0.3s ease-out',
-      }}
     >
       {children}
     </div>
@@ -301,12 +272,12 @@ export function TabPanel({ tabId, activeTab, children, className = '' }: TabPane
 // PRESET TAB COMPONENTS
 // ============================================================================
 
-/** Arcane tabs with sacred geometry styling */
+/** Arcane tabs with corner accents */
 export const ArcaneTabs = (props: Omit<TabsProps, 'variant'>) => (
   <Tabs variant="arcane" {...props} />
 );
 
-/** Pill tabs with ethereal glow */
+/** Pill tabs */
 export const PillTabs = (props: Omit<TabsProps, 'variant'>) => (
   <Tabs variant="pills" {...props} />
 );

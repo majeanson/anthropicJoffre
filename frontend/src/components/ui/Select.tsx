@@ -1,31 +1,14 @@
 /**
- * Select Component - Midnight Alchemy Edition
+ * Select Component - Multi-Skin Edition
  *
- * Mystical dropdown select with brass frame aesthetics.
- * Features ethereal hover states and sacred geometry accents.
+ * Dropdown select with proper CSS variable support for all themes.
  *
  * Features:
- * - 3 variants: default, filled, arcane
+ * - 4 variants: default, filled, arcane, outlined
  * - 3 sizes: sm, md, lg
- * - Error state with crimson glow
- * - Icon support with element theming
- * - Sacred geometry corner decorations
+ * - Error state
+ * - Icon support
  * - Full accessibility (native select)
- *
- * Usage:
- * ```tsx
- * <Select
- *   label="Element Type"
- *   value={element}
- *   onChange={(e) => setElement(e.target.value)}
- *   options={[
- *     { value: 'fire', label: 'Fire △' },
- *     { value: 'water', label: 'Water ▽' },
- *     { value: 'earth', label: 'Earth ◇' },
- *     { value: 'air', label: 'Air ○' },
- *   ]}
- * />
- * ```
  */
 
 import { SelectHTMLAttributes, forwardRef, ReactNode, useState } from 'react';
@@ -103,53 +86,72 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
   // Icon padding
   const leftPaddingClass = leftIcon ? (size === 'sm' ? 'pl-8' : size === 'lg' ? 'pl-12' : 'pl-10') : '';
 
-  // Variant-specific styles
-  const getVariantStyles = () => {
-    const baseStyle: React.CSSProperties = {
-      backgroundColor: '#131824',
-      borderWidth: '2px',
-      borderStyle: 'solid',
-      borderColor: error ? '#8B3D3D' : '#2D3548',
-      color: '#E8E4DC',
-      fontFamily: '"Cormorant Garamond", Georgia, serif',
-    };
+  // Variant-specific classes
+  const getVariantClasses = () => {
+    const baseClasses = `
+      bg-[var(--color-bg-secondary)]
+      border-[var(--input-border-width)]
+      text-[var(--color-text-primary)]
+      font-body
+    `;
 
     switch (variant) {
       case 'filled':
-        return {
-          ...baseStyle,
-          backgroundColor: '#1A1F2E',
-          borderColor: error ? '#8B3D3D' : 'transparent',
-        };
+        return `
+          ${baseClasses}
+          bg-[var(--color-bg-tertiary)]
+          ${error
+            ? 'border-[var(--color-error)]'
+            : 'border-transparent'
+          }
+        `;
       case 'arcane':
-        return {
-          ...baseStyle,
-          backgroundColor: '#0B0E14',
-          borderColor: error ? '#8B3D3D' : isFocused ? '#C17F59' : '#2D3548',
-          boxShadow: isFocused
-            ? '0 0 20px rgba(193, 127, 89, 0.2), inset 0 0 30px rgba(193, 127, 89, 0.05)'
-            : '0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.02)',
-        };
+        return `
+          ${baseClasses}
+          bg-[var(--color-bg-primary)]
+          ${error
+            ? 'border-[var(--color-error)]'
+            : isFocused
+              ? 'border-[var(--color-text-accent)]'
+              : 'border-[var(--color-border-default)]'
+          }
+        `;
+      case 'outlined':
+        return `
+          ${baseClasses}
+          bg-transparent
+          ${error
+            ? 'border-[var(--color-error)]'
+            : isFocused
+              ? 'border-[var(--color-text-accent)]'
+              : 'border-[var(--color-border-default)]'
+          }
+        `;
       default:
-        return {
-          ...baseStyle,
-          borderColor: error ? '#8B3D3D' : isFocused ? '#C17F59' : '#2D3548',
-        };
+        return `
+          ${baseClasses}
+          ${error
+            ? 'border-[var(--color-error)]'
+            : isFocused
+              ? 'border-[var(--color-text-accent)]'
+              : 'border-[var(--color-border-default)]'
+          }
+        `;
     }
   };
 
   return (
     <div className={`${fullWidth ? 'w-full' : ''} ${containerClassName}`}>
-      {/* Label with Cinzel font */}
+      {/* Label */}
       {label && (
         <label
           htmlFor={selectId}
-          className={`block font-semibold uppercase tracking-wider ${labelSizeClasses[size]}`}
-          style={{
-            color: isFocused ? '#D4A574' : '#9CA3AF',
-            fontFamily: '"Cinzel", Georgia, serif',
-            transition: 'color 0.2s ease',
-          }}
+          className={`
+            block font-display font-semibold uppercase tracking-wider
+            transition-colors duration-[var(--duration-fast)]
+            ${labelSizeClasses[size]}
+            ${isFocused ? 'text-[var(--color-text-accent)]' : 'text-[var(--color-text-secondary)]'}
+          `}
         >
           {label}
         </label>
@@ -160,12 +162,12 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         {/* Left Icon */}
         {leftIcon && (
           <div
-            className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base'}`}
-            style={{
-              color: isFocused ? '#D4A574' : '#6B7280',
-              filter: isFocused ? 'drop-shadow(0 0 4px rgba(212, 165, 116, 0.4))' : undefined,
-              transition: 'all 0.2s ease',
-            }}
+            className={`
+              absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none
+              transition-colors duration-[var(--duration-fast)]
+              ${size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base'}
+              ${isFocused ? 'text-[var(--color-text-accent)]' : 'text-[var(--color-text-muted)]'}
+            `}
           >
             {leftIcon}
           </div>
@@ -175,24 +177,32 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         {variant === 'arcane' && (
           <>
             <div
-              className={`absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 rounded-tl-md pointer-events-none transition-colors duration-200 ${
-                isFocused ? 'border-[#C17F59]' : 'border-[#2D3548]'
-              }`}
+              className={`
+                absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 rounded-tl-[var(--radius-sm)] pointer-events-none
+                transition-colors duration-[var(--duration-fast)]
+                ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+              `}
             />
             <div
-              className={`absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 rounded-tr-md pointer-events-none transition-colors duration-200 ${
-                isFocused ? 'border-[#C17F59]' : 'border-[#2D3548]'
-              }`}
+              className={`
+                absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 rounded-tr-[var(--radius-sm)] pointer-events-none
+                transition-colors duration-[var(--duration-fast)]
+                ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+              `}
             />
             <div
-              className={`absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 rounded-bl-md pointer-events-none transition-colors duration-200 ${
-                isFocused ? 'border-[#C17F59]' : 'border-[#2D3548]'
-              }`}
+              className={`
+                absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 rounded-bl-[var(--radius-sm)] pointer-events-none
+                transition-colors duration-[var(--duration-fast)]
+                ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+              `}
             />
             <div
-              className={`absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 rounded-br-md pointer-events-none transition-colors duration-200 ${
-                isFocused ? 'border-[#C17F59]' : 'border-[#2D3548]'
-              }`}
+              className={`
+                absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 rounded-br-[var(--radius-sm)] pointer-events-none
+                transition-colors duration-[var(--duration-fast)]
+                ${isFocused ? 'border-[var(--color-text-accent)]' : 'border-[var(--color-border-default)]'}
+              `}
             />
           </>
         )}
@@ -208,24 +218,29 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
             w-full
             ${sizeClasses[size]}
             ${leftPaddingClass}
-            rounded-md
+            rounded-[var(--radius-md)]
             appearance-none
             cursor-pointer
-            transition-all duration-200
+            transition-all duration-[var(--duration-fast)]
             focus:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-[#C17F59]
+            focus-visible:ring-[var(--input-focus-ring-width)]
+            focus-visible:ring-[var(--color-text-accent)]
             focus-visible:ring-offset-2
-            focus-visible:ring-offset-[#0B0E14]
+            focus-visible:ring-offset-[var(--color-bg-primary)]
             ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+            ${getVariantClasses()}
             ${className}
           `}
-          style={getVariantStyles()}
+          style={{
+            boxShadow: isFocused && variant === 'arcane'
+              ? '0 0 20px color-mix(in srgb, var(--color-text-accent) 20%, transparent)'
+              : 'var(--shadow-sm)',
+          }}
           {...props}
         >
           {/* Placeholder option */}
           {placeholder && (
-            <option value="" disabled style={{ color: '#6B7280' }}>
+            <option value="" disabled className="text-[var(--color-text-muted)]">
               {placeholder}
             </option>
           )}
@@ -236,24 +251,24 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
               key={option.value}
               value={option.value}
               disabled={option.disabled}
-              style={{
-                backgroundColor: '#131824',
-                color: option.disabled ? '#6B7280' : '#E8E4DC',
-              }}
+              className={`
+                bg-[var(--color-bg-secondary)]
+                ${option.disabled ? 'text-[var(--color-text-muted)]' : 'text-[var(--color-text-primary)]'}
+              `}
             >
               {option.label}
             </option>
           ))}
         </select>
 
-        {/* Dropdown Arrow with copper accent */}
+        {/* Dropdown Arrow */}
         <div
-          className={`absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none ${size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base'}`}
-          style={{
-            color: isFocused ? '#D4A574' : '#C17F59',
-            filter: isFocused ? 'drop-shadow(0 0 4px rgba(212, 165, 116, 0.4))' : undefined,
-            transition: 'all 0.2s ease',
-          }}
+          className={`
+            absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none
+            transition-colors duration-[var(--duration-fast)]
+            ${size === 'sm' ? 'text-sm' : size === 'lg' ? 'text-xl' : 'text-base'}
+            ${isFocused ? 'text-[var(--color-text-accent)]' : 'text-[var(--color-text-accent)]/70'}
+          `}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -264,11 +279,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       {/* Helper Text or Error Message */}
       {(helperText || error) && (
         <p
-          className="mt-1.5 text-sm"
-          style={{
-            color: error ? '#A63D3D' : '#6B7280',
-            fontFamily: '"Cormorant Garamond", Georgia, serif',
-          }}
+          className={`
+            mt-1.5 text-sm font-body
+            ${error ? 'text-[var(--color-error)]' : 'text-[var(--color-text-muted)]'}
+          `}
         >
           {error || helperText}
         </p>
@@ -283,7 +297,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 
 export interface PresetSelectProps extends Omit<SelectProps, 'variant'> {}
 
-/** Arcane select with sacred geometry corners */
+/** Arcane select with corner accents */
 export const ArcaneSelect = forwardRef<HTMLSelectElement, PresetSelectProps>(
   (props, ref) => <Select ref={ref} variant="arcane" {...props} />
 );
