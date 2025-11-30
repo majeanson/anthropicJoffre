@@ -129,7 +129,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
       </UICard>
 
       {/* Achievements grid */}
-      <div className="overflow-y-auto max-h-[calc(70vh-200px)]">
+      <div className="overflow-y-auto max-h-[calc(70vh-300px)]">
         {loading ? (
           <LoadingState message="Loading achievements..." card />
         ) : filteredAchievements.length === 0 ? (

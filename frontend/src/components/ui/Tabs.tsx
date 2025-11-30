@@ -65,12 +65,12 @@ export interface TabsProps {
 
 const sizeClasses: Record<TabSize, { tab: string; icon: string; badge: string }> = {
   sm: {
-    tab: 'px-3 py-1.5 text-sm',
+    tab: 'px-3 py-3 text-sm',
     icon: 'text-sm',
     badge: 'text-xs px-1.5 py-0.5 min-w-[1.25rem]',
   },
   md: {
-    tab: 'px-4 py-2 text-base',
+    tab: 'px-4 py-3 text-base',
     icon: 'text-base',
     badge: 'text-xs px-2 py-0.5 min-w-[1.5rem]',
   },

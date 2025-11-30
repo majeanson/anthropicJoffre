@@ -528,7 +528,6 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
               <thead className="bg-amber-100 dark:bg-gray-700">
                 <tr>
                   <th className="px-3 sm:px-4 py-3 text-left text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Player</th>
-                  <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Team</th>
                   <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Tricks</th>
                   <th className="px-3 sm:px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase tracking-wider">Points</th>
                 </tr>
@@ -556,11 +555,6 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
                             </span>
                           )}
                         </div>
-                      </td>
-                      <td className="px-3 sm:px-4 py-3 text-sm text-center">
-                        <span className={`font-bold ${player.teamId === 1 ? 'text-orange-600 dark:text-orange-400' : 'text-purple-600 dark:text-purple-400'}`}>
-                          {player.teamId}
-                        </span>
                       </td>
                       <td className="px-3 sm:px-4 py-3 text-sm text-center font-medium text-gray-800 dark:text-gray-200">{player.tricksWon}</td>
                       <td className="px-3 sm:px-4 py-3 text-sm text-center font-bold text-gray-900 dark:text-gray-100">{player.pointsWon}</td>

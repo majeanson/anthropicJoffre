@@ -23,16 +23,32 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         </p>
       </section>
 
+      {/* Special Cards */}
+      <UICard variant="bordered" size="md" className="border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/40">
+        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+          Cards
+        </h3>
+        <ul className="space-y-2 text-lg">
+          <li>• 4 colors (Red, Brown, Green, Blue) with cards going from [0-7]</li>
+          <li>• Two special cards that you WANT to get ... or AVOID!</li>
+          <li>• <strong className="text-red-600">Red 0:</strong> +5 bonus points (6 total for that trick)</li>
+          <li>• <strong className="text-amber-800">Brown 0:</strong> -3 penalty points (-2 total for that trick)</li>
+          <li>• All other tricks worth 1 point</li>
+        </ul>
+      </UICard>
+
       {/* Betting Phase */}
       <UICard variant="bordered" size="md" className="border-yellow-300 dark:border-yellow-600 bg-yellow-50 dark:bg-yellow-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
           Betting Phase
         </h3>
         <ul className="space-y-2 text-lg">
+          <li>• The winning bet starts the round. First card played chooses the trump color!</li>
           <li>• Each round starts with betting (7-12 points)</li>
           <li>• Players take turns bidding after the dealer</li>
           <li>• <strong>Non-dealers must raise</strong> or skip (if no bets yet)</li>
           <li>• <strong>Dealer can equalize or raise</strong> - dealer wins ties!</li>
+          <li>• Dealer cannot skip if no players bet beforehand</li>
           <li>• "Without Trump" doubles the bet stakes</li>
           <li>• Highest bidder becomes the offensive team</li>
         </ul>
@@ -44,7 +60,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           Playing Phase
         </h3>
         <ul className="space-y-2 text-lg">
-          <li>• Highest bidder leads the first trick</li>
+          <li>• Highest bidder leads the first trick. First card played chooses the trump color!</li>
           <li>• <strong>You must follow suit</strong> if you have the led color</li>
           <li>• Trump (bet color) beats non-trump cards</li>
           <li>• Highest card in led suit wins if no trump played</li>
@@ -52,33 +68,23 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         </ul>
       </UICard>
 
-      {/* Card Queuing */}
-      <UICard variant="bordered" size="md" className="border-cyan-300 dark:border-cyan-600 bg-cyan-50 dark:bg-cyan-900/40">
+       {/* Scoring */}
+      <UICard variant="bordered" size="md" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Card Queuing
+          Scoring
         </h3>
-        <div className="space-y-2 text-lg">
-          <p>
-            <strong>Pre-select your next card</strong> while waiting for your turn!
-            Click any card in your hand when it's <em>not</em> your turn to queue it.
-          </p>
-          <ul className="space-y-2 ml-4">
-            <li>• <strong>Queued cards</strong> are marked with a gold "QUEUED" badge</li>
-            <li>• The card will <strong>auto-play instantly</strong> when your turn arrives</li>
-            <li>• Click the same card again to <strong>unqueue</strong> it</li>
-            <li>• Only one card can be queued at a time</li>
-            <li>• Great for fast-paced gameplay and quick decision-making!</li>
-          </ul>
-          <p className="text-sm text-cyan-700 dark:text-cyan-300 italic mt-3 bg-cyan-100 dark:bg-cyan-800/50 p-2 rounded">
-            Pro tip: Queue your card early to think ahead while others play!
-          </p>
-        </div>
+        <ul className="space-y-2 text-lg">
+          <li>• Offensive team wins if they meet their bet</li>
+          <li>• They gain points equal to their bet</li>
+          <li>• Defensive team gains points from tricks won</li>
+          <li>• If offensive fails, they lose bet points</li>
+        </ul>
       </UICard>
 
       {/* Beginner Mode Features */}
       <UICard variant="bordered" size="md" className="border-emerald-300 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Beginner Mode Features
+          Beginner Mode Features (Toggle in settings)
         </h3>
         <div className="space-y-4">
           {/* Move Suggestions */}
@@ -127,6 +133,29 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
         </div>
       </UICard>
 
+      {/* Card Queuing */}
+      <UICard variant="bordered" size="md" className="border-cyan-300 dark:border-cyan-600 bg-cyan-50 dark:bg-cyan-900/40">
+        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
+          Card Queuing
+        </h3>
+        <div className="space-y-2 text-lg">
+          <p>
+            <strong>Pre-select your next card</strong> while waiting for your turn!
+            Click any card in your hand when it's <em>not</em> your turn to queue it.
+          </p>
+          <ul className="space-y-2 ml-4">
+            <li>• <strong>Queued cards</strong> are marked with a gold "QUEUED" badge</li>
+            <li>• The card will <strong>auto-play instantly</strong> when your turn arrives</li>
+            <li>• Click the same card again to <strong>unqueue</strong> it</li>
+            <li>• Only one card can be queued at a time</li>
+            <li>• Great for fast-paced gameplay and quick decision-making!</li>
+          </ul>
+          <p className="text-sm text-cyan-700 dark:text-cyan-300 italic mt-3 bg-cyan-100 dark:bg-cyan-800/50 p-2 rounded">
+            Pro tip: Queue your card early to think ahead while others play!
+          </p>
+        </div>
+      </UICard>
+
       {/* Keyboard Navigation - Desktop only */}
       <UICard variant="bordered" size="md" className="hidden md:block border-indigo-300 dark:border-indigo-600 bg-indigo-50 dark:bg-indigo-900/40">
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
@@ -153,32 +182,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           </p>
         </div>
       </UICard>
-
-      {/* Special Cards */}
-      <UICard variant="bordered" size="md" className="border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Special Cards
-        </h3>
-        <ul className="space-y-2 text-lg">
-          <li>• <strong className="text-red-600">Red 0:</strong> +5 bonus points (6 total for that trick)</li>
-          <li>• <strong className="text-amber-800">Brown 0:</strong> -3 penalty points (-2 total for that trick)</li>
-          <li>• All other tricks worth 1 point</li>
-        </ul>
-      </UICard>
-
-      {/* Scoring */}
-      <UICard variant="bordered" size="md" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/40">
-        <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
-          Scoring
-        </h3>
-        <ul className="space-y-2 text-lg">
-          <li>• Offensive team wins if they meet their bet</li>
-          <li>• They gain points equal to their bet</li>
-          <li>• Defensive team gains points from tricks won</li>
-          <li>• If offensive fails, they lose bet points</li>
-        </ul>
-      </UICard>
-
+      
       {/* Teams */}
       <section>
         <h3 className="text-2xl font-bold text-umber-900 dark:text-gray-100 mb-3 flex items-center gap-2">
