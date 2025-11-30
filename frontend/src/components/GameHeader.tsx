@@ -137,7 +137,7 @@ export function GameHeader({
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg min-h-[60px] z-10 relative overflow-visible">
+    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg min-h-[60px] z-40 relative overflow-visible">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1 sm:py-1.5">
         {/* Desktop: Single row - All items on same horizontal line */}
         <div className="hidden md:flex items-center gap-3">
@@ -184,7 +184,7 @@ export function GameHeader({
               <p className="text-xs text-white/90 font-semibold">T1</p>
               <p className="text-base text-white font-black">{animatedTeam1Score}</p>
               {team1ScoreChange !== null && (
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
                   <span className={team1ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
                     {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
                   </span>
@@ -196,7 +196,7 @@ export function GameHeader({
               <p className="text-xs text-white/90 font-semibold">T2</p>
               <p className="text-base text-white font-black">{animatedTeam2Score}</p>
               {team2ScoreChange !== null && (
-                <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
                   <span className={team2ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
                     {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
                   </span>
@@ -328,7 +328,7 @@ export function GameHeader({
                 <p className="text-xs text-white/90 font-semibold">T1</p>
                 <p className="text-base text-white font-black">{animatedTeam1Score}</p>
                 {team1ScoreChange !== null && (
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
                     <span className={team1ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
                       {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
                     </span>
@@ -340,7 +340,7 @@ export function GameHeader({
                 <p className="text-xs text-white/90 font-semibold">T2</p>
                 <p className="text-base text-white font-black">{animatedTeam2Score}</p>
                 {team2ScoreChange !== null && (
-                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap">
+                  <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
                     <span className={team2ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
                       {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
                     </span>
