@@ -69,7 +69,7 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
                   ? bet.skipped
                     ? 'bg-gray-300 dark:bg-gray-700 opacity-60'
                     : isHighestBet
-                    ? 'bg-gradient-to-r from-yellow-400 to-amber-500 dark:from-yellow-600 dark:to-amber-700 text-white shadow-lg ring-2 ring-yellow-300 dark:ring-yellow-500'
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 text-white shadow-lg ring-2 ring-green-300 dark:ring-green-500'
                     : player.teamId === 1
                     ? 'bg-orange-400 dark:bg-orange-600 text-white'
                     : 'bg-purple-400 dark:bg-purple-600 text-white'
@@ -173,7 +173,7 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
       <div className="mt-3 pt-3 border-t border-umber-300 dark:border-gray-600">
         <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
           <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded bg-gradient-to-r from-yellow-400 to-amber-500 inline-block"></span>
+            <span className="w-4 h-4 rounded bg-gradient-to-r from-green-500 to-emerald-600 inline-block"></span>
             <span>Highest Bet</span>
           </div>
           <div className="flex items-center gap-2">
