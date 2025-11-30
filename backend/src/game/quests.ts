@@ -29,7 +29,7 @@ export interface PlayerQuest {
   quest_template_id: number;
   progress: number;
   completed: boolean;
-  date_assigned: string;
+  date_assigned: string | Date; // PostgreSQL can return either
   completed_at?: string;
   reward_claimed: boolean;
   claimed_at?: string;
@@ -448,7 +448,17 @@ export function canClaimQuestReward(quest: PlayerQuest): {
 
   // Check if quest is from today (can only claim today's quests)
   const today = new Date().toISOString().split('T')[0];
-  const questDate = quest.date_assigned.split('T')[0];
+
+  // Handle date_assigned as either string or Date object (PostgreSQL can return either)
+  let questDate: string;
+  if (typeof quest.date_assigned === 'string') {
+    questDate = quest.date_assigned.split('T')[0];
+  } else if (quest.date_assigned instanceof Date) {
+    questDate = quest.date_assigned.toISOString().split('T')[0];
+  } else {
+    // Fallback: convert to string and try to parse
+    questDate = new Date(quest.date_assigned).toISOString().split('T')[0];
+  }
 
   if (questDate !== today) {
     return { canClaim: false, reason: 'Quest expired (not from today)' };
