@@ -31,7 +31,8 @@ interface CardProps {
   faceDown?: boolean;
 }
 
-// Alchemical element colors for each suit
+// Suit-specific styles that work across all themes
+// Uses CSS variables for colors but keeps simple shadows that work on any background
 const suitStyles: Record<CardColor, {
   border: string;
   text: string;
@@ -43,45 +44,45 @@ const suitStyles: Record<CardColor, {
   red: {
     border: 'var(--color-suit-red)',
     text: 'var(--color-suit-red)',
-    shadow: '0 4px 16px rgba(220, 38, 38, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
-    shadowHover: '0 8px 32px rgba(220, 38, 38, 0.4), 0 0 40px rgba(220, 38, 38, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-    innerGlow: 'rgba(220, 38, 38, 0.12)',
+    shadow: 'var(--shadow-md)',
+    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
+    innerGlow: 'color-mix(in srgb, var(--color-suit-red) 12%, transparent)',
     elementName: 'Fire',
   },
   brown: {
     border: 'var(--color-suit-brown)',
     text: 'var(--color-suit-brown)',
-    shadow: '0 4px 16px rgba(180, 83, 9, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
-    shadowHover: '0 8px 32px rgba(180, 83, 9, 0.4), 0 0 40px rgba(180, 83, 9, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-    innerGlow: 'rgba(180, 83, 9, 0.12)',
+    shadow: 'var(--shadow-md)',
+    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
+    innerGlow: 'color-mix(in srgb, var(--color-suit-brown) 12%, transparent)',
     elementName: 'Earth',
   },
   green: {
     border: 'var(--color-suit-green)',
     text: 'var(--color-suit-green)',
-    shadow: '0 4px 16px rgba(5, 150, 105, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
-    shadowHover: '0 8px 32px rgba(5, 150, 105, 0.4), 0 0 40px rgba(5, 150, 105, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-    innerGlow: 'rgba(5, 150, 105, 0.12)',
+    shadow: 'var(--shadow-md)',
+    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
+    innerGlow: 'color-mix(in srgb, var(--color-suit-green) 12%, transparent)',
     elementName: 'Nature',
   },
   blue: {
     border: 'var(--color-suit-blue)',
     text: 'var(--color-suit-blue)',
-    shadow: '0 4px 16px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
-    shadowHover: '0 8px 32px rgba(37, 99, 235, 0.4), 0 0 40px rgba(37, 99, 235, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-    innerGlow: 'rgba(37, 99, 235, 0.12)',
+    shadow: 'var(--shadow-md)',
+    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
+    innerGlow: 'color-mix(in srgb, var(--color-suit-blue) 12%, transparent)',
     elementName: 'Water',
   },
 };
 
-// Size configurations with golden ratio proportions
+// Size configurations with improved readability
 const sizeStyles = {
   tiny: {
     container: 'w-14 h-20 sm:w-12 sm:h-20',
     text: 'text-base',
-    cornerText: 'text-[10px]',
+    cornerText: 'text-sm font-black',      // Increased from text-[10px]
     emblem: 'w-7 h-7 sm:w-6 sm:h-6',
-    badge: 'text-[8px] px-0.5',
+    badge: 'text-[9px] px-1 py-0.5',       // Slightly larger
     borderWidth: '2px',
     cornerOffset: 'top-0.5 left-1',
     cornerOffsetBottom: 'bottom-0.5 right-1',
@@ -89,9 +90,9 @@ const sizeStyles = {
   small: {
     container: 'w-20 h-32 md:w-16 md:h-28',
     text: 'text-lg',
-    cornerText: 'text-xs',
+    cornerText: 'text-base font-black',    // Increased from text-xs
     emblem: 'w-12 h-12 md:w-10 md:h-10',
-    badge: 'text-[9px] px-0.5',
+    badge: 'text-[10px] px-1 py-0.5',
     borderWidth: '2px',
     cornerOffset: 'top-1 left-1.5',
     cornerOffsetBottom: 'bottom-1 right-1.5',
@@ -99,9 +100,9 @@ const sizeStyles = {
   medium: {
     container: 'w-24 h-36 md:w-20 md:h-32',
     text: 'text-2xl',
-    cornerText: 'text-sm',
+    cornerText: 'text-lg font-black',      // Increased from text-sm
     emblem: 'w-14 h-14 md:w-12 md:h-12',
-    badge: 'text-xs px-1',
+    badge: 'text-xs px-1.5 py-0.5',
     borderWidth: '2px',
     cornerOffset: 'top-1 left-1.5',
     cornerOffsetBottom: 'bottom-1 right-1.5',
@@ -109,9 +110,9 @@ const sizeStyles = {
   large: {
     container: 'w-28 h-40 md:w-24 md:h-36',
     text: 'text-3xl',
-    cornerText: 'text-base',
+    cornerText: 'text-xl font-black',      // Increased from text-base
     emblem: 'w-18 h-18 md:w-16 md:h-16',
-    badge: 'text-sm px-1.5',
+    badge: 'text-sm px-2 py-0.5',
     borderWidth: '3px',
     cornerOffset: 'top-1.5 left-2',
     cornerOffsetBottom: 'bottom-1.5 right-2',
@@ -194,15 +195,15 @@ function CardComponent({
         <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-[var(--color-border-accent)] opacity-50" />
         <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-[var(--color-border-accent)] opacity-50" />
 
-        {/* Center alchemical symbol */}
+        {/* Center symbol */}
         <div
           className="w-10 h-10 rounded-full flex items-center justify-center relative"
           style={{
-            background: 'linear-gradient(135deg, var(--color-bg-accent) 0%, rgba(193, 127, 89, 0.8) 100%)',
-            boxShadow: '0 2px 12px rgba(212, 165, 116, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+            background: `linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 80%, black))`,
+            boxShadow: 'var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
           }}
         >
-          {/* Triangle inside circle (alchemical symbol) */}
+          {/* Triangle inside circle */}
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 4L21 20H3L12 4Z"
@@ -284,17 +285,25 @@ function CardComponent({
         />
       )}
 
-      {/* Top-left value with mystical typography */}
+      {/* Top-left value with high contrast */}
       {!isSpecial && (
         <span
           className={`
             absolute ${sizeConfig.cornerOffset}
-            font-display font-bold
+            font-display
             ${sizeConfig.cornerText}
+            select-none
           `}
           style={{
             color: suitStyle.text,
-            textShadow: `0 1px 3px rgba(0, 0, 0, 0.4), 0 0 8px ${suitStyle.innerGlow}`,
+            textShadow: `
+              -1px -1px 0 var(--card-bg-color),
+              1px -1px 0 var(--card-bg-color),
+              -1px 1px 0 var(--card-bg-color),
+              1px 1px 0 var(--card-bg-color),
+              0 2px 4px rgba(0, 0, 0, 0.5)
+            `,
+            WebkitTextStroke: '0.5px var(--card-bg-color)',
           }}
         >
           {card.value}
@@ -322,13 +331,21 @@ function CardComponent({
         <span
           className={`
             absolute ${sizeConfig.cornerOffsetBottom}
-            font-display font-bold
+            font-display
             ${sizeConfig.cornerText}
             rotate-180
+            select-none
           `}
           style={{
             color: suitStyle.text,
-            textShadow: `0 1px 3px rgba(0, 0, 0, 0.4), 0 0 8px ${suitStyle.innerGlow}`,
+            textShadow: `
+              -1px -1px 0 var(--card-bg-color),
+              1px -1px 0 var(--card-bg-color),
+              -1px 1px 0 var(--card-bg-color),
+              1px 1px 0 var(--card-bg-color),
+              0 2px 4px rgba(0, 0, 0, 0.5)
+            `,
+            WebkitTextStroke: '0.5px var(--card-bg-color)',
           }}
         >
           {card.value}
@@ -360,25 +377,28 @@ function CardComponent({
         </span>
       )}
 
-      {/* Disabled overlay with arcane seal */}
+      {/* Disabled overlay with seal */}
       {disabled && onClick && (
         <div
           className="absolute inset-0 flex items-center justify-center rounded-[var(--radius-lg)]"
           style={{
-            backgroundColor: 'rgba(11, 14, 20, 0.6)',
+            backgroundColor: 'color-mix(in srgb, var(--color-bg-primary) 60%, transparent)',
             backdropFilter: 'grayscale(90%) brightness(0.7)',
           }}
         >
           <div
             className="w-10 h-10 rounded-full flex items-center justify-center"
             style={{
-              background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.8), rgba(127, 29, 29, 0.8))',
-              boxShadow: '0 0 15px rgba(220, 38, 38, 0.4)',
+              background: `linear-gradient(135deg, var(--color-error), color-mix(in srgb, var(--color-error) 70%, black))`,
+              boxShadow: 'var(--shadow-md)',
             }}
           >
             <span
-              className="font-display text-xl font-bold text-white"
-              style={{ textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)' }}
+              className="font-display text-xl font-bold"
+              style={{
+                color: 'white',
+                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
+              }}
             >
               ✕
             </span>
@@ -486,10 +506,8 @@ export function CardBack({ size = 'medium', teamColor }: CardBackProps) {
         style={{
           background: teamColor
             ? `linear-gradient(135deg, ${teamColors[teamColor]}, color-mix(in srgb, ${teamColors[teamColor]} 80%, black))`
-            : 'linear-gradient(135deg, var(--color-bg-accent) 0%, rgba(193, 127, 89, 0.8) 100%)',
-          boxShadow: teamColor
-            ? `0 2px 12px ${teamGlows[teamColor]}`
-            : '0 2px 12px rgba(212, 165, 116, 0.5)',
+            : `linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 80%, black))`,
+          boxShadow: 'var(--shadow-glow)',
         }}
       >
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
@@ -534,14 +552,14 @@ export function CardStack({ count, size = 'medium', maxVisible = 5 }: CardStackP
         </div>
       ))}
 
-      {/* Card count badge with copper accent */}
+      {/* Card count badge */}
       {count > 0 && (
         <div
           className="absolute -top-2 -right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center font-display text-xs font-bold"
           style={{
-            background: 'linear-gradient(135deg, var(--color-bg-accent), rgba(193, 127, 89, 0.9))',
+            background: `linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 90%, black))`,
             color: 'var(--color-text-inverse)',
-            boxShadow: '0 2px 10px rgba(212, 165, 116, 0.5)',
+            boxShadow: 'var(--shadow-glow)',
           }}
         >
           {count}
@@ -565,12 +583,12 @@ interface ElegantCardDisplayProps {
 export function ElegantCardDisplay({ card, size = 'medium', spotlight = false }: ElegantCardDisplayProps) {
   return (
     <div className="relative inline-block">
-      {/* Mystical spotlight effect */}
+      {/* Spotlight effect */}
       {spotlight && (
         <div
           className="absolute -inset-10 rounded-full pointer-events-none"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(212, 165, 116, 0.15) 0%, rgba(193, 127, 89, 0.08) 30%, transparent 60%)',
+            background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--color-glow) 15%, transparent) 0%, color-mix(in srgb, var(--color-highlight) 8%, transparent) 30%, transparent 60%)',
             filter: 'blur(12px)',
             animation: 'ethereal-pulse 3s ease-in-out infinite',
           }}
