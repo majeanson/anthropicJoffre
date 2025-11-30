@@ -1,3 +1,10 @@
+/**
+ * GameHeader Component - Multi-Skin Edition
+ *
+ * Game header with scores, round info, and action buttons.
+ * Uses CSS variables for skin compatibility.
+ */
+
 import { useState, useRef, useEffect } from 'react';
 import { SettingsPanel } from './SettingsPanel';
 import { TutorialProgressModal } from './TutorialProgressModal';
@@ -18,11 +25,11 @@ interface GameHeaderProps {
   onOpenChat?: () => void;
   onOpenBotManagement?: () => void;
   onOpenRules?: () => void;
-  onOpenAchievements?: () => void; // Sprint 2 Phase 1
-  onOpenFriends?: () => void; // Sprint 2 Phase 2
-  onOpenNotifications?: () => void; // Sprint 3 Phase 5
-  unreadNotificationsCount?: number; // Sprint 3 Phase 5
-  pendingFriendRequestsCount?: number; // Sprint 16 - Friend requests badge
+  onOpenAchievements?: () => void;
+  onOpenFriends?: () => void;
+  onOpenNotifications?: () => void;
+  unreadNotificationsCount?: number;
+  pendingFriendRequestsCount?: number;
   botCount?: number;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
@@ -88,18 +95,13 @@ export function GameHeader({
     if (team1Change !== 0) {
       setTeam1ScoreChange(team1Change);
       setTeam1Flash(team1Change > 0 ? 'green' : 'red');
-
-      // Clear flash after 500ms
       setTimeout(() => setTeam1Flash(null), 500);
-
-      // Clear floating indicator after 1500ms
       setTimeout(() => setTeam1ScoreChange(null), 1500);
     }
 
     if (team2Change !== 0) {
       setTeam2ScoreChange(team2Change);
       setTeam2Flash(team2Change > 0 ? 'green' : 'red');
-
       setTimeout(() => setTeam2Flash(null), 500);
       setTimeout(() => setTeam2ScoreChange(null), 1500);
     }
@@ -108,16 +110,16 @@ export function GameHeader({
     prevTeam2ScoreRef.current = team2Score;
   }, [team1Score, team2Score]);
 
-  // Helper to get trump color display
-  const getTrumpColorClass = (color: CardColor | null | undefined): string => {
-    if (!color) return 'bg-gray-500';
+  // Helper to get trump color
+  const getTrumpColorStyle = (color: CardColor | null | undefined): React.CSSProperties => {
+    if (!color) return { backgroundColor: 'var(--color-text-muted)' };
     const colorMap: Record<CardColor, string> = {
-      red: 'bg-red-500',
-      brown: 'bg-amber-700',
-      green: 'bg-green-600',
-      blue: 'bg-blue-500'
+      red: '#ef4444',
+      brown: '#92400e',
+      green: '#16a34a',
+      blue: '#3b82f6'
     };
-    return colorMap[color];
+    return { backgroundColor: colorMap[color] };
   };
 
   const getTrumpColorName = (color: CardColor | null | undefined): string => {
@@ -137,41 +139,68 @@ export function GameHeader({
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg z-40 relative overflow-visible">
+    <div
+      className="border-b-2 shadow-lg z-40 relative overflow-visible"
+      style={{
+        background: 'linear-gradient(to right, var(--color-bg-secondary), var(--color-bg-tertiary))',
+        borderColor: 'var(--color-border-accent)',
+      }}
+    >
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1 sm:py-1.5">
-        {/* Desktop: Single row - All items on same horizontal line */}
+        {/* Desktop: Single row */}
         <div className="hidden md:flex items-center gap-3">
           {/* Game Info - Clickable to copy link */}
           <Button
             onClick={handleCopyGameLink}
             variant="ghost"
             size="xs"
-            className="!bg-white/20 dark:!bg-black/20 !text-white/80 dark:!text-gray-300 hover:!bg-white/30 dark:hover:!bg-black/30"
             title="Click to copy game link"
           >
-            <p className="text-xs font-mono font-bold">
+            <p
+              className="text-xs font-mono font-bold"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
               {linkCopied ? '✓ Copied!' : gameId}
             </p>
           </Button>
-          <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
-            <p className="text-xs text-white dark:text-gray-100 font-bold" data-testid="round-number">R{roundNumber}</p>
+
+          <div
+            className="px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
+            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+          >
+            <p
+              className="text-xs font-bold"
+              style={{ color: 'var(--color-text-primary)' }}
+              data-testid="round-number"
+            >
+              R{roundNumber}
+            </p>
           </div>
 
           {/* Bet and Trump Display */}
           {(highestBet || trump) && (
-            <div className="flex items-center gap-1 bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
+            <div
+              className="flex items-center gap-1 px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
+              style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+            >
               {highestBet && (
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-white/80 dark:text-gray-300">Bet:</span>
-                  <span className="text-xs text-white dark:text-gray-100 font-bold">{highestBet.amount}</span>
-                  {highestBet.withoutTrump && <span className="text-xs text-yellow-300 font-bold" title="Without Trump">!</span>}
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Bet:</span>
+                  <span className="text-xs font-bold" style={{ color: 'var(--color-text-primary)' }}>{highestBet.amount}</span>
+                  {highestBet.withoutTrump && (
+                    <span className="text-xs font-bold" style={{ color: 'var(--color-warning)' }} title="Without Trump">!</span>
+                  )}
                 </div>
               )}
-              {highestBet && trump && <span className="text-white/50">|</span>}
+              {highestBet && trump && <span style={{ color: 'var(--color-text-muted)' }}>|</span>}
               {trump && (
                 <div className="flex items-center gap-1">
-                  <span className="text-xs text-white/80 dark:text-gray-300">Trump:</span>
-                  <div className={`w-3 h-3 rounded-sm ${getTrumpColorClass(trump)}`} title={getTrumpColorName(trump)}></div>
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Trump:</span>
+                  <div
+                    className="w-3 h-3 rounded-sm"
+                    style={getTrumpColorStyle(trump)}
+                    title={getTrumpColorName(trump)}
+                  />
                 </div>
               )}
             </div>
@@ -180,24 +209,45 @@ export function GameHeader({
           {/* Team Scores */}
           <div className="flex items-center gap-1" data-testid="team-scores">
             <span className="sr-only">Team 1: {team1Score} Team 2: {team2Score}</span>
-            <div className={`relative bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''} ${team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
-              <p className="text-xs text-white/90 font-semibold">T1</p>
-              <p className="text-base text-white font-black">{animatedTeam1Score}</p>
+
+            {/* Team 1 Score */}
+            <div
+              className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+                team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
+              } ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
+              style={{
+                backgroundColor: 'var(--color-team1-primary)',
+                boxShadow: bettingTeamId === 1 ? '0 0 0 2px var(--color-warning), 0 0 10px var(--color-warning)' : undefined,
+              }}
+            >
+              <p className="text-xs font-semibold" style={{ color: 'var(--color-team1-text)', opacity: 0.9 }}>T1</p>
+              <p className="text-base font-black" style={{ color: 'var(--color-team1-text)' }}>{animatedTeam1Score}</p>
               {team1ScoreChange !== null && (
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                  <span className={team1ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                  <span style={{ color: team1ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                     {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
                   </span>
                 </div>
               )}
             </div>
-            <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-            <div className={`relative bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300 ring-offset-1 ring-offset-amber-800 dark:ring-offset-gray-800' : ''} ${team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
-              <p className="text-xs text-white/90 font-semibold">T2</p>
-              <p className="text-base text-white font-black">{animatedTeam2Score}</p>
+
+            <div className="font-bold text-sm flex-shrink-0" style={{ color: 'var(--color-text-primary)' }}>:</div>
+
+            {/* Team 2 Score */}
+            <div
+              className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+                team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
+              } ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
+              style={{
+                backgroundColor: 'var(--color-team2-primary)',
+                boxShadow: bettingTeamId === 2 ? '0 0 0 2px var(--color-warning), 0 0 10px var(--color-warning)' : undefined,
+              }}
+            >
+              <p className="text-xs font-semibold" style={{ color: 'var(--color-team2-text)', opacity: 0.9 }}>T2</p>
+              <p className="text-base font-black" style={{ color: 'var(--color-team2-text)' }}>{animatedTeam2Score}</p>
               {team2ScoreChange !== null && (
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                  <span className={team2ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                  <span style={{ color: team2ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                     {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
                   </span>
                 </div>
@@ -206,11 +256,10 @@ export function GameHeader({
           </div>
 
           {/* Spacer */}
-          <div className="flex-1"></div>
+          <div className="flex-1" />
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Chat Button */}
             {onOpenChat && (
               <HeaderActionButton
                 onClick={onOpenChat}
@@ -222,7 +271,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Leaderboard Button */}
             {onOpenLeaderboard && (
               <HeaderActionButton
                 onClick={onOpenLeaderboard}
@@ -233,7 +281,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Achievements Button - Sprint 2 Phase 1 */}
             {onOpenAchievements && (
               <HeaderActionButton
                 onClick={onOpenAchievements}
@@ -244,7 +291,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Friends Button - Sprint 2 Phase 2 */}
             {onOpenFriends && (
               <HeaderActionButton
                 onClick={onOpenFriends}
@@ -256,7 +302,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Notifications Button - Sprint 3 Phase 5 */}
             {onOpenNotifications && (
               <HeaderActionButton
                 onClick={onOpenNotifications}
@@ -268,7 +313,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Tutorial Progress Button - Only in beginner mode */}
             {beginnerMode && (
               <HeaderActionButton
                 onClick={() => setTutorialProgressOpen(true)}
@@ -279,7 +323,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Settings Button - Opens unified settings panel */}
             <HeaderActionButton
               onClick={() => setSettingsOpen(true)}
               icon="⚙️"
@@ -298,50 +341,78 @@ export function GameHeader({
               onClick={handleCopyGameLink}
               variant="ghost"
               size="xs"
-              className="!bg-white/20 dark:!bg-black/20 !text-white/80 dark:!text-gray-300"
               title="Click to copy game link"
             >
-              <p className="text-xs font-mono font-bold">
+              <p className="text-xs font-mono font-bold" style={{ color: 'var(--color-text-secondary)' }}>
                 {linkCopied ? '✓' : gameId}
               </p>
             </Button>
-            <div className="bg-white/20 dark:bg-black/20 px-2 py-1 rounded backdrop-blur-sm flex-shrink-0">
-              <p className="text-xs text-white dark:text-gray-100 font-bold">R{roundNumber}</p>
+
+            <div
+              className="px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
+              style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+            >
+              <p className="text-xs font-bold" style={{ color: 'var(--color-text-primary)' }}>R{roundNumber}</p>
             </div>
 
             {/* Mobile Bet and Trump Display */}
             {(highestBet || trump) && (
-              <div className="flex items-center gap-0.5 bg-white/20 dark:bg-black/20 px-1.5 py-1 rounded backdrop-blur-sm flex-shrink-0">
+              <div
+                className="flex items-center gap-0.5 px-1.5 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
+                style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+              >
                 {highestBet && (
-                  <span className="text-[10px] text-white dark:text-gray-100 font-bold">{highestBet.amount}{highestBet.withoutTrump ? '!' : ''}</span>
+                  <span className="text-[10px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                    {highestBet.amount}{highestBet.withoutTrump ? '!' : ''}
+                  </span>
                 )}
                 {trump && (
-                  <div className={`w-2.5 h-2.5 rounded-sm ${getTrumpColorClass(trump)}`}></div>
+                  <div className="w-2.5 h-2.5 rounded-sm" style={getTrumpColorStyle(trump)} />
                 )}
               </div>
             )}
 
-            <div className="flex-1"></div>
+            <div className="flex-1" />
 
             <div className="flex items-center gap-1">
-              <div className={`relative bg-orange-500 dark:bg-orange-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 1 ? 'ring-2 ring-yellow-300' : ''} ${team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
-                <p className="text-xs text-white/90 font-semibold">T1</p>
-                <p className="text-base text-white font-black">{animatedTeam1Score}</p>
+              {/* Team 1 Score Mobile */}
+              <div
+                className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+                  team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
+                } ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
+                style={{
+                  backgroundColor: 'var(--color-team1-primary)',
+                  boxShadow: bettingTeamId === 1 ? '0 0 0 2px var(--color-warning)' : undefined,
+                }}
+              >
+                <p className="text-xs font-semibold" style={{ color: 'var(--color-team1-text)', opacity: 0.9 }}>T1</p>
+                <p className="text-base font-black" style={{ color: 'var(--color-team1-text)' }}>{animatedTeam1Score}</p>
                 {team1ScoreChange !== null && (
                   <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                    <span className={team1ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                    <span style={{ color: team1ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                       {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
                     </span>
                   </div>
                 )}
               </div>
-              <div className="text-white dark:text-gray-300 font-bold text-sm flex-shrink-0">:</div>
-              <div className={`relative bg-purple-500 dark:bg-purple-600 px-2 py-1 rounded shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${bettingTeamId === 2 ? 'ring-2 ring-yellow-300' : ''} ${team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''} ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}>
-                <p className="text-xs text-white/90 font-semibold">T2</p>
-                <p className="text-base text-white font-black">{animatedTeam2Score}</p>
+
+              <div className="font-bold text-sm flex-shrink-0" style={{ color: 'var(--color-text-primary)' }}>:</div>
+
+              {/* Team 2 Score Mobile */}
+              <div
+                className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+                  team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
+                } ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
+                style={{
+                  backgroundColor: 'var(--color-team2-primary)',
+                  boxShadow: bettingTeamId === 2 ? '0 0 0 2px var(--color-warning)' : undefined,
+                }}
+              >
+                <p className="text-xs font-semibold" style={{ color: 'var(--color-team2-text)', opacity: 0.9 }}>T2</p>
+                <p className="text-base font-black" style={{ color: 'var(--color-team2-text)' }}>{animatedTeam2Score}</p>
                 {team2ScoreChange !== null && (
                   <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                    <span className={team2ScoreChange > 0 ? 'text-green-400' : 'text-red-400'}>
+                    <span style={{ color: team2ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
                       {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
                     </span>
                   </div>
@@ -352,7 +423,6 @@ export function GameHeader({
 
           {/* Row 2: Action Buttons */}
           <div className="flex items-center justify-center gap-1 flex-wrap">
-            {/* Chat Button */}
             {onOpenChat && (
               <HeaderActionButton
                 onClick={onOpenChat}
@@ -364,7 +434,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Leaderboard Button */}
             {onOpenLeaderboard && (
               <HeaderActionButton
                 onClick={onOpenLeaderboard}
@@ -375,7 +444,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Achievements Button - Sprint 2 Phase 1 */}
             {onOpenAchievements && (
               <HeaderActionButton
                 onClick={onOpenAchievements}
@@ -386,7 +454,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Friends Button - Sprint 2 Phase 2 */}
             {onOpenFriends && (
               <HeaderActionButton
                 onClick={onOpenFriends}
@@ -398,7 +465,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Tutorial Progress Button - Only in beginner mode */}
             {beginnerMode && (
               <HeaderActionButton
                 onClick={() => setTutorialProgressOpen(true)}
@@ -409,7 +475,6 @@ export function GameHeader({
               />
             )}
 
-            {/* Settings Button */}
             <HeaderActionButton
               onClick={() => setSettingsOpen(true)}
               icon="⚙️"
@@ -437,7 +502,7 @@ export function GameHeader({
         connectionStats={connectionStats}
       />
 
-      {/* Tutorial Progress Modal - Only shown in beginner mode */}
+      {/* Tutorial Progress Modal */}
       {beginnerMode && (
         <TutorialProgressModal
           isOpen={tutorialProgressOpen}

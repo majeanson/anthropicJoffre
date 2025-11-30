@@ -124,8 +124,8 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
         </Button>
 
         {/* Register Link */}
-        <div className="text-center pt-4 border-t border-gray-700">
-          <p className="text-gray-400 text-sm">
+        <div className="text-center pt-4 border-t" style={{ borderColor: 'var(--color-border-default)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Don't have an account?{' '}
             <Button
               type="button"

@@ -42,10 +42,11 @@ interface LobbyProps {
   onShowRegister?: () => void;
   onShowQuests?: () => void;
   onShowRewardsCalendar?: () => void;
+  onShowPersonalHub?: () => void;
 }
 
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowQuests, onShowRewardsCalendar }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowQuests, onShowRewardsCalendar, onShowPersonalHub }: LobbyProps) {
   const { user, updateProfile, getUserProfile, isLoading: authLoading } = useAuth();
   // Use authenticated username if available, otherwise use stored playerName for guests
   // Initialize empty - will be set by useEffect once auth state is known
@@ -402,29 +403,86 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             />
           </ErrorBoundary>
         )}
-        <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-4 relative overflow-hidden">
-          {/* Animated background cards */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none">
-            <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }}>🃏</div>
-            <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>🎴</div>
-            <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }}>🂡</div>
-            <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }}>🂱</div>
+        <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center p-4 relative overflow-hidden">
+          {/* Animated background - Retro grid lines */}
+          <div className="absolute inset-0 pointer-events-none opacity-20">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `
+                  linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
+                  linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px)
+                `,
+                backgroundSize: '40px 40px',
+              }}
+            />
+            {/* Animated glow orbs */}
+            <div
+              className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full animate-pulse"
+              style={{
+                background: 'radial-gradient(circle, var(--color-glow) 0%, transparent 70%)',
+                opacity: 0.3,
+                animationDuration: '4s',
+              }}
+            />
+            <div
+              className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full animate-pulse"
+              style={{
+                background: 'radial-gradient(circle, var(--color-team2-primary) 0%, transparent 70%)',
+                opacity: 0.2,
+                animationDuration: '3s',
+                animationDelay: '1s',
+              }}
+            />
           </div>
 
-          <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-10 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
-            {/* Decorative corners */}
-            <div className="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-tl-xl"></div>
-            <div className="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-tr-xl"></div>
-            <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
-            <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
+          {/* Main container with neon border */}
+          <div
+            className="
+              bg-[var(--color-bg-secondary)]
+              rounded-[var(--radius-xl)]
+              p-8 md:p-10
+              max-w-md w-full
+              border-[var(--modal-border-width)]
+              border-[var(--color-border-accent)]
+              relative
+              overflow-hidden
+            "
+            style={{
+              boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
+            }}
+          >
+            {/* Scanline effect overlay */}
+            <div
+              className="absolute inset-0 pointer-events-none z-10 opacity-30"
+              style={{
+                background: 'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 2px)',
+              }}
+            />
 
-            {/* Title */}
-            <div className="text-center mb-6">
-              <h1 className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-800 via-orange-700 to-red-800 dark:from-blue-400 dark:via-purple-500 dark:to-pink-500 font-serif tracking-wider animate-pulse" style={{ animationDuration: '1s' }}>
+            {/* Decorative corner accents */}
+            <div className="absolute top-0 left-0 w-12 h-12 border-t-[3px] border-l-[3px] border-[var(--color-text-accent)] rounded-tl-[var(--radius-xl)] opacity-60" />
+            <div className="absolute top-0 right-0 w-12 h-12 border-t-[3px] border-r-[3px] border-[var(--color-text-accent)] rounded-tr-[var(--radius-xl)] opacity-60" />
+            <div className="absolute bottom-0 left-0 w-12 h-12 border-b-[3px] border-l-[3px] border-[var(--color-team2-primary)] rounded-bl-[var(--radius-xl)] opacity-60" />
+            <div className="absolute bottom-0 right-0 w-12 h-12 border-b-[3px] border-r-[3px] border-[var(--color-team2-primary)] rounded-br-[var(--radius-xl)] opacity-60" />
+
+            {/* Title with neon glow */}
+            <div className="text-center mb-8 relative z-20">
+              <h1
+                className="text-5xl md:text-6xl font-display uppercase tracking-wider"
+                style={{
+                  color: 'var(--color-text-primary)',
+                  textShadow: '0 0 10px var(--color-glow), 0 0 20px var(--color-glow), 0 0 40px var(--color-glow)',
+                }}
+              >
                 J⋀ffre
               </h1>
+              <p className="text-[var(--color-text-muted)] text-xs uppercase tracking-widest mt-2 font-body">
+                Multiplayer Trick Card Game
+              </p>
+
               {/* Authentication Section */}
-              <div className="mt-4">
+              <div className="mt-6">
                 {user ? (
                   <div className="flex flex-col items-center gap-2">
                     {/* Profile Button - Clickable dropdown menu with profile actions */}
@@ -434,20 +492,22 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       socket={socket}
                       onShowLogin={onShowLogin}
                       onShowProfileEditor={() => setShowProfileEditor(true)}
+                      onShowPersonalHub={onShowPersonalHub}
                     />
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-3">
                     {playerName.trim() && (
-                      <p className="text-xs text-umber-600 dark:text-gray-400 font-medium">
-                        Playing as <span className="font-bold text-umber-800 dark:text-gray-200">{playerName}</span>
+                      <p className="text-xs text-[var(--color-text-muted)] font-body">
+                        Playing as{' '}
+                        <span className="font-display text-[var(--color-text-accent)]">{playerName}</span>
                       </p>
                     )}
-                    <div className="flex items-center justify-center gap-2">
+                    <div className="flex items-center justify-center gap-3">
                       <Button
                         data-keyboard-nav="login-btn"
                         onClick={onShowLogin}
-                        variant="primary"
+                        variant="neon"
                         size="sm"
                       >
                         Login
@@ -466,51 +526,89 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               </div>
             </div>
 
-            {/* Horizontal Tab Navigation */}
-            <div className="mb-6">
+            {/* Horizontal Tab Navigation - Arcade style */}
+            <div className="mb-6 relative z-20">
               <div className="grid grid-cols-4 gap-2 mb-4">
-                <Button
+                <button
                   data-nav-tab="play"
                   onClick={() => { sounds.buttonClick(); setMainTab('play'); setNavCol(0); }}
-                  variant={mainTab === 'play' ? 'primary' : 'ghost'}
-                  size="md"
+                  className={`
+                    px-2 py-2
+                    font-display text-xs uppercase tracking-wider
+                    rounded-[var(--radius-md)]
+                    border-2 transition-all duration-[var(--duration-fast)]
+                    ${mainTab === 'play'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
+                    }
+                  `}
                 >
-                  PLAY
-                </Button>
-                <Button
+                  Play
+                </button>
+                <button
                   data-nav-tab="social"
                   onClick={() => { sounds.buttonClick(); setMainTab('social'); setNavCol(1); }}
-                  variant={mainTab === 'social' ? 'primary' : 'ghost'}
-                  size="md"
-                  className="relative"
+                  className={`
+                    px-2 py-2 relative
+                    font-display text-xs uppercase tracking-wider
+                    rounded-[var(--radius-md)]
+                    border-2 transition-all duration-[var(--duration-fast)]
+                    ${mainTab === 'social'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
+                    }
+                  `}
                 >
-                  SOCIAL
+                  Social
                   {onlinePlayers.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                    <span
+                      className="absolute -top-1 -right-1 text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-display"
+                      style={{
+                        backgroundColor: 'var(--color-success)',
+                        color: 'black',
+                        boxShadow: '0 0 8px var(--color-success)',
+                      }}
+                    >
                       {onlinePlayers.length}
                     </span>
                   )}
-                </Button>
-                <Button
+                </button>
+                <button
                   data-nav-tab="stats"
                   onClick={() => { sounds.buttonClick(); setMainTab('stats'); setNavCol(2); }}
-                  variant={mainTab === 'stats' ? 'primary' : 'ghost'}
-                  size="md"
+                  className={`
+                    px-2 py-2
+                    font-display text-xs uppercase tracking-wider
+                    rounded-[var(--radius-md)]
+                    border-2 transition-all duration-[var(--duration-fast)]
+                    ${mainTab === 'stats'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
+                    }
+                  `}
                 >
-                  STATS
-                </Button>
-                <Button
+                  Stats
+                </button>
+                <button
                   data-nav-tab="settings"
                   onClick={() => { sounds.buttonClick(); setMainTab('settings'); setNavCol(3); }}
-                  variant={mainTab === 'settings' ? 'primary' : 'ghost'}
-                  size="md"
+                  className={`
+                    px-2 py-2
+                    font-display text-xs uppercase tracking-wider
+                    rounded-[var(--radius-md)]
+                    border-2 transition-all duration-[var(--duration-fast)]
+                    ${mainTab === 'settings'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
+                    }
+                  `}
                 >
-                  SETTINGS
-                </Button>
+                  Settings
+                </button>
               </div>
 
               {/* Tab Content */}
-              <div className="min-h-[400px]" data-tab-content>
+              <div className="min-h-[400px] relative z-20" data-tab-content>
                 {/* PLAY TAB */}
                 {mainTab === 'play' && (
                   <PlayContent

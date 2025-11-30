@@ -122,7 +122,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
             size="sm"
           />
 
-          <div className="ml-auto text-sm text-umber-600 dark:text-gray-400">
+          <div className="ml-auto text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Showing {filteredAchievements.length} achievements
           </div>
         </div>

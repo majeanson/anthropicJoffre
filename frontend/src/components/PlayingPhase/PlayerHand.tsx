@@ -1,17 +1,14 @@
 /**
- * PlayerHand Component
- * Renders player's hand with card dealing animation, keyboard navigation,
- * and card click handlers
+ * PlayerHand Component - Multi-Skin Edition
  *
- * Extracted from PlayingPhase.tsx (lines 209-235, 333-422, 451-511, 1024-1121)
- * Part of Sprint: PlayingPhase.tsx split into focused components
+ * Renders player's hand with card dealing animation and keyboard navigation.
+ * Uses CSS variables for skin compatibility.
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { Card as CardType, TrickCard } from '../../types/game';
 import { sounds } from '../../utils/sounds';
-import { UICard } from '../ui/UICard';
 
 export interface PlayerHandProps {
   hand: CardType[];
@@ -144,7 +141,7 @@ export const PlayerHand = memo(function PlayerHand({
           sounds.cardDeal();
           return prev + 1;
         });
-      }, 120); // Stagger animation for each card
+      }, 120);
 
       return () => clearInterval(interval);
     }
@@ -197,8 +194,7 @@ export const PlayerHand = memo(function PlayerHand({
             const nextPos = (currentPos + 1) % navigableCardsIndexes.length;
             setSelectedCardIndex(navigableCardsIndexes[nextPos]);
           } else {
-            const prevPos =
-              (currentPos - 1 + navigableCardsIndexes.length) % navigableCardsIndexes.length;
+            const prevPos = (currentPos - 1 + navigableCardsIndexes.length) % navigableCardsIndexes.length;
             setSelectedCardIndex(navigableCardsIndexes[prevPos]);
           }
         }
@@ -234,8 +230,7 @@ export const PlayerHand = memo(function PlayerHand({
         } else {
           // If NOT your turn: queue the card
           sounds.cardDeal();
-          handleCardClick(card); // This will trigger queue logic
-          // Keep selection for visual feedback
+          handleCardClick(card);
         }
       }
       // Number keys 1-9: quick select card by position
@@ -263,7 +258,7 @@ export const PlayerHand = memo(function PlayerHand({
     setSelectedCardIndex(null);
   }, [currentPlayerIndex]);
 
-  // Scroll selected card into view (for keyboard navigation on mobile)
+  // Scroll selected card into view
   useEffect(() => {
     if (selectedCardIndex !== null && cardRefs.current[selectedCardIndex]) {
       cardRefs.current[selectedCardIndex]?.scrollIntoView({
@@ -277,21 +272,35 @@ export const PlayerHand = memo(function PlayerHand({
   if (isSpectator) {
     return (
       <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-10">
-        <UICard
-          variant="bordered"
-          size="lg"
-          className="bg-umber-900/40 backdrop-blur-xl shadow-2xl"
+        <div
+          className="rounded-[var(--radius-xl)] p-4 border-2 backdrop-blur-xl shadow-2xl"
+          style={{
+            backgroundColor: 'var(--color-bg-secondary)',
+            borderColor: 'var(--color-border-accent)',
+          }}
           data-testid="player-hand"
         >
           <div className="text-center py-8">
-            <UICard variant="bordered" size="md" gradient="primary" className="inline-block shadow-lg">
-              <span className="text-umber-800 dark:text-gray-200 text-base font-semibold">
+            <div
+              className="inline-block rounded-[var(--radius-lg)] px-6 py-3 border-2"
+              style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-border-default)',
+                boxShadow: 'var(--shadow-glow)',
+              }}
+            >
+              <span
+                className="text-base font-semibold flex items-center gap-2"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
                 <span aria-hidden="true">🔒</span> Hands Hidden
               </span>
-              <p className="text-umber-600 dark:text-gray-400 text-sm mt-1.5">Spectator Mode</p>
-            </UICard>
+              <p className="text-sm mt-1.5" style={{ color: 'var(--color-text-muted)' }}>
+                Spectator Mode
+              </p>
+            </div>
           </div>
-        </UICard>
+        </div>
       </div>
     );
   }
@@ -300,7 +309,7 @@ export const PlayerHand = memo(function PlayerHand({
     return null;
   }
 
-  // Create combined hand: actual hand + card in transition (if it's no longer in hand)
+  // Create combined hand: actual hand + card in transition
   const displayHand = [...hand];
   if (
     cardInTransition &&
@@ -311,10 +320,13 @@ export const PlayerHand = memo(function PlayerHand({
 
   return (
     <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-[11] overflow-visible">
-      <UICard
-        variant="bordered"
-        size="lg"
-        className="bg-umber-900/40 backdrop-blur-xl shadow-2xl overflow-visible"
+      <div
+        className="rounded-[var(--radius-xl)] p-4 border-2 backdrop-blur-xl shadow-2xl overflow-visible"
+        style={{
+          backgroundColor: 'var(--color-bg-secondary)',
+          borderColor: 'var(--color-border-accent)',
+          boxShadow: 'var(--shadow-glow)',
+        }}
         data-testid="player-hand"
       >
         <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-2 md:mx-0 px-2 md:px-0 pt-6 -mt-4 pb-2">
@@ -322,7 +334,7 @@ export const PlayerHand = memo(function PlayerHand({
             {displayHand.map((card, index) => {
               const playable = isCardPlayable(card);
               const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
-              const dealDelay = index * 120; // Stagger animation for each card
+              const dealDelay = index * 120;
               const isTransitioning =
                 cardInTransition &&
                 card.color === cardInTransition.color &&
@@ -340,8 +352,7 @@ export const PlayerHand = memo(function PlayerHand({
                       : isTransitioning
                       ? 'opacity-0 motion-safe:animate-card-play-arc'
                       : 'opacity-100 scale-100'
-                  }
-                            ${isSelected || isQueued ? '-translate-y-2 scale-110' : ''}`}
+                  } ${isSelected || isQueued ? '-translate-y-2 scale-110' : ''}`}
                   style={{
                     transition: isTransitioning
                       ? 'opacity 400ms ease-out, transform 400ms ease-out'
@@ -351,13 +362,30 @@ export const PlayerHand = memo(function PlayerHand({
                 >
                   {/* Selection indicator ring */}
                   {isSelected && (
-                    <div className="absolute -inset-2 rounded-lg ring-4 ring-blue-500 dark:ring-blue-400 animate-pulse pointer-events-none z-10" />
+                    <div
+                      className="absolute -inset-2 rounded-lg animate-pulse pointer-events-none z-10"
+                      style={{
+                        boxShadow: '0 0 0 4px var(--color-info)',
+                      }}
+                    />
                   )}
-                  {/* Queued indicator - pulsing gold ring and centered badge */}
+                  {/* Queued indicator - pulsing ring and badge */}
                   {isQueued && (
                     <>
-                      <div className="absolute -inset-2 rounded-lg ring-4 ring-yellow-400 dark:ring-yellow-500 animate-pulse pointer-events-none z-20" />
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-yellow-900 text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 border-yellow-300 pointer-events-none">
+                      <div
+                        className="absolute -inset-2 rounded-lg animate-pulse pointer-events-none z-20"
+                        style={{
+                          boxShadow: '0 0 0 4px var(--color-warning)',
+                        }}
+                      />
+                      <div
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none"
+                        style={{
+                          backgroundColor: 'var(--color-warning)',
+                          color: 'var(--color-bg-primary)',
+                          borderColor: 'var(--color-warning)',
+                        }}
+                      >
                         QUEUED
                       </div>
                     </>
@@ -375,7 +403,7 @@ export const PlayerHand = memo(function PlayerHand({
             })}
           </div>
         </div>
-      </UICard>
+      </div>
     </div>
   );
 });

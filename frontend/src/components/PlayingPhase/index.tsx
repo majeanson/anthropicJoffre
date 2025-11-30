@@ -1,10 +1,8 @@
 /**
- * PlayingPhase Component - Main Orchestrator
- * Coordinates all sub-components: ScoreBoard, TrickArea, PlayerHand
- * Manages socket listeners, sound effects, and overlay effects
+ * PlayingPhase Component - Multi-Skin Edition
  *
- * Refactored from PlayingPhase.tsx (1,191 lines → ~400 lines)
- * Split into focused components for better maintainability
+ * Main orchestrator for the playing phase with proper CSS variable usage.
+ * Coordinates: ScoreBoard, TrickArea, PlayerHand
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -22,6 +20,7 @@ import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
 import { suggestMove } from '../../utils/moveSuggestion';
+import { Button } from '../ui/Button';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';
@@ -42,7 +41,7 @@ interface PlayingPhaseProps {
   onOpenBotManagement?: () => void;
   onOpenAchievements?: () => void;
   onOpenFriends?: () => void;
-  pendingFriendRequestsCount?: number; // Sprint 16 - Friend requests badge
+  pendingFriendRequestsCount?: number;
   onClickPlayer?: (playerName: string) => void;
   socket?: Socket | null;
   gameId?: string;
@@ -73,39 +72,54 @@ function PlayingPhaseComponent({
   onNewChatMessage,
   connectionStats,
 }: PlayingPhaseProps) {
-  // ✅ CRITICAL: Check player existence BEFORE any hooks
-  // Use player NAME as stable identifier (socket.id changes on reconnect)
+  // CRITICAL: Check player existence BEFORE any hooks
   const playerLookup = isSpectator
     ? gameState.players[0]
     : gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
 
-
   // Safety check: If player not found and not spectator, show error BEFORE calling any hooks
   if (!playerLookup && !isSpectator) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900">
-        <div className="bg-parchment-50 dark:bg-gray-800 p-8 rounded-lg shadow-xl text-center border-2 border-parchment-400 dark:border-gray-600">
-          <h2 className="text-2xl font-bold mb-4 text-umber-900 dark:text-gray-100">
+      <div
+        className="flex items-center justify-center min-h-screen"
+        style={{ background: 'var(--color-bg-primary)' }}
+      >
+        <div
+          className="p-8 rounded-[var(--radius-xl)] text-center border-2"
+          style={{
+            backgroundColor: 'var(--color-bg-secondary)',
+            borderColor: 'var(--color-border-accent)',
+            boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
+          }}
+        >
+          <h2
+            className="text-2xl font-display uppercase tracking-wider mb-4"
+            style={{ color: 'var(--color-text-primary)' }}
+          >
             Player Not Found
           </h2>
-          <p className="text-umber-700 dark:text-gray-300 mb-6">
+          <p
+            className="font-body mb-6"
+            style={{ color: 'var(--color-text-muted)' }}
+          >
             Your player data could not be found in this game.
           </p>
-          <button
+          <Button
             onClick={() => {
               sessionStorage.removeItem('gameSession');
               window.location.reload();
             }}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-2 rounded-lg transition-colors border-2 border-blue-800"
+            variant="primary"
+            size="lg"
           >
             Return to Lobby
-          </button>
+          </Button>
         </div>
       </div>
     );
   }
 
-  // ✅ NOW it's safe to call hooks
+  // NOW it's safe to call hooks
   const { animationsEnabled, beginnerMode } = useSettings();
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -119,16 +133,16 @@ function PlayingPhaseComponent({
     onNewChatMessage
   });
 
-  // Sprint 1 Phase 2: Card play effect state
+  // Card play effect state
   const [playEffect, setPlayEffect] = useState<{
     card: CardType;
     position: { x: number; y: number };
   } | null>(null);
 
-  // Card queue state - allows pre-selecting a card to auto-play when turn comes
+  // Card queue state
   const [queuedCard, setQueuedCard] = useState<CardType | null>(null);
 
-  // Sprint 1 Phase 3: Trick winner celebration state
+  // Trick winner celebration state
   const [trickWinner, setTrickWinner] = useState<{
     playerName: string;
     points: number;
@@ -136,18 +150,18 @@ function PlayingPhaseComponent({
     position: 'bottom' | 'left' | 'top' | 'right';
   } | null>(null);
 
-  // IMPROVEMENT #11: Bot thinking - store reasons for ALL bots in current trick
+  // Bot thinking state
   const [botThinkingMap, setBotThinkingMap] = useState<Map<string, string>>(new Map());
   const [openThinkingButtons, setOpenThinkingButtons] = useState<Set<string>>(new Set());
   const [suggestionOpen, setSuggestionOpen] = useState(false);
 
-  // Track autoplayEnabled with ref to avoid stale closure
+  // Track autoplayEnabled with ref
   const autoplayEnabledRef = useRef(autoplayEnabled);
   useEffect(() => {
     autoplayEnabledRef.current = autoplayEnabled;
   }, [autoplayEnabled]);
 
-  // Track which trick we've already played sound for (prevents duplicate sounds)
+  // Track which trick we've already played sound for
   const lastSoundedTrickWinnerRef = useRef<string | null>(null);
 
   // Get current player
@@ -171,7 +185,7 @@ function PlayingPhaseComponent({
     }
   }, [isCurrentTurn, onAutoplayToggle]);
 
-  // Toggle handlers for bot thinking and move suggestions
+  // Toggle handlers
   const toggleBotThinking = useCallback((botName: string) => {
     setOpenThinkingButtons(prev => {
       const newSet = new Set(prev);
@@ -200,15 +214,9 @@ function PlayingPhaseComponent({
       const winner = data.gameState.players.find(p => p.id === data.winnerId);
       if (!winner) return;
 
-      // Map player position to direction
       const winnerIndex = data.gameState.players.findIndex(p => p.id === data.winnerId);
       const relativePosition = (winnerIndex - currentPlayerIndex + 4) % 4;
-      const positions: ('bottom' | 'left' | 'top' | 'right')[] = [
-        'bottom',
-        'left',
-        'top',
-        'right',
-      ];
+      const positions: ('bottom' | 'left' | 'top' | 'right')[] = ['bottom', 'left', 'top', 'right'];
 
       setTrickWinner({
         playerName: winner.name,
@@ -217,30 +225,22 @@ function PlayingPhaseComponent({
         position: positions[relativePosition],
       });
 
-      // Auto-clear after 2s
       setTimeout(() => setTrickWinner(null), 2000);
     };
 
     socket.on('trick_resolved', handleTrickResolved);
-
-    return () => {
-      socket.off('trick_resolved', handleTrickResolved);
-    };
+    return () => { socket.off('trick_resolved', handleTrickResolved); };
   }, [socket, currentPlayerIndex]);
 
-  // Win/loss sound effects - use ref to prevent duplicate sounds
+  // Win/loss sound effects
   useEffect(() => {
     if (!gameState.previousTrick) return;
 
     const winnerId = gameState.previousTrick.winnerId;
-
-    // Skip if we already played sound for this trick winner
     if (lastSoundedTrickWinnerRef.current === winnerId) return;
     lastSoundedTrickWinnerRef.current = winnerId;
 
-    const winnerTeamId = gameState.players.find(
-      p => p.id === winnerId
-    )?.teamId;
+    const winnerTeamId = gameState.players.find(p => p.id === winnerId)?.teamId;
     const currentPlayerTeamId = currentPlayer?.teamId;
 
     if (winnerTeamId === currentPlayerTeamId) {
@@ -250,15 +250,14 @@ function PlayingPhaseComponent({
     }
   }, [gameState.previousTrick, currentPlayer?.teamId, gameState.players]);
 
-  // IMPROVEMENT #11: Generate thinking reasons for ALL bots in current trick
+  // Generate thinking reasons for bots
   useEffect(() => {
     const newMap = new Map<string, string>();
 
     gameState.currentTrick.forEach((play, index) => {
       const player = gameState.players.find(p => p.name === play.playerName);
-      if (!player?.isBot) return; // Only for bots
+      if (!player?.isBot) return;
 
-      // Generate helpful message based on the card played
       const card = play.card;
       const trickLength = index + 1;
       let action = '';
@@ -286,7 +285,6 @@ function PlayingPhaseComponent({
 
     setBotThinkingMap(newMap);
 
-    // Clear open buttons when trick changes (new trick starts)
     if (gameState.currentTrick.length === 0) {
       setOpenThinkingButtons(new Set());
       setSuggestionOpen(false);
@@ -296,7 +294,6 @@ function PlayingPhaseComponent({
   // "Your turn" notification
   useEffect(() => {
     if (!isCurrentTurn) return;
-
     const timeoutId = setTimeout(() => sounds.yourTurn(), 10000);
     return () => clearTimeout(timeoutId);
   }, [isCurrentTurn, gameState.currentPlayerIndex]);
@@ -305,7 +302,6 @@ function PlayingPhaseComponent({
   useEffect(() => {
     if (!isCurrentTurn || !queuedCard || !currentPlayer) return;
 
-    // Check if queued card is still in hand
     const cardInHand = currentPlayer.hand.some(
       c => c.color === queuedCard.color && c.value === queuedCard.value
     );
@@ -314,13 +310,11 @@ function PlayingPhaseComponent({
       return;
     }
 
-    // Check if queued card is valid to play (suit-following rules)
     let isValidToPlay = true;
     if (gameState.currentTrick.length > 0) {
       const ledSuit = gameState.currentTrick[0].card.color;
       const hasLedSuit = currentPlayer.hand.some(c => c.color === ledSuit);
       if (hasLedSuit && queuedCard.color !== ledSuit) {
-        // Must follow suit but queued card doesn't match
         isValidToPlay = false;
       }
     }
@@ -330,7 +324,6 @@ function PlayingPhaseComponent({
       return;
     }
 
-    // Auto-play the queued card with a small delay for UX
     const timeoutId = setTimeout(() => {
       sounds.cardConfirm(queuedCard.value);
       onPlayCard(queuedCard);
@@ -351,12 +344,11 @@ function PlayingPhaseComponent({
       setQueuedCard(null);
       return;
     }
-    // Toggle queue if same card clicked
     if (queuedCard && queuedCard.color === card.color && queuedCard.value === card.value) {
       setQueuedCard(null);
     } else {
       setQueuedCard(card);
-      sounds.cardDeal(); // Subtle feedback sound
+      sounds.cardDeal();
     }
   }, [queuedCard]);
 
@@ -366,60 +358,60 @@ function PlayingPhaseComponent({
 
     return (
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50">
-        {/* Spotlight effect for current player's turn */}
-        {isCurrentTurn && (
-          <div className="absolute inset-0 -m-12 rounded-full motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(96, 165, 250, 0.3) 0%, rgba(96, 165, 250, 0.1) 50%, transparent 100%)' }} />
-        )}
         <div
-          className={`relative bg-umber-800/90 rounded-2xl px-6 py-4 lg:px-8 lg:py-6 shadow-xl transition-all ${
-            isCurrentTurn
-              ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse'
-              : 'border-2 border-parchment-400 dark:border-gray-600'
-          }`}
+          className={`
+            relative rounded-[var(--radius-xl)] px-6 py-4 lg:px-8 lg:py-6
+            border-2 transition-all duration-[var(--duration-fast)]
+          `}
+          style={{
+            backgroundColor: 'var(--color-bg-tertiary)',
+            borderColor: isCurrentTurn ? 'var(--color-text-accent)' : 'var(--color-border-default)',
+            boxShadow: isCurrentTurn ? 'var(--shadow-glow)' : 'var(--shadow-lg)',
+          }}
           data-testid="turn-indicator"
         >
           {isCurrentTurn && (
             <div className="mb-2">
-              <span className="text-4xl motion-safe:animate-arrow-bounce motion-reduce:inline">
-                👇
-              </span>
+              <span className="text-4xl animate-bounce">👇</span>
             </div>
           )}
           <p
-            className="text-parchment-50 text-lg md:text-2xl lg:text-3xl font-semibold"
+            className="text-lg md:text-2xl lg:text-3xl font-display uppercase tracking-wider"
+            style={{ color: 'var(--color-text-primary)' }}
             data-testid="current-turn-player"
           >
             {isCurrentTurn
               ? 'Your Turn - Play a card!'
-              : `Waiting for first card from ${
-                  gameState.players[gameState.currentPlayerIndex]?.name
-                }...`}
+              : `Waiting for ${gameState.players[gameState.currentPlayerIndex]?.name}...`}
           </p>
           <div className="mt-2 flex gap-1 justify-center" aria-hidden="true">
-            <div className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-400 dark:bg-gray-500 rounded-full animate-bounce"></div>
-            <div
-              className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-400 dark:bg-gray-500 rounded-full animate-bounce"
-              style={{ animationDelay: '0.1s' }}
-            ></div>
-            <div
-              className="w-2 h-2 lg:w-3 lg:h-3 bg-parchment-400 dark:bg-gray-500 rounded-full animate-bounce"
-              style={{ animationDelay: '0.2s' }}
-            ></div>
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"
+                style={{
+                  backgroundColor: 'var(--color-text-accent)',
+                  animationDelay: `${i * 0.1}s`,
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>
     );
   };
 
-  // Get current move suggestion for human player
+  // Get current move suggestion
   const currentSuggestion = useMemo(() => {
     if (!isCurrentTurn || isSpectator || gameState.phase !== 'playing') return null;
-    const suggestion = suggestMove(gameState, currentPlayerId);
-    return suggestion;
+    return suggestMove(gameState, currentPlayerId);
   }, [isCurrentTurn, isSpectator, gameState, currentPlayerId]);
 
   return (
-    <div className="h-screen-safe md:min-h-screen-safe bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col overflow-y-auto overflow-x-hidden md:overflow-visible">
+    <div
+      className="h-screen-safe md:min-h-screen-safe flex flex-col overflow-y-auto overflow-x-hidden md:overflow-visible"
+      style={{ background: 'var(--color-bg-primary)' }}
+    >
       <GameHeader
         gameId={gameId || ''}
         roundNumber={gameState.roundNumber}
@@ -452,7 +444,18 @@ function PlayingPhaseComponent({
         />
 
         <div className="mb-2 md:mb-4 lg:mb-6 relative px-2 md:px-4 lg:px-6 flex-1">
-          <div className="bg-umber-900/40 backdrop-blur-xl rounded-3xl p-3 md:p-6 lg:p-8 md:min-h-[400px] lg:min-h-[450px] relative border-2 border-parchment-400 dark:border-gray-600 shadow-2xl h-full flex flex-col">
+          <div
+            className="
+              rounded-[var(--radius-xl)] p-3 md:p-6 lg:p-8
+              md:min-h-[400px] lg:min-h-[450px]
+              relative border-2 h-full flex flex-col
+            "
+            style={{
+              backgroundColor: 'var(--color-bg-secondary)',
+              borderColor: 'var(--color-border-accent)',
+              boxShadow: 'var(--shadow-glow)',
+            }}
+          >
             <EmptyTrickMessage />
 
             <TrickArea
@@ -516,10 +519,7 @@ function PlayingPhaseComponent({
         messages={chatMessages}
         onSendMessage={(message: string) => {
           if (socket) {
-            socket.emit('send_game_chat', {
-              gameId,
-              message: message.trim(),
-            });
+            socket.emit('send_game_chat', { gameId, message: message.trim() });
           }
         }}
       />
@@ -533,7 +533,7 @@ function PlayingPhaseComponent({
         />
       )}
 
-      {/* Winner Banner - fixed at bottom */}
+      {/* Winner Banner */}
       {trickWinner && (
         <TrickWinnerBanner
           playerName={trickWinner.playerName}

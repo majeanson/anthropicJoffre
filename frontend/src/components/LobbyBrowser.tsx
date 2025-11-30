@@ -1,3 +1,10 @@
+/**
+ * LobbyBrowser Component - Retro Gaming Edition
+ *
+ * Browse and join active games, or watch replays of recent finished games.
+ * Features neon-styled cards, arcade tab navigation, and retro aesthetic.
+ */
+
 import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
 import { useAuth } from '../contexts/AuthContext';
@@ -5,20 +12,21 @@ import { API_ENDPOINTS } from '../config/constants';
 import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
 import logger from '../utils/logger';
 import { sounds } from '../utils/sounds';
-import { UICard, UIBadge, EmptyState, Tabs, Tab, Checkbox, Select, SelectOption, Button } from './ui';
+import { Button, NeonButton } from './ui/Button';
+import { Input } from './ui/Input';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
 
 // Sprint 8 Task 2: Move pure helper functions outside component for performance
-const getPhaseColor = (phase: string): 'info' | 'warning' | 'success' | 'team2' | 'gray' => {
+const getPhaseColor = (phase: string): string => {
   switch (phase) {
-    case 'team_selection': return 'info';
-    case 'betting': return 'warning';
-    case 'playing': return 'success';
-    case 'scoring': return 'team2';
-    case 'game_over': return 'gray';
-    default: return 'gray';
+    case 'team_selection': return 'var(--color-info)';
+    case 'betting': return 'var(--color-warning)';
+    case 'playing': return 'var(--color-success)';
+    case 'scoring': return 'var(--color-team2-primary)';
+    case 'game_over': return 'var(--color-text-muted)';
+    default: return 'var(--color-text-muted)';
   }
 };
 
@@ -103,25 +111,6 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   // Track if we've done the initial load for each tab
   const hasLoadedActiveGames = useRef(false);
   const hasLoadedRecentGames = useRef(false);
-
-  // Tab definitions for Tabs component
-  const lobbyTabs: Tab[] = [
-    { id: 'active', label: 'Active Games', icon: '🎮' },
-    { id: 'recent', label: 'Recent Finished Games', icon: '📜' },
-  ];
-
-  // Select options for filters
-  const gameModeOptions: SelectOption[] = [
-    { value: 'all', label: 'All Games' },
-    { value: 'ranked', label: 'Ranked' },
-    { value: 'casual', label: 'Casual' },
-  ];
-
-  const sortByOptions: SelectOption[] = [
-    { value: 'newest', label: 'Newest' },
-    { value: 'players', label: 'Most Players' },
-    { value: 'score', label: 'Highest Score' },
-  ];
 
   // Handler to validate join game request
   const handleJoinGameClick = (game: LobbyGame) => {
@@ -421,7 +410,11 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {
     return (
-      <Suspense fallback={<div className="min-h-screen bg-gray-900 flex items-center justify-center"><div className="text-white">Loading replay...</div></div>}>
+      <Suspense fallback={
+        <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
+          <div className="text-[var(--color-text-accent)] font-display animate-pulse">Loading replay...</div>
+        </div>
+      }>
         <GameReplay
           gameId={replayGameId}
           socket={socket}
@@ -432,72 +425,146 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onKeyDown={(e) => e.stopPropagation()}>
-      <div className="bg-parchment-50 dark:bg-gray-800 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border-4 border-amber-700 dark:border-gray-600 shadow-2xl">
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+      style={{ backdropFilter: 'blur(8px)' }}
+      onKeyDown={(e) => e.stopPropagation()}
+    >
+      <div
+        className="
+          bg-[var(--color-bg-secondary)]
+          rounded-[var(--radius-xl)]
+          max-w-4xl w-full max-h-[90vh]
+          overflow-hidden
+          border-2 border-[var(--color-border-accent)]
+        "
+        style={{
+          boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
+        }}
+      >
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 p-6 text-white flex items-center justify-between">
+        <div
+          className="p-6 flex items-center justify-between relative"
+          style={{
+            background: 'linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-bg-primary) 100%)',
+            borderBottom: '2px solid var(--color-border-accent)',
+          }}
+        >
           <div>
-            <h2 className="text-3xl font-black font-serif">Game Lobby</h2>
-            <p className="text-sm opacity-90 mt-1">
+            <h2
+              className="text-2xl sm:text-3xl font-display uppercase tracking-wider"
+              style={{
+                color: 'var(--color-text-primary)',
+                textShadow: '0 0 20px var(--color-glow), 0 0 40px var(--color-glow)',
+              }}
+            >
+              Game Lobby
+            </h2>
+            <p className="text-sm text-[var(--color-text-muted)] mt-1 font-body">
               {activeTab === 'active'
                 ? `${games.length} active game${games.length !== 1 ? 's' : ''}`
                 : `${recentGames.length} recent game${recentGames.length !== 1 ? 's' : ''}`
               }
             </p>
           </div>
-          <Button
+          <button
             onClick={onClose}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 rounded-full p-2"
+            className="
+              p-2 rounded-[var(--radius-md)]
+              text-[var(--color-text-muted)]
+              hover:text-[var(--color-text-primary)]
+              hover:bg-[var(--color-bg-tertiary)]
+              transition-all duration-[var(--duration-fast)]
+            "
             aria-label="Close"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </Button>
+          </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="bg-parchment-100 dark:bg-gray-700">
-          <Tabs
-            tabs={lobbyTabs}
-            activeTab={activeTab}
-            onChange={(tabId) => setActiveTab(tabId as 'active' | 'recent')}
-            variant="underline"
-            size="lg"
-            fullWidth
-            className="border-parchment-300 dark:border-gray-600"
-          />
+        {/* Tab Navigation - Arcade Style */}
+        <div className="flex border-b border-[var(--color-border-default)]">
+          <button
+            onClick={() => { setActiveTab('active'); sounds.buttonClick(); }}
+            className={`
+              flex-1 px-4 py-3
+              font-display uppercase tracking-wider text-sm
+              transition-all duration-[var(--duration-fast)]
+              flex items-center justify-center gap-2
+              ${activeTab === 'active'
+                ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-accent)] border-b-2 border-[var(--color-text-accent)]'
+                : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]/50'
+              }
+            `}
+            style={activeTab === 'active' ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
+          >
+            <span>🎮</span>
+            <span>Active Games</span>
+          </button>
+          <button
+            onClick={() => { setActiveTab('recent'); sounds.buttonClick(); }}
+            className={`
+              flex-1 px-4 py-3
+              font-display uppercase tracking-wider text-sm
+              transition-all duration-[var(--duration-fast)]
+              flex items-center justify-center gap-2
+              ${activeTab === 'recent'
+                ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-accent)] border-b-2 border-[var(--color-text-accent)]'
+                : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]/50'
+              }
+            `}
+            style={activeTab === 'recent' ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
+          >
+            <span>📜</span>
+            <span>Recent Games</span>
+          </button>
         </div>
 
         {/* Content Area */}
         <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-4 space-y-3">
           {/* Join with Game ID Section - Only in Active Games tab */}
           {activeTab === 'active' && (
-            <UICard variant="bordered" size="md">
-              <Button
-                onClick={() => setShowJoinInput(!showJoinInput)}
-                variant="ghost"
-                size="md"
-                className="w-full flex items-center justify-between text-left"
+            <div
+              className="
+                rounded-[var(--radius-lg)]
+                border border-[var(--color-border-default)]
+                bg-[var(--color-bg-tertiary)]
+                overflow-hidden
+              "
+            >
+              <button
+                onClick={() => { setShowJoinInput(!showJoinInput); sounds.buttonClick(); }}
+                className="
+                  w-full px-4 py-3
+                  flex items-center justify-between
+                  text-left
+                  hover:bg-[var(--color-bg-secondary)]
+                  transition-colors duration-[var(--duration-fast)]
+                "
               >
                 <div className="flex items-center gap-2">
                   <span className="text-lg">🔑</span>
-                  <span className="font-semibold text-umber-900 dark:text-gray-100">Join with Game ID</span>
+                  <span className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm">
+                    Join with Game ID
+                  </span>
                 </div>
-                <span className="text-sm text-umber-600 dark:text-gray-400">{showJoinInput ? '▲' : '▼'}</span>
-              </Button>
+                <span className="text-[var(--color-text-muted)]">{showJoinInput ? '▲' : '▼'}</span>
+              </button>
 
               {showJoinInput && (
-                <div className="mt-3 space-y-2 animate-fadeIn origin-top">
-                  <input
-                    type="text"
-                    value={gameId}
-                    onChange={(e) => setGameId(e.target.value)}
-                    className="w-full px-3 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500 bg-parchment-100 dark:bg-gray-600 text-umber-900 dark:text-gray-100 text-sm"
-                    placeholder="Enter Game ID"
-                  />
+                <div className="px-4 pb-4 space-y-3 border-t border-[var(--color-border-subtle)]">
+                  <div className="pt-3">
+                    <Input
+                      value={gameId}
+                      onChange={(e) => setGameId(e.target.value)}
+                      placeholder="Enter Game ID"
+                      variant="default"
+                      size="md"
+                      leftIcon={<span className="text-sm">🎮</span>}
+                    />
+                  </div>
                   <Button
                     data-testid="join-game-button"
                     onClick={() => {
@@ -507,101 +574,190 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                       }
                     }}
                     disabled={!gameId.trim()}
-                    variant="secondary"
+                    variant="success"
                     size="md"
-                    className="w-full"
+                    fullWidth
                   >
                     Join Game
                   </Button>
                 </div>
               )}
-            </UICard>
+            </div>
           )}
 
           {/* Sprint 6: Filter and Sort Bar - Only in Active Games tab */}
           {activeTab === 'active' && games.length > 0 && (
-            <UICard variant="bordered" size="md">
+            <div
+              className="
+                p-4
+                rounded-[var(--radius-lg)]
+                border border-[var(--color-border-default)]
+                bg-[var(--color-bg-tertiary)]
+              "
+            >
               <div className="flex flex-wrap items-center gap-4">
-                {/* Filter Checkboxes */}
+                {/* Filter Checkboxes - Retro Style */}
                 <div className="flex items-center gap-4 flex-wrap">
-                  <Checkbox
-                    label="🤖 With Bots"
-                    size="sm"
-                    checked={filterWithBots}
-                    onChange={(e) => setFilterWithBots(e.target.checked)}
-                  />
-                  <Checkbox
-                    label="💺 Needs Players"
-                    size="sm"
-                    checked={filterNeedsPlayers}
-                    onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
-                  />
-                  <Checkbox
-                    label="🎮 In Progress"
-                    size="sm"
-                    checked={filterInProgress}
-                    onChange={(e) => setFilterInProgress(e.target.checked)}
-                  />
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={filterWithBots}
+                      onChange={(e) => setFilterWithBots(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div
+                      className={`
+                        w-4 h-4 rounded-[var(--radius-sm)]
+                        border-2 border-[var(--color-border-accent)]
+                        flex items-center justify-center
+                        transition-all duration-[var(--duration-fast)]
+                        ${filterWithBots
+                          ? 'bg-[var(--color-text-accent)]'
+                          : 'bg-transparent group-hover:border-[var(--color-text-accent)]'
+                        }
+                      `}
+                      style={filterWithBots ? { boxShadow: '0 0 8px var(--color-glow)' } : {}}
+                    >
+                      {filterWithBots && <span className="text-[10px] text-black">✓</span>}
+                    </div>
+                    <span className="text-xs text-[var(--color-text-secondary)] font-body">🤖 With Bots</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={filterNeedsPlayers}
+                      onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div
+                      className={`
+                        w-4 h-4 rounded-[var(--radius-sm)]
+                        border-2 border-[var(--color-border-accent)]
+                        flex items-center justify-center
+                        transition-all duration-[var(--duration-fast)]
+                        ${filterNeedsPlayers
+                          ? 'bg-[var(--color-text-accent)]'
+                          : 'bg-transparent group-hover:border-[var(--color-text-accent)]'
+                        }
+                      `}
+                      style={filterNeedsPlayers ? { boxShadow: '0 0 8px var(--color-glow)' } : {}}
+                    >
+                      {filterNeedsPlayers && <span className="text-[10px] text-black">✓</span>}
+                    </div>
+                    <span className="text-xs text-[var(--color-text-secondary)] font-body">💺 Needs Players</span>
+                  </label>
+
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={filterInProgress}
+                      onChange={(e) => setFilterInProgress(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div
+                      className={`
+                        w-4 h-4 rounded-[var(--radius-sm)]
+                        border-2 border-[var(--color-border-accent)]
+                        flex items-center justify-center
+                        transition-all duration-[var(--duration-fast)]
+                        ${filterInProgress
+                          ? 'bg-[var(--color-text-accent)]'
+                          : 'bg-transparent group-hover:border-[var(--color-text-accent)]'
+                        }
+                      `}
+                      style={filterInProgress ? { boxShadow: '0 0 8px var(--color-glow)' } : {}}
+                    >
+                      {filterInProgress && <span className="text-[10px] text-black">✓</span>}
+                    </div>
+                    <span className="text-xs text-[var(--color-text-secondary)] font-body">🎮 In Progress</span>
+                  </label>
                 </div>
 
                 {/* Game Mode Filter */}
-                <Select
-                  label="Mode"
-                  size="sm"
-                  variant="default"
-                  value={filterGameMode}
-                  onChange={(e) => setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')}
-                  options={gameModeOptions}
-                  leftIcon="🎯"
-                />
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-[var(--color-text-muted)] font-body">Mode:</span>
+                  <select
+                    value={filterGameMode}
+                    onChange={(e) => setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')}
+                    className="
+                      px-3 py-1.5
+                      bg-[var(--color-bg-secondary)]
+                      border border-[var(--color-border-default)]
+                      rounded-[var(--radius-md)]
+                      text-xs text-[var(--color-text-secondary)]
+                      font-body
+                      focus:outline-none focus:border-[var(--color-text-accent)]
+                      focus:ring-1 focus:ring-[var(--color-text-accent)]
+                    "
+                  >
+                    <option value="all">All Games</option>
+                    <option value="ranked">Ranked</option>
+                    <option value="casual">Casual</option>
+                  </select>
+                </div>
 
                 {/* Sort Dropdown */}
-                <Select
-                  label="Sort by"
-                  size="sm"
-                  variant="default"
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
-                  options={sortByOptions}
-                  leftIcon="⏰"
-                  containerClassName="ml-auto"
-                />
+                <div className="flex items-center gap-2 ml-auto">
+                  <span className="text-xs text-[var(--color-text-muted)] font-body">Sort:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
+                    className="
+                      px-3 py-1.5
+                      bg-[var(--color-bg-secondary)]
+                      border border-[var(--color-border-default)]
+                      rounded-[var(--radius-md)]
+                      text-xs text-[var(--color-text-secondary)]
+                      font-body
+                      focus:outline-none focus:border-[var(--color-text-accent)]
+                      focus:ring-1 focus:ring-[var(--color-text-accent)]
+                    "
+                  >
+                    <option value="newest">Newest</option>
+                    <option value="players">Most Players</option>
+                    <option value="score">Highest Score</option>
+                  </select>
+                </div>
               </div>
 
               {/* Active filter count */}
               {(filterWithBots || filterNeedsPlayers || filterInProgress || filterGameMode !== 'all') && (
-                <div className="mt-2 text-xs text-umber-600 dark:text-gray-400">
+                <div className="mt-3 text-xs text-[var(--color-text-muted)] font-body">
                   Showing {filteredAndSortedGames.length} of {games.length} games
                 </div>
               )}
-            </UICard>
+            </div>
           )}
 
-          {/* Loading State - Sprint 6: Skeleton Loaders */}
+          {/* Loading State - Retro Skeleton Loaders */}
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-parchment-50 dark:bg-gray-700 rounded-xl p-4 border-2 border-parchment-400 dark:border-gray-600 animate-pulse"
+                  className="
+                    rounded-[var(--radius-lg)]
+                    border border-[var(--color-border-default)]
+                    bg-[var(--color-bg-tertiary)]
+                    p-4
+                    animate-pulse
+                  "
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 space-y-2">
-                      {/* Game ID skeleton */}
                       <div className="flex items-center gap-3">
-                        <div className="h-6 w-24 bg-parchment-300 dark:bg-gray-600 rounded"></div>
-                        <div className="h-6 w-20 bg-parchment-300 dark:bg-gray-600 rounded-full"></div>
+                        <div className="h-6 w-24 bg-[var(--color-bg-secondary)] rounded-[var(--radius-sm)]" />
+                        <div className="h-6 w-20 bg-[var(--color-bg-secondary)] rounded-full" />
                       </div>
-                      {/* Player info skeleton */}
                       <div className="flex items-center gap-4">
-                        <div className="h-4 w-16 bg-parchment-300 dark:bg-gray-600 rounded"></div>
-                        <div className="h-4 w-16 bg-parchment-300 dark:bg-gray-600 rounded"></div>
-                        <div className="h-4 w-20 bg-parchment-300 dark:bg-gray-600 rounded"></div>
+                        <div className="h-4 w-16 bg-[var(--color-bg-secondary)] rounded-[var(--radius-sm)]" />
+                        <div className="h-4 w-16 bg-[var(--color-bg-secondary)] rounded-[var(--radius-sm)]" />
+                        <div className="h-4 w-20 bg-[var(--color-bg-secondary)] rounded-[var(--radius-sm)]" />
                       </div>
                     </div>
-                    {/* Button skeleton */}
                     <div className="flex gap-2">
-                      <div className="h-10 w-16 bg-parchment-300 dark:bg-gray-600 rounded-lg"></div>
+                      <div className="h-10 w-16 bg-[var(--color-bg-secondary)] rounded-[var(--radius-md)]" />
                     </div>
                   </div>
                 </div>
@@ -609,20 +765,30 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
             </div>
           )}
 
-          {/* Error State - Sprint 6: Enhanced with correlation ID and retry */}
+          {/* Error State */}
           {error && (
-            <UICard variant="gradient" gradient="error" size="md">
+            <div
+              className="
+                p-4
+                rounded-[var(--radius-lg)]
+                border-2 border-[var(--color-error)]
+                bg-[var(--color-error)]/10
+              "
+              style={{
+                boxShadow: '0 0 20px rgba(255, 0, 110, 0.3)',
+              }}
+            >
               <div className="flex items-start gap-3">
                 <span className="text-2xl">⚠️</span>
                 <div className="flex-1">
-                  <p className="text-white font-semibold mb-1">
+                  <p className="text-[var(--color-error)] font-display text-sm uppercase tracking-wider mb-1">
                     {error}
                   </p>
                   {correlationId && (
-                    <p className="text-xs text-white/90 font-mono mt-2">
+                    <p className="text-xs text-[var(--color-text-muted)] font-mono mt-2">
                       Error ID: {correlationId}
                       <br />
-                      <span className="text-xs opacity-75">
+                      <span className="opacity-75">
                         Please include this ID when reporting the issue
                       </span>
                     </p>
@@ -639,68 +805,105 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                     }}
                     disabled={isRetrying}
                     variant="danger"
-                    size="md"
+                    size="sm"
                     className="mt-3"
                   >
                     {isRetrying ? '🔄 Retrying...' : '🔄 Try Again'}
                   </Button>
                 </div>
               </div>
-            </UICard>
+            </div>
           )}
 
           {/* Active Games Tab */}
           {activeTab === 'active' && !loading && !error && (
             <>
               {games.length === 0 ? (
-                <EmptyState
-                  icon="🎮"
-                  title="No active games"
-                  description="Create a new game to get started!"
-                />
+                <div className="text-center py-12">
+                  <span className="text-6xl block mb-4">🎮</span>
+                  <h3
+                    className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2"
+                    style={{ textShadow: '0 0 10px var(--color-glow)' }}
+                  >
+                    No Active Games
+                  </h3>
+                  <p className="text-sm text-[var(--color-text-muted)] font-body">
+                    Create a new game to get started!
+                  </p>
+                </div>
               ) : filteredAndSortedGames.length === 0 ? (
-                <EmptyState
-                  icon="🔍"
-                  title="No games match your filters"
-                  description="Try adjusting your filters to see more games"
-                />
+                <div className="text-center py-12">
+                  <span className="text-6xl block mb-4">🔍</span>
+                  <h3
+                    className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2"
+                    style={{ textShadow: '0 0 10px var(--color-glow)' }}
+                  >
+                    No Matches
+                  </h3>
+                  <p className="text-sm text-[var(--color-text-muted)] font-body">
+                    Try adjusting your filters to see more games
+                  </p>
+                </div>
               ) : (
                 filteredAndSortedGames.map((game, index) => (
-                  <UICard
+                  <div
                     key={game.gameId}
-                    variant="bordered"
-                    size="md"
-                    className={`transition-all shadow-sm hover:shadow-md ${
-                      selectedIndex === index
-                        ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/20'
-                        : 'hover:border-amber-500 dark:hover:border-gray-500'
-                    }`}
+                    className={`
+                      rounded-[var(--radius-lg)]
+                      border-2
+                      p-4
+                      transition-all duration-[var(--duration-fast)]
+                      ${selectedIndex === index
+                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
+                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
+                      }
+                    `}
+                    style={selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
                   >
-                    {/* Mobile: stack vertically, Desktop: side by side */}
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        {/* Game ID and badges - wrap on mobile */}
+                        {/* Game ID and badges */}
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="font-black text-lg sm:text-xl text-umber-900 dark:text-gray-100">
+                          <span
+                            className="font-display text-lg sm:text-xl uppercase tracking-wider"
+                            style={{
+                              color: 'var(--color-text-primary)',
+                              textShadow: '0 0 5px var(--color-glow)',
+                            }}
+                          >
                             Game {game.gameId}
                           </span>
-                          <UIBadge
-                            variant="solid"
-                            color={getPhaseColor(game.phase)}
-                            size="sm"
+                          <span
+                            className="
+                              px-2 py-0.5
+                              rounded-full
+                              text-xs font-display uppercase
+                            "
+                            style={{
+                              backgroundColor: getPhaseColor(game.phase),
+                              color: 'var(--color-text-inverse)',
+                              boxShadow: `0 0 8px ${getPhaseColor(game.phase)}`,
+                            }}
                           >
                             {getPhaseLabel(game.phase)}
-                          </UIBadge>
-                          <UIBadge
-                            variant="solid"
-                            color={game.persistenceMode === 'elo' ? 'warning' : 'gray'}
-                            size="sm"
+                          </span>
+                          <span
+                            className={`
+                              px-2 py-0.5
+                              rounded-full
+                              text-xs font-display uppercase
+                              ${game.persistenceMode === 'elo'
+                                ? 'bg-[var(--color-warning)] text-black'
+                                : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-muted)]'
+                              }
+                            `}
+                            style={game.persistenceMode === 'elo' ? { boxShadow: '0 0 8px var(--color-warning)' } : {}}
                           >
                             {game.persistenceMode === 'elo' ? '🏆 Ranked' : '🎲 Casual'}
-                          </UIBadge>
+                          </span>
                         </div>
-                        {/* Player info - wrap on mobile */}
-                        <div className="text-sm text-umber-600 dark:text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1">
+                        {/* Player info */}
+                        <div className="text-sm text-[var(--color-text-muted)] font-body flex flex-wrap items-center gap-x-4 gap-y-1">
                           <span>👥 {game.humanPlayerCount} player{game.humanPlayerCount !== 1 ? 's' : ''}</span>
                           {game.botPlayerCount > 0 && (
                             <span>🤖 {game.botPlayerCount} bot{game.botPlayerCount !== 1 ? 's' : ''}</span>
@@ -711,11 +914,8 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                         </div>
                       </div>
 
-                      {/* Action buttons - full width on mobile */}
+                      {/* Action buttons */}
                       <div className="flex gap-2 sm:flex-shrink-0">
-                        {/* Show Join button for:
-                            1. Team selection games with open spots or bots
-                            2. In-progress games with bots (to replace them) */}
                         {(game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) && (
                           <Button
                             onClick={() => handleJoinGameClick(game)}
@@ -727,22 +927,21 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                           </Button>
                         )}
                         {game.isInProgress && (
-                          <Button
+                          <NeonButton
                             onClick={() => {
                               onSpectateGame(game.gameId);
                               onClose();
                             }}
-                            variant="primary"
                             size="sm"
                             className="flex-1 sm:flex-none"
                           >
                             <span>👁️</span>
                             Spectate
-                          </Button>
+                          </NeonButton>
                         )}
                       </div>
                     </div>
-                  </UICard>
+                  </div>
                 ))
               )}
             </>
@@ -752,11 +951,18 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
           {activeTab === 'recent' && !loading && !error && (
             <>
               {recentGames.length === 0 ? (
-                <EmptyState
-                  icon="📜"
-                  title="No recent games"
-                  description="Completed games will appear here"
-                />
+                <div className="text-center py-12">
+                  <span className="text-6xl block mb-4">📜</span>
+                  <h3
+                    className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2"
+                    style={{ textShadow: '0 0 10px var(--color-glow)' }}
+                  >
+                    No Recent Games
+                  </h3>
+                  <p className="text-sm text-[var(--color-text-muted)] font-body">
+                    Completed games will appear here
+                  </p>
+                </div>
               ) : (
                 recentGames.map((game, index) => {
                   const durationMinutes = Math.floor(game.game_duration_seconds / 60);
@@ -764,31 +970,48 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                   const timeAgo = getTimeAgo(finishedDate);
 
                   return (
-                    <UICard
+                    <div
                       key={game.game_id}
-                      variant="bordered"
-                      size="md"
-                      className={`transition-all shadow-sm hover:shadow-md ${
-                        selectedIndex === index
-                          ? 'border-blue-500 ring-2 ring-blue-500 ring-opacity-50 bg-blue-50 dark:bg-blue-900/20'
-                          : 'hover:border-amber-500 dark:hover:border-gray-500'
-                      }`}
+                      className={`
+                        rounded-[var(--radius-lg)]
+                        border-2
+                        p-4
+                        transition-all duration-[var(--duration-fast)]
+                        ${selectedIndex === index
+                          ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
+                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
+                        }
+                      `}
+                      style={selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <span className="font-black text-xl text-umber-900 dark:text-gray-100">
+                          <div className="flex flex-wrap items-center gap-3 mb-2">
+                            <span
+                              className="font-display text-lg sm:text-xl uppercase tracking-wider"
+                              style={{
+                                color: 'var(--color-text-primary)',
+                                textShadow: '0 0 5px var(--color-glow)',
+                              }}
+                            >
                               Game {game.game_id}
                             </span>
-                            <UIBadge
-                              variant="solid"
-                              color={game.winning_team === 1 ? 'team1' : 'team2'}
-                              size="sm"
+                            <span
+                              className="
+                                px-2 py-0.5
+                                rounded-full
+                                text-xs font-display uppercase
+                              "
+                              style={{
+                                backgroundColor: game.winning_team === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)',
+                                color: 'white',
+                                boxShadow: `0 0 8px ${game.winning_team === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)'}`,
+                              }}
                             >
                               🏆 Team {game.winning_team} Won
-                            </UIBadge>
+                            </span>
                           </div>
-                          <div className="text-sm text-umber-600 dark:text-gray-400 flex items-center gap-4">
+                          <div className="text-sm text-[var(--color-text-muted)] font-body flex flex-wrap items-center gap-x-4 gap-y-1">
                             <span>📊 Score: {game.team1_score} - {game.team2_score}</span>
                             <span>🎯 {game.rounds} rounds</span>
                             <span>⏱️ {durationMinutes}m</span>
@@ -796,16 +1019,16 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                           </div>
                         </div>
 
-                        <Button
+                        <NeonButton
                           onClick={() => setReplayGameId(game.game_id)}
-                          variant="secondary"
                           size="sm"
+                          glow
                         >
                           <span aria-hidden="true">📺</span>
                           Watch Replay
-                        </Button>
+                        </NeonButton>
                       </div>
-                    </UICard>
+                    </div>
                   );
                 })
               )}

@@ -1,15 +1,20 @@
+/**
+ * TeamSelection Component - Multi-Skin Edition
+ *
+ * Team selection phase with proper CSS variable usage for skin compatibility.
+ * Features team panels, bot management, and game setup.
+ */
+
 import { Player, ChatMessage } from '../types/game';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
-import { useSettings } from '../contexts/SettingsContext';
 import { HowToPlay } from './HowToPlay';
 import { BotDifficulty } from '../utils/botPlayer';
 import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 import { UnifiedChat } from './UnifiedChat';
 import { TeamSelectionSocialSidebar } from './TeamSelectionSocialSidebar';
 import { sounds } from '../utils/sounds';
-import { colors } from '../design-system';
-import { UICard, Button } from './ui';
+import { Button, NeonButton } from './ui/Button';
 
 // Keyboard navigation type for team selection
 type NavSection = 'header' | 'teams' | 'difficulty' | 'actions' | 'rules';
@@ -45,22 +50,19 @@ export function TeamSelection({
   botDifficulty = 'medium',
   onBotDifficultyChange,
 }: TeamSelectionProps) {
-  const { darkMode, setDarkMode } = useSettings();
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [showRules, setShowRules] = useState(false);
   const [showSocialSidebar, setShowSocialSidebar] = useState(false);
 
-  // Keyboard navigation state - grid-based like GameBoy
-  // Sections: header -> teams -> difficulty -> actions -> rules
+  // Keyboard navigation state
   const [navSection, setNavSection] = useState<NavSection>('actions');
   const [navCol, setNavCol] = useState(0);
-  const [teamNavRow, setTeamNavRow] = useState(0); // 0-1 for team positions
-  const [teamNavTeam, setTeamNavTeam] = useState<1 | 2>(1); // Which team
+  const [teamNavRow, setTeamNavRow] = useState(0);
+  const [teamNavTeam, setTeamNavTeam] = useState<1 | 2>(1);
 
   // Refs for focusable elements
   const leaveButtonRef = useRef<HTMLButtonElement>(null);
-  const darkModeButtonRef = useRef<HTMLButtonElement>(null);
   const copyLinkButtonRef = useRef<HTMLButtonElement>(null);
   const easyButtonRef = useRef<HTMLButtonElement>(null);
   const mediumButtonRef = useRef<HTMLButtonElement>(null);
@@ -71,7 +73,7 @@ export function TeamSelection({
   const team1SwapRefs = useRef<(HTMLButtonElement | null)[]>([null, null]);
   const team2SwapRefs = useRef<(HTMLButtonElement | null)[]>([null, null]);
 
-  // Sprint 8 Task 2: Memoize expensive computations for performance
+  // Memoize expensive computations
   const currentPlayer = useMemo(() =>
     players.find(p => p.name === currentPlayerId || p.id === currentPlayerId),
     [players, currentPlayerId]
@@ -87,7 +89,7 @@ export function TeamSelection({
     [players]
   );
 
-  // Listen for chat messages (for FloatingTeamChat)
+  // Listen for chat messages
   useEffect(() => {
     if (!socket) return;
 
@@ -109,6 +111,7 @@ export function TeamSelection({
       setShowCopyToast(true);
       setTimeout(() => setShowCopyToast(false), 3000);
     } catch (err) {
+      // Silently fail
     }
   }, [gameId]);
 
@@ -116,7 +119,7 @@ export function TeamSelection({
   const showDifficulty = players.filter(p => !p.isEmpty).length < 4 && onAddBot && onBotDifficultyChange;
   const showAddBot = players.filter(p => !p.isEmpty).length < 4 && onAddBot;
 
-  // Get sections in order (some may be hidden)
+  // Get sections in order
   const getSections = useCallback((): NavSection[] => {
     const sections: NavSection[] = ['header', 'teams'];
     if (showDifficulty) sections.push('difficulty');
@@ -128,9 +131,9 @@ export function TeamSelection({
   const getMaxCols = useCallback((section: NavSection): number => {
     switch (section) {
       case 'header': return onLeaveGame ? 2 : 1;
-      case 'teams': return 2; // Team 1 | Team 2
-      case 'difficulty': return 3; // Easy | Medium | Hard
-      case 'actions': return showAddBot ? 2 : 1; // Add Bot | Start Game
+      case 'teams': return 2;
+      case 'difficulty': return 3;
+      case 'actions': return showAddBot ? 2 : 1;
       case 'rules': return 1;
       default: return 1;
     }
@@ -141,8 +144,7 @@ export function TeamSelection({
     switch (navSection) {
       case 'header':
         if (navCol === 0 && leaveButtonRef.current) leaveButtonRef.current.focus();
-        else if (navCol === 1 && darkModeButtonRef.current) darkModeButtonRef.current.focus();
-        else if (!onLeaveGame && darkModeButtonRef.current) darkModeButtonRef.current.focus();
+        else if (!onLeaveGame && copyLinkButtonRef.current) copyLinkButtonRef.current.focus();
         break;
       case 'teams':
         const teamRefs = teamNavTeam === 1 ? team1SwapRefs.current : team2SwapRefs.current;
@@ -165,7 +167,7 @@ export function TeamSelection({
 
   // Keyboard navigation
   useEffect(() => {
-    if (showRules) return; // Don't navigate when modal is open
+    if (showRules) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const sections = getSections();
@@ -183,10 +185,8 @@ export function TeamSelection({
         case 'ArrowUp':
           e.preventDefault();
           if (navSection === 'teams') {
-            // Navigate within team positions
             setTeamNavRow(prev => prev > 0 ? prev - 1 : 1);
           } else {
-            // Move to previous section
             const newIndex = currentIndex > 0 ? currentIndex - 1 : sections.length - 1;
             setNavSection(sections[newIndex]);
             setNavCol(0);
@@ -197,10 +197,8 @@ export function TeamSelection({
         case 'ArrowDown':
           e.preventDefault();
           if (navSection === 'teams') {
-            // Navigate within team positions
             setTeamNavRow(prev => prev < 1 ? prev + 1 : 0);
           } else {
-            // Move to next section
             const newIndex = currentIndex < sections.length - 1 ? currentIndex + 1 : 0;
             setNavSection(sections[newIndex]);
             setNavCol(0);
@@ -211,7 +209,6 @@ export function TeamSelection({
         case 'ArrowLeft':
           e.preventDefault();
           if (navSection === 'teams') {
-            // Switch between teams
             setTeamNavTeam(prev => prev === 1 ? 2 : 1);
           } else {
             const maxCols = getMaxCols(navSection);
@@ -223,18 +220,12 @@ export function TeamSelection({
         case 'ArrowRight':
           e.preventDefault();
           if (navSection === 'teams') {
-            // Switch between teams
             setTeamNavTeam(prev => prev === 1 ? 2 : 1);
           } else {
             const maxCols = getMaxCols(navSection);
             setNavCol(prev => prev < maxCols - 1 ? prev + 1 : 0);
           }
           sounds.buttonClick();
-          break;
-
-        case 'Enter':
-        case ' ':
-          // Let buttons handle their own clicks
           break;
       }
     };
@@ -250,13 +241,11 @@ export function TeamSelection({
     }
   }, [navSection, navCol, teamNavRow, teamNavTeam, showRules, focusCurrentElement]);
 
-  // Validation for starting game (memoized to avoid recalculation on every render)
+  // Validation for starting game
   const canStartGame = useMemo(() => {
-    // Must have 4 players (including real players, bots, but NOT empty seats)
     const realPlayers = players.filter(p => !p.isEmpty);
     if (realPlayers.length !== 4) return false;
 
-    // Must have 2 real players per team (no empty seats)
     const team1RealPlayers = team1Players.filter(p => !p.isEmpty);
     const team2RealPlayers = team2Players.filter(p => !p.isEmpty);
     if (team1RealPlayers.length !== 2) return false;
@@ -283,16 +272,183 @@ export function TeamSelection({
     return '';
   }, [players, team1Players, team2Players]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden" style={{ background: colors.gradients.special }}>
-      <div className="bg-parchment-50 dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-4xl w-full relative border-2 border-amber-700 dark:border-gray-600 backdrop-blur-sm">
+  // Render team player slot
+  const renderPlayerSlot = (
+    playerAtPosition: Player | undefined,
+    position: number,
+    teamId: 1 | 2,
+    teamColor: string,
+    _teamColorSecondary: string // Reserved for future use
+  ) => {
+    void _teamColorSecondary;
+    const isCurrentPlayer = playerAtPosition?.id === currentPlayerId;
+    const isEmptySeat = playerAtPosition?.isEmpty;
 
+    return (
+      <div
+        key={`team${teamId}-${position}`}
+        className={`
+          p-4 rounded-[var(--radius-md)]
+          border-2 transition-all duration-[var(--duration-fast)]
+          ${isCurrentPlayer
+            ? ''
+            : playerAtPosition && !isEmptySeat
+            ? 'bg-[var(--color-bg-secondary)] border-[var(--color-border-default)]'
+            : 'bg-[var(--color-bg-tertiary)] border-dashed border-[var(--color-border-subtle)]'
+          }
+        `}
+        style={isCurrentPlayer ? {
+          backgroundColor: `${teamColor}20`,
+          borderColor: teamColor,
+          boxShadow: `0 0 10px ${teamColor}40`,
+        } : {}}
+      >
+        {playerAtPosition && !isEmptySeat ? (
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span
+                className="font-display text-sm uppercase tracking-wider"
+                style={{ color: isCurrentPlayer ? teamColor : 'var(--color-text-primary)' }}
+              >
+                {playerAtPosition.name}
+                {isCurrentPlayer && ' (You)'}
+              </span>
+              {playerAtPosition.isBot && (
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]">
+                  🤖 Bot
+                </span>
+              )}
+              {!playerAtPosition.isBot && (
+                <PlayerConnectionIndicator
+                  status={playerAtPosition.connectionStatus}
+                  reconnectTimeLeft={playerAtPosition.reconnectTimeLeft}
+                  small
+                />
+              )}
+            </div>
+            <div className="flex gap-2">
+              {!isCurrentPlayer && currentPlayer && (
+                <Button
+                  ref={(el) => {
+                    if (teamId === 1) team1SwapRefs.current[position] = el;
+                    else team2SwapRefs.current[position] = el;
+                  }}
+                  onClick={() => { sounds.buttonClick(); onSwapPosition(playerAtPosition.id); }}
+                  variant={teamId === 1 ? 'warning' : 'secondary'}
+                  size="xs"
+                  title={currentPlayer.teamId !== teamId ? 'Swap with this player (changes teams!)' : 'Swap positions'}
+                >
+                  ↔ Swap
+                </Button>
+              )}
+              {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
+                <Button
+                  onClick={() => { sounds.buttonClick(); onKickPlayer(playerAtPosition.id); }}
+                  variant="danger"
+                  size="xs"
+                  title="Remove player from game"
+                >
+                  ✕
+                </Button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            {isEmptySeat ? (
+              <div className="space-y-2">
+                <div className="text-[var(--color-text-muted)] text-sm font-body italic">
+                  💺 {playerAtPosition?.emptySlotName || 'Empty Seat'}
+                </div>
+                {!currentPlayer && socket && (
+                  <Button
+                    onClick={() => {
+                      const allPlayers = players;
+                      const seatIndex = allPlayers.findIndex(p => p.id === playerAtPosition?.id);
+                      if (seatIndex !== -1) {
+                        const playerName = prompt('Enter your name to fill this seat:');
+                        if (playerName && playerName.trim()) {
+                          socket.emit('fill_empty_seat', {
+                            gameId,
+                            playerName: playerName.trim(),
+                            emptySlotIndex: seatIndex,
+                          });
+                        }
+                      }
+                    }}
+                    variant="success"
+                    size="xs"
+                  >
+                    Fill Seat
+                  </Button>
+                )}
+              </div>
+            ) : currentPlayer?.teamId !== teamId ? (
+              <button
+                onClick={() => {
+                  sounds.teamSwitch();
+                  onSelectTeam(teamId);
+                }}
+                className="
+                  font-display text-sm uppercase tracking-wider
+                  transition-all duration-[var(--duration-fast)]
+                  hover:scale-105
+                "
+                style={{
+                  color: teamColor,
+                  textShadow: `0 0 10px ${teamColor}60`,
+                }}
+              >
+                Join Team {teamId}
+              </button>
+            ) : (
+              <span className="text-[var(--color-text-muted)] font-body">Empty Seat</span>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
+      style={{ background: 'var(--color-bg-primary)' }}
+    >
+      {/* Animated background grid */}
+      <div className="absolute inset-0 pointer-events-none opacity-20">
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `
+              linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
+              linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+          }}
+        />
+      </div>
+
+      {/* Main container */}
+      <div
+        className="
+          bg-[var(--color-bg-secondary)]
+          rounded-[var(--radius-xl)]
+          p-6 sm:p-8
+          max-w-4xl w-full
+          relative
+          border-2 border-[var(--color-border-accent)]
+        "
+        style={{
+          boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
+        }}
+      >
         {/* Top-left buttons */}
         <div className="absolute top-4 left-4 flex gap-2 z-10">
           {onLeaveGame && (
             <Button
               ref={leaveButtonRef}
-              onClick={onLeaveGame}
+              onClick={() => { sounds.buttonClick(); onLeaveGame(); }}
               variant="danger"
               size="sm"
               title="Leave Game"
@@ -301,335 +457,209 @@ export function TeamSelection({
             </Button>
           )}
           <Button
-            onClick={() => setShowSocialSidebar(!showSocialSidebar)}
+            onClick={() => { sounds.buttonClick(); setShowSocialSidebar(!showSocialSidebar); }}
             variant="success"
             size="sm"
             title="Find players to invite"
           >
             👥 Find Players
           </Button>
-          <Button
-            ref={darkModeButtonRef}
-            onClick={() => setDarkMode(!darkMode)}
-            variant="ghost"
-            size="sm"
-            title={darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}
-          >
-            {darkMode ? '☀️' : '🌙'}
-          </Button>
         </div>
 
-        <h2 className="text-3xl font-bold mb-6 text-umber-900 dark:text-gray-100 text-center font-serif mt-12">Team Selection</h2>
+        {/* Title */}
+        <h2
+          className="text-2xl sm:text-3xl font-display uppercase tracking-wider mb-6 text-center mt-12"
+          style={{
+            color: 'var(--color-text-primary)',
+            textShadow: '0 0 20px var(--color-glow)',
+          }}
+        >
+          Team Selection
+        </h2>
 
+        {/* Game ID Section */}
         <div className="mb-6">
-          <p className="text-sm text-umber-700 dark:text-gray-300 mb-2">Game ID:</p>
-          <UICard variant="bordered" size="md" className="bg-parchment-100 dark:bg-gray-700">
-            <div data-testid="game-id" className="font-mono text-lg text-center text-umber-900 dark:text-gray-100">{gameId}</div>
-          </UICard>
+          <p className="text-sm text-[var(--color-text-muted)] mb-2 font-body">Game ID:</p>
+          <div
+            className="
+              p-3
+              rounded-[var(--radius-md)]
+              border border-[var(--color-border-default)]
+              bg-[var(--color-bg-tertiary)]
+            "
+          >
+            <div
+              data-testid="game-id"
+              className="font-mono text-lg text-center"
+              style={{ color: 'var(--color-text-accent)' }}
+            >
+              {gameId}
+            </div>
+          </div>
 
-          {/* Copy Game Link Button */}
-          <Button
+          <NeonButton
             ref={copyLinkButtonRef}
             onClick={handleCopyGameLink}
-            variant="primary"
             size="md"
-            className="w-full mt-3"
-            title="Copy shareable game link"
+            fullWidth
+            className="mt-3"
+            glow
           >
             🔗 Copy Game Link
-          </Button>
+          </NeonButton>
         </div>
 
         {/* Toast Notification */}
         {showCopyToast && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-lg shadow-2xl border-2 border-green-700 animate-bounce z-50 flex items-center gap-2">
+          <div
+            className="
+              fixed top-4 left-1/2 transform -translate-x-1/2
+              px-6 py-3 rounded-[var(--radius-lg)]
+              border-2 animate-bounce z-50
+              flex items-center gap-2
+              font-display uppercase tracking-wider text-sm
+            "
+            style={{
+              backgroundColor: 'var(--color-success)',
+              borderColor: 'var(--color-success)',
+              color: 'var(--color-text-inverse)',
+              boxShadow: '0 0 20px var(--color-success)',
+            }}
+          >
             <span>✅</span>
-            <span className="font-bold">Game link copied! Share with friends.</span>
+            <span>Game link copied!</span>
           </div>
         )}
 
-        <div className="mb-8">
-          <p className="text-center text-umber-700 dark:text-gray-300 mb-4">
-            Players (<span data-testid="player-count">{players.length}</span>/4) - Choose your team and position
+        {/* Player count */}
+        <div className="mb-6">
+          <p className="text-center text-[var(--color-text-secondary)] font-body">
+            Players (<span data-testid="player-count">{players.filter(p => !p.isEmpty).length}</span>/4) - Choose your team and position
           </p>
         </div>
 
-        {/* Team Selection */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        {/* Team Selection Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8 mb-8">
           {/* Team 1 */}
-          <UICard variant="bordered" size="lg" className="border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-900" data-testid="team-1-container">
-            <h3 className="text-xl font-bold text-orange-800 dark:text-orange-200 mb-4 text-center">Team 1</h3>
+          <div
+            className="
+              p-4 sm:p-6
+              rounded-[var(--radius-lg)]
+              border-2
+            "
+            style={{
+              borderColor: 'var(--color-team1-primary)',
+              backgroundColor: 'var(--color-team1-primary)10',
+            }}
+            data-testid="team-1-container"
+          >
+            <h3
+              className="text-xl font-display uppercase tracking-wider mb-4 text-center"
+              style={{
+                color: 'var(--color-team1-primary)',
+                textShadow: '0 0 10px var(--color-team1-primary)',
+              }}
+            >
+              Team 1
+            </h3>
             <div className="space-y-3">
-              {[0, 1].map((position) => {
-                const playerAtPosition = team1Players[position];
-                const isCurrentPlayer = playerAtPosition?.id === currentPlayerId;
-                const isEmptySeat = playerAtPosition?.isEmpty;
-
-                return (
-                  <div
-                    key={`team1-${position}`}
-                    className={`p-4 rounded-lg border-2 ${
-                      isCurrentPlayer
-                        ? 'bg-orange-200 dark:bg-orange-700/60 border-orange-500 dark:border-orange-500'
-                        : playerAtPosition && !isEmptySeat
-                        ? 'bg-parchment-50 dark:bg-gray-700 border-orange-200 dark:border-orange-700'
-                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
-                    }`}
-                  >
-                    {playerAtPosition && !isEmptySeat ? (
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
-                            {playerAtPosition.name}
-                            {isCurrentPlayer && ' (You)'}
-                          </span>
-                          {!playerAtPosition.isBot && (
-                            <PlayerConnectionIndicator
-                              status={playerAtPosition.connectionStatus}
-                              reconnectTimeLeft={playerAtPosition.reconnectTimeLeft}
-                              small
-                            />
-                          )}
-                        </div>
-                        <div className="flex gap-2">
-                          {!isCurrentPlayer && currentPlayer && (
-                            <Button
-                              onClick={() => onSwapPosition(playerAtPosition.id)}
-                              variant="warning"
-                              size="xs"
-                              title={currentPlayer.teamId !== 1 ? 'Swap with this player (changes teams!)' : 'Swap positions'}
-                              aria-label={`Swap positions with ${playerAtPosition.name}${currentPlayer.teamId !== 1 ? ' (this will change your team)' : ''}`}
-                            >
-                              Swap
-                            </Button>
-                          )}
-                          {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
-                            <Button
-                              onClick={() => onKickPlayer(playerAtPosition.id)}
-                              variant="danger"
-                              size="xs"
-                              title="Remove player from game"
-                              aria-label={`Remove ${playerAtPosition.name} from game`}
-                            >
-                              <span aria-hidden="true">✕</span>
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        {isEmptySeat ? (
-                          <div className="space-y-2">
-                            <div className="text-umber-400 dark:text-gray-500 text-sm italic">
-                              💺 {playerAtPosition.emptySlotName || 'Empty Seat'}
-                            </div>
-                            {!currentPlayer && socket && (
-                              <Button
-                                onClick={() => {
-                                  // Get player index to fill the seat
-                                  const allPlayers = players;
-                                  const seatIndex = allPlayers.findIndex(p => p.id === playerAtPosition.id);
-                                  if (seatIndex !== -1) {
-                                    const playerName = prompt('Enter your name to fill this seat:');
-                                    if (playerName && playerName.trim()) {
-                                      socket.emit('fill_empty_seat', {
-                                        gameId,
-                                        playerName: playerName.trim(),
-                                        emptySlotIndex: seatIndex,
-                                      });
-                                    }
-                                  }
-                                }}
-                                variant="success"
-                                size="xs"
-                              >
-                                Fill Seat
-                              </Button>
-                            )}
-                          </div>
-                        ) : currentPlayer?.teamId !== 1 ? (
-                          <Button
-                            onClick={() => {
-                              sounds.teamSwitch(); // Sprint 1 Phase 6
-                              onSelectTeam(1);
-                            }}
-                            variant="link"
-                            size="sm"
-                            className="!text-orange-600 dark:!text-orange-400 hover:!text-orange-800 dark:hover:!text-orange-300"
-                          >
-                            Join Team 1
-                          </Button>
-                        ) : (
-                          <span className="text-umber-400 dark:text-gray-500">Empty Seat</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {[0, 1].map((position) =>
+                renderPlayerSlot(
+                  team1Players[position],
+                  position,
+                  1,
+                  'var(--color-team1-primary)',
+                  'var(--color-team1-secondary)'
+                )
+              )}
             </div>
-          </UICard>
+          </div>
 
           {/* Team 2 */}
-          <UICard variant="bordered" size="lg" className="border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900" data-testid="team-2-container">
-            <h3 className="text-xl font-bold text-purple-800 dark:text-purple-200 mb-4 text-center">Team 2</h3>
+          <div
+            className="
+              p-4 sm:p-6
+              rounded-[var(--radius-lg)]
+              border-2
+            "
+            style={{
+              borderColor: 'var(--color-team2-primary)',
+              backgroundColor: 'var(--color-team2-primary)10',
+            }}
+            data-testid="team-2-container"
+          >
+            <h3
+              className="text-xl font-display uppercase tracking-wider mb-4 text-center"
+              style={{
+                color: 'var(--color-team2-primary)',
+                textShadow: '0 0 10px var(--color-team2-primary)',
+              }}
+            >
+              Team 2
+            </h3>
             <div className="space-y-3">
-              {[0, 1].map((position) => {
-                const playerAtPosition = team2Players[position];
-                const isCurrentPlayer = playerAtPosition?.id === currentPlayerId;
-                const isEmptySeat = playerAtPosition?.isEmpty;
-
-                return (
-                  <div
-                    key={`team2-${position}`}
-                    className={`p-4 rounded-lg border-2 ${
-                      isCurrentPlayer
-                        ? 'bg-purple-200 dark:bg-purple-700/60 border-purple-500 dark:border-purple-500'
-                        : playerAtPosition && !isEmptySeat
-                        ? 'bg-parchment-50 dark:bg-gray-700 border-purple-200 dark:border-purple-700'
-                        : 'bg-parchment-100 dark:bg-gray-700 border-dashed border-parchment-300 dark:border-gray-600'
-                    }`}
-                  >
-                    {playerAtPosition && !isEmptySeat ? (
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-umber-900 dark:text-gray-100 text-center sm:text-left">
-                            {playerAtPosition.name}
-                            {isCurrentPlayer && ' (You)'}
-                          </span>
-                          {!playerAtPosition.isBot && (
-                            <PlayerConnectionIndicator
-                              status={playerAtPosition.connectionStatus}
-                              reconnectTimeLeft={playerAtPosition.reconnectTimeLeft}
-                              small
-                            />
-                          )}
-                        </div>
-                        <div className="flex gap-2">
-                          {!isCurrentPlayer && currentPlayer && (
-                            <Button
-                              onClick={() => onSwapPosition(playerAtPosition.id)}
-                              variant="secondary"
-                              size="xs"
-                              title={currentPlayer.teamId !== 2 ? 'Swap with this player (changes teams!)' : 'Swap positions'}
-                            >
-                              Swap
-                            </Button>
-                          )}
-                          {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
-                            <Button
-                              onClick={() => onKickPlayer(playerAtPosition.id)}
-                              variant="danger"
-                              size="xs"
-                              title="Remove player from game"
-                            >
-                              <span aria-hidden="true">✕</span>
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        {isEmptySeat ? (
-                          <div className="space-y-2">
-                            <div className="text-umber-400 dark:text-gray-500 text-sm italic">
-                              💺 {playerAtPosition.emptySlotName || 'Empty Seat'}
-                            </div>
-                            {!currentPlayer && socket && (
-                              <Button
-                                onClick={() => {
-                                  // Get player index to fill the seat
-                                  const allPlayers = players;
-                                  const seatIndex = allPlayers.findIndex(p => p.id === playerAtPosition.id);
-                                  if (seatIndex !== -1) {
-                                    const playerName = prompt('Enter your name to fill this seat:');
-                                    if (playerName && playerName.trim()) {
-                                      socket.emit('fill_empty_seat', {
-                                        gameId,
-                                        playerName: playerName.trim(),
-                                        emptySlotIndex: seatIndex,
-                                      });
-                                    }
-                                  }
-                                }}
-                                variant="success"
-                                size="xs"
-                              >
-                                Fill Seat
-                              </Button>
-                            )}
-                          </div>
-                        ) : currentPlayer?.teamId !== 2 ? (
-                          <Button
-                            onClick={() => {
-                              sounds.teamSwitch(); // Sprint 1 Phase 6
-                              onSelectTeam(2);
-                            }}
-                            variant="link"
-                            size="sm"
-                            className="!text-purple-600 dark:!text-purple-400 hover:!text-purple-800 dark:hover:!text-purple-300"
-                          >
-                            Join Team 2
-                          </Button>
-                        ) : (
-                          <span className="text-umber-400 dark:text-gray-500">Empty Seat</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+              {[0, 1].map((position) =>
+                renderPlayerSlot(
+                  team2Players[position],
+                  position,
+                  2,
+                  'var(--color-team2-primary)',
+                  'var(--color-team2-secondary)'
+                )
+              )}
             </div>
-          </UICard>
+          </div>
         </div>
 
-
         {/* Bot Difficulty & Start Game Section */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-4">
           {/* Bot Difficulty Selector */}
-          {players.filter(p => !p.isEmpty).length < 4 && onAddBot && onBotDifficultyChange && (
-            <UICard variant="bordered" size="md" className="bg-parchment-200 dark:bg-gray-700 max-w-md mx-auto">
-              <label className="block text-xs font-semibold text-umber-700 dark:text-gray-300 mb-2">
+          {showDifficulty && onBotDifficultyChange && (
+            <div
+              className="
+                p-4
+                rounded-[var(--radius-lg)]
+                border border-[var(--color-border-default)]
+                bg-[var(--color-bg-tertiary)]
+                max-w-md mx-auto
+              "
+            >
+              <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-3">
                 Bot Difficulty
               </label>
               <div className="grid grid-cols-3 gap-2">
-                <Button
-                  ref={easyButtonRef}
-                  onClick={() => onBotDifficultyChange('easy')}
-                  variant={botDifficulty === 'easy' ? 'primary' : 'ghost'}
-                  size="sm"
-                >
-                  Easy
-                </Button>
-                <Button
-                  ref={mediumButtonRef}
-                  onClick={() => onBotDifficultyChange('medium')}
-                  variant={botDifficulty === 'medium' ? 'primary' : 'ghost'}
-                  size="sm"
-                >
-                  Medium
-                </Button>
-                <Button
-                  ref={hardButtonRef}
-                  onClick={() => onBotDifficultyChange('hard')}
-                  variant={botDifficulty === 'hard' ? 'primary' : 'ghost'}
-                  size="sm"
-                >
-                  Hard
-                </Button>
+                {(['easy', 'medium', 'hard'] as BotDifficulty[]).map((difficulty, index) => (
+                  <button
+                    key={difficulty}
+                    ref={index === 0 ? easyButtonRef : index === 1 ? mediumButtonRef : hardButtonRef}
+                    onClick={() => { sounds.buttonClick(); onBotDifficultyChange(difficulty); }}
+                    className={`
+                      px-3 py-2
+                      rounded-[var(--radius-md)]
+                      font-display text-xs uppercase tracking-wider
+                      border-2 transition-all duration-[var(--duration-fast)]
+                      ${botDifficulty === difficulty
+                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/20 text-[var(--color-text-accent)]'
+                        : 'border-[var(--color-border-default)] bg-transparent text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)]'
+                      }
+                    `}
+                    style={botDifficulty === difficulty ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
+                  >
+                    {difficulty === 'easy' && '😊'} {difficulty === 'medium' && '🤔'} {difficulty === 'hard' && '😈'} {difficulty}
+                  </button>
+                ))}
               </div>
-            </UICard>
+            </div>
           )}
 
-          <div className="flex gap-3 justify-center items-center">
-            {/* Add Bot Button - only show if less than 4 real players (excluding empty seats) */}
-            {players.filter(p => !p.isEmpty).length < 4 && onAddBot && (
+          {/* Action buttons */}
+          <div className="flex gap-3 justify-center items-center flex-wrap">
+            {showAddBot && onAddBot && (
               <Button
                 ref={addBotButtonRef}
-                onClick={onAddBot}
+                onClick={() => { sounds.buttonClick(); onAddBot(); }}
                 variant="warning"
                 size="md"
-                title="Add a bot player"
               >
                 🤖 Add Bot
               </Button>
@@ -646,29 +676,43 @@ export function TeamSelection({
               variant="success"
               size="lg"
             >
-              Start Game
+              🎮 Start Game
             </Button>
           </div>
 
+          {/* Start game validation message */}
           {!canStartGame && (
-            <UICard variant="bordered" size="sm" className="bg-parchment-200 dark:bg-gray-600 border-umber-400">
-              <p data-testid="start-game-message" className="text-umber-800 dark:text-gray-200">
+            <div
+              className="
+                p-3
+                rounded-[var(--radius-md)]
+                border border-[var(--color-warning)]
+                bg-[var(--color-warning)]/10
+                max-w-md mx-auto
+              "
+            >
+              <p
+                data-testid="start-game-message"
+                className="text-sm font-body"
+                style={{ color: 'var(--color-warning)' }}
+              >
                 {startGameMessage}
               </p>
-            </UICard>
+            </div>
           )}
         </div>
 
+        {/* Rules button */}
         <div className="mt-6">
-          <Button
+          <NeonButton
             ref={rulesButtonRef}
-            onClick={() => setShowRules(true)}
-            variant="warning"
+            onClick={() => { sounds.buttonClick(); setShowRules(true); }}
             size="lg"
-            className="w-full"
+            fullWidth
+            glow
           >
             📖 Game Rules
-          </Button>
+          </NeonButton>
         </div>
       </div>
 

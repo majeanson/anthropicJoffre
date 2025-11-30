@@ -1,26 +1,34 @@
 /**
- * Card Component Stories
- * Sprint 21 - Game card component showcase
+ * Card Component Stories - Retro Gaming Edition
  *
- * Displays the various card types, colors, sizes, and states.
+ * Showcases the playing card component with distinctive neon glow effects
+ * for each suit color, pixel-perfect borders, and arcade-style animations.
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { Card } from '../../Card';
-import { CardColor } from '../../../types/game';
+import { Card, CardBack, CardStack } from '../../Card';
+import { CardColor, CardValue, Card as CardType } from '../../../types/game';
 
 const meta = {
   title: 'Game/Card',
   component: Card,
   parameters: {
     layout: 'centered',
-    backgrounds: {
-      default: 'game-table',
-      values: [
-        { name: 'game-table', value: '#1a472a' },
-        { name: 'light', value: '#f5f5f5' },
-        { name: 'dark', value: '#1a1a1a' },
-      ],
+    docs: {
+      description: {
+        component: `
+Playing card component with retro arcade aesthetics and neon glow effects.
+
+## Features
+- **4 suit colors**: Red, Brown, Green, Blue - each with unique neon glow
+- **4 sizes**: tiny, small, medium, large
+- **Special cards**: Red 0 (+5 points), Brown 0 (-2 points)
+- **Playable state**: Glowing pulse animation for valid plays
+- **Keyboard navigation**: Focus ring support for accessibility
+- **Card back**: Patterned design for opponent hands
+- **Card stack**: Deck visualization component
+        `,
+      },
     },
   },
   tags: ['autodocs'],
@@ -32,7 +40,7 @@ const meta = {
     },
     disabled: {
       control: 'boolean',
-      description: 'Disabled state',
+      description: 'Disabled state (cannot be played)',
     },
     isPlayable: {
       control: 'boolean',
@@ -42,42 +50,108 @@ const meta = {
       control: 'boolean',
       description: 'Keyboard selection ring',
     },
+    faceDown: {
+      control: 'boolean',
+      description: 'Show card back instead of face',
+    },
   },
 } satisfies Meta<typeof Card>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+type RenderOnlyStory = StoryObj<typeof Card>; // For render-only stories without args
 
-// Regular cards (all colors, value 5)
+// ============================================================================
+// SUIT COLORS
+// ============================================================================
+
 export const RedCard: Story = {
   args: {
-    card: { color: 'red', value: 5 },
+    card: { color: 'red', value: 7 },
     size: 'medium',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Red suit card with pink neon glow effect.',
+      },
+    },
   },
 };
 
 export const BrownCard: Story = {
   args: {
-    card: { color: 'brown', value: 5 },
+    card: { color: 'brown', value: 7 },
     size: 'medium',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Brown suit card with amber neon glow effect.',
+      },
+    },
   },
 };
 
 export const GreenCard: Story = {
   args: {
-    card: { color: 'green', value: 5 },
+    card: { color: 'green', value: 7 },
     size: 'medium',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Green suit card with mint neon glow effect.',
+      },
+    },
   },
 };
 
 export const BlueCard: Story = {
   args: {
-    card: { color: 'blue', value: 5 },
+    card: { color: 'blue', value: 7 },
     size: 'medium',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Blue suit card with cyan neon glow effect.',
+      },
+    },
   },
 };
 
-// Special cards (Red 0 and Brown 0)
+// ============================================================================
+// ALL COLORS SHOWCASE
+// ============================================================================
+
+export const AllColors: Story = {
+  args: {
+    card: { color: 'red', value: 7 },
+  },
+  render: () => {
+    const colors: CardColor[] = ['red', 'brown', 'green', 'blue'];
+    return (
+      <div className="flex gap-6 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+        {colors.map((color) => (
+          <Card key={color} card={{ color, value: 7 }} size="medium" />
+        ))}
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'All four suit colors with their unique neon glow effects.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// SPECIAL CARDS
+// ============================================================================
+
 export const RedSpecial: Story = {
   args: {
     card: { color: 'red', value: 0 },
@@ -86,7 +160,7 @@ export const RedSpecial: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Red 0 card - Special card worth +5 points when won in a trick',
+        story: 'Red 0 - Special card that awards +5 bonus points when won in a trick.',
       },
     },
   },
@@ -100,52 +174,122 @@ export const BrownSpecial: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Brown 0 card - Special card worth -2 points when won in a trick',
+        story: 'Brown 0 - Special card that deducts -2 points when won in a trick.',
       },
     },
   },
 };
 
-// Size variants
+export const SpecialCards: Story = {
+  args: {
+    card: { color: 'red', value: 0 },
+  },
+  render: () => (
+    <div className="flex gap-8 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <div className="flex flex-col items-center gap-3">
+        <Card card={{ color: 'red', value: 0 }} size="large" />
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1 bg-[var(--color-warning)] text-black text-xs font-display rounded-full shadow-[0_0_10px_var(--color-warning)]">
+            +5 Points
+          </span>
+        </div>
+      </div>
+      <div className="flex flex-col items-center gap-3">
+        <Card card={{ color: 'brown', value: 0 }} size="large" />
+        <div className="flex items-center gap-2">
+          <span className="px-3 py-1 bg-[var(--color-error)] text-white text-xs font-display rounded-full shadow-[0_0_10px_var(--color-error)]">
+            -2 Points
+          </span>
+        </div>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Both special cards with their point value indicators.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// SIZES
+// ============================================================================
+
 export const TinySize: Story = {
   args: {
-    card: { color: 'blue', value: 7 },
+    card: { color: 'blue', value: 5 },
     size: 'tiny',
   },
 };
 
 export const SmallSize: Story = {
   args: {
-    card: { color: 'green', value: 7 },
+    card: { color: 'green', value: 5 },
     size: 'small',
   },
 };
 
 export const MediumSize: Story = {
   args: {
-    card: { color: 'red', value: 7 },
+    card: { color: 'red', value: 5 },
     size: 'medium',
   },
 };
 
 export const LargeSize: Story = {
   args: {
-    card: { color: 'brown', value: 7 },
+    card: { color: 'brown', value: 5 },
     size: 'large',
   },
 };
 
-// States
+export const AllSizes: RenderOnlyStory = {
+  render: () => (
+    <div className="flex items-end gap-4 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <div className="flex flex-col items-center gap-2">
+        <Card card={{ color: 'blue', value: 5 }} size="tiny" />
+        <span className="text-[var(--color-text-muted)] text-xs font-display">Tiny</span>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <Card card={{ color: 'green', value: 5 }} size="small" />
+        <span className="text-[var(--color-text-muted)] text-xs font-display">Small</span>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <Card card={{ color: 'red', value: 5 }} size="medium" />
+        <span className="text-[var(--color-text-muted)] text-xs font-display">Medium</span>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <Card card={{ color: 'brown', value: 5 }} size="large" />
+        <span className="text-[var(--color-text-muted)] text-xs font-display">Large</span>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'All card size variants from tiny to large.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// STATES
+// ============================================================================
+
 export const Playable: Story = {
   args: {
     card: { color: 'green', value: 5 },
     size: 'medium',
     isPlayable: true,
+    onClick: () => console.log('Card played!'),
   },
   parameters: {
     docs: {
       description: {
-        story: 'Card with playable glow animation - indicates card can be played this turn',
+        story: 'Playable state with pulsing glow animation - indicates the card can be played this turn.',
       },
     },
   },
@@ -160,7 +304,7 @@ export const KeyboardSelected: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Card with keyboard selection ring - for keyboard navigation',
+        story: 'Keyboard selection ring for accessibility - used during keyboard navigation.',
       },
     },
   },
@@ -171,81 +315,148 @@ export const Disabled: Story = {
     card: { color: 'red', value: 7 },
     size: 'medium',
     disabled: true,
+    onClick: () => console.log('Card clicked'),
   },
-};
-
-// Value showcase
-export const AllValues: Story = {
-  args: {
-    card: { color: 'blue', value: 1 },
-  },
-  render: () => (
-    <div className="flex gap-2 flex-wrap max-w-2xl">
-      {([0, 1, 2, 3, 4, 5, 6, 7] as const).map((value) => (
-        <Card key={value} card={{ color: 'blue', value }} size="small" />
-      ))}
-    </div>
-  ),
   parameters: {
     docs: {
       description: {
-        story: 'All card values (0-7) in blue color',
+        story: 'Disabled state with X overlay - cannot be played (e.g., wrong suit).',
       },
     },
   },
 };
 
-// Color showcase
-export const AllColors: Story = {
+export const FaceDown: Story = {
   args: {
     card: { color: 'red', value: 7 },
-  },
-  render: () => {
-    const colors: CardColor[] = ['red', 'brown', 'green', 'blue'];
-    return (
-      <div className="flex gap-4">
-        {colors.map((color) => (
-          <Card key={color} card={{ color, value: 7 }} size="medium" />
-        ))}
-      </div>
-    );
+    size: 'medium',
+    faceDown: true,
   },
   parameters: {
     docs: {
       description: {
-        story: 'All four card colors with value 7',
+        story: 'Face-down card showing the back pattern.',
       },
     },
   },
 };
 
-// Special cards showcase
-export const SpecialCards: Story = {
-  args: {
-    card: { color: 'red', value: 0 },
-  },
+// ============================================================================
+// ALL VALUES
+// ============================================================================
+
+export const AllValues: RenderOnlyStory = {
   render: () => (
-    <div className="flex gap-4">
-      <div className="flex flex-col items-center gap-2">
-        <Card card={{ color: 'red', value: 0 }} size="medium" />
-        <span className="text-xs text-white bg-green-600 px-2 py-1 rounded">+5 Points</span>
-      </div>
-      <div className="flex flex-col items-center gap-2">
-        <Card card={{ color: 'brown', value: 0 }} size="medium" />
-        <span className="text-xs text-white bg-red-600 px-2 py-1 rounded">-2 Points</span>
+    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <h3 className="font-display text-[var(--color-text-primary)] text-sm uppercase tracking-wider mb-4">
+        Blue Suit (0-7)
+      </h3>
+      <div className="flex flex-wrap gap-2">
+        {([0, 1, 2, 3, 4, 5, 6, 7] as const).map((value) => (
+          <Card key={value} card={{ color: 'blue', value }} size="small" />
+        ))}
       </div>
     </div>
   ),
   parameters: {
     docs: {
       description: {
-        story: 'Special cards: Red 0 (+5 points) and Brown 0 (-2 points)',
+        story: 'All card values (0-7) for a single suit.',
       },
     },
   },
 };
 
-// Interactive example
+// ============================================================================
+// CARD BACK COMPONENT
+// ============================================================================
+
+export const CardBackDefault: RenderOnlyStory = {
+  render: () => (
+    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <CardBack size="medium" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Default card back design for opponent hands.',
+      },
+    },
+  },
+};
+
+export const CardBackTeamColors: RenderOnlyStory = {
+  render: () => (
+    <div className="flex gap-6 p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <div className="flex flex-col items-center gap-2">
+        <CardBack size="medium" teamColor={1} />
+        <span className="text-[var(--color-team1-primary)] text-xs font-display">Team 1</span>
+      </div>
+      <div className="flex flex-col items-center gap-2">
+        <CardBack size="medium" teamColor={2} />
+        <span className="text-[var(--color-team2-primary)] text-xs font-display">Team 2</span>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Card backs with team color tinting.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// CARD STACK COMPONENT
+// ============================================================================
+
+export const CardStackDefault: RenderOnlyStory = {
+  render: () => (
+    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <CardStack count={8} size="medium" />
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Card stack showing deck with count indicator.',
+      },
+    },
+  },
+};
+
+export const CardStackSizes: RenderOnlyStory = {
+  render: () => (
+    <div className="flex gap-12 items-end p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <div className="flex flex-col items-center gap-4">
+        <CardStack count={12} size="small" />
+        <span className="text-[var(--color-text-muted)] text-xs font-display">Small</span>
+      </div>
+      <div className="flex flex-col items-center gap-4">
+        <CardStack count={24} size="medium" />
+        <span className="text-[var(--color-text-muted)] text-xs font-display">Medium</span>
+      </div>
+      <div className="flex flex-col items-center gap-4">
+        <CardStack count={32} size="large" />
+        <span className="text-[var(--color-text-muted)] text-xs font-display">Large</span>
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Card stacks in different sizes.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// INTERACTIVE EXAMPLES
+// ============================================================================
+
 export const Interactive: Story = {
   args: {
     card: { color: 'green', value: 5 },
@@ -255,7 +466,122 @@ export const Interactive: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Interactive card with click handler',
+        story: 'Interactive card with click handler - hover for glow effect.',
+      },
+    },
+  },
+};
+
+// ============================================================================
+// GAME UI EXAMPLES
+// ============================================================================
+
+export const PlayerHand: RenderOnlyStory = {
+  render: () => {
+    const hand: CardType[] = [
+      { color: 'red', value: 3 as CardValue },
+      { color: 'blue', value: 5 as CardValue },
+      { color: 'green', value: 7 as CardValue },
+      { color: 'brown', value: 2 as CardValue },
+      { color: 'red', value: 0 as CardValue },
+      { color: 'blue', value: 4 as CardValue },
+      { color: 'green', value: 1 as CardValue },
+      { color: 'brown', value: 6 as CardValue },
+    ];
+    const playableIndices = [1, 5]; // Blue cards are playable (led suit)
+
+    return (
+      <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="text-[var(--color-text-accent)] text-sm font-display uppercase">
+            Led Suit: Blue
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {hand.map((card, i) => (
+            <Card
+              key={i}
+              card={card}
+              size="small"
+              isPlayable={playableIndices.includes(i)}
+              disabled={!playableIndices.includes(i)}
+              onClick={() => console.log(`Played ${card.color} ${card.value}`)}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Example player hand showing playable cards (following suit rule).',
+      },
+    },
+  },
+};
+
+export const TrickInProgress: RenderOnlyStory = {
+  render: () => {
+    const trick: { card: CardType; player: string }[] = [
+      { card: { color: 'blue', value: 5 as CardValue }, player: 'Player 1' },
+      { card: { color: 'blue', value: 7 as CardValue }, player: 'Player 2' },
+      { card: { color: 'green', value: 3 as CardValue }, player: 'Player 3' },
+    ];
+
+    return (
+      <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+        <h3 className="font-display text-[var(--color-text-primary)] text-sm uppercase tracking-wider mb-4 text-center">
+          Current Trick
+        </h3>
+        <div className="flex justify-center gap-4">
+          {trick.map(({ card, player }, i) => (
+            <div key={i} className="flex flex-col items-center gap-2">
+              <Card card={card} size="medium" />
+              <span className="text-[var(--color-text-muted)] text-xs">{player}</span>
+            </div>
+          ))}
+          <div className="flex flex-col items-center gap-2 opacity-50">
+            <div className="w-24 h-36 rounded-[var(--radius-lg)] border-2 border-dashed border-[var(--color-border-default)] flex items-center justify-center">
+              <span className="text-[var(--color-text-muted)] text-2xl">?</span>
+            </div>
+            <span className="text-[var(--color-text-muted)] text-xs">Waiting...</span>
+          </div>
+        </div>
+      </div>
+    );
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Example trick in progress showing played cards.',
+      },
+    },
+  },
+};
+
+export const OpponentHand: RenderOnlyStory = {
+  render: () => (
+    <div className="p-8 bg-[var(--color-bg-primary)] rounded-[var(--radius-xl)]">
+      <div className="flex items-center gap-2 mb-4">
+        <span className="text-[var(--color-text-primary)] font-display text-sm">
+          Opponent (Team 2)
+        </span>
+        <span className="text-[var(--color-text-muted)] text-xs">
+          5 cards
+        </span>
+      </div>
+      <div className="flex gap-1">
+        {[...Array(5)].map((_, i) => (
+          <CardBack key={i} size="small" teamColor={2} />
+        ))}
+      </div>
+    </div>
+  ),
+  parameters: {
+    docs: {
+      description: {
+        story: 'Opponent hand display with team-colored card backs.',
       },
     },
   },

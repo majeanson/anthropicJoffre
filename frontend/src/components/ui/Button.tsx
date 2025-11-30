@@ -1,41 +1,38 @@
 /**
- * Button Component
- * Sprint 21: Refactored with design token system
+ * Button Component - Retro Gaming Edition
  *
- * Unified button system with multiple variants, sizes, and states.
- * Supports icons, loading states, and full dark mode.
+ * A distinctive button system with arcade-inspired aesthetics.
+ * Features neon glows, pixel-perfect borders, and satisfying press effects.
  *
- * Features:
- * - 6 variants: primary, secondary, success, warning, danger, ghost, link
- * - 5 sizes: xs, sm, md, lg, xl
- * - Icon support (left, right, or icon-only)
- * - Loading state with spinner
- * - Disabled state
- * - Full width option
- * - Dark mode support
- * - Uses design token system for consistency
+ * Variants:
+ * - primary: Hot pink neon with cyan glow
+ * - secondary: Outlined with subtle glow
+ * - success: Neon green arcade style
+ * - warning: Arcade yellow
+ * - danger: Hot pink-red with glitch effect on hover
+ * - ghost: Transparent with neon border on hover
+ * - link: Neon underline effect
  *
- * Usage:
- * ```tsx
- * <Button variant="primary" size="lg" onClick={handleClick}>
- *   Click Me
- * </Button>
- *
- * <Button
- *   variant="danger"
- *   leftIcon={<TrashIcon />}
- *   loading={isDeleting}
- *   onClick={handleDelete}
- * >
- *   Delete Account
- * </Button>
- * ```
+ * Special Effects:
+ * - Arcade button press (translateY effect)
+ * - Neon glow on hover
+ * - Pixel-perfect borders (for retro skin)
+ * - Scanline overlay on focus
  */
 
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from 'react';
-import { colors, spacing, shadows } from '../../design-system';
+import { useSkin } from '../../contexts/SkinContext';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost' | 'link';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'ghost'
+  | 'link'
+  | 'neon';
+
 export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
@@ -45,152 +42,251 @@ export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
   size?: ButtonSize;
   /** Button content */
   children?: ReactNode;
-
-  // Icons
   /** Icon to show on the left */
   leftIcon?: ReactNode;
   /** Icon to show on the right */
   rightIcon?: ReactNode;
-
-  // States
   /** Show loading spinner */
   loading?: boolean;
   /** Disable button */
   disabled?: boolean;
-
-  // Layout
   /** Make button full width */
   fullWidth?: boolean;
-
-  // Additional classes (use sparingly)
+  /** Enable arcade-style press effect */
+  arcade?: boolean;
+  /** Enable pulsing glow effect */
+  glow?: boolean;
   /** Additional custom classes */
   className?: string;
 }
 
-const variantClasses: Record<ButtonVariant, string> = {
-  primary: `
-    bg-gradient-to-r ${colors.gradients.primary}
-    hover:${colors.gradients.primaryHover}
-    dark:${colors.gradients.primaryDark}
-    dark:hover:${colors.gradients.primaryDarkHover}
-    border-2 border-blue-800 dark:border-blue-900
-    text-white ${shadows.button}
-  `,
-  secondary: `
-    bg-white dark:bg-gray-800
-    hover:bg-gray-100 dark:hover:bg-gray-700
-    border-2 ${colors.borders.light.default} dark:${colors.borders.dark.default}
-    text-gray-900 dark:text-gray-100
-    ${shadows.md}
-  `,
-  success: `
-    bg-gradient-to-r ${colors.gradients.success}
-    hover:${colors.gradients.successHover}
-    dark:${colors.gradients.successDark}
-    border-2 border-green-800 dark:border-green-900
-    text-white ${shadows.button}
-  `,
-  warning: `
-    bg-gradient-to-r ${colors.gradients.warning}
-    hover:${colors.gradients.warningHover}
-    dark:${colors.gradients.warningDark}
-    border-2 border-orange-800 dark:border-orange-900
-    text-white ${shadows.button}
-  `,
-  danger: `
-    bg-gradient-to-r ${colors.gradients.error}
-    hover:${colors.gradients.errorHover}
-    dark:${colors.gradients.errorDark}
-    border-2 border-red-800 dark:border-red-900
-    text-white ${shadows.button}
-  `,
-  ghost: `
-    bg-transparent
-    hover:bg-gray-100 dark:hover:bg-gray-800
-    border-2 border-transparent
-    text-gray-700 dark:text-gray-300
-  `,
-  link: `
-    bg-transparent
-    hover:bg-transparent
-    border-2 border-transparent
-    text-blue-600 dark:text-blue-400
-    hover:text-blue-800 dark:hover:text-blue-300
-    underline
-  `,
-};
+// Retro-styled spinner
+const RetroSpinner = () => (
+  <svg
+    className="animate-spin h-5 w-5"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <circle
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeDasharray="31.4 31.4"
+      strokeLinecap="square"
+    />
+  </svg>
+);
 
-// Button size variants using design tokens
-const sizeClasses: Record<ButtonSize, string> = {
-  xs: `${spacing.button.sm} text-xs`,    // py-2 px-3 text-xs
-  sm: `${spacing.button.sm} text-sm`,    // py-2 px-3 text-sm
-  md: `${spacing.button.md} text-base`,  // py-3 px-4 text-base
-  lg: `${spacing.button.lg} text-lg`,    // py-4 px-6 text-lg
-  xl: `${spacing.button.xl} text-xl`,    // py-4 px-8 text-xl
-};
-
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button({
-  variant = 'primary',
-  size = 'md',
-  children,
-  leftIcon,
-  rightIcon,
-  loading = false,
-  disabled = false,
-  fullWidth = false,
-  className = '',
-  type = 'button',
-  ...props
-}, ref) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    variant = 'primary',
+    size = 'md',
+    children,
+    leftIcon,
+    rightIcon,
+    loading = false,
+    disabled = false,
+    fullWidth = false,
+    arcade = false,
+    glow = false,
+    className = '',
+    type = 'button',
+    ...props
+  },
+  ref
+) {
+  useSkin(); // Provides skin context for CSS variables
   const isDisabled = disabled || loading;
 
-  // Loading spinner
-  const spinner = (
-    <svg
-      className="animate-spin h-4 w-4"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-      />
-    </svg>
-  );
+  // Size classes
+  const sizeClasses: Record<ButtonSize, string> = {
+    xs: 'px-3 py-1.5 text-xs gap-1.5',
+    sm: 'px-4 py-2 text-sm gap-2',
+    md: 'px-6 py-3 text-base gap-2',
+    lg: 'px-8 py-4 text-lg gap-3',
+    xl: 'px-10 py-5 text-xl gap-3',
+  };
+
+  // Base styles that apply to all variants
+  const baseClasses = `
+    inline-flex items-center justify-center
+    font-display tracking-wider
+    border-[length:var(--button-border-width)]
+    rounded-[var(--radius-lg)]
+    transition-all duration-[var(--duration-fast)]
+    focus-visible:outline-none focus-visible:ring-[var(--input-focus-ring-width)]
+    focus-visible:ring-[var(--color-text-accent)] focus-visible:ring-offset-2
+    focus-visible:ring-offset-[var(--color-bg-primary)]
+    uppercase
+    ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+    ${fullWidth ? 'w-full' : ''}
+    ${arcade && !isDisabled ? 'arcade-button' : ''}
+    ${glow && !isDisabled ? 'pulse-glow' : ''}
+  `;
+
+  // Variant-specific styles
+  const variantClasses: Record<ButtonVariant, string> = {
+    primary: `
+      bg-[var(--color-bg-accent)]
+      border-[var(--color-highlight)]
+      text-[var(--color-text-primary)]
+      shadow-[0_0_10px_var(--color-bg-accent)]
+      ${!isDisabled ? `
+        hover:shadow-[0_0_20px_var(--color-bg-accent),0_0_40px_var(--color-bg-accent)]
+        hover:scale-105
+        active:scale-95
+      ` : ''}
+    `,
+    secondary: `
+      bg-transparent
+      border-[var(--color-border-accent)]
+      text-[var(--color-text-accent)]
+      ${!isDisabled ? `
+        hover:bg-[var(--color-bg-tertiary)]
+        hover:shadow-[0_0_15px_var(--color-glow)]
+        hover:scale-105
+        active:scale-95
+      ` : ''}
+    `,
+    success: `
+      bg-[var(--color-success)]
+      border-[var(--color-success)]
+      text-[var(--color-text-inverse)]
+      shadow-[0_0_10px_var(--color-success)]
+      ${!isDisabled ? `
+        hover:shadow-[0_0_20px_var(--color-success),0_0_40px_var(--color-success)]
+        hover:scale-105
+        active:scale-95
+      ` : ''}
+    `,
+    warning: `
+      bg-[var(--color-warning)]
+      border-[var(--color-warning)]
+      text-[var(--color-text-inverse)]
+      shadow-[0_0_10px_var(--color-warning)]
+      ${!isDisabled ? `
+        hover:shadow-[0_0_20px_var(--color-warning),0_0_40px_var(--color-warning)]
+        hover:scale-105
+        active:scale-95
+      ` : ''}
+    `,
+    danger: `
+      bg-[var(--color-error)]
+      border-[var(--color-error)]
+      text-[var(--color-text-primary)]
+      shadow-[0_0_10px_var(--color-error)]
+      ${!isDisabled ? `
+        hover:shadow-[0_0_20px_var(--color-error),0_0_40px_var(--color-error)]
+        hover:scale-105
+        hover:animate-pulse
+        active:scale-95
+      ` : ''}
+    `,
+    ghost: `
+      bg-transparent
+      border-transparent
+      text-[var(--color-text-secondary)]
+      ${!isDisabled ? `
+        hover:text-[var(--color-text-accent)]
+        hover:border-[var(--color-border-accent)]
+        hover:bg-[var(--color-bg-secondary)]
+        active:scale-95
+      ` : ''}
+    `,
+    link: `
+      bg-transparent
+      border-transparent
+      text-[var(--color-text-accent)]
+      underline underline-offset-4
+      decoration-2 decoration-[var(--color-text-accent)]
+      p-0
+      ${!isDisabled ? `
+        hover:decoration-[var(--color-bg-accent)]
+        hover:text-[var(--color-bg-accent)]
+      ` : ''}
+    `,
+    neon: `
+      bg-transparent
+      border-[var(--color-glow)]
+      text-[var(--color-glow)]
+      shadow-[inset_0_0_10px_var(--color-glow),0_0_10px_var(--color-glow)]
+      ${!isDisabled ? `
+        hover:bg-[var(--color-glow)]
+        hover:text-[var(--color-text-inverse)]
+        hover:shadow-[inset_0_0_20px_var(--color-glow),0_0_30px_var(--color-glow),0_0_60px_var(--color-glow)]
+        active:scale-95
+      ` : ''}
+    `,
+  };
 
   return (
     <button
       ref={ref}
       type={type}
+      disabled={isDisabled}
       className={`
-        ${variantClasses[variant]}
+        ${baseClasses}
         ${sizeClasses[size]}
-        ${fullWidth ? 'w-full' : ''}
-        ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105 active:scale-95'}
-        inline-flex items-center justify-center ${spacing.gap.sm}
-        rounded-lg font-bold
-        transition-all duration-200
-        ${colors.focus.light} dark:${colors.focus.dark}
-        focus-visible:ring-2 focus-visible:ring-offset-2
+        ${variantClasses[variant]}
         ${className}
       `}
-      disabled={isDisabled}
       {...props}
     >
-      {loading && spinner}
-      {!loading && leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
-      {children && <span>{children}</span>}
-      {!loading && rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+      {loading ? (
+        <RetroSpinner />
+      ) : (
+        <>
+          {leftIcon && <span className="flex-shrink-0">{leftIcon}</span>}
+          {children && <span>{children}</span>}
+          {rightIcon && <span className="flex-shrink-0">{rightIcon}</span>}
+        </>
+      )}
     </button>
   );
 });
+
+// ============================================================================
+// PRESET BUTTON COMPONENTS
+// ============================================================================
+
+export interface PresetButtonProps extends Omit<ButtonProps, 'variant'> {}
+
+/** Primary action button with arcade effect */
+export const PrimaryButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="primary" arcade {...props} />
+);
+PrimaryButton.displayName = 'PrimaryButton';
+
+/** Secondary/outline button */
+export const SecondaryButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="secondary" {...props} />
+);
+SecondaryButton.displayName = 'SecondaryButton';
+
+/** Success/confirm button with glow */
+export const SuccessButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="success" glow {...props} />
+);
+SuccessButton.displayName = 'SuccessButton';
+
+/** Danger/delete button */
+export const DangerButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="danger" {...props} />
+);
+DangerButton.displayName = 'DangerButton';
+
+/** Full neon glow button */
+export const NeonButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="neon" {...props} />
+);
+NeonButton.displayName = 'NeonButton';
+
+/** Ghost button for subtle actions */
+export const GhostButton = forwardRef<HTMLButtonElement, PresetButtonProps>(
+  (props, ref) => <Button ref={ref} variant="ghost" {...props} />
+);
+GhostButton.displayName = 'GhostButton';
+
+export default Button;

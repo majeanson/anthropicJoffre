@@ -1,3 +1,13 @@
+/**
+ * PlayContent Component - Retro Gaming Edition
+ *
+ * Main play tab content with game options:
+ * - Rejoin active games
+ * - Create multiplayer games
+ * - Browse and join games
+ * - Quick play with bots
+ */
+
 import { ActiveGames } from './ActiveGames';
 import { QuickPlayPanel } from './QuickPlayPanel';
 import { Socket } from 'socket.io-client';
@@ -5,8 +15,7 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 import { getUserTierInfo } from '../utils/userTier';
-import { UICard } from './ui/UICard';
-import { Button } from './ui/Button';
+import { Button, NeonButton } from './ui/Button';
 
 interface PlayContentProps {
   hasValidSession?: boolean;
@@ -50,11 +59,21 @@ export function PlayContent({
     <div className="space-y-4">
       {/* Guest Tier Banner - Prompt to create account */}
       {isGuest && (
-        <UICard variant="bordered" size="md" gradient="warning">
-          <p className="text-sm text-amber-800 dark:text-amber-200 text-center mb-2">
+        <div
+          className="
+            p-4
+            rounded-[var(--radius-lg)]
+            border-2 border-[var(--color-warning)]
+            bg-[var(--color-warning)]/10
+          "
+          style={{
+            boxShadow: '0 0 15px rgba(255, 190, 11, 0.2)',
+          }}
+        >
+          <p className="text-sm text-[var(--color-warning)] text-center mb-3 font-body">
             Enter a player name or create an account to play games
           </p>
-          <div className="flex gap-2 justify-center">
+          <div className="flex gap-3 justify-center">
             {onShowLogin && (
               <Button
                 variant="warning"
@@ -66,7 +85,7 @@ export function PlayContent({
             )}
             {onShowRegister && (
               <Button
-                variant="secondary"
+                variant="ghost"
                 size="sm"
                 onClick={() => { sounds.buttonClick(); onShowRegister(); }}
               >
@@ -74,22 +93,34 @@ export function PlayContent({
               </Button>
             )}
           </div>
-        </UICard>
+        </div>
       )}
 
       {/* Rejoin Game (if available) */}
       {hasValidSession && onRejoinGame && (
-        <Button
+        <button
           data-testid="rejoin-game-button"
           data-keyboard-nav="rejoin-game"
-          variant="warning"
-          size="lg"
           onClick={onRejoinGame}
-          className="w-full animate-pulse ring-2 ring-orange-400"
+          className="
+            w-full py-4
+            font-display uppercase tracking-wider
+            rounded-[var(--radius-lg)]
+            border-2 border-[var(--color-warning)]
+            bg-[var(--color-warning)]/20
+            text-[var(--color-warning)]
+            animate-pulse
+            transition-all duration-[var(--duration-fast)]
+            hover:bg-[var(--color-warning)]/30
+            flex items-center justify-center gap-3
+          "
+          style={{
+            boxShadow: '0 0 20px var(--color-warning), inset 0 0 20px rgba(255, 190, 11, 0.1)',
+          }}
         >
-          <span aria-hidden="true">🔄</span>
+          <span className="text-xl">🔄</span>
           <span>Rejoin Game</span>
-        </Button>
+        </button>
       )}
 
       {/* Active Games (Resumable) */}
@@ -100,11 +131,18 @@ export function PlayContent({
       />
 
       {/* Multiplayer Section */}
-      <UICard variant="bordered" size="md" className="bg-parchment-200 dark:bg-gray-700/50">
-        <h3 className="text-sm font-bold text-umber-800 dark:text-gray-200 mb-3 text-center">
+      <div
+        className="
+          p-4
+          rounded-[var(--radius-lg)]
+          border border-[var(--color-border-default)]
+          bg-[var(--color-bg-tertiary)]
+        "
+      >
+        <h3 className="text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-3 text-center">
           Multiplayer
         </h3>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <Button
             data-testid="create-game-button"
             data-keyboard-nav="create-game"
@@ -112,24 +150,24 @@ export function PlayContent({
             size="md"
             onClick={() => { sounds.buttonClick(); onCreateGame(); }}
             disabled={!tierInfo.canCreateGame}
-            className="w-full"
+            fullWidth
+            leftIcon={<span>{tierInfo.canCreateGame ? '➕' : '🔒'}</span>}
           >
-            {tierInfo.canCreateGame ? '➕ Create Game' : '🔒 Create Game (Login Required)'}
+            {tierInfo.canCreateGame ? 'Create Game' : 'Create Game (Login)'}
           </Button>
 
-          <Button
+          <NeonButton
             data-testid="join-game-button"
             data-keyboard-nav="browse-games"
-            variant="primary"
             size="md"
             onClick={() => { sounds.buttonClick(); onBrowseGames(); }}
-            className="w-full"
+            fullWidth
+            leftIcon={<span>🔍</span>}
           >
-            <span aria-hidden="true">🔍</span>
             Browse & Join Games
-          </Button>
+          </NeonButton>
         </div>
-      </UICard>
+      </div>
 
       {/* Quick Play Section - Available for all users including guests */}
       <QuickPlayPanel

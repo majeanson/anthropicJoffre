@@ -226,12 +226,12 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           {password && (
             <div className="mt-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-gray-400">Password Strength:</span>
+                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Password Strength:</span>
                 <span className={`text-xs font-semibold ${passwordStrength.color.replace('bg-', 'text-')}`}>
                   {passwordStrength.strength}
                 </span>
               </div>
-              <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
                 <div
                   className={`h-full ${passwordStrength.color} transition-all duration-300`}
                   style={{ width: `${passwordStrength.percentage}%` }}
@@ -270,8 +270,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         </Button>
 
         {/* Login Link */}
-        <div className="text-center pt-4 border-t border-gray-700">
-          <p className="text-gray-400 text-sm">
+        <div className="text-center pt-4 border-t" style={{ borderColor: 'var(--color-border-default)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Already have an account?{' '}
             <Button
               type="button"

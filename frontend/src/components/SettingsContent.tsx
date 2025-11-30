@@ -1,7 +1,19 @@
+/**
+ * SettingsContent Component - Retro Gaming Edition
+ *
+ * Settings panel with retro gaming aesthetic:
+ * - Theme/Skin selection
+ * - Sound settings
+ * - Keyboard navigation hints
+ * - Debug options
+ */
+
 import { useState } from 'react';
 import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
-import { UICard, Button, UIToggle, UISliderField, UIDivider } from './ui';
+import { useSkin } from '../contexts/SkinContext';
+import { Button, NeonButton } from './ui/Button';
+import { SkinSelectorDropdown } from './SkinSelector';
 
 interface SettingsContentProps {
   onShowRules: () => void;
@@ -9,127 +21,249 @@ interface SettingsContentProps {
 }
 
 export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentProps) {
-  const { darkMode, setDarkMode } = useSettings();
+  useSettings(); // Provides theme context
+  useSkin(); // Provides skin context
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
 
   return (
     <div className="space-y-4">
-      <UICard variant="bordered" size="lg" className="bg-parchment-200 dark:bg-gray-700">
-        <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 text-center">⚙️ Settings</h3>
+      {/* Main Settings Card */}
+      <div
+        className="
+          p-5
+          rounded-[var(--radius-lg)]
+          border border-[var(--color-border-default)]
+          bg-[var(--color-bg-tertiary)]
+        "
+      >
+        <h3
+          className="text-lg font-display uppercase tracking-wider text-center mb-6"
+          style={{
+            color: 'var(--color-text-primary)',
+            textShadow: '0 0 10px var(--color-glow)',
+          }}
+        >
+          Settings
+        </h3>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           {/* Keyboard Navigation Hint - hidden on mobile */}
-          <UICard variant="bordered" size="sm" gradient="info" className="hidden sm:block mb-4">
-            <h4 className="text-sm font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2">
+          <div
+            className="
+              hidden sm:block
+              p-4
+              rounded-[var(--radius-md)]
+              border border-[var(--color-text-accent)]/30
+              bg-[var(--color-text-accent)]/5
+            "
+          >
+            <h4 className="text-xs font-display uppercase tracking-wider text-[var(--color-text-accent)] mb-3 flex items-center gap-2">
               <span>⌨️</span>
               <span>Keyboard Navigation</span>
             </h4>
-            <p className="text-xs text-blue-700 dark:text-blue-400 mb-2">
-              Navigate the lobby with arrow keys:
-            </p>
-            <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400">
-              <kbd className="px-2 py-1 bg-white dark:bg-gray-700 border border-blue-300 dark:border-gray-600 rounded font-mono">← →</kbd>
-              <span>Switch tabs</span>
+            <div className="space-y-2">
+              <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
+                <kbd
+                  className="
+                    px-2 py-1
+                    bg-[var(--color-bg-secondary)]
+                    border border-[var(--color-border-default)]
+                    rounded-[var(--radius-sm)]
+                    font-mono text-[var(--color-text-muted)]
+                  "
+                >
+                  ← →
+                </kbd>
+                <span className="font-body">Switch tabs</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
+                <kbd
+                  className="
+                    px-2 py-1
+                    bg-[var(--color-bg-secondary)]
+                    border border-[var(--color-border-default)]
+                    rounded-[var(--radius-sm)]
+                    font-mono text-[var(--color-text-muted)]
+                  "
+                >
+                  ↑ ↓
+                </kbd>
+                <span className="font-body">Navigate buttons</span>
+              </div>
+              <div className="flex items-center gap-3 text-xs text-[var(--color-text-secondary)]">
+                <kbd
+                  className="
+                    px-2 py-1
+                    bg-[var(--color-bg-secondary)]
+                    border border-[var(--color-border-default)]
+                    rounded-[var(--radius-sm)]
+                    font-mono text-[var(--color-text-muted)]
+                  "
+                >
+                  Enter
+                </kbd>
+                <span className="font-body">Activate</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400 mt-1">
-              <kbd className="px-2 py-1 bg-white dark:bg-gray-700 border border-blue-300 dark:border-gray-600 rounded font-mono">↑ ↓</kbd>
-              <span>Navigate buttons</span>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-blue-700 dark:text-blue-400 mt-1">
-              <kbd className="px-2 py-1 bg-white dark:bg-gray-700 border border-blue-300 dark:border-gray-600 rounded font-mono">Enter</kbd>
-              <span>Activate</span>
-            </div>
-          </UICard>
+          </div>
 
-          {/* Dark Mode */}
+          {/* Visual Theme / Skin */}
           <div>
-            <label className="block text-sm font-semibold text-umber-800 dark:text-gray-200 mb-2">
-              Theme
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+              Visual Theme
             </label>
-            <Button
-              onClick={() => setDarkMode(!darkMode)}
-              variant="secondary"
-              size="md"
-              className="w-full flex items-center justify-center gap-2"
-              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              aria-pressed={darkMode}
-            >
-              <span className="text-xl" aria-hidden="true">{darkMode ? '☀️' : '🌙'}</span>
-              <span>{darkMode ? "Mornin' J⋀ffre" : 'J⋀ffre after dark'}</span>
-            </Button>
+            <SkinSelectorDropdown />
           </div>
 
           {/* Sound Effects */}
           <div>
-            <label className="block text-sm font-semibold text-umber-800 dark:text-gray-200 mb-2">
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
               Sound Effects
             </label>
-            <UICard variant="bordered" size="sm" className="bg-parchment-100 dark:bg-gray-600 space-y-3">
+            <div
+              className="
+                p-4
+                rounded-[var(--radius-md)]
+                border border-[var(--color-border-default)]
+                bg-[var(--color-bg-secondary)]
+                space-y-4
+              "
+            >
               {/* Sound Toggle */}
               <div className="flex items-center justify-between">
-                <span className="text-sm text-umber-700 dark:text-gray-300">Enable Sounds</span>
-                <UIToggle
-                  enabled={soundEnabled}
-                  onChange={(enabled) => {
-                    sounds.setEnabled(enabled);
-                    setSoundEnabled(enabled);
+                <span className="text-sm text-[var(--color-text-secondary)] font-body">Enable Sounds</span>
+                <button
+                  onClick={() => {
+                    const newEnabled = !soundEnabled;
+                    sounds.setEnabled(newEnabled);
+                    setSoundEnabled(newEnabled);
+                    if (newEnabled) sounds.buttonClick();
                   }}
-                  label="Enable Sounds"
-                />
+                  className={`
+                    w-12 h-6
+                    rounded-full
+                    relative
+                    transition-all duration-[var(--duration-fast)]
+                    ${soundEnabled
+                      ? 'bg-[var(--color-success)]'
+                      : 'bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)]'
+                    }
+                  `}
+                  style={{
+                    boxShadow: soundEnabled ? '0 0 10px var(--color-success)' : 'none',
+                  }}
+                  aria-label="Enable Sounds"
+                  aria-pressed={soundEnabled}
+                >
+                  <div
+                    className={`
+                      absolute top-1 w-4 h-4
+                      rounded-full
+                      bg-white
+                      transition-all duration-[var(--duration-fast)]
+                      ${soundEnabled ? 'right-1' : 'left-1'}
+                    `}
+                  />
+                </button>
               </div>
 
               {/* Volume Slider */}
-              <UISliderField
-                value={Math.round(soundVolume * 100)}
-                onChange={(value) => {
-                  const newVolume = value / 100;
-                  sounds.setVolume(newVolume);
-                  setSoundVolume(newVolume);
-                }}
-                fieldLabel="Volume"
-                formatValue={(v) => `${v}%`}
-              />
-            </UICard>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-[var(--color-text-muted)] font-body">Volume</span>
+                  <span className="text-xs text-[var(--color-text-accent)] font-display">
+                    {Math.round(soundVolume * 100)}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={Math.round(soundVolume * 100)}
+                  onChange={(e) => {
+                    const newVolume = parseInt(e.target.value) / 100;
+                    sounds.setVolume(newVolume);
+                    setSoundVolume(newVolume);
+                  }}
+                  className="
+                    w-full h-2
+                    rounded-full
+                    appearance-none
+                    cursor-pointer
+                    bg-[var(--color-bg-tertiary)]
+                    [&::-webkit-slider-thumb]:appearance-none
+                    [&::-webkit-slider-thumb]:w-4
+                    [&::-webkit-slider-thumb]:h-4
+                    [&::-webkit-slider-thumb]:rounded-full
+                    [&::-webkit-slider-thumb]:bg-[var(--color-text-accent)]
+                    [&::-webkit-slider-thumb]:shadow-[0_0_10px_var(--color-glow)]
+                    [&::-webkit-slider-thumb]:cursor-pointer
+                    [&::-moz-range-thumb]:w-4
+                    [&::-moz-range-thumb]:h-4
+                    [&::-moz-range-thumb]:rounded-full
+                    [&::-moz-range-thumb]:bg-[var(--color-text-accent)]
+                    [&::-moz-range-thumb]:border-none
+                    [&::-moz-range-thumb]:cursor-pointer
+                  "
+                  style={{
+                    background: `linear-gradient(to right, var(--color-text-accent) 0%, var(--color-text-accent) ${soundVolume * 100}%, var(--color-bg-tertiary) ${soundVolume * 100}%, var(--color-bg-tertiary) 100%)`,
+                  }}
+                />
+              </div>
+            </div>
           </div>
 
+          {/* Divider */}
+          <div className="border-t border-[var(--color-border-subtle)] my-4" />
+
           {/* How to Play */}
-          <UIDivider size="md" color="muted" />
-          <Button
+          <NeonButton
             data-keyboard-nav="how-to-play"
-            variant="warning"
             size="lg"
             onClick={() => { sounds.buttonClick(); onShowRules(); }}
-            className="w-full"
+            fullWidth
+            leftIcon={<span>📖</span>}
+            glow
           >
-            📖 How to Play
-          </Button>
+            How to Play
+          </NeonButton>
+
+          {/* Divider */}
+          <div className="border-t border-[var(--color-border-subtle)] my-4" />
 
           {/* About */}
-          <UIDivider size="md" color="muted" />
-          <div>
-            <p className="text-center text-sm text-umber-700 dark:text-gray-300">
-              <strong>J⋀ffre</strong>
+          <div className="text-center py-2">
+            <p
+              className="font-display text-lg uppercase tracking-wider"
+              style={{
+                color: 'var(--color-text-primary)',
+                textShadow: '0 0 5px var(--color-glow)',
+              }}
+            >
+              J⋀ffre
             </p>
-            <p className="text-center text-xs text-umber-600 dark:text-gray-400 mt-1">
+            <p className="text-xs text-[var(--color-text-muted)] mt-1 font-body">
               A 4-player trick-taking card game
             </p>
           </div>
 
+          {/* Divider */}
+          <div className="border-t border-[var(--color-border-subtle)] my-4" />
+
           {/* Debug Fun */}
-          <UIDivider size="md" color="muted" />
           <Button
             data-keyboard-nav="debug-fun"
-            variant="secondary"
+            variant="ghost"
             size="lg"
             onClick={() => { sounds.buttonClick(); onShowDebug(); }}
-            className="w-full"
+            fullWidth
+            leftIcon={<span>🎮</span>}
           >
-            <span aria-hidden="true">🎮</span> Debug Fun
+            Debug Fun
           </Button>
-
         </div>
-      </UICard>
+      </div>
     </div>
   );
 }

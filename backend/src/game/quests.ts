@@ -63,6 +63,21 @@ export interface GameQuestContext {
 }
 
 /**
+ * Round-level quest tracking context
+ * Used after each round to track incremental progress
+ */
+export interface RoundQuestContext {
+  playerName: string;
+  gameId: string;
+  tricksWon: number;
+  betMade: boolean; // Did player's team make their bet this round?
+  wasBettingTeam: boolean; // Was player's team the betting team?
+  betAmount: number;
+  wonRedZero: boolean;
+  usedBrownZeroDefensively: boolean;
+}
+
+/**
  * Determine if a game qualifies as a "comeback win"
  * A comeback is when a team was behind by 10+ points and still won
  */
@@ -165,7 +180,51 @@ export function extractQuestContext(
 }
 
 /**
- * Calculate quest progress for a given game context
+ * Extract quest-relevant context from a completed round
+ * Called at the end of each round to track progress
+ */
+export function extractRoundQuestContext(
+  gameState: GameState,
+  playerName: string,
+  gameId: string,
+  roundStats: {
+    redZerosCollected: Map<string, number>;
+    brownZerosReceived: Map<string, number>;
+  } | undefined,
+  scoring: {
+    betMade: boolean;
+    offensiveTeamId: 1 | 2;
+    betAmount: number;
+  }
+): RoundQuestContext {
+  const player = gameState.players.find(p => p.name === playerName);
+
+  if (!player) {
+    throw new Error(`Player ${playerName} not found in game state`);
+  }
+
+  const playerTeam = player.teamId;
+  const wasBettingTeam = scoring.offensiveTeamId === playerTeam;
+  const betMade = wasBettingTeam && scoring.betMade;
+
+  // Check special cards from round stats
+  const wonRedZero = (roundStats?.redZerosCollected.get(playerName) || 0) > 0;
+  const usedBrownZeroDefensively = (roundStats?.brownZerosReceived.get(playerName) || 0) > 0;
+
+  return {
+    playerName,
+    gameId,
+    tricksWon: player.tricksWon || 0,
+    betMade,
+    wasBettingTeam,
+    betAmount: scoring.betAmount,
+    wonRedZero,
+    usedBrownZeroDefensively,
+  };
+}
+
+/**
+ * Calculate quest progress for a given game context (game-level)
  * Returns how much progress should be added to each quest type
  */
 export function calculateQuestProgress(
@@ -226,6 +285,73 @@ export function calculateQuestProgress(
 
     case 'comeback':
       if (context.wasComeback) {
+        progressDelta = 1;
+      }
+      break;
+
+    default:
+      progressDelta = 0;
+  }
+
+  return progressDelta;
+}
+
+/**
+ * Calculate quest progress for a round context (round-level)
+ * Returns how much progress should be added to each quest type
+ * Note: 'wins', 'games_played', and 'comeback' are game-level and return 0 here
+ */
+export function calculateRoundQuestProgress(
+  quest: PlayerQuest & { template?: QuestTemplate },
+  context: RoundQuestContext
+): number {
+  const template = quest.template;
+
+  if (!template) {
+    return 0;
+  }
+
+  // Already completed, no more progress
+  if (quest.completed) {
+    return 0;
+  }
+
+  let progressDelta = 0;
+
+  switch (template.objective_type) {
+    case 'wins':
+    case 'games_played':
+    case 'comeback':
+      // These are game-level quests, not tracked per round
+      progressDelta = 0;
+      break;
+
+    case 'tricks_won':
+      progressDelta = context.tricksWon;
+      break;
+
+    case 'bets_made':
+      // One bet is made per round (if player's team was betting)
+      progressDelta = context.wasBettingTeam ? 1 : 0;
+      break;
+
+    case 'bets_won':
+      // Track bets won (player's team was betting and made the bet)
+      progressDelta = context.betMade ? 1 : 0;
+      break;
+
+    case 'special_cards':
+      // Check quest key to determine which special card
+      if (template.quest_key === 'win_red_zero' && context.wonRedZero) {
+        progressDelta = 1;
+      } else if (template.quest_key === 'win_brown_zero' && context.usedBrownZeroDefensively) {
+        progressDelta = 1;
+      }
+      break;
+
+    case 'bet_amount':
+      // Quest requires betting X+ amount and winning the round
+      if (context.betMade && context.betAmount >= template.target_value) {
         progressDelta = 1;
       }
       break;

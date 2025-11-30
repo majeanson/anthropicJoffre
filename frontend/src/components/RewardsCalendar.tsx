@@ -44,7 +44,7 @@ export function RewardsCalendar({
   const [progress, setProgress] = useState<CalendarProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [claimingDay, setClaimingDay] = useState<number | null>(null);
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{ message: string; isError: boolean } | null>(null);
 
   useEffect(() => {
     if (!socket || !playerName) return;
@@ -85,7 +85,14 @@ export function RewardsCalendar({
       if (data.rewards.xp) rewardText.push(`+${data.rewards.xp} XP`);
       if (data.rewards.currency) rewardText.push(`+${data.rewards.currency} coins`);
 
-      setNotification(`Day ${data.dayNumber} claimed: ${rewardText.join(', ')}!`);
+      setNotification({ message: `Day ${data.dayNumber} claimed: ${rewardText.join(', ')}!`, isError: false });
+      setTimeout(() => setNotification(null), 5000);
+      setClaimingDay(null);
+    };
+
+    // Listen for errors (e.g., claiming wrong day, already claimed)
+    const handleError = (data: { message: string }) => {
+      setNotification({ message: data.message, isError: true });
       setTimeout(() => setNotification(null), 5000);
       setClaimingDay(null);
     };
@@ -93,27 +100,33 @@ export function RewardsCalendar({
     socket.on('daily_calendar', handleDailyCalendar);
     socket.on('calendar_progress', handleCalendarProgress);
     socket.on('calendar_reward_claimed', handleCalendarRewardClaimed);
+    socket.on('error', handleError);
 
     return () => {
       socket.off('daily_calendar', handleDailyCalendar);
       socket.off('calendar_progress', handleCalendarProgress);
       socket.off('calendar_reward_claimed', handleCalendarRewardClaimed);
+      socket.off('error', handleError);
     };
   }, [socket, playerName]);
 
   const handleClaimReward = (dayNumber: number) => {
     if (!socket || claimingDay || !progress) return;
 
-    // Check if can claim (must be current day or earlier)
-    if (dayNumber > progress.currentDay) {
-      setNotification('Cannot claim future rewards!');
+    // Check if already claimed
+    if (progress.rewardsClaimed.includes(dayNumber)) {
+      setNotification({ message: 'Already claimed!', isError: true });
       setTimeout(() => setNotification(null), 3000);
       return;
     }
 
-    // Check if already claimed
-    if (progress.rewardsClaimed.includes(dayNumber)) {
-      setNotification('Already claimed!');
+    // Only allow claiming TODAY's reward (currentDay is calculated server-side based on elapsed days)
+    if (dayNumber !== progress.currentDay) {
+      if (dayNumber > progress.currentDay) {
+        setNotification({ message: 'Cannot claim future rewards!', isError: true });
+      } else {
+        setNotification({ message: 'This reward has expired. You can only claim today\'s reward.', isError: true });
+      }
       setTimeout(() => setNotification(null), 3000);
       return;
     }
@@ -126,7 +139,9 @@ export function RewardsCalendar({
     if (!progress) return 'locked';
 
     if (progress.rewardsClaimed.includes(dayNumber)) return 'claimed';
+    // Only TODAY's day is available (currentDay is calculated based on days since start)
     if (dayNumber === progress.currentDay) return 'available';
+    // Past days that weren't claimed are missed
     if (dayNumber < progress.currentDay) return 'missed';
     return 'locked';
   };
@@ -179,8 +194,8 @@ export function RewardsCalendar({
       {/* Notification */}
       {notification && (
         <div className="mb-4">
-          <UICard variant="gradient" gradient="success" size="sm" className="text-center">
-            <p className="text-white">{notification}</p>
+          <UICard variant="gradient" gradient={notification.isError ? 'error' : 'success'} size="sm" className="text-center">
+            <p className="text-white">{notification.message}</p>
           </UICard>
         </div>
       )}

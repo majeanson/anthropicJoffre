@@ -31,6 +31,7 @@ const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => (
 // Sprint 19: Quest system components
 const DailyQuestsPanel = lazy(() => import('./DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
 const RewardsCalendar = lazy(() => import('./RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
+const PersonalHub = lazy(() => import('./PersonalHub').then(m => ({ default: m.PersonalHub })));
 
 interface GlobalUIProps {
   reconnecting: boolean;
@@ -59,7 +60,10 @@ interface GlobalUIProps {
   setShowQuestsPanel: (show: boolean) => void;
   showRewardsCalendar: boolean;
   setShowRewardsCalendar: (show: boolean) => void;
+  showPersonalHub: boolean;
+  setShowPersonalHub: (show: boolean) => void;
   currentPlayerName: string;
+  onOpenProfile?: () => void;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({
@@ -87,7 +91,10 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   setShowQuestsPanel,
   showRewardsCalendar,
   setShowRewardsCalendar,
-  currentPlayerName
+  showPersonalHub,
+  setShowPersonalHub,
+  currentPlayerName,
+  onOpenProfile
 }) => {
   const modals = useModals();
   const auth = useAuth();
@@ -203,6 +210,16 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
 
       {/* Sprint 19: Quest System Modals */}
       <Suspense fallback={<div />}>
+        <PersonalHub
+          socket={socket}
+          playerName={currentPlayerName}
+          isOpen={showPersonalHub}
+          onClose={() => setShowPersonalHub(false)}
+          onOpenQuests={() => setShowQuestsPanel(true)}
+          onOpenCalendar={() => setShowRewardsCalendar(true)}
+          onOpenAchievements={() => setShowAchievementsPanel(true)}
+          onOpenProfile={onOpenProfile || (() => {})}
+        />
         <DailyQuestsPanel
           socket={socket}
           playerName={currentPlayerName}

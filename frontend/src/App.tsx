@@ -116,15 +116,22 @@ function AppContent() {
   } = useDebugMode();
 
   // Sprint 3 Refactoring: UI state management hook
+  // Sprint 19: Added quest and rewards calendar state
   const {
     showBotManagement,
     showFriendsPanel,
     showReplayModal,
     showAchievementsPanel,
+    showQuestsPanel,
+    showRewardsCalendar,
+    showPersonalHub,
     setShowBotManagement,
     setShowFriendsPanel,
     setShowReplayModal,
     setShowAchievementsPanel,
+    setShowQuestsPanel,
+    setShowRewardsCalendar,
+    setShowPersonalHub,
   } = useUIState();
 
   // UI state
@@ -148,10 +155,6 @@ function AppContent() {
 
   // Task 10 Phase 2: Keyboard shortcuts help modal
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
-
-  // Sprint 19: Quest system state
-  const [showQuestsPanel, setShowQuestsPanel] = useState(false);
-  const [showRewardsCalendar, setShowRewardsCalendar] = useState(false);
 
   // Player profile modal state
   const [profilePlayerName, setProfilePlayerName] = useState<string | null>(null);
@@ -655,7 +658,10 @@ function AppContent() {
     setShowQuestsPanel,
     showRewardsCalendar,
     setShowRewardsCalendar,
-    currentPlayerName
+    showPersonalHub,
+    setShowPersonalHub,
+    currentPlayerName,
+    onOpenProfile: () => setProfilePlayerName(currentPlayerName)
   };
 
   if (!gameState) {
@@ -679,6 +685,7 @@ function AppContent() {
           onBotDifficultyChange={setBotDifficulty}
           onShowQuests={() => setShowQuestsPanel(true)}
           onShowRewardsCalendar={() => setShowRewardsCalendar(true)}
+          onShowPersonalHub={() => setShowPersonalHub(true)}
         />
       </>
     );

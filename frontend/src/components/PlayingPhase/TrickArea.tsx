@@ -1,10 +1,8 @@
 /**
- * TrickArea Component
- * Renders the circular trick layout with 4 player positions
- * Includes previous trick modal and card animations
+ * TrickArea Component - Multi-Skin Edition
  *
- * Extracted from PlayingPhase.tsx (lines 429-448, 601-635, 790-1021)
- * Part of Sprint: PlayingPhase.tsx split into focused components
+ * Circular trick layout with 4 player positions.
+ * Uses CSS variables for skin compatibility.
  */
 
 import { useState, useEffect, useMemo, memo } from 'react';
@@ -12,9 +10,9 @@ import { Card as CardComponent } from '../Card';
 import { PlayerPosition } from './PlayerPosition';
 import { ConfettiEffect } from '../ConfettiEffect';
 import { GameState, TrickCard, Player } from '../../types/game';
+import { Button } from '../ui/Button';
 import logger from '../../utils/logger';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
-import { colors } from '../../design-system';
 
 interface TrickWinnerInfo {
   playerName: string;
@@ -65,7 +63,6 @@ export const TrickArea = memo(function TrickArea({
     const positions: (TrickCard | null)[] = [null, null, null, null];
 
     trick.forEach(tc => {
-      // Find player by ID first, then match by name as fallback (for reconnection stability)
       const playerIndex = gameState.players.findIndex(
         p => p.id === tc.playerId || p.name === tc.playerName
       );
@@ -75,7 +72,6 @@ export const TrickArea = memo(function TrickArea({
         return;
       }
 
-      // Calculate relative position (0=bottom, 1=left, 2=top, 3=right)
       const relativePosition = (playerIndex - currentPlayerIndex + 4) % 4;
       positions[relativePosition] = tc;
     });
@@ -109,7 +105,7 @@ export const TrickArea = memo(function TrickArea({
     return gameState.players[playerIndex] || null;
   };
 
-  // Helper: Check if player is thinking (bot's turn)
+  // Helper: Check if player is thinking
   const isPlayerThinking = (positionIndex: number): boolean => {
     const playerIndex = (currentPlayerIndex + positionIndex) % 4;
     const player = gameState.players[playerIndex];
@@ -121,16 +117,24 @@ export const TrickArea = memo(function TrickArea({
   };
 
   // Render individual card with animations
-  const renderCard = (
-    tc: TrickCard | null,
-    isWinner: boolean = false,
-    positionIndex?: number
-  ) => {
+  const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
       return (
-        <div className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed border-parchment-400 dark:border-gray-600/40 rounded-xl flex items-center justify-center bg-parchment-300/50 dark:bg-gray-600/20 backdrop-blur">
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-parchment-400 dark:border-gray-600/50 flex items-center justify-center">
-            <div className="w-2 h-2 rounded-full bg-parchment-500/40 dark:bg-parchment-400/30"></div>
+        <div
+          className="w-16 h-24 md:w-20 md:h-28 border-2 border-dashed rounded-[var(--radius-lg)] flex items-center justify-center"
+          style={{
+            borderColor: 'var(--color-border-subtle)',
+            backgroundColor: 'var(--color-bg-tertiary)',
+          }}
+        >
+          <div
+            className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed flex items-center justify-center"
+            style={{ borderColor: 'var(--color-border-subtle)' }}
+          >
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: 'var(--color-text-muted)', opacity: 0.4 }}
+            />
           </div>
         </div>
       );
@@ -139,7 +143,6 @@ export const TrickArea = memo(function TrickArea({
     // Determine animation classes
     let animationClass = '';
 
-    // Trick collection animation - all cards move to winner (PRIORITY)
     if (trickCollectionAnimation && gameState.currentTrick.length === 4) {
       const winnerPosition = cardPositions.findIndex(cp => cp?.playerId === currentTrickWinnerId);
       if (winnerPosition !== -1 && positionIndex !== undefined) {
@@ -147,9 +150,7 @@ export const TrickArea = memo(function TrickArea({
         const winnerDir = directions[winnerPosition];
         animationClass = `animate-collect-to-${winnerDir}`;
       }
-    }
-    // Card play animation - cards slide in from their position (ONLY when trick not complete)
-    else if (positionIndex !== undefined && gameState.currentTrick.length < 4) {
+    } else if (positionIndex !== undefined && gameState.currentTrick.length < 4) {
       const slideDirections = [
         'animate-slide-from-bottom',
         'animate-slide-from-left',
@@ -162,20 +163,21 @@ export const TrickArea = memo(function TrickArea({
     return (
       <div
         className={`inline-block transition-all duration-500 ${
-          isWinner
-            ? 'scale-110 ring-4 md:ring-6 ring-yellow-400 rounded-lg shadow-2xl shadow-yellow-400/50'
-            : ''
+          isWinner ? 'scale-110 rounded-lg' : ''
         } ${animationClass}`}
+        style={isWinner ? {
+          boxShadow: '0 0 20px var(--color-warning), 0 0 40px var(--color-warning)',
+        } : {}}
       >
         <CardComponent card={tc.card} size="small" />
       </div>
     );
   };
 
-  // Render player position with badge and swap button
+  // Render player position with badge
   const renderPlayerPosition = (positionIndex: number) => {
     const player = getPlayer(positionIndex);
-    const isYou = positionIndex === 0; // Bottom position is always "You"
+    const isYou = positionIndex === 0;
     const isWinner = Boolean(
       cardPositions[positionIndex]?.playerId === currentTrickWinnerId ||
         (showPreviousTrick &&
@@ -183,18 +185,14 @@ export const TrickArea = memo(function TrickArea({
           previousCardPositions[positionIndex]?.playerId === gameState.previousTrick?.winnerId)
     );
 
-    // Check if bot has thinking reason in current trick
-    // ONLY show in beginner mode
     const botThinking = beginnerMode && player?.isBot && player.name && botThinkingMap.has(player.name)
       ? botThinkingMap.get(player.name)!
       : null;
     const botThinkingOpen = player?.name ? openThinkingButtons.has(player.name) : false;
 
-    // Position for tooltip (opposite of player position)
     const tooltipPositions: ('top' | 'bottom' | 'left' | 'right')[] = ['top', 'right', 'bottom', 'left'];
     const tooltipPosition = tooltipPositions[positionIndex];
 
-    // Show suggestion button for human player when it's their turn and beginner mode is on
     const showSuggestion = Boolean(isYou && isCurrentTurn && beginnerMode && currentSuggestion && !isSpectator);
 
     return (
@@ -218,38 +216,48 @@ export const TrickArea = memo(function TrickArea({
 
   return (
     <div className="flex-1 flex items-center justify-center mb-4 md:mb-6 relative">
-      {/* Previous Trick Button - Top Left Corner */}
+      {/* Previous Trick Button */}
       {gameState.previousTrick && (
-        <button
+        <Button
           onClick={() => setShowPreviousTrick(!showPreviousTrick)}
-          className={`absolute top-2 md:top-4 left-2 md:left-4 z-50 active:scale-95 text-parchment-50 w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-2 rounded-full md:rounded-lg text-base md:text-sm font-bold transition-all duration-200 shadow-2xl hover:shadow-2xl flex items-center justify-center backdrop-blur-md border-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2`}
-          style={{ background: showPreviousTrick ? colors.gradients.info : colors.gradients.warning }}
-          title={showPreviousTrick ? 'Current Trick' : 'Previous Trick'}
+          variant={showPreviousTrick ? 'primary' : 'warning'}
+          size="sm"
+          className="absolute top-2 md:top-4 left-2 md:left-4 z-50"
         >
           <span className="md:hidden" aria-hidden="true">{showPreviousTrick ? '▶️' : '⏮️'}</span>
-          <span className="hidden md:inline">{showPreviousTrick ? <><span aria-hidden="true">▶️</span> Current</> : <><span aria-hidden="true">⏮️</span> Previous</>}</span>
-        </button>
+          <span className="hidden md:inline">{showPreviousTrick ? '▶️ Current' : '⏮️ Previous'}</span>
+        </Button>
       )}
 
       {showPreviousTrick && previousCardPositions ? (
         // Previous Trick View
         <>
-          {/* Modal overlay background */}
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-lg z-30" />
+          {/* Modal overlay */}
+          <div
+            className="absolute inset-0 rounded-[var(--radius-lg)] z-30"
+            style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(4px)' }}
+          />
 
           {/* Title */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50">
-            <div className="bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2 border-2 border-yellow-400/50">
-              <div className="text-yellow-400 text-sm md:text-2xl font-bold mb-1 md:mb-2 drop-shadow-lg">
+            <div
+              className="rounded-[var(--radius-lg)] px-4 py-2 border-2"
+              style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                borderColor: 'var(--color-warning)',
+                boxShadow: '0 0 15px var(--color-warning)',
+              }}
+            >
+              <div
+                className="text-sm md:text-2xl font-display uppercase tracking-wider mb-1 md:mb-2"
+                style={{ color: 'var(--color-warning)' }}
+              >
                 Previous Trick
               </div>
-              <div className="text-white text-xs md:text-lg drop-shadow-md">
-                Winner:{' '}
-                {gameState.previousTrick
-                  ? gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name
-                  : ''}
+              <div className="text-xs md:text-lg" style={{ color: 'var(--color-text-primary)' }}>
+                Winner: {gameState.players.find(p => p.id === gameState.previousTrick?.winnerId)?.name}
               </div>
-              <div className="text-white/80 text-xs md:text-sm">
+              <div className="text-xs md:text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 +{gameState.previousTrick?.points || 0} points
               </div>
             </div>
@@ -257,25 +265,25 @@ export const TrickArea = memo(function TrickArea({
 
           {/* Circular Layout - Previous Trick */}
           <div className="relative h-[280px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-40">
-            {/* Bottom (position 0) */}
+            {/* Bottom */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(previousCardPositions[0], previousCardPositions[0]?.playerId === gameState.previousTrick?.winnerId, 0)}
               {renderPlayerPosition(0)}
             </div>
 
-            {/* Left (position 1) */}
+            {/* Left */}
             <div className="absolute top-1/2 left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(previousCardPositions[1], previousCardPositions[1]?.playerId === gameState.previousTrick?.winnerId, 1)}
               {renderPlayerPosition(1)}
             </div>
 
-            {/* Top (position 2) */}
+            {/* Top */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderPlayerPosition(2)}
               {renderCard(previousCardPositions[2], previousCardPositions[2]?.playerId === gameState.previousTrick?.winnerId, 2)}
             </div>
 
-            {/* Right (position 3) */}
+            {/* Right */}
             <div className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(previousCardPositions[3], previousCardPositions[3]?.playerId === gameState.previousTrick?.winnerId, 3)}
               {renderPlayerPosition(3)}
@@ -286,31 +294,31 @@ export const TrickArea = memo(function TrickArea({
         // Current Trick View
         <>
           <div className="relative h-[330px] sm:h-[330px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto" data-testid="trick-area">
-            {/* Bottom (position 0) - You */}
+            {/* Bottom */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
               {renderPlayerPosition(0)}
             </div>
 
-            {/* Left (position 1) */}
+            {/* Left */}
             <div className="absolute top-1/2 left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
               {renderPlayerPosition(1)}
             </div>
 
-            {/* Top (position 2) */}
+            {/* Top */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderPlayerPosition(2)}
               {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId, 2)}
             </div>
 
-            {/* Right (position 3) */}
+            {/* Right */}
             <div className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
               {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
               {renderPlayerPosition(3)}
             </div>
 
-            {/* Winner Effect - positioned relative to this container */}
+            {/* Winner Effect */}
             {trickWinner && (
               <ConfettiEffect
                 position={trickWinner.position}

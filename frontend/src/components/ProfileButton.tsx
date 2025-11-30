@@ -39,6 +39,7 @@ interface ProfileButtonProps {
   socket: Socket | null;
   onShowLogin?: () => void;
   onShowProfileEditor?: () => void;
+  onShowPersonalHub?: () => void;
   className?: string;
   compact?: boolean;
 }
@@ -49,6 +50,7 @@ export function ProfileButton({
   socket,
   onShowLogin,
   onShowProfileEditor,
+  onShowPersonalHub,
   className = '',
   compact = false
 }: ProfileButtonProps) {
@@ -69,8 +71,20 @@ export function ProfileButton({
     logout();
   };
 
+  const handleShowProgress = () => {
+    if (onShowPersonalHub) {
+      onShowPersonalHub();
+    }
+  };
+
   // Define dropdown menu items
   const menuItems: DropdownMenuItem[] = [
+    {
+      label: 'My Progress',
+      icon: '🎮',
+      onClick: handleShowProgress,
+      'data-testid': 'my-progress-button',
+    },
     {
       label: 'View Profile',
       icon: '👤',

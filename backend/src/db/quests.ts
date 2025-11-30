@@ -16,7 +16,9 @@ import {
   PlayerQuest,
   QuestProgress,
   GameQuestContext,
+  RoundQuestContext,
   calculateQuestProgress,
+  calculateRoundQuestProgress,
   isQuestCompleted,
   canClaimQuestReward,
 } from '../game/quests';
@@ -171,6 +173,99 @@ export async function updateQuestProgress(
   } catch (error) {
     await client.query('ROLLBACK');
     console.error('[Quests DB] Error updating quest progress:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Update quest progress for a player after a round (round-level)
+ * Returns array of quests that made progress
+ */
+export async function updateRoundQuestProgress(
+  context: RoundQuestContext
+): Promise<QuestProgress[]> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return [];
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // Get player's active quests for today
+    const questsResult = await client.query<PlayerQuest>(
+      `
+      SELECT
+        pdq.*,
+        row_to_json(qt.*) as template
+      FROM player_daily_quests pdq
+      JOIN quest_templates qt ON pdq.quest_template_id = qt.id
+      WHERE pdq.player_name = $1
+        AND pdq.date_assigned = CURRENT_DATE
+        AND pdq.completed = FALSE
+      `,
+      [context.playerName]
+    );
+
+    const questProgressUpdates: QuestProgress[] = [];
+
+    // Update each quest using round-level progress calculation
+    for (const quest of questsResult.rows) {
+      const progressDelta = calculateRoundQuestProgress(quest, context);
+
+      if (progressDelta === 0) {
+        continue; // No progress for this quest
+      }
+
+      const newProgress = quest.progress + progressDelta;
+      const completed = isQuestCompleted(quest.progress, progressDelta, quest.template!.target_value);
+
+      // Update quest in database
+      await client.query(
+        `
+        UPDATE player_daily_quests
+        SET progress = $1,
+            completed = $2,
+            completed_at = CASE WHEN $2 = TRUE THEN CURRENT_TIMESTAMP ELSE completed_at END
+        WHERE id = $3
+        `,
+        [newProgress, completed, quest.id]
+      );
+
+      // Log quest progress event
+      await client.query(
+        `
+        INSERT INTO quest_progress_events (player_name, quest_template_id, event_type, progress_delta, game_id)
+        VALUES ($1, $2, $3, $4, $5)
+        `,
+        [
+          context.playerName,
+          quest.quest_template_id,
+          completed ? 'completed' : 'progress',
+          progressDelta,
+          context.gameId,
+        ]
+      );
+
+      questProgressUpdates.push({
+        questId: quest.id,
+        progressDelta,
+        newProgress,
+        completed,
+        questName: quest.template!.name,
+      });
+    }
+
+    await client.query('COMMIT');
+
+    return questProgressUpdates;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('[Quests DB] Error updating round quest progress:', error);
     throw error;
   } finally {
     client.release();
@@ -394,6 +489,7 @@ export async function getDailyRewardsCalendar(): Promise<
 /**
  * Get player's calendar progress
  * Auto-creates if doesn't exist
+ * Calculates currentDay based on days elapsed since month_start_date
  */
 export async function getPlayerCalendarProgress(playerName: string): Promise<{
   currentDay: number;
@@ -419,10 +515,11 @@ export async function getPlayerCalendarProgress(playerName: string): Promise<{
     await client.query('BEGIN');
 
     // Get or create calendar progress
+    // Calculate actual current day based on days elapsed since month_start_date
     let result = await client.query(
       `
       SELECT
-        current_day,
+        LEAST(30, GREATEST(1, (CURRENT_DATE - month_start_date)::int + 1)) as current_day,
         rewards_claimed,
         month_start_date,
         last_claimed_date,
@@ -436,20 +533,33 @@ export async function getPlayerCalendarProgress(playerName: string): Promise<{
       [playerName]
     );
 
-    // Create if doesn't exist
+    // Create if doesn't exist or calendar expired (>30 days old)
     if (result.rows.length === 0) {
-      await client.query(
+      // Check if there's an old calendar to carry over resets count
+      const oldResult = await client.query(
         `
-        INSERT INTO player_calendar_progress (player_name, current_day, month_start_date)
-        VALUES ($1, 1, CURRENT_DATE)
+        SELECT calendar_resets FROM player_calendar_progress
+        WHERE player_name = $1
+        ORDER BY month_start_date DESC
+        LIMIT 1
         `,
         [playerName]
+      );
+
+      const previousResets = oldResult.rows.length > 0 ? oldResult.rows[0].calendar_resets : 0;
+
+      await client.query(
+        `
+        INSERT INTO player_calendar_progress (player_name, current_day, month_start_date, calendar_resets)
+        VALUES ($1, 1, CURRENT_DATE, $2)
+        `,
+        [playerName, previousResets]
       );
 
       result = await client.query(
         `
         SELECT
-          current_day,
+          1 as current_day,
           rewards_claimed,
           month_start_date,
           last_claimed_date,
@@ -483,6 +593,7 @@ export async function getPlayerCalendarProgress(playerName: string): Promise<{
 
 /**
  * Claim daily calendar reward
+ * Only allows claiming TODAY's reward (based on days since month_start_date)
  */
 export async function claimCalendarReward(
   playerName: string,
@@ -498,11 +609,15 @@ export async function claimCalendarReward(
   try {
     await client.query('BEGIN');
 
-    // Get player's calendar progress
+    // Get player's calendar progress with calculated current day
     const progressResult = await client.query(
       `
-      SELECT * FROM player_calendar_progress
+      SELECT
+        *,
+        LEAST(30, GREATEST(1, (CURRENT_DATE - month_start_date)::int + 1)) as actual_current_day
+      FROM player_calendar_progress
       WHERE player_name = $1
+        AND month_start_date >= CURRENT_DATE - INTERVAL '30 days'
       ORDER BY month_start_date DESC
       LIMIT 1
       `,
@@ -511,11 +626,12 @@ export async function claimCalendarReward(
 
     if (progressResult.rows.length === 0) {
       await client.query('ROLLBACK');
-      return null;
+      throw new Error('No active calendar found. Please open the calendar first.');
     }
 
     const progress = progressResult.rows[0];
     const rewardsClaimed: number[] = progress.rewards_claimed || [];
+    const actualCurrentDay: number = progress.actual_current_day;
 
     // Check if already claimed
     if (rewardsClaimed.includes(dayNumber)) {
@@ -523,14 +639,18 @@ export async function claimCalendarReward(
       throw new Error('Reward already claimed');
     }
 
-    // Check if can claim (must be current day or earlier)
-    if (dayNumber > progress.current_day) {
+    // STRICT: Only allow claiming TODAY's day (not past days)
+    if (dayNumber !== actualCurrentDay) {
       await client.query('ROLLBACK');
-      throw new Error('Cannot claim future rewards');
+      if (dayNumber > actualCurrentDay) {
+        throw new Error('Cannot claim future rewards');
+      } else {
+        throw new Error('This reward has expired. You can only claim today\'s reward.');
+      }
     }
 
     // Get reward details
-    const rewardResult = await pool.query(
+    const rewardResult = await client.query(
       `SELECT * FROM daily_rewards_calendar WHERE day_number = $1`,
       [dayNumber]
     );
@@ -542,17 +662,12 @@ export async function claimCalendarReward(
 
     const reward = rewardResult.rows[0];
 
-    // Update calendar progress
+    // Update calendar progress - no need to update current_day since it's calculated dynamically
     await client.query(
       `
       UPDATE player_calendar_progress
       SET rewards_claimed = array_append(rewards_claimed, $1),
           last_claimed_date = CURRENT_DATE,
-          current_day = CASE
-            WHEN $1 = current_day AND current_day < 30 THEN current_day + 1
-            WHEN $1 = 30 THEN 1
-            ELSE current_day
-          END,
           calendar_resets = CASE
             WHEN $1 = 30 THEN calendar_resets + 1
             ELSE calendar_resets

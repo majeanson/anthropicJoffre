@@ -1,9 +1,8 @@
 /**
- * PlayerPosition Component
- * Renders player name badge and bot difficulty indicator (with click-to-toggle thinking)
+ * PlayerPosition Component - Multi-Skin Edition
  *
- * Extracted from PlayingPhase.tsx (lines 517-599, 908-1014)
- * Part of Sprint: PlayingPhase.tsx split into focused components
+ * Renders player name badge and bot difficulty indicator.
+ * Uses CSS variables for skin compatibility.
  */
 
 import { memo } from 'react';
@@ -11,7 +10,6 @@ import { Player } from '../../types/game';
 import { MoveSuggestionButton } from '../MoveSuggestionButton';
 import { GameTooltip } from '../ui';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
-import { colors } from '../../design-system';
 
 export interface PlayerPositionProps {
   player: Player | null;
@@ -44,14 +42,14 @@ export const PlayerPosition = memo(function PlayerPosition({
   suggestionOpen,
   onToggleSuggestion,
 }: PlayerPositionProps) {
-  // Helper: Get bot difficulty badge (now with bot thinking on click toggle)
+  // Helper: Get bot difficulty badge (with click-to-toggle thinking)
   const getBotDifficultyBadge = (): JSX.Element | null => {
     if (!player?.isBot || !player.botDifficulty) return null;
 
     const badges = {
-      easy: { color: 'bg-green-500/90 text-white', icon: '🤖', label: 'Easy' },
-      medium: { color: 'bg-yellow-500/90 text-white', icon: '🤖', label: 'Med' },
-      hard: { color: 'bg-red-500/90 text-white', icon: '🤖', label: 'Hard' },
+      easy: { bgColor: 'var(--color-success)', label: 'Easy' },
+      medium: { bgColor: 'var(--color-warning)', label: 'Med' },
+      hard: { bgColor: 'var(--color-error)', label: 'Hard' },
     };
 
     const badge = badges[player.botDifficulty];
@@ -62,31 +60,30 @@ export const PlayerPosition = memo(function PlayerPosition({
         <>
           <button
             onClick={onToggleBotThinking}
-            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg transition-all active:scale-95 cursor-pointer hover:brightness-110 ${
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1 transition-all active:scale-95 cursor-pointer hover:brightness-110 ${
               botThinkingOpen ? 'ring-2 ring-white scale-105' : ''
             }`}
+            style={{
+              backgroundColor: badge.bgColor,
+              color: 'white',
+              boxShadow: `0 2px 8px ${badge.bgColor}`,
+            }}
             title={`Click to see what ${player.name} is thinking`}
             aria-expanded={botThinkingOpen}
             aria-label={botThinkingOpen ? `Hide ${player.name}'s thinking` : `Show ${player.name}'s thinking`}
           >
-            <span className={isThinking ? 'animate-pulse' : ''}>{badge.icon}</span>
+            <span className={isThinking ? 'animate-pulse' : ''}>🤖</span>
             <span className="hidden md:inline">{badge.label}</span>
             {isThinking && (
               <span className="flex gap-0.5 text-base md:text-xs">
-                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>
-                  .
-                </span>
-                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>
-                  .
-                </span>
-                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>
-                  .
-                </span>
+                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
               </span>
             )}
           </button>
 
-          {/* Bot Thinking Tooltip - Using GameTooltip for proper z-index and mobile positioning */}
+          {/* Bot Thinking Tooltip */}
           <GameTooltip
             isOpen={botThinkingOpen}
             onClose={onToggleBotThinking}
@@ -96,10 +93,12 @@ export const PlayerPosition = memo(function PlayerPosition({
             testId="bot-thinking-tooltip"
           >
             <div className="space-y-1">
-              <p className="text-xs font-medium text-white/70">
+              <p className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>
                 {badge.label} difficulty
               </p>
-              <p className="text-base font-bold">{botThinking}</p>
+              <p className="text-base font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                {botThinking}
+              </p>
             </div>
           </GameTooltip>
         </>
@@ -109,22 +108,21 @@ export const PlayerPosition = memo(function PlayerPosition({
     // No bot thinking - just show static badge
     return (
       <span
-        className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg`}
+        className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1"
+        style={{
+          backgroundColor: badge.bgColor,
+          color: 'white',
+          boxShadow: `0 2px 8px ${badge.bgColor}`,
+        }}
         title={`Bot (${badge.label} difficulty)${isThinking ? ' - Thinking...' : ''}`}
       >
-        <span className={isThinking ? 'animate-pulse' : ''}>{badge.icon}</span>
+        <span className={isThinking ? 'animate-pulse' : ''}>🤖</span>
         <span className="hidden md:inline">{badge.label}</span>
         {isThinking && (
           <span className="flex gap-0.5 text-base md:text-xs">
-            <span className="animate-bounce" style={{ animationDelay: '0ms' }}>
-              .
-            </span>
-            <span className="animate-bounce" style={{ animationDelay: '150ms' }}>
-              .
-            </span>
-            <span className="animate-bounce" style={{ animationDelay: '300ms' }}>
-              .
-            </span>
+            <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+            <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+            <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
           </span>
         )}
       </span>
@@ -138,27 +136,28 @@ export const PlayerPosition = memo(function PlayerPosition({
     return player.name;
   };
 
-  // Helper: Get badge CSS classes
-  const getBadgeClasses = (): string => {
-    const baseClasses =
-      'max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-xl text-xs md:text-sm font-bold shadow-lg';
-
-    let colorClasses = '';
+  // Helper: Get badge style based on team
+  const getBadgeStyle = (): React.CSSProperties => {
     if (!player || player.isEmpty) {
-      colorClasses =
-        'text-gray-200 border-2 border-dashed border-gray-500';
-    } else if (player.teamId === 1) {
-      colorClasses = 'text-white';
-    } else {
-      colorClasses = 'text-white';
+      return {
+        backgroundColor: 'var(--color-bg-tertiary)',
+        borderColor: 'var(--color-border-subtle)',
+        borderWidth: '2px',
+        borderStyle: 'dashed',
+      };
     }
 
-    const winnerRing = isWinner ? 'ring-2 md:ring-3 ring-yellow-400' : '';
+    const teamColor = player.teamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)';
+    const teamTextColor = player.teamId === 1 ? 'var(--color-team1-text)' : 'var(--color-team2-text)';
 
-    return `${baseClasses} ${colorClasses} ${winnerRing}`;
+    return {
+      background: teamColor,
+      color: teamTextColor,
+      boxShadow: isWinner ? '0 0 15px var(--color-warning)' : `0 4px 12px ${teamColor}`,
+    };
   };
 
-  // Handle player name click (allow clicking on own profile and other real players, not bots)
+  // Handle player name click
   const handleNameClick = () => {
     if (player && !player.isEmpty && !player.isBot && onClickPlayer) {
       onClickPlayer(player.name);
@@ -205,13 +204,28 @@ export const PlayerPosition = memo(function PlayerPosition({
         />
       )}
 
-      <div className={getBadgeClasses()} style={(player && !player.isEmpty) ? (player.teamId === 1 ? { background: colors.gradients.team1 } : { background: colors.gradients.team2 }) : {}}>
-        <span className="flex items-center justify-center relative">
+      <div
+        className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-[var(--radius-lg)] text-xs md:text-sm font-bold shadow-lg ${
+          isWinner ? 'ring-2 md:ring-3' : ''
+        }`}
+        style={{
+          ...getBadgeStyle(),
+          ...(isWinner ? { ringColor: 'var(--color-warning)' } : {}),
+        }}
+      >
+        <span
+          className="flex items-center justify-center relative"
+          style={{ color: player && !player.isEmpty
+            ? (player.teamId === 1 ? 'var(--color-team1-text)' : 'var(--color-team2-text)')
+            : 'var(--color-text-muted)'
+          }}
+        >
           {player?.isEmpty && <span aria-hidden="true">💺 </span>}
           {isClickable ? (
             <button
               onClick={handleNameClick}
-              className="hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/50 rounded px-1 -mx-1"
+              className="hover:underline cursor-pointer focus:outline-none rounded px-1 -mx-1"
+              style={{ outline: 'none' }}
               title={`View ${player.name}'s profile`}
             >
               {getDisplayName()}

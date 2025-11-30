@@ -1,3 +1,10 @@
+/**
+ * BettingPhase Component - Multi-Skin Edition
+ *
+ * Betting phase with proper CSS variable usage for skin compatibility.
+ * Features bet selection, trump options, and validation feedback.
+ */
+
 import { useMemo, useState, useEffect, memo } from 'react';
 import { Socket } from 'socket.io-client';
 import { Bet, Player, GameState } from '../types/game';
@@ -14,8 +21,7 @@ import { useChatNotifications } from '../hooks/useChatNotifications';
 import { MoveSuggestionPanel } from './MoveSuggestionPanel';
 import { useSettings } from '../contexts/SettingsContext';
 import { BettingHistory } from './BettingHistory';
-import { UICard } from './ui/UICard';
-import { Button } from './ui/Button';
+import { Button, NeonButton } from './ui/Button';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -29,9 +35,9 @@ interface BettingPhaseProps {
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
   onOpenBotManagement?: () => void;
-  onOpenAchievements?: () => void; // Sprint 2 Phase 1
-  onOpenFriends?: () => void; // Sprint 2 Phase 2
-  pendingFriendRequestsCount?: number; // Sprint 16 - Friend requests badge
+  onOpenAchievements?: () => void;
+  onOpenFriends?: () => void;
+  pendingFriendRequestsCount?: number;
   soundEnabled?: boolean;
   onSoundToggle?: () => void;
   connectionStats?: ConnectionStats;
@@ -39,16 +45,36 @@ interface BettingPhaseProps {
   gameId?: string;
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
-  onClickPlayer: (playerName: string) => void; // Click player to view profile (REQUIRED)
+  onClickPlayer: (playerName: string) => void;
 }
 
-function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentPlayerIndex, dealerIndex, onPlaceBet, onLeaveGame, gameState, autoplayEnabled = false, onAutoplayToggle, onOpenBotManagement, onOpenAchievements, onOpenFriends, pendingFriendRequestsCount = 0, soundEnabled = true, onSoundToggle, connectionStats, socket, gameId, chatMessages = [], onNewChatMessage, onClickPlayer }: BettingPhaseProps) {
-
-  // Get beginner mode setting
+function BettingPhaseComponent({
+  players,
+  currentBets,
+  currentPlayerId,
+  currentPlayerIndex,
+  dealerIndex,
+  onPlaceBet,
+  onLeaveGame,
+  gameState,
+  autoplayEnabled = false,
+  onAutoplayToggle,
+  onOpenBotManagement,
+  onOpenAchievements,
+  onOpenFriends,
+  pendingFriendRequestsCount = 0,
+  soundEnabled = true,
+  onSoundToggle,
+  connectionStats,
+  socket,
+  gameId,
+  chatMessages = [],
+  onNewChatMessage,
+  onClickPlayer
+}: BettingPhaseProps) {
   const { beginnerMode } = useSettings();
 
   // Memoize expensive computations
-  // Find current player by name (stable identifier)
   const currentPlayer = useMemo(
     () => players.find(p => p.name === currentPlayerId),
     [players, currentPlayerId]
@@ -80,12 +106,9 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false);
   const [chatOpen, setChatOpen] = useState<boolean>(false);
 
-  // Keyboard navigation state - 3 levels
-  // Level 0: Bet amount (7-12)
-  // Level 1: Trump option (With/Without)
-  // Level 2: Action buttons (Skip/Place)
+  // Keyboard navigation state
   const [navLevel, setNavLevel] = useState<number>(0);
-  const [actionIndex, setActionIndex] = useState<number>(0); // 0=Skip, 1=Place (for level 2)
+  const [actionIndex, setActionIndex] = useState<number>(0);
 
   // Use chat notifications hook
   const { unreadChatCount } = useChatNotifications({
@@ -95,7 +118,7 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
     onNewChatMessage
   });
 
-  // Get highest valid bet (excluding skipped bets) - memoized
+  // Get highest valid bet
   const highestBet = useMemo((): Bet | null => {
     const validBets = currentBets.filter(b => !b.skipped);
     if (validBets.length === 0) return null;
@@ -107,28 +130,21 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   }, [currentBets]);
 
   const canSkip = (): boolean => {
-    // Non-dealers can always skip
-    if (!isDealer) {
-      return true;
-    }
-
-    // Dealer CANNOT skip if NO valid bets exist (must start the betting)
-    // Dealer CAN skip if there ARE valid bets
+    if (!isDealer) return true;
     const hasValidBets = currentBets.some(b => !b.skipped);
-    return hasValidBets; // Dealer can skip only if someone has bet
+    return hasValidBets;
   };
 
   const handlePlaceBet = () => {
-    sounds.betPlaced(); // Sprint 1 Phase 6: Bet placed sound
+    sounds.betPlaced();
     onPlaceBet(selectedAmount, withoutTrump, false);
   };
 
   const handleSkip = () => {
-    sounds.betSkipped(); // Sprint 1 Phase 6: Skip sound
+    sounds.betSkipped();
     onPlaceBet(-1, false, true);
   };
 
-  // Scroll to the active navigation level
   const scrollToLevel = (level: number) => {
     const levelIds = ['bet-level-amount', 'bet-level-trump', 'bet-level-action'];
     const element = document.getElementById(levelIds[level]);
@@ -137,53 +153,43 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
     }
   };
 
-  // Keyboard accessibility for betting - 3 level navigation
+  // Keyboard navigation
   useEffect(() => {
     if (!isMyTurn || hasPlacedBet) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Up/Down - Navigate between levels
       if (e.key === 'ArrowUp') {
         e.preventDefault();
         const newLevel = Math.max(0, navLevel - 1);
         setNavLevel(newLevel);
         scrollToLevel(newLevel);
         sounds.buttonClick();
-      }
-      else if (e.key === 'ArrowDown') {
+      } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         const newLevel = Math.min(2, navLevel + 1);
         setNavLevel(newLevel);
         scrollToLevel(newLevel);
         sounds.buttonClick();
-      }
-      // Left/Right - Adjust value within current level
-      else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         e.preventDefault();
         if (navLevel === 0) {
-          // Level 0: Bet amount
           if (e.key === 'ArrowRight') {
             setSelectedAmount(prev => Math.min(12, prev + 1));
           } else {
             setSelectedAmount(prev => Math.max(7, prev - 1));
           }
         } else if (navLevel === 1) {
-          // Level 1: Trump option toggle
           setWithoutTrump(prev => !prev);
         } else if (navLevel === 2) {
-          // Level 2: Action buttons (Skip/Place)
           const hasSkip = canSkip();
           if (hasSkip) {
             setActionIndex(prev => prev === 0 ? 1 : 0);
           }
         }
         sounds.buttonClick();
-      }
-      // Enter - Activate current selection
-      else if (e.key === 'Enter') {
+      } else if (e.key === 'Enter') {
         e.preventDefault();
         if (navLevel === 2) {
-          // Action level - execute selected action
           if (actionIndex === 0 && canSkip()) {
             handleSkip();
           } else if (actionIndex === 1 || !canSkip()) {
@@ -192,13 +198,10 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
             }
           }
         } else {
-          // On other levels, Enter moves to action level
           setNavLevel(2);
         }
         sounds.buttonClick();
-      }
-      // Escape - Go back one level or skip
-      else if (e.key === 'Escape') {
+      } else if (e.key === 'Escape') {
         e.preventDefault();
         if (navLevel > 0) {
           setNavLevel(prev => prev - 1);
@@ -213,36 +216,27 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isMyTurn, hasPlacedBet, selectedAmount, withoutTrump, navLevel, actionIndex]);
 
-  // Check if a specific bet amount is valid (for button disabling)
   const isBetAmountValid = (amount: number): boolean => {
-    if (!highestBet) return true; // No bets yet, all amounts valid
-
-    if (isDealer) {
-      // Dealer can match or raise
-      return amount >= highestBet.amount;
-    } else {
-      // Non-dealer must raise (strictly greater)
-      // Note: They could match with withoutTrump, but we disable the button to encourage raising
-      return amount > highestBet.amount;
-    }
+    if (!highestBet) return true;
+    if (isDealer) return amount >= highestBet.amount;
+    return amount > highestBet.amount;
   };
 
-  // Check if current selection is valid
   const isCurrentBetValid = (): boolean => {
-    if (!highestBet) return true; // No bets yet, all valid
-
-    if (isDealer) {
-      // Dealer can match or raise
-      return selectedAmount >= highestBet.amount;
-    } else {
-      // Non-dealer must raise (higher amount or same with withoutTrump)
-      return selectedAmount > highestBet.amount ||
-             (selectedAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
-    }
+    if (!highestBet) return true;
+    if (isDealer) return selectedAmount >= highestBet.amount;
+    return selectedAmount > highestBet.amount ||
+           (selectedAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
   };
+
+  // Get current player's team color
+  const currentTurnTeamId = players[currentPlayerIndex]?.teamId;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-parchment-400 to-parchment-500 dark:from-gray-800 dark:to-gray-900 flex flex-col">
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: 'var(--color-bg-primary)' }}
+    >
       <GameHeader
         gameId={gameState.id}
         roundNumber={gameState.roundNumber}
@@ -268,218 +262,313 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
       />
 
       <div className="flex-1 flex items-center justify-center p-4">
-        <UICard variant="bordered" size="lg" className="bg-parchment-50 dark:bg-gray-800 max-w-2xl w-full border-2 border-parchment-400 dark:border-gray-600">
-          <h2 className="text-2xl font-bold text-umber-900 dark:text-gray-100 font-serif mb-4">Betting Phase</h2>
+        <div
+          className="
+            bg-[var(--color-bg-secondary)]
+            rounded-[var(--radius-xl)]
+            p-6 max-w-2xl w-full
+            border-2 border-[var(--color-border-accent)]
+          "
+          style={{
+            boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
+          }}
+        >
+          <h2
+            className="text-2xl font-display uppercase tracking-wider mb-4 text-center"
+            style={{
+              color: 'var(--color-text-primary)',
+              textShadow: '0 0 10px var(--color-glow)',
+            }}
+          >
+            Betting Phase
+          </h2>
 
-      {/* Current Turn Indicator with Timeout */}
-      {!hasPlacedBet && (
-        <div className="relative mb-6">
-          {/* Spotlight effect for current player */}
-          {isMyTurn && (
-            <div className="absolute inset-0 -m-4 rounded-full bg-gradient-radial from-blue-400/30 via-blue-400/10 to-transparent motion-safe:animate-spotlight motion-reduce:opacity-30 pointer-events-none" />
-          )}
-          <div className={`relative px-3 md:px-4 py-2 md:py-3 rounded-xl text-sm md:text-base font-bold shadow-lg flex items-center justify-center gap-2 flex-wrap transition-all bg-gradient-to-r ${
-            players[currentPlayerIndex]?.teamId === 1
-              ? 'from-orange-400 to-amber-500'
-              : 'from-purple-400 to-indigo-500'
-          } text-white ${isMyTurn ? 'border-4 border-blue-500 motion-safe:animate-turn-pulse' : ''}`}>
-            {isMyTurn && (
-              <span className="motion-safe:animate-arrow-bounce motion-reduce:inline">👇</span>
-            )}
-            <span>Waiting for: {players[currentPlayerIndex]?.name}{isMyTurn ? ' (Your Turn)' : ''}</span>
-            <TimeoutIndicator
-              duration={60000}
-              isActive={!hasPlacedBet && isMyTurn}
-              resetKey={currentPlayerIndex}
-              onTimeout={() => {
-                // Auto-enable autoplay when timeout expires (only for current player)
-                if (isMyTurn && onAutoplayToggle && !autoplayEnabled) {
-                  onAutoplayToggle();
-                }
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* IMPROVEMENT #12: Betting History Visualization */}
-      <div className="mb-6">
-        <BettingHistory
-          players={players}
-          currentBets={currentBets}
-          dealerIndex={dealerIndex}
-          onClickPlayer={onClickPlayer}
-        />
-      </div>
-
-      {/* Player's Hand Display - 4x2 Grid */}
-      {playerHand.length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold mb-3 text-umber-800 dark:text-gray-200">Your Hand</h3>
-          <div className="grid grid-cols-4 gap-2 md:gap-3 max-w-md mx-auto">
-            {playerHand.map((card, index) => (
+          {/* Current Turn Indicator */}
+          {!hasPlacedBet && (
+            <div className="relative mb-6">
               <div
-                key={`${card.color}-${card.value}-${index}`}
-                className="flex justify-center"
+                className={`
+                  relative px-4 py-3 rounded-[var(--radius-lg)]
+                  font-display uppercase tracking-wider text-sm
+                  flex items-center justify-center gap-2 flex-wrap
+                  border-2 transition-all duration-[var(--duration-fast)]
+                `}
+                style={{
+                  backgroundColor: currentTurnTeamId === 1
+                    ? 'var(--color-team1-primary)'
+                    : 'var(--color-team2-primary)',
+                  borderColor: isMyTurn ? 'var(--color-text-accent)' : 'transparent',
+                  color: currentTurnTeamId === 1
+                    ? 'var(--color-team1-text)'
+                    : 'var(--color-team2-text)',
+                  boxShadow: isMyTurn
+                    ? '0 0 20px var(--color-glow), 0 0 40px var(--color-glow)'
+                    : `0 0 15px ${currentTurnTeamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)'}`,
+                }}
               >
-                <CardComponent
-                  card={card}
-                  size="small"
+                {isMyTurn && <span className="animate-bounce">👇</span>}
+                <span>Waiting for: {players[currentPlayerIndex]?.name}{isMyTurn ? ' (Your Turn)' : ''}</span>
+                <TimeoutIndicator
+                  duration={60000}
+                  isActive={!hasPlacedBet && isMyTurn}
+                  resetKey={currentPlayerIndex}
+                  onTimeout={() => {
+                    if (isMyTurn && onAutoplayToggle && !autoplayEnabled) {
+                      onAutoplayToggle();
+                    }
+                  }}
                 />
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* Betting History */}
+          <div className="mb-6">
+            <BettingHistory
+              players={players}
+              currentBets={currentBets}
+              dealerIndex={dealerIndex}
+              onClickPlayer={onClickPlayer}
+            />
           </div>
-        </div>
-      )}
 
-      {/* Beginner Mode: Move Suggestion */}
-      {beginnerMode && !hasPlacedBet && isMyTurn && (
-        <div className="mb-6">
-          <MoveSuggestionPanel
-            gameState={gameState}
-            currentPlayerId={currentPlayerId}
-            isMyTurn={isMyTurn}
-          />
-        </div>
-      )}
-
-      {!hasPlacedBet && (
-        <div className="space-y-3 mt-6 pt-6 border-t-2 border-parchment-400 dark:border-gray-600">
-          {isMyTurn ? (
-            <>
-              <div className="space-y-4">
-                {/* Level 0: Bet Amount */}
-                <div id="bet-level-amount" className={`p-3 rounded-lg transition-all ${navLevel === 0 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
-                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
-                    {navLevel === 0 && <span className="text-orange-500">▶</span>}
-                    Select Bet Amount: <span className="hidden sm:inline text-xs text-umber-600 dark:text-gray-400">(← → to adjust)</span>
-                  </label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[7, 8, 9, 10, 11, 12].map((amount) => {
-                      const isValid = isBetAmountValid(amount);
-                      return (
-                        <Button
-                          key={amount}
-                          onClick={() => setSelectedAmount(amount)}
-                          disabled={!isValid}
-                          variant={selectedAmount === amount ? 'primary' : 'ghost'}
-                          size="md"
-                          className={`py-3 px-4 ${
-                            !isValid
-                              ? 'opacity-50'
-                              : selectedAmount === amount
-                                ? 'ring-2 ring-umber-400'
-                                : ''
-                          }`}
-                        >
-                          {amount}
-                        </Button>
-                      );
-                    })}
+          {/* Player's Hand Display */}
+          {playerHand.length > 0 && (
+            <div className="mb-6">
+              <h3
+                className="text-sm font-display uppercase tracking-wider mb-3"
+                style={{ color: 'var(--color-text-secondary)' }}
+              >
+                Your Hand
+              </h3>
+              <div className="grid grid-cols-4 gap-2 md:gap-3 max-w-md mx-auto">
+                {playerHand.map((card, index) => (
+                  <div key={`${card.color}-${card.value}-${index}`} className="flex justify-center">
+                    <CardComponent card={card} size="small" />
                   </div>
-                </div>
-
-                {/* Level 1: Trump Option */}
-                <div id="bet-level-trump" className={`p-3 rounded-lg transition-all ${navLevel === 1 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
-                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
-                    {navLevel === 1 && <span className="text-orange-500">▶</span>}
-                    Trump Option: <span className="hidden sm:inline text-xs text-umber-600 dark:text-gray-400">(← → to toggle)</span>
-                  </label>
-                  <div className="space-y-2">
-                    <label className="flex items-center p-3 bg-parchment-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-parchment-200 dark:bg-gray-600 transition-colors border border-parchment-300 dark:border-gray-600">
-                      <input
-                        type="radio"
-                        name="trump"
-                        checked={!withoutTrump}
-                        onChange={() => setWithoutTrump(false)}
-                        className="w-4 h-4 text-umber-600 dark:text-gray-400 focus:ring-umber-500"
-                      />
-                      <span className="ml-3 text-sm font-medium text-umber-800 dark:text-gray-200">
-                        With Trump (1x)
-                      </span>
-                    </label>
-                    <label className="flex items-center p-3 bg-parchment-100 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-parchment-200 dark:bg-gray-600 transition-colors border border-parchment-300 dark:border-gray-600">
-                      <input
-                        type="radio"
-                        name="trump"
-                        checked={withoutTrump}
-                        onChange={() => setWithoutTrump(true)}
-                        className="w-4 h-4 text-umber-600 dark:text-gray-400 focus:ring-umber-500"
-                      />
-                      <span className="ml-3 text-sm font-medium text-umber-800 dark:text-gray-200">
-                        Without Trump (2x multiplier)
-                      </span>
-                    </label>
-                  </div>
-                </div>
-
-                {/* Level 2: Action Buttons */}
-                <div id="bet-level-action" className={`p-3 rounded-lg transition-all ${navLevel === 2 ? 'ring-2 ring-orange-500 bg-orange-50 dark:bg-orange-900/20' : ''}`}>
-                  <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-3 flex items-center gap-2">
-                    {navLevel === 2 && <span className="text-orange-500">▶</span>}
-                    Action: <span className="hidden sm:inline text-xs text-umber-600 dark:text-gray-400">(← → to select, Enter to confirm)</span>
-                  </label>
-                  <div className="flex gap-3">
-                    {canSkip() && (
-                      <Button
-                        data-testid="skip-bet-button"
-                        onClick={handleSkip}
-                        variant="secondary"
-                        className={`flex-1 py-4 ${
-                          navLevel === 2 && actionIndex === 0 ? 'ring-4 ring-orange-500' : ''
-                        }`}
-                      >
-                        SKIP
-                      </Button>
-                    )}
-                    <Button
-                      onClick={handlePlaceBet}
-                      disabled={!isCurrentBetValid()}
-                      variant={isCurrentBetValid() ? 'success' : 'secondary'}
-                      className={`flex-1 py-4 ${navLevel === 2 && (actionIndex === 1 || !canSkip()) ? 'ring-4 ring-orange-500' : ''}`}
-                    >
-                      Place Bet: {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
-                    </Button>
-                  </div>
-                </div>
+                ))}
               </div>
+            </div>
+          )}
 
-              {/* Smart Validation Messages - Single priority-based display */}
-              <SmartValidationMessage
-                messages={[
-                  ...(!isCurrentBetValid() && highestBet ? [{
-                    type: 'warning' as const,
-                    text: `Too low: Current highest is ${highestBet.amount} points${highestBet.withoutTrump ? ' (No Trump)' : ''}. ${isDealer ? 'You can match or raise.' : 'You must raise.'}`
-                  }] : []),
-                  ...(isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) ? [{
-                    type: 'info' as const,
-                    text: 'Dealer Privilege: You can match or raise the current bet'
-                  }] : []),
-                  ...(isDealer && !currentBets.some(b => !b.skipped) ? [{
-                    type: 'info' as const,
-                    text: 'Dealer: You must bet at least 7 points'
-                  }] : []),
-                  ...(isCurrentBetValid() ? [{
-                    type: 'success' as const,
-                    text: `Ready to place bet: ${selectedAmount} ${withoutTrump ? '(No Trump)' : ''}`
-                  }] : [])
-                ]}
+          {/* Beginner Mode: Move Suggestion */}
+          {beginnerMode && !hasPlacedBet && isMyTurn && (
+            <div className="mb-6">
+              <MoveSuggestionPanel
+                gameState={gameState}
+                currentPlayerId={currentPlayerId}
+                isMyTurn={isMyTurn}
               />
-            </>
-          ) : (
-            <div className="text-center text-umber-700 dark:text-gray-300 font-medium py-3 text-sm">
-              <span>It's {players[currentPlayerIndex]?.name}'s turn to bet</span>
+            </div>
+          )}
+
+          {/* Betting Controls */}
+          {!hasPlacedBet && (
+            <div
+              className="space-y-4 mt-6 pt-6"
+              style={{ borderTop: '2px solid var(--color-border-default)' }}
+            >
+              {isMyTurn ? (
+                <>
+                  {/* Level 0: Bet Amount */}
+                  <div
+                    id="bet-level-amount"
+                    className={`
+                      p-4 rounded-[var(--radius-lg)]
+                      border-2 transition-all duration-[var(--duration-fast)]
+                      ${navLevel === 0
+                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
+                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)]'
+                      }
+                    `}
+                    style={navLevel === 0 ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
+                  >
+                    <label
+                      className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      {navLevel === 0 && <span style={{ color: 'var(--color-text-accent)' }}>▶</span>}
+                      Select Bet Amount
+                      <span className="hidden sm:inline text-[10px]">(← → to adjust)</span>
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[7, 8, 9, 10, 11, 12].map((amount) => {
+                        const isValid = isBetAmountValid(amount);
+                        const isSelected = selectedAmount === amount;
+                        return (
+                          <button
+                            key={amount}
+                            onClick={() => { sounds.buttonClick(); setSelectedAmount(amount); }}
+                            disabled={!isValid}
+                            className={`
+                              py-3 px-4
+                              rounded-[var(--radius-md)]
+                              font-display text-lg
+                              border-2 transition-all duration-[var(--duration-fast)]
+                              ${!isValid
+                                ? 'opacity-40 cursor-not-allowed border-[var(--color-border-subtle)] text-[var(--color-text-muted)]'
+                                : isSelected
+                                ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/20 text-[var(--color-text-accent)]'
+                                : 'border-[var(--color-border-default)] bg-transparent text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
+                              }
+                            `}
+                            style={isSelected && isValid ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
+                          >
+                            {amount}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Level 1: Trump Option */}
+                  <div
+                    id="bet-level-trump"
+                    className={`
+                      p-4 rounded-[var(--radius-lg)]
+                      border-2 transition-all duration-[var(--duration-fast)]
+                      ${navLevel === 1
+                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
+                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)]'
+                      }
+                    `}
+                    style={navLevel === 1 ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
+                  >
+                    <label
+                      className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      {navLevel === 1 && <span style={{ color: 'var(--color-text-accent)' }}>▶</span>}
+                      Trump Option
+                      <span className="hidden sm:inline text-[10px]">(← → to toggle)</span>
+                    </label>
+                    <div className="space-y-2">
+                      {[
+                        { value: false, label: 'With Trump (1x)', icon: '🃏' },
+                        { value: true, label: 'Without Trump (2x)', icon: '✨' }
+                      ].map((option) => (
+                        <button
+                          key={option.label}
+                          onClick={() => { sounds.buttonClick(); setWithoutTrump(option.value); }}
+                          className={`
+                            w-full flex items-center p-3
+                            rounded-[var(--radius-md)]
+                            border-2 transition-all duration-[var(--duration-fast)]
+                            ${withoutTrump === option.value
+                              ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/20'
+                              : 'border-[var(--color-border-default)] bg-[var(--color-bg-secondary)] hover:border-[var(--color-border-accent)]'
+                            }
+                          `}
+                        >
+                          <span className="mr-3 text-lg">{option.icon}</span>
+                          <span
+                            className="font-body text-sm"
+                            style={{
+                              color: withoutTrump === option.value
+                                ? 'var(--color-text-accent)'
+                                : 'var(--color-text-secondary)'
+                            }}
+                          >
+                            {option.label}
+                          </span>
+                          {withoutTrump === option.value && (
+                            <span className="ml-auto" style={{ color: 'var(--color-text-accent)' }}>✓</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Level 2: Action Buttons */}
+                  <div
+                    id="bet-level-action"
+                    className={`
+                      p-4 rounded-[var(--radius-lg)]
+                      border-2 transition-all duration-[var(--duration-fast)]
+                      ${navLevel === 2
+                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
+                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)]'
+                      }
+                    `}
+                    style={navLevel === 2 ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
+                  >
+                    <label
+                      className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      {navLevel === 2 && <span style={{ color: 'var(--color-text-accent)' }}>▶</span>}
+                      Action
+                      <span className="hidden sm:inline text-[10px]">(← → select, Enter confirm)</span>
+                    </label>
+                    <div className="flex gap-3">
+                      {canSkip() && (
+                        <Button
+                          data-testid="skip-bet-button"
+                          onClick={handleSkip}
+                          variant="ghost"
+                          size="lg"
+                          className={`flex-1 ${navLevel === 2 && actionIndex === 0 ? 'ring-2 ring-[var(--color-text-accent)]' : ''}`}
+                        >
+                          ⏭️ Skip
+                        </Button>
+                      )}
+                      <NeonButton
+                        onClick={handlePlaceBet}
+                        disabled={!isCurrentBetValid()}
+                        size="lg"
+                        glow={isCurrentBetValid()}
+                        className={`flex-1 ${navLevel === 2 && (actionIndex === 1 || !canSkip()) ? 'ring-2 ring-[var(--color-text-accent)]' : ''}`}
+                      >
+                        🎲 Bet {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
+                      </NeonButton>
+                    </div>
+                  </div>
+
+                  {/* Validation Messages */}
+                  <SmartValidationMessage
+                    messages={[
+                      ...(!isCurrentBetValid() && highestBet ? [{
+                        type: 'warning' as const,
+                        text: `Too low: Current highest is ${highestBet.amount} points${highestBet.withoutTrump ? ' (No Trump)' : ''}. ${isDealer ? 'You can match or raise.' : 'You must raise.'}`
+                      }] : []),
+                      ...(isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) ? [{
+                        type: 'info' as const,
+                        text: 'Dealer Privilege: You can match or raise the current bet'
+                      }] : []),
+                      ...(isDealer && !currentBets.some(b => !b.skipped) ? [{
+                        type: 'info' as const,
+                        text: 'Dealer: You must bet at least 7 points'
+                      }] : []),
+                      ...(isCurrentBetValid() ? [{
+                        type: 'success' as const,
+                        text: `Ready to place bet: ${selectedAmount} ${withoutTrump ? '(No Trump)' : ''}`
+                      }] : [])
+                    ]}
+                  />
+                </>
+              ) : (
+                <div
+                  className="text-center font-body py-3"
+                  style={{ color: 'var(--color-text-muted)' }}
+                >
+                  It's {players[currentPlayerIndex]?.name}'s turn to bet
+                </div>
+              )}
+            </div>
+          )}
+
+          {hasPlacedBet && (
+            <div
+              className="text-center font-body mt-6 pt-6"
+              style={{
+                borderTop: '2px solid var(--color-border-default)',
+                color: 'var(--color-success)',
+              }}
+            >
+              ✓ Waiting for other players to bet...
             </div>
           )}
         </div>
-      )}
-
-      {hasPlacedBet && (
-        <div className="text-center text-forest-700 font-medium mt-6 pt-6 border-t-2 border-parchment-400 dark:border-gray-600">
-          Waiting for other players to bet...
-        </div>
-      )}
-        </UICard>
       </div>
 
       <Leaderboard
@@ -503,7 +592,6 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
               gameId,
               message: message.trim()
             });
-            // Trigger new message callback for sound effects
             onNewChatMessage({
               playerId: currentPlayerId,
               playerName: currentPlayer?.name || 'Unknown',
@@ -519,6 +607,4 @@ function BettingPhaseComponent({ players, currentBets, currentPlayerId, currentP
   );
 }
 
-// Export memoized component to prevent unnecessary re-renders
-// Only re-render when bets, players, or critical props change
 export const BettingPhase = memo(BettingPhaseComponent);

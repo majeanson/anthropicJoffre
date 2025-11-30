@@ -108,8 +108,8 @@ import {
 // Import conditional persistence manager
 import * as PersistenceManager from './db/persistenceManager';
 // Import quest system (Sprint 19: Daily Engagement System)
-import { updateQuestProgress } from './db/quests';
-import { extractQuestContext } from './game/quests';
+import { updateQuestProgress, updateRoundQuestProgress } from './db/quests';
+import { extractQuestContext, extractRoundQuestContext } from './game/quests';
 import {
   saveGameState as saveGameToDB,
   loadGameState as loadGameFromDB,
@@ -1524,6 +1524,37 @@ async function endRound(gameId: string) {
           gameId,
           eventType: 'red_zero_collected',
         });
+      }
+
+      // ========================================================================
+      // QUEST PROGRESS - Update after each round (Sprint 19)
+      // ========================================================================
+      try {
+        const roundQuestContext = extractRoundQuestContext(
+          game,
+          player.name,
+          gameId,
+          stats,
+          scoring
+        );
+
+        const questProgressUpdates = await updateRoundQuestProgress(roundQuestContext);
+
+        // Emit progress update to player if any quests made progress
+        if (questProgressUpdates.length > 0) {
+          const playerSocket = [...io.sockets.sockets.values()].find(
+            s => game.players.find(p => p.id === s.id && p.name === player.name)
+          );
+          if (playerSocket) {
+            playerSocket.emit('quest_progress_update', {
+              updates: questProgressUpdates,
+              source: 'round_complete',
+            });
+          }
+        }
+      } catch (questError) {
+        console.error(`[Quests] Error updating quest progress for ${player.name}:`, questError);
+        // Don't throw - quest errors shouldn't break the game
       }
     }
   } catch (error) {
