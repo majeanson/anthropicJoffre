@@ -6,9 +6,10 @@
  * Part of Sprint: PlayingPhase.tsx split into focused components
  */
 
-import { memo, useRef, useEffect } from 'react';
+import { memo } from 'react';
 import { Player } from '../../types/game';
 import { MoveSuggestionButton } from '../MoveSuggestionButton';
+import { GameTooltip } from '../ui';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
 import { colors } from '../../design-system';
 
@@ -43,96 +44,6 @@ export const PlayerPosition = memo(function PlayerPosition({
   suggestionOpen,
   onToggleSuggestion,
 }: PlayerPositionProps) {
-  const badgeRef = useRef<HTMLButtonElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
-
-  // Close tooltip when clicking outside
-  useEffect(() => {
-    if (!botThinkingOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        badgeRef.current &&
-        !badgeRef.current.contains(event.target as Node) &&
-        tooltipRef.current &&
-        !tooltipRef.current.contains(event.target as Node)
-      ) {
-        onToggleBotThinking();
-      }
-    };
-
-    // Close on escape key
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onToggleBotThinking();
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-    };
-  }, [botThinkingOpen, onToggleBotThinking]);
-
-  // Get tooltip position style for mobile-friendly positioning
-  const getTooltipStyle = () => {
-    if (!badgeRef.current) return {};
-
-    const rect = badgeRef.current.getBoundingClientRect();
-    const isMobile = window.innerWidth < 640;
-    const tooltipWidth = isMobile ? Math.min(280, window.innerWidth - 32) : 250;
-    const padding = 16;
-
-    // On mobile, position in center of screen above the player hand
-    if (isMobile) {
-      return {
-        top: '50%',
-        left: padding,
-        right: padding,
-        transform: 'translateY(-50%)',
-        width: 'auto',
-        maxWidth: `calc(100vw - ${padding * 2}px)`,
-      };
-    }
-
-    // Desktop positioning based on tooltipPosition prop
-    switch (tooltipPosition) {
-      case 'top':
-        return {
-          bottom: window.innerHeight - rect.top + 8,
-          left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
-          width: tooltipWidth,
-        };
-      case 'bottom':
-        return {
-          top: rect.bottom + 8,
-          left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
-          width: tooltipWidth,
-        };
-      case 'left':
-        return {
-          top: Math.max(padding, rect.top - 20),
-          right: window.innerWidth - rect.left + 8,
-          width: tooltipWidth,
-        };
-      case 'right':
-        return {
-          top: Math.max(padding, rect.top - 20),
-          left: rect.right + 8,
-          width: tooltipWidth,
-        };
-      default:
-        return {
-          top: rect.bottom + 8,
-          left: rect.left + rect.width / 2 - tooltipWidth / 2,
-          width: tooltipWidth,
-        };
-    }
-  };
-
   // Helper: Get bot difficulty badge (now with bot thinking on click toggle)
   const getBotDifficultyBadge = (): JSX.Element | null => {
     if (!player?.isBot || !player.botDifficulty) return null;
@@ -150,7 +61,6 @@ export const PlayerPosition = memo(function PlayerPosition({
       return (
         <>
           <button
-            ref={badgeRef}
             onClick={onToggleBotThinking}
             className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ${badge.color} ml-1 shadow-lg transition-all active:scale-95 cursor-pointer hover:brightness-110 ${
               botThinkingOpen ? 'ring-2 ring-white scale-105' : ''
@@ -175,27 +85,23 @@ export const PlayerPosition = memo(function PlayerPosition({
               </span>
             )}
           </button>
-          {/* Tooltip shown when toggled on - fixed position for proper z-index */}
-          {botThinkingOpen && (
-            <div
-              ref={tooltipRef}
-              className="fixed z-[10500]"
-              style={getTooltipStyle()}
-              role="tooltip"
-            >
-              <div className="text-white px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-2xl border-2 border-blue-300" style={{ background: colors.gradients.info }}>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center justify-center w-6 h-6 md:w-8 md:h-8 bg-white/20 rounded-full flex-shrink-0">
-                    <span className="text-sm md:text-lg">🤖</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-semibold truncate">{player.name}</div>
-                    <div className="text-xs md:text-sm font-bold mt-0.5">{botThinking}</div>
-                  </div>
-                </div>
-              </div>
+
+          {/* Bot Thinking Tooltip - Using GameTooltip for proper z-index and mobile positioning */}
+          <GameTooltip
+            isOpen={botThinkingOpen}
+            onClose={onToggleBotThinking}
+            title={player.name}
+            icon="🤖"
+            variant="bot"
+            testId="bot-thinking-tooltip"
+          >
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-white/70">
+                {badge.label} difficulty
+              </p>
+              <p className="text-base font-bold">{botThinking}</p>
             </div>
-          )}
+          </GameTooltip>
         </>
       );
     }

@@ -60,6 +60,9 @@ export type { AlertProps, AlertVariant } from './Alert';
 export { Tooltip } from './Tooltip';
 export type { TooltipProps, TooltipPosition, TooltipVariant } from './Tooltip';
 
+export { GameTooltip, GameTooltipTrigger } from './GameTooltip';
+export type { GameTooltipProps, GameTooltipTriggerProps, GameTooltipVariant } from './GameTooltip';
+
 export { Toast } from './Toast';
 export type { ToastProps, ToastVariant } from './Toast';
 
