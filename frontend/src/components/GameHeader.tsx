@@ -137,7 +137,7 @@ export function GameHeader({
   };
 
   return (
-    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg min-h-[60px] z-40 relative overflow-visible">
+    <div className="bg-gradient-to-r from-amber-700 to-orange-700 dark:from-gray-700 dark:to-gray-900 border-b-2 border-amber-800 dark:border-gray-600 shadow-lg z-40 relative overflow-visible">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1 sm:py-1.5">
         {/* Desktop: Single row - All items on same horizontal line */}
         <div className="hidden md:flex items-center gap-3">

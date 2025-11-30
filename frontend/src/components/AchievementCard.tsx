@@ -56,7 +56,7 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
       size={uiCardSize}
       className={`relative border-2 ${getTierBorder(achievement.tier)} transition-all ${
         isLocked
-          ? 'bg-gray-800 dark:bg-gray-900 opacity-50 grayscale'
+          ? 'bg-gray-300 dark:bg-gray-800 opacity-60 grayscale'
           : `bg-gradient-to-br ${getTierColor(achievement.tier)} shadow-lg hover:scale-105 motion-safe:transition-transform`
       }`}
     >
@@ -75,10 +75,10 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className={`${titleSizes[size]} font-bold text-white truncate`}>
+          <div className={`${titleSizes[size]} font-bold truncate ${isLocked ? 'text-gray-700 dark:text-gray-300' : 'text-white'}`}>
             {achievement.is_secret && isLocked ? '???' : achievement.achievement_name}
           </div>
-          <div className="text-xs text-white/80 mt-1">
+          <div className={`text-xs mt-1 ${isLocked ? 'text-gray-600 dark:text-gray-400' : 'text-white/80'}`}>
             {achievement.is_secret && isLocked ? 'Secret achievement' : achievement.description}
           </div>
 
@@ -101,10 +101,10 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
 
           {/* Points and tier */}
           <div className="flex items-center gap-2 mt-2">
-            <span className="text-xs font-semibold bg-white/20 text-white px-2 py-0.5 rounded-full">
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${isLocked ? 'bg-gray-400/30 text-gray-700 dark:bg-gray-600/30 dark:text-gray-300' : 'bg-white/20 text-white'}`}>
               {achievement.points} pts
             </span>
-            <span className="text-xs uppercase tracking-wider text-white/60">
+            <span className={`text-xs uppercase tracking-wider ${isLocked ? 'text-gray-500 dark:text-gray-500' : 'text-white/60'}`}>
               {achievement.tier}
             </span>
             {achievement.is_unlocked && achievement.unlocked_at && (

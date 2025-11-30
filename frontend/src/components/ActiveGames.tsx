@@ -80,8 +80,8 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
 
   if (loading && activeGames.length === 0) {
     return (
-      <UICard variant="gradient" gradient="info" size="md" className="text-center">
-        <p className="text-white">
+      <UICard variant="bordered" size="md" className="text-center bg-blue-50 dark:bg-blue-900 border-blue-300 dark:border-blue-600">
+        <p className="text-blue-800 dark:text-blue-200">
           🔍 Loading your active games...
         </p>
       </UICard>
@@ -90,8 +90,8 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
 
   if (error) {
     return (
-      <UICard variant="gradient" gradient="error" size="md" className="text-center">
-        <p className="text-white">
+      <UICard variant="bordered" size="md" className="text-center bg-red-50 dark:bg-red-900 border-red-300 dark:border-red-600">
+        <p className="text-red-800 dark:text-red-200">
           ⚠️ {error}
         </p>
       </UICard>
@@ -118,8 +118,8 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
   };
 
   return (
-    <UICard variant="gradient" gradient="success" size="lg">
-      <h3 className="font-bold text-lg text-white mb-3 flex items-center gap-2">
+    <UICard variant="bordered" size="lg" className="bg-green-50 dark:bg-green-900 border-green-300 dark:border-green-600">
+      <h3 className="font-bold text-lg text-green-900 dark:text-green-100 mb-3 flex items-center gap-2">
         <span aria-hidden="true">🔄</span>
         <span>Your Active Games ({activeGames.length})</span>
       </h3>
@@ -179,7 +179,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
         ))}
       </div>
 
-      <p className="text-xs text-white/90 mt-3 text-center">
+      <p className="text-xs text-green-700 dark:text-green-300 mt-3 text-center">
         💡 Click Resume to rejoin your game
       </p>
     </UICard>

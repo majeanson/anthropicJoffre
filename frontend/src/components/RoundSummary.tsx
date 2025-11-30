@@ -507,7 +507,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       {lastRound.tricks && lastRound.tricks.length > 0 && (
         <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '300ms' }}>
           <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">🃏 Trick History</h3>
-          <UICard variant="bordered" className="bg-white dark:bg-gray-800 border-2 border-amber-200 dark:border-gray-600">
+          <UICard variant="bordered" className="bg-parchment-100 dark:bg-gray-800 border-2 border-amber-200 dark:border-gray-600">
             <TrickHistory
               tricks={lastRound.tricks}
               players={gameState.players}
@@ -522,7 +522,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       {/* Detailed Player Statistics */}
       <div className="space-y-3 animate-fadeInUp" style={{ animationDelay: '400ms' }}>
         <h3 className="font-bold text-lg sm:text-xl text-gray-800 dark:text-gray-200">📊 Player Performance</h3>
-        <UICard variant="bordered" className="bg-white dark:bg-gray-800 overflow-hidden border-2 border-amber-200 dark:border-gray-600">
+        <UICard variant="bordered" className="bg-parchment-100 dark:bg-gray-800 overflow-hidden border-2 border-amber-200 dark:border-gray-600">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[500px]">
               <thead className="bg-amber-100 dark:bg-gray-700">

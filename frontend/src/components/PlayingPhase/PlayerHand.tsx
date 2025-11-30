@@ -310,7 +310,7 @@ export const PlayerHand = memo(function PlayerHand({
   }
 
   return (
-    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-[45] overflow-visible">
+    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-[11] overflow-visible">
       <UICard
         variant="bordered"
         size="lg"

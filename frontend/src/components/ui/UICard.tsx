@@ -95,10 +95,11 @@ export const UICard: React.FC<UICardProps> = ({
     : '';
 
   // Variant-specific styles - use parchment theme for light mode consistency
+  // Using parchment-100 for warmer, less white backgrounds
   const variantStyles = {
-    default: 'bg-parchment-50 dark:bg-gray-800 shadow-md',
-    elevated: 'bg-parchment-50 dark:bg-gray-800 shadow-lg',
-    bordered: 'bg-parchment-50 dark:bg-gray-800 border-2 shadow-sm',
+    default: 'bg-parchment-100 dark:bg-gray-800 shadow-md',
+    elevated: 'bg-parchment-100 dark:bg-gray-800 shadow-lg',
+    bordered: 'bg-parchment-100 dark:bg-gray-800 border-2 shadow-sm',
     gradient: '',
   }[variant];
 

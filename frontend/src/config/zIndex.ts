@@ -79,7 +79,7 @@ export function getModalZIndex(stackLevel: number = 0): number {
  *
  * Game elements:
  * - z-[10]     - game board
- * - z-[45]     - player hand
+ * - z-[11]     - player hand
  * - z-[9999]   - game effects (card animations, score floats)
  *
  * UI overlays (must be >= 10000):

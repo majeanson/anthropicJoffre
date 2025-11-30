@@ -676,10 +676,12 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                         : 'hover:border-amber-500 dark:hover:border-gray-500'
                     }`}
                   >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <span className="font-black text-xl text-umber-900 dark:text-gray-100">
+                    {/* Mobile: stack vertically, Desktop: side by side */}
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        {/* Game ID and badges - wrap on mobile */}
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className="font-black text-lg sm:text-xl text-umber-900 dark:text-gray-100">
                             Game {game.gameId}
                           </span>
                           <UIBadge
@@ -697,26 +699,20 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                             {game.persistenceMode === 'elo' ? '🏆 Ranked' : '🎲 Casual'}
                           </UIBadge>
                         </div>
-                        <div className="text-sm text-umber-600 dark:text-gray-400 flex items-center gap-4">
+                        {/* Player info - wrap on mobile */}
+                        <div className="text-sm text-umber-600 dark:text-gray-400 flex flex-wrap items-center gap-x-4 gap-y-1">
                           <span>👥 {game.humanPlayerCount} player{game.humanPlayerCount !== 1 ? 's' : ''}</span>
                           {game.botPlayerCount > 0 && (
                             <span>🤖 {game.botPlayerCount} bot{game.botPlayerCount !== 1 ? 's' : ''}</span>
                           )}
-                          {(() => {
-                            const emptySeats = 4 - (game.humanPlayerCount + game.botPlayerCount);
-                            return emptySeats > 0 && (
-                              <span className="text-gray-500 dark:text-gray-500 italic">
-                                💺 {emptySeats} empty seat{emptySeats !== 1 ? 's' : ''}
-                              </span>
-                            );
-                          })()}
                           {game.isInProgress && (
                             <span>📊 Round {game.roundNumber}</span>
                           )}
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2">
+                      {/* Action buttons - full width on mobile */}
+                      <div className="flex gap-2 sm:flex-shrink-0">
                         {/* Show Join button for:
                             1. Team selection games with open spots or bots
                             2. In-progress games with bots (to replace them) */}
@@ -725,6 +721,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                             onClick={() => handleJoinGameClick(game)}
                             variant="success"
                             size="sm"
+                            className="flex-1 sm:flex-none"
                           >
                             Join
                           </Button>
@@ -737,6 +734,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
                             }}
                             variant="primary"
                             size="sm"
+                            className="flex-1 sm:flex-none"
                           >
                             <span>👁️</span>
                             Spectate
