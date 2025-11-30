@@ -68,7 +68,7 @@ const positionClasses: Record<TooltipPosition, { container: string; arrow: strin
   },
 };
 
-// Variant styles with Midnight Alchemy theming
+// Variant styles using CSS variables for skin compatibility
 const variantStyles: Record<TooltipVariant, {
   bg: string;
   text: string;
@@ -76,46 +76,46 @@ const variantStyles: Record<TooltipVariant, {
   shadow: string;
 }> = {
   dark: {
-    bg: '#0B0E14',
-    text: '#E8E4DC',
-    border: '#2D3548',
-    shadow: '0 4px 20px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(45, 53, 72, 0.5)',
+    bg: 'var(--color-bg-primary)',
+    text: 'var(--color-text-primary)',
+    border: 'var(--color-border-default)',
+    shadow: 'var(--shadow-lg)',
   },
   light: {
-    bg: '#1A1F2E',
-    text: '#E8E4DC',
-    border: '#C17F59',
-    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(193, 127, 89, 0.15)',
+    bg: 'var(--color-bg-secondary)',
+    text: 'var(--color-text-primary)',
+    border: 'var(--color-border-accent)',
+    shadow: 'var(--shadow-lg), var(--shadow-glow)',
   },
   arcane: {
-    bg: 'linear-gradient(180deg, #1A1F2E 0%, #131824 100%)',
-    text: '#D4A574',
-    border: '#C17F59',
-    shadow: '0 4px 20px rgba(0, 0, 0, 0.5), 0 0 25px rgba(193, 127, 89, 0.25)',
+    bg: 'linear-gradient(180deg, var(--color-bg-secondary) 0%, var(--color-bg-primary) 100%)',
+    text: 'var(--color-text-accent)',
+    border: 'var(--color-border-accent)',
+    shadow: 'var(--shadow-lg), var(--shadow-glow)',
   },
   success: {
-    bg: '#1A2E23',
-    text: '#4A9C6D',
-    border: '#4A9C6D',
-    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(74, 156, 109, 0.2)',
+    bg: 'color-mix(in srgb, var(--color-success) 15%, var(--color-bg-primary))',
+    text: 'var(--color-success)',
+    border: 'var(--color-success)',
+    shadow: 'var(--shadow-lg)',
   },
   warning: {
-    bg: '#2E2A1A',
-    text: '#D4A574',
-    border: '#D4A574',
-    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 165, 116, 0.2)',
+    bg: 'color-mix(in srgb, var(--color-warning) 15%, var(--color-bg-primary))',
+    text: 'var(--color-warning)',
+    border: 'var(--color-warning)',
+    shadow: 'var(--shadow-lg)',
   },
   error: {
-    bg: '#2E1A1A',
-    text: '#A63D3D',
-    border: '#8B3D3D',
-    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(166, 61, 61, 0.2)',
+    bg: 'color-mix(in srgb, var(--color-error) 15%, var(--color-bg-primary))',
+    text: 'var(--color-error)',
+    border: 'var(--color-error)',
+    shadow: 'var(--shadow-lg)',
   },
   info: {
-    bg: '#1A232E',
-    text: '#4682B4',
-    border: '#4682B4',
-    shadow: '0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(70, 130, 180, 0.2)',
+    bg: 'color-mix(in srgb, var(--color-info) 15%, var(--color-bg-primary))',
+    text: 'var(--color-info)',
+    border: 'var(--color-info)',
+    shadow: 'var(--shadow-lg)',
   },
 };
 
@@ -182,7 +182,7 @@ export function Tooltip({
       borderColor: 'transparent',
     };
 
-    const arrowColor = variant === 'arcane' ? '#1A1F2E' : variantStyle.bg;
+    const arrowColor = variant === 'arcane' ? 'var(--color-bg-secondary)' : variantStyle.bg;
 
     switch (position) {
       case 'top':
@@ -239,10 +239,10 @@ export function Tooltip({
           {/* Arcane corner accents */}
           {variant === 'arcane' && (
             <>
-              <div className="absolute top-0 left-0 w-2 h-2 border-l border-t border-[#C17F59] opacity-60 rounded-tl-sm" />
-              <div className="absolute top-0 right-0 w-2 h-2 border-r border-t border-[#C17F59] opacity-60 rounded-tr-sm" />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b border-[#C17F59] opacity-60 rounded-bl-sm" />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b border-[#C17F59] opacity-60 rounded-br-sm" />
+              <div className="absolute top-0 left-0 w-2 h-2 border-l border-t opacity-60 rounded-tl-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
+              <div className="absolute top-0 right-0 w-2 h-2 border-r border-t opacity-60 rounded-tr-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b opacity-60 rounded-bl-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b opacity-60 rounded-br-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
             </>
           )}
 

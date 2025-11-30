@@ -52,6 +52,8 @@ export interface ProgressBarProps {
   animated?: boolean;
   /** Additional classes for container */
   className?: string;
+  /** Inline styles for container */
+  style?: React.CSSProperties;
 }
 
 const sizeClasses: Record<ProgressBarSize, { bar: string; text: string }> = {
@@ -83,6 +85,7 @@ export function ProgressBar({
   valueFormatter,
   animated = true,
   className = '',
+  style,
 }: ProgressBarProps) {
   // Calculate percentage
   const percentage = Math.min(100, Math.max(0, (value / max) * 100));
@@ -127,7 +130,7 @@ export function ProgressBar({
   } : {};
 
   return (
-    <div className={`w-full ${className}`}>
+    <div className={`w-full ${className}`} style={style}>
       {/* Label and Value Row */}
       {(label || showValue) && (
         <div className="flex items-center justify-between mb-2">

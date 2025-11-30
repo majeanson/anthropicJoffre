@@ -46,6 +46,8 @@ export interface UICardProps {
   gradient?: UICardGradient;
   /** Additional CSS classes */
   className?: string;
+  /** Inline styles */
+  style?: React.CSSProperties;
   /** Card content */
   children: ReactNode;
   /** Optional click handler (makes card interactive) */
@@ -69,6 +71,7 @@ export const UICard: React.FC<UICardProps> = ({
   padding,
   gradient = 'primary',
   className = '',
+  style,
   children,
   onClick,
 }) => {
@@ -147,7 +150,7 @@ export const UICard: React.FC<UICardProps> = ({
     .join(' ');
 
   return (
-    <div className={allStyles} onClick={onClick}>
+    <div className={allStyles} style={style} onClick={onClick}>
       {children}
     </div>
   );

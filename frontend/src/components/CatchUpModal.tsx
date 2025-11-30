@@ -44,12 +44,12 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
     >
       <div className="space-y-4">
         {/* Round and Phase */}
-        <UICard variant="bordered" size="md" className="bg-green-50 dark:bg-green-900 border-green-300 dark:border-green-600">
+        <UICard variant="bordered" size="md" gradient="success">
           <div className="flex items-center gap-3">
             <div className="text-3xl" aria-hidden="true">📍</div>
             <div>
-              <p className="text-sm text-green-700 dark:text-green-300">Current Status</p>
-              <p className="text-lg font-bold text-green-900 dark:text-green-100">
+              <p className="text-sm" style={{ color: 'var(--color-success)' }}>Current Status</p>
+              <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 Round {gameState.roundNumber} - {phaseDisplayName}
               </p>
             </div>
@@ -57,18 +57,18 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
         </UICard>
 
         {/* Team Scores */}
-        <UICard variant="bordered" size="md" className="bg-green-50 dark:bg-green-900 border-green-300 dark:border-green-600">
+        <UICard variant="bordered" size="md" gradient="success">
           <div className="flex items-center gap-3 mb-3">
             <div className="text-3xl" aria-hidden="true">🏆</div>
             <div>
-              <p className="text-sm text-green-700 dark:text-green-300">Score</p>
+              <p className="text-sm" style={{ color: 'var(--color-success)' }}>Score</p>
               {leadingTeam && (
-                <p className="text-lg font-bold text-green-900 dark:text-green-100">
+                <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
                   Team {leadingTeam} is leading!
                 </p>
               )}
               {!leadingTeam && (
-                <p className="text-lg font-bold text-green-800 dark:text-green-200">
+                <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
                   Tied game!
                 </p>
               )}
@@ -81,8 +81,8 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
               size="sm"
               className="text-center"
             >
-              <p className="text-xs font-semibold text-orange-600 dark:text-orange-400">Team 1</p>
-              <p className="text-2xl font-black text-orange-600 dark:text-orange-400">{gameState.teamScores.team1}</p>
+              <p className="text-xs font-semibold" style={{ color: 'var(--color-team1-primary)' }}>Team 1</p>
+              <p className="text-2xl font-black" style={{ color: 'var(--color-team1-primary)' }}>{gameState.teamScores.team1}</p>
             </UICard>
             <UICard
               variant={currentPlayer?.teamId === 2 ? "gradient" : "bordered"}
@@ -90,22 +90,22 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
               size="sm"
               className="text-center"
             >
-              <p className="text-xs font-semibold text-purple-600 dark:text-purple-400">Team 2</p>
-              <p className="text-2xl font-black text-purple-600 dark:text-purple-400">{gameState.teamScores.team2}</p>
+              <p className="text-xs font-semibold" style={{ color: 'var(--color-team2-primary)' }}>Team 2</p>
+              <p className="text-2xl font-black" style={{ color: 'var(--color-team2-primary)' }}>{gameState.teamScores.team2}</p>
             </UICard>
           </div>
         </UICard>
 
         {/* Your Turn Indicator */}
         {isCurrentTurn && gameState.phase !== 'team_selection' && gameState.phase !== 'game_over' && (
-          <UICard variant="bordered" size="md" className="bg-emerald-50 dark:bg-emerald-900 border-emerald-400 dark:border-emerald-600">
+          <UICard variant="bordered" size="md" gradient="success">
             <div className="flex items-center gap-3">
               <div className="text-3xl animate-bounce" aria-hidden="true">✨</div>
               <div>
-                <p className="text-lg font-bold text-emerald-900 dark:text-emerald-100">
+                <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
                   It's your turn!
                 </p>
-                <p className="text-sm text-emerald-700 dark:text-emerald-300">
+                <p className="text-sm" style={{ color: 'var(--color-success)' }}>
                   The game is waiting for you
                 </p>
               </div>
@@ -115,11 +115,11 @@ export const CatchUpModal = memo(function CatchUpModal({ gameState, currentPlaye
 
         {/* Waiting Indicator */}
         {!isCurrentTurn && gameState.phase !== 'team_selection' && gameState.phase !== 'game_over' && gameState.phase !== 'scoring' && (
-          <UICard variant="bordered" size="md" className="bg-blue-50 dark:bg-blue-900 border-blue-300 dark:border-blue-600">
+          <UICard variant="bordered" size="md" gradient="info">
             <div className="flex items-center gap-3">
               <div className="text-2xl" aria-hidden="true">⏳</div>
               <div>
-                <p className="text-sm text-blue-800 dark:text-blue-200">
+                <p className="text-sm" style={{ color: 'var(--color-info)' }}>
                   Waiting for{' '}
                   <span className="font-bold">
                     {gameState.players[gameState.currentPlayerIndex]?.name}

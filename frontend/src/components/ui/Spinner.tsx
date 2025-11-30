@@ -42,39 +42,40 @@ const sizeClasses: Record<SpinnerSize, { ring: string; dots: string; dotSize: st
   lg: { ring: 'h-12 w-12', dots: 'gap-2', dotSize: 'h-3 w-3' },
 };
 
-// Color styles with Midnight Alchemy ethereal glows
+// Color styles using CSS variables for skin compatibility
+// Note: glow uses color-mix for transparency
 const colorStyles: Record<SpinnerColor, { color: string; glow: string }> = {
   accent: {
-    color: '#C17F59',
-    glow: 'rgba(193, 127, 89, 0.5)',
+    color: 'var(--color-text-accent)',
+    glow: 'color-mix(in srgb, var(--color-text-accent) 50%, transparent)',
   },
   primary: {
-    color: '#D4A574',
-    glow: 'rgba(212, 165, 116, 0.4)',
+    color: 'var(--color-text-primary)',
+    glow: 'color-mix(in srgb, var(--color-text-primary) 40%, transparent)',
   },
   white: {
-    color: '#E8E4DC',
-    glow: 'rgba(232, 228, 220, 0.3)',
+    color: 'var(--color-text-primary)',
+    glow: 'color-mix(in srgb, var(--color-text-primary) 30%, transparent)',
   },
   muted: {
-    color: '#6B7280',
-    glow: 'rgba(107, 114, 128, 0.3)',
+    color: 'var(--color-text-muted)',
+    glow: 'color-mix(in srgb, var(--color-text-muted) 30%, transparent)',
   },
   success: {
-    color: '#4A9C6D',
-    glow: 'rgba(74, 156, 109, 0.5)',
+    color: 'var(--color-success)',
+    glow: 'color-mix(in srgb, var(--color-success) 50%, transparent)',
   },
   warning: {
-    color: '#D4A574',
-    glow: 'rgba(212, 165, 116, 0.5)',
+    color: 'var(--color-warning)',
+    glow: 'color-mix(in srgb, var(--color-warning) 50%, transparent)',
   },
   error: {
-    color: '#A63D3D',
-    glow: 'rgba(166, 61, 61, 0.5)',
+    color: 'var(--color-error)',
+    glow: 'color-mix(in srgb, var(--color-error) 50%, transparent)',
   },
   gray: {
-    color: '#6B7280',
-    glow: 'rgba(107, 114, 128, 0.3)',
+    color: 'var(--color-text-muted)',
+    glow: 'color-mix(in srgb, var(--color-text-muted) 30%, transparent)',
   },
 };
 

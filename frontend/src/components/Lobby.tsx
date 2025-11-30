@@ -538,7 +538,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     rounded-[var(--radius-md)]
                     border-2 transition-all duration-[var(--duration-fast)]
                     ${mainTab === 'play'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
                       : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
                     }
                   `}
@@ -554,7 +554,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     rounded-[var(--radius-md)]
                     border-2 transition-all duration-[var(--duration-fast)]
                     ${mainTab === 'social'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
                       : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
                     }
                   `}
@@ -582,7 +582,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     rounded-[var(--radius-md)]
                     border-2 transition-all duration-[var(--duration-fast)]
                     ${mainTab === 'stats'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
                       : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
                     }
                   `}
@@ -598,7 +598,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     rounded-[var(--radius-md)]
                     border-2 transition-all duration-[var(--duration-fast)]
                     ${mainTab === 'settings'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-primary)] shadow-[0_0_15px_var(--color-glow)]'
+                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
                       : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
                     }
                   `}

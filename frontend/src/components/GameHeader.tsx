@@ -110,14 +110,14 @@ export function GameHeader({
     prevTeam2ScoreRef.current = team2Score;
   }, [team1Score, team2Score]);
 
-  // Helper to get trump color
+  // Helper to get trump color using CSS variables for skin compatibility
   const getTrumpColorStyle = (color: CardColor | null | undefined): React.CSSProperties => {
     if (!color) return { backgroundColor: 'var(--color-text-muted)' };
     const colorMap: Record<CardColor, string> = {
-      red: '#ef4444',
-      brown: '#92400e',
-      green: '#16a34a',
-      blue: '#3b82f6'
+      red: 'var(--color-suit-red)',
+      brown: 'var(--color-suit-brown)',
+      green: 'var(--color-suit-green)',
+      blue: 'var(--color-suit-blue)'
     };
     return { backgroundColor: colorMap[color] };
   };

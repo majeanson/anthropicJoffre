@@ -80,8 +80,8 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
 
   if (loading && activeGames.length === 0) {
     return (
-      <UICard variant="bordered" size="md" className="text-center bg-blue-50 dark:bg-blue-900 border-blue-300 dark:border-blue-600">
-        <p className="text-blue-800 dark:text-blue-200">
+      <UICard variant="bordered" size="md" gradient="info" className="text-center">
+        <p style={{ color: 'var(--color-info)' }}>
           🔍 Loading your active games...
         </p>
       </UICard>
@@ -90,8 +90,8 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
 
   if (error) {
     return (
-      <UICard variant="bordered" size="md" className="text-center bg-red-50 dark:bg-red-900 border-red-300 dark:border-red-600">
-        <p className="text-red-800 dark:text-red-200">
+      <UICard variant="bordered" size="md" gradient="error" className="text-center">
+        <p style={{ color: 'var(--color-error)' }}>
           ⚠️ {error}
         </p>
       </UICard>
@@ -111,15 +111,18 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
     }
   };
 
-  const getTeamColor = (teamId: number | null) => {
-    if (teamId === 1) return 'text-orange-600 dark:text-orange-400';
-    if (teamId === 2) return 'text-purple-600 dark:text-purple-400';
-    return 'text-gray-600 dark:text-gray-400';
+  const getTeamColorStyle = (teamId: number | null): React.CSSProperties => {
+    if (teamId === 1) return { color: 'var(--color-team1-primary)' };
+    if (teamId === 2) return { color: 'var(--color-team2-primary)' };
+    return { color: 'var(--color-text-muted)' };
   };
 
   return (
-    <UICard variant="bordered" size="lg" className="bg-green-50 dark:bg-green-900 border-green-300 dark:border-green-600">
-      <h3 className="font-bold text-lg text-green-900 dark:text-green-100 mb-3 flex items-center gap-2">
+    <UICard variant="bordered" size="lg" gradient="success">
+      <h3
+        className="font-bold text-lg mb-3 flex items-center gap-2"
+        style={{ color: 'var(--color-success)' }}
+      >
         <span aria-hidden="true">🔄</span>
         <span>Your Active Games ({activeGames.length})</span>
       </h3>
@@ -130,32 +133,39 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
             key={game.gameId}
             variant="bordered"
             size="md"
-            className="hover:border-green-500 dark:hover:border-green-500 transition-colors"
+            className="transition-colors"
+            style={{ ['--hover-border' as string]: 'var(--color-success)' }}
           >
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs text-gray-600 dark:text-gray-400">
+                  <span
+                    className="font-mono text-xs"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
                     {game.gameId.substring(0, 8).toUpperCase()}
                   </span>
-                  <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  <span
+                    className="text-sm font-semibold"
+                    style={{ color: 'var(--color-text-secondary)' }}
+                  >
                     {getPhaseLabel(game.phase)}
                   </span>
                 </div>
 
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                   Players: {game.playerNames.join(', ')}
                 </div>
 
                 <div className="flex items-center gap-4 mt-1 text-sm">
-                  <span className="text-orange-600 dark:text-orange-400 font-bold">
+                  <span className="font-bold" style={{ color: 'var(--color-team1-primary)' }}>
                     Team 1: {game.teamScores.team1}
                   </span>
-                  <span className="text-purple-600 dark:text-purple-400 font-bold">
+                  <span className="font-bold" style={{ color: 'var(--color-team2-primary)' }}>
                     Team 2: {game.teamScores.team2}
                   </span>
                   {game.myTeamId && (
-                    <span className={`text-xs font-semibold ${getTeamColor(game.myTeamId)}`}>
+                    <span className="text-xs font-semibold" style={getTeamColorStyle(game.myTeamId)}>
                       (You're Team {game.myTeamId})
                     </span>
                   )}
@@ -179,7 +189,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
         ))}
       </div>
 
-      <p className="text-xs text-green-700 dark:text-green-300 mt-3 text-center">
+      <p className="text-xs mt-3 text-center" style={{ color: 'var(--color-success)' }}>
         💡 Click Resume to rejoin your game
       </p>
     </UICard>

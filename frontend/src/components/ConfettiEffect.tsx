@@ -40,22 +40,30 @@ export function ConfettiEffect({ teamColor, duration = 1500, position = 'bottom'
   const isBrownZero = points < 0;
   const isSpecialCard = isRedZero || isBrownZero;
 
+  // Get CSS variables for skin-aware colors
+  const root = getComputedStyle(document.documentElement);
+  const suitRed = root.getPropertyValue('--color-suit-red').trim() || '#ef4444';
+  const suitBrown = root.getPropertyValue('--color-suit-brown').trim() || '#92400e';
+  const team1Color = root.getPropertyValue('--color-team1-primary').trim() || '#f97316';
+  const team2Color = root.getPropertyValue('--color-team2-primary').trim() || '#a855f7';
+  const accentGold = root.getPropertyValue('--color-warning').trim() || '#fbbf24';
+
   // Colors based on card type
   let primaryColor: string;
   let accentColor: string;
 
   if (isRedZero) {
     // Red 0 - golden/red celebration
-    primaryColor = '#ef4444'; // red
-    accentColor = '#fbbf24'; // gold
+    primaryColor = suitRed;
+    accentColor = accentGold;
   } else if (isBrownZero) {
     // Brown 0 - brown/dark effect
-    primaryColor = '#78350f'; // brown
-    accentColor = '#92400e'; // amber-brown
+    primaryColor = suitBrown;
+    accentColor = suitBrown;
   } else {
-    // Normal - team colors
-    primaryColor = teamColor === 'orange' ? '#f97316' : '#a855f7';
-    accentColor = teamColor === 'orange' ? '#fbbf24' : '#c084fc';
+    // Normal - team colors from CSS variables
+    primaryColor = teamColor === 'orange' ? team1Color : team2Color;
+    accentColor = accentGold;
   }
 
   // Generate sparkles - more for special cards
@@ -156,9 +164,9 @@ export function ConfettiEffect({ teamColor, duration = 1500, position = 'bottom'
           width: isSpecialCard ? 60 : 40,
           height: isSpecialCard ? 60 : 40,
           background: isRedZero
-            ? `radial-gradient(circle, #fbbf2480 0%, #ef444440 50%, transparent 70%)`
+            ? `radial-gradient(circle, ${accentGold}80 0%, ${suitRed}40 50%, transparent 70%)`
             : isBrownZero
-            ? `radial-gradient(circle, #92400e60 0%, #78350f40 50%, transparent 70%)`
+            ? `radial-gradient(circle, ${suitBrown}60 0%, ${suitBrown}40 50%, transparent 70%)`
             : `radial-gradient(circle, ${primaryColor}80 0%, transparent 70%)`,
           animation: `pulse-glow ${effectDuration}ms ease-out forwards`,
         }}

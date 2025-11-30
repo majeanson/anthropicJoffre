@@ -49,12 +49,15 @@ export function TimeoutBanner({
           {/* Visual Progress Bar */}
           <div className="h-12 w-2 bg-white/20 rounded-full overflow-hidden">
             <div
-              className={`w-full transition-all duration-1000 ease-linear ${
-                isCritical ? 'bg-red-400' : isWarning ? 'bg-orange-400' : 'bg-blue-400'
-              }`}
+              className="w-full transition-all duration-1000 ease-linear"
               style={{
                 height: `${(secondsRemaining / 60) * 100}%`,
-                transformOrigin: 'bottom'
+                transformOrigin: 'bottom',
+                backgroundColor: isCritical
+                  ? 'var(--color-error)'
+                  : isWarning
+                  ? 'var(--color-warning)'
+                  : 'var(--color-info)'
               }}
             />
           </div>

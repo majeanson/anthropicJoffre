@@ -373,12 +373,10 @@ function CardComponent({
             backgroundColor: card.color === 'red'
               ? 'var(--color-success)'
               : 'var(--color-error)',
-            color: card.color === 'red'
-              ? '#0B0E14'
-              : '#FEF2F2',
+            color: 'var(--color-text-inverse)',
             boxShadow: card.color === 'red'
-              ? '0 2px 10px rgba(45, 212, 191, 0.6)'
-              : '0 2px 10px rgba(220, 38, 38, 0.6)',
+              ? '0 2px 10px var(--color-success)'
+              : '0 2px 10px var(--color-error)',
           }}
         >
           {card.color === 'red' ? '+5' : '-2'}

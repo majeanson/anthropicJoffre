@@ -467,6 +467,7 @@ export function TeamSelection({
           </Button>
         </div>
 
+
         {/* Title */}
         <h2
           className="text-2xl sm:text-3xl font-display uppercase tracking-wider mb-6 text-center mt-12"

@@ -13,6 +13,7 @@ import {
   MidnightModal,
   EmberModal,
   TealModal,
+  MinimalModal,
 } from '../Modal';
 import { Button, ArcaneButton, DangerButton, SuccessButton } from '../Button';
 
@@ -58,7 +59,7 @@ Each theme evokes a different aspect of the alchemist's study.
   argTypes: {
     theme: {
       control: 'select',
-      options: ['arcane', 'midnight', 'ember', 'void', 'parchment', 'teal'],
+      options: ['arcane', 'midnight', 'ember', 'void', 'parchment', 'teal', 'minimal'],
       description: 'Visual theme preset',
     },
     size: {
@@ -252,6 +253,31 @@ export const TealTheme: Story = {
   },
 };
 
+export const MinimalTheme: Story = {
+  render: (args) => <ModalWrapper {...args} />,
+  args: {
+    isOpen: true,
+    onClose: () => {},
+    title: 'Minimal Style',
+    subtitle: 'Uses CSS variables for skin compatibility',
+    icon: '◯',
+    theme: 'minimal',
+    children: (
+      <p style={{ color: 'var(--color-text-secondary)' }}>
+        The minimal theme uses CSS variables, making it automatically compatible
+        with all skin themes including light and dark Modern Minimal.
+      </p>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Minimal theme that uses CSS variables for automatic skin compatibility.',
+      },
+    },
+  },
+};
+
 // ============================================================================
 // ALL THEMES SHOWCASE
 // ============================================================================
@@ -267,6 +293,7 @@ export const AllThemes: RenderOnlyStory = {
       { id: 'void', label: 'Void', icon: '☿', color: '#7C3AED' },
       { id: 'parchment', label: 'Parchment', icon: '📜', color: '#D4A574' },
       { id: 'teal', label: 'Teal', icon: '▽', color: '#2DD4BF' },
+      { id: 'minimal', label: 'Minimal', icon: '◯', color: '#6B7280' },
     ] as const;
 
     return (
@@ -458,6 +485,7 @@ export const PresetModals: RenderOnlyStory = {
       { id: 'midnight', Component: MidnightModal, label: 'Midnight Modal' },
       { id: 'ember', Component: EmberModal, label: 'Ember Modal' },
       { id: 'teal', Component: TealModal, label: 'Teal Modal' },
+      { id: 'minimal', Component: MinimalModal, label: 'Minimal Modal' },
     ];
 
     return (

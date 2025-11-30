@@ -39,9 +39,50 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
       })
     : null;
 
+  // Helper to get background style based on bet status
+  const getBetBackgroundStyle = (
+    bet: Bet | undefined,
+    isHighestBet: boolean,
+    teamId: 1 | 2
+  ): React.CSSProperties => {
+    if (!bet) {
+      return {
+        backgroundColor: 'var(--color-bg-tertiary)',
+        border: '1px dashed var(--color-border-default)',
+      };
+    }
+    if (bet.skipped) {
+      return {
+        backgroundColor: 'var(--color-bg-tertiary)',
+        opacity: 0.6,
+      };
+    }
+    if (isHighestBet) {
+      return {
+        background: `linear-gradient(to right, var(--color-success), color-mix(in srgb, var(--color-success) 80%, black))`,
+        color: 'white',
+        boxShadow: '0 4px 12px color-mix(in srgb, var(--color-success) 40%, transparent)',
+      };
+    }
+    return {
+      backgroundColor: teamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)',
+      color: teamId === 1 ? 'var(--color-team1-text)' : 'var(--color-team2-text)',
+    };
+  };
+
   return (
-    <UICard variant="bordered" size="md" className="bg-gradient-to-br from-parchment-100 to-parchment-200 dark:from-gray-800 dark:to-gray-900 shadow-md">
-      <div className="text-umber-800 dark:text-gray-300 font-bold text-sm mb-3 flex items-center gap-2">
+    <UICard
+      variant="bordered"
+      size="md"
+      className="shadow-md"
+      style={{
+        background: 'linear-gradient(to bottom right, var(--color-bg-secondary), var(--color-bg-tertiary))',
+      }}
+    >
+      <div
+        className="font-bold text-sm mb-3 flex items-center gap-2"
+        style={{ color: 'var(--color-text-primary)' }}
+      >
         <span className="text-lg">📜</span>
         <span>Betting History</span>
       </div>
@@ -51,38 +92,28 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
           const player = players[playerIndex];
           const bet = betsByPlayerIndex.get(playerIndex);
           const isDealer = playerIndex === dealerIndex;
-          const isHighestBet = bet && highestBet && bet.playerName === highestBet.playerName && !bet.skipped;
+          const isHighestBet = !!(bet && highestBet && bet.playerName === highestBet.playerName && !bet.skipped);
 
           if (!player) return null;
 
           return (
             <div
               key={player.id}
-              className={`flex items-center justify-between p-2 rounded-lg transition-all border-l-4 ${
-                // Team color border (ALWAYS visible)
-                player.teamId === 1
-                  ? 'border-l-orange-600 dark:border-l-orange-500'
-                  : 'border-l-purple-600 dark:border-l-purple-500'
-              } ${
-                // Background color based on bet status
-                bet
-                  ? bet.skipped
-                    ? 'bg-gray-300 dark:bg-gray-700 opacity-60'
-                    : isHighestBet
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-600 dark:from-green-600 dark:to-emerald-700 text-white shadow-lg ring-2 ring-green-300 dark:ring-green-500'
-                    : player.teamId === 1
-                    ? 'bg-orange-400 dark:bg-orange-600 text-white'
-                    : 'bg-purple-400 dark:bg-purple-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 border border-dashed border-gray-400 dark:border-gray-500'
-              }`}
+              className="flex items-center justify-between p-2 rounded-lg transition-all border-l-4"
+              style={{
+                borderLeftColor: player.teamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)',
+                ...getBetBackgroundStyle(bet, isHighestBet, player.teamId),
+              }}
             >
               {/* Left side: Order number + Player name + Team badge */}
               <div className="flex items-center gap-2">
-                <span className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
-                  bet && !bet.skipped
-                    ? 'bg-white/20 text-white'
-                    : 'bg-gray-400 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
-                }`}>
+                <span
+                  className="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
+                  style={{
+                    backgroundColor: bet && !bet.skipped ? 'rgba(255,255,255,0.2)' : 'var(--color-bg-tertiary)',
+                    color: bet && !bet.skipped ? 'inherit' : 'var(--color-text-secondary)',
+                  }}
+                >
                   {orderIndex + 1}
                 </span>
                 <div className="flex flex-col">
@@ -159,7 +190,10 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
                     </>
                   )
                 ) : (
-                  <span className="text-xs text-gray-500 dark:text-gray-400 italic">
+                  <span
+                    className="text-xs italic"
+                    style={{ color: 'var(--color-text-muted)' }}
+                  >
                     Waiting...
                   </span>
                 )}
@@ -170,10 +204,16 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
       </div>
 
       {/* Legend */}
-      <div className="mt-3 pt-3 border-t border-umber-300 dark:border-gray-600">
-        <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+      <div
+        className="mt-3 pt-3"
+        style={{ borderTop: '1px solid var(--color-border-default)' }}
+      >
+        <div className="text-xs space-y-1" style={{ color: 'var(--color-text-muted)' }}>
           <div className="flex items-center gap-2">
-            <span className="w-4 h-4 rounded bg-gradient-to-r from-green-500 to-emerald-600 inline-block"></span>
+            <span
+              className="w-4 h-4 rounded inline-block"
+              style={{ background: `linear-gradient(to right, var(--color-success), color-mix(in srgb, var(--color-success) 80%, black))` }}
+            ></span>
             <span>Highest Bet</span>
           </div>
           <div className="flex items-center gap-2">

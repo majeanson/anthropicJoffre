@@ -19,7 +19,7 @@ export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, ma
 
         {/* Helpful hint for cold start */}
         {isFirstAttempt && (
-          <p className="text-xs text-blue-100 mb-2">
+          <p className="text-xs mb-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
             Server may be waking up (cold start). This can take 10-30 seconds...
           </p>
         )}
@@ -32,7 +32,11 @@ export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, ma
           showValue
           size="sm"
           color="info"
-          className="[&_*]:text-white/80 [&>div:first-child]:text-white/80 [&>div:last-child]:bg-blue-800/50 [&>div:last-child>div]:bg-white"
+          className="[&_*]:text-white/80 [&>div:first-child]:text-white/80"
+          style={{
+            ['--progress-track' as string]: 'color-mix(in srgb, var(--color-info) 30%, transparent)',
+            ['--progress-fill' as string]: 'white',
+          }}
         />
       </UICard>
     </div>

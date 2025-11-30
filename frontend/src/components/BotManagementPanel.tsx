@@ -93,51 +93,69 @@ export const BotManagementPanel = memo(function BotManagementPanel({
           {gameState.players.map((player, index) => {
             const isMe = player.id === currentPlayerId;
             const isEmptySeat = player.isEmpty;
-            const bgColor = isEmptySeat
-              ? 'bg-gray-100 dark:bg-gray-800'
-              : player.teamId === 1
-                ? 'bg-orange-50 dark:bg-orange-900/20'
-                : 'bg-purple-50 dark:bg-purple-900/20';
-            const borderColor = isEmptySeat
-              ? 'border-gray-400 dark:border-gray-600 border-dashed'
-              : player.teamId === 1
-                ? 'border-orange-300 dark:border-orange-600'
-                : 'border-purple-300 dark:border-purple-600';
-            const textColor = isEmptySeat
-              ? 'text-gray-500 dark:text-gray-500'
-              : player.teamId === 1
-                ? 'text-orange-700 dark:text-orange-300'
-                : 'text-purple-700 dark:text-purple-300';
             const isPlayerTurn = gameState.currentPlayerIndex === index;
+
+            // Generate styles using CSS variables
+            const cardStyle: React.CSSProperties = {
+              backgroundColor: isEmptySeat
+                ? 'var(--color-bg-tertiary)'
+                : player.teamId === 1
+                  ? 'color-mix(in srgb, var(--color-team1-primary) 15%, var(--color-bg-secondary))'
+                  : 'color-mix(in srgb, var(--color-team2-primary) 15%, var(--color-bg-secondary))',
+              borderWidth: '2px',
+              borderStyle: isEmptySeat ? 'dashed' : 'solid',
+              borderColor: isEmptySeat
+                ? 'var(--color-border-default)'
+                : player.teamId === 1
+                  ? 'var(--color-team1-primary)'
+                  : 'var(--color-team2-primary)',
+              ...(isMe && !isEmptySeat ? { boxShadow: '0 0 0 2px var(--color-info)' } : {}),
+            };
+
+            const textColorStyle: React.CSSProperties = {
+              color: isEmptySeat
+                ? 'var(--color-text-muted)'
+                : player.teamId === 1
+                  ? 'var(--color-team1-primary)'
+                  : 'var(--color-team2-primary)',
+            };
 
             return (
               <UICard
                 key={`${player.name}-${index}`}
                 variant="bordered"
                 size="md"
-                className={`${bgColor} border-2 ${borderColor} transition-all ${
-                  isMe ? 'ring-2 ring-blue-500' : ''
-                }`}
+                className="transition-all"
+                style={cardStyle}
               >
                 <div className="flex items-center justify-between gap-4">
                   {/* Player Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className={`font-bold text-lg ${textColor} ${isEmptySeat ? 'italic' : ''}`}>
+                      <span
+                        className={`font-bold text-lg ${isEmptySeat ? 'italic' : ''}`}
+                        style={textColorStyle}
+                      >
                         {isEmptySeat ? '💺 ' : ''}{isEmptySeat ? (player.emptySlotName || 'Empty Seat') : player.name}
                       </span>
                       {isMe && !isEmptySeat && (
-                        <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-bold">
+                        <span
+                          className="text-xs px-2 py-0.5 rounded-full font-bold"
+                          style={{ backgroundColor: 'var(--color-info)', color: 'white' }}
+                        >
                           YOU
                         </span>
                       )}
                       {isPlayerTurn && !isEmptySeat && (
-                        <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold animate-pulse">
+                        <span
+                          className="text-xs px-2 py-0.5 rounded-full font-bold animate-pulse"
+                          style={{ backgroundColor: 'var(--color-success)', color: 'white' }}
+                        >
                           TURN
                         </span>
                       )}
                       {!isEmptySeat && (
-                        <span className={`${textColor} text-sm font-semibold ml-2`}>
+                        <span className="text-sm font-semibold ml-2" style={textColorStyle}>
                           Team {player.teamId}
                         </span>
                       )}
@@ -147,14 +165,30 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                   {/* Bot Indicator & Difficulty / Empty Seat Indicator */}
                   {isEmptySeat ? (
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 px-3 py-1.5 rounded-full">
-                        <span className="text-sm font-bold text-gray-600 dark:text-gray-400 italic">Empty</span>
+                      <div
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+                      >
+                        <span
+                          className="text-sm font-bold italic"
+                          style={{ color: 'var(--color-text-muted)' }}
+                        >
+                          Empty
+                        </span>
                       </div>
                     </div>
                   ) : player.isBot ? (
                     <div className="flex items-center gap-2 flex-wrap justify-end">
-                      <div className="flex items-center gap-2 bg-gray-200 dark:bg-gray-700 px-3 py-1.5 rounded-full">
-                        <span className="text-sm font-bold text-gray-700 dark:text-gray-300">🤖 Bot</span>
+                      <div
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+                      >
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: 'var(--color-text-secondary)' }}
+                        >
+                          🤖 Bot
+                        </span>
                       </div>
 
                       {/* Difficulty Selector - Dark mode support */}
@@ -206,8 +240,11 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 flex-wrap justify-end">
-                      <div className="flex items-center gap-2 bg-green-100 dark:bg-green-900/30 px-3 py-1.5 rounded-full">
-                        <span className="text-sm font-bold text-green-700 dark:text-green-300">👤 Human</span>
+                      <div
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+                        style={{ backgroundColor: 'color-mix(in srgb, var(--color-success) 20%, var(--color-bg-secondary))' }}
+                      >
+                        <span className="text-sm font-bold" style={{ color: 'var(--color-success)' }}>👤 Human</span>
                       </div>
 
                       {/* Action Buttons */}
@@ -268,8 +305,13 @@ export const BotManagementPanel = memo(function BotManagementPanel({
 
         {/* Help Text for Non-Creators */}
         {!isCreator && (
-          <UICard variant="bordered" size="md" className="mt-4 bg-gray-100 dark:bg-gray-700 text-center">
-            <p className="text-gray-700 dark:text-gray-300 text-sm">
+          <UICard
+            variant="bordered"
+            size="md"
+            className="mt-4 text-center"
+            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+          >
+            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               ℹ️ Only the game creator can manage teams and swap positions
             </p>
           </UICard>

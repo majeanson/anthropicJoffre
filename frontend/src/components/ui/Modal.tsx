@@ -28,7 +28,7 @@ import { sizes } from '../../config/layout';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 export type ModalTheme =
-  | 'arcane' | 'midnight' | 'ember' | 'void' | 'parchment' | 'teal'
+  | 'arcane' | 'midnight' | 'ember' | 'void' | 'parchment' | 'teal' | 'minimal'
   // Legacy themes for backward compatibility
   | 'elegant' | 'velvet' | 'neon' | 'arcade' | 'hologram' | 'classic' | 'terminal'
   | 'blue' | 'purple' | 'green' | 'orange' | 'red';
@@ -164,6 +164,17 @@ const themeConfigs: Record<ModalTheme, {
     closeButton: 'bg-[#DC2626] hover:bg-[#EF4444] hover:shadow-[0_0_20px_rgba(220,38,38,0.5)]',
     footer: 'bg-[#0D1F1F]',
     glow: '0 0 50px rgba(45, 212, 191, 0.25), 0 0 100px rgba(45, 212, 191, 0.1), 0 8px 32px rgba(0, 0, 0, 0.7)',
+  },
+  // Minimal theme - uses CSS variables for skin compatibility
+  minimal: {
+    backdrop: 'bg-[var(--color-bg-overlay)]',
+    container: 'bg-[var(--color-bg-secondary)]',
+    header: 'bg-[var(--color-bg-accent)]',
+    border: 'border-[var(--color-border-accent)]',
+    title: 'text-[var(--color-text-inverse)]',
+    closeButton: 'bg-[var(--color-error)] hover:opacity-90',
+    footer: 'bg-[var(--color-bg-tertiary)]',
+    glow: 'var(--shadow-lg)',
   },
   // Legacy theme mappings
   elegant: {
@@ -571,6 +582,11 @@ export const ClassicModal = (props: PresetModalProps) => (
 /** Terminal/hacker styled modal */
 export const TerminalModal = (props: PresetModalProps) => (
   <Modal theme="terminal" scanlines {...props} />
+);
+
+/** Minimal theme modal - uses CSS variables for skin compatibility */
+export const MinimalModal = (props: PresetModalProps) => (
+  <Modal theme="minimal" {...props} />
 );
 
 // Legacy exports for backward compatibility

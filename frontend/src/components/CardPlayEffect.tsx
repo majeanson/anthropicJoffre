@@ -40,11 +40,13 @@ export function CardPlayEffect({ card, position, onComplete }: CardPlayEffectPro
   useEffect(() => {
     // Generate particles in a radial pattern
     const newParticles: Particle[] = [];
+    // Use CSS variables for skin-aware suit colors
+    const root = getComputedStyle(document.documentElement);
     const colors = {
-      red: '#dc2626',
-      brown: '#b45309',
-      green: '#16a34a',
-      blue: '#2563eb',
+      red: root.getPropertyValue('--color-suit-red').trim() || '#dc2626',
+      brown: root.getPropertyValue('--color-suit-brown').trim() || '#b45309',
+      green: root.getPropertyValue('--color-suit-green').trim() || '#16a34a',
+      blue: root.getPropertyValue('--color-suit-blue').trim() || '#2563eb',
     };
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
