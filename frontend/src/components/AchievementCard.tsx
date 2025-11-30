@@ -15,11 +15,12 @@ interface AchievementCardProps {
 
 export function AchievementCard({ achievement, size = 'medium' }: AchievementCardProps) {
   const getTierColor = (tier: AchievementTier): string => {
+    // Use darker colors for better white text contrast in light mode
     switch (tier) {
-      case 'bronze': return 'from-amber-500 to-orange-600';
-      case 'silver': return 'from-gray-400 to-gray-600';
-      case 'gold': return 'from-purple-500 to-pink-600';
-      case 'platinum': return 'from-blue-400 to-cyan-500';
+      case 'bronze': return 'from-amber-600 to-orange-700';
+      case 'silver': return 'from-gray-500 to-gray-700';
+      case 'gold': return 'from-purple-600 to-pink-700';
+      case 'platinum': return 'from-blue-500 to-cyan-600';
     }
   };
 

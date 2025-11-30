@@ -88,7 +88,7 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
           variant="ghost"
           size="sm"
           onClick={handleClose}
-          className="absolute top-2 right-2 text-white/70 hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
+          className="absolute top-2 right-2 text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-white/10"
           aria-label="Close achievement notification"
         >
           ×
@@ -100,15 +100,15 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
             🏆
           </div>
 
-          {/* Content */}
-          <div className="text-white">
-            <div className="text-xs uppercase tracking-wider mb-1">
+          {/* Content - Use dark text in light mode, white in dark mode */}
+          <div className="text-gray-900 dark:text-white">
+            <div className="text-xs uppercase tracking-wider mb-1 text-gray-700 dark:text-white/90">
               {achievement.is_secret ? '🔓 Secret Achievement Unlocked!' : 'Achievement Unlocked!'}
             </div>
             <div className="font-bold text-xl mb-1">
               {name}
             </div>
-            <div className="text-sm">
+            <div className="text-sm text-gray-700 dark:text-white/80">
               {achievement.description}
             </div>
           </div>
@@ -120,8 +120,8 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
         </div>
 
         {/* Progress Bar Animation */}
-        <div className="mt-3 h-1 bg-white/20 rounded-full overflow-hidden">
-          <div className="h-full bg-white animate-progress-fill" />
+        <div className="mt-3 h-1 bg-gray-300 dark:bg-white/20 rounded-full overflow-hidden">
+          <div className="h-full bg-gray-700 dark:bg-white animate-progress-fill" />
         </div>
       </UICard>
     </div>
