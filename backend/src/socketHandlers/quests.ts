@@ -48,6 +48,10 @@ export function registerQuestHandlers(socket: Socket): void {
     await handleGetDailyCalendar.call(this);
   });
 
+  socket.on('get_player_calendar_progress', async function(this: Socket, data: { playerName: string }) {
+    await handleGetPlayerCalendarProgress.call(this, data);
+  });
+
   socket.on('claim_calendar_reward', async function(this: Socket, data: { playerName: string; dayNumber: number }) {
     await handleClaimCalendarReward.call(this, data);
   });
@@ -228,6 +232,32 @@ async function handleGetDailyCalendar(this: Socket): Promise<void> {
     console.error('[Quests] Error fetching daily calendar:', error);
     this.emit('error', {
       message: 'Failed to fetch daily calendar. Please try again.',
+    });
+  }
+}
+
+/**
+ * Get player's calendar progress
+ */
+async function handleGetPlayerCalendarProgress(
+  this: Socket,
+  data: { playerName: string }
+): Promise<void> {
+  try {
+    const { playerName } = data;
+
+    if (!playerName) {
+      this.emit('error', { message: 'Player name is required' });
+      return;
+    }
+
+    const progress = await getPlayerCalendarProgress(playerName);
+
+    this.emit('calendar_progress', progress);
+  } catch (error) {
+    console.error('[Quests] Error fetching calendar progress:', error);
+    this.emit('error', {
+      message: 'Failed to fetch calendar progress. Please try again.',
     });
   }
 }
