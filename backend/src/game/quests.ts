@@ -15,7 +15,7 @@ export interface QuestTemplate {
   name: string;
   description: string;
   quest_type: 'easy' | 'medium' | 'hard';
-  objective_type: 'wins' | 'games_played' | 'tricks_won' | 'bets_made' | 'special_cards' | 'bet_amount' | 'comeback';
+  objective_type: 'wins' | 'games_played' | 'tricks_won' | 'bets_made' | 'bets_won' | 'special_cards' | 'bet_amount' | 'comeback';
   target_value: number;
   reward_xp: number;
   reward_currency: number;
@@ -53,6 +53,7 @@ export interface GameQuestContext {
   won: boolean;
   tricksWon: number;
   betsMade: number;
+  betsWon: number; // Number of rounds where player's team was betting team and won
   betAmount?: number;
   wonRedZero: boolean;
   usedBrownZeroDefensively: boolean;
@@ -136,12 +137,24 @@ export function extractQuestContext(
 
   const wasComeback = won && isGameComeback(gameState, playerTeam);
 
+  // Count bets won (rounds where player's team was betting team and made the bet)
+  let betsWon = 0;
+  if (gameState.roundHistory && Array.isArray(gameState.roundHistory)) {
+    for (const round of gameState.roundHistory) {
+      // Check if player's team was the offensive (betting) team and they made the bet
+      if (round.offensiveTeam === playerTeam && round.betMade) {
+        betsWon++;
+      }
+    }
+  }
+
   return {
     playerName,
     gameId,
     won,
     tricksWon: player.tricksWon || 0,
     betsMade: gameState.roundHistory ? gameState.roundHistory.length : 0, // Each round = 1 bet
+    betsWon,
     betAmount: gameState.highestBet?.amount,
     wonRedZero,
     usedBrownZeroDefensively,
@@ -189,6 +202,10 @@ export function calculateQuestProgress(
 
     case 'bets_made':
       progressDelta = context.betsMade;
+      break;
+
+    case 'bets_won':
+      progressDelta = context.betsWon;
       break;
 
     case 'special_cards':
