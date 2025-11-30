@@ -58,9 +58,9 @@ export function SocialListItem({
   return (
     <div
       className={`
-        bg-gray-800/50 dark:bg-gray-800/50 rounded-lg p-4
+        bg-parchment-200 dark:bg-gray-800/50 rounded-lg p-4
         flex items-center justify-between
-        hover:bg-gray-800 dark:hover:bg-gray-700
+        hover:bg-parchment-300 dark:hover:bg-gray-700
         transition-colors
         ${onClick ? 'cursor-pointer' : ''}
         ${className}
@@ -72,12 +72,12 @@ export function SocialListItem({
         {avatar || <OnlineStatusBadge status={status} showText={false} />}
 
         <div className="min-w-0 flex-1">
-          <p className="text-white font-semibold truncate">{playerName}</p>
+          <p className="text-gray-900 dark:text-white font-semibold truncate">{playerName}</p>
           {metadata && (
-            <p className="text-sm text-gray-400 truncate">{metadata}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{metadata}</p>
           )}
           {status && !avatar && (
-            <p className={`text-sm ${status === 'offline' ? 'text-gray-500' : 'text-green-400'}`}>
+            <p className={`text-sm ${status === 'offline' ? 'text-gray-500' : 'text-green-600 dark:text-green-400'}`}>
               {status === 'in_game' && 'In Game'}
               {status === 'in_lobby' && 'In Lobby'}
               {status === 'in_team_selection' && 'Team Selection'}

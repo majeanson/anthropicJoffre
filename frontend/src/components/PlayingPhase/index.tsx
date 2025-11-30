@@ -439,6 +439,9 @@ function PlayingPhaseComponent({
         onOpenChat={() => setChatOpen(!chatOpen)}
         unreadChatCount={unreadChatCount}
         connectionStats={connectionStats}
+        highestBet={gameState.highestBet ? { amount: gameState.highestBet.amount, withoutTrump: gameState.highestBet.withoutTrump, playerId: gameState.highestBet.playerId } : undefined}
+        trump={gameState.trump}
+        bettingTeamId={gameState.highestBet?.playerId ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId : null}
       />
 
       <div className="flex flex-col flex-1 overflow-visible relative">

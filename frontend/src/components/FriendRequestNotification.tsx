@@ -39,8 +39,8 @@ export default function FriendRequestNotificationComponent({
         <div className="flex items-start gap-3">
           <span className="text-3xl" aria-hidden="true">👥</span>
           <div className="flex-1">
-            <h3 className="text-white font-bold text-lg">Friend Request</h3>
-            <p className="text-white/90 text-sm mt-1">
+            <h3 className="text-purple-900 dark:text-white font-bold text-lg">Friend Request</h3>
+            <p className="text-purple-800 dark:text-white/90 text-sm mt-1">
               <span className="font-semibold">{notification.from_player}</span> sent you a friend request
             </p>
             <div className="flex gap-2 mt-3">
@@ -51,7 +51,7 @@ export default function FriendRequestNotificationComponent({
                   onView();
                   onClose();
                 }}
-                className="flex-1 bg-white/20 hover:bg-white/30 text-white"
+                className="flex-1 bg-purple-200 hover:bg-purple-300 text-purple-900 dark:bg-white/20 dark:hover:bg-white/30 dark:text-white"
               >
                 View
               </Button>
@@ -59,7 +59,7 @@ export default function FriendRequestNotificationComponent({
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="bg-gray-800/50 hover:bg-gray-800/70 text-white"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-800/50 dark:hover:bg-gray-800/70 dark:text-white"
               >
                 Dismiss
               </Button>
@@ -69,7 +69,7 @@ export default function FriendRequestNotificationComponent({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-white/80 hover:text-white text-xl font-bold p-0 w-6 h-6"
+            className="text-purple-700 hover:text-purple-900 dark:text-white/80 dark:hover:text-white text-xl font-bold p-0 w-6 h-6"
           >
             ×
           </Button>
