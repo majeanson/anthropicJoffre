@@ -412,7 +412,7 @@ export function TeamSelection({
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative overflow-hidden"
+      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative"
       style={{ background: 'var(--color-bg-primary)' }}
     >
       {/* Animated background grid */}
@@ -429,18 +429,19 @@ export function TeamSelection({
         />
       </div>
 
-      {/* Main container */}
+      {/* Main container - full width */}
       <div
         className="
           bg-[var(--color-bg-secondary)]
           rounded-[var(--radius-xl)]
           p-6 sm:p-8
-          max-w-4xl w-full
+          w-full
           relative
           border-2 border-[var(--color-border-accent)]
         "
         style={{
           boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
+          maxWidth: '1200px',
         }}
       >
         {/* Top-left buttons */}

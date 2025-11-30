@@ -932,8 +932,8 @@ export const midnightAlchemySkin: Skin = {
 
   typography: {
     fontFamily: {
-      display: '"Cinzel Decorative", "Cinzel", Georgia, serif',
-      body: '"Cormorant Garamond", "Georgia", serif',
+      display: '"Cinzel", "Playfair Display", Georgia, serif',
+      body: '"Lora", "Source Serif 4", Georgia, serif',
       mono: '"Fira Code", "JetBrains Mono", monospace',
     },
     fontWeight: {
