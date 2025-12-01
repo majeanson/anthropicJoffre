@@ -168,6 +168,27 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
           </div>
         </section>
 
+        {/* Developer Links */}
+        <section>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-purple-200 pb-2">
+            🔧 Developer Resources
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              variant="secondary"
+              onClick={() => window.open('https://69291bd0d238365e7e12f66c-nqeyaruzoe.chromatic.com/', '_blank')}
+            >
+              <span aria-hidden="true">📖</span> Open Storybook
+            </Button>
+            <Button
+              variant="warning"
+              onClick={() => window.open('https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568', '_blank')}
+            >
+              <span aria-hidden="true">🐛</span> Open Sentry
+            </Button>
+          </div>
+        </section>
+
         {/* Sentry Testing */}
         <section>
           <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-red-200 pb-2">
