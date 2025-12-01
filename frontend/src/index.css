@@ -48,9 +48,9 @@
   --color-team2-secondary: #4d82a6;
   --color-team2-text: #f4efe4;
 
-  /* Suit colors */
-  --color-suit-red: #b84444;
-  --color-suit-brown: #8b6914;
+  /* Suit colors - Red and Brown are now more distinct for mobile accessibility */
+  --color-suit-red: #c93535;      /* Brighter, more saturated red */
+  --color-suit-brown: #6b4423;    /* True brown (darker, more saturated) */
   --color-suit-green: #3d7a54;
   --color-suit-blue: #3d6a8a;
 
