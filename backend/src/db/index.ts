@@ -586,7 +586,17 @@ export const getPlayerStats = async (playerName: string) => {
         rounds_win_percentage, avg_tricks_per_round, avg_points_per_round,
         total_bets_made, bets_won, bets_lost, bet_success_rate, avg_bet_amount,
         highest_bet, without_trump_bets, trump_cards_played, red_zeros_collected,
-        brown_zeros_received, is_bot, created_at, updated_at
+        brown_zeros_received, is_bot, created_at, updated_at,
+        COALESCE(total_xp, 0) as total_xp,
+        COALESCE(current_level, 1) as current_level,
+        COALESCE(cosmetic_currency, 0) as cosmetic_currency,
+        CASE
+          WHEN elo_rating >= 1600 THEN 'Diamond'
+          WHEN elo_rating >= 1400 THEN 'Platinum'
+          WHEN elo_rating >= 1200 THEN 'Gold'
+          WHEN elo_rating >= 1000 THEN 'Silver'
+          ELSE 'Bronze'
+        END as ranking_tier
       FROM player_stats
       WHERE player_name = $1 AND is_bot = FALSE
     `;

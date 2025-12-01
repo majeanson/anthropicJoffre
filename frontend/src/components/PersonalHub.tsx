@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { Modal, UICard, Button, Spinner } from './ui';
 import { LoginStreakBadge } from './LoginStreakBadge';
+import { getLevelProgress, getLevelTitle, getLevelColor, getLevelGradient, formatXp } from '../utils/xpSystem';
 
 interface QuestSummary {
   total: number;
@@ -25,6 +26,15 @@ interface CalendarSummary {
   currentDay: number;
   canClaimToday: boolean;
   totalClaimed: number;
+}
+
+interface PlayerStatsSummary {
+  total_xp: number;
+  current_level: number;
+  games_played: number;
+  games_won: number;
+  win_percentage: number;
+  elo_rating: number;
 }
 
 interface PersonalHubProps {
@@ -50,6 +60,7 @@ export function PersonalHub({
 }: PersonalHubProps) {
   const [questSummary, setQuestSummary] = useState<QuestSummary | null>(null);
   const [calendarSummary, setCalendarSummary] = useState<CalendarSummary | null>(null);
+  const [playerStats, setPlayerStats] = useState<PlayerStatsSummary | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -57,9 +68,10 @@ export function PersonalHub({
 
     setLoading(true);
 
-    // Fetch quest summary
+    // Fetch quest summary, calendar progress, and player stats
     socket.emit('get_daily_quests', { playerName });
     socket.emit('get_player_calendar_progress', { playerName });
+    socket.emit('get_player_stats', { playerName });
 
     const handleDailyQuests = (data: { quests: Array<{ completed: boolean; reward_claimed: boolean }> }) => {
       const total = data.quests.length;
@@ -78,12 +90,27 @@ export function PersonalHub({
       });
     };
 
+    const handlePlayerStats = (data: { stats: PlayerStatsSummary | null; playerName: string }) => {
+      if (data.playerName === playerName && data.stats) {
+        setPlayerStats({
+          total_xp: data.stats.total_xp || 0,
+          current_level: data.stats.current_level || 1,
+          games_played: data.stats.games_played || 0,
+          games_won: data.stats.games_won || 0,
+          win_percentage: data.stats.win_percentage || 0,
+          elo_rating: data.stats.elo_rating || 1200,
+        });
+      }
+    };
+
     socket.on('daily_quests', handleDailyQuests);
     socket.on('calendar_progress', handleCalendarProgress);
+    socket.on('player_stats_response', handlePlayerStats);
 
     return () => {
       socket.off('daily_quests', handleDailyQuests);
       socket.off('calendar_progress', handleCalendarProgress);
+      socket.off('player_stats_response', handlePlayerStats);
     };
   }, [socket, playerName, isOpen]);
 
@@ -110,6 +137,66 @@ export function PersonalHub({
         </div>
       ) : (
         <div className="space-y-4">
+          {/* XP and Level Display */}
+          {playerStats && (
+            (() => {
+              const progress = getLevelProgress(playerStats.total_xp);
+              const levelTitle = getLevelTitle(progress.level);
+              const levelColor = getLevelColor(progress.level);
+              const levelGradient = getLevelGradient(progress.level);
+
+              return (
+                <UICard variant="bordered" size="md">
+                  <div className="flex items-center gap-4">
+                    {/* Level Badge */}
+                    <div className={`
+                      w-16 h-16 rounded-xl flex flex-col items-center justify-center
+                      bg-gradient-to-br ${levelGradient}
+                      shadow-lg
+                    `}>
+                      <span className="text-white font-bold text-2xl">{progress.level}</span>
+                      <span className="text-white/80 text-[10px] uppercase">Level</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className={`font-bold text-lg ${levelColor}`}>{levelTitle}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {formatXp(playerStats.total_xp)} XP Total
+                        </span>
+                      </div>
+                      {/* XP Progress Bar */}
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full bg-gradient-to-r ${levelGradient} transition-all duration-500`}
+                          style={{ width: `${progress.progressPercent}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        <span>{progress.progressPercent}% to Level {progress.level + 1}</span>
+                        <span>{formatXp(progress.xpToNextLevel)} XP needed</span>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Quick Stats Row */}
+                  <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <div className="text-lg font-bold text-blue-500">{playerStats.games_played}</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Games</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-green-500">{playerStats.win_percentage.toFixed(0)}%</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Win Rate</div>
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold text-yellow-500">{playerStats.elo_rating}</div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">ELO</div>
+                    </div>
+                  </div>
+                </UICard>
+              );
+            })()
+          )}
+
           {/* Login Streak */}
           <UICard variant="gradient" gradient="warning" size="md" className="cursor-pointer hover:scale-[1.02] transition-transform">
             <div className="flex items-center justify-between">

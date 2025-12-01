@@ -16,6 +16,7 @@
 import { useEffect, useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon } from '../utils/tierBadge';
+import { getLevelProgress, getLevelTitle, getLevelColor, getLevelGradient, formatXp } from '../utils/xpSystem';
 import Avatar from './Avatar';
 import { useAuth } from '../contexts/AuthContext';
 import { AchievementProgress } from '../types/achievements';
@@ -30,6 +31,9 @@ interface QuickStats {
   win_percentage: number;
   elo_rating: number;
   ranking_tier: 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
+  total_xp?: number;
+  current_level?: number;
+  cosmetic_currency?: number;
 }
 
 interface UserProfile {
@@ -252,6 +256,52 @@ export function PlayerProfileModal({
                 </div>
               </div>
             </div>
+
+            {/* XP and Level Display */}
+            {stats.total_xp !== undefined && (
+              (() => {
+                const progress = getLevelProgress(stats.total_xp || 0);
+                const levelTitle = getLevelTitle(progress.level);
+                const levelColor = getLevelColor(progress.level);
+                const levelGradient = getLevelGradient(progress.level);
+
+                return (
+                  <UICard variant="bordered" size="sm">
+                    <div className="flex items-center gap-3 mb-2">
+                      {/* Level Badge */}
+                      <div className={`
+                        w-12 h-12 rounded-lg flex items-center justify-center
+                        bg-gradient-to-br ${levelGradient}
+                        shadow-lg
+                      `}>
+                        <span className="text-white font-bold text-lg">{progress.level}</span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className={`font-bold ${levelColor}`}>{levelTitle}</span>
+                          <span className="text-xs text-gray-400">
+                            {formatXp(stats.total_xp || 0)} XP
+                          </span>
+                        </div>
+                        {/* XP Progress Bar */}
+                        <div className="mt-1">
+                          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full bg-gradient-to-r ${levelGradient} transition-all duration-500`}
+                              style={{ width: `${progress.progressPercent}%` }}
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs text-gray-500 mt-0.5">
+                            <span>Level {progress.level}</span>
+                            <span>{formatXp(progress.xpToNextLevel)} XP to next</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </UICard>
+                );
+              })()
+            )}
 
             {/* Profile Information */}
             {profile && (
