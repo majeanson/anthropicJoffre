@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState } from '../types/game';
 import * as Sentry from '@sentry/react';
-import { Modal, Button } from './ui';
+import { Modal, Button, Input } from './ui';
 import { UICard } from './ui/UICard';
 
 interface TestPanelProps {
@@ -100,32 +100,22 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
           </h3>
           <UICard variant="bordered" size="md">
             <div className="grid grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Team 1 Score
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={team1Score}
-                  onChange={(e) => setTeam1Score(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white dark:bg-gray-700"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  Team 2 Score
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={team2Score}
-                  onChange={(e) => setTeam2Score(parseInt(e.target.value) || 0)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white dark:bg-gray-700"
-                />
-              </div>
+              <Input
+                type="number"
+                label="Team 1 Score"
+                min={0}
+                max={100}
+                value={team1Score}
+                onChange={(e) => setTeam1Score(parseInt(e.target.value) || 0)}
+              />
+              <Input
+                type="number"
+                label="Team 2 Score"
+                min={0}
+                max={100}
+                value={team2Score}
+                onChange={(e) => setTeam2Score(parseInt(e.target.value) || 0)}
+              />
             </div>
             <Button variant="success" fullWidth onClick={handleSetScores}>
               Apply Scores

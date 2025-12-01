@@ -28,6 +28,7 @@ import { PlayerProfileModal } from './PlayerProfileModal';
 import { UnifiedChat } from './UnifiedChat';
 import type { ChatMessage } from '../types/game';
 import { Button } from './ui/Button';
+import { Select } from './ui/Select';
 
 interface SocialPanelProps {
   socialTab: 'recent' | 'online' | 'chat' | 'friends' | 'messages' | 'profile';
@@ -905,32 +906,29 @@ export function SocialPanel({
                         <div className="text-xs text-gray-500 mt-1">{profileBio.length}/200</div>
                       </div>
 
-                      <div>
-                        <label className="text-xs font-semibold text-umber-700 dark:text-gray-300 block mb-1">
-                          Country
-                        </label>
-                        <select
-                          value={profileCountry}
-                          onChange={(e) => setProfileCountry(e.target.value)}
-                          className="w-full px-2 py-1.5 text-sm rounded border border-parchment-400 dark:border-gray-500 bg-white dark:bg-gray-700 text-umber-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                          <option value="">Select a country...</option>
-                          <option value="US">🇺🇸 United States</option>
-                          <option value="CA">🇨🇦 Canada</option>
-                          <option value="GB">🇬🇧 United Kingdom</option>
-                          <option value="FR">🇫🇷 France</option>
-                          <option value="DE">🇩🇪 Germany</option>
-                          <option value="ES">🇪🇸 Spain</option>
-                          <option value="IT">🇮🇹 Italy</option>
-                          <option value="JP">🇯🇵 Japan</option>
-                          <option value="AU">🇦🇺 Australia</option>
-                          <option value="BR">🇧🇷 Brazil</option>
-                          <option value="MX">🇲🇽 Mexico</option>
-                          <option value="IN">🇮🇳 India</option>
-                          <option value="CN">🇨🇳 China</option>
-                          <option value="KR">🇰🇷 South Korea</option>
-                        </select>
-                      </div>
+                      <Select
+                        label="Country"
+                        value={profileCountry}
+                        onChange={(e) => setProfileCountry(e.target.value)}
+                        options={[
+                          { value: '', label: 'Select a country...' },
+                          { value: 'US', label: '🇺🇸 United States' },
+                          { value: 'CA', label: '🇨🇦 Canada' },
+                          { value: 'GB', label: '🇬🇧 United Kingdom' },
+                          { value: 'FR', label: '🇫🇷 France' },
+                          { value: 'DE', label: '🇩🇪 Germany' },
+                          { value: 'ES', label: '🇪🇸 Spain' },
+                          { value: 'IT', label: '🇮🇹 Italy' },
+                          { value: 'JP', label: '🇯🇵 Japan' },
+                          { value: 'AU', label: '🇦🇺 Australia' },
+                          { value: 'BR', label: '🇧🇷 Brazil' },
+                          { value: 'MX', label: '🇲🇽 Mexico' },
+                          { value: 'IN', label: '🇮🇳 India' },
+                          { value: 'CN', label: '🇨🇳 China' },
+                          { value: 'KR', label: '🇰🇷 South Korea' },
+                        ]}
+                        size="sm"
+                      />
 
                       <div>
                         <label className="text-xs font-semibold text-umber-700 dark:text-gray-300 block mb-1">

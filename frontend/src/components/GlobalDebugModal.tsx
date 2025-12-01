@@ -5,6 +5,7 @@ import buildInfo from '../buildInfo.json';
 import { CONFIG } from '../config/constants';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
+import { Select } from './ui/Select';
 
 interface GlobalDebugModalProps {
   isOpen: boolean;
@@ -316,14 +317,15 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
           <section>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">🎮 All Games ({games.length})</h3>
-              <select
+              <Select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'uptime' | 'round')}
-                className="px-3 py-1 rounded border text-sm"
-              >
-                <option value="uptime">Sort by Uptime</option>
-                <option value="round">Sort by Round</option>
-              </select>
+                options={[
+                  { value: 'uptime', label: 'Sort by Uptime' },
+                  { value: 'round', label: 'Sort by Round' },
+                ]}
+                size="sm"
+              />
             </div>
 
             {games.length === 0 ? (

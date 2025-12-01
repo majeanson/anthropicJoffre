@@ -12,6 +12,7 @@ import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 import { UICard } from './ui/UICard';
 import { Button } from './ui/Button';
+import { Input } from './ui/Input';
 
 // Lazy load modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -304,43 +305,26 @@ export function JoinGameForm({
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
-                Game ID
-              </label>
-              <input
-                ref={gameIdInputRef}
-                data-testid="game-id-input"
-                type="text"
-                value={gameId}
-                onChange={(e) => setGameId(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-parchment-400 dark:border-gray-500 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 focus:outline-none focus:ring-offset-2 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100"
-                placeholder="Enter game ID"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-umber-800 dark:text-gray-200 mb-2">
-                Your Name {joinType === 'spectator' && '(Optional)'}
-              </label>
-              <input
-                ref={playerNameInputRef}
-                data-testid="player-name-input"
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                disabled={!!user}
-                placeholder={user ? "Using authenticated username" : "Enter your name"}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:ring-2 focus:ring-umber-500 focus:border-umber-500 focus:outline-none focus:ring-offset-2 bg-parchment-100 dark:bg-gray-700 text-umber-900 dark:text-gray-100 ${
-                  user ? 'opacity-60 cursor-not-allowed' : ''
-                } ${
-                  autoJoinGameId
-                    ? 'border-blue-400 dark:border-blue-500 ring-2 ring-blue-300 dark:ring-blue-700'
-                    : 'border-parchment-400 dark:border-gray-500'
-                }`}
-                required={joinType === 'player'}
-              />
-            </div>
+            <Input
+              ref={gameIdInputRef}
+              data-testid="game-id-input"
+              label="Game ID"
+              value={gameId}
+              onChange={(e) => setGameId(e.target.value)}
+              placeholder="Enter game ID"
+              required
+            />
+            <Input
+              ref={playerNameInputRef}
+              data-testid="player-name-input"
+              label={`Your Name ${joinType === 'spectator' ? '(Optional)' : ''}`}
+              value={playerName}
+              onChange={(e) => setPlayerName(e.target.value)}
+              disabled={!!user}
+              placeholder={user ? "Using authenticated username" : "Enter your name"}
+              required={joinType === 'player'}
+              className={autoJoinGameId ? 'ring-2 ring-blue-300 dark:ring-blue-700' : ''}
+            />
 
             {/* Info message for spectator mode */}
             {joinType === 'spectator' && (

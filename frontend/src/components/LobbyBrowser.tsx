@@ -14,6 +14,9 @@ import logger from '../utils/logger';
 import { sounds } from '../utils/sounds';
 import { Button, NeonButton } from './ui/Button';
 import { Input } from './ui/Input';
+import { Tabs, Tab } from './ui/Tabs';
+import { Checkbox } from './ui/Checkbox';
+import { Select } from './ui/Select';
 
 // Lazy load GameReplay component
 const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
@@ -485,42 +488,20 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
         </div>
 
         {/* Tab Navigation - Arcade Style */}
-        <div className="flex border-b border-[var(--color-border-default)]">
-          <button
-            onClick={() => { setActiveTab('active'); sounds.buttonClick(); }}
-            className={`
-              flex-1 px-4 py-3
-              font-display uppercase tracking-wider text-sm
-              transition-all duration-[var(--duration-fast)]
-              flex items-center justify-center gap-2
-              ${activeTab === 'active'
-                ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-accent)] border-b-2 border-[var(--color-text-accent)]'
-                : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]/50'
-              }
-            `}
-            style={activeTab === 'active' ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
-          >
-            <span>🎮</span>
-            <span>Active Games</span>
-          </button>
-          <button
-            onClick={() => { setActiveTab('recent'); sounds.buttonClick(); }}
-            className={`
-              flex-1 px-4 py-3
-              font-display uppercase tracking-wider text-sm
-              transition-all duration-[var(--duration-fast)]
-              flex items-center justify-center gap-2
-              ${activeTab === 'recent'
-                ? 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-accent)] border-b-2 border-[var(--color-text-accent)]'
-                : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-tertiary)]/50'
-              }
-            `}
-            style={activeTab === 'recent' ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
-          >
-            <span>📜</span>
-            <span>Recent Games</span>
-          </button>
-        </div>
+        <Tabs
+          tabs={[
+            { id: 'active', label: 'Active Games', icon: '🎮' },
+            { id: 'recent', label: 'Recent Games', icon: '📜' },
+          ] as Tab[]}
+          activeTab={activeTab}
+          onChange={(tabId) => {
+            setActiveTab(tabId as 'active' | 'recent');
+            sounds.buttonClick();
+          }}
+          variant="underline"
+          size="md"
+          fullWidth
+        />
 
         {/* Content Area */}
         <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-4 space-y-3">
@@ -596,128 +577,56 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
               "
             >
               <div className="flex flex-wrap items-center gap-4">
-                {/* Filter Checkboxes - Retro Style */}
+                {/* Filter Checkboxes */}
                 <div className="flex items-center gap-4 flex-wrap">
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={filterWithBots}
-                      onChange={(e) => setFilterWithBots(e.target.checked)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`
-                        w-4 h-4 rounded-[var(--radius-sm)]
-                        border-2 border-[var(--color-border-accent)]
-                        flex items-center justify-center
-                        transition-all duration-[var(--duration-fast)]
-                        ${filterWithBots
-                          ? 'bg-[var(--color-text-accent)]'
-                          : 'bg-transparent group-hover:border-[var(--color-text-accent)]'
-                        }
-                      `}
-                      style={filterWithBots ? { boxShadow: '0 0 8px var(--color-glow)' } : {}}
-                    >
-                      {filterWithBots && <span className="text-[10px] text-black">✓</span>}
-                    </div>
-                    <span className="text-xs text-[var(--color-text-secondary)] font-body">🤖 With Bots</span>
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={filterNeedsPlayers}
-                      onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`
-                        w-4 h-4 rounded-[var(--radius-sm)]
-                        border-2 border-[var(--color-border-accent)]
-                        flex items-center justify-center
-                        transition-all duration-[var(--duration-fast)]
-                        ${filterNeedsPlayers
-                          ? 'bg-[var(--color-text-accent)]'
-                          : 'bg-transparent group-hover:border-[var(--color-text-accent)]'
-                        }
-                      `}
-                      style={filterNeedsPlayers ? { boxShadow: '0 0 8px var(--color-glow)' } : {}}
-                    >
-                      {filterNeedsPlayers && <span className="text-[10px] text-black">✓</span>}
-                    </div>
-                    <span className="text-xs text-[var(--color-text-secondary)] font-body">💺 Needs Players</span>
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={filterInProgress}
-                      onChange={(e) => setFilterInProgress(e.target.checked)}
-                      className="sr-only"
-                    />
-                    <div
-                      className={`
-                        w-4 h-4 rounded-[var(--radius-sm)]
-                        border-2 border-[var(--color-border-accent)]
-                        flex items-center justify-center
-                        transition-all duration-[var(--duration-fast)]
-                        ${filterInProgress
-                          ? 'bg-[var(--color-text-accent)]'
-                          : 'bg-transparent group-hover:border-[var(--color-text-accent)]'
-                        }
-                      `}
-                      style={filterInProgress ? { boxShadow: '0 0 8px var(--color-glow)' } : {}}
-                    >
-                      {filterInProgress && <span className="text-[10px] text-black">✓</span>}
-                    </div>
-                    <span className="text-xs text-[var(--color-text-secondary)] font-body">🎮 In Progress</span>
-                  </label>
+                  <Checkbox
+                    checked={filterWithBots}
+                    onChange={(e) => setFilterWithBots(e.target.checked)}
+                    label="🤖 With Bots"
+                    size="sm"
+                  />
+                  <Checkbox
+                    checked={filterNeedsPlayers}
+                    onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
+                    label="💺 Needs Players"
+                    size="sm"
+                  />
+                  <Checkbox
+                    checked={filterInProgress}
+                    onChange={(e) => setFilterInProgress(e.target.checked)}
+                    label="🎮 In Progress"
+                    size="sm"
+                  />
                 </div>
 
                 {/* Game Mode Filter */}
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[var(--color-text-muted)] font-body">Mode:</span>
-                  <select
+                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">Mode:</span>
+                  <Select
                     value={filterGameMode}
                     onChange={(e) => setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')}
-                    className="
-                      px-3 py-1.5
-                      bg-[var(--color-bg-secondary)]
-                      border border-[var(--color-border-default)]
-                      rounded-[var(--radius-md)]
-                      text-xs text-[var(--color-text-secondary)]
-                      font-body
-                      focus:outline-none focus:border-[var(--color-text-accent)]
-                      focus:ring-1 focus:ring-[var(--color-text-accent)]
-                    "
-                  >
-                    <option value="all">All Games</option>
-                    <option value="ranked">Ranked</option>
-                    <option value="casual">Casual</option>
-                  </select>
+                    options={[
+                      { value: 'all', label: 'All Games' },
+                      { value: 'ranked', label: 'Ranked' },
+                      { value: 'casual', label: 'Casual' },
+                    ]}
+                    size="sm"
+                  />
                 </div>
 
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-2 ml-auto">
-                  <span className="text-xs text-[var(--color-text-muted)] font-body">Sort:</span>
-                  <select
+                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">Sort:</span>
+                  <Select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
-                    className="
-                      px-3 py-1.5
-                      bg-[var(--color-bg-secondary)]
-                      border border-[var(--color-border-default)]
-                      rounded-[var(--radius-md)]
-                      text-xs text-[var(--color-text-secondary)]
-                      font-body
-                      focus:outline-none focus:border-[var(--color-text-accent)]
-                      focus:ring-1 focus:ring-[var(--color-text-accent)]
-                    "
-                  >
-                    <option value="newest">Newest</option>
-                    <option value="players">Most Players</option>
-                    <option value="score">Highest Score</option>
-                  </select>
+                    options={[
+                      { value: 'newest', label: 'Newest' },
+                      { value: 'players', label: 'Most Players' },
+                      { value: 'score', label: 'Highest Score' },
+                    ]}
+                    size="sm"
+                  />
                 </div>
               </div>
 

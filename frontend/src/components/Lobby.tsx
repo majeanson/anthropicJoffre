@@ -21,6 +21,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { ProfileButton } from './ProfileButton';
 import { ProfileEditorModal } from './ProfileEditorModal';
 import { Button } from './ui/Button';
+import { Tabs, Tab } from './ui/Tabs';
 
 // Lazy load heavy modals
 const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
@@ -528,84 +529,24 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
             {/* Horizontal Tab Navigation - Arcade style */}
             <div className="mb-6 relative z-20">
-              <div className="grid grid-cols-4 gap-2 mb-4">
-                <button
-                  data-nav-tab="play"
-                  onClick={() => { sounds.buttonClick(); setMainTab('play'); setNavCol(0); }}
-                  className={`
-                    px-2 py-2
-                    font-display text-xs uppercase tracking-wider
-                    rounded-[var(--radius-md)]
-                    border-2 transition-all duration-[var(--duration-fast)]
-                    ${mainTab === 'play'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
-                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
-                    }
-                  `}
-                >
-                  Play
-                </button>
-                <button
-                  data-nav-tab="social"
-                  onClick={() => { sounds.buttonClick(); setMainTab('social'); setNavCol(1); }}
-                  className={`
-                    px-2 py-2 relative
-                    font-display text-xs uppercase tracking-wider
-                    rounded-[var(--radius-md)]
-                    border-2 transition-all duration-[var(--duration-fast)]
-                    ${mainTab === 'social'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
-                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
-                    }
-                  `}
-                >
-                  Social
-                  {onlinePlayers.length > 0 && (
-                    <span
-                      className="absolute -top-1 -right-1 text-[10px] rounded-full w-5 h-5 flex items-center justify-center font-display"
-                      style={{
-                        backgroundColor: 'var(--color-success)',
-                        color: 'black',
-                        boxShadow: '0 0 8px var(--color-success)',
-                      }}
-                    >
-                      {onlinePlayers.length}
-                    </span>
-                  )}
-                </button>
-                <button
-                  data-nav-tab="stats"
-                  onClick={() => { sounds.buttonClick(); setMainTab('stats'); setNavCol(2); }}
-                  className={`
-                    px-2 py-2
-                    font-display text-xs uppercase tracking-wider
-                    rounded-[var(--radius-md)]
-                    border-2 transition-all duration-[var(--duration-fast)]
-                    ${mainTab === 'stats'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
-                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
-                    }
-                  `}
-                >
-                  Stats
-                </button>
-                <button
-                  data-nav-tab="settings"
-                  onClick={() => { sounds.buttonClick(); setMainTab('settings'); setNavCol(3); }}
-                  className={`
-                    px-2 py-2
-                    font-display text-xs uppercase tracking-wider
-                    rounded-[var(--radius-md)]
-                    border-2 transition-all duration-[var(--duration-fast)]
-                    ${mainTab === 'settings'
-                      ? 'bg-[var(--color-bg-accent)] border-[var(--color-text-accent)] text-[var(--color-text-inverse)] shadow-[0_0_15px_var(--color-glow)]'
-                      : 'bg-transparent border-[var(--color-border-default)] text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-secondary)]'
-                    }
-                  `}
-                >
-                  Settings
-                </button>
-              </div>
+              <Tabs
+                tabs={[
+                  { id: 'play', label: 'Play' },
+                  { id: 'social', label: 'Social', badge: onlinePlayers.length > 0 ? onlinePlayers.length : undefined },
+                  { id: 'stats', label: 'Stats' },
+                  { id: 'settings', label: 'Settings' },
+                ] as Tab[]}
+                activeTab={mainTab}
+                onChange={(tabId) => {
+                  sounds.buttonClick();
+                  setMainTab(tabId as typeof mainTab);
+                  setNavCol(['play', 'social', 'stats', 'settings'].indexOf(tabId));
+                }}
+                variant="boxed"
+                size="sm"
+                fullWidth
+                className="mb-4"
+              />
 
               {/* Tab Content */}
               <div className="min-h-[400px] relative z-20" data-tab-content>

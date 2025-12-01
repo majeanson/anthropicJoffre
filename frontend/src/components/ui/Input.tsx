@@ -188,7 +188,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
             w-full
             font-body text-[1.1em]
             text-[var(--color-text-primary)]
-            placeholder:text-[var(--color-text-muted)]
+            placeholder:text-[var(--color-text-secondary)]
             placeholder:font-body placeholder:italic
             rounded-[var(--radius-md)]
             transition-all duration-[var(--duration-normal)]

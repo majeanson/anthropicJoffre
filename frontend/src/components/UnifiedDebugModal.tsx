@@ -6,6 +6,7 @@ import { BuildInfo } from '../types/buildInfo';
 import { CONFIG } from '../config/constants';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
+import { Select } from './ui/Select';
 
 // Type the imported JSON
 const buildInfo = buildInfoJson as BuildInfo;
@@ -547,14 +548,15 @@ export function UnifiedDebugModal({ isOpen, onClose, socket }: UnifiedDebugModal
                     >
                       {isClearing ? '🔄 Clearing...' : `🗑️ Clear All (${games.length})`}
                     </Button>
-                    <select
+                    <Select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as 'uptime' | 'round')}
-                      className="text-xs px-2 py-1.5 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-                    >
-                      <option value="uptime">Sort by Uptime</option>
-                      <option value="round">Sort by Round</option>
-                    </select>
+                      options={[
+                        { value: 'uptime', label: 'Sort by Uptime' },
+                        { value: 'round', label: 'Sort by Round' },
+                      ]}
+                      size="sm"
+                    />
                   </div>
 
                   {/* Games Table */}
