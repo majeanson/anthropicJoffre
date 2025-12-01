@@ -42,7 +42,6 @@ const suitStyles: Record<CardColor, {
   innerGlow: string;
   elementName: string;
   borderStyle: string;      // Solid for red, double for brown - visual differentiation
-  suitIndicator: string;    // Small symbol for colorblind/mobile accessibility
 }> = {
   red: {
     border: 'var(--color-suit-red)',
@@ -52,7 +51,6 @@ const suitStyles: Record<CardColor, {
     innerGlow: 'color-mix(in srgb, var(--color-suit-red) 12%, transparent)',
     elementName: 'Fire',
     borderStyle: 'solid',
-    suitIndicator: '♦',     // Diamond for red
   },
   brown: {
     border: 'var(--color-suit-brown)',
@@ -62,7 +60,6 @@ const suitStyles: Record<CardColor, {
     innerGlow: 'color-mix(in srgb, var(--color-suit-brown) 12%, transparent)',
     elementName: 'Earth',
     borderStyle: 'double',   // Double border for brown - distinct from red
-    suitIndicator: '♣',     // Club for brown
   },
   green: {
     border: 'var(--color-suit-green)',
@@ -72,7 +69,6 @@ const suitStyles: Record<CardColor, {
     innerGlow: 'color-mix(in srgb, var(--color-suit-green) 12%, transparent)',
     elementName: 'Nature',
     borderStyle: 'solid',
-    suitIndicator: '♠',     // Spade for green
   },
   blue: {
     border: 'var(--color-suit-blue)',
@@ -82,7 +78,6 @@ const suitStyles: Record<CardColor, {
     innerGlow: 'color-mix(in srgb, var(--color-suit-blue) 12%, transparent)',
     elementName: 'Water',
     borderStyle: 'solid',
-    suitIndicator: '♥',     // Heart for blue
   },
 };
 
@@ -296,47 +291,33 @@ function CardComponent({
         />
       )}
 
-      {/* Top-left value with suit indicator for accessibility */}
+      {/* Top-left value with high contrast outline */}
       {!isSpecial && (
-        <div
+        <span
           className={`
             absolute ${sizeConfig.cornerOffset}
-            flex flex-col items-center leading-none
+            font-display
+            ${sizeConfig.cornerText}
             select-none
           `}
+          style={{
+            color: suitStyle.text,
+            textShadow: `
+              -1px -1px 0 rgba(255, 255, 255, 0.9),
+              1px -1px 0 rgba(255, 255, 255, 0.9),
+              -1px 1px 0 rgba(255, 255, 255, 0.9),
+              1px 1px 0 rgba(255, 255, 255, 0.9),
+              -2px -2px 0 rgba(0, 0, 0, 0.15),
+              2px -2px 0 rgba(0, 0, 0, 0.15),
+              -2px 2px 0 rgba(0, 0, 0, 0.15),
+              2px 2px 0 rgba(0, 0, 0, 0.15),
+              0 1px 3px rgba(0, 0, 0, 0.3)
+            `,
+            WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
+          }}
         >
-          <span
-            className={`font-display ${sizeConfig.cornerText}`}
-            style={{
-              color: suitStyle.text,
-              textShadow: `
-                -1px -1px 0 rgba(255, 255, 255, 0.9),
-                1px -1px 0 rgba(255, 255, 255, 0.9),
-                -1px 1px 0 rgba(255, 255, 255, 0.9),
-                1px 1px 0 rgba(255, 255, 255, 0.9),
-                -2px -2px 0 rgba(0, 0, 0, 0.15),
-                2px -2px 0 rgba(0, 0, 0, 0.15),
-                -2px 2px 0 rgba(0, 0, 0, 0.15),
-                2px 2px 0 rgba(0, 0, 0, 0.15),
-                0 1px 3px rgba(0, 0, 0, 0.3)
-              `,
-              WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
-            }}
-          >
-            {card.value}
-          </span>
-          {/* Suit indicator symbol for colorblind/mobile accessibility */}
-          <span
-            className="text-[8px] sm:text-[10px] -mt-0.5"
-            style={{
-              color: suitStyle.text,
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-            }}
-            aria-hidden="true"
-          >
-            {suitStyle.suitIndicator}
-          </span>
-        </div>
+          {card.value}
+        </span>
       )}
 
       {/* Center emblem or special card image */}
@@ -355,29 +336,27 @@ function CardComponent({
         }}
       />
 
-      {/* Bottom-right value with suit indicator (rotated) */}
+      {/* Bottom-right value (rotated) */}
       {!isSpecial && (
-        <div
+        <span
           className={`
             absolute ${sizeConfig.cornerOffsetBottom}
-            flex flex-col items-center leading-none
+            font-display
+            ${sizeConfig.cornerText}
             rotate-180
             select-none
           `}
-        >
-          <span
-            className={`font-display ${sizeConfig.cornerText}`}
-            style={{
-              color: suitStyle.text,
-              textShadow: `
-                -1px -1px 0 rgba(255, 255, 255, 0.9),
-                1px -1px 0 rgba(255, 255, 255, 0.9),
-                -1px 1px 0 rgba(255, 255, 255, 0.9),
-                1px 1px 0 rgba(255, 255, 255, 0.9),
-                -2px -2px 0 rgba(0, 0, 0, 0.15),
-                2px -2px 0 rgba(0, 0, 0, 0.15),
-                -2px 2px 0 rgba(0, 0, 0, 0.15),
-                2px 2px 0 rgba(0, 0, 0, 0.15),
+          style={{
+            color: suitStyle.text,
+            textShadow: `
+              -1px -1px 0 rgba(255, 255, 255, 0.9),
+              1px -1px 0 rgba(255, 255, 255, 0.9),
+              -1px 1px 0 rgba(255, 255, 255, 0.9),
+              1px 1px 0 rgba(255, 255, 255, 0.9),
+              -2px -2px 0 rgba(0, 0, 0, 0.15),
+              2px -2px 0 rgba(0, 0, 0, 0.15),
+              -2px 2px 0 rgba(0, 0, 0, 0.15),
+              2px 2px 0 rgba(0, 0, 0, 0.15),
               0 1px 3px rgba(0, 0, 0, 0.3)
             `,
             WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
@@ -385,18 +364,6 @@ function CardComponent({
         >
           {card.value}
         </span>
-          {/* Suit indicator symbol for colorblind/mobile accessibility */}
-          <span
-            className="text-[8px] sm:text-[10px] -mt-0.5"
-            style={{
-              color: suitStyle.text,
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
-            }}
-            aria-hidden="true"
-          >
-            {suitStyle.suitIndicator}
-          </span>
-        </div>
       )}
 
       {/* Special card badge with transmutation glow */}
