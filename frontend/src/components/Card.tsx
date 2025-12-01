@@ -285,7 +285,7 @@ function CardComponent({
         />
       )}
 
-      {/* Top-left value with high contrast - uses card bg for stroke */}
+      {/* Top-left value with high contrast outline */}
       {!isSpecial && (
         <span
           className={`
@@ -297,17 +297,17 @@ function CardComponent({
           style={{
             color: suitStyle.text,
             textShadow: `
-              -1px -1px 0 var(--card-bg-color),
-              1px -1px 0 var(--card-bg-color),
-              -1px 1px 0 var(--card-bg-color),
-              1px 1px 0 var(--card-bg-color),
-              -2px -2px 0 var(--card-bg-color),
-              2px -2px 0 var(--card-bg-color),
-              -2px 2px 0 var(--card-bg-color),
-              2px 2px 0 var(--card-bg-color),
-              0 2px 4px rgba(0, 0, 0, 0.25)
+              -1px -1px 0 rgba(255, 255, 255, 0.9),
+              1px -1px 0 rgba(255, 255, 255, 0.9),
+              -1px 1px 0 rgba(255, 255, 255, 0.9),
+              1px 1px 0 rgba(255, 255, 255, 0.9),
+              -2px -2px 0 rgba(0, 0, 0, 0.15),
+              2px -2px 0 rgba(0, 0, 0, 0.15),
+              -2px 2px 0 rgba(0, 0, 0, 0.15),
+              2px 2px 0 rgba(0, 0, 0, 0.15),
+              0 1px 3px rgba(0, 0, 0, 0.3)
             `,
-            WebkitTextStroke: '1px var(--card-bg-color)',
+            WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
           }}
         >
           {card.value}
@@ -330,7 +330,7 @@ function CardComponent({
         }}
       />
 
-      {/* Bottom-right value (rotated) - uses card bg for stroke */}
+      {/* Bottom-right value (rotated) with high contrast outline */}
       {!isSpecial && (
         <span
           className={`
@@ -343,17 +343,17 @@ function CardComponent({
           style={{
             color: suitStyle.text,
             textShadow: `
-              -1px -1px 0 var(--card-bg-color),
-              1px -1px 0 var(--card-bg-color),
-              -1px 1px 0 var(--card-bg-color),
-              1px 1px 0 var(--card-bg-color),
-              -2px -2px 0 var(--card-bg-color),
-              2px -2px 0 var(--card-bg-color),
-              -2px 2px 0 var(--card-bg-color),
-              2px 2px 0 var(--card-bg-color),
-              0 2px 4px rgba(0, 0, 0, 0.25)
+              -1px -1px 0 rgba(255, 255, 255, 0.9),
+              1px -1px 0 rgba(255, 255, 255, 0.9),
+              -1px 1px 0 rgba(255, 255, 255, 0.9),
+              1px 1px 0 rgba(255, 255, 255, 0.9),
+              -2px -2px 0 rgba(0, 0, 0, 0.15),
+              2px -2px 0 rgba(0, 0, 0, 0.15),
+              -2px 2px 0 rgba(0, 0, 0, 0.15),
+              2px 2px 0 rgba(0, 0, 0, 0.15),
+              0 1px 3px rgba(0, 0, 0, 0.3)
             `,
-            WebkitTextStroke: '1px var(--card-bg-color)',
+            WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
           }}
         >
           {card.value}

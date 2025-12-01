@@ -134,18 +134,18 @@ export function UnifiedChat({
       <Button
         onClick={toggleChat}
         variant="primary"
-        className="fixed bottom-4 right-4 rounded-full shadow-lg z-40 hover:scale-105 transition-transform"
+        className="fixed bottom-4 right-4 rounded-full shadow-lg z-40 hover:scale-105 transition-transform !p-3 sm:!px-4 sm:!py-2"
         data-testid="unified-chat-button"
       >
         <span className="text-xl">💬</span>
-        <span className="font-semibold">Chat</span>
+        <span className="font-semibold hidden sm:inline ml-1">Chat</span>
         {unreadCount > 0 && (
           <UIBadge
             variant="solid"
             color="error"
             size="xs"
             pulse
-            className="ml-1"
+            className="absolute -top-1 -right-1 sm:relative sm:top-0 sm:right-0 sm:ml-1"
           >
             {unreadCount}
           </UIBadge>

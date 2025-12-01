@@ -2,7 +2,7 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
 import { LobbyBrowser } from './LobbyBrowser';
 import { HowToPlay } from './HowToPlay';
-import { UnifiedDebugModal } from './UnifiedDebugModal';
+import { UnifiedDebugPanel } from './UnifiedDebugPanel';
 import { useLobbyChat } from '../hooks/useLobbyChat';
 import { SocialPanel } from './SocialPanel';
 import { StatsPanel } from './StatsPanel';
@@ -374,9 +374,11 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     return (
       <>
         <HowToPlay isModal={true} isOpen={showRules} onClose={() => setShowRules(false)} />
-        <UnifiedDebugModal
+        <UnifiedDebugPanel
           isOpen={showDebug}
           onClose={() => setShowDebug(false)}
+          gameState={null}
+          gameId=""
           socket={socket}
         />
         {showBrowser && (
