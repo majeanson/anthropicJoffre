@@ -128,29 +128,31 @@ export function UnifiedChat({
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Floating button (collapsed state)
+  // Floating button (collapsed state) - wrapped in fixed container to ensure proper positioning
   if (mode === 'floating' && !isExpanded) {
     return (
-      <Button
-        onClick={toggleChat}
-        variant="primary"
-        className="fixed bottom-4 right-4 rounded-full shadow-lg z-40 hover:scale-105 transition-transform !p-3 sm:!px-4 sm:!py-2"
-        data-testid="unified-chat-button"
-      >
-        <span className="text-xl">💬</span>
-        <span className="font-semibold hidden sm:inline ml-1">Chat</span>
-        {unreadCount > 0 && (
-          <UIBadge
-            variant="solid"
-            color="error"
-            size="xs"
-            pulse
-            className="absolute -top-1 -right-1 sm:relative sm:top-0 sm:right-0 sm:ml-1"
-          >
-            {unreadCount}
-          </UIBadge>
-        )}
-      </Button>
+      <div className="fixed bottom-4 right-4 z-40" style={{ position: 'fixed' }}>
+        <Button
+          onClick={toggleChat}
+          variant="primary"
+          className="rounded-full shadow-lg hover:scale-105 transition-transform !p-3 sm:!px-4 sm:!py-2"
+          data-testid="unified-chat-button"
+        >
+          <span className="text-xl">💬</span>
+          <span className="font-semibold hidden sm:inline ml-1">Chat</span>
+          {unreadCount > 0 && (
+            <UIBadge
+              variant="solid"
+              color="error"
+              size="xs"
+              pulse
+              className="absolute -top-1 -right-1 sm:relative sm:top-0 sm:right-0 sm:ml-1"
+            >
+              {unreadCount}
+            </UIBadge>
+          )}
+        </Button>
+      </div>
     );
   }
 
