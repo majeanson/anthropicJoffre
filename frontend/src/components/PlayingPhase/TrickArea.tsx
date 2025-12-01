@@ -218,7 +218,7 @@ export const TrickArea = memo(function TrickArea({
     <div className="flex-1 flex items-center justify-center mb-4 md:mb-6 relative">
       {/* Previous Trick Button - Inside playing field top-left */}
       {gameState.previousTrick && (
-        <div className="absolute top-0 left-0 z-[60]">
+        <div className="absolute top-0 left-0 z-10">
           <Button
             onClick={() => setShowPreviousTrick(!showPreviousTrick)}
             variant={showPreviousTrick ? 'primary' : 'warning'}

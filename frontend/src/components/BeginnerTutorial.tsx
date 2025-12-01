@@ -131,13 +131,10 @@ export function BeginnerTutorial({
           return gameState.phase === 'betting' && gameState.currentBets.length === 0;
 
         case 'betting_decision':
-          const player = gameState.players.find((p) => p.id === currentPlayerId);
-          const playerIndex = gameState.players.findIndex((p) => p.id === currentPlayerId);
+          // Show when betting phase has at least one bet placed (so user can see the mechanics)
           return (
             gameState.phase === 'betting' &&
-            playerIndex === gameState.currentPlayerIndex &&
-            player &&
-            !player.isBot
+            gameState.currentBets.length >= 1
           );
 
         case 'playing_intro':
@@ -169,11 +166,13 @@ export function BeginnerTutorial({
           );
 
         case 'special_cards':
-          const currentPlayer = gameState.players.find((p) => p.id === currentPlayerId);
-          const hasSpecialCard = currentPlayer?.hand.some(
-            (card) => card.value === 0 && (card.color === 'red' || card.color === 'brown')
+          // Show early in the playing phase to teach about special cards
+          // Don't require the player to have a special card - just inform them
+          return (
+            gameState.phase === 'playing' &&
+            gameState.currentRoundTricks.length >= 2 &&
+            gameState.currentRoundTricks.length <= 4
           );
-          return gameState.phase === 'playing' && hasSpecialCard && gameState.currentRoundTricks.length <= 2;
 
         case 'round_summary':
           return gameState.phase === 'scoring';

@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
 import { useSkin } from '../contexts/SkinContext';
+import { resetTutorialProgress, getTutorialStats } from '../utils/tutorialProgress';
 import { Button, NeonButton } from './ui/Button';
 import { SkinSelectorDropdown } from './SkinSelector';
 
@@ -79,6 +80,13 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
   useSkin();
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
+  const [tutorialStats, setTutorialStats] = useState(getTutorialStats());
+
+  const handleResetTutorial = () => {
+    resetTutorialProgress();
+    setTutorialStats(getTutorialStats());
+    sounds.buttonClick();
+  };
 
   return (
     <div className="space-y-4">
@@ -194,6 +202,49 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
                   description="Card animations, glows, transitions"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[var(--color-border-subtle)]" />
+
+          {/* Tutorial Progress */}
+          <div>
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-3">
+              📚 Tutorial Progress
+            </label>
+            <div
+              className="
+                p-4
+                rounded-[var(--radius-md)]
+                border border-[var(--color-border-default)]
+                bg-[var(--color-bg-secondary)]
+                space-y-3
+              "
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-[var(--color-text-secondary)] font-body">
+                  Completed: {tutorialStats.completed}/{tutorialStats.total}
+                </span>
+                <span className="text-sm text-[var(--color-text-accent)] font-display">
+                  {tutorialStats.percentage}%
+                </span>
+              </div>
+              <div className="w-full bg-[var(--color-bg-tertiary)] rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-[var(--color-success)] h-full transition-all duration-500 rounded-full"
+                  style={{ width: `${tutorialStats.percentage}%` }}
+                />
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleResetTutorial}
+                fullWidth
+                className="mt-2"
+              >
+                🔄 Reset Tutorial Progress
+              </Button>
             </div>
           </div>
 
