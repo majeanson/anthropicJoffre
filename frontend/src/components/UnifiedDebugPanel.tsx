@@ -1017,6 +1017,29 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                 </div>
               </UICard>
 
+              {/* Developer Resources */}
+              <UICard variant="gradient" gradient="primary" size="md">
+                <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
+                  <span>🔧</span> Developer Resources
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={() => window.open('https://69291bd0d238365e7e12f66c-nqeyaruzoe.chromatic.com/', '_blank')}
+                    variant="secondary"
+                    size="md"
+                  >
+                    📖 Open Storybook
+                  </Button>
+                  <Button
+                    onClick={() => window.open('https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568', '_blank')}
+                    variant="warning"
+                    size="md"
+                  >
+                    🐛 Open Sentry
+                  </Button>
+                </div>
+              </UICard>
+
               {/* Sentry Testing */}
               <UICard variant="gradient" gradient="error" size="md">
                 <h3 className="text-lg font-bold text-red-300 mb-3 flex items-center gap-2">
