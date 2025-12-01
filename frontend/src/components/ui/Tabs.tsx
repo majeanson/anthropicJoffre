@@ -88,9 +88,16 @@ export function Tabs({
       role="tablist"
       className={`
         flex
+        overflow-x-auto
+        scrollbar-thin scrollbar-thumb-[var(--color-border-default)] scrollbar-track-transparent
         ${containerStyles[variant]}
         ${className}
       `}
+      style={{
+        // Hide scrollbar on mobile but allow scrolling
+        scrollbarWidth: 'thin',
+        WebkitOverflowScrolling: 'touch',
+      }}
     >
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab;
@@ -176,10 +183,10 @@ export function Tabs({
               ${sizeStyle.tab}
               ${tabStyles.base}
               ${isActive ? tabStyles.active : tabStyles.inactive}
-              ${fullWidth ? 'flex-1' : ''}
+              ${fullWidth ? 'flex-1' : 'flex-shrink-0'}
               ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               inline-flex items-center justify-center gap-2
-              font-display font-medium tracking-wide
+              font-display font-medium tracking-wide whitespace-nowrap
               focus:outline-none
               focus-visible:ring-2
               focus-visible:ring-[var(--color-text-accent)]
