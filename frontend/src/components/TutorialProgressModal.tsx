@@ -1,9 +1,10 @@
 /**
  * Tutorial Progress Modal
  * Shows completed and remaining tutorial steps in beginner mode
+ * Click on any step to view its full explanation
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getTutorialStats, ALL_TUTORIAL_PHASES, TutorialPhase } from '../utils/tutorialProgress';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
@@ -37,10 +38,24 @@ const TUTORIAL_TITLES: Record<TutorialPhase, string> = {
   round_summary: 'Round Complete',
 };
 
+// Same content as BeginnerTutorial.tsx for consistency
+const TUTORIAL_CONTENT: Record<TutorialPhase, string> = {
+  team_selection: `This is a 4-player, 2-team trick-taking card game. Here's what to do:\n\n• Choose a team (Orange or Purple)\n• Your teammate sits across from you\n• Click "Start Game" when all 4 players are ready\n\n💡 Tip: You and your teammate work together to win!`,
+  betting_intro: `Now it's time to bet on how many POINTS your team will win this round.\n\n• Bets range from 7-12 points\n• Each trick is worth 1 point normally\n• Red 0 card: +5 bonus points\n• Brown 0 card: -2 penalty points\n\n💡 Tip: Look at your hand strength before betting!`,
+  betting_decision: `When it's your turn to bet:\n\n• You must raise the current highest bet, or\n• You can SKIP (pass) if you don't have a strong hand\n• "Without Trump" option doubles your bet multiplier\n\n💡 Tip: The dealer (marked with 👑) cannot skip if everyone else skips!`,
+  playing_intro: `Time to play! The highest bet determined the TRUMP suit.\n\n• Trump suit cards beat all other suits\n• You must play 8 tricks (8 cards each)\n• The highest card wins each trick\n\n💡 Tip: Save your high trump cards for important tricks!`,
+  playing_suit: `IMPORTANT RULE: You must follow the LED SUIT if you have it!\n\n• The first card played determines the led suit\n• If you have that color, you MUST play it\n• If you don't have it, you can play any card (including trump)\n\n💡 Tip: Unplayable cards will be grayed out and marked with ✕`,
+  playing_trump: `Trump cards are powerful:\n\n• They beat any non-trump card\n• Play them strategically to win important tricks\n• Higher value trumps beat lower value trumps\n\n💡 Tip: Don't waste high trumps on low-value tricks!`,
+  trick_complete: `A trick is complete when all 4 players play a card.\n\n• The winner leads the next trick\n• Points are added to your team's score\n• Watch the trick counter (e.g., "Trick 3/8")\n\n💡 Tip: Keep track of which suits have been played!`,
+  special_cards: `Watch out for these special cards:\n\n• 🔴 Red 0: Worth +5 bonus points\n• 🟤 Brown 0: Worth -2 penalty points\n\n💡 Tip: Try to win tricks with Red 0, and avoid winning tricks with Brown 0!`,
+  round_summary: `The round is over! Here's what happens:\n\n• Compare your team's score to the bet\n• If you met/exceeded the bet: gain points\n• If you fell short: lose points\n• First team to 41+ points wins!\n\n💡 Tip: Accurate betting is key to winning!`,
+};
+
 export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModalProps) {
   const stats = getTutorialStats();
   const lastCompletedRef = useRef<HTMLDivElement>(null);
   const listContainerRef = useRef<HTMLDivElement>(null);
+  const [expandedPhase, setExpandedPhase] = useState<TutorialPhase | null>(null);
 
   // Scroll to the most recently completed tutorial when modal opens
   useEffect(() => {
@@ -55,10 +70,21 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
     }
   }, [isOpen]);
 
+  // Reset expanded phase when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setExpandedPhase(null);
+    }
+  }, [isOpen]);
+
   // Find the index of the last completed tutorial
   const lastCompletedIndex = ALL_TUTORIAL_PHASES.reduce((lastIdx, phase, idx) => {
     return stats.completedPhases.includes(phase) ? idx : lastIdx;
   }, -1);
+
+  const toggleExpanded = (phase: TutorialPhase) => {
+    setExpandedPhase(expandedPhase === phase ? null : phase);
+  };
 
   return (
     <Modal
@@ -100,47 +126,79 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
           {ALL_TUTORIAL_PHASES.map((phase, index) => {
             const isCompleted = stats.completedPhases.includes(phase);
             const isLastCompleted = index === lastCompletedIndex;
+            const isExpanded = expandedPhase === phase;
 
             return (
               <div
                 key={phase}
                 ref={isLastCompleted ? lastCompletedRef : undefined}
                 className={`
-                  flex items-start gap-3 p-3 rounded-lg border-2 transition-all
+                  rounded-lg border-2 transition-all overflow-hidden
                   ${
                     isCompleted
                       ? 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600'
                       : 'bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600'
                   }
+                  ${isExpanded ? 'ring-2 ring-blue-400 dark:ring-blue-500' : ''}
                 `}
               >
-                {/* Icon/Checkmark */}
-                <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
-                  {isCompleted ? (
-                    <span className="text-2xl text-green-600 dark:text-green-400">✓</span>
-                  ) : (
-                    <span className="text-2xl">{TUTORIAL_ICONS[phase]}</span>
-                  )}
-                </div>
+                {/* Clickable Header */}
+                <button
+                  onClick={() => toggleExpanded(phase)}
+                  className="w-full flex items-start gap-3 p-3 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                >
+                  {/* Icon/Checkmark */}
+                  <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
+                    {isCompleted ? (
+                      <span className="text-2xl text-green-600 dark:text-green-400">✓</span>
+                    ) : (
+                      <span className="text-2xl">{TUTORIAL_ICONS[phase]}</span>
+                    )}
+                  </div>
 
-                {/* Title */}
-                <div className="flex-1 min-w-0">
-                  <h3
-                    className={`
-                      font-semibold text-sm
-                      ${
-                        isCompleted
-                          ? 'text-green-800 dark:text-green-200'
-                          : 'text-gray-800 dark:text-gray-200'
-                      }
-                    `}
-                  >
-                    {TUTORIAL_TITLES[phase]}
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                    {isCompleted ? 'Completed' : 'Not yet seen'}
-                  </p>
-                </div>
+                  {/* Title and Status */}
+                  <div className="flex-1 min-w-0">
+                    <h3
+                      className={`
+                        font-semibold text-sm
+                        ${
+                          isCompleted
+                            ? 'text-green-800 dark:text-green-200'
+                            : 'text-gray-800 dark:text-gray-200'
+                        }
+                      `}
+                    >
+                      {TUTORIAL_TITLES[phase]}
+                    </h3>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                      {isCompleted ? 'Completed' : 'Not yet seen'} • Tap to {isExpanded ? 'hide' : 'view'}
+                    </p>
+                  </div>
+
+                  {/* Expand/Collapse Indicator */}
+                  <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                    <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+                      ▼
+                    </span>
+                  </div>
+                </button>
+
+                {/* Expandable Content */}
+                {isExpanded && (
+                  <div className="px-3 pb-3 pt-0 border-t border-gray-200 dark:border-gray-600">
+                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xl">{TUTORIAL_ICONS[phase]}</span>
+                        <span className="text-blue-900 dark:text-blue-100 font-bold text-sm">
+                          {TUTORIAL_TITLES[phase]}
+                        </span>
+                      </div>
+                      <p className="text-blue-900 dark:text-blue-100 text-sm whitespace-pre-line leading-relaxed">
+                        {TUTORIAL_CONTENT[phase]}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
