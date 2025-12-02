@@ -291,7 +291,7 @@ function CardComponent({
         />
       )}
 
-      {/* Top-left value with high contrast outline */}
+      {/* Top-left value with heavy contrast outline for maximum readability */}
       {!isSpecial && (
         <span
           className={`
@@ -303,17 +303,22 @@ function CardComponent({
           style={{
             color: suitStyle.text,
             textShadow: `
-              -1px -1px 0 rgba(255, 255, 255, 0.9),
-              1px -1px 0 rgba(255, 255, 255, 0.9),
-              -1px 1px 0 rgba(255, 255, 255, 0.9),
-              1px 1px 0 rgba(255, 255, 255, 0.9),
-              -2px -2px 0 rgba(0, 0, 0, 0.15),
-              2px -2px 0 rgba(0, 0, 0, 0.15),
-              -2px 2px 0 rgba(0, 0, 0, 0.15),
-              2px 2px 0 rgba(0, 0, 0, 0.15),
-              0 1px 3px rgba(0, 0, 0, 0.3)
+              -2px -2px 0 #fff,
+              2px -2px 0 #fff,
+              -2px 2px 0 #fff,
+              2px 2px 0 #fff,
+              -1px -1px 0 #fff,
+              1px -1px 0 #fff,
+              -1px 1px 0 #fff,
+              1px 1px 0 #fff,
+              0 0 0 #fff,
+              -3px 0 0 #fff,
+              3px 0 0 #fff,
+              0 -3px 0 #fff,
+              0 3px 0 #fff,
+              0 2px 4px rgba(0, 0, 0, 0.5)
             `,
-            WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
+            WebkitTextStroke: '1px #fff',
           }}
         >
           {card.value}
@@ -336,7 +341,7 @@ function CardComponent({
         }}
       />
 
-      {/* Bottom-right value (rotated) */}
+      {/* Bottom-right value (rotated) with heavy contrast outline */}
       {!isSpecial && (
         <span
           className={`
@@ -349,17 +354,22 @@ function CardComponent({
           style={{
             color: suitStyle.text,
             textShadow: `
-              -1px -1px 0 rgba(255, 255, 255, 0.9),
-              1px -1px 0 rgba(255, 255, 255, 0.9),
-              -1px 1px 0 rgba(255, 255, 255, 0.9),
-              1px 1px 0 rgba(255, 255, 255, 0.9),
-              -2px -2px 0 rgba(0, 0, 0, 0.15),
-              2px -2px 0 rgba(0, 0, 0, 0.15),
-              -2px 2px 0 rgba(0, 0, 0, 0.15),
-              2px 2px 0 rgba(0, 0, 0, 0.15),
-              0 1px 3px rgba(0, 0, 0, 0.3)
+              -2px -2px 0 #fff,
+              2px -2px 0 #fff,
+              -2px 2px 0 #fff,
+              2px 2px 0 #fff,
+              -1px -1px 0 #fff,
+              1px -1px 0 #fff,
+              -1px 1px 0 #fff,
+              1px 1px 0 #fff,
+              0 0 0 #fff,
+              -3px 0 0 #fff,
+              3px 0 0 #fff,
+              0 -3px 0 #fff,
+              0 3px 0 #fff,
+              0 2px 4px rgba(0, 0, 0, 0.5)
             `,
-            WebkitTextStroke: '0.5px rgba(0, 0, 0, 0.2)',
+            WebkitTextStroke: '1px #fff',
           }}
         >
           {card.value}
