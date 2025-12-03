@@ -72,8 +72,10 @@ function createTestGameState(overrides: Partial<GameState> = {}): GameState {
         botDifficulty: null,
       },
     ],
-    team1Score: 42,
-    team2Score: 25,
+    teamScores: {
+      team1: 42,
+      team2: 25,
+    },
     winningTeam: 1,
     roundNumber: 5,
     dealerIndex: 0,
@@ -122,7 +124,7 @@ describe('Quest System - Game Logic', () => {
   describe('extractQuestContext', () => {
     it('should extract basic quest context for winning player', () => {
       const game = createTestGameState();
-      const context = extractQuestContext(game, 'Alice', 'game-123');
+      const context = extractQuestContext(game, 'Alice', 'game-123', 1);
 
       expect(context).toEqual({
         playerName: 'Alice',
@@ -130,6 +132,7 @@ describe('Quest System - Game Logic', () => {
         won: true,
         tricksWon: 5,
         betsMade: 0, // No round history
+        betsWon: 0,
         betAmount: undefined,
         wonRedZero: false,
         usedBrownZeroDefensively: false,
@@ -141,7 +144,7 @@ describe('Quest System - Game Logic', () => {
 
     it('should extract context for losing player', () => {
       const game = createTestGameState();
-      const context = extractQuestContext(game, 'Bob', 'game-123');
+      const context = extractQuestContext(game, 'Bob', 'game-123', 1);
 
       expect(context.won).toBe(false);
       expect(context.playerName).toBe('Bob');
@@ -150,23 +153,21 @@ describe('Quest System - Game Logic', () => {
 
     it('should detect comeback win', () => {
       const game = createTestGameState({
-        team1Score: 42,
-        team2Score: 35, // Within 10 points = comeback
+        teamScores: { team1: 42, team2: 35 }, // Within 10 points = comeback
         winningTeam: 1,
       });
 
-      const context = extractQuestContext(game, 'Alice', 'game-123');
+      const context = extractQuestContext(game, 'Alice', 'game-123', 1);
       expect(context.wasComeback).toBe(true);
     });
 
     it('should not detect comeback for easy win', () => {
       const game = createTestGameState({
-        team1Score: 42,
-        team2Score: 15, // More than 10 points ahead = not comeback
+        teamScores: { team1: 42, team2: 15 }, // More than 10 points ahead = not comeback
         winningTeam: 1,
       });
 
-      const context = extractQuestContext(game, 'Alice', 'game-123');
+      const context = extractQuestContext(game, 'Alice', 'game-123', 1);
       expect(context.wasComeback).toBe(false);
     });
 
@@ -182,7 +183,7 @@ describe('Quest System - Game Logic', () => {
               {
                 trickNumber: 1,
                 winnerId: 'player1',
-                cards: [
+                trick: [
                   { playerId: 'player1', card: { color: 'red', value: 0 } },
                   { playerId: 'player2', card: { color: 'blue', value: 5 } },
                 ],
@@ -192,7 +193,7 @@ describe('Quest System - Game Logic', () => {
         ],
       } as any);
 
-      const context = extractQuestContext(game, 'Alice', 'game-123');
+      const context = extractQuestContext(game, 'Alice', 'game-123', 1);
       expect(context.wonRedZero).toBe(true);
     });
 
@@ -208,7 +209,7 @@ describe('Quest System - Game Logic', () => {
               {
                 trickNumber: 1,
                 winnerId: 'player2', // Someone else won
-                cards: [
+                trick: [
                   { playerId: 'player1', card: { color: 'brown', value: 0 } },
                   { playerId: 'player2', card: { color: 'red', value: 5 } },
                 ],
@@ -218,7 +219,7 @@ describe('Quest System - Game Logic', () => {
         ],
       } as any);
 
-      const context = extractQuestContext(game, 'Alice', 'game-123');
+      const context = extractQuestContext(game, 'Alice', 'game-123', 1);
       expect(context.usedBrownZeroDefensively).toBe(true);
     });
 
@@ -231,13 +232,13 @@ describe('Quest System - Game Logic', () => {
         ] as any,
       });
 
-      const context = extractQuestContext(game, 'Alice', 'game-123');
+      const context = extractQuestContext(game, 'Alice', 'game-123', 1);
       expect(context.betsMade).toBe(3);
     });
 
     it('should throw error for non-existent player', () => {
       const game = createTestGameState();
-      expect(() => extractQuestContext(game, 'NonExistent', 'game-123')).toThrow(
+      expect(() => extractQuestContext(game, 'NonExistent', 'game-123', 1)).toThrow(
         'Player NonExistent not found in game state'
       );
     });
