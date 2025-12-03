@@ -136,7 +136,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     ${glow && !isDisabled ? 'ethereal-pulse' : ''}
   `;
 
-  // Variant-specific styles with alchemical aesthetics
+  // Variant-specific styles with proper hover effects
   const variantClasses: Record<ButtonVariant, string> = {
     primary: `
       bg-gradient-to-b from-[var(--color-bg-accent)] to-[color-mix(in_srgb,var(--color-bg-accent)_80%,black)]
@@ -144,12 +144,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       text-[var(--color-text-inverse)]
       shadow-[var(--shadow-md)]
       ${!isDisabled ? `
-        hover:from-[color-mix(in_srgb,var(--color-bg-accent)_110%,white)]
-        hover:to-[var(--color-bg-accent)]
+        hover:from-[color-mix(in_srgb,var(--color-bg-accent)_85%,white)]
+        hover:to-[color-mix(in_srgb,var(--color-bg-accent)_95%,white)]
         hover:shadow-[var(--shadow-lg)]
         hover:-translate-y-0.5
+        hover:brightness-110
         active:translate-y-0.5
         active:shadow-[var(--shadow-sm)]
+        active:brightness-95
       ` : ''}
     `,
     secondary: `
@@ -158,12 +160,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       text-[var(--color-text-accent)]
       shadow-none
       ${!isDisabled ? `
-        hover:bg-[color-mix(in_srgb,var(--color-bg-accent)_10%,transparent)]
+        hover:bg-[color-mix(in_srgb,var(--color-bg-accent)_15%,transparent)]
         hover:border-[var(--color-text-accent)]
         hover:shadow-[var(--shadow-glow)]
         hover:-translate-y-0.5
         active:translate-y-0
-        active:bg-[color-mix(in_srgb,var(--color-bg-accent)_15%,transparent)]
+        active:bg-[color-mix(in_srgb,var(--color-bg-accent)_25%,transparent)]
       ` : ''}
     `,
     success: `
@@ -173,11 +175,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       font-bold
       shadow-[var(--shadow-md)]
       ${!isDisabled ? `
-        hover:from-[color-mix(in_srgb,var(--color-success)_115%,white)]
-        hover:to-[var(--color-success)]
+        hover:from-[color-mix(in_srgb,var(--color-success)_80%,white)]
+        hover:to-[color-mix(in_srgb,var(--color-success)_90%,white)]
         hover:shadow-[var(--shadow-lg)]
         hover:-translate-y-0.5
+        hover:brightness-110
         active:translate-y-0.5
+        active:brightness-95
       ` : ''}
     `,
     warning: `
@@ -187,11 +191,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       font-bold
       shadow-[var(--shadow-md)]
       ${!isDisabled ? `
-        hover:from-[color-mix(in_srgb,var(--color-warning)_115%,white)]
-        hover:to-[var(--color-warning)]
+        hover:from-[color-mix(in_srgb,var(--color-warning)_80%,white)]
+        hover:to-[color-mix(in_srgb,var(--color-warning)_90%,white)]
         hover:shadow-[var(--shadow-lg)]
         hover:-translate-y-0.5
+        hover:brightness-110
         active:translate-y-0.5
+        active:brightness-95
       ` : ''}
     `,
     danger: `
@@ -200,11 +206,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       text-white
       shadow-[var(--shadow-md)]
       ${!isDisabled ? `
-        hover:from-[color-mix(in_srgb,var(--color-error)_115%,white)]
-        hover:to-[var(--color-error)]
+        hover:from-[color-mix(in_srgb,var(--color-error)_80%,white)]
+        hover:to-[color-mix(in_srgb,var(--color-error)_90%,white)]
         hover:shadow-[var(--shadow-lg)]
         hover:-translate-y-0.5
+        hover:brightness-110
         active:translate-y-0.5
+        active:brightness-95
       ` : ''}
     `,
     ghost: `
@@ -213,8 +221,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       text-[var(--color-text-secondary)]
       ${!isDisabled ? `
         hover:text-[var(--color-text-accent)]
-        hover:bg-[color-mix(in_srgb,var(--color-bg-accent)_8%,transparent)]
-        active:bg-[color-mix(in_srgb,var(--color-bg-accent)_12%,transparent)]
+        hover:bg-[color-mix(in_srgb,var(--color-bg-accent)_12%,transparent)]
+        active:bg-[color-mix(in_srgb,var(--color-bg-accent)_20%,transparent)]
       ` : ''}
     `,
     link: `
@@ -227,7 +235,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ${!isDisabled ? `
         hover:decoration-2
         hover:decoration-[var(--color-text-accent)]
-        hover:text-[color-mix(in_srgb,var(--color-text-accent)_85%,white)]
+        hover:brightness-125
       ` : ''}
     `,
     elegant: `
@@ -236,11 +244,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       text-[var(--color-text-accent)]
       shadow-[var(--shadow-md)]
       ${!isDisabled ? `
-        hover:from-[var(--color-bg-tertiary)]
-        hover:to-[color-mix(in_srgb,var(--color-bg-tertiary)_90%,black)]
+        hover:from-[color-mix(in_srgb,var(--color-bg-secondary)_90%,white)]
+        hover:to-[var(--color-bg-secondary)]
         hover:shadow-[var(--shadow-lg)]
         hover:-translate-y-0.5
+        hover:brightness-110
         active:translate-y-0
+        active:brightness-95
       ` : ''}
     `,
     arcane: `
@@ -249,10 +259,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       text-[var(--color-text-accent)]
       shadow-[var(--shadow-glow)]
       ${!isDisabled ? `
-        hover:bg-[color-mix(in_srgb,var(--color-bg-primary)_95%,var(--color-bg-accent))]
+        hover:bg-[color-mix(in_srgb,var(--color-bg-accent)_20%,var(--color-bg-primary))]
         hover:shadow-[var(--shadow-lg),var(--shadow-glow)]
         hover:-translate-y-1
+        hover:brightness-110
         active:translate-y-0
+        active:brightness-95
       ` : ''}
     `,
   };
