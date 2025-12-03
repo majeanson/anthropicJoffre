@@ -83,7 +83,7 @@ fi
 echo ""
 
 # Check backend health
-if ! check_health "Backend" "http://localhost:3000/api/health"; then
+if ! check_health "Backend" "http://localhost:3001/api/health"; then
   echo ""
   echo "ERROR: Backend server is not running!"
   echo ""
@@ -151,7 +151,7 @@ cat > "${RESULTS_DIR}/summary.md" << SUMMARY
 ## Safety Checks (All Passed)
 ✅ TypeScript: Backend (npx tsc --noEmit)
 ✅ TypeScript: Frontend (npx tsc --noEmit)
-✅ Backend Health: http://localhost:3000/api/health
+✅ Backend Health: http://localhost:3001/api/health
 ✅ Frontend Health: http://localhost:5173
 
 ## Quick Stats
