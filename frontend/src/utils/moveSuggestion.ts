@@ -67,6 +67,12 @@ function findBestTrump(hand: Card[]): CardColor {
 /**
  * Evaluate hand strength for betting
  * If trump is null (betting phase), evaluate with the BEST possible trump choice
+ *
+ * SCORING SYSTEM:
+ * - Each trump card adds base value (higher cards = more certain wins)
+ * - High non-trump cards add partial value (can win if not cut)
+ * - Long trump suits get bonus (trump control)
+ * - Red 0 in hand = +1 point potential
  */
 function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
   trumpCount: number;
@@ -94,6 +100,7 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
 
   // Track trump high cards separately
   let trumpHighCards = 0;
+  let nonTrumpHighCards = 0;
 
   hand.forEach((card) => {
     // Count cards by color
@@ -110,17 +117,41 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
       if (card.value >= 6) {
         trumpHighCards++;
       }
-      if (card.value >= 5) estimatedTricks += 1;
+      // Trump card trick estimation:
+      // 7 trump = almost guaranteed win (0.95)
+      // 6 trump = likely win (0.85)
+      // 5 trump = good chance (0.7)
+      // 4 trump = decent chance (0.5)
+      // 3 trump = some chance (0.35)
+      // Lower = can beat non-trump but risky
       if (card.value === 7) {
-        estimatedTricks += 0.5;
+        estimatedTricks += 0.95;
         hasSevenInColor = true;
+      } else if (card.value === 6) {
+        estimatedTricks += 0.85;
+      } else if (card.value === 5) {
+        estimatedTricks += 0.7;
+      } else if (card.value === 4) {
+        estimatedTricks += 0.5;
+      } else if (card.value === 3) {
+        estimatedTricks += 0.35;
+      } else if (card.value >= 1) {
+        estimatedTricks += 0.25; // Low trump still beats non-trump
+      }
+    } else {
+      // Non-trump high cards (6 or 7) can win if not cut
+      // Value depends on how many trump we have (more trump = opponents have less to cut)
+      if (card.value === 7) {
+        nonTrumpHighCards++;
+        hasSevenInColor = true;
+      } else if (card.value === 6) {
+        nonTrumpHighCards++;
       }
     }
 
-    // Count high cards (6 or 7)
+    // Count all high cards (6 or 7)
     if (card.value >= 6) {
       highCards++;
-      if (card.value === 7) hasSevenInColor = true;
     }
 
     // Check for special cards
@@ -138,35 +169,87 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
     }
   });
 
-  // IMPROVEMENT: Long trump suit bonus (5+ trump = trump bleed strategy)
-  // With 5+ trump, you can:
-  // 1. Bleed out opponents' trump (force them to use all their trump)
-  // 2. Then your high non-trump cards (like 7 red) become unbeatable
-  // 3. Control the game flow and win high-value tricks
-  if (trumpCount >= 5) {
-    // Base bonus for having 5+ trump (can control trump flow)
-    estimatedTricks += 1.5;
-
-    // Additional bonus if you have high trump (6 or 7)
-    // With high trump + many trump, you can guarantee winning key tricks
-    if (trumpHighCards >= 1) {
-      estimatedTricks += 1.0;
+  // Non-trump high card value depends on trump count
+  // More trump = less likely opponents can cut your high cards
+  hand.forEach(card => {
+    if (card.color !== optimalTrump) {
+      if (card.value === 7) {
+        // 7 non-trump: high chance to win if we have trump control
+        if (trumpCount >= 5) {
+          estimatedTricks += 0.85; // Very likely to win after trump bleed
+        } else if (trumpCount >= 4) {
+          estimatedTricks += 0.6;
+        } else if (trumpCount >= 3) {
+          estimatedTricks += 0.45;
+        } else {
+          estimatedTricks += 0.3; // Can still win sometimes
+        }
+      } else if (card.value === 6) {
+        // 6 non-trump: moderate chance
+        if (trumpCount >= 5) {
+          estimatedTricks += 0.7;
+        } else if (trumpCount >= 4) {
+          estimatedTricks += 0.45;
+        } else if (trumpCount >= 3) {
+          estimatedTricks += 0.3;
+        } else {
+          estimatedTricks += 0.2;
+        }
+      } else if (card.value === 5) {
+        // 5 non-trump: small chance
+        if (trumpCount >= 5) {
+          estimatedTricks += 0.4;
+        } else if (trumpCount >= 4) {
+          estimatedTricks += 0.25;
+        } else {
+          estimatedTricks += 0.15;
+        }
+      }
     }
+  });
 
-    // Extra bonus for 6+ or 7+ trump (overwhelming trump control)
-    if (trumpCount >= 6) estimatedTricks += 1.0;
-    if (trumpCount >= 7) estimatedTricks += 1.5;
+  // Long trump suit bonus (5+ trump = trump bleed strategy)
+  // With 5+ trump, you can bleed out opponents' trump
+  if (trumpCount >= 5) {
+    // Base bonus for trump control
+    estimatedTricks += 0.5;
+
+    // Additional bonus for overwhelming trump
+    if (trumpCount >= 6) estimatedTricks += 0.5;
+    if (trumpCount >= 7) estimatedTricks += 0.75;
   }
 
-  // IMPROVEMENT: Non-trump 7 bonus when you have trump control
-  // If you have 5+ trump AND a 7 in another suit, that 7 is almost guaranteed to win
-  // because you can bleed trump first, then play your 7 (nobody can cut it)
-  if (trumpCount >= 5) {
-    hand.forEach(card => {
-      if (card.value === 7 && card.color !== optimalTrump) {
-        estimatedTricks += 1.5; // High-value guaranteed win after trump bleed
-      }
-    });
+  // Red 0 bonus - ALWAYS worth considering (+5 points = 6 total for that trick)
+  // The question is: can we WIN the trick with it, or at least give it to teammate?
+  if (hasRedZero) {
+    // Red 0 is always in hand at start - the value depends on our ability to control when to play it
+    // With trump control, we can ensure we or teammate wins when we play it
+    if (trumpCount >= 4) {
+      estimatedTricks += 1.0; // High confidence we can win or support red 0 trick
+    } else if (trumpCount >= 3) {
+      estimatedTricks += 0.75;
+    } else if (trumpCount >= 2) {
+      estimatedTricks += 0.5;
+    } else {
+      estimatedTricks += 0.25; // Still valuable but harder to control
+    }
+  }
+
+  // Brown 0 penalty consideration (-2 points per trick that contains it)
+  // If we're likely to WIN tricks (high trump control), we might accidentally win Brown 0 tricks
+  // This is a risk factor that reduces our effective estimated points
+  if (hasBrownZero) {
+    // With many trump, we're more likely to win unwanted Brown 0 tricks
+    // The penalty is that each Brown 0 trick we win is worth -2 instead of +1 (net -3 compared to normal)
+    // But if we're cautious, we can try to dump Brown 0 when opponent is winning
+    if (trumpCount >= 5) {
+      estimatedTricks -= 0.4; // High trump = hard to avoid winning Brown 0
+    } else if (trumpCount >= 4) {
+      estimatedTricks -= 0.25;
+    } else {
+      // With fewer trump, easier to lose on purpose / dump Brown 0
+      estimatedTricks -= 0.1;
+    }
   }
 
   return {
@@ -185,7 +268,17 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
 
 /**
  * Suggest a bet for the current player
- * Difficulty guide: 7 or skip = normal, 8 = medium, 9-10 = hard, 11-12 = very hard
+ *
+ * IMPORTANT: Each player has Red 0 (+5 bonus) worth ~6 points total
+ * Normal tricks = 1 point each, so 8 tricks + Red 0 = ~13 points possible
+ *
+ * Thresholds (estimated tricks/points):
+ * - < 4: Weak - Skip recommended
+ * - 4-5: Marginal - Bet 7 or skip
+ * - 5-6: Decent - Bet 7-8
+ * - 6-7: Good - Bet 8-9
+ * - 7-8: Strong - Bet 9-10
+ * - 8+: Excellent - Bet 10-12
  */
 export function suggestBet(gameState: GameState, playerName: string): BetSuggestion {
   const player = gameState.players.find((p) => p.name === playerName);
@@ -212,31 +305,40 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
 
   // Check if dominant color makes "without trump" viable
   const dominantColorCount = strength.dominantColor ? strength.colorDistribution.get(strength.dominantColor) || 0 : 0;
-  const isWithoutTrumpViable = dominantColorCount >= 5 && strength.hasSevenInColor; // Need 5+ cards and a 7 in dominant color
+  const isWithoutTrumpViable = dominantColorCount >= 5 && strength.hasSevenInColor;
 
-  // CASE 1: Weak hand (< 5 estimated tricks) - Suggest SKIP or 7
-  if (strength.estimatedTricks < 5 && !isDealer) {
+  // Round estimated tricks for display
+  const estTricks = Math.round(strength.estimatedTricks * 10) / 10;
+
+  // Build hand summary
+  const specialCards = [];
+  if (strength.hasRedZero) specialCards.push('Red 0 +5');
+  if (strength.hasBrownZero) specialCards.push('Brown 0 -2');
+  const specialCardsStr = specialCards.length > 0 ? `, ${specialCards.join(', ')}` : '';
+  const handSummary = `~${estTricks} pts est. (${strength.trumpCount} ${strength.optimalTrump} trump, ${strength.highCards} high cards${specialCardsStr})`;
+
+  // CASE 1: Weak hand (< 4 estimated) - Suggest SKIP
+  if (strength.estimatedTricks < 4 && !isDealer) {
     return {
       amount: 7,
       withoutTrump: false,
       skip: true,
-      reason: `Weak hand - Skip is safest (${strength.trumpCount} ${strength.optimalTrump} if you choose trump, ${strength.highCards} high cards)`,
-      alternatives: `Alternative: Bet 7 (normal difficulty) if you're feeling lucky, but you'll likely lose points.`,
+      reason: `⚠️ Weak hand - Skip recommended | ${handSummary}`,
+      alternatives: `Alternative: Bet 7 if you're feeling lucky, but risky with this hand.`,
     };
   }
 
-  // CASE 2: Very strong hand (10+ tricks possible) - Suggest 11-12 (VERY HARD)
-  if (strength.estimatedTricks >= 9 || (strength.trumpCount >= 6 && strength.highCards >= 4)) {
-    const suggestedAmount = Math.min(12, 10 + Math.floor(strength.estimatedTricks - 8));
+  // CASE 2: Excellent hand (8+ tricks) - Suggest 10-12
+  if (strength.estimatedTricks >= 8 || (strength.trumpCount >= 6 && strength.highCards >= 4)) {
+    const suggestedAmount = Math.min(12, Math.floor(strength.estimatedTricks + 2));
 
-    // Check if "without trump" makes sense
     if (isWithoutTrumpViable && dominantColorCount >= 6) {
       return {
         amount: suggestedAmount,
         withoutTrump: true,
         skip: false,
-        reason: `🔥 VERY HARD BET with "Without Trump" (doubles points!) - ${dominantColorCount} ${strength.dominantColor} cards including high cards`,
-        alternatives: `Alternative: Bet ${suggestedAmount} with trump for normal play (still very hard). Without trump doubles your points but you must control the game with your ${strength.dominantColor} suit!`,
+        reason: `🔥 EXCELLENT with "No Trump" (2x points!) | ${handSummary}`,
+        alternatives: `Alternative: Bet ${suggestedAmount} with trump for safer play.`,
       };
     }
 
@@ -244,25 +346,24 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
       amount: suggestedAmount,
       withoutTrump: false,
       skip: false,
-      reason: `🔥 VERY HARD - Excellent hand! (${strength.trumpCount} ${strength.optimalTrump} trump, ${strength.highCards} high cards)`,
+      reason: `🔥 EXCELLENT hand! Bet high | ${handSummary}`,
       alternatives: highestBet
-        ? `Alternative: Match current bet (${highestBet.amount}) to play safer, but you're leaving points on the table.`
-        : `Alternative: Bet 9-10 (hard) for less risk.`,
+        ? `Alternative: Match ${highestBet.amount} to play safer.`
+        : `Alternative: Bet 9 for less pressure.`,
     };
   }
 
-  // CASE 3: Strong hand (7-9 tricks) - Suggest 9-10 (HARD)
+  // CASE 3: Strong hand (7-8 tricks) - Suggest 9-10
   if (strength.estimatedTricks >= 7 || (strength.trumpCount >= 4 && strength.highCards >= 3)) {
-    const suggestedAmount = 9 + (strength.estimatedTricks >= 8 ? 1 : 0);
+    const suggestedAmount = strength.estimatedTricks >= 7.5 ? 10 : 9;
 
-    // Check for "without trump" possibility
     if (isWithoutTrumpViable) {
       return {
         amount: suggestedAmount,
         withoutTrump: true,
         skip: false,
-        reason: `⚡ HARD BET with "Without Trump" (doubles points!) - ${dominantColorCount} ${strength.dominantColor} cards with control`,
-        alternatives: `Alternative: Bet ${suggestedAmount} with ${strength.optimalTrump} trump for normal play. Without trump is risky but doubles your points if you win with your ${strength.dominantColor} suit!`,
+        reason: `⚡ STRONG with "No Trump" option | ${handSummary}`,
+        alternatives: `Alternative: Bet ${suggestedAmount} with ${strength.optimalTrump} trump.`,
       };
     }
 
@@ -270,53 +371,65 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
       amount: suggestedAmount,
       withoutTrump: false,
       skip: false,
-      reason: `⚡ HARD - Strong hand (${strength.trumpCount} ${strength.optimalTrump} trump, ${strength.highCards} high cards)`,
-      alternatives: `Alternative: Bet 8 (medium) for less pressure.`,
+      reason: `⚡ STRONG hand | ${handSummary}`,
+      alternatives: `Alternative: Bet 8 for less pressure.`,
     };
   }
 
-  // CASE 4: Good hand with no red cards (void suit advantage) - Suggest 8-9
-  if (strength.noRedCards && strength.trumpCount >= 3) {
-    // Check if optimal trump is red (void in red)
-    const isVoidRed = strength.optimalTrump === 'red';
+  // CASE 4: Good hand (6-7 tricks) - Suggest 8-9
+  if (strength.estimatedTricks >= 6) {
+    const suggestedAmount = strength.estimatedTricks >= 6.5 ? 9 : 8;
 
     return {
-      amount: isVoidRed ? 9 : 8,
+      amount: suggestedAmount,
       withoutTrump: false,
       skip: false,
-      reason: isVoidRed
-        ? `✂️ FUNKY - Void in red! Make red trump to cut all red tricks for +5 points (${strength.trumpCount} ${strength.optimalTrump} cards)`
-        : `✂️ MEDIUM - No red cards! Cut Red 0 with ${strength.optimalTrump} trump (${strength.trumpCount} cards)`,
-      alternatives: isVoidRed
-        ? `Void suits are powerful! Every time red is led, you cut with ${strength.optimalTrump} trump. Alternative: Bet 8 for less risk.`
-        : `Alternative: Bet 7 to play safe, or 9 if you're confident in controlling Red 0 tricks.`,
+      reason: `✅ GOOD hand | ${handSummary}`,
+      alternatives: isDealer
+        ? `As dealer, this is a solid betting hand.`
+        : `Alternative: Bet 7 for minimum risk.`,
     };
   }
 
-  // CASE 5: Medium hand (5-6 tricks) - Suggest 8 (MEDIUM)
-  if (strength.estimatedTricks >= 5 || strength.trumpCount >= 3) {
+  // CASE 5: Decent hand (5-6 tricks) - Suggest 7-8
+  if (strength.estimatedTricks >= 5) {
     return {
       amount: 8,
       withoutTrump: false,
       skip: false,
-      reason: `📊 MEDIUM - Decent hand (${strength.trumpCount} ${strength.optimalTrump} trump, ${strength.highCards} high cards)`,
+      reason: `📊 DECENT hand | ${handSummary}`,
       alternatives: isDealer
-        ? `As dealer, you must bet or raise. Bet 8 for a balanced risk.`
-        : `Alternative: Skip to avoid risk, or bet 7 (normal) for minimum commitment.`,
+        ? `As dealer, bet 8 for balanced risk.`
+        : `Alternative: Skip or bet 7 for safety.`,
     };
   }
 
-  // CASE 6: Marginal hand - Suggest 7 (NORMAL) or skip
+  // CASE 6: Marginal hand (4-5 tricks) - Suggest 7 or skip
+  if (strength.estimatedTricks >= 4) {
+    return {
+      amount: 7,
+      withoutTrump: false,
+      skip: !isDealer,
+      reason: isDealer
+        ? `📋 MARGINAL - Bet 7 (must bet as dealer) | ${handSummary}`
+        : `📋 MARGINAL - Skip or bet 7 | ${handSummary}`,
+      alternatives: isDealer
+        ? `As dealer, 7 is your safest option.`
+        : `Alternative: Bet 7 if others skipped and you want to try.`,
+    };
+  }
+
+  // CASE 7: Weak hand (< 4 tricks) - Dealer must bet
   return {
     amount: 7,
     withoutTrump: false,
     skip: !isDealer,
     reason: isDealer
-      ? `📋 NORMAL - As dealer, bet 7 (minimum) - ${strength.trumpCount} ${strength.optimalTrump} trump`
-      : `📋 NORMAL - Marginal hand (${strength.trumpCount} ${strength.optimalTrump} trump), skip is safer`,
+      ? `⚠️ WEAK but must bet as dealer | ${handSummary}`
+      : `⚠️ WEAK - Skip recommended | ${handSummary}`,
     alternatives: isDealer
-      ? `As dealer, you must bet. 7 is the safest minimum bet.`
-      : `Alternative: Bet 7 if you feel lucky, but skipping avoids losing points.`,
+      ? `As dealer, you must bet. 7 minimizes risk.`
+      : `Alternative: Bet 7 only if feeling very lucky.`,
   };
 }
 
