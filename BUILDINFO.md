@@ -1,6 +1,6 @@
 # Build Information
 
-**Last Updated**: 2025-11-26
+**Last Updated**: 2025-12-02
 **Build Status**: Development
 **Version**: 1.0.0-dev
 
@@ -425,8 +425,9 @@ VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 ### Links
 - **Repository**: GitHub (private)
 - **Deployment**: Railway (pending)
+- **Storybook**: https://69291bd0d238365e7e12f66c-lyaqfncxgl.chromatic.com/
 - **Monitoring**: Sentry (configured but not active)
 
 ---
 
-*This buildinfo is automatically updated with each major change. Last update: 2025-11-25*
+*This buildinfo is automatically updated with each major change. Last update: 2025-12-02*
