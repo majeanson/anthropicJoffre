@@ -857,18 +857,36 @@ function handleBettingTimeout(gameId: string, playerName: string) {
   const isDealer = game.currentPlayerIndex === game.dealerIndex;
   const hasValidBets = game.currentBets.some(b => !b.skipped);
 
-  // If dealer and no valid bets, must bet minimum 7
-  if (isDealer && !hasValidBets) {
-    const bet: Bet = {
-      playerId: player.id,
-      playerName: player.name,
-      amount: 7,
-      withoutTrump: false,
-      skipped: false,
-    };
-    game.currentBets.push(bet);
+  // Dealer betting rules:
+  // 1. If no valid bets exist, dealer MUST bet minimum 7
+  // 2. If valid bets exist, dealer EQUALIZES (matches) the highest bet
+  // Non-dealer: Always skip on timeout
+  if (isDealer) {
+    if (!hasValidBets) {
+      // No valid bets - dealer must bet minimum 7
+      const bet: Bet = {
+        playerId: player.id,
+        playerName: player.name,
+        amount: 7,
+        withoutTrump: false,
+        skipped: false,
+      };
+      game.currentBets.push(bet);
+    } else {
+      // Valid bets exist - dealer equalizes (matches) the highest bet
+      const dealerPlayerId = game.players[game.dealerIndex].id;
+      const highestBet = getHighestBet(game.currentBets, dealerPlayerId);
+      const bet: Bet = {
+        playerId: player.id,
+        playerName: player.name,
+        amount: highestBet?.amount || 7,
+        withoutTrump: highestBet?.withoutTrump || false,
+        skipped: false,
+      };
+      game.currentBets.push(bet);
+    }
   } else {
-    // Skip the bet
+    // Non-dealer: Skip the bet on timeout
     const bet: Bet = {
       playerId: player.id,
       playerName: player.name,

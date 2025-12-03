@@ -755,3 +755,178 @@ export async function getQuestStats(playerName: string): Promise<{
     totalCurrencyEarned: parseInt(result.rows[0].total_currency) || 0,
   };
 }
+
+// ============================================================================
+// Weekly Calendar Functions (Sprint 20 - Replaces 30-day calendar)
+// ============================================================================
+
+export interface WeeklyCalendarDay {
+  dayNumber: number;
+  dayName: string;
+  rewardXp: number;
+  rewardCurrency: number;
+  isSpecial: boolean;
+  icon: string;
+}
+
+export interface WeeklyProgress {
+  weekStartDate: string;
+  daysClaimed: number[];
+  currentDayOfWeek: number; // 1=Monday, 7=Sunday
+}
+
+/**
+ * Get weekly rewards calendar (7 days Mon-Sun)
+ */
+export async function getWeeklyCalendar(): Promise<WeeklyCalendarDay[]> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return [];
+  }
+
+  const result = await pool.query(
+    `
+    SELECT
+      day_number,
+      day_name,
+      reward_xp,
+      reward_currency,
+      is_special,
+      icon
+    FROM weekly_rewards_calendar
+    ORDER BY day_number
+    `
+  );
+
+  return result.rows.map(row => ({
+    dayNumber: row.day_number,
+    dayName: row.day_name,
+    rewardXp: row.reward_xp,
+    rewardCurrency: row.reward_currency,
+    isSpecial: row.is_special,
+    icon: row.icon,
+  }));
+}
+
+/**
+ * Get player's weekly progress
+ * Auto-resets if new week has started
+ */
+export async function getPlayerWeeklyProgress(playerName: string): Promise<WeeklyProgress> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    // Return current day as Monday-based (1-7)
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const currentDayOfWeek = dayOfWeek === 0 ? 7 : dayOfWeek; // Sunday = 7
+    return {
+      weekStartDate: new Date().toISOString().split('T')[0],
+      daysClaimed: [],
+      currentDayOfWeek,
+    };
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // Get current week's Monday and day of week
+    const dateResult = await client.query(`
+      SELECT
+        get_week_monday(CURRENT_DATE) as week_monday,
+        get_day_of_week(CURRENT_DATE) as current_day
+    `);
+
+    const weekMonday = dateResult.rows[0].week_monday;
+    const currentDayOfWeek = dateResult.rows[0].current_day;
+
+    // Get or create/reset player weekly progress
+    let result = await client.query(
+      `
+      SELECT week_start_date, days_claimed
+      FROM player_weekly_progress
+      WHERE player_name = $1
+      `,
+      [playerName]
+    );
+
+    if (result.rows.length === 0) {
+      // Create new progress
+      await client.query(
+        `
+        INSERT INTO player_weekly_progress (player_name, week_start_date, days_claimed)
+        VALUES ($1, $2, '{}')
+        `,
+        [playerName, weekMonday]
+      );
+      result = await client.query(
+        `SELECT week_start_date, days_claimed FROM player_weekly_progress WHERE player_name = $1`,
+        [playerName]
+      );
+    } else if (result.rows[0].week_start_date < weekMonday) {
+      // New week started, reset progress
+      await client.query(
+        `
+        UPDATE player_weekly_progress
+        SET week_start_date = $1, days_claimed = '{}', updated_at = CURRENT_TIMESTAMP
+        WHERE player_name = $2
+        `,
+        [weekMonday, playerName]
+      );
+      result = await client.query(
+        `SELECT week_start_date, days_claimed FROM player_weekly_progress WHERE player_name = $1`,
+        [playerName]
+      );
+    }
+
+    await client.query('COMMIT');
+
+    return {
+      weekStartDate: result.rows[0].week_start_date,
+      daysClaimed: result.rows[0].days_claimed || [],
+      currentDayOfWeek,
+    };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('[Quests DB] Error fetching weekly progress:', error);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Claim weekly calendar reward
+ * Only allows claiming TODAY's reward
+ */
+export async function claimWeeklyReward(
+  playerName: string,
+  dayNumber: number
+): Promise<{ success: boolean; xp: number; currency: number; message: string }> {
+  if (!pool) {
+    console.error('[Quests DB] Database pool not initialized');
+    return { success: false, xp: 0, currency: 0, message: 'Database not available' };
+  }
+
+  const result = await pool.query<{
+    success: boolean;
+    reward_xp: number;
+    reward_currency: number;
+    message: string;
+  }>(
+    `SELECT * FROM claim_weekly_reward($1, $2)`,
+    [playerName, dayNumber]
+  );
+
+  if (result.rows.length === 0) {
+    return { success: false, xp: 0, currency: 0, message: 'Failed to claim reward' };
+  }
+
+  return {
+    success: result.rows[0].success,
+    xp: result.rows[0].reward_xp,
+    currency: result.rows[0].reward_currency,
+    message: result.rows[0].message,
+  };
+}

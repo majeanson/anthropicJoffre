@@ -57,6 +57,8 @@ import { useAutoplay } from './hooks/useAutoplay';
 import { useGameEventListeners } from './hooks/useGameEventListeners';
 // Tutorial achievement hook
 import { useTutorialAchievement } from './hooks/useTutorialAchievement';
+// Sprint 20: Skin context for level-based unlocks
+import { useSkin } from './contexts/SkinContext';
 
 function AppContent() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
@@ -98,6 +100,13 @@ function AppContent() {
 
   // Tutorial achievement check (runs when all tutorials completed)
   useTutorialAchievement({ socket });
+
+  // Sprint 20: Skin context for level-based skin unlocks
+  const {
+    setPlayerLevel,
+    setUnlockedSkinIds,
+    setSkinRequirements,
+  } = useSkin();
 
   // Sprint 3 Refactoring: Audio management hook
   const { soundEnabled, toggleSound, playErrorSound } = useAudioManager({ gameState });
@@ -152,6 +161,9 @@ function AppContent() {
 
   // Sprint 16: Swap request state
   const [swapRequest, setSwapRequest] = useState<{ fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean } | null>(null);
+
+  // Sprint 20: Level up celebration state
+  const [levelUpData, setLevelUpData] = useState<{ oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null>(null);
 
   // Task 10 Phase 2: Keyboard shortcuts help modal
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
@@ -229,6 +241,58 @@ function AppContent() {
       socket.off('achievement_unlocked', handleAchievementUnlocked);
     };
   }, [socket]);
+
+  // Sprint 20: Player progression and level-up listeners
+  useEffect(() => {
+    if (!socket || !currentPlayerName) return;
+
+    // Fetch initial skin requirements and player progression
+    socket.emit('get_skin_requirements');
+    socket.emit('get_player_progression', { playerName: currentPlayerName });
+
+    const handleSkinRequirements = (data: { requirements: Array<{ skinId: string; requiredLevel: number; unlockDescription: string }> }) => {
+      setSkinRequirements(data.requirements);
+    };
+
+    const handlePlayerProgression = (data: {
+      level: number;
+      totalXp: number;
+      unlockedSkins: string[];
+    }) => {
+      setPlayerLevel(data.level);
+      setUnlockedSkinIds(data.unlockedSkins);
+    };
+
+    const handleLevelUp = (data: {
+      playerName: string;
+      oldLevel: number;
+      newLevel: number;
+      newlyUnlockedSkins: string[];
+      allUnlockedSkins: string[];
+    }) => {
+      // Only show level-up modal for current player
+      if (data.playerName === currentPlayerName) {
+        setLevelUpData({
+          oldLevel: data.oldLevel,
+          newLevel: data.newLevel,
+          newlyUnlockedSkins: data.newlyUnlockedSkins,
+        });
+        setPlayerLevel(data.newLevel);
+        // Update unlocked skins with full list from server
+        setUnlockedSkinIds(data.allUnlockedSkins);
+      }
+    };
+
+    socket.on('skin_requirements', handleSkinRequirements);
+    socket.on('player_progression', handlePlayerProgression);
+    socket.on('player_leveled_up', handleLevelUp);
+
+    return () => {
+      socket.off('skin_requirements', handleSkinRequirements);
+      socket.off('player_progression', handlePlayerProgression);
+      socket.off('player_leveled_up', handleLevelUp);
+    };
+  }, [socket, currentPlayerName, setPlayerLevel, setUnlockedSkinIds, setSkinRequirements]);
 
   // Sprint 2 Phase 2: Friend request notifications
   useEffect(() => {
@@ -661,7 +725,10 @@ function AppContent() {
     showPersonalHub,
     setShowPersonalHub,
     currentPlayerName,
-    onOpenProfile: () => setProfilePlayerName(currentPlayerName)
+    onOpenProfile: () => setProfilePlayerName(currentPlayerName),
+    // Sprint 20: Level up celebration
+    levelUpData,
+    setLevelUpData,
   };
 
   if (!gameState) {

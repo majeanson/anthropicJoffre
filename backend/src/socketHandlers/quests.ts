@@ -21,8 +21,20 @@ import {
   getPlayerCalendarProgress,
   claimCalendarReward,
   getQuestStats,
+  // Weekly calendar (Sprint 20)
+  getWeeklyCalendar,
+  getPlayerWeeklyProgress,
+  claimWeeklyReward,
 } from '../db/quests';
 import { calculateLevelFromXP } from '../game/quests';
+import {
+  getSkinRequirements,
+  getPlayerUnlockedSkins,
+  getPlayerLevel,
+  checkAndUnlockSkins,
+  getPlayerSkinStatus,
+  updatePlayerLevel,
+} from '../db/skins';
 
 /**
  * Register all quest-related socket handlers
@@ -58,6 +70,40 @@ export function registerQuestHandlers(socket: Socket): void {
 
   socket.on('get_quest_stats', async function(this: Socket, data: { playerName: string }) {
     await handleGetQuestStats.call(this, data);
+  });
+
+  // Weekly calendar handlers (Sprint 20)
+  socket.on('get_weekly_calendar', async function(this: Socket) {
+    await handleGetWeeklyCalendar.call(this);
+  });
+
+  socket.on('get_player_weekly_progress', async function(this: Socket, data: { playerName: string }) {
+    await handleGetPlayerWeeklyProgress.call(this, data);
+  });
+
+  socket.on('claim_weekly_reward', async function(this: Socket, data: { playerName: string; dayNumber: number }) {
+    await handleClaimWeeklyReward.call(this, data);
+  });
+
+  // Skin unlock handlers (Sprint 20)
+  socket.on('get_skin_requirements', async function(this: Socket) {
+    await handleGetSkinRequirements.call(this);
+  });
+
+  socket.on('get_player_unlocked_skins', async function(this: Socket, data: { playerName: string }) {
+    await handleGetPlayerUnlockedSkins.call(this, data);
+  });
+
+  socket.on('get_player_skin_status', async function(this: Socket, data: { playerName: string }) {
+    await handleGetPlayerSkinStatus.call(this, data);
+  });
+
+  socket.on('get_player_progression', async function(this: Socket, data: { playerName: string }) {
+    await handleGetPlayerProgression.call(this, data);
+  });
+
+  socket.on('check_skin_unlocks', async function(this: Socket, data: { playerName: string }) {
+    await handleCheckSkinUnlocks.call(this, data);
   });
 }
 
@@ -323,6 +369,262 @@ async function handleGetQuestStats(
     console.error('[Quests] Error fetching quest stats:', error);
     this.emit('error', {
       message: 'Failed to fetch quest statistics. Please try again.',
+    });
+  }
+}
+
+// ============================================================================
+// Weekly Calendar Handlers (Sprint 20)
+// ============================================================================
+
+/**
+ * Get weekly rewards calendar (7 days Mon-Sun)
+ */
+async function handleGetWeeklyCalendar(this: Socket): Promise<void> {
+  try {
+    const calendar = await getWeeklyCalendar();
+    this.emit('weekly_calendar', { calendar });
+  } catch (error) {
+    console.error('[Quests] Error fetching weekly calendar:', error);
+    this.emit('error', {
+      message: 'Failed to fetch weekly calendar. Please try again.',
+    });
+  }
+}
+
+/**
+ * Get player's weekly progress
+ */
+async function handleGetPlayerWeeklyProgress(
+  this: Socket,
+  data: { playerName: string }
+): Promise<void> {
+  try {
+    const { playerName } = data;
+
+    if (!playerName) {
+      this.emit('error', { message: 'Player name is required' });
+      return;
+    }
+
+    const progress = await getPlayerWeeklyProgress(playerName);
+    this.emit('weekly_progress', progress);
+  } catch (error) {
+    console.error('[Quests] Error fetching weekly progress:', error);
+    this.emit('error', {
+      message: 'Failed to fetch weekly progress. Please try again.',
+    });
+  }
+}
+
+/**
+ * Claim weekly calendar reward
+ */
+async function handleClaimWeeklyReward(
+  this: Socket,
+  data: { playerName: string; dayNumber: number }
+): Promise<void> {
+  try {
+    const { playerName, dayNumber } = data;
+
+    if (!playerName || dayNumber === undefined) {
+      this.emit('error', { message: 'Player name and day number are required' });
+      return;
+    }
+
+    const result = await claimWeeklyReward(playerName, dayNumber);
+
+    if (!result.success) {
+      this.emit('error', { message: result.message });
+      return;
+    }
+
+    // Check for level up after awarding XP
+    const levelResult = await updatePlayerLevel(playerName);
+
+    // Check for new skin unlocks if leveled up
+    let newlyUnlockedSkins: string[] = [];
+    if (levelResult.leveledUp) {
+      const skinResult = await checkAndUnlockSkins(playerName);
+      newlyUnlockedSkins = skinResult.newlyUnlocked;
+    }
+
+    // Get updated player level info
+    const levelInfo = await getPlayerLevel(playerName);
+    const xpInfo = calculateLevelFromXP(levelInfo.totalXp);
+
+    this.emit('weekly_reward_claimed', {
+      dayNumber,
+      xp: result.xp,
+      currency: result.currency,
+      message: result.message,
+      leveledUp: levelResult.leveledUp,
+      newLevel: levelResult.newLevel,
+      oldLevel: levelResult.oldLevel,
+      newlyUnlockedSkins,
+      currentLevelXP: xpInfo.currentLevelXP,
+      nextLevelXP: xpInfo.nextLevelXP,
+      totalXP: levelInfo.totalXp,
+      totalCurrency: levelInfo.cosmeticCurrency,
+    });
+
+    // Refresh weekly progress
+    const progress = await getPlayerWeeklyProgress(playerName);
+    this.emit('weekly_progress', progress);
+  } catch (error: any) {
+    console.error('[Quests] Error claiming weekly reward:', error);
+    this.emit('error', {
+      message: error.message || 'Failed to claim weekly reward. Please try again.',
+    });
+  }
+}
+
+// ============================================================================
+// Skin Unlock Handlers (Sprint 20)
+// ============================================================================
+
+/**
+ * Get all skin requirements
+ */
+async function handleGetSkinRequirements(this: Socket): Promise<void> {
+  try {
+    const requirements = await getSkinRequirements();
+    this.emit('skin_requirements', { requirements });
+  } catch (error) {
+    console.error('[Quests] Error fetching skin requirements:', error);
+    this.emit('error', {
+      message: 'Failed to fetch skin requirements. Please try again.',
+    });
+  }
+}
+
+/**
+ * Get player's unlocked skins
+ */
+async function handleGetPlayerUnlockedSkins(
+  this: Socket,
+  data: { playerName: string }
+): Promise<void> {
+  try {
+    const { playerName } = data;
+
+    if (!playerName) {
+      this.emit('error', { message: 'Player name is required' });
+      return;
+    }
+
+    const unlockedSkins = await getPlayerUnlockedSkins(playerName);
+    this.emit('player_unlocked_skins', { unlockedSkins });
+  } catch (error) {
+    console.error('[Quests] Error fetching unlocked skins:', error);
+    this.emit('error', {
+      message: 'Failed to fetch unlocked skins. Please try again.',
+    });
+  }
+}
+
+/**
+ * Get player's full skin status (all skins with unlock status)
+ */
+async function handleGetPlayerSkinStatus(
+  this: Socket,
+  data: { playerName: string }
+): Promise<void> {
+  try {
+    const { playerName } = data;
+
+    if (!playerName) {
+      this.emit('error', { message: 'Player name is required' });
+      return;
+    }
+
+    const skins = await getPlayerSkinStatus(playerName);
+    const levelInfo = await getPlayerLevel(playerName);
+
+    this.emit('player_skin_status', {
+      skins,
+      playerLevel: levelInfo.level,
+    });
+  } catch (error) {
+    console.error('[Quests] Error fetching skin status:', error);
+    this.emit('error', {
+      message: 'Failed to fetch skin status. Please try again.',
+    });
+  }
+}
+
+/**
+ * Get player's full progression info (level, XP, currency, unlocked skins)
+ */
+async function handleGetPlayerProgression(
+  this: Socket,
+  data: { playerName: string }
+): Promise<void> {
+  try {
+    const { playerName } = data;
+
+    if (!playerName) {
+      this.emit('error', { message: 'Player name is required' });
+      return;
+    }
+
+    const levelInfo = await getPlayerLevel(playerName);
+    const xpInfo = calculateLevelFromXP(levelInfo.totalXp);
+    const unlockedSkins = await getPlayerUnlockedSkins(playerName);
+    const streak = await getLoginStreak(playerName);
+    const questStats = await getQuestStats(playerName);
+
+    this.emit('player_progression', {
+      level: levelInfo.level,
+      totalXp: levelInfo.totalXp,
+      currentLevelXP: xpInfo.currentLevelXP,
+      nextLevelXP: xpInfo.nextLevelXP,
+      cosmeticCurrency: levelInfo.cosmeticCurrency,
+      unlockedSkins,
+      streak: streak || { currentStreak: 0, longestStreak: 0, totalLogins: 0 },
+      questStats,
+    });
+  } catch (error) {
+    console.error('[Quests] Error fetching player progression:', error);
+    this.emit('error', {
+      message: 'Failed to fetch player progression. Please try again.',
+    });
+  }
+}
+
+/**
+ * Check and unlock any earned skins based on player level
+ */
+async function handleCheckSkinUnlocks(
+  this: Socket,
+  data: { playerName: string }
+): Promise<void> {
+  try {
+    const { playerName } = data;
+
+    if (!playerName) {
+      this.emit('error', { message: 'Player name is required' });
+      return;
+    }
+
+    const result = await checkAndUnlockSkins(playerName);
+
+    this.emit('skin_unlocks_checked', {
+      newlyUnlocked: result.newlyUnlocked,
+      playerLevel: result.playerLevel,
+    });
+
+    // If there are new unlocks, emit a special notification event
+    if (result.newlyUnlocked.length > 0) {
+      this.emit('new_skins_unlocked', {
+        skins: result.newlyUnlocked,
+        playerLevel: result.playerLevel,
+      });
+    }
+  } catch (error) {
+    console.error('[Quests] Error checking skin unlocks:', error);
+    this.emit('error', {
+      message: 'Failed to check skin unlocks. Please try again.',
     });
   }
 }

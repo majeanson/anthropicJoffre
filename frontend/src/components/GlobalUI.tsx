@@ -31,7 +31,9 @@ const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => (
 // Sprint 19: Quest system components
 const DailyQuestsPanel = lazy(() => import('./DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
 const RewardsCalendar = lazy(() => import('./RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
-const PersonalHub = lazy(() => import('./PersonalHub').then(m => ({ default: m.PersonalHub })));
+// Sprint 20: Replaced PersonalHub with unified ProfileProgressModal
+const ProfileProgressModal = lazy(() => import('./ProfileProgressModal').then(m => ({ default: m.ProfileProgressModal })));
+const LevelUpModal = lazy(() => import('./LevelUpModal').then(m => ({ default: m.LevelUpModal })));
 
 interface GlobalUIProps {
   reconnecting: boolean;
@@ -64,6 +66,9 @@ interface GlobalUIProps {
   setShowPersonalHub: (show: boolean) => void;
   currentPlayerName: string;
   onOpenProfile?: () => void;
+  // Sprint 20: Level up celebration
+  levelUpData: { oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null;
+  setLevelUpData: (data: { oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null) => void;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({
@@ -94,8 +99,11 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   showPersonalHub,
   setShowPersonalHub,
   currentPlayerName,
-  onOpenProfile
+  onOpenProfile: _onOpenProfile,
+  levelUpData,
+  setLevelUpData,
 }) => {
+  void _onOpenProfile; // Reserved for future use
   const modals = useModals();
   const auth = useAuth();
 
@@ -208,17 +216,13 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
         />
       </Suspense>
 
-      {/* Sprint 19: Quest System Modals */}
+      {/* Sprint 20: Unified Profile Progress Modal (replaces PersonalHub) */}
       <Suspense fallback={<div />}>
-        <PersonalHub
-          socket={socket}
-          playerName={currentPlayerName}
+        <ProfileProgressModal
           isOpen={showPersonalHub}
           onClose={() => setShowPersonalHub(false)}
-          onOpenQuests={() => setShowQuestsPanel(true)}
-          onOpenCalendar={() => setShowRewardsCalendar(true)}
-          onOpenAchievements={() => setShowAchievementsPanel(true)}
-          onOpenProfile={onOpenProfile || (() => {})}
+          playerName={currentPlayerName}
+          socket={socket}
         />
         <DailyQuestsPanel
           socket={socket}
@@ -232,6 +236,16 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
           isOpen={showRewardsCalendar}
           onClose={() => setShowRewardsCalendar(false)}
         />
+        {/* Sprint 20: Level Up Celebration Modal */}
+        {levelUpData && (
+          <LevelUpModal
+            isOpen={!!levelUpData}
+            onClose={() => setLevelUpData(null)}
+            oldLevel={levelUpData.oldLevel}
+            newLevel={levelUpData.newLevel}
+            newlyUnlockedSkins={levelUpData.newlyUnlockedSkins}
+          />
+        )}
       </Suspense>
     </>
   );

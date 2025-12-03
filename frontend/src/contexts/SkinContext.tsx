@@ -34,9 +34,19 @@ import {
   skinList,
 } from '../config/skins';
 
+// Re-export SkinId for convenience
+export type { SkinId };
+
 // ============================================================================
 // CONTEXT TYPES
 // ============================================================================
+
+/** Skin requirement from backend */
+interface SkinRequirement {
+  skinId: string;
+  requiredLevel: number;
+  unlockDescription: string;
+}
 
 interface SkinContextValue {
   /** Current active skin */
@@ -56,6 +66,31 @@ interface SkinContextValue {
 
   /** Toggle between light and dark skins */
   toggleDarkMode: () => void;
+
+  // Sprint 20: Level-based skin unlocks
+  /** Current player level */
+  playerLevel: number;
+
+  /** Set player level (called by App.tsx) */
+  setPlayerLevel: (level: number) => void;
+
+  /** List of unlocked skin IDs */
+  unlockedSkinIds: string[];
+
+  /** Set unlocked skin IDs (called by App.tsx) */
+  setUnlockedSkinIds: (ids: string[]) => void;
+
+  /** Skin requirements from backend */
+  skinRequirements: SkinRequirement[];
+
+  /** Set skin requirements (called by App.tsx) */
+  setSkinRequirements: (requirements: SkinRequirement[]) => void;
+
+  /** Check if a skin is unlocked for the player */
+  isSkinUnlocked: (skinId: SkinId) => boolean;
+
+  /** Get required level for a skin */
+  getRequiredLevel: (skinId: SkinId) => number;
 }
 
 const SkinContext = createContext<SkinContextValue | undefined>(undefined);
@@ -91,6 +126,11 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
     return defaultSkin || defaultSkinId;
   });
 
+  // Sprint 20: Player level and skin unlock state
+  const [playerLevel, setPlayerLevel] = useState<number>(1);
+  const [unlockedSkinIds, setUnlockedSkinIds] = useState<string[]>([]);
+  const [skinRequirements, setSkinRequirements] = useState<SkinRequirement[]>([]);
+
   // Get the full skin object
   const skin = useMemo(() => getSkin(skinId), [skinId]);
 
@@ -103,20 +143,46 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
     localStorage.setItem('theme', skin.isDark ? 'dark' : 'historic');
   }, [skin, skinId]);
 
-  // Change skin handler
-  const setSkin = useCallback((id: SkinId) => {
-    setSkinId(id);
-  }, []);
+  // Check if a skin is unlocked for the player
+  const isSkinUnlocked = useCallback((checkSkinId: SkinId) => {
+    // Check backend unlocked skins first
+    if (unlockedSkinIds.includes(checkSkinId)) return true;
 
-  // Toggle between dark and light skins
+    // Check requirements - skins with level 0 are always unlocked
+    const requirement = skinRequirements.find(r => r.skinId === checkSkinId);
+    if (!requirement) return true; // If no requirement found, assume unlocked
+    if (requirement.requiredLevel === 0) return true;
+
+    // Check if player level meets requirement
+    return playerLevel >= requirement.requiredLevel;
+  }, [unlockedSkinIds, skinRequirements, playerLevel]);
+
+  // Get required level for a skin
+  const getRequiredLevel = useCallback((checkSkinId: SkinId) => {
+    const requirement = skinRequirements.find(r => r.skinId === checkSkinId);
+    return requirement?.requiredLevel || 0;
+  }, [skinRequirements]);
+
+  // Change skin handler - only allow if unlocked
+  const setSkin = useCallback((id: SkinId) => {
+    if (isSkinUnlocked(id)) {
+      setSkinId(id);
+    } else {
+      console.warn(`[SkinContext] Attempted to set locked skin: ${id}`);
+    }
+  }, [isSkinUnlocked]);
+
+  // Toggle between dark and light skins - only consider unlocked skins
   const toggleDarkMode = useCallback(() => {
-    // Find a skin with opposite dark mode setting
     const currentIsDark = skin.isDark;
-    const oppositeSkin = skinList.find(s => s.isDark !== currentIsDark);
+    // Find an unlocked skin with opposite dark mode setting
+    const oppositeSkin = skinList.find(
+      s => s.isDark !== currentIsDark && isSkinUnlocked(s.id)
+    );
     if (oppositeSkin) {
       setSkinId(oppositeSkin.id);
     }
-  }, [skin.isDark]);
+  }, [skin.isDark, isSkinUnlocked]);
 
   // Context value
   const value = useMemo<SkinContextValue>(
@@ -127,8 +193,17 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
       availableSkins: skinList,
       isDarkMode: skin.isDark,
       toggleDarkMode,
+      // Sprint 20: Level-based unlocks
+      playerLevel,
+      setPlayerLevel,
+      unlockedSkinIds,
+      setUnlockedSkinIds,
+      skinRequirements,
+      setSkinRequirements,
+      isSkinUnlocked,
+      getRequiredLevel,
     }),
-    [skin, skinId, setSkin, toggleDarkMode]
+    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel]
   );
 
   return (

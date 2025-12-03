@@ -905,6 +905,35 @@ describe('calculateRoundScoring', () => {
     expect(result.gameOver).toBe(true);
     expect(result.winningTeam).toBe(2);
   });
+
+  it('should correctly identify dealer team as offensive when dealer equalizes bet', () => {
+    // Scenario: Player 1 (Team 1) bets 9, Dealer (p4, Team 2) equalizes with 9
+    // Dealer should be the offensive team
+    const game = createTestGame({
+      phase: 'scoring',
+      dealerIndex: 3, // p4 is the dealer
+      highestBet: { playerId: 'p4', playerName: 'Player 4', amount: 9, withoutTrump: false, skipped: false },
+      currentBets: [
+        { playerId: 'p1', playerName: 'Player 1', amount: 9, withoutTrump: false, skipped: false },
+        { playerId: 'p2', playerName: 'Player 2', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p3', playerName: 'Player 3', amount: 0, withoutTrump: false, skipped: true },
+        { playerId: 'p4', playerName: 'Player 4', amount: 9, withoutTrump: false, skipped: false }, // dealer equalizes
+      ],
+      teamScores: { team1: 0, team2: 0 },
+    });
+
+    // Give Team 2 (offensive) 10 points
+    game.players[1].pointsWon = 5; // p2 (Team 2)
+    game.players[3].pointsWon = 5; // p4 (Team 2)
+
+    const result = calculateRoundScoring(game);
+
+    // Dealer's team (Team 2) should be the offensive team
+    expect(result.offensiveTeamId).toBe(2);
+    expect(result.defensiveTeamId).toBe(1);
+    expect(result.offensiveTeamPoints).toBe(10);
+    expect(result.betMade).toBe(true); // 10 >= 9
+  });
 });
 
 describe('applyRoundScoring', () => {

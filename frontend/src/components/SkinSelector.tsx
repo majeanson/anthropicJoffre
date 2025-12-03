@@ -23,13 +23,16 @@ import { Modal } from './ui/Modal';
 interface SkinCardProps {
   skin: Skin;
   isSelected: boolean;
+  isLocked: boolean;
+  requiredLevel: number;
   onSelect: (id: SkinId) => void;
 }
 
-function SkinCard({ skin, isSelected, onSelect }: SkinCardProps) {
+function SkinCard({ skin, isSelected, isLocked, requiredLevel, onSelect }: SkinCardProps) {
   return (
     <button
-      onClick={() => onSelect(skin.id)}
+      onClick={() => !isLocked && onSelect(skin.id)}
+      disabled={isLocked}
       className={`
         relative
         w-full
@@ -38,17 +41,28 @@ function SkinCard({ skin, isSelected, onSelect }: SkinCardProps) {
         border-[var(--button-border-width)]
         transition-all duration-[var(--duration-normal)]
         text-left
-        ${isSelected
-          ? 'border-[var(--color-text-accent)] shadow-[0_0_20px_var(--color-glow)]'
-          : 'border-[var(--color-border-default)] hover:border-[var(--color-border-accent)]'
+        ${isLocked
+          ? 'opacity-60 cursor-not-allowed border-[var(--color-border-default)]'
+          : isSelected
+            ? 'border-[var(--color-text-accent)] shadow-[0_0_20px_var(--color-glow)]'
+            : 'border-[var(--color-border-default)] hover:border-[var(--color-border-accent)] hover:scale-[1.02]'
         }
         bg-[var(--color-bg-secondary)]
-        hover:scale-[1.02]
         focus-visible:outline-none
         focus-visible:ring-[var(--input-focus-ring-width)]
         focus-visible:ring-[var(--color-text-accent)]
       `}
     >
+      {/* Lock overlay */}
+      {isLocked && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-[var(--radius-lg)] bg-black/40 z-10">
+          <div className="text-center">
+            <span className="text-3xl">🔒</span>
+            <p className="text-xs text-white mt-1 font-medium">Level {requiredLevel}</p>
+          </div>
+        </div>
+      )}
+
       {/* Preview gradient */}
       <div
         className="w-full h-20 rounded-[var(--radius-md)] mb-3"
@@ -77,7 +91,7 @@ function SkinCard({ skin, isSelected, onSelect }: SkinCardProps) {
       </div>
 
       {/* Selected indicator */}
-      {isSelected && (
+      {isSelected && !isLocked && (
         <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-success)] flex items-center justify-center">
           <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -107,7 +121,7 @@ export function SkinSelectorGrid({
   onSkinChange,
 }: SkinSelectorGridProps) {
   void _showDescriptions; // Reserved for future use
-  const { skinId, setSkin, availableSkins } = useSkin();
+  const { skinId, setSkin, availableSkins, isSkinUnlocked, getRequiredLevel } = useSkin();
 
   const handleSelect = (id: SkinId) => {
     setSkin(id);
@@ -130,6 +144,8 @@ export function SkinSelectorGrid({
           key={skin.id}
           skin={skin}
           isSelected={skin.id === skinId}
+          isLocked={!isSkinUnlocked(skin.id)}
+          requiredLevel={getRequiredLevel(skin.id)}
           onSelect={handleSelect}
         />
       ))}
@@ -147,10 +163,11 @@ interface SkinSelectorDropdownProps {
 }
 
 export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps) {
-  const { skin, skinId, setSkin, availableSkins } = useSkin();
+  const { skin, skinId, setSkin, availableSkins, isSkinUnlocked, getRequiredLevel } = useSkin();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = (id: SkinId) => {
+    if (!isSkinUnlocked(id)) return; // Don't allow locked skins
     setSkin(id);
     setIsOpen(false);
     const selectedSkin = availableSkins.find(s => s.id === id);
@@ -219,41 +236,59 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
             overflow-hidden
             animate-slideUp
           `}>
-            {availableSkins.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => handleSelect(s.id)}
-                className={`
-                  flex items-center gap-3
-                  w-full
-                  px-4 py-3
-                  text-left
-                  transition-colors duration-[var(--duration-fast)]
-                  ${s.id === skinId
-                    ? 'bg-[var(--color-bg-tertiary)]'
-                    : 'hover:bg-[var(--color-bg-tertiary)]'
-                  }
-                `}
-              >
-                <div
-                  className="w-8 h-8 rounded-[var(--radius-sm)] flex-shrink-0"
-                  style={{ background: s.preview }}
-                />
-                <div className="flex-1">
-                  <div className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm">
-                    {s.name}
+            {availableSkins.map((s) => {
+              const isLocked = !isSkinUnlocked(s.id);
+              const requiredLevel = getRequiredLevel(s.id);
+
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => handleSelect(s.id)}
+                  disabled={isLocked}
+                  className={`
+                    flex items-center gap-3
+                    w-full
+                    px-4 py-3
+                    text-left
+                    transition-colors duration-[var(--duration-fast)]
+                    ${isLocked
+                      ? 'opacity-50 cursor-not-allowed'
+                      : s.id === skinId
+                        ? 'bg-[var(--color-bg-tertiary)]'
+                        : 'hover:bg-[var(--color-bg-tertiary)]'
+                    }
+                  `}
+                >
+                  <div className="relative">
+                    <div
+                      className="w-8 h-8 rounded-[var(--radius-sm)] flex-shrink-0"
+                      style={{ background: s.preview }}
+                    />
+                    {isLocked && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-[var(--radius-sm)]">
+                        <span className="text-sm">🔒</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="text-xs text-[var(--color-text-muted)] font-body">
-                    {s.isDark ? 'Dark theme' : 'Light theme'}
+                  <div className="flex-1">
+                    <div className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm">
+                      {s.name}
+                    </div>
+                    <div className="text-xs text-[var(--color-text-muted)] font-body">
+                      {isLocked ? `Level ${requiredLevel} required` : s.isDark ? 'Dark theme' : 'Light theme'}
+                    </div>
                   </div>
-                </div>
-                {s.id === skinId && (
-                  <svg className="w-5 h-5 text-[var(--color-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                )}
-              </button>
-            ))}
+                  {s.id === skinId && !isLocked && (
+                    <svg className="w-5 h-5 text-[var(--color-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  {isLocked && (
+                    <span className="text-xs text-[var(--color-text-muted)]">Lvl {requiredLevel}</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </>
       )}
