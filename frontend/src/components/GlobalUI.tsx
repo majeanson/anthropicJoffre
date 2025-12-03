@@ -30,7 +30,7 @@ const PasswordResetModal = lazy(() => import('./PasswordResetModal'));
 const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => ({ default: m.NotificationCenter })));
 // Sprint 19: Quest system components
 const DailyQuestsPanel = lazy(() => import('./DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
-const RewardsCalendar = lazy(() => import('./RewardsCalendar').then(m => ({ default: m.RewardsCalendar })));
+// Note: Old 30-day RewardsCalendar removed in Sprint 20 - replaced by WeeklyCalendar inside ProfileProgressModal
 // Sprint 20: Replaced PersonalHub with unified ProfileProgressModal
 const ProfileProgressModal = lazy(() => import('./ProfileProgressModal').then(m => ({ default: m.ProfileProgressModal })));
 const LevelUpModal = lazy(() => import('./LevelUpModal').then(m => ({ default: m.LevelUpModal })));
@@ -94,8 +94,8 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   socket,
   showQuestsPanel,
   setShowQuestsPanel,
-  showRewardsCalendar,
-  setShowRewardsCalendar,
+  showRewardsCalendar: _showRewardsCalendar,
+  setShowRewardsCalendar: _setShowRewardsCalendar,
   showPersonalHub,
   setShowPersonalHub,
   currentPlayerName,
@@ -104,6 +104,8 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   setLevelUpData,
 }) => {
   void _onOpenProfile; // Reserved for future use
+  void _showRewardsCalendar; // Deprecated: Old 30-day calendar replaced by WeeklyCalendar in ProfileProgressModal
+  void _setShowRewardsCalendar; // Deprecated: Old 30-day calendar replaced by WeeklyCalendar in ProfileProgressModal
   const modals = useModals();
   const auth = useAuth();
 
@@ -230,12 +232,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
           isOpen={showQuestsPanel}
           onClose={() => setShowQuestsPanel(false)}
         />
-        <RewardsCalendar
-          socket={socket}
-          playerName={currentPlayerName}
-          isOpen={showRewardsCalendar}
-          onClose={() => setShowRewardsCalendar(false)}
-        />
+        {/* Note: Old 30-day RewardsCalendar removed - use Calendar tab in ProfileProgressModal */}
         {/* Sprint 20: Level Up Celebration Modal */}
         {levelUpData && (
           <LevelUpModal
