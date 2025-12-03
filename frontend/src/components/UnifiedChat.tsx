@@ -226,50 +226,53 @@ export function UnifiedChat({
             </p>
           ) : (
             <div className="space-y-2">
-              {messages.slice(-maxMessages).map((msg, idx) => (
-                <div
-                  key={idx}
-                  className="text-sm p-2 rounded-[var(--radius-md)] shadow-sm"
-                  style={{
-                    backgroundColor: msg.playerId === currentPlayerId
-                      ? 'var(--color-info)'
-                      : 'var(--color-bg-secondary)',
-                    borderLeft: msg.playerId === currentPlayerId
-                      ? '2px solid var(--color-text-accent)'
-                      : 'none',
-                  }}
-                >
-                  <div className="flex items-center justify-between mb-0.5">
-                    {onPlayerClick ? (
-                      <PlayerNameButton
-                        playerName={msg.playerName}
-                        onClick={() => onPlayerClick(msg.playerName)}
-                        variant="inline"
-                        className="text-xs"
-                      />
-                    ) : (
-                      <span
-                        className="font-semibold text-xs"
-                        style={{ color: 'var(--color-text-accent)' }}
-                      >
-                        {msg.playerName}
-                      </span>
-                    )}
-                    <span
-                      className="text-xs"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      {formatTime(msg.timestamp)}
-                    </span>
-                  </div>
-                  <p
-                    className="break-words"
-                    style={{ color: 'var(--color-text-primary)' }}
+              {messages.slice(-maxMessages).map((msg, idx) => {
+                const isOwnMessage = msg.playerId === currentPlayerId;
+                return (
+                  <div
+                    key={idx}
+                    className="text-sm p-2 rounded-[var(--radius-md)] shadow-sm"
+                    style={{
+                      backgroundColor: isOwnMessage
+                        ? 'color-mix(in srgb, var(--color-text-accent) 15%, var(--color-bg-secondary))'
+                        : 'var(--color-bg-secondary)',
+                      borderLeft: isOwnMessage
+                        ? '3px solid var(--color-text-accent)'
+                        : '3px solid var(--color-border-subtle)',
+                    }}
                   >
-                    {msg.message}
-                  </p>
-                </div>
-              ))}
+                    <div className="flex items-center justify-between mb-0.5">
+                      {onPlayerClick ? (
+                        <PlayerNameButton
+                          playerName={msg.playerName}
+                          onClick={() => onPlayerClick(msg.playerName)}
+                          variant="inline"
+                          className="text-xs"
+                        />
+                      ) : (
+                        <span
+                          className="font-semibold text-xs"
+                          style={{ color: isOwnMessage ? 'var(--color-text-accent)' : 'var(--color-text-secondary)' }}
+                        >
+                          {msg.playerName}
+                        </span>
+                      )}
+                      <span
+                        className="text-xs"
+                        style={{ color: 'var(--color-text-muted)' }}
+                      >
+                        {formatTime(msg.timestamp)}
+                      </span>
+                    </div>
+                    <p
+                      className="break-words"
+                      style={{ color: 'var(--color-text-primary)' }}
+                    >
+                      {msg.message}
+                    </p>
+                  </div>
+                );
+              })}
               <div ref={messagesEndRef} />
             </div>
           )}
