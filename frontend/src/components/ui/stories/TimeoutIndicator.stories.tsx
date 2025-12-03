@@ -344,7 +344,7 @@ export const BadgeSizes: Story = {
       </p>
 
       <div className="space-y-4">
-        {(['xs', 'sm', 'md', 'lg'] as const).map((size) => (
+        {(['xs', 'sm', 'md'] as const).map((size) => (
           <div
             key={size}
             className="flex items-center justify-between p-3 rounded-lg bg-[var(--color-bg-secondary)]"
