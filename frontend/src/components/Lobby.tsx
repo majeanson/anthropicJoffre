@@ -20,6 +20,7 @@ import { OnlinePlayer } from '../types/game';
 import { useAuth } from '../contexts/AuthContext';
 import { ProfileButton } from './ProfileButton';
 import { ProfileEditorModal } from './ProfileEditorModal';
+import { LoginStreakBadge } from './LoginStreakBadge';
 import { Button } from './ui/Button';
 import { Tabs, Tab } from './ui/Tabs';
 
@@ -487,7 +488,13 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
               {/* Authentication Section */}
               <div className="mt-6">
                 {user ? (
-                  <div className="flex flex-col items-center gap-2">
+                  <div className="flex flex-col items-center gap-3">
+                    {/* Login Streak Badge - Sprint 22D */}
+                    <LoginStreakBadge
+                      socket={socket}
+                      playerName={user.username}
+                      onClick={onShowPersonalHub}
+                    />
                     {/* Profile Button - Clickable dropdown menu with profile actions */}
                     <ProfileButton
                       user={user}

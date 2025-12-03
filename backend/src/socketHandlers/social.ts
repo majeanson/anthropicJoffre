@@ -10,6 +10,7 @@ import { getRecentPlayers, getFriendSuggestions, getMutualFriends } from '../uti
 import { errorBoundaries } from '../middleware/errorBoundary.js';
 import { getUserByUsername } from '../db/users.js';
 import { getUserProfile, updateUserProfile, ProfileUpdateData } from '../db/profiles.js';
+import { createNotification } from '../db/notifications.js';
 
 interface SocialHandlerDependencies {
   errorBoundaries: typeof errorBoundaries;
@@ -73,6 +74,67 @@ export function registerSocialHandlers(
 
       const mutualFriends = await getMutualFriends(username, otherUsername);
       socket.emit('mutual_friends', { otherUsername, mutualFriends });
+    })
+  );
+
+  /**
+   * Send game invite to another player
+   * Sprint 22A - Game Invite System
+   */
+  socket.on(
+    'send_game_invite',
+    errorBoundaries.gameAction('send_game_invite')(async ({
+      gameId,
+      toPlayer
+    }: {
+      gameId: string;
+      toPlayer: string;
+    }) => {
+      const fromPlayer = socket.data.playerName;
+
+      if (!fromPlayer) {
+        socket.emit('error', { message: 'Not logged in', context: 'send_game_invite' });
+        return;
+      }
+
+      if (fromPlayer === toPlayer) {
+        socket.emit('error', { message: 'Cannot invite yourself', context: 'send_game_invite' });
+        return;
+      }
+
+      try {
+        // Create database notification for recipient (if authenticated)
+        const recipientUser = await getUserByUsername(toPlayer);
+        if (recipientUser) {
+          await createNotification({
+            user_id: recipientUser.user_id,
+            notification_type: 'game_invite',
+            title: 'Game Invite',
+            message: `${fromPlayer} invited you to join their game`,
+            data: {
+              game_id: gameId,
+              from_player: fromPlayer,
+              game_url: `?join=${gameId}`
+            },
+            expires_at: new Date(Date.now() + 60 * 60 * 1000) // 1 hour expiry
+          });
+        }
+
+        // Send real-time notification to recipient if online
+        io.to(`player:${toPlayer}`).emit('game_invite_received', {
+          gameId,
+          fromPlayer,
+          timestamp: Date.now()
+        });
+
+        // Confirm to sender
+        socket.emit('game_invite_sent', { toPlayer, gameId });
+
+        console.log(`[Social] Game invite sent from ${fromPlayer} to ${toPlayer} for game ${gameId}`);
+      } catch (error) {
+        console.error('[Social] Error sending game invite:', error);
+        socket.emit('error', { message: 'Failed to send invite', context: 'send_game_invite' });
+      }
     })
   );
 

@@ -72,6 +72,7 @@ export function PlayerProfileModal({
   const [sendingRequest, setSendingRequest] = useState(false);
   const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
   const [achievementPoints, setAchievementPoints] = useState(0);
+  const [mutualFriends, setMutualFriends] = useState<string[]>([]);
 
   const { user, isAuthenticated } = useAuth();
   const isOwnProfile = isAuthenticated && user?.username === playerName;
@@ -170,6 +171,31 @@ export function PlayerProfileModal({
 
     return () => {
       socket.off('friends_list', handleFriendsList);
+    };
+  }, [socket, isAuthenticated, isOwnProfile, playerName]);
+
+  // Fetch mutual friends (Sprint 22C)
+  useEffect(() => {
+    if (!socket || !isAuthenticated || isOwnProfile || !playerName) return;
+
+    socket.emit('get_mutual_friends', { otherUsername: playerName });
+
+    const handleMutualFriends = ({
+      otherUsername,
+      mutualFriends: friends
+    }: {
+      otherUsername: string;
+      mutualFriends: string[];
+    }) => {
+      if (otherUsername === playerName) {
+        setMutualFriends(friends);
+      }
+    };
+
+    socket.on('mutual_friends', handleMutualFriends);
+
+    return () => {
+      socket.off('mutual_friends', handleMutualFriends);
     };
   }, [socket, isAuthenticated, isOwnProfile, playerName]);
 
@@ -417,6 +443,36 @@ export function PlayerProfileModal({
                   )}
                   {achievements.filter(a => a.is_unlocked).length === 0 && (
                     <p className="text-sm text-gray-500 italic">No achievements yet</p>
+                  )}
+                </div>
+              </UICard>
+            )}
+
+            {/* Mutual Friends Section (Sprint 22C) */}
+            {mutualFriends.length > 0 && (
+              <UICard variant="bordered" size="md">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-semibold text-purple-400">
+                    <span aria-hidden="true">🤝</span> Mutual Friends
+                  </h4>
+                  <span className="text-xs text-gray-400">
+                    {mutualFriends.length} in common
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {mutualFriends.slice(0, 6).map((friendName) => (
+                    <div
+                      key={friendName}
+                      className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30"
+                    >
+                      <Avatar username={friendName} size="sm" />
+                      <span className="text-sm text-gray-200">{friendName}</span>
+                    </div>
+                  ))}
+                  {mutualFriends.length > 6 && (
+                    <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-700 text-gray-300 text-sm">
+                      +{mutualFriends.length - 6} more
+                    </div>
                   )}
                 </div>
               </UICard>

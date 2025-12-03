@@ -93,21 +93,33 @@ export function TeamSelectionSocialSidebar({
     };
   }, [socket, user]);
 
+  // Listen for invite confirmation
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleInviteSent = ({ toPlayer }: { toPlayer: string }) => {
+      console.log(`[Social] Game invite sent to ${toPlayer}`);
+    };
+
+    socket.on('game_invite_sent', handleInviteSent);
+
+    return () => {
+      socket.off('game_invite_sent', handleInviteSent);
+    };
+  }, [socket]);
+
   const handleInvitePlayer = (playerName: string) => {
     if (!socket) return;
 
-    // Copy game link to clipboard
+    // Send socket-based invite notification
+    socket.emit('send_game_invite', { gameId, toPlayer: playerName });
+
+    // Also copy game link to clipboard as backup
     const gameUrl = `${window.location.origin}?join=${gameId}`;
     navigator.clipboard.writeText(gameUrl);
 
     // Mark as invited
     setInvitedPlayers(prev => new Set([...prev, playerName]));
-
-    // TODO: Send notification to player via socket
-    // socket.emit('send_game_invite', { gameId, toPlayer: playerName });
-
-    // Show feedback
-    alert(`Invite link copied! Share it with ${playerName}`);
   };
 
   if (!isOpen) return null;

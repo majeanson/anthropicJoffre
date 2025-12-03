@@ -335,6 +335,34 @@ function AppContent() {
     };
   }, [socket, auth.isAuthenticated])
 
+  // Sprint 22A: Game invite listener
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleGameInviteReceived = ({
+      gameId: inviteGameId,
+      fromPlayer
+    }: {
+      gameId: string;
+      fromPlayer: string;
+      timestamp: number;
+    }) => {
+      showToast(
+        `${fromPlayer} invited you to join their game!`,
+        'info',
+        8000
+      );
+      // Store invite for potential "Join Now" action
+      console.log(`[Social] Game invite received from ${fromPlayer} for game ${inviteGameId}`);
+    };
+
+    socket.on('game_invite_received', handleGameInviteReceived);
+
+    return () => {
+      socket.off('game_invite_received', handleGameInviteReceived);
+    };
+  }, [socket, showToast]);
+
   // Sprint 4 Phase 4.4: Game event listeners extracted to custom hook
   useGameEventListeners({
     socket,
