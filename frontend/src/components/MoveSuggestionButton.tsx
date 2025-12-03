@@ -60,20 +60,37 @@ export function MoveSuggestionButton({
         variant="success"
         testId="move-suggestion-tooltip"
       >
-        <div className="space-y-2">
-          <div className="text-lg font-bold">{suggestion}</div>
-          <p className="text-sm">{details}</p>
+        <div className="space-y-3">
+          {/* Recommended card */}
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">{suggestion}</span>
+            <div className="text-lg font-bold">Play this card</div>
+          </div>
+
+          {/* Why this move */}
+          <div className="bg-white/10 rounded-lg p-3">
+            <div className="text-xs font-semibold mb-1 flex items-center gap-1 opacity-80">
+              <span>🎯</span>
+              <span>Why this move:</span>
+            </div>
+            <p className="text-sm">{details}</p>
+          </div>
 
           {/* Alternatives Section */}
           {alternatives && (
-            <div className="pt-2 border-t border-white/20">
-              <div className="text-xs font-semibold mb-1 flex items-center gap-1">
+            <div className="bg-white/10 rounded-lg p-3">
+              <div className="text-xs font-semibold mb-1 flex items-center gap-1 opacity-80">
                 <span>💭</span>
-                <span>Alternative:</span>
+                <span>Other options:</span>
               </div>
-              <p className="text-xs">{alternatives}</p>
+              <p className="text-sm">{alternatives}</p>
             </div>
           )}
+
+          {/* Tip */}
+          <p className="text-xs opacity-70 text-center">
+            Tap the suggested card in your hand to play it
+          </p>
         </div>
       </GameTooltip>
     </>

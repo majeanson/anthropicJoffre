@@ -87,18 +87,48 @@ export const PlayerPosition = memo(function PlayerPosition({
           <GameTooltip
             isOpen={botThinkingOpen}
             onClose={onToggleBotThinking}
-            title={player.name}
+            title={`${player.name}'s Move`}
             icon="🤖"
             variant="bot"
             testId="bot-thinking-tooltip"
           >
-            <div className="space-y-1">
-              <p className="text-xs font-medium" style={{ color: 'var(--color-text-muted)' }}>
-                {badge.label} difficulty
-              </p>
-              <p className="text-base font-bold" style={{ color: 'var(--color-text-primary)' }}>
+            <div className="space-y-3">
+              {/* Bot difficulty indicator */}
+              <div className="flex items-center gap-2">
+                <span
+                  className="px-2 py-0.5 rounded text-xs font-bold"
+                  style={{ backgroundColor: badge.bgColor }}
+                >
+                  {badge.label} Bot
+                </span>
+              </div>
+
+              {/* Main action */}
+              <div className="text-lg font-bold">
                 {botThinking}
-              </p>
+              </div>
+
+              {/* Explanation based on action type */}
+              <div className="text-sm opacity-90 space-y-2">
+                {botThinking?.includes('Red 0') && (
+                  <p>💡 Red 0 adds +5 bonus points to the trick winner. Bots play it when their team is winning the trick.</p>
+                )}
+                {botThinking?.includes('Brown 0') && (
+                  <p>💡 Brown 0 gives -2 penalty points. Bots dump it when opponents are winning the trick.</p>
+                )}
+                {botThinking?.includes('trump') && (
+                  <p>💡 Trump cards beat all non-trump cards. Higher trump beats lower trump.</p>
+                )}
+                {botThinking?.includes('Leading') && (
+                  <p>💡 The first card played sets the "led suit" that others must follow if they have it.</p>
+                )}
+                {botThinking?.includes('7 ') && (
+                  <p>💡 7 is the highest value card in any suit - it can only be beaten by trump.</p>
+                )}
+                {botThinking?.includes('secure the win') && (
+                  <p>💡 Playing a high card to guarantee winning this trick.</p>
+                )}
+              </div>
             </div>
           </GameTooltip>
         </>
