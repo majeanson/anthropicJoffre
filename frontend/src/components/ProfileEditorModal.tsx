@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { Socket } from 'socket.io-client';
 import { User, UserProfile, UserPreferences, ProfileUpdateData } from '../types/auth';
 import { ProfileEditor, ProfileData } from './ProfileEditor';
 import logger from '../utils/logger';
@@ -15,18 +16,21 @@ interface ProfileEditorModalProps {
   onClose: () => void;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;
   getUserProfile: () => Promise<{ profile: UserProfile | null; preferences: UserPreferences | null } | null>;
+  socket?: Socket | null;
 }
 
 export function ProfileEditorModal({
   user,
   onClose,
   updateProfile,
-  getUserProfile
+  getUserProfile,
+  socket
 }: ProfileEditorModalProps) {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [playerLevel, setPlayerLevel] = useState(1);
 
-  // Fetch user profile on mount
+  // Fetch user profile and player level on mount
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -67,6 +71,23 @@ export function ProfileEditorModal({
     fetchProfile();
   }, [getUserProfile, user]);
 
+  // Fetch player level for avatar unlock system
+  useEffect(() => {
+    if (!socket || !user.username) return;
+
+    socket.emit('get_player_progression', { playerName: user.username });
+
+    const handleProgression = (data: { level: number }) => {
+      setPlayerLevel(data.level || 1);
+    };
+
+    socket.on('player_progression', handleProgression);
+
+    return () => {
+      socket.off('player_progression', handleProgression);
+    };
+  }, [socket, user.username]);
+
   if (loading || !profileData) {
     return (
       <Modal
@@ -96,6 +117,7 @@ export function ProfileEditorModal({
     >
       <ProfileEditor
         initialData={profileData}
+        playerLevel={playerLevel}
         onSave={async (data: ProfileData) => {
           try {
             await updateProfile(data);

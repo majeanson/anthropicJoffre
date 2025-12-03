@@ -376,12 +376,19 @@ export function isQuestCompleted(
 
 /**
  * Calculate XP required for a given level
- * Exponential curve: Level 1 = 100 XP, Level 2 = 150 XP, Level 3 = 225 XP, etc.
- * Formula: baseXP * (1.5 ^ (level - 1))
+ * Gentler exponential curve for accessible progression:
+ * - Level 1→2: 75 XP (1-2 games)
+ * - Level 5: ~117 XP
+ * - Level 10: ~186 XP
+ * - Level 20: ~423 XP
+ * - Level 30: ~963 XP
+ *
+ * Formula: baseXP * (1.25 ^ (level - 1))
+ * This makes early levels quick to achieve while still providing long-term goals.
  */
 export function calculateXPForLevel(level: number): number {
-  const baseXP = 100;
-  return Math.floor(baseXP * Math.pow(1.5, level - 1));
+  const baseXP = 75; // Reduced from 100
+  return Math.floor(baseXP * Math.pow(1.25, level - 1));
 }
 
 /**

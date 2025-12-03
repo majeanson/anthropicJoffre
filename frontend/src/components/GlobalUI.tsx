@@ -28,11 +28,10 @@ const LoginModal = lazy(() => import('./LoginModal'));
 const RegisterModal = lazy(() => import('./RegisterModal'));
 const PasswordResetModal = lazy(() => import('./PasswordResetModal'));
 const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => ({ default: m.NotificationCenter })));
-// Sprint 19: Quest system components
-const DailyQuestsPanel = lazy(() => import('./DailyQuestsPanel').then(m => ({ default: m.DailyQuestsPanel })));
-// Note: Old 30-day RewardsCalendar removed in Sprint 20 - replaced by WeeklyCalendar inside ProfileProgressModal
+// Note: Old DailyQuestsPanel and 30-day RewardsCalendar removed - use ProfileProgressModal tabs instead
 // Sprint 20: Replaced PersonalHub with unified ProfileProgressModal
 const ProfileProgressModal = lazy(() => import('./ProfileProgressModal').then(m => ({ default: m.ProfileProgressModal })));
+import type { TabId } from './ProfileProgressModal';
 const LevelUpModal = lazy(() => import('./LevelUpModal').then(m => ({ default: m.LevelUpModal })));
 
 interface GlobalUIProps {
@@ -104,9 +103,24 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   setLevelUpData,
 }) => {
   void _onOpenProfile; // Reserved for future use
-  void _showRewardsCalendar; // Deprecated: Old 30-day calendar replaced by WeeklyCalendar in ProfileProgressModal
-  void _setShowRewardsCalendar; // Deprecated: Old 30-day calendar replaced by WeeklyCalendar in ProfileProgressModal
   const modals = useModals();
+
+  // Compute initial tab for ProfileProgressModal based on which button was clicked
+  const getProfileModalInitialTab = (): TabId => {
+    if (showQuestsPanel) return 'quests';
+    if (_showRewardsCalendar) return 'calendar';
+    return 'overview';
+  };
+
+  // Check if ProfileProgressModal should be open (from any source)
+  const isProfileModalOpen = showPersonalHub || showQuestsPanel || _showRewardsCalendar;
+
+  // Close handler that resets all related states
+  const handleProfileModalClose = () => {
+    setShowPersonalHub(false);
+    setShowQuestsPanel(false);
+    _setShowRewardsCalendar(false);
+  };
   const auth = useAuth();
 
   const {
@@ -218,21 +232,15 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
         />
       </Suspense>
 
-      {/* Sprint 20: Unified Profile Progress Modal (replaces PersonalHub) */}
+      {/* Sprint 20: Unified Profile Progress Modal (replaces PersonalHub, DailyQuestsPanel, RewardsCalendar) */}
       <Suspense fallback={<div />}>
         <ProfileProgressModal
-          isOpen={showPersonalHub}
-          onClose={() => setShowPersonalHub(false)}
+          isOpen={isProfileModalOpen}
+          onClose={handleProfileModalClose}
           playerName={currentPlayerName}
           socket={socket}
+          initialTab={getProfileModalInitialTab()}
         />
-        <DailyQuestsPanel
-          socket={socket}
-          playerName={currentPlayerName}
-          isOpen={showQuestsPanel}
-          onClose={() => setShowQuestsPanel(false)}
-        />
-        {/* Note: Old 30-day RewardsCalendar removed - use Calendar tab in ProfileProgressModal */}
         {/* Sprint 20: Level Up Celebration Modal */}
         {levelUpData && (
           <LevelUpModal

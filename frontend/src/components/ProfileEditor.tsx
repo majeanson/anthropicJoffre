@@ -21,6 +21,7 @@ export interface ProfileData {
 
 interface ProfileEditorProps {
   initialData?: ProfileData;
+  playerLevel?: number;
   onSave: (data: ProfileData) => Promise<void>;
   onCancel: () => void;
 }
@@ -52,7 +53,7 @@ const VISIBILITY_OPTIONS: SelectOption[] = [
   { value: 'private', label: 'Private - Only you' },
 ];
 
-export function ProfileEditor({ initialData, onSave, onCancel }: ProfileEditorProps) {
+export function ProfileEditor({ initialData, playerLevel = 1, onSave, onCancel }: ProfileEditorProps) {
   const [avatarId, setAvatarId] = useState(initialData?.avatar_id || 'dog');
   const [bio, setBio] = useState(initialData?.bio || '');
   const [country, setCountry] = useState(initialData?.country || '');
@@ -119,6 +120,7 @@ export function ProfileEditor({ initialData, onSave, onCancel }: ProfileEditorPr
                 setAvatarId(id);
                 setShowAvatarSelector(false);
               }}
+              playerLevel={playerLevel}
             />
           </div>
         )}

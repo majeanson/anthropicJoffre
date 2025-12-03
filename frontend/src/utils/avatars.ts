@@ -1,116 +1,156 @@
 /**
  * Avatar System
- * Sprint 3 Phase 3.2
+ * Sprint 21: Reward System Overhaul
  *
- * Emoji-based avatars for user profiles
+ * Emoji-based avatars for user profiles with unlock progression
+ * - 8 default avatars available to all players
+ * - Additional avatars unlock at specific levels
+ * - Rare avatars for achievements and special milestones
  */
 
 export interface Avatar {
   id: string;
   emoji: string;
   name: string;
-  category: 'animals' | 'people' | 'objects' | 'nature' | 'food' | 'sports';
+  category: 'default' | 'animals' | 'mythical' | 'prestige' | 'special';
+  unlockLevel: number; // 0 = always available, >0 = level required
+  unlockDescription?: string; // How to unlock (for non-level unlocks)
 }
 
+/**
+ * All avatars organized by unlock progression
+ */
 export const AVATARS: Avatar[] = [
-  // Animals (20)
-  { id: 'dog', emoji: '🐕', name: 'Dog', category: 'animals' },
-  { id: 'cat', emoji: '🐈', name: 'Cat', category: 'animals' },
-  { id: 'fox', emoji: '🦊', name: 'Fox', category: 'animals' },
-  { id: 'lion', emoji: '🦁', name: 'Lion', category: 'animals' },
-  { id: 'tiger', emoji: '🐯', name: 'Tiger', category: 'animals' },
-  { id: 'bear', emoji: '🐻', name: 'Bear', category: 'animals' },
-  { id: 'panda', emoji: '🐼', name: 'Panda', category: 'animals' },
-  { id: 'koala', emoji: '🐨', name: 'Koala', category: 'animals' },
-  { id: 'monkey', emoji: '🐵', name: 'Monkey', category: 'animals' },
-  { id: 'rabbit', emoji: '🐰', name: 'Rabbit', category: 'animals' },
-  { id: 'wolf', emoji: '🐺', name: 'Wolf', category: 'animals' },
-  { id: 'elephant', emoji: '🐘', name: 'Elephant', category: 'animals' },
-  { id: 'penguin', emoji: '🐧', name: 'Penguin', category: 'animals' },
-  { id: 'owl', emoji: '🦉', name: 'Owl', category: 'animals' },
-  { id: 'eagle', emoji: '🦅', name: 'Eagle', category: 'animals' },
-  { id: 'dragon', emoji: '🐉', name: 'Dragon', category: 'animals' },
-  { id: 'unicorn', emoji: '🦄', name: 'Unicorn', category: 'animals' },
-  { id: 'turtle', emoji: '🐢', name: 'Turtle', category: 'animals' },
-  { id: 'frog', emoji: '🐸', name: 'Frog', category: 'animals' },
-  { id: 'shark', emoji: '🦈', name: 'Shark', category: 'animals' },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // DEFAULT AVATARS (8) - Available to everyone
+  // ═══════════════════════════════════════════════════════════════════════════
+  { id: 'cards', emoji: '🃏', name: 'Joker', category: 'default', unlockLevel: 0 },
+  { id: 'star', emoji: '⭐', name: 'Star', category: 'default', unlockLevel: 0 },
+  { id: 'fire', emoji: '🔥', name: 'Fire', category: 'default', unlockLevel: 0 },
+  { id: 'lightning', emoji: '⚡', name: 'Lightning', category: 'default', unlockLevel: 0 },
+  { id: 'target', emoji: '🎯', name: 'Bullseye', category: 'default', unlockLevel: 0 },
+  { id: 'dice', emoji: '🎲', name: 'Lucky Dice', category: 'default', unlockLevel: 0 },
+  { id: 'gem', emoji: '💎', name: 'Diamond', category: 'default', unlockLevel: 0 },
+  { id: 'crown', emoji: '👑', name: 'Crown', category: 'default', unlockLevel: 0 },
 
-  // People (15)
-  { id: 'ninja', emoji: '🥷', name: 'Ninja', category: 'people' },
-  { id: 'mage', emoji: '🧙', name: 'Mage', category: 'people' },
-  { id: 'superhero', emoji: '🦸', name: 'Superhero', category: 'people' },
-  { id: 'detective', emoji: '🕵️', name: 'Detective', category: 'people' },
-  { id: 'astronaut', emoji: '👨‍🚀', name: 'Astronaut', category: 'people' },
-  { id: 'pirate', emoji: '🏴‍☠️', name: 'Pirate', category: 'people' },
-  { id: 'robot', emoji: '🤖', name: 'Robot', category: 'people' },
-  { id: 'alien', emoji: '👽', name: 'Alien', category: 'people' },
-  { id: 'ghost', emoji: '👻', name: 'Ghost', category: 'people' },
-  { id: 'zombie', emoji: '🧟', name: 'Zombie', category: 'people' },
-  { id: 'vampire', emoji: '🧛', name: 'Vampire', category: 'people' },
-  { id: 'genie', emoji: '🧞', name: 'Genie', category: 'people' },
-  { id: 'elf', emoji: '🧝', name: 'Elf', category: 'people' },
-  { id: 'fairy', emoji: '🧚', name: 'Fairy', category: 'people' },
-  { id: 'santa', emoji: '🎅', name: 'Santa', category: 'people' },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // EARLY UNLOCKS (Level 2-5) - Quick progression rewards
+  // ═══════════════════════════════════════════════════════════════════════════
+  { id: 'fox', emoji: '🦊', name: 'Clever Fox', category: 'animals', unlockLevel: 2 },
+  { id: 'cat', emoji: '🐈', name: 'Cat', category: 'animals', unlockLevel: 3 },
+  { id: 'dog', emoji: '🐕', name: 'Dog', category: 'animals', unlockLevel: 3 },
+  { id: 'owl', emoji: '🦉', name: 'Wise Owl', category: 'animals', unlockLevel: 4 },
+  { id: 'rabbit', emoji: '🐰', name: 'Rabbit', category: 'animals', unlockLevel: 5 },
+  { id: 'wolf', emoji: '🐺', name: 'Wolf', category: 'animals', unlockLevel: 5 },
 
-  // Objects (15)
-  { id: 'crown', emoji: '👑', name: 'Crown', category: 'objects' },
-  { id: 'gem', emoji: '💎', name: 'Diamond', category: 'objects' },
-  { id: 'trophy', emoji: '🏆', name: 'Trophy', category: 'objects' },
-  { id: 'medal', emoji: '🏅', name: 'Medal', category: 'objects' },
-  { id: 'star', emoji: '⭐', name: 'Star', category: 'objects' },
-  { id: 'fire', emoji: '🔥', name: 'Fire', category: 'objects' },
-  { id: 'lightning', emoji: '⚡', name: 'Lightning', category: 'objects' },
-  { id: 'rocket', emoji: '🚀', name: 'Rocket', category: 'objects' },
-  { id: 'crystal_ball', emoji: '🔮', name: 'Crystal Ball', category: 'objects' },
-  { id: 'magic_wand', emoji: '🪄', name: 'Magic Wand', category: 'objects' },
-  { id: 'sword', emoji: '⚔️', name: 'Sword', category: 'objects' },
-  { id: 'shield', emoji: '🛡️', name: 'Shield', category: 'objects' },
-  { id: 'bomb', emoji: '💣', name: 'Bomb', category: 'objects' },
-  { id: 'key', emoji: '🔑', name: 'Key', category: 'objects' },
-  { id: 'dice', emoji: '🎲', name: 'Dice', category: 'objects' },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MID-GAME UNLOCKS (Level 6-12) - Regular progression
+  // ═══════════════════════════════════════════════════════════════════════════
+  { id: 'lion', emoji: '🦁', name: 'Lion', category: 'animals', unlockLevel: 6 },
+  { id: 'tiger', emoji: '🐯', name: 'Tiger', category: 'animals', unlockLevel: 7 },
+  { id: 'bear', emoji: '🐻', name: 'Bear', category: 'animals', unlockLevel: 8 },
+  { id: 'eagle', emoji: '🦅', name: 'Eagle', category: 'animals', unlockLevel: 9 },
+  { id: 'shark', emoji: '🦈', name: 'Shark', category: 'animals', unlockLevel: 10 },
+  { id: 'panda', emoji: '🐼', name: 'Panda', category: 'animals', unlockLevel: 11 },
+  { id: 'penguin', emoji: '🐧', name: 'Penguin', category: 'animals', unlockLevel: 12 },
 
-  // Nature (10)
-  { id: 'sun', emoji: '☀️', name: 'Sun', category: 'nature' },
-  { id: 'moon', emoji: '🌙', name: 'Moon', category: 'nature' },
-  { id: 'rainbow', emoji: '🌈', name: 'Rainbow', category: 'nature' },
-  { id: 'cloud', emoji: '☁️', name: 'Cloud', category: 'nature' },
-  { id: 'snowflake', emoji: '❄️', name: 'Snowflake', category: 'nature' },
-  { id: 'tree', emoji: '🌳', name: 'Tree', category: 'nature' },
-  { id: 'flower', emoji: '🌸', name: 'Flower', category: 'nature' },
-  { id: 'rose', emoji: '🌹', name: 'Rose', category: 'nature' },
-  { id: 'mushroom', emoji: '🍄', name: 'Mushroom', category: 'nature' },
-  { id: 'volcano', emoji: '🌋', name: 'Volcano', category: 'nature' },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // MYTHICAL CREATURES (Level 15-25) - Advanced progression
+  // ═══════════════════════════════════════════════════════════════════════════
+  { id: 'unicorn', emoji: '🦄', name: 'Unicorn', category: 'mythical', unlockLevel: 15 },
+  { id: 'dragon', emoji: '🐉', name: 'Dragon', category: 'mythical', unlockLevel: 18 },
+  { id: 'phoenix', emoji: '🔥', name: 'Phoenix', category: 'mythical', unlockLevel: 20, unlockDescription: 'The legendary firebird' },
+  { id: 'ghost', emoji: '👻', name: 'Ghost', category: 'mythical', unlockLevel: 22 },
+  { id: 'alien', emoji: '👽', name: 'Alien', category: 'mythical', unlockLevel: 25 },
 
-  // Food (10)
-  { id: 'pizza', emoji: '🍕', name: 'Pizza', category: 'food' },
-  { id: 'burger', emoji: '🍔', name: 'Burger', category: 'food' },
-  { id: 'taco', emoji: '🌮', name: 'Taco', category: 'food' },
-  { id: 'sushi', emoji: '🍣', name: 'Sushi', category: 'food' },
-  { id: 'ramen', emoji: '🍜', name: 'Ramen', category: 'food' },
-  { id: 'donut', emoji: '🍩', name: 'Donut', category: 'food' },
-  { id: 'cake', emoji: '🍰', name: 'Cake', category: 'food' },
-  { id: 'icecream', emoji: '🍦', name: 'Ice Cream', category: 'food' },
-  { id: 'coffee', emoji: '☕', name: 'Coffee', category: 'food' },
-  { id: 'cookie', emoji: '🍪', name: 'Cookie', category: 'food' },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // PRESTIGE AVATARS (Level 30-50) - Elite status symbols
+  // ═══════════════════════════════════════════════════════════════════════════
+  { id: 'ninja', emoji: '🥷', name: 'Shadow Ninja', category: 'prestige', unlockLevel: 30 },
+  { id: 'robot', emoji: '🤖', name: 'Robot', category: 'prestige', unlockLevel: 35 },
+  { id: 'astronaut', emoji: '👨‍🚀', name: 'Astronaut', category: 'prestige', unlockLevel: 40 },
+  { id: 'mage', emoji: '🧙', name: 'Grand Wizard', category: 'prestige', unlockLevel: 45 },
+  { id: 'superhero', emoji: '🦸', name: 'Superhero', category: 'prestige', unlockLevel: 50 },
 
-  // Sports (10)
-  { id: 'soccer', emoji: '⚽', name: 'Soccer Ball', category: 'sports' },
-  { id: 'basketball', emoji: '🏀', name: 'Basketball', category: 'sports' },
-  { id: 'baseball', emoji: '⚾', name: 'Baseball', category: 'sports' },
-  { id: 'football', emoji: '🏈', name: 'Football', category: 'sports' },
-  { id: 'tennis', emoji: '🎾', name: 'Tennis', category: 'sports' },
-  { id: 'bowling', emoji: '🎳', name: 'Bowling', category: 'sports' },
-  { id: 'gaming', emoji: '🎮', name: 'Gaming', category: 'sports' },
-  { id: 'chess', emoji: '♟️', name: 'Chess', category: 'sports' },
-  { id: 'cards', emoji: '🃏', name: 'Cards', category: 'sports' },
-  { id: 'target', emoji: '🎯', name: 'Target', category: 'sports' },
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SPECIAL AVATARS - Achievement/Event unlocks (not level-based)
+  // ═══════════════════════════════════════════════════════════════════════════
+  { id: 'trophy', emoji: '🏆', name: 'Champion', category: 'special', unlockLevel: 999, unlockDescription: 'Win 100 games' },
+  { id: 'medal', emoji: '🏅', name: 'Medalist', category: 'special', unlockLevel: 999, unlockDescription: 'Complete all achievements' },
+  { id: 'rocket', emoji: '🚀', name: 'Rocket', category: 'special', unlockLevel: 999, unlockDescription: 'Play 500 games' },
 ];
+
+/**
+ * Player titles that unlock at specific levels
+ */
+export interface Title {
+  id: string;
+  name: string;
+  unlockLevel: number;
+  color: string; // Tailwind color class
+}
+
+export const TITLES: Title[] = [
+  { id: 'newcomer', name: 'Newcomer', unlockLevel: 1, color: 'text-gray-400' },
+  { id: 'apprentice', name: 'Apprentice', unlockLevel: 3, color: 'text-green-400' },
+  { id: 'player', name: 'Card Player', unlockLevel: 5, color: 'text-blue-400' },
+  { id: 'skilled', name: 'Skilled Player', unlockLevel: 8, color: 'text-blue-500' },
+  { id: 'veteran', name: 'Veteran', unlockLevel: 12, color: 'text-purple-400' },
+  { id: 'expert', name: 'Expert', unlockLevel: 18, color: 'text-purple-500' },
+  { id: 'master', name: 'Card Master', unlockLevel: 25, color: 'text-yellow-400' },
+  { id: 'grandmaster', name: 'Grand Master', unlockLevel: 35, color: 'text-yellow-500' },
+  { id: 'legend', name: 'Legend', unlockLevel: 45, color: 'text-orange-400' },
+  { id: 'champion', name: 'Champion', unlockLevel: 50, color: 'text-red-400' },
+];
+
+/**
+ * UI Skins that unlock at specific levels
+ * These reference the actual skin IDs from config/skins.ts
+ */
+export interface SkinReward {
+  skinId: string;
+  name: string;
+  unlockLevel: number;
+  description: string;
+}
+
+export const SKIN_REWARDS: SkinReward[] = [
+  { skinId: 'midnight-alchemy', name: 'Midnight Alchemy', unlockLevel: 0, description: 'Mystical alchemist aesthetic' },
+  { skinId: 'tavern-noir', name: 'Tavern Noir', unlockLevel: 0, description: 'Moody candlelit atmosphere' },
+  { skinId: 'modern-minimal', name: 'Modern Minimal', unlockLevel: 5, description: 'Clean, light interface' },
+  { skinId: 'classic-parchment', name: 'Classic Parchment', unlockLevel: 10, description: 'Traditional elegance' },
+  { skinId: 'modern-minimal-dark', name: 'Modern Dark', unlockLevel: 15, description: 'Sleek dark interface' },
+  { skinId: 'luxury-casino', name: 'Luxury Casino', unlockLevel: 25, description: 'Gold accents and velvet depth' },
+  { skinId: 'cyberpunk-neon', name: 'Cyberpunk Neon', unlockLevel: 40, description: 'Neon with glitch effects' },
+];
+
+// Keep CardBackReward as alias for backwards compatibility
+export type CardBackReward = SkinReward;
+export const CARD_BACK_REWARDS = SKIN_REWARDS;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
 
 /**
  * Get avatar by ID
  */
 export function getAvatarById(id: string): Avatar | undefined {
   return AVATARS.find(avatar => avatar.id === id);
+}
+
+/**
+ * Get avatars available to a player at a given level
+ */
+export function getUnlockedAvatars(playerLevel: number): Avatar[] {
+  return AVATARS.filter(avatar => avatar.unlockLevel <= playerLevel);
+}
+
+/**
+ * Get locked avatars (not yet available)
+ */
+export function getLockedAvatars(playerLevel: number): Avatar[] {
+  return AVATARS.filter(avatar => avatar.unlockLevel > playerLevel);
 }
 
 /**
@@ -121,10 +161,27 @@ export function getAvatarsByCategory(category: Avatar['category']): Avatar[] {
 }
 
 /**
- * Get random avatar
+ * Get default avatars (always available)
  */
-export function getRandomAvatar(): Avatar {
-  return AVATARS[Math.floor(Math.random() * AVATARS.length)];
+export function getDefaultAvatars(): Avatar[] {
+  return AVATARS.filter(avatar => avatar.category === 'default');
+}
+
+/**
+ * Check if an avatar is unlocked for a player
+ */
+export function isAvatarUnlocked(avatarId: string, playerLevel: number): boolean {
+  const avatar = getAvatarById(avatarId);
+  if (!avatar) return false;
+  return avatar.unlockLevel <= playerLevel;
+}
+
+/**
+ * Get random unlocked avatar for a player
+ */
+export function getRandomUnlockedAvatar(playerLevel: number): Avatar {
+  const unlocked = getUnlockedAvatars(playerLevel);
+  return unlocked[Math.floor(Math.random() * unlocked.length)] || AVATARS[0];
 }
 
 /**
@@ -136,13 +193,62 @@ export function getAvatarUrl(avatarId: string): string {
 }
 
 /**
- * Categories for filtering
+ * Get player's current title based on level
  */
-export const AVATAR_CATEGORIES: Array<{ id: Avatar['category']; name: string }> = [
-  { id: 'animals', name: 'Animals' },
-  { id: 'people', name: 'Characters' },
-  { id: 'objects', name: 'Objects' },
-  { id: 'nature', name: 'Nature' },
-  { id: 'food', name: 'Food' },
-  { id: 'sports', name: 'Sports' },
+export function getTitleForLevel(level: number): Title {
+  // Find the highest title the player has unlocked
+  const unlocked = TITLES.filter(t => t.unlockLevel <= level);
+  return unlocked[unlocked.length - 1] || TITLES[0];
+}
+
+/**
+ * Get next title to unlock
+ */
+export function getNextTitle(level: number): Title | null {
+  return TITLES.find(t => t.unlockLevel > level) || null;
+}
+
+/**
+ * Categories for filtering in UI
+ */
+export const AVATAR_CATEGORIES: Array<{ id: Avatar['category']; name: string; description: string }> = [
+  { id: 'default', name: 'Starter', description: 'Available to all players' },
+  { id: 'animals', name: 'Animals', description: 'Unlock through leveling' },
+  { id: 'mythical', name: 'Mythical', description: 'Rare creatures' },
+  { id: 'prestige', name: 'Prestige', description: 'Elite status symbols' },
+  { id: 'special', name: 'Special', description: 'Achievement rewards' },
 ];
+
+/**
+ * Get all rewards a player will unlock at the next few levels
+ */
+export function getUpcomingRewards(currentLevel: number, lookAhead: number = 5): {
+  level: number;
+  avatars: Avatar[];
+  title: Title | null;
+  skins: SkinReward[];
+}[] {
+  const rewards: {
+    level: number;
+    avatars: Avatar[];
+    title: Title | null;
+    skins: SkinReward[];
+  }[] = [];
+
+  for (let level = currentLevel + 1; level <= currentLevel + lookAhead; level++) {
+    const avatarsAtLevel = AVATARS.filter(a => a.unlockLevel === level);
+    const titleAtLevel = TITLES.find(t => t.unlockLevel === level) || null;
+    const skinsAtLevel = SKIN_REWARDS.filter(s => s.unlockLevel === level);
+
+    if (avatarsAtLevel.length > 0 || titleAtLevel || skinsAtLevel.length > 0) {
+      rewards.push({
+        level,
+        avatars: avatarsAtLevel,
+        title: titleAtLevel,
+        skins: skinsAtLevel,
+      });
+    }
+  }
+
+  return rewards;
+}

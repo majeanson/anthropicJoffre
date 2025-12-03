@@ -14,16 +14,46 @@ import { useState, useEffect, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { LevelProgressBar } from './LevelProgressBar';
 import { WeeklyCalendar, WeeklyCalendarDay } from './WeeklyCalendar';
+import { RewardsTab } from './RewardsTab';
 import { useSkin, type SkinId } from '../contexts/SkinContext';
 import { skinList } from '../config/skins';
+import { Button, ProgressBar, UIBadge, UICard } from './ui';
 
-type TabId = 'overview' | 'quests' | 'calendar' | 'skins';
+export type TabId = 'overview' | 'quests' | 'calendar' | 'skins' | 'rewards';
+
+interface QuestTemplate {
+  id: number;
+  quest_key: string;
+  name: string;
+  description: string;
+  quest_type: 'easy' | 'medium' | 'hard';
+  objective_type: string;
+  target_value: number;
+  reward_xp: number;
+  reward_currency: number;
+  icon: string;
+  is_active: boolean;
+}
+
+interface PlayerQuest {
+  id: number;
+  player_name: string;
+  quest_template_id: number;
+  progress: number;
+  completed: boolean;
+  date_assigned: string;
+  completed_at?: string;
+  reward_claimed: boolean;
+  claimed_at?: string;
+  template?: QuestTemplate;
+}
 
 export interface ProfileProgressModalProps {
   isOpen: boolean;
   onClose: () => void;
   playerName: string;
   socket: Socket | null;
+  initialTab?: TabId;
 }
 
 interface PlayerProgression {
@@ -64,16 +94,27 @@ export function ProfileProgressModal({
   onClose,
   playerName,
   socket,
+  initialTab = 'overview',
 }: ProfileProgressModalProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [progression, setProgression] = useState<PlayerProgression | null>(null);
   const [skinRequirements, setSkinRequirements] = useState<SkinRequirement[]>([]);
   const [weeklyCalendar, setWeeklyCalendar] = useState<WeeklyCalendarDay[]>([]);
   const [weeklyProgress, setWeeklyProgress] = useState<WeeklyProgress | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isClaimingReward, setIsClaimingReward] = useState(false);
+  const [quests, setQuests] = useState<PlayerQuest[]>([]);
+  const [claimingQuestId, setClaimingQuestId] = useState<number | null>(null);
+  const [questNotification, setQuestNotification] = useState<string | null>(null);
 
   const { skinId, setSkin } = useSkin();
+
+  // Update activeTab when initialTab changes (when modal opens with different tab)
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+    }
+  }, [isOpen, initialTab]);
 
   // Fetch all data on open
   useEffect(() => {
@@ -86,6 +127,7 @@ export function ProfileProgressModal({
     socket.emit('get_skin_requirements');
     socket.emit('get_weekly_calendar');
     socket.emit('get_player_weekly_progress', { playerName });
+    socket.emit('get_daily_quests', { playerName });
 
     // Set up listeners
     const handleProgression = (data: PlayerProgression) => {
@@ -119,11 +161,38 @@ export function ProfileProgressModal({
       socket.emit('get_player_weekly_progress', { playerName });
     };
 
+    // Quest handlers
+    const handleDailyQuests = (data: { quests: PlayerQuest[] }) => {
+      setQuests(data.quests);
+    };
+
+    const handleQuestRewardClaimed = (data: {
+      questId: number;
+      rewards: { xp: number; currency: number };
+    }) => {
+      setQuests((prevQuests) =>
+        prevQuests.map((quest) =>
+          quest.id === data.questId
+            ? { ...quest, reward_claimed: true, claimed_at: new Date().toISOString() }
+            : quest
+        )
+      );
+      setQuestNotification(
+        `Claimed: +${data.rewards.xp} XP, +${data.rewards.currency} coins!`
+      );
+      setTimeout(() => setQuestNotification(null), 5000);
+      setClaimingQuestId(null);
+      // Refresh progression data
+      socket.emit('get_player_progression', { playerName });
+    };
+
     socket.on('player_progression', handleProgression);
     socket.on('skin_requirements', handleSkinRequirements);
     socket.on('weekly_calendar', handleWeeklyCalendar);
     socket.on('weekly_progress', handleWeeklyProgress);
     socket.on('weekly_reward_claimed', handleWeeklyRewardClaimed);
+    socket.on('daily_quests', handleDailyQuests);
+    socket.on('quest_reward_claimed', handleQuestRewardClaimed);
 
     return () => {
       socket.off('player_progression', handleProgression);
@@ -131,6 +200,8 @@ export function ProfileProgressModal({
       socket.off('weekly_calendar', handleWeeklyCalendar);
       socket.off('weekly_progress', handleWeeklyProgress);
       socket.off('weekly_reward_claimed', handleWeeklyRewardClaimed);
+      socket.off('daily_quests', handleDailyQuests);
+      socket.off('quest_reward_claimed', handleQuestRewardClaimed);
     };
   }, [isOpen, socket, playerName]);
 
@@ -139,6 +210,12 @@ export function ProfileProgressModal({
     setIsClaimingReward(true);
     socket.emit('claim_weekly_reward', { playerName, dayNumber });
   }, [socket, playerName]);
+
+  const handleClaimQuestReward = useCallback((questId: number) => {
+    if (!socket || claimingQuestId) return;
+    setClaimingQuestId(questId);
+    socket.emit('claim_quest_reward', { playerName, questId });
+  }, [socket, playerName, claimingQuestId]);
 
   const isSkinUnlocked = useCallback((skinId: string) => {
     if (!progression) return false;
@@ -157,6 +234,7 @@ export function ProfileProgressModal({
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
     { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'rewards', label: 'Rewards', icon: '🎁' },
     { id: 'quests', label: 'Quests', icon: '🎯' },
     { id: 'calendar', label: 'Calendar', icon: '📅' },
     { id: 'skins', label: 'Skins', icon: '🎨' },
@@ -164,7 +242,7 @@ export function ProfileProgressModal({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50"
+      className="fixed inset-0 flex items-center justify-center z-[10000]"
       style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
       onClick={onClose}
     >
@@ -298,15 +376,25 @@ export function ProfileProgressModal({
                 </div>
               )}
 
+              {/* Rewards Tab */}
+              {activeTab === 'rewards' && progression && (
+                <RewardsTab
+                  playerLevel={progression.level}
+                  totalXp={progression.totalXp}
+                  currentLevelXP={progression.currentLevelXP}
+                  nextLevelXP={progression.nextLevelXP}
+                />
+              )}
+
               {/* Quests Tab */}
               {activeTab === 'quests' && socket && progression && (
                 <div className="space-y-4">
-                  <p
-                    className="text-sm"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
-                    Complete daily quests to earn XP and coins!
-                  </p>
+                  {/* Notification */}
+                  {questNotification && (
+                    <UICard variant="gradient" gradient="success" size="sm" className="text-center animate-pulse">
+                      <p className="text-green-900 dark:text-white">{questNotification}</p>
+                    </UICard>
+                  )}
 
                   {/* Quest summary */}
                   <div
@@ -324,7 +412,7 @@ export function ProfileProgressModal({
                         className="text-sm font-bold"
                         style={{ color: 'var(--color-text-accent)' }}
                       >
-                        {progression.questStats.questsCompletedToday}/3
+                        {quests.filter(q => q.completed).length}/{quests.length}
                       </span>
                     </div>
 
@@ -336,20 +424,113 @@ export function ProfileProgressModal({
                       <div
                         className="h-full rounded-full transition-all duration-300"
                         style={{
-                          width: `${(progression.questStats.questsCompletedToday / 3) * 100}%`,
+                          width: `${quests.length > 0 ? (quests.filter(q => q.completed).length / quests.length) * 100 : 0}%`,
                           backgroundColor: 'var(--color-text-accent)',
                         }}
                       />
                     </div>
-
-                    <div
-                      className="mt-3 grid grid-cols-2 gap-2 text-sm"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      <div>Total XP Earned: <strong>{progression.questStats.totalXpEarned}</strong></div>
-                      <div>Total Coins: <strong>{progression.questStats.totalCurrencyEarned}</strong></div>
-                    </div>
                   </div>
+
+                  {/* Quest List */}
+                  {quests.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-xl mb-2">📋</p>
+                      <p style={{ color: 'var(--color-text-muted)' }}>No quests available</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Check back tomorrow for new quests!</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {quests.map((quest) => {
+                        if (!quest.template) return null;
+                        const getDifficultyLabel = (type: 'easy' | 'medium' | 'hard') =>
+                          type.charAt(0).toUpperCase() + type.slice(1);
+
+                        return (
+                          <UICard
+                            key={quest.id}
+                            variant="bordered"
+                            size="md"
+                            className="hover:border-gray-500 transition-colors"
+                          >
+                            {/* Quest Header */}
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <span className="text-2xl">{quest.template.icon}</span>
+                                <div>
+                                  <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                                    {quest.template.name}
+                                  </h3>
+                                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                                    {quest.template.description}
+                                  </p>
+                                </div>
+                              </div>
+                              <UIBadge
+                                variant="subtle"
+                                color={
+                                  quest.template.quest_type === 'easy'
+                                    ? 'success'
+                                    : quest.template.quest_type === 'medium'
+                                    ? 'warning'
+                                    : 'error'
+                                }
+                                size="sm"
+                              >
+                                {getDifficultyLabel(quest.template.quest_type)}
+                              </UIBadge>
+                            </div>
+
+                            {/* Progress Bar */}
+                            <div className="mb-3">
+                              <ProgressBar
+                                value={quest.progress}
+                                max={quest.template.target_value}
+                                label={`${quest.progress}/${quest.template.target_value}`}
+                                showValue
+                                variant="gradient"
+                                color={quest.completed ? 'success' : 'primary'}
+                                size="md"
+                              />
+                            </div>
+
+                            {/* Rewards and Action */}
+                            <div className="flex items-center justify-between">
+                              <div className="flex gap-4 text-sm">
+                                <div className="flex items-center gap-1">
+                                  <span style={{ color: 'var(--color-info)' }}>⭐</span>
+                                  <span style={{ color: 'var(--color-text-secondary)' }}>
+                                    {quest.template.reward_xp} XP
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span style={{ color: 'var(--color-warning)' }}>💰</span>
+                                  <span style={{ color: 'var(--color-text-secondary)' }}>
+                                    {quest.template.reward_currency} coins
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Claim Button */}
+                              {quest.completed && !quest.reward_claimed ? (
+                                <Button
+                                  onClick={() => handleClaimQuestReward(quest.id)}
+                                  disabled={claimingQuestId === quest.id}
+                                  variant="success"
+                                  size="sm"
+                                >
+                                  {claimingQuestId === quest.id ? 'Claiming...' : 'Claim'}
+                                </Button>
+                              ) : quest.reward_claimed ? (
+                                <span style={{ color: 'var(--color-success)' }} className="font-semibold text-sm">✓ Claimed</span>
+                              ) : (
+                                <span style={{ color: 'var(--color-text-muted)' }} className="text-sm">In Progress</span>
+                              )}
+                            </div>
+                          </UICard>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   <p
                     className="text-xs text-center"

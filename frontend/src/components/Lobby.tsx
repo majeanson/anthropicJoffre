@@ -651,6 +651,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             onClose={() => setShowProfileEditor(false)}
             updateProfile={updateProfile}
             getUserProfile={getUserProfile}
+            socket={socket}
           />
         )}
       </>

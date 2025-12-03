@@ -531,26 +531,29 @@ describe('Quest System - Game Logic', () => {
 
   describe('XP Calculation System', () => {
     describe('calculateXPForLevel', () => {
+      // Updated for gentler progression curve: base 75, exponent 1.25
       it('should calculate correct XP for level 1', () => {
-        expect(calculateXPForLevel(1)).toBe(100);
+        expect(calculateXPForLevel(1)).toBe(75);
       });
 
       it('should calculate correct XP for level 2', () => {
-        expect(calculateXPForLevel(2)).toBe(150);
+        // 75 * 1.25^1 = 93.75 -> 93
+        expect(calculateXPForLevel(2)).toBe(93);
       });
 
       it('should calculate correct XP for level 3', () => {
-        expect(calculateXPForLevel(3)).toBe(225);
+        // 75 * 1.25^2 = 117.1875 -> 117
+        expect(calculateXPForLevel(3)).toBe(117);
       });
 
       it('should calculate correct XP for level 5', () => {
-        // 100 * 1.5^4 = 100 * 5.0625 = 506.25 -> 506
-        expect(calculateXPForLevel(5)).toBe(506);
+        // 75 * 1.25^4 = 183.105... -> 183
+        expect(calculateXPForLevel(5)).toBe(183);
       });
 
       it('should calculate correct XP for level 10', () => {
-        // 100 * 1.5^9 = 100 * 38.443... = 3844
-        expect(calculateXPForLevel(10)).toBe(3844);
+        // 75 * 1.25^9 = 558.79... -> 558
+        expect(calculateXPForLevel(10)).toBe(558);
       });
     });
 
@@ -560,17 +563,18 @@ describe('Quest System - Game Logic', () => {
       });
 
       it('should calculate total XP to reach level 2', () => {
-        expect(calculateTotalXPForLevel(2)).toBe(100);
+        // Level 1→2 requires 75 XP (base)
+        expect(calculateTotalXPForLevel(2)).toBe(75);
       });
 
       it('should calculate total XP to reach level 3', () => {
-        // 100 + 150 = 250
-        expect(calculateTotalXPForLevel(3)).toBe(250);
+        // 75 + 93 = 168 (using gentler curve: 75 * 1.25^0 + 75 * 1.25^1)
+        expect(calculateTotalXPForLevel(3)).toBe(168);
       });
 
       it('should calculate total XP to reach level 5', () => {
-        // 100 + 150 + 225 + 337 = 812
-        expect(calculateTotalXPForLevel(5)).toBe(812);
+        // 75 + 93 + 117 + 146 = 431 (gentler exponential)
+        expect(calculateTotalXPForLevel(5)).toBe(431);
       });
     });
 
@@ -579,43 +583,43 @@ describe('Quest System - Game Logic', () => {
         const result = calculateLevelFromXP(0);
         expect(result.level).toBe(1);
         expect(result.currentLevelXP).toBe(0);
-        expect(result.nextLevelXP).toBe(100);
+        expect(result.nextLevelXP).toBe(75); // Updated: base is now 75
       });
 
       it('should return level 1 for 50 XP', () => {
         const result = calculateLevelFromXP(50);
         expect(result.level).toBe(1);
         expect(result.currentLevelXP).toBe(50);
-        expect(result.nextLevelXP).toBe(100);
+        expect(result.nextLevelXP).toBe(75);
+      });
+
+      it('should return level 2 for 75 XP', () => {
+        const result = calculateLevelFromXP(75);
+        expect(result.level).toBe(2);
+        expect(result.currentLevelXP).toBe(0);
+        expect(result.nextLevelXP).toBe(93); // 75 * 1.25 = 93
       });
 
       it('should return level 2 for 100 XP', () => {
         const result = calculateLevelFromXP(100);
         expect(result.level).toBe(2);
-        expect(result.currentLevelXP).toBe(0);
-        expect(result.nextLevelXP).toBe(150);
+        expect(result.currentLevelXP).toBe(25);
+        expect(result.nextLevelXP).toBe(93);
       });
 
-      it('should return level 2 for 150 XP', () => {
-        const result = calculateLevelFromXP(150);
-        expect(result.level).toBe(2);
-        expect(result.currentLevelXP).toBe(50);
-        expect(result.nextLevelXP).toBe(150);
-      });
-
-      it('should return level 3 for 250 XP', () => {
-        const result = calculateLevelFromXP(250);
+      it('should return level 3 for 168 XP', () => {
+        // 75 + 93 = 168 total to reach level 3
+        const result = calculateLevelFromXP(168);
         expect(result.level).toBe(3);
         expect(result.currentLevelXP).toBe(0);
-        expect(result.nextLevelXP).toBe(225);
+        expect(result.nextLevelXP).toBe(117); // 75 * 1.25^2 = 117
       });
 
       it('should reach high levels with extreme XP', () => {
         const result = calculateLevelFromXP(999999999);
-        // With exponential curve, 999M XP reaches level 39
+        // With gentler exponential curve (1.25), high XP still reaches cap
         // The cap at 50 in the implementation prevents infinite loops
-        expect(result.level).toBeGreaterThanOrEqual(30);
-        expect(result.level).toBeLessThanOrEqual(50);
+        expect(result.level).toBe(50);
       });
     });
   });

@@ -47,7 +47,10 @@ export const PlayerHand = memo(function PlayerHand({
   // Calculate playable cards (suit-following rules)
   const playableCards = useMemo(() => {
     if (!isCurrentTurn) return [];
-    if (currentTrick.length === 0) return hand;
+    // When currentTrick.length === 4, the previous trick is still displayed for 2 seconds,
+    // but we're actually leading a new trick (all cards are playable)
+    // When currentTrick.length === 0, we're also leading (all cards are playable)
+    if (currentTrick.length === 0 || currentTrick.length === 4) return hand;
 
     const ledSuit = currentTrick[0].card.color;
     const hasLedSuit = hand.some(c => c.color === ledSuit);

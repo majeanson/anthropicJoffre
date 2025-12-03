@@ -311,7 +311,11 @@ function PlayingPhaseComponent({
     }
 
     let isValidToPlay = true;
-    if (gameState.currentTrick.length > 0) {
+    // Only validate suit-following if there are 1-3 cards in the trick (someone has led)
+    // When currentTrick.length === 4, the previous trick is still displayed for 2 seconds,
+    // but we're actually leading a new trick (no suit-following required)
+    // When currentTrick.length === 0, we're also leading (no suit-following required)
+    if (gameState.currentTrick.length > 0 && gameState.currentTrick.length < 4) {
       const ledSuit = gameState.currentTrick[0].card.color;
       const hasLedSuit = currentPlayer.hand.some(c => c.color === ledSuit);
       if (hasLedSuit && queuedCard.color !== ledSuit) {
