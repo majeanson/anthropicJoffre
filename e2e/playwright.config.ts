@@ -129,15 +129,26 @@ export default defineConfig({
   // Preserve test artifacts in CI
   preserveOutput: process.env.CI ? 'always' : 'failures-only',
 
-  // Web server configuration
-  webServer: {
-    command: 'cd .. && npm run dev',
-    url: 'http://localhost:5173',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120000,
-    stdout: process.env.DEBUG ? 'pipe' : 'ignore',
-    stderr: process.env.DEBUG ? 'pipe' : 'ignore',
-  },
+  // Web server configuration - start both backend and frontend
+  // Use array syntax to wait for both services to be ready
+  webServer: [
+    {
+      command: 'cd ../backend && npm run dev',
+      url: 'http://localhost:3000/api/health',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+      stdout: process.env.DEBUG ? 'pipe' : 'ignore',
+      stderr: process.env.DEBUG ? 'pipe' : 'ignore',
+    },
+    {
+      command: 'cd ../frontend && npm run dev',
+      url: 'http://localhost:5173',
+      reuseExistingServer: !process.env.CI,
+      timeout: 120000,
+      stdout: process.env.DEBUG ? 'pipe' : 'ignore',
+      stderr: process.env.DEBUG ? 'pipe' : 'ignore',
+    },
+  ],
 
   // Test match patterns for different test suites
   ...(TEST_MODE === 'game-flow' ? {
