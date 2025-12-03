@@ -28,6 +28,8 @@ export interface UserPreferences {
   email_notifications: boolean;
   language: string;
   autoplay_enabled: boolean;
+  skin_id: string;
+  card_skin_id: string;
   created_at: Date;
 }
 
@@ -48,6 +50,8 @@ export interface PreferencesUpdateData {
   email_notifications?: boolean;
   language?: string;
   autoplay_enabled?: boolean;
+  skin_id?: string;
+  card_skin_id?: string;
 }
 
 /**
@@ -154,7 +158,7 @@ export async function updateUserProfile(
 export async function getUserPreferences(userId: number): Promise<UserPreferences | null> {
   try {
     const result = await query(
-      'SELECT preference_id, user_id, theme, sound_enabled, sound_volume, notifications_enabled, email_notifications, language, autoplay_enabled, created_at FROM user_preferences WHERE user_id = $1',
+      'SELECT preference_id, user_id, theme, sound_enabled, sound_volume, notifications_enabled, email_notifications, language, autoplay_enabled, skin_id, card_skin_id, created_at FROM user_preferences WHERE user_id = $1',
       [userId]
     );
     return result.rows[0] || null;
@@ -175,9 +179,10 @@ export async function createUserPreferences(
     const result = await query(
       `INSERT INTO user_preferences (
         user_id, theme, sound_enabled, sound_volume,
-        notifications_enabled, email_notifications, language, autoplay_enabled
+        notifications_enabled, email_notifications, language, autoplay_enabled,
+        skin_id, card_skin_id
       )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        ON CONFLICT (user_id) DO NOTHING
        RETURNING *`,
       [
@@ -188,7 +193,9 @@ export async function createUserPreferences(
         preferences?.notifications_enabled !== undefined ? preferences.notifications_enabled : true,
         preferences?.email_notifications !== undefined ? preferences.email_notifications : true,
         preferences?.language || 'en',
-        preferences?.autoplay_enabled !== undefined ? preferences.autoplay_enabled : false
+        preferences?.autoplay_enabled !== undefined ? preferences.autoplay_enabled : false,
+        preferences?.skin_id || 'tavern-noir',
+        preferences?.card_skin_id || 'classic'
       ]
     );
     return result.rows[0] || null;
@@ -243,6 +250,16 @@ export async function updateUserPreferences(
     if (updates.autoplay_enabled !== undefined) {
       setClauses.push(`autoplay_enabled = $${paramIndex++}`);
       values.push(updates.autoplay_enabled);
+    }
+
+    if (updates.skin_id !== undefined) {
+      setClauses.push(`skin_id = $${paramIndex++}`);
+      values.push(updates.skin_id);
+    }
+
+    if (updates.card_skin_id !== undefined) {
+      setClauses.push(`card_skin_id = $${paramIndex++}`);
+      values.push(updates.card_skin_id);
     }
 
     if (setClauses.length === 0) {

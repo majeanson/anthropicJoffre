@@ -19,6 +19,7 @@
 
 import { memo, useMemo } from 'react';
 import { Card as CardType, CardColor } from '../types/game';
+import { useCardSkin } from '../contexts/SkinContext';
 
 interface CardProps {
   card: CardType;
@@ -134,6 +135,9 @@ function CardComponent({
   isKeyboardSelected = false,
   faceDown = false,
 }: CardProps) {
+  // Get card skin for value formatting
+  const { cardSkin } = useCardSkin();
+
   // Memoize expensive calculations
   const isSpecial = useMemo(
     () => (card.color === 'red' || card.color === 'brown') && card.value === 0,
@@ -142,6 +146,24 @@ function CardComponent({
 
   const suitStyle = suitStyles[card.color];
   const sizeConfig = sizeStyles[size];
+
+  // Get formatted value from card skin
+  const formattedValue = useMemo(
+    () => cardSkin.formatValue(card.value, isSpecial),
+    [cardSkin, card.value, isSpecial]
+  );
+
+  // Get special card display from card skin
+  const specialDisplay = useMemo(() => {
+    if (!isSpecial) return null;
+    if (card.color === 'red') {
+      return cardSkin.specialCards.redBonus;
+    }
+    return cardSkin.specialCards.brownPenalty;
+  }, [isSpecial, card.color, cardSkin]);
+
+  // Get suit-specific style overrides from card skin
+  const cardSkinSuitStyle = cardSkin.suits[card.color];
 
   // Determine which image to show
   const cardImage = useMemo(() => {
@@ -301,11 +323,12 @@ function CardComponent({
             select-none
           `}
           style={{
-            backgroundColor: suitStyle.border,
+            backgroundColor: cardSkinSuitStyle.color,
             minWidth: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
             height: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
             padding: '0 4px',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
+            fontFamily: cardSkin.fontFamily,
           }}
         >
           <span
@@ -313,9 +336,10 @@ function CardComponent({
             style={{
               color: '#fff',
               textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+              fontFamily: cardSkin.fontFamily,
             }}
           >
-            {card.value}
+            {formattedValue}
           </span>
         </div>
       )}
@@ -347,11 +371,12 @@ function CardComponent({
             select-none
           `}
           style={{
-            backgroundColor: suitStyle.border,
+            backgroundColor: cardSkinSuitStyle.color,
             minWidth: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
             height: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
             padding: '0 4px',
             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
+            fontFamily: cardSkin.fontFamily,
           }}
         >
           <span
@@ -359,15 +384,16 @@ function CardComponent({
             style={{
               color: '#fff',
               textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+              fontFamily: cardSkin.fontFamily,
             }}
           >
-            {card.value}
+            {formattedValue}
           </span>
         </div>
       )}
 
       {/* Special card badge with transmutation glow */}
-      {isSpecial && (
+      {isSpecial && specialDisplay && (
         <span
           className={`
             absolute top-0.5 right-0.5
@@ -383,9 +409,10 @@ function CardComponent({
             boxShadow: card.color === 'red'
               ? '0 2px 10px var(--color-success)'
               : '0 2px 10px var(--color-error)',
+            fontFamily: cardSkin.fontFamily,
           }}
         >
-          {card.color === 'red' ? '+5' : '-2'}
+          {specialDisplay.label}
         </span>
       )}
 

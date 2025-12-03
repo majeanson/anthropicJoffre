@@ -105,6 +105,7 @@ function AppContent() {
     setPlayerLevel,
     setUnlockedSkinIds,
     setSkinRequirements,
+    loadPreferencesFromBackend,
   } = useSkin();
 
   // Sprint 3 Refactoring: Audio management hook
@@ -196,6 +197,16 @@ function AppContent() {
     }
     setShowFriendsPanel(true);
   }, [auth.isAuthenticated, showToast, setShowFriendsPanel]);
+
+  // Load skin preferences from backend when user is authenticated
+  useEffect(() => {
+    if (auth.isAuthenticated) {
+      const token = auth.getAccessToken();
+      if (token) {
+        loadPreferencesFromBackend(token);
+      }
+    }
+  }, [auth.isAuthenticated, auth.getAccessToken, loadPreferencesFromBackend]);
 
   // Handler to open player profile modal
   const handleClickPlayer = useCallback((playerName: string) => {

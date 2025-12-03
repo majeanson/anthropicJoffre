@@ -68,6 +68,7 @@ export const API_ENDPOINTS = {
   authRefresh: () => `${CONFIG.API_BASE_URL}/api/auth/refresh`,
   authProfile: () => `${CONFIG.API_BASE_URL}/api/auth/me`,
   userProfile: () => `${CONFIG.API_BASE_URL}/api/profiles/me`,
+  userPreferences: () => `${CONFIG.API_BASE_URL}/api/profiles/preferences`,
 
   // CSRF
   csrfToken: () => `${CONFIG.API_BASE_URL}/api/csrf-token`,

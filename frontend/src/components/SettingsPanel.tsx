@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { useSettings } from '../contexts/SettingsContext';
 import { useSkin } from '../contexts/SkinContext';
 import { SkinId } from '../config/skins';
+import { CardSkinId } from '../config/cardSkins';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
 import { ConnectionQualityBadge } from './ConnectionQualityIndicator';
 import { Button, UIToggle, UIDivider, Tabs, Tab, Select } from './ui';
@@ -44,7 +45,7 @@ export function SettingsPanel({
   connectionStats
 }: SettingsPanelProps) {
   const { animationsEnabled, setAnimationsEnabled, beginnerMode, setBeginnerMode } = useSettings();
-  const { skinId, setSkin, availableSkins } = useSkin();
+  const { skinId, setSkin, availableSkins, cardSkinId, setCardSkin, availableCardSkins, isCardSkinUnlocked, getCardSkinRequiredLevel, playerLevel } = useSkin();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
   if (!isOpen) return null;
@@ -75,6 +76,17 @@ export function SettingsPanel({
     value: skin.id,
     label: skin.name,
   }));
+
+  // Convert card skins to Select options with lock indicators
+  const cardSkinOptions = availableCardSkins.map(cardSkin => {
+    const isLocked = !isCardSkinUnlocked(cardSkin.id);
+    const requiredLevel = getCardSkinRequiredLevel(cardSkin.id);
+    return {
+      value: cardSkin.id,
+      label: isLocked ? `🔒 ${cardSkin.name} (Lvl ${requiredLevel})` : cardSkin.name,
+      disabled: isLocked,
+    };
+  });
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -175,6 +187,31 @@ export function SettingsPanel({
               </p>
             </div>
 
+            {/* Card Skin Selector */}
+            <div data-testid="settings-card-skin">
+              <Select
+                label="Card Style"
+                options={cardSkinOptions}
+                value={cardSkinId}
+                onChange={(e) => {
+                  const newId = e.target.value as CardSkinId;
+                  if (isCardSkinUnlocked(newId)) {
+                    setCardSkin(newId);
+                  }
+                }}
+                fullWidth
+                variant="arcane"
+              />
+              <p className="text-xs text-[var(--color-text-muted)] mt-2 ml-1">
+                {availableCardSkins.find(s => s.id === cardSkinId)?.description}
+                {playerLevel < 30 && (
+                  <span className="block mt-1 text-[var(--color-text-accent)]">
+                    Level up to unlock more card styles!
+                  </span>
+                )}
+              </p>
+            </div>
+
             {/* Animations Toggle */}
             <div className="flex items-center justify-between" data-testid="settings-animations-pref">
               <div className="flex items-center gap-2">
@@ -266,9 +303,9 @@ export function SettingsPanel({
         data-testid="settings-backdrop"
       />
 
-      {/* Settings Panel - Increased width for tabs */}
+      {/* Settings Panel - Increased width for tabs, positioned above chat on mobile */}
       <div
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 border-2 rounded-lg shadow-2xl z-[10001] w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
+        className="fixed bottom-20 right-4 sm:bottom-4 md:bottom-6 md:right-6 border-2 rounded-lg shadow-2xl z-[10001] w-full sm:w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
         style={{
           backgroundColor: 'var(--color-bg-secondary)',
           borderColor: 'var(--color-border-accent)',
