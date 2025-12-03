@@ -291,38 +291,33 @@ function CardComponent({
         />
       )}
 
-      {/* Top-left value with heavy contrast outline for maximum readability */}
+      {/* Top-left value badge - colored background with white text for high contrast */}
       {!isSpecial && (
-        <span
+        <div
           className={`
             absolute ${sizeConfig.cornerOffset}
-            font-display
-            ${sizeConfig.cornerText}
+            flex items-center justify-center
+            rounded-md
             select-none
           `}
           style={{
-            color: suitStyle.text,
-            textShadow: `
-              -2px -2px 0 #fff,
-              2px -2px 0 #fff,
-              -2px 2px 0 #fff,
-              2px 2px 0 #fff,
-              -1px -1px 0 #fff,
-              1px -1px 0 #fff,
-              -1px 1px 0 #fff,
-              1px 1px 0 #fff,
-              0 0 0 #fff,
-              -3px 0 0 #fff,
-              3px 0 0 #fff,
-              0 -3px 0 #fff,
-              0 3px 0 #fff,
-              0 2px 4px rgba(0, 0, 0, 0.5)
-            `,
-            WebkitTextStroke: '1px #fff',
+            backgroundColor: suitStyle.border,
+            minWidth: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
+            height: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
+            padding: '0 4px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
           }}
         >
-          {card.value}
-        </span>
+          <span
+            className={`font-display ${sizeConfig.cornerText}`}
+            style={{
+              color: '#fff',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {card.value}
+          </span>
+        </div>
       )}
 
       {/* Center emblem or special card image */}
@@ -341,39 +336,34 @@ function CardComponent({
         }}
       />
 
-      {/* Bottom-right value (rotated) with heavy contrast outline */}
+      {/* Bottom-right value badge (rotated) - colored background with white text */}
       {!isSpecial && (
-        <span
+        <div
           className={`
             absolute ${sizeConfig.cornerOffsetBottom}
-            font-display
-            ${sizeConfig.cornerText}
+            flex items-center justify-center
+            rounded-md
             rotate-180
             select-none
           `}
           style={{
-            color: suitStyle.text,
-            textShadow: `
-              -2px -2px 0 #fff,
-              2px -2px 0 #fff,
-              -2px 2px 0 #fff,
-              2px 2px 0 #fff,
-              -1px -1px 0 #fff,
-              1px -1px 0 #fff,
-              -1px 1px 0 #fff,
-              1px 1px 0 #fff,
-              0 0 0 #fff,
-              -3px 0 0 #fff,
-              3px 0 0 #fff,
-              0 -3px 0 #fff,
-              0 3px 0 #fff,
-              0 2px 4px rgba(0, 0, 0, 0.5)
-            `,
-            WebkitTextStroke: '1px #fff',
+            backgroundColor: suitStyle.border,
+            minWidth: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
+            height: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
+            padding: '0 4px',
+            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
           }}
         >
-          {card.value}
-        </span>
+          <span
+            className={`font-display ${sizeConfig.cornerText}`}
+            style={{
+              color: '#fff',
+              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            {card.value}
+          </span>
+        </div>
       )}
 
       {/* Special card badge with transmutation glow */}
