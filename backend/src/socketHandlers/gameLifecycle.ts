@@ -76,9 +76,11 @@ export function registerGameLifecycleHandlers(socket: Socket, deps: GameLifecycl
       return;
     }
 
-    // Side effects - Update online player statuses
+    // Side effects - Update online player statuses (only for human players, not bots)
     game.players.forEach(player => {
-      updateOnlinePlayer(player.id, player.name, 'in_game', gameId);
+      if (!player.isBot) {
+        updateOnlinePlayer(player.id, player.name, 'in_game', gameId);
+      }
     });
 
     // Start the game (handles state transitions and I/O)

@@ -134,6 +134,32 @@ interface SkinContextValue {
 
   /** Whether preferences have been loaded from backend */
   isPreferencesLoaded: boolean;
+
+  // Preview mode (for skin shop - applies skin visually without persisting)
+  /** Current preview skin ID (null = no preview active) */
+  previewSkinId: SkinId | null;
+
+  /** Current preview card skin ID (null = no preview active) */
+  previewCardSkinId: CardSkinId | null;
+
+  /** Start previewing a UI skin (applies visually but doesn't save) */
+  startPreviewSkin: (id: SkinId) => void;
+
+  /** Start previewing a card skin (applies visually but doesn't save) */
+  startPreviewCardSkin: (id: CardSkinId) => void;
+
+  /** Stop previewing and restore actual skin */
+  stopPreview: () => void;
+
+  /** Whether we're currently in preview mode */
+  isPreviewActive: boolean;
+
+  // Cosmetic currency and purchases
+  /** Current cosmetic currency balance */
+  cosmeticCurrency: number;
+
+  /** Set cosmetic currency balance (called by App.tsx) */
+  setCosmeticCurrency: (amount: number) => void;
 }
 
 const SkinContext = createContext<SkinContextValue | undefined>(undefined);
@@ -194,25 +220,41 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const accessTokenRef = useRef<string | null>(null);
 
-  // Get the full skin object
-  const skin = useMemo(() => getSkin(skinId), [skinId]);
+  // Preview mode state (for skin shop - applies skin visually without persisting)
+  const [previewSkinId, setPreviewSkinId] = useState<SkinId | null>(null);
+  const [previewCardSkinId, setPreviewCardSkinId] = useState<CardSkinId | null>(null);
 
-  // Get the full card skin object
-  const cardSkin = useMemo(() => getCardSkin(cardSkinId), [cardSkinId]);
+  // Cosmetic currency state
+  const [cosmeticCurrency, setCosmeticCurrency] = useState<number>(0);
 
-  // Apply skin to document when it changes
+  // Determine which skin to actually display (preview takes precedence)
+  const effectiveSkinId = previewSkinId ?? skinId;
+  const effectiveCardSkinId = previewCardSkinId ?? cardSkinId;
+
+  // Get the full skin object (uses preview if active)
+  const skin = useMemo(() => getSkin(effectiveSkinId), [effectiveSkinId]);
+
+  // Get the full card skin object (uses preview if active)
+  const cardSkin = useMemo(() => getCardSkin(effectiveCardSkinId), [effectiveCardSkinId]);
+
+  // Apply skin to document when it changes (includes preview skins)
   useEffect(() => {
     applySkinToDocument(skin);
-    localStorage.setItem(SKIN_STORAGE_KEY, skinId);
 
-    // Also update the old theme storage for backward compatibility
-    localStorage.setItem('theme', skin.isDark ? 'dark' : 'historic');
-  }, [skin, skinId]);
+    // Only persist to localStorage when NOT in preview mode
+    if (!previewSkinId) {
+      localStorage.setItem(SKIN_STORAGE_KEY, skinId);
+      // Also update the old theme storage for backward compatibility
+      localStorage.setItem('theme', skin.isDark ? 'dark' : 'historic');
+    }
+  }, [skin, skinId, previewSkinId]);
 
-  // Persist card skin to localStorage
+  // Persist card skin to localStorage (only when not in preview mode)
   useEffect(() => {
-    localStorage.setItem(CARD_SKIN_STORAGE_KEY, cardSkinId);
-  }, [cardSkinId]);
+    if (!previewCardSkinId) {
+      localStorage.setItem(CARD_SKIN_STORAGE_KEY, cardSkinId);
+    }
+  }, [cardSkinId, previewCardSkinId]);
 
   // Save preferences to backend (debounced)
   const savePreferencesToBackend = useCallback(async (newSkinId: string, newCardSkinId: string) => {
@@ -357,6 +399,22 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
     }
   }, [skin.isDark, isSkinUnlocked]);
 
+  // Preview mode functions (for skin shop - applies skin visually without persisting)
+  const startPreviewSkin = useCallback((id: SkinId) => {
+    setPreviewSkinId(id);
+  }, []);
+
+  const startPreviewCardSkin = useCallback((id: CardSkinId) => {
+    setPreviewCardSkinId(id);
+  }, []);
+
+  const stopPreview = useCallback(() => {
+    setPreviewSkinId(null);
+    setPreviewCardSkinId(null);
+  }, []);
+
+  const isPreviewActive = previewSkinId !== null || previewCardSkinId !== null;
+
   // Context value
   const value = useMemo<SkinContextValue>(
     () => ({
@@ -385,8 +443,18 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
       // Backend sync
       loadPreferencesFromBackend,
       isPreferencesLoaded,
+      // Preview mode
+      previewSkinId,
+      previewCardSkinId,
+      startPreviewSkin,
+      startPreviewCardSkin,
+      stopPreview,
+      isPreviewActive,
+      // Cosmetic currency
+      cosmeticCurrency,
+      setCosmeticCurrency,
     }),
-    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded]
+    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded, previewSkinId, previewCardSkinId, startPreviewSkin, startPreviewCardSkin, stopPreview, isPreviewActive, cosmeticCurrency, setCosmeticCurrency]
   );
 
   return (

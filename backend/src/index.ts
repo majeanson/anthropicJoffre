@@ -1054,7 +1054,7 @@ app.use(csrfErrorHandler);
 // ============================================================================
 
 // Socket.IO authentication middleware - set playerName from JWT token if available
-io.use((socket, next) => {
+io.use(async (socket, next) => {
   try {
     const token = socket.handshake.auth.token;
 
@@ -1064,6 +1064,10 @@ io.use((socket, next) => {
       if (payload && payload.username) {
         // Set playerName from authenticated user
         socket.data.playerName = payload.username;
+
+        // Join player-specific room for real-time notifications (friend requests, DMs, etc.)
+        socket.join(`player:${payload.username}`);
+        console.log(`[AUTH] Player ${payload.username} joined their notification room`);
       }
     }
 
@@ -1080,6 +1084,42 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
   // Register connection with ConnectionManager
   connectionManager.registerConnection(socket);
+
+  // Track authenticated users as online immediately on connection
+  // This ensures they appear in the global online players list even before joining a game
+  if (socket.data.playerName) {
+    updateOnlinePlayer(socket.id, socket.data.playerName, 'in_lobby', undefined);
+    console.log(`[ONLINE] Authenticated player ${socket.data.playerName} added to online list`);
+  }
+
+  // Handle post-connection authentication (when user logs in after already connecting)
+  socket.on('authenticate', errorBoundaries.readOnly('authenticate')(async ({ token }: { token: string }) => {
+    try {
+      const payload = verifyAccessToken(token);
+
+      if (payload && payload.username) {
+        // Leave old player room if re-authenticating as different user
+        if (socket.data.playerName && socket.data.playerName !== payload.username) {
+          socket.leave(`player:${socket.data.playerName}`);
+          onlinePlayers.delete(socket.id); // Remove old entry
+        }
+
+        // Set playerName and join new player room
+        socket.data.playerName = payload.username;
+        socket.join(`player:${payload.username}`);
+
+        // Track as online
+        updateOnlinePlayer(socket.id, payload.username, 'in_lobby', undefined);
+
+        socket.emit('authenticated', { success: true, username: payload.username });
+        console.log(`[AUTH] Player ${payload.username} authenticated post-connection`);
+      } else {
+        socket.emit('authenticated', { success: false, error: 'Invalid token' });
+      }
+    } catch (error) {
+      socket.emit('authenticated', { success: false, error: 'Authentication failed' });
+    }
+  }));
 
   // ============================================================================
   // Lobby Handlers - Refactored (Sprint 3)

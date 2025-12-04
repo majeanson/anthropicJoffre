@@ -53,6 +53,25 @@ export function registerFriendHandlers(
         return;
       }
 
+      // Check if target player allows friend requests (respect their privacy settings)
+      try {
+        const { getUserByUsername } = await import('../db/users.js');
+        const { getUserProfile } = await import('../db/profiles.js');
+
+        const targetUser = await getUserByUsername(toPlayer);
+        if (targetUser) {
+          const profile = await getUserProfile(targetUser.user_id);
+          if (profile && profile.allow_friend_requests === false) {
+            socket.emit('error', { message: 'This player is not accepting friend requests' });
+            return;
+          }
+        }
+        // If user not found in users table, they're a guest - allow the request
+      } catch (error) {
+        // If profile check fails, allow the request to continue (fail-open for guest users)
+        console.log(`Friend request preference check failed for ${toPlayer}, allowing request:`, error);
+      }
+
       const request = await sendFriendRequest(fromPlayer, toPlayer);
 
       if (!request) {

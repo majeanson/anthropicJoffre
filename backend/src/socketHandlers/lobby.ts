@@ -552,8 +552,10 @@ export function registerLobbyHandlers(socket: Socket, deps: LobbyHandlersDepende
       isBot || false
     );
 
-    // Track online player status
-    updateOnlinePlayer(socket.id, sanitizedName, 'in_team_selection', gameId);
+    // Track online player status (only for human players, not bots)
+    if (!isBot) {
+      updateOnlinePlayer(socket.id, sanitizedName, 'in_team_selection', gameId);
+    }
 
     // Update player presence in database (conditional on persistence mode, only for human players)
     if (!isBot) {

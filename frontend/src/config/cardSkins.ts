@@ -324,3 +324,38 @@ export function getCardSkinRequirements(): CardSkinRequirement[] {
 }
 
 export default cardSkins;
+
+// ============================================================================
+// CARD SKIN PRICING CONFIGURATION
+// Prices in cosmetic currency. Users can buy skins even if below required level.
+// ============================================================================
+
+export interface CardSkinPricingInfo {
+  /** Price in cosmetic currency (0 = free) */
+  price: number;
+  /** Suggested level (for display, not enforced when buying) */
+  suggestedLevel: number;
+}
+
+/**
+ * Card Skin pricing map
+ * - Free skins (level 0): price = 0
+ * - Premium skins: purchasable with cosmetic currency
+ */
+export const cardSkinPricing: Record<CardSkinId, CardSkinPricingInfo> = {
+  'classic': { price: 0, suggestedLevel: 0 },       // Free
+  'roman': { price: 0, suggestedLevel: 0 },         // Free
+  'elemental': { price: 150, suggestedLevel: 5 },   // Cheap
+  'runic': { price: 300, suggestedLevel: 10 },      // Medium
+  'alchemical': { price: 500, suggestedLevel: 15 }, // Medium
+  'celestial': { price: 750, suggestedLevel: 20 },  // Premium
+  'royal': { price: 1000, suggestedLevel: 25 },     // Premium
+  'arcane': { price: 1500, suggestedLevel: 30 },    // Most expensive
+};
+
+/**
+ * Get pricing info for a card skin
+ */
+export function getCardSkinPricing(cardSkinId: CardSkinId): CardSkinPricingInfo {
+  return cardSkinPricing[cardSkinId] || { price: 0, suggestedLevel: 0 };
+}

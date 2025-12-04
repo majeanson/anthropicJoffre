@@ -66,6 +66,11 @@ export function SocialPanel({
   const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
 
+  // Friend search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Array<{ player_name: string; games_played: number; games_won: number }>>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
   // Profile editing state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileBio, setProfileBio] = useState('');
@@ -214,6 +219,31 @@ export function SocialPanel({
     socket.emit('send_friend_request', { toPlayer: friendName });
     sounds.buttonClick();
   };
+
+  // Search for players to add as friends
+  const handleSearch = () => {
+    if (!socket || !user || searchQuery.trim().length < 2) return;
+    setIsSearching(true);
+    socket.emit('search_players', { searchQuery: searchQuery.trim() });
+  };
+
+  // Listen for search results
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleSearchResults = ({ players }: { players: Array<{ player_name: string; games_played: number; games_won: number }> }) => {
+      // Filter out bots from search results
+      const humanPlayers = players.filter(p => !p.player_name.startsWith('Bot '));
+      setSearchResults(humanPlayers);
+      setIsSearching(false);
+    };
+
+    socket.on('player_search_results', handleSearchResults);
+
+    return () => {
+      socket.off('player_search_results', handleSearchResults);
+    };
+  }, [socket]);
 
   const handleAcceptRequest = (requestId: number) => {
     if (!socket || !user) return;
@@ -514,6 +544,92 @@ export function SocialPanel({
               </div>
             ) : (
               <>
+                {/* Find Friends Search */}
+                <div className="mb-4">
+                  <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                    🔍 Find Friends
+                  </h4>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      placeholder="Search by name..."
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border-2 border-parchment-400 dark:border-gray-500 bg-parchment-50 dark:bg-gray-700 text-umber-900 dark:text-gray-100 placeholder-umber-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    />
+                    <Button
+                      onClick={handleSearch}
+                      disabled={searchQuery.trim().length < 2 || isSearching}
+                      variant="primary"
+                      size="sm"
+                    >
+                      {isSearching ? '...' : '🔍'}
+                    </Button>
+                  </div>
+
+                  {/* Search Results */}
+                  {searchResults.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {searchResults.slice(0, 5).map(player => {
+                        const isAlreadyFriend = friends.some(f => f.player_name === player.player_name);
+                        const isPending = sentRequests.some(r => r.to_player === player.player_name);
+                        const isSelf = player.player_name === user?.username;
+
+                        if (isSelf) return null;
+
+                        return (
+                          <div
+                            key={player.player_name}
+                            className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-2 border border-purple-300 dark:border-purple-600"
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <PlayerNameButton
+                                  playerName={player.player_name}
+                                  onClick={() => setSelectedPlayerProfile(player.player_name)}
+                                  variant="plain"
+                                  className="font-semibold text-sm text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400 truncate text-left"
+                                />
+                                <p className="text-xs text-umber-600 dark:text-gray-400">
+                                  {player.games_played} games • {player.games_won} wins
+                                </p>
+                              </div>
+                              {isAlreadyFriend ? (
+                                <span className="px-2 py-1 bg-green-600 text-white text-xs rounded font-bold">
+                                  Friends
+                                </span>
+                              ) : isPending ? (
+                                <span className="px-2 py-1 bg-yellow-600 text-white text-xs rounded font-bold">
+                                  Pending
+                                </span>
+                              ) : (
+                                <Button
+                                  onClick={() => {
+                                    handleSendFriendRequest(player.player_name);
+                                    // Clear this result from the list
+                                    setSearchResults(prev => prev.filter(p => p.player_name !== player.player_name));
+                                  }}
+                                  variant="success"
+                                  size="sm"
+                                >
+                                  ➕ Add
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
+                    <p className="mt-2 text-xs text-umber-500 dark:text-gray-400 text-center">
+                      No players found matching "{searchQuery}"
+                    </p>
+                  )}
+                </div>
+
                 {/* Pending Friend Requests */}
                 {pendingRequests.length > 0 && (
                   <div className="mb-4">

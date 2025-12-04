@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-04T03:25:00.000Z",
-  "version": "4.0.1",
+  "buildDate": "2025-12-04T23:50:53.165Z",
+  "version": "2.3.1",
   "git": {
-    "commitMessage": "feat: Add card skins to progress modal and lobby settings",
-    "commitHash": "d64044a",
-    "commitDate": "2025-12-03 22:19:59 -0500",
+    "commitMessage": "fix: Resolve Lobby build error and update buildInfo\n\n- Fix remaining onShowPersonalHub references in Lobby.tsx\n- Update buildInfo.json with latest commit details\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "486954d",
+    "commitDate": "2025-12-03 22:25:04 -0500",
     "branch": "main"
   },
   "futureTodos": [
@@ -13,5 +13,95 @@
     "Enhanced Leaderboard",
     "Achievements & Badges",
     "Friend System"
+  ],
+  "releaseDate": "2025-11-18",
+  "buildStatus": "✅ Production Ready",
+  "testsStatus": {
+    "backend": "✅ 368 tests passing (100%)",
+    "frontend": "✅ 142 tests passing (100%)",
+    "e2e": "✅ 29 test files (social + position swap)"
+  },
+  "sprint": "Sprint 17 - Completion & Stabilization",
+  "phases": {
+    "sprint16": {
+      "name": "Social Features Enhancement",
+      "status": "✅ Completed",
+      "duration": "7 days",
+      "dateCompleted": "2025-11-18",
+      "features": [
+        "UnifiedChat component consolidating all chat systems",
+        "Direct messaging system with real-time delivery",
+        "Player profile modals with quick actions",
+        "Social hub with tabbed interface",
+        "Friend suggestions based on recent games",
+        "Recent players tracking from last 20 games",
+        "Replay sharing with deep links",
+        "Achievement notifications in NotificationCenter",
+        "Player avatars with status indicators",
+        "Clickable player names throughout app"
+      ]
+    },
+    "sprint17": {
+      "name": "Completion & Stabilization",
+      "status": "✅ Completed",
+      "duration": "1 day",
+      "dateCompleted": "2025-11-18",
+      "tasks": [
+        "Deleted deprecated chat components (LobbyChat, FloatingTeamChat, ChatPanel)",
+        "Fixed misleading comment in playerMigrationHelpers.ts",
+        "Removed hardcoded Sentry DSN from main.tsx",
+        "Added dealerName field to RoundHistory type",
+        "Created comprehensive position swap regression tests (29-position-swap.spec.ts)",
+        "Verified all backend tests passing (368 tests)",
+        "Verified all frontend tests passing (142 tests)"
+      ],
+      "improvements": [
+        "Removed 3 deprecated components (~500 lines)",
+        "Improved code documentation accuracy",
+        "Enhanced security (removed hardcoded secrets)",
+        "Expanded type system with dealerName tracking",
+        "Added 12+ position swap test scenarios"
+      ],
+      "deletedFiles": [
+        "frontend/src/components/LobbyChat.tsx",
+        "frontend/src/components/FloatingTeamChat.tsx",
+        "frontend/src/components/ChatPanel.tsx"
+      ],
+      "modifiedFiles": [
+        "frontend/src/App.tsx (ChatMessage import)",
+        "frontend/src/hooks/useChatMessages.ts (ChatMessage import)",
+        "backend/src/utils/playerMigrationHelpers.ts (comment fix)",
+        "frontend/src/main.tsx (removed hardcoded DSN)",
+        "backend/src/types/game.ts (added dealerName)",
+        "frontend/src/types/game.ts (added dealerName)",
+        "backend/src/game/state.ts (populate dealerName)"
+      ],
+      "newFiles": [
+        "e2e/tests/29-position-swap.spec.ts (comprehensive swap tests)"
+      ]
+    }
+  },
+  "totalDuration": "8 days",
+  "newFeatures": [
+    "Direct messaging system with read receipts",
+    "Player profile modals accessible from anywhere",
+    "Unified chat component for all contexts",
+    "Social hub consolidating all social features",
+    "Friend suggestions algorithm",
+    "Recent players tracking",
+    "Replay sharing with URL deep links",
+    "Achievement and friend request notifications",
+    "Position swap regression test suite",
+    "Enhanced type safety with dealerName tracking"
+  ],
+  "notes": [
+    "Sprint 17 completed - Completion & Stabilization",
+    "All deprecated chat components removed",
+    "Code documentation improved",
+    "Security enhanced (no hardcoded secrets)",
+    "Type system expanded with dealerName",
+    "Position swap test coverage complete",
+    "All 510 tests passing (368 backend + 142 frontend)",
+    "Ready for v2.3.1 release"
   ]
 }

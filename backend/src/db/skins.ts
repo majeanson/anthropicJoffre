@@ -348,3 +348,99 @@ export async function awardXpAndCheckLevelUp(
     client.release();
   }
 }
+
+/**
+ * Purchase a skin with cosmetic currency
+ * - Deducts currency from player
+ * - Unlocks the skin
+ * - Returns success/failure with updated currency balance
+ */
+export async function purchaseSkin(
+  playerName: string,
+  skinId: string,
+  price: number,
+  skinType: 'ui' | 'card'
+): Promise<{
+  success: boolean;
+  error?: string;
+  newBalance?: number;
+}> {
+  if (!pool) {
+    console.error('[Skins DB] Database pool not initialized');
+    return { success: false, error: 'Database not available' };
+  }
+
+  // Free skins don't need purchase
+  if (price <= 0) {
+    return { success: false, error: 'This skin is free and cannot be purchased' };
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    // Check current balance
+    const balanceResult = await client.query(
+      `SELECT cosmetic_currency FROM player_stats WHERE player_name = $1`,
+      [playerName]
+    );
+
+    if (balanceResult.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return { success: false, error: 'Player not found' };
+    }
+
+    const currentBalance = balanceResult.rows[0].cosmetic_currency || 0;
+
+    if (currentBalance < price) {
+      await client.query('ROLLBACK');
+      return {
+        success: false,
+        error: `Not enough currency. Need ${price}, have ${currentBalance}`,
+      };
+    }
+
+    // Check if already unlocked
+    const unlockCheckResult = await client.query(
+      `SELECT 1 FROM player_skin_unlocks WHERE player_name = $1 AND skin_id = $2`,
+      [playerName, skinId]
+    );
+
+    if (unlockCheckResult.rows.length > 0) {
+      await client.query('ROLLBACK');
+      return { success: false, error: 'Skin already owned' };
+    }
+
+    // Deduct currency
+    await client.query(
+      `UPDATE player_stats SET cosmetic_currency = cosmetic_currency - $1 WHERE player_name = $2`,
+      [price, playerName]
+    );
+
+    // Unlock the skin
+    await client.query(
+      `INSERT INTO player_skin_unlocks (player_name, skin_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+      [playerName, skinId]
+    );
+
+    await client.query('COMMIT');
+
+    // Get updated balance
+    const newBalanceResult = await client.query(
+      `SELECT cosmetic_currency FROM player_stats WHERE player_name = $1`,
+      [playerName]
+    );
+
+    return {
+      success: true,
+      newBalance: newBalanceResult.rows[0]?.cosmetic_currency || 0,
+    };
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error('[Skins DB] Error purchasing skin:', error);
+    return { success: false, error: 'Purchase failed' };
+  } finally {
+    client.release();
+  }
+}

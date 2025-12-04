@@ -11,6 +11,7 @@ import { errorBoundaries } from '../middleware/errorBoundary.js';
 import { getUserByUsername } from '../db/users.js';
 import { getUserProfile, updateUserProfile, ProfileUpdateData } from '../db/profiles.js';
 import { createNotification } from '../db/notifications.js';
+import { purchaseSkin, getPlayerLevel, getPlayerUnlockedSkins } from '../db/skins.js';
 
 interface SocialHandlerDependencies {
   errorBoundaries: typeof errorBoundaries;
@@ -218,6 +219,64 @@ export function registerSocialHandlers(
       } catch (error) {
         console.error('Error updating user profile:', error);
         socket.emit('error', { message: 'Failed to update profile', context: 'update_user_profile' });
+      }
+    })
+  );
+
+  /**
+   * Purchase a skin with cosmetic currency
+   * Sprint 21 - Skin Purchase System
+   */
+  socket.on(
+    'purchase_skin',
+    errorBoundaries.gameAction('purchase_skin')(async ({
+      skinId,
+      price,
+      skinType
+    }: {
+      skinId: string;
+      price: number;
+      skinType: 'ui' | 'card';
+    }) => {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('skin_purchase_result', {
+          success: false,
+          error: 'Not logged in'
+        });
+        return;
+      }
+
+      try {
+        const result = await purchaseSkin(playerName, skinId, price, skinType);
+
+        if (result.success) {
+          // Get updated player data to send back
+          const playerData = await getPlayerLevel(playerName);
+          const unlockedSkins = await getPlayerUnlockedSkins(playerName);
+
+          socket.emit('skin_purchase_result', {
+            success: true,
+            skinId,
+            skinType,
+            newBalance: result.newBalance,
+            unlockedSkins
+          });
+
+          console.log(`[Social] ${playerName} purchased ${skinType} skin: ${skinId} for ${price} currency`);
+        } else {
+          socket.emit('skin_purchase_result', {
+            success: false,
+            error: result.error
+          });
+        }
+      } catch (error) {
+        console.error('[Social] Error purchasing skin:', error);
+        socket.emit('skin_purchase_result', {
+          success: false,
+          error: 'Purchase failed'
+        });
       }
     })
   );

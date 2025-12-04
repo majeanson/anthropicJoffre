@@ -93,6 +93,13 @@ export interface SkinTypography {
   };
 }
 
+export interface SkinPricing {
+  /** Price in cosmetic currency (0 = free or level-only) */
+  price: number;
+  /** Required level (0 = no level requirement, just purchase) */
+  requiredLevel: number;
+}
+
 export interface SkinEffects {
   // Border radius scale
   radius: {
@@ -171,6 +178,8 @@ export interface Skin {
   effects: SkinEffects;
   components: SkinComponents;
   cssVariables: Record<string, string>;  // CSS custom properties
+  /** Pricing info for shop (optional, defaults to level-gated) */
+  pricing?: SkinPricing;
 }
 
 // ============================================================================
@@ -1288,4 +1297,38 @@ export function applySkinToDocument(skin: Skin): void {
 
   // Set skin ID as data attribute
   root.setAttribute('data-skin', skin.id);
+}
+
+// ============================================================================
+// SKIN PRICING CONFIGURATION
+// Prices in cosmetic currency. Users can buy skins even if below required level.
+// ============================================================================
+
+export interface SkinPricingInfo {
+  /** Price in cosmetic currency (0 = free) */
+  price: number;
+  /** Suggested level (for display, not enforced when buying) */
+  suggestedLevel: number;
+}
+
+/**
+ * UI Skin pricing map
+ * - Free skins (level 0): price = 0
+ * - Premium skins: purchasable with cosmetic currency
+ */
+export const skinPricing: Record<SkinId, SkinPricingInfo> = {
+  'midnight-alchemy': { price: 0, suggestedLevel: 0 },       // Free (default dark)
+  'classic-parchment': { price: 0, suggestedLevel: 0 },      // Free (default light)
+  'modern-minimal': { price: 100, suggestedLevel: 3 },       // Cheap
+  'tavern-noir': { price: 250, suggestedLevel: 5 },          // Medium
+  'modern-minimal-dark': { price: 400, suggestedLevel: 8 },  // Medium
+  'luxury-casino': { price: 750, suggestedLevel: 12 },       // Premium
+  'cyberpunk-neon': { price: 1000, suggestedLevel: 15 },     // Most expensive
+};
+
+/**
+ * Get pricing info for a UI skin
+ */
+export function getSkinPricing(skinId: SkinId): SkinPricingInfo {
+  return skinPricing[skinId] || { price: 0, suggestedLevel: 0 };
 }

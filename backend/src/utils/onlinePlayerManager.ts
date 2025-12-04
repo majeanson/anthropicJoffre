@@ -51,6 +51,7 @@ export function updateOnlinePlayer(
 /**
  * Broadcast online players list to all connected clients
  * Filters out inactive players (no activity in last 30 seconds)
+ * Also filters out bots (defense-in-depth - bots should never be added, but filter here as backup)
  *
  * @param io - Socket.io server instance
  * @param onlinePlayers - Online players storage Map
@@ -62,8 +63,10 @@ export function broadcastOnlinePlayers(
   const now = Date.now();
 
   // Filter active players (active in last 30 seconds)
+  // Also filter out bots as defense-in-depth (bots should not be added to the map, but filter here as backup)
   const activePlayers = Array.from(onlinePlayers.values())
-    .filter(p => now - p.lastActivity < ACTIVITY_THRESHOLD);
+    .filter(p => now - p.lastActivity < ACTIVITY_THRESHOLD)
+    .filter(p => !p.playerName.startsWith('Bot '));
 
   // Broadcast to all connected clients
   io.emit('online_players_update', activePlayers);

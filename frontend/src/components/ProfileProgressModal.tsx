@@ -16,9 +16,10 @@ import { Socket } from 'socket.io-client';
 import { LevelProgressBar } from './LevelProgressBar';
 import { WeeklyCalendar, WeeklyCalendarDay } from './WeeklyCalendar';
 import { RewardsTab } from './RewardsTab';
-import { useSkin, type SkinId } from '../contexts/SkinContext';
-import { skinList } from '../config/skins';
-import { CardSkinSelector } from './CardSkinSelector';
+import { useSkin, type SkinId, type CardSkinId } from '../contexts/SkinContext';
+import { skinList, getSkinPricing } from '../config/skins';
+import { cardSkinList, getCardSkinPricing } from '../config/cardSkins';
+import { Card } from './Card';
 import { Button, ProgressBar, UIBadge, UICard } from './ui';
 
 export type TabId = 'overview' | 'quests' | 'calendar' | 'skins' | 'rewards';
@@ -109,7 +110,23 @@ export function ProfileProgressModal({
   const [claimingQuestId, setClaimingQuestId] = useState<number | null>(null);
   const [questNotification, setQuestNotification] = useState<string | null>(null);
 
-  const { skinId, setSkin } = useSkin();
+  const {
+    skinId,
+    setSkin,
+    cardSkinId,
+    setCardSkin,
+    startPreviewSkin,
+    startPreviewCardSkin,
+    stopPreview,
+    isPreviewActive,
+    setCosmeticCurrency,
+    setUnlockedSkinIds,
+    isCardSkinUnlocked: contextIsCardSkinUnlocked,
+  } = useSkin();
+
+  const [purchaseError, setPurchaseError] = useState<string | null>(null);
+  const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
+  const [isPurchasing, setIsPurchasing] = useState(false);
 
   // Update activeTab when initialTab changes (when modal opens with different tab)
   useEffect(() => {
@@ -188,6 +205,33 @@ export function ProfileProgressModal({
       socket.emit('get_player_progression', { playerName });
     };
 
+    // Skin purchase handler
+    const handleSkinPurchaseResult = (data: {
+      success: boolean;
+      skinId?: string;
+      skinType?: 'ui' | 'card';
+      newBalance?: number;
+      unlockedSkins?: string[];
+      error?: string;
+    }) => {
+      setIsPurchasing(false);
+      if (data.success) {
+        setPurchaseSuccess(`Successfully purchased ${data.skinId}!`);
+        setTimeout(() => setPurchaseSuccess(null), 3000);
+        if (data.newBalance !== undefined) {
+          setCosmeticCurrency(data.newBalance);
+        }
+        if (data.unlockedSkins) {
+          setUnlockedSkinIds(data.unlockedSkins);
+        }
+        // Refresh progression data
+        socket.emit('get_player_progression', { playerName });
+      } else {
+        setPurchaseError(data.error || 'Purchase failed');
+        setTimeout(() => setPurchaseError(null), 3000);
+      }
+    };
+
     socket.on('player_progression', handleProgression);
     socket.on('skin_requirements', handleSkinRequirements);
     socket.on('weekly_calendar', handleWeeklyCalendar);
@@ -195,6 +239,7 @@ export function ProfileProgressModal({
     socket.on('weekly_reward_claimed', handleWeeklyRewardClaimed);
     socket.on('daily_quests', handleDailyQuests);
     socket.on('quest_reward_claimed', handleQuestRewardClaimed);
+    socket.on('skin_purchase_result', handleSkinPurchaseResult);
 
     return () => {
       socket.off('player_progression', handleProgression);
@@ -204,8 +249,9 @@ export function ProfileProgressModal({
       socket.off('weekly_reward_claimed', handleWeeklyRewardClaimed);
       socket.off('daily_quests', handleDailyQuests);
       socket.off('quest_reward_claimed', handleQuestRewardClaimed);
+      socket.off('skin_purchase_result', handleSkinPurchaseResult);
     };
-  }, [isOpen, socket, playerName]);
+  }, [isOpen, socket, playerName, setCosmeticCurrency, setUnlockedSkinIds]);
 
   const handleClaimWeeklyReward = useCallback((dayNumber: number) => {
     if (!socket || !playerName) return;
@@ -227,10 +273,31 @@ export function ProfileProgressModal({
     return progression.unlockedSkins.includes(skinId);
   }, [progression, skinRequirements]);
 
-  const getRequiredLevel = useCallback((skinId: string) => {
-    const requirement = skinRequirements.find(r => r.skinId === skinId);
-    return requirement?.requiredLevel || 0;
-  }, [skinRequirements]);
+  // Purchase skin handler
+  const handlePurchaseSkin = useCallback((skinIdToBuy: string, skinType: 'ui' | 'card') => {
+    if (!socket || isPurchasing) return;
+
+    const pricing = skinType === 'ui'
+      ? getSkinPricing(skinIdToBuy as SkinId)
+      : getCardSkinPricing(skinIdToBuy as CardSkinId);
+
+    if (pricing.price <= 0) return; // Can't purchase free skins
+
+    setIsPurchasing(true);
+    setPurchaseError(null);
+    socket.emit('purchase_skin', {
+      skinId: skinIdToBuy,
+      price: pricing.price,
+      skinType,
+    });
+  }, [socket, isPurchasing]);
+
+  // Stop preview when modal closes
+  useEffect(() => {
+    if (!isOpen && isPreviewActive) {
+      stopPreview();
+    }
+  }, [isOpen, isPreviewActive, stopPreview]);
 
   if (!isOpen) return null;
 
@@ -558,12 +625,48 @@ export function ProfileProgressModal({
               {/* Skins Tab */}
               {activeTab === 'skins' && progression && (
                 <div className="space-y-6">
-                  <p
-                    className="text-sm"
-                    style={{ color: 'var(--color-text-muted)' }}
+                  {/* Balance and status bar */}
+                  <div
+                    className="flex items-center justify-between p-3 rounded-lg"
+                    style={{ backgroundColor: 'var(--color-bg-secondary)' }}
                   >
-                    Unlock new skins by reaching higher levels. Your current level: <strong>{progression.level}</strong>
-                  </p>
+                    <div>
+                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                        Level: <strong style={{ color: 'var(--color-text-primary)' }}>{progression.level}</strong>
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span style={{ color: 'var(--color-warning)' }}>💰</span>
+                      <span className="font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                        {progression.cosmeticCurrency.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Purchase notifications */}
+                  {purchaseSuccess && (
+                    <div className="p-3 rounded-lg bg-green-500/20 text-green-400 text-sm text-center animate-pulse">
+                      ✓ {purchaseSuccess}
+                    </div>
+                  )}
+                  {purchaseError && (
+                    <div className="p-3 rounded-lg bg-red-500/20 text-red-400 text-sm text-center">
+                      ✕ {purchaseError}
+                    </div>
+                  )}
+
+                  {/* Preview indicator */}
+                  {isPreviewActive && (
+                    <div className="p-2 rounded-lg bg-purple-500/20 text-purple-300 text-xs text-center flex items-center justify-center gap-2">
+                      <span>👁️ Preview Mode</span>
+                      <button
+                        onClick={stopPreview}
+                        className="underline hover:text-purple-200"
+                      >
+                        Stop
+                      </button>
+                    </div>
+                  )}
 
                   {/* Card Skins Section */}
                   <div>
@@ -577,9 +680,131 @@ export function ProfileProgressModal({
                       className="text-xs mb-3"
                       style={{ color: 'var(--color-text-muted)' }}
                     >
-                      Change how your playing cards look during games
+                      Hover to preview. Purchase to own permanently.
                     </p>
-                    <CardSkinSelector columns={2} showPreview={true} />
+
+                    {/* Live Preview */}
+                    <div className="p-4 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)] mb-4">
+                      <p className="text-xs text-[var(--color-text-muted)] mb-3 text-center uppercase tracking-wider">
+                        Live Preview
+                      </p>
+                      <div className="flex justify-center gap-2 flex-wrap">
+                        <Card card={{ color: 'red', value: 5 }} size="small" />
+                        <Card card={{ color: 'blue', value: 6 }} size="small" />
+                        <Card card={{ color: 'green', value: 1 }} size="small" />
+                        <Card card={{ color: 'brown', value: 7 }} size="small" />
+                        <Card card={{ color: 'red', value: 0 }} size="small" />
+                        <Card card={{ color: 'brown', value: 0 }} size="small" />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {cardSkinList.map((cardSkinItem) => {
+                        const isUnlocked = contextIsCardSkinUnlocked(cardSkinItem.id) || progression.unlockedSkins.includes(cardSkinItem.id);
+                        const pricing = getCardSkinPricing(cardSkinItem.id);
+                        const isActive = cardSkinId === cardSkinItem.id;
+                        const canAfford = progression.cosmeticCurrency >= pricing.price;
+
+                        return (
+                          <div
+                            key={cardSkinItem.id}
+                            className={`
+                              relative p-3 rounded-lg text-left transition-all
+                              ${isActive
+                                ? 'ring-2 ring-blue-500'
+                                : 'hover:ring-1 hover:ring-purple-500/50'
+                              }
+                            `}
+                            style={{
+                              backgroundColor: 'var(--color-bg-secondary)',
+                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
+                            }}
+                            onMouseEnter={() => startPreviewCardSkin(cardSkinItem.id)}
+                            onMouseLeave={stopPreview}
+                          >
+                            {/* Preview gradient with mini cards */}
+                            <div
+                              className="w-full h-12 rounded mb-2 flex items-center justify-center gap-1"
+                              style={{ background: cardSkinItem.preview }}
+                            >
+                              {[5, 7, 3].map((val, idx) => (
+                                <div
+                                  key={idx}
+                                  className="w-6 h-9 rounded text-white font-bold text-xs flex items-center justify-center"
+                                  style={{
+                                    backgroundColor: cardSkinItem.suits[['red', 'blue', 'green'][idx] as 'red' | 'blue' | 'green'].color,
+                                    fontFamily: cardSkinItem.fontFamily,
+                                  }}
+                                >
+                                  {cardSkinItem.formatValue(val, false)}
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Skin info */}
+                            <h4
+                              className="font-medium text-sm"
+                              style={{ color: 'var(--color-text-primary)' }}
+                            >
+                              {cardSkinItem.name}
+                            </h4>
+                            <p
+                              className="text-xs line-clamp-1 mb-2"
+                              style={{ color: 'var(--color-text-muted)' }}
+                            >
+                              {cardSkinItem.description}
+                            </p>
+
+                            {/* Action buttons */}
+                            <div className="flex items-center justify-between">
+                              {isUnlocked ? (
+                                <>
+                                  {isActive ? (
+                                    <span className="text-xs px-2 py-1 rounded bg-blue-500 text-white">
+                                      Active
+                                    </span>
+                                  ) : (
+                                    <button
+                                      onClick={() => setCardSkin(cardSkinItem.id)}
+                                      className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                                    >
+                                      Select
+                                    </button>
+                                  )}
+                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                    ✓ Owned
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  {pricing.price > 0 ? (
+                                    <button
+                                      onClick={() => handlePurchaseSkin(cardSkinItem.id, 'card')}
+                                      disabled={!canAfford || isPurchasing}
+                                      className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                                        canAfford
+                                          ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                          : 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
+                                      }`}
+                                    >
+                                      <span>💰</span>
+                                      <span>{pricing.price}</span>
+                                    </button>
+                                  ) : (
+                                    <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
+                                      Free
+                                    </span>
+                                  )}
+                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                    Lvl {pricing.suggestedLevel}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* UI Theme Skins Section */}
@@ -594,43 +819,32 @@ export function ProfileProgressModal({
                       className="text-xs mb-3"
                       style={{ color: 'var(--color-text-muted)' }}
                     >
-                      Change the overall look and feel of the interface
+                      Hover to preview. The entire interface will change!
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {skinList.map((skinItem) => {
-                        const isUnlocked = isSkinUnlocked(skinItem.id);
-                        const requiredLevel = getRequiredLevel(skinItem.id);
+                        const isUnlocked = isSkinUnlocked(skinItem.id) || progression.unlockedSkins.includes(skinItem.id);
+                        const pricing = getSkinPricing(skinItem.id as SkinId);
                         const isActive = skinId === skinItem.id;
+                        const canAfford = progression.cosmeticCurrency >= pricing.price;
 
                         return (
-                          <button
+                          <div
                             key={skinItem.id}
-                            onClick={() => isUnlocked && setSkin(skinItem.id as SkinId)}
-                            disabled={!isUnlocked}
                             className={`
                               relative p-3 rounded-lg text-left transition-all
                               ${isActive
                                 ? 'ring-2 ring-blue-500'
-                                : isUnlocked
-                                  ? 'hover:scale-[1.02] cursor-pointer'
-                                  : 'opacity-60 cursor-not-allowed'
+                                : 'hover:ring-1 hover:ring-purple-500/50'
                               }
                             `}
                             style={{
                               backgroundColor: 'var(--color-bg-secondary)',
                               border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
                             }}
+                            onMouseEnter={() => startPreviewSkin(skinItem.id as SkinId)}
+                            onMouseLeave={stopPreview}
                           >
-                            {/* Lock overlay */}
-                            {!isUnlocked && (
-                              <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/40 z-10">
-                                <div className="text-center">
-                                  <span className="text-2xl">🔒</span>
-                                  <p className="text-xs text-white mt-1">Level {requiredLevel}</p>
-                                </div>
-                              </div>
-                            )}
-
                             {/* Preview gradient */}
                             <div
                               className="w-full h-12 rounded mb-2"
@@ -645,19 +859,59 @@ export function ProfileProgressModal({
                               {skinItem.name}
                             </h4>
                             <p
-                              className="text-xs line-clamp-1"
+                              className="text-xs line-clamp-1 mb-2"
                               style={{ color: 'var(--color-text-muted)' }}
                             >
                               {skinItem.description}
                             </p>
 
-                            {/* Active indicator */}
-                            {isActive && (
-                              <span className="absolute top-2 right-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded">
-                                Active
-                              </span>
-                            )}
-                          </button>
+                            {/* Action buttons */}
+                            <div className="flex items-center justify-between">
+                              {isUnlocked ? (
+                                <>
+                                  {isActive ? (
+                                    <span className="text-xs px-2 py-1 rounded bg-blue-500 text-white">
+                                      Active
+                                    </span>
+                                  ) : (
+                                    <button
+                                      onClick={() => setSkin(skinItem.id as SkinId)}
+                                      className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                                    >
+                                      Select
+                                    </button>
+                                  )}
+                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                    ✓ Owned
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  {pricing.price > 0 ? (
+                                    <button
+                                      onClick={() => handlePurchaseSkin(skinItem.id, 'ui')}
+                                      disabled={!canAfford || isPurchasing}
+                                      className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                                        canAfford
+                                          ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                          : 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
+                                      }`}
+                                    >
+                                      <span>💰</span>
+                                      <span>{pricing.price}</span>
+                                    </button>
+                                  ) : (
+                                    <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
+                                      Free
+                                    </span>
+                                  )}
+                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                    Lvl {pricing.suggestedLevel}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
                         );
                       })}
                     </div>
