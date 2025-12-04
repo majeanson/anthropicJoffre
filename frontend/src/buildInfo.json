@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-11-30T01:20:42.756Z",
-  "version": "4.0.0",
+  "buildDate": "2025-12-04T03:25:00.000Z",
+  "version": "4.0.1",
   "git": {
-    "commitMessage": "fix: Add SettingsProvider to GameHeader Storybook stories\n\nWrap GameHeader stories with SettingsProvider to fix Chromatic build errors.\nThe component uses useSettings() hook which requires the context provider.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "e3d6156",
-    "commitDate": "2025-11-29 20:10:25 -0500",
+    "commitMessage": "feat: Add card skins to progress modal and lobby settings",
+    "commitHash": "d64044a",
+    "commitDate": "2025-12-03 22:19:59 -0500",
     "branch": "main"
   },
   "futureTodos": [

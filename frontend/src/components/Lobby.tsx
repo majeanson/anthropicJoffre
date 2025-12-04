@@ -491,7 +491,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     <LoginStreakBadge
                       socket={socket}
                       playerName={user.username}
-                      onClick={onShowPersonalHub}
+                      onClick={onShowProgress}
                     />
                     {/* Profile Button - Clickable dropdown menu with profile actions */}
                     <ProfileButton
@@ -500,7 +500,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       socket={socket}
                       onShowLogin={onShowLogin}
                       onShowProfileEditor={() => setShowProfileEditor(true)}
-                      onShowPersonalHub={onShowPersonalHub}
+                      onShowPersonalHub={onShowProgress}
                     />
                   </div>
                 ) : (
