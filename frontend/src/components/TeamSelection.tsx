@@ -5,7 +5,7 @@
  * Features team panels, bot management, and game setup.
  */
 
-import { Player, ChatMessage } from '../types/game';
+import { Player, ChatMessage, VoiceParticipant } from '../types/game';
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Socket } from 'socket.io-client';
 import { HowToPlay } from './HowToPlay';
@@ -33,6 +33,13 @@ interface TeamSelectionProps {
   socket?: Socket | null;
   botDifficulty?: BotDifficulty;
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
+  // Voice chat props
+  isVoiceEnabled?: boolean;
+  isVoiceMuted?: boolean;
+  voiceParticipants?: VoiceParticipant[];
+  voiceError?: string | null;
+  onVoiceToggle?: () => void;
+  onVoiceMuteToggle?: () => void;
 }
 
 export function TeamSelection({
@@ -49,6 +56,12 @@ export function TeamSelection({
   socket,
   botDifficulty = 'medium',
   onBotDifficultyChange,
+  isVoiceEnabled = false,
+  isVoiceMuted = false,
+  voiceParticipants = [],
+  // voiceError, // Available for error display
+  onVoiceToggle,
+  onVoiceMuteToggle,
 }: TeamSelectionProps) {
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -465,6 +478,27 @@ export function TeamSelection({
           >
             👥 Find Players
           </Button>
+          {/* Voice Chat Buttons */}
+          {onVoiceToggle && (
+            <Button
+              onClick={() => { sounds.buttonClick(); onVoiceToggle(); }}
+              variant={isVoiceEnabled ? "success" : "secondary"}
+              size="sm"
+              title={isVoiceEnabled ? `Voice Chat (${voiceParticipants.length} in call)` : "Join Voice Chat"}
+            >
+              {isVoiceEnabled ? (isVoiceMuted ? "🔇" : "🎙️") : "🎤"} Voice{isVoiceEnabled && ` (${voiceParticipants.length})`}
+            </Button>
+          )}
+          {isVoiceEnabled && onVoiceMuteToggle && (
+            <Button
+              onClick={() => { sounds.buttonClick(); onVoiceMuteToggle(); }}
+              variant={isVoiceMuted ? "warning" : "secondary"}
+              size="sm"
+              title={isVoiceMuted ? "Unmute microphone" : "Mute microphone"}
+            >
+              {isVoiceMuted ? "🔇 Unmute" : "🔊 Mute"}
+            </Button>
+          )}
         </div>
 
 

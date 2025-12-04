@@ -13,7 +13,7 @@ import { Leaderboard } from '../Leaderboard';
 import { UnifiedChat } from '../UnifiedChat';
 import { GameHeader } from '../GameHeader';
 import { HowToPlay } from '../HowToPlay';
-import { ChatMessage } from '../../types/game';
+import { ChatMessage, VoiceParticipant } from '../../types/game';
 import { GameState, Card as CardType } from '../../types/game';
 import { sounds } from '../../utils/sounds';
 import { ConnectionStats } from '../../hooks/useConnectionQuality';
@@ -48,6 +48,13 @@ interface PlayingPhaseProps {
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
   connectionStats?: ConnectionStats;
+  // Voice chat props
+  isVoiceEnabled?: boolean;
+  isVoiceMuted?: boolean;
+  voiceParticipants?: VoiceParticipant[];
+  voiceError?: string | null;
+  onVoiceToggle?: () => void;
+  onVoiceMuteToggle?: () => void;
 }
 
 function PlayingPhaseComponent({
@@ -71,6 +78,12 @@ function PlayingPhaseComponent({
   chatMessages = [],
   onNewChatMessage,
   connectionStats,
+  isVoiceEnabled = false,
+  isVoiceMuted = false,
+  voiceParticipants = [],
+  voiceError,
+  onVoiceToggle,
+  onVoiceMuteToggle,
 }: PlayingPhaseProps) {
   // CRITICAL: Check player existence BEFORE any hooks
   const playerLookup = isSpectator
@@ -438,6 +451,12 @@ function PlayingPhaseComponent({
         highestBet={gameState.highestBet ? { amount: gameState.highestBet.amount, withoutTrump: gameState.highestBet.withoutTrump, playerId: gameState.highestBet.playerId } : undefined}
         trump={gameState.trump}
         bettingTeamId={gameState.highestBet?.playerId ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId : null}
+        isVoiceEnabled={isVoiceEnabled}
+        isVoiceMuted={isVoiceMuted}
+        voiceParticipants={voiceParticipants}
+        voiceError={voiceError}
+        onVoiceToggle={onVoiceToggle}
+        onVoiceMuteToggle={onVoiceMuteToggle}
       />
 
       <div className="flex flex-col flex-1 overflow-visible relative">

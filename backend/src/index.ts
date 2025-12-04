@@ -43,7 +43,7 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { ConnectionManager } from './connection/ConnectionManager';
-import { GameState, Player, Bet, TrickCard, Card, PlayerSession, GamePhase } from './types/game';
+import { GameState, Player, Bet, TrickCard, Card, PlayerSession, GamePhase, VoiceParticipant } from './types/game';
 import { createDeck, shuffleDeck, dealCards } from './game/deck';
 import {
   determineWinner,
@@ -207,6 +207,7 @@ import { registerNotificationHandlers } from './socketHandlers/notifications'; /
 import { registerDirectMessageHandlers } from './socketHandlers/directMessages'; // Sprint 16 Day 4
 import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 Day 6
 import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: Daily Engagement System
+import { registerVoiceHandlers } from './socketHandlers/voice'; // Voice chat WebRTC signaling
 import {
   generateSessionToken as generateSessionTokenUtil,
   createPlayerSession as createPlayerSessionUtil,
@@ -480,6 +481,9 @@ const activeTimeouts = new Map<string, NodeJS.Timeout>();
 
 // Disconnect timeout storage (maps socket.id to timeout ID)
 const disconnectTimeouts = new Map<string, NodeJS.Timeout>();
+
+// Voice chat participants (maps gameId -> (socketId -> VoiceParticipant))
+const voiceParticipants = new Map<string, Map<string, VoiceParticipant>>();
 
 // Swap request tracking (maps gameId-targetPlayerId to request data)
 interface SwapRequest {
@@ -1228,6 +1232,17 @@ io.on('connection', (socket) => {
   // Quest Handlers - Sprint 19: Daily Engagement System
   // ============================================================================
   registerQuestHandlers(socket);
+
+  // ============================================================================
+  // Voice Chat Handlers - WebRTC Signaling
+  // ============================================================================
+  registerVoiceHandlers(socket, {
+    games,
+    voiceParticipants,
+    io,
+    logger,
+    errorBoundaries,
+  });
 
   // ============================================================================
   // Connection Handlers - Refactored (Sprint 3)

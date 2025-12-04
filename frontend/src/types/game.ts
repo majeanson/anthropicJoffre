@@ -269,3 +269,15 @@ export interface OnlinePlayer {
   gameId?: string;
   lastActivity: number;
 }
+
+/**
+ * Voice chat participant
+ * Sync with backend/src/types/game.ts
+ */
+export interface VoiceParticipant {
+  odId: string;        // Socket ID of the participant
+  name: string;        // Display name
+  isSpectator: boolean; // True if spectator, false if player
+  isMuted: boolean;    // Mute state
+  isSpeaking: boolean; // Voice activity indicator
+}

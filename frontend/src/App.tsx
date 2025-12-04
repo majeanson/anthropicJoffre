@@ -46,6 +46,8 @@ import { useBotManagement } from './hooks/useBotManagement';
 import { useConnectionQuality } from './hooks/useConnectionQuality';
 // Sprint 3 Refactoring: Audio management
 import { useAudioManager } from './hooks/useAudioManager';
+// Voice chat hook
+import { useVoiceChat } from './hooks/useVoiceChat';
 // Sprint 3 Refactoring: Debug mode management
 import { useDebugMode } from './hooks/useDebugMode';
 // Sprint 3 Refactoring: UI state management
@@ -110,6 +112,27 @@ function AppContent() {
 
   // Sprint 3 Refactoring: Audio management hook
   const { soundEnabled, toggleSound, playErrorSound } = useAudioManager({ gameState });
+
+  // Voice chat hook
+  const {
+    isVoiceEnabled,
+    // isConnecting: isVoiceConnecting, // Available for UI loading state
+    isMuted: isVoiceMuted,
+    participants: voiceParticipants,
+    error: voiceError,
+    joinVoice,
+    leaveVoice,
+    toggleMute: toggleVoiceMute,
+  } = useVoiceChat({ socket, gameId, isSpectator });
+
+  // Voice toggle handler
+  const handleVoiceToggle = useCallback(() => {
+    if (isVoiceEnabled) {
+      leaveVoice();
+    } else {
+      joinVoice();
+    }
+  }, [isVoiceEnabled, joinVoice, leaveVoice]);
 
   // Sprint 3 Refactoring: Debug mode management hook
   const {
@@ -867,6 +890,12 @@ function AppContent() {
               socket={socket}
               botDifficulty={botDifficulty}
               onBotDifficultyChange={setBotDifficulty}
+              isVoiceEnabled={isVoiceEnabled}
+              isVoiceMuted={isVoiceMuted}
+              voiceParticipants={voiceParticipants}
+              voiceError={voiceError}
+              onVoiceToggle={handleVoiceToggle}
+              onVoiceMuteToggle={toggleVoiceMute}
             />
           </Suspense>
         </ErrorBoundary>
@@ -955,6 +984,12 @@ function AppContent() {
             gameId={gameId}
             chatMessages={chatMessages}
             onNewChatMessage={handleNewChatMessage}
+            isVoiceEnabled={isVoiceEnabled}
+            isVoiceMuted={isVoiceMuted}
+            voiceParticipants={voiceParticipants}
+            voiceError={voiceError}
+            onVoiceToggle={handleVoiceToggle}
+            onVoiceMuteToggle={toggleVoiceMute}
           />
           </Suspense>
         </ErrorBoundary>
@@ -1041,6 +1076,12 @@ function AppContent() {
           chatMessages={chatMessages}
           onNewChatMessage={handleNewChatMessage}
           connectionStats={connectionStats}
+          isVoiceEnabled={isVoiceEnabled}
+          isVoiceMuted={isVoiceMuted}
+          voiceParticipants={voiceParticipants}
+          voiceError={voiceError}
+          onVoiceToggle={handleVoiceToggle}
+          onVoiceMuteToggle={toggleVoiceMute}
         />
           </Suspense>
         </ErrorBoundary>

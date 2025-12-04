@@ -296,3 +296,14 @@ export interface PlayerStats {
   current_loss_streak?: number;
   best_win_streak?: number;
 }
+
+/**
+ * Voice chat participant
+ */
+export interface VoiceParticipant {
+  odId: string;        // Socket ID of the participant
+  name: string;        // Display name
+  isSpectator: boolean; // True if spectator, false if player
+  isMuted: boolean;    // Mute state
+  isSpeaking: boolean; // Voice activity indicator
+}

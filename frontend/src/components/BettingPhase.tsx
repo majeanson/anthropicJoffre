@@ -7,7 +7,7 @@
 
 import { useMemo, useState, useEffect, memo } from 'react';
 import { Socket } from 'socket.io-client';
-import { Bet, Player, GameState } from '../types/game';
+import { Bet, Player, GameState, VoiceParticipant } from '../types/game';
 import { Card as CardComponent } from './Card';
 import { TimeoutIndicator } from './TimeoutIndicator';
 import { Leaderboard } from './Leaderboard';
@@ -46,6 +46,13 @@ interface BettingPhaseProps {
   chatMessages?: ChatMessage[];
   onNewChatMessage?: (message: ChatMessage) => void;
   onClickPlayer: (playerName: string) => void;
+  // Voice chat props
+  isVoiceEnabled?: boolean;
+  isVoiceMuted?: boolean;
+  voiceParticipants?: VoiceParticipant[];
+  voiceError?: string | null;
+  onVoiceToggle?: () => void;
+  onVoiceMuteToggle?: () => void;
 }
 
 function BettingPhaseComponent({
@@ -70,7 +77,13 @@ function BettingPhaseComponent({
   gameId,
   chatMessages = [],
   onNewChatMessage,
-  onClickPlayer
+  onClickPlayer,
+  isVoiceEnabled = false,
+  isVoiceMuted = false,
+  voiceParticipants = [],
+  voiceError,
+  onVoiceToggle,
+  onVoiceMuteToggle,
 }: BettingPhaseProps) {
   const { beginnerMode } = useSettings();
 
@@ -259,6 +272,12 @@ function BettingPhaseComponent({
         highestBet={highestBet ? { amount: highestBet.amount, withoutTrump: highestBet.withoutTrump, playerId: highestBet.playerId } : undefined}
         trump={gameState.trump}
         bettingTeamId={gameState.highestBet?.playerId ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId : null}
+        isVoiceEnabled={isVoiceEnabled}
+        isVoiceMuted={isVoiceMuted}
+        voiceParticipants={voiceParticipants}
+        voiceError={voiceError}
+        onVoiceToggle={onVoiceToggle}
+        onVoiceMuteToggle={onVoiceMuteToggle}
       />
 
       <div className="flex-1 flex items-center justify-center p-4">

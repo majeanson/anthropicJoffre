@@ -10,7 +10,7 @@ import { SettingsPanel } from './SettingsPanel';
 import { TutorialProgressModal } from './TutorialProgressModal';
 import { HeaderActionButton, Button } from './ui';
 import { ConnectionStats } from '../hooks/useConnectionQuality';
-import { CardColor } from '../types/game';
+import { CardColor, VoiceParticipant } from '../types/game';
 import { useCountUp } from '../hooks/useCountUp';
 import { useSettings } from '../contexts/SettingsContext';
 import logger from '../utils/logger';
@@ -41,6 +41,13 @@ interface GameHeaderProps {
   highestBet?: { amount: number; withoutTrump: boolean; playerId: string };
   trump?: CardColor | null;
   bettingTeamId?: 1 | 2 | null;
+  // Voice chat props
+  isVoiceEnabled?: boolean;
+  isVoiceMuted?: boolean;
+  voiceParticipants?: VoiceParticipant[];
+  voiceError?: string | null;
+  onVoiceToggle?: () => void;
+  onVoiceMuteToggle?: () => void;
 }
 
 export function GameHeader({
@@ -68,7 +75,13 @@ export function GameHeader({
   connectionStats,
   highestBet,
   trump,
-  bettingTeamId
+  bettingTeamId,
+  isVoiceEnabled = false,
+  isVoiceMuted = false,
+  voiceParticipants = [],
+  voiceError,
+  onVoiceToggle,
+  onVoiceMuteToggle,
 }: GameHeaderProps) {
   const { beginnerMode } = useSettings();
   const [linkCopied, setLinkCopied] = useState(false);
@@ -271,6 +284,32 @@ export function GameHeader({
               />
             )}
 
+            {/* Voice Chat Button */}
+            {onVoiceToggle && (
+              <HeaderActionButton
+                onClick={onVoiceToggle}
+                icon={isVoiceEnabled ? (isVoiceMuted ? "🔇" : "🎙️") : "🎤"}
+                label={isVoiceEnabled ? (isVoiceMuted ? "Muted" : "Voice") : "Voice"}
+                badgeCount={isVoiceEnabled ? voiceParticipants.length : undefined}
+                title={isVoiceEnabled
+                  ? `Voice Chat (${voiceParticipants.length} in call)${voiceError ? ` - ${voiceError}` : ''}`
+                  : "Join Voice Chat"
+                }
+                testId="header-voice-button"
+              />
+            )}
+
+            {/* Mute Button - only when voice enabled */}
+            {isVoiceEnabled && onVoiceMuteToggle && (
+              <HeaderActionButton
+                onClick={onVoiceMuteToggle}
+                icon={isVoiceMuted ? "🔇" : "🔊"}
+                label={isVoiceMuted ? "Unmute" : "Mute"}
+                title={isVoiceMuted ? "Unmute microphone" : "Mute microphone"}
+                testId="header-mute-button"
+              />
+            )}
+
             {onOpenLeaderboard && (
               <HeaderActionButton
                 onClick={onOpenLeaderboard}
@@ -429,6 +468,29 @@ export function GameHeader({
                 icon="💬"
                 badgeCount={unreadChatCount}
                 title="Chat"
+                size="sm"
+                className="p-1.5"
+              />
+            )}
+
+            {/* Voice Chat Button - Mobile */}
+            {onVoiceToggle && (
+              <HeaderActionButton
+                onClick={onVoiceToggle}
+                icon={isVoiceEnabled ? (isVoiceMuted ? "🔇" : "🎙️") : "🎤"}
+                badgeCount={isVoiceEnabled ? voiceParticipants.length : undefined}
+                title={isVoiceEnabled ? `Voice (${voiceParticipants.length})` : "Voice"}
+                size="sm"
+                className="p-1.5"
+              />
+            )}
+
+            {/* Mute Button - Mobile (only when voice enabled) */}
+            {isVoiceEnabled && onVoiceMuteToggle && (
+              <HeaderActionButton
+                onClick={onVoiceMuteToggle}
+                icon={isVoiceMuted ? "🔇" : "🔊"}
+                title={isVoiceMuted ? "Unmute" : "Mute"}
                 size="sm"
                 className="p-1.5"
               />
