@@ -26,8 +26,8 @@ export default defineConfig({
     },
   },
   build: {
-    // Chunk size warning limit (increase to 1000 kB to reduce warnings)
-    chunkSizeWarningLimit: 1000,
+    // Chunk size warning limit - keep at 500KB to catch large bundles
+    chunkSizeWarningLimit: 500,
 
     rollupOptions: {
       output: {
@@ -41,6 +41,9 @@ export default defineConfig({
 
           // Sentry vendor chunk (if used)
           'vendor-sentry': ['@sentry/react'],
+
+          // UI utilities chunk
+          'vendor-ui': ['clsx', 'tailwind-merge'],
         },
 
         // Optimize chunk file names for better caching

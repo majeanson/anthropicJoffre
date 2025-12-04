@@ -119,7 +119,7 @@ export async function acceptFriendRequest(requestId: number): Promise<Friendship
     // If friendship already existed, fetch it
     if (friendshipResult.rows.length === 0) {
       const existingFriendship = await client.query(
-        'SELECT * FROM friendships WHERE player1_name = $1 AND player2_name = $2',
+        'SELECT id, player1_name, player2_name, created_at FROM friendships WHERE player1_name = $1 AND player2_name = $2',
         [player1, player2]
       );
       if (existingFriendship.rows.length === 0) {

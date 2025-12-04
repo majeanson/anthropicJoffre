@@ -33,7 +33,8 @@ export async function getAllQuestTemplates(): Promise<QuestTemplate[]> {
   }
 
   const result = await pool.query<QuestTemplate>(
-    `SELECT * FROM quest_templates WHERE is_active = TRUE ORDER BY quest_type, id`
+    `SELECT id, name, description, quest_type, target_value, reward_xp, reward_currency, icon, is_active
+     FROM quest_templates WHERE is_active = TRUE ORDER BY quest_type, id`
   );
 
   return result.rows;
@@ -384,7 +385,7 @@ export async function updateLoginStreak(playerName: string): Promise<{
     longest_streak: number;
     freeze_used: boolean;
   }>(
-    `SELECT * FROM update_login_streak($1)`,
+    `SELECT current_streak, longest_streak, freeze_used FROM update_login_streak($1)`,
     [playerName]
   );
 
@@ -613,7 +614,12 @@ export async function claimCalendarReward(
     const progressResult = await client.query(
       `
       SELECT
-        *,
+        player_name,
+        current_day,
+        rewards_claimed,
+        month_start_date,
+        last_claimed_date,
+        calendar_resets,
         LEAST(30, GREATEST(1, (CURRENT_DATE - month_start_date)::int + 1)) as actual_current_day
       FROM player_calendar_progress
       WHERE player_name = $1
@@ -651,7 +657,8 @@ export async function claimCalendarReward(
 
     // Get reward details
     const rewardResult = await client.query(
-      `SELECT * FROM daily_rewards_calendar WHERE day_number = $1`,
+      `SELECT day_number, reward_type, reward_amount, reward_item_id, is_special, icon, description
+       FROM daily_rewards_calendar WHERE day_number = $1`,
       [dayNumber]
     );
 
@@ -915,7 +922,7 @@ export async function claimWeeklyReward(
     reward_currency: number;
     message: string;
   }>(
-    `SELECT * FROM claim_weekly_reward($1, $2)`,
+    `SELECT success, reward_xp, reward_currency, message FROM claim_weekly_reward($1, $2)`,
     [playerName, dayNumber]
   );
 

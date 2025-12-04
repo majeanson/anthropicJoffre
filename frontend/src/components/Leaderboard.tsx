@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { GameState } from '../types/game';
 import { Card as CardComponent } from './Card';
 import { UICard, UIBadge, Modal, Button } from './ui';
@@ -17,9 +17,15 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
   const team2Score = gameState.teamScores.team2;
   const leadingTeam = team1Score > team2Score ? 1 : team1Score < team2Score ? 2 : null;
 
-  // Get team members
-  const team1Players = gameState.players.filter(p => p.teamId === 1);
-  const team2Players = gameState.players.filter(p => p.teamId === 2);
+  // Memoize team members to avoid recalculating on every render
+  const team1Players = useMemo(() => gameState.players.filter(p => p.teamId === 1), [gameState.players]);
+  const team2Players = useMemo(() => gameState.players.filter(p => p.teamId === 2), [gameState.players]);
+
+  // Memoize reversed round history to avoid creating new array on every render
+  const reversedRoundHistory = useMemo(
+    () => gameState.roundHistory.slice().reverse(),
+    [gameState.roundHistory]
+  );
 
   const toggleRound = (roundNumber: number) => {
     const newExpanded = new Set(expandedRounds);
@@ -137,13 +143,13 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
           )}
 
           {/* Round History */}
-          {gameState.roundHistory.length > 0 && (
+          {reversedRoundHistory.length > 0 && (
             <section>
               <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
                 <span aria-hidden="true">📜</span> Round History
               </h3>
               <div className="space-y-3">
-                {gameState.roundHistory.slice().reverse().map((round) => {
+                {reversedRoundHistory.map((round) => {
                   const betPlayer = gameState.players.find(p => p.id === round.highestBet.playerId);
                   const isExpanded = expandedRounds.has(round.roundNumber);
                   const hasTricks = round.tricks && round.tricks.length > 0;

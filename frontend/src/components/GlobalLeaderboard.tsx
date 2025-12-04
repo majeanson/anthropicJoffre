@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, memo } from 'react';
 import { Socket } from 'socket.io-client';
 import { getTierColor, getTierIcon, getRankMedal } from '../utils/tierBadge';
 import { TableSkeleton } from './ui/Skeleton';
@@ -29,6 +29,106 @@ interface GlobalLeaderboardProps {
   onClose: () => void;
   onViewPlayerStats?: (playerName: string) => void;
 }
+
+// Memoized player row component to prevent re-renders
+interface LeaderboardRowProps {
+  player: LeaderboardPlayer;
+  index: number;
+  showRoundStats: boolean;
+  onViewPlayerStats?: (playerName: string) => void;
+}
+
+const LeaderboardRow = memo(function LeaderboardRow({
+  player,
+  index,
+  showRoundStats,
+  onViewPlayerStats,
+}: LeaderboardRowProps) {
+  return (
+    <div
+      className={`grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 p-4 rounded-lg transition-all duration-200 ${
+        index < 3
+          ? 'bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40 border-2 border-yellow-400 dark:border-yellow-600'
+          : 'bg-parchment-50 dark:bg-gray-800 hover:bg-parchment-100 dark:hover:bg-gray-750 border border-parchment-400 dark:border-gray-600'
+      } ${onViewPlayerStats ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
+      onClick={() => onViewPlayerStats?.(player.player_name)}
+    >
+      {/* Rank */}
+      <div className="col-span-1 flex items-center">
+        <span className="text-2xl md:text-3xl font-bold text-umber-800 dark:text-gray-300">
+          {getRankMedal(index + 1)}
+        </span>
+      </div>
+
+      {/* Player Name */}
+      <div className="col-span-1 md:col-span-2 flex flex-col justify-center">
+        <p className="font-bold text-lg text-umber-900 dark:text-gray-100">{player.player_name}</p>
+        <p className="text-xs text-umber-600 dark:text-gray-400">
+          {showRoundStats
+            ? `${player.rounds_won || 0}W - ${(player.total_rounds_played || 0) - (player.rounds_won || 0)}L`
+            : `${player.games_won}W - ${player.games_lost}L`
+          }
+        </p>
+      </div>
+
+      {!showRoundStats ? (
+        <>
+          {/* ELO Rating */}
+          <div className="col-span-1 flex flex-col items-center justify-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">ELO</p>
+            <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{player.elo_rating}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">Peak: {player.highest_rating}</p>
+          </div>
+
+          {/* Games Played */}
+          <div className="col-span-1 flex flex-col items-center justify-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Games</p>
+            <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games_played}</p>
+          </div>
+
+          {/* Win Percentage */}
+          <div className="col-span-1 flex flex-col items-center justify-center">
+            <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Win Rate</p>
+            <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.win_percentage}%</p>
+          </div>
+
+          {/* Tier Badge */}
+          <div className="col-span-1 flex items-center justify-center">
+            <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.ranking_tier, true)}`}>
+              {getTierIcon(player.ranking_tier)} {player.ranking_tier}
+            </span>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Total Rounds Played */}
+          <div className="col-span-1 flex flex-col items-center justify-center">
+            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Rounds</p>
+            <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{player.total_rounds_played || 0}</p>
+          </div>
+
+          {/* Round Win Percentage */}
+          <div className="col-span-1 flex flex-col items-center justify-center">
+            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Round Win%</p>
+            <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.rounds_win_percentage || 0}%</p>
+          </div>
+
+          {/* Average Tricks Per Round */}
+          <div className="col-span-1 flex flex-col items-center justify-center">
+            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Avg Tricks</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{player.avg_tricks_per_round || 0}</p>
+          </div>
+
+          {/* Bet Success Rate */}
+          <div className="col-span-1 flex flex-col items-center justify-center">
+            <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Bet Success</p>
+            <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{player.bet_success_rate || 0}%</p>
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
 
 export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }: GlobalLeaderboardProps) {
   // ✅ CRITICAL: Check isOpen BEFORE any hooks to prevent "Rendered more hooks than during the previous render" error
@@ -122,89 +222,13 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
 
               {/* Player Rows */}
               {players.map((player, index) => (
-                <div
+                <LeaderboardRow
                   key={player.player_name}
-                  className={`grid grid-cols-1 md:grid-cols-7 gap-2 md:gap-4 p-4 rounded-lg transition-all duration-200 ${
-                    index < 3
-                      ? 'bg-gradient-to-r from-yellow-100 to-amber-100 dark:from-yellow-900/40 dark:to-amber-900/40 border-2 border-yellow-400 dark:border-yellow-600'
-                      : 'bg-parchment-50 dark:bg-gray-800 hover:bg-parchment-100 dark:hover:bg-gray-750 border border-parchment-400 dark:border-gray-600'
-                  } ${onViewPlayerStats ? 'cursor-pointer hover:scale-[1.02]' : ''}`}
-                  onClick={() => onViewPlayerStats?.(player.player_name)}
-                >
-                  {/* Rank */}
-                  <div className="col-span-1 flex items-center">
-                    <span className="text-2xl md:text-3xl font-bold text-umber-800 dark:text-gray-300">
-                      {getRankMedal(index + 1)}
-                    </span>
-                  </div>
-
-                  {/* Player Name */}
-                  <div className="col-span-1 md:col-span-2 flex flex-col justify-center">
-                    <p className="font-bold text-lg text-umber-900 dark:text-gray-100">{player.player_name}</p>
-                    <p className="text-xs text-umber-600 dark:text-gray-400">
-                      {showRoundStats
-                        ? `${player.rounds_won || 0}W - ${(player.total_rounds_played || 0) - (player.rounds_won || 0)}L`
-                        : `${player.games_won}W - ${player.games_lost}L`
-                      }
-                    </p>
-                  </div>
-
-                  {!showRoundStats ? (
-                    <>
-                      {/* ELO Rating */}
-                      <div className="col-span-1 flex flex-col items-center justify-center">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">ELO</p>
-                        <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{player.elo_rating}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-500">Peak: {player.highest_rating}</p>
-                      </div>
-
-                      {/* Games Played */}
-                      <div className="col-span-1 flex flex-col items-center justify-center">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Games</p>
-                        <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games_played}</p>
-                      </div>
-
-                      {/* Win Percentage */}
-                      <div className="col-span-1 flex flex-col items-center justify-center">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Win Rate</p>
-                        <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.win_percentage}%</p>
-                      </div>
-
-                      {/* Tier Badge */}
-                      <div className="col-span-1 flex items-center justify-center">
-                        <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.ranking_tier, true)}`}>
-                          {getTierIcon(player.ranking_tier)} {player.ranking_tier}
-                        </span>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      {/* Total Rounds Played */}
-                      <div className="col-span-1 flex flex-col items-center justify-center">
-                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Rounds</p>
-                        <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{player.total_rounds_played || 0}</p>
-                      </div>
-
-                      {/* Round Win Percentage */}
-                      <div className="col-span-1 flex flex-col items-center justify-center">
-                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Round Win%</p>
-                        <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.rounds_win_percentage || 0}%</p>
-                      </div>
-
-                      {/* Average Tricks Per Round */}
-                      <div className="col-span-1 flex flex-col items-center justify-center">
-                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Avg Tricks</p>
-                        <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{player.avg_tricks_per_round || 0}</p>
-                      </div>
-
-                      {/* Bet Success Rate */}
-                      <div className="col-span-1 flex flex-col items-center justify-center">
-                        <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Bet Success</p>
-                        <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{player.bet_success_rate || 0}%</p>
-                      </div>
-                    </>
-                  )}
-                </div>
+                  player={player}
+                  index={index}
+                  showRoundStats={showRoundStats}
+                  onViewPlayerStats={onViewPlayerStats}
+                />
               ))}
             </div>
           )}
