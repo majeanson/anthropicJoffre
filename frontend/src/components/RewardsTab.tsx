@@ -16,6 +16,7 @@ import {
   getNextTitle,
   getUpcomingRewards,
 } from '../utils/avatars';
+import { cardSkinList, CardSkin } from '../config/cardSkins';
 
 interface RewardsTabProps {
   playerLevel: number;
@@ -34,22 +35,46 @@ export function RewardsTab({
   const currentTitle = getTitleForLevel(playerLevel);
   const nextTitle = getNextTitle(playerLevel);
 
-  // Upcoming rewards (next 10 levels)
-  const upcomingRewards = useMemo(
-    () => getUpcomingRewards(playerLevel, 10),
-    [playerLevel]
-  );
+  // Upcoming rewards (next 10 levels) - including card skins
+  const upcomingRewards = useMemo(() => {
+    const baseRewards = getUpcomingRewards(playerLevel, 10);
+
+    // Enhance with card skins
+    return baseRewards.map(reward => ({
+      ...reward,
+      cardSkins: cardSkinList.filter(cs => cs.requiredLevel === reward.level),
+    }));
+  }, [playerLevel]);
+
+  // Also find levels with ONLY card skins (not covered by base rewards)
+  const additionalCardSkinLevels = useMemo(() => {
+    const existingLevels = new Set(upcomingRewards.map(r => r.level));
+    const cardSkinOnlyRewards: { level: number; cardSkins: CardSkin[] }[] = [];
+
+    for (let level = playerLevel + 1; level <= playerLevel + 10; level++) {
+      if (!existingLevels.has(level)) {
+        const cardSkinsAtLevel = cardSkinList.filter(cs => cs.requiredLevel === level);
+        if (cardSkinsAtLevel.length > 0) {
+          cardSkinOnlyRewards.push({ level, cardSkins: cardSkinsAtLevel });
+        }
+      }
+    }
+
+    return cardSkinOnlyRewards;
+  }, [playerLevel, upcomingRewards]);
 
   // Calculate progress stats
   const stats = useMemo(() => {
     const unlockedAvatars = AVATARS.filter(a => isAvatarUnlocked(a.id, playerLevel)).length;
     const unlockedTitles = TITLES.filter(t => t.unlockLevel <= playerLevel).length;
     const unlockedSkins = SKIN_REWARDS.filter(s => s.unlockLevel <= playerLevel).length;
+    const unlockedCardSkins = cardSkinList.filter(cs => cs.requiredLevel <= playerLevel).length;
 
     return {
       avatars: { unlocked: unlockedAvatars, total: AVATARS.length },
       titles: { unlocked: unlockedTitles, total: TITLES.length },
       skins: { unlocked: unlockedSkins, total: SKIN_REWARDS.length },
+      cardSkins: { unlocked: unlockedCardSkins, total: cardSkinList.length },
     };
   }, [playerLevel]);
 
@@ -119,7 +144,7 @@ export function RewardsTab({
       </div>
 
       {/* Collection Progress */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <ProgressCard
           icon="😀"
           label="Avatars"
@@ -134,14 +159,20 @@ export function RewardsTab({
         />
         <ProgressCard
           icon="🎨"
-          label="Skins"
+          label="UI Themes"
           unlocked={stats.skins.unlocked}
           total={stats.skins.total}
+        />
+        <ProgressCard
+          icon="🃏"
+          label="Card Skins"
+          unlocked={stats.cardSkins.unlocked}
+          total={stats.cardSkins.total}
         />
       </div>
 
       {/* Upcoming Rewards */}
-      {upcomingRewards.length > 0 && (
+      {(upcomingRewards.length > 0 || additionalCardSkinLevels.length > 0) && (
         <div>
           <h3
             className="text-lg font-semibold mb-3"
@@ -150,16 +181,30 @@ export function RewardsTab({
             Upcoming Rewards
           </h3>
           <div className="space-y-2">
-            {upcomingRewards.map(reward => (
-              <UpcomingRewardRow
-                key={reward.level}
-                level={reward.level}
-                currentLevel={playerLevel}
-                avatars={reward.avatars}
-                title={reward.title}
-                skins={reward.skins}
-              />
-            ))}
+            {/* Merge and sort all upcoming rewards by level */}
+            {[
+              ...upcomingRewards.map(r => ({ ...r, type: 'full' as const })),
+              ...additionalCardSkinLevels.map(r => ({
+                level: r.level,
+                avatars: [] as Avatar[],
+                title: null as Title | null,
+                skins: [] as SkinReward[],
+                cardSkins: r.cardSkins,
+                type: 'cardOnly' as const,
+              })),
+            ]
+              .sort((a, b) => a.level - b.level)
+              .map(reward => (
+                <UpcomingRewardRow
+                  key={reward.level}
+                  level={reward.level}
+                  currentLevel={playerLevel}
+                  avatars={reward.avatars}
+                  title={reward.title}
+                  skins={reward.skins}
+                  cardSkins={reward.cardSkins}
+                />
+              ))}
           </div>
         </div>
       )}
@@ -278,12 +323,14 @@ function UpcomingRewardRow({
   avatars,
   title,
   skins,
+  cardSkins,
 }: {
   level: number;
   currentLevel: number;
   avatars: Avatar[];
   title: Title | null;
   skins: SkinReward[];
+  cardSkins: CardSkin[];
 }) {
   const levelsAway = level - currentLevel;
 
@@ -337,6 +384,17 @@ function UpcomingRewardRow({
           >
             <span>🎨</span>
             <span style={{ color: 'var(--color-text-muted)' }}>{skin.name}</span>
+          </div>
+        ))}
+        {cardSkins.map(cardSkin => (
+          <div
+            key={cardSkin.id}
+            className="flex items-center gap-1 px-2 py-1 rounded-full text-sm"
+            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+            title={cardSkin.description}
+          >
+            <span>🃏</span>
+            <span style={{ color: 'var(--color-text-muted)' }}>{cardSkin.name}</span>
           </div>
         ))}
       </div>

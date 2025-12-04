@@ -811,9 +811,7 @@ function AppContent() {
           onShowLogin={modals.openLoginModal}
           onShowRegister={modals.openRegisterModal}
           onBotDifficultyChange={setBotDifficulty}
-          onShowQuests={() => setShowQuestsPanel(true)}
-          onShowRewardsCalendar={() => setShowRewardsCalendar(true)}
-          onShowPersonalHub={() => setShowPersonalHub(true)}
+          onShowProgress={() => setShowPersonalHub(true)}
         />
       </>
     );

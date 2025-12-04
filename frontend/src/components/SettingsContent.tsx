@@ -12,10 +12,11 @@
 import { useState } from 'react';
 import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
-import { useSkin } from '../contexts/SkinContext';
+import { useSkin, useCardSkin } from '../contexts/SkinContext';
 import { resetTutorialProgress, getTutorialStats } from '../utils/tutorialProgress';
 import { Button, NeonButton } from './ui/Button';
 import { SkinSelectorDropdown } from './SkinSelector';
+import { CardSkinDropdown } from './CardSkinSelector';
 
 interface SettingsContentProps {
   onShowRules: () => void;
@@ -78,6 +79,7 @@ function ToggleSwitch({
 export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentProps) {
   const { animationsEnabled, setAnimationsEnabled } = useSettings();
   useSkin();
+  useCardSkin(); // Initialize card skin context
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
   const [tutorialStats, setTutorialStats] = useState(getTutorialStats());
@@ -116,6 +118,17 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
               🎨 Visual Theme
             </label>
             <SkinSelectorDropdown />
+          </div>
+
+          {/* Card Skin */}
+          <div>
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+              🃏 Card Style
+            </label>
+            <CardSkinDropdown />
+            <p className="text-xs text-[var(--color-text-muted)] mt-2">
+              Unlock more card styles by leveling up!
+            </p>
           </div>
 
           {/* Divider */}

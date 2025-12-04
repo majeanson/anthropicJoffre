@@ -42,13 +42,11 @@ interface LobbyProps {
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
   onShowLogin?: () => void;
   onShowRegister?: () => void;
-  onShowQuests?: () => void;
-  onShowRewardsCalendar?: () => void;
-  onShowPersonalHub?: () => void;
+  onShowProgress?: () => void;
 }
 
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowQuests, onShowRewardsCalendar, onShowPersonalHub }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowProgress }: LobbyProps) {
   const { user, updateProfile, getUserProfile, isLoading: authLoading } = useAuth();
   // Use authenticated username if available, otherwise use stored playerName for guests
   // Initialize empty - will be set by useEffect once auth state is known
@@ -610,8 +608,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     setShowPlayerStats={setShowPlayerStats}
                     setShowLeaderboard={setShowLeaderboard}
                     setShowBrowser={setShowBrowser}
-                    onShowQuests={onShowQuests}
-                    onShowRewardsCalendar={onShowRewardsCalendar}
+                    onShowProgress={onShowProgress}
                   />
                 )}
 

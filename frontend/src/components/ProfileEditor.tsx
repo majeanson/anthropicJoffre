@@ -3,7 +3,7 @@
  * Sprint 3 Phase 3.2
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AvatarSelector } from './AvatarSelector';
 import { getAvatarById } from '../utils/avatars';
 import { Button, Checkbox, Select } from './ui';
@@ -70,6 +70,19 @@ export function ProfileEditor({ initialData, playerLevel = 1, onSave, onCancel }
 
   const [isSaving, setIsSaving] = useState(false);
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+
+  // Sync state with initialData when it changes (e.g., after async fetch)
+  useEffect(() => {
+    if (initialData) {
+      setAvatarId(initialData.avatar_id || 'dog');
+      setBio(initialData.bio || '');
+      setCountry(initialData.country || '');
+      setFavoriteTeam(initialData.favorite_team || null);
+      setVisibility(initialData.visibility || 'public');
+      setShowOnlineStatus(initialData.show_online_status !== undefined ? initialData.show_online_status : true);
+      setAllowFriendRequests(initialData.allow_friend_requests !== undefined ? initialData.allow_friend_requests : true);
+    }
+  }, [initialData]);
 
   const selectedAvatar = getAvatarById(avatarId);
 

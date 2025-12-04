@@ -23,6 +23,7 @@
  */
 
 import { ReactNode, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { getModalZIndex } from '../../config/zIndex';
 import { sizes } from '../../config/layout';
 
@@ -383,7 +384,8 @@ export function Modal({
 
   const hasHeader = title || icon || subtitle || showCloseButton;
 
-  return (
+  // Use portal to render at document.body level, avoiding stacking context issues
+  return createPortal(
     <div
       className={`fixed inset-0 flex items-center justify-center ${mobileFullScreen ? 'sm:p-4 max-sm:p-0' : 'p-4'}`}
       style={{ zIndex: modalZIndex }}
@@ -544,7 +546,8 @@ export function Modal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

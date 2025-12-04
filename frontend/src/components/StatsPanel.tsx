@@ -20,8 +20,7 @@ interface StatsPanelProps {
   setShowPlayerStats: (show: boolean) => void;
   setShowLeaderboard: (show: boolean) => void;
   setShowBrowser: (show: boolean) => void;
-  onShowQuests?: () => void;
-  onShowRewardsCalendar?: () => void;
+  onShowProgress?: () => void;
 }
 
 export function StatsPanel({
@@ -32,8 +31,7 @@ export function StatsPanel({
   setShowPlayerStats,
   setShowLeaderboard,
   setShowBrowser,
-  onShowQuests,
-  onShowRewardsCalendar,
+  onShowProgress,
 }: StatsPanelProps) {
   return (
     <div className="space-y-3">
@@ -99,36 +97,20 @@ export function StatsPanel({
             Recent Games
           </Button>
 
-          {/* Sprint 19: Quest System Buttons */}
-          {onShowQuests && (
+          {/* Progress & Rewards Button */}
+          {onShowProgress && (
             <Button
-              data-keyboard-nav="daily-quests"
+              data-keyboard-nav="progress"
               onClick={() => {
                 sounds.buttonClick();
-                onShowQuests();
+                onShowProgress();
               }}
               variant="secondary"
               size="lg"
               fullWidth
             >
-              <span className="text-xl">📋</span>
-              Daily Quests
-            </Button>
-          )}
-
-          {onShowRewardsCalendar && (
-            <Button
-              data-keyboard-nav="rewards-calendar"
-              onClick={() => {
-                sounds.buttonClick();
-                onShowRewardsCalendar();
-              }}
-              variant="secondary"
-              size="lg"
-              fullWidth
-            >
-              <span className="text-xl">🎁</span>
-              Rewards Calendar
+              <span className="text-xl">🏆</span>
+              Progress & Rewards
             </Button>
           )}
         </div>

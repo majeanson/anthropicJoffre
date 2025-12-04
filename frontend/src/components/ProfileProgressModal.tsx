@@ -11,12 +11,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Socket } from 'socket.io-client';
 import { LevelProgressBar } from './LevelProgressBar';
 import { WeeklyCalendar, WeeklyCalendarDay } from './WeeklyCalendar';
 import { RewardsTab } from './RewardsTab';
 import { useSkin, type SkinId } from '../contexts/SkinContext';
 import { skinList } from '../config/skins';
+import { CardSkinSelector } from './CardSkinSelector';
 import { Button, ProgressBar, UIBadge, UICard } from './ui';
 
 export type TabId = 'overview' | 'quests' | 'calendar' | 'skins' | 'rewards';
@@ -240,7 +242,8 @@ export function ProfileProgressModal({
     { id: 'skins', label: 'Skins', icon: '🎨' },
   ];
 
-  return (
+  // Use portal to ensure modal renders at document.body level, avoiding stacking context issues
+  return createPortal(
     <div
       className="fixed inset-0 flex items-center justify-center z-[10000]"
       style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
@@ -554,7 +557,7 @@ export function ProfileProgressModal({
 
               {/* Skins Tab */}
               {activeTab === 'skins' && progression && (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <p
                     className="text-sm"
                     style={{ color: 'var(--color-text-muted)' }}
@@ -562,70 +565,102 @@ export function ProfileProgressModal({
                     Unlock new skins by reaching higher levels. Your current level: <strong>{progression.level}</strong>
                   </p>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {skinList.map((skinItem) => {
-                      const isUnlocked = isSkinUnlocked(skinItem.id);
-                      const requiredLevel = getRequiredLevel(skinItem.id);
-                      const isActive = skinId === skinItem.id;
+                  {/* Card Skins Section */}
+                  <div>
+                    <h3
+                      className="font-semibold mb-3 flex items-center gap-2"
+                      style={{ color: 'var(--color-text-primary)' }}
+                    >
+                      <span>🃏</span> Card Skins
+                    </h3>
+                    <p
+                      className="text-xs mb-3"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      Change how your playing cards look during games
+                    </p>
+                    <CardSkinSelector columns={2} showPreview={true} />
+                  </div>
 
-                      return (
-                        <button
-                          key={skinItem.id}
-                          onClick={() => isUnlocked && setSkin(skinItem.id as SkinId)}
-                          disabled={!isUnlocked}
-                          className={`
-                            relative p-3 rounded-lg text-left transition-all
-                            ${isActive
-                              ? 'ring-2 ring-blue-500'
-                              : isUnlocked
-                                ? 'hover:scale-[1.02] cursor-pointer'
-                                : 'opacity-60 cursor-not-allowed'
-                            }
-                          `}
-                          style={{
-                            backgroundColor: 'var(--color-bg-secondary)',
-                            border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
-                          }}
-                        >
-                          {/* Lock overlay */}
-                          {!isUnlocked && (
-                            <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/40 z-10">
-                              <div className="text-center">
-                                <span className="text-2xl">🔒</span>
-                                <p className="text-xs text-white mt-1">Level {requiredLevel}</p>
+                  {/* UI Theme Skins Section */}
+                  <div>
+                    <h3
+                      className="font-semibold mb-3 flex items-center gap-2"
+                      style={{ color: 'var(--color-text-primary)' }}
+                    >
+                      <span>🎨</span> UI Themes
+                    </h3>
+                    <p
+                      className="text-xs mb-3"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      Change the overall look and feel of the interface
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {skinList.map((skinItem) => {
+                        const isUnlocked = isSkinUnlocked(skinItem.id);
+                        const requiredLevel = getRequiredLevel(skinItem.id);
+                        const isActive = skinId === skinItem.id;
+
+                        return (
+                          <button
+                            key={skinItem.id}
+                            onClick={() => isUnlocked && setSkin(skinItem.id as SkinId)}
+                            disabled={!isUnlocked}
+                            className={`
+                              relative p-3 rounded-lg text-left transition-all
+                              ${isActive
+                                ? 'ring-2 ring-blue-500'
+                                : isUnlocked
+                                  ? 'hover:scale-[1.02] cursor-pointer'
+                                  : 'opacity-60 cursor-not-allowed'
+                              }
+                            `}
+                            style={{
+                              backgroundColor: 'var(--color-bg-secondary)',
+                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
+                            }}
+                          >
+                            {/* Lock overlay */}
+                            {!isUnlocked && (
+                              <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/40 z-10">
+                                <div className="text-center">
+                                  <span className="text-2xl">🔒</span>
+                                  <p className="text-xs text-white mt-1">Level {requiredLevel}</p>
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
 
-                          {/* Preview gradient */}
-                          <div
-                            className="w-full h-12 rounded mb-2"
-                            style={{ background: skinItem.preview }}
-                          />
+                            {/* Preview gradient */}
+                            <div
+                              className="w-full h-12 rounded mb-2"
+                              style={{ background: skinItem.preview }}
+                            />
 
-                          {/* Skin info */}
-                          <h4
-                            className="font-medium text-sm"
-                            style={{ color: 'var(--color-text-primary)' }}
-                          >
-                            {skinItem.name}
-                          </h4>
-                          <p
-                            className="text-xs line-clamp-1"
-                            style={{ color: 'var(--color-text-muted)' }}
-                          >
-                            {skinItem.description}
-                          </p>
+                            {/* Skin info */}
+                            <h4
+                              className="font-medium text-sm"
+                              style={{ color: 'var(--color-text-primary)' }}
+                            >
+                              {skinItem.name}
+                            </h4>
+                            <p
+                              className="text-xs line-clamp-1"
+                              style={{ color: 'var(--color-text-muted)' }}
+                            >
+                              {skinItem.description}
+                            </p>
 
-                          {/* Active indicator */}
-                          {isActive && (
-                            <span className="absolute top-2 right-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded">
-                              Active
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                            {/* Active indicator */}
+                            {isActive && (
+                              <span className="absolute top-2 right-2 text-xs bg-blue-500 text-white px-2 py-0.5 rounded">
+                                Active
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
@@ -633,7 +668,8 @@ export function ProfileProgressModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
