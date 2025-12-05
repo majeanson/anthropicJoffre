@@ -35,6 +35,7 @@ interface BeginnerTutorialProps {
   currentPlayerId: string;
   onClose?: () => void;
   onDismiss?: (phase: TutorialPhase) => void;
+  onAllTutorialsCompleted?: () => void;
 }
 
 const tutorialSteps: TutorialStep[] = [
@@ -108,6 +109,7 @@ export function BeginnerTutorial({
   currentPlayerId,
   onClose,
   onDismiss,
+  onAllTutorialsCompleted,
 }: BeginnerTutorialProps) {
   // Use centralized tutorial progress system instead of separate localStorage key
   const [dismissedPhases, setDismissedPhases] = useState<Set<TutorialPhase>>(() => {
@@ -214,10 +216,11 @@ export function BeginnerTutorial({
       setDismissedPhases(newDismissed);
       onDismiss?.(currentStep.phase);
 
-      // Check if this was the last tutorial
+      // Check if this was the last tutorial and trigger achievement check
       const stats = getTutorialStats();
       if (stats.allCompleted) {
-        console.log('🎉 All tutorials completed! Achievement will be unlocked on next socket connection.');
+        console.log('🎉 All tutorials completed! Triggering achievement unlock...');
+        onAllTutorialsCompleted?.();
       }
 
       setCurrentStep(null);

@@ -100,7 +100,7 @@ function AppContent() {
   const { beginnerMode } = useSettings();
 
   // Tutorial achievement check (runs when all tutorials completed)
-  useTutorialAchievement({ socket });
+  const { checkTutorialAchievement } = useTutorialAchievement({ socket });
 
   // Sprint 20: Skin context for level-based skin unlocks
   const {
@@ -915,6 +915,7 @@ function AppContent() {
               <BeginnerTutorial
                 gameState={gameState}
                 currentPlayerId={currentPlayerName}
+                onAllTutorialsCompleted={checkTutorialAchievement}
               />
             </Suspense>
           </ErrorBoundary>
@@ -1009,6 +1010,7 @@ function AppContent() {
               <BeginnerTutorial
                 gameState={gameState}
                 currentPlayerId={currentPlayerName}
+                onAllTutorialsCompleted={checkTutorialAchievement}
               />
             </Suspense>
           </ErrorBoundary>
@@ -1101,6 +1103,7 @@ function AppContent() {
               <BeginnerTutorial
                 gameState={gameState}
                 currentPlayerId={currentPlayerName}
+                onAllTutorialsCompleted={checkTutorialAchievement}
               />
             </Suspense>
           </ErrorBoundary>
@@ -1178,6 +1181,7 @@ function AppContent() {
               <BeginnerTutorial
                 gameState={gameState}
                 currentPlayerId={currentPlayerName}
+                onAllTutorialsCompleted={checkTutorialAchievement}
               />
             </Suspense>
           </ErrorBoundary>
