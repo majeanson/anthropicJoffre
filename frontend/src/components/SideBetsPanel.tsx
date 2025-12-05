@@ -218,11 +218,12 @@ export default function SideBetsPanel({
 
   return (
     <>
-      {/* Side panel */}
+      {/* Side panel - fully opaque */}
       <div
-        className={`fixed right-0 top-0 h-full w-80 max-w-[90vw] bg-[var(--color-surface)] border-l border-[var(--color-border)] shadow-2xl transform transition-transform duration-300 z-50 ${
+        className={`fixed right-0 top-0 h-full w-80 max-w-[90vw] bg-[var(--color-surface)] border-l border-[var(--color-border)] shadow-2xl transform transition-transform duration-300 z-50 backdrop-blur-none ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ backgroundColor: 'var(--color-surface)', opacity: 1 }}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)] bg-gradient-to-r from-yellow-500/10 to-amber-500/10">
@@ -411,7 +412,7 @@ export default function SideBetsPanel({
                 {resolvedBets.slice(0, 5).map(bet => (
                   <div
                     key={bet.id}
-                    className="p-3 bg-[var(--color-surface-elevated)] rounded-lg border border-[var(--color-border)] opacity-60"
+                    className="p-3 bg-[var(--color-surface-elevated)] rounded-lg border border-[var(--color-border)] opacity-75"
                   >
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-[var(--color-text-secondary)]">
@@ -463,10 +464,10 @@ export default function SideBetsPanel({
         />
       )}
 
-      {/* Overlay when panel is open */}
+      {/* Overlay when panel is open - reduced opacity */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/30 z-40"
           onClick={onClose}
         />
       )}

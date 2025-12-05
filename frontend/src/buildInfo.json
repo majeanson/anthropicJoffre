@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T12:51:12.614Z",
+  "buildDate": "2025-12-05T13:10:21.604Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "fix: Make side bets handlers resilient to missing database table\n\n- Only fetch bets when panel is opened (not on every mount)\n- Return graceful defaults when side_bets table doesn't exist\n- Prevents \"Game action failed\" error in playing phase\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "0f7b854",
-    "commitDate": "2025-12-05 07:43:04 -0500",
+    "commitMessage": "feat: Add side_bets database migration\n\nCreates migration 027_side_bets.sql:\n- side_bets table for storing bet data\n- cosmetic_currency column in player_stats (default 100 coins)\n- Side bet tracking columns (won, lost, coins_won, coins_lost)\n- Indexes for efficient queries\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "cd30338",
+    "commitDate": "2025-12-05 08:04:29 -0500",
     "branch": "main"
   },
   "futureTodos": [
