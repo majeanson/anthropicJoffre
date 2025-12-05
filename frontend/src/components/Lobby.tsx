@@ -43,10 +43,11 @@ interface LobbyProps {
   onShowLogin?: () => void;
   onShowRegister?: () => void;
   onShowProgress?: () => void;
+  onShowWhyRegister?: () => void;
 }
 
 
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowProgress }: LobbyProps) {
+export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowProgress, onShowWhyRegister }: LobbyProps) {
   const { user, updateProfile, getUserProfile, isLoading: authLoading } = useAuth();
   // Use authenticated username if available, otherwise use stored playerName for guests
   // Initialize empty - will be set by useEffect once auth state is known
@@ -402,6 +403,10 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 onSpectateGame(gameId, playerName);
               }}
               onClose={() => setShowBrowser(false)}
+              onShowWhyRegister={() => {
+                setShowBrowser(false);
+                onShowWhyRegister?.();
+              }}
             />
           </ErrorBoundary>
         )}
@@ -501,6 +506,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                       onShowLogin={onShowLogin}
                       onShowProfileEditor={() => setShowProfileEditor(true)}
                       onShowPersonalHub={onShowProgress}
+                      onShowWhyRegister={onShowWhyRegister}
                     />
                   </div>
                 ) : (
@@ -595,6 +601,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                     user={user}
                     lobbyMessages={lobbyMessages}
                     sendLobbyMessage={sendLobbyMessage}
+                    onShowWhyRegister={onShowWhyRegister}
                   />
                 )}
 

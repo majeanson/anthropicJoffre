@@ -85,10 +85,11 @@ interface LobbyBrowserProps {
   onJoinGame: (gameId: string) => void;
   onSpectateGame: (gameId: string) => void;
   onClose: () => void;
+  onShowWhyRegister?: () => void;
 }
 
 
-export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: LobbyBrowserProps) {
+export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onShowWhyRegister }: LobbyBrowserProps) {
   const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'active' | 'recent'>('active');
   const [games, setGames] = useState<LobbyGame[]>([]);
@@ -119,9 +120,10 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose }: Lo
   const handleJoinGameClick = (game: LobbyGame) => {
     // Check if game is ranked and user is not authenticated
     if (game.persistenceMode === 'elo' && !isAuthenticated) {
-      setError('Please register to join ranked games');
-      // Clear error after 5 seconds
-      setTimeout(() => setError(null), 5000);
+      // Show Why Register modal instead of error message
+      if (onShowWhyRegister) {
+        onShowWhyRegister();
+      }
       return;
     }
 

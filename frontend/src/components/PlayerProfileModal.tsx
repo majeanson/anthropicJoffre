@@ -58,6 +58,7 @@ interface PlayerProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
   onViewFullStats?: () => void; // Opens PlayerStatsModal
+  onShowWhyRegister?: () => void; // Opens Why Register modal
 }
 
 export function PlayerProfileModal({
@@ -65,7 +66,8 @@ export function PlayerProfileModal({
   socket,
   isOpen,
   onClose,
-  onViewFullStats
+  onViewFullStats,
+  onShowWhyRegister
 }: PlayerProfileModalProps) {
   // ✅ Early return BEFORE hooks
   if (!isOpen || !playerName) return null;
@@ -601,9 +603,22 @@ export function PlayerProfileModal({
             {/* Guest prompt */}
             {!isAuthenticated && !isOwnProfile && (
               <UICard variant="gradient" gradient="info" size="sm" className="text-center">
-                <p className="text-sm text-blue-100">
+                <p className="text-sm text-blue-100 mb-3">
                   Sign in to add friends and send messages
                 </p>
+                {onShowWhyRegister && (
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    onClick={() => {
+                      onClose();
+                      onShowWhyRegister();
+                    }}
+                    leftIcon={<span>🚀</span>}
+                  >
+                    Why should I register?
+                  </Button>
+                )}
               </UICard>
             )}
           </div>

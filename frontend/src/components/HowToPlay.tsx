@@ -6,6 +6,8 @@ interface HowToPlayProps {
   isOpen?: boolean;
   onClose?: () => void;
   initialTab?: TabId;
+  onRegister?: () => void;
+  onLogin?: () => void;
 }
 
 type TabId = 'rules' | 'features' | 'rewards' | 'register';
@@ -373,8 +375,42 @@ const RewardsContent = () => (
 // ============================================================================
 // TAB CONTENT: Why Register
 // ============================================================================
-const RegisterContent = () => (
+const RegisterContent = ({
+  onRegister,
+  onLogin,
+}: {
+  onRegister?: () => void;
+  onLogin?: () => void;
+}) => (
   <div className="space-y-5">
+    {/* Action buttons at top if callbacks provided */}
+    {(onRegister || onLogin) && (
+      <div className="flex flex-col sm:flex-row gap-3">
+        {onRegister && (
+          <Button
+            onClick={onRegister}
+            variant="success"
+            size="lg"
+            fullWidth
+            leftIcon={<span>🚀</span>}
+          >
+            Create Free Account
+          </Button>
+        )}
+        {onLogin && (
+          <Button
+            onClick={onLogin}
+            variant="secondary"
+            size="lg"
+            fullWidth
+            leftIcon={<span>🔑</span>}
+          >
+            I Already Have an Account
+          </Button>
+        )}
+      </div>
+    )}
+
     <SectionCard borderColor="#22c55e">
       <p className="text-base mb-4" style={{ color: 'var(--color-text-secondary)' }}>
         You can play as a guest, but registering unlocks the full experience:
@@ -442,15 +478,18 @@ const RegisterContent = () => (
         </div>
       </div>
 
-      <p
-        className="text-sm italic mt-4 p-2 rounded text-center"
-        style={{
-          backgroundColor: 'color-mix(in srgb, #22c55e 15%, var(--color-bg-tertiary))',
-          color: 'var(--color-text-secondary)',
-        }}
-      >
-        Registration is free! Click "Register" in the top-right corner to get started.
-      </p>
+      {/* Only show text hint if no action buttons */}
+      {!onRegister && !onLogin && (
+        <p
+          className="text-sm italic mt-4 p-2 rounded text-center"
+          style={{
+            backgroundColor: 'color-mix(in srgb, #22c55e 15%, var(--color-bg-tertiary))',
+            color: 'var(--color-text-secondary)',
+          }}
+        >
+          Registration is free! Click "Register" in the top-right corner to get started.
+        </p>
+      )}
     </SectionCard>
   </div>
 );
@@ -458,7 +497,14 @@ const RegisterContent = () => (
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
-export function HowToPlay({ isModal = false, isOpen = true, onClose, initialTab = 'rules' }: HowToPlayProps) {
+export function HowToPlay({
+  isModal = false,
+  isOpen = true,
+  onClose,
+  initialTab = 'rules',
+  onRegister,
+  onLogin,
+}: HowToPlayProps) {
   // Early return BEFORE hooks (for modal closed state)
   if (isModal && !isOpen) return null;
 
@@ -474,7 +520,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose, initialTab 
       case 'rewards':
         return <RewardsContent />;
       case 'register':
-        return <RegisterContent />;
+        return <RegisterContent onRegister={onRegister} onLogin={onLogin} />;
       default:
         return <RulesContent />;
     }

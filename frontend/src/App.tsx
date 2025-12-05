@@ -25,6 +25,8 @@ const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcuts
 const PlayerProfileModal = lazy(() => import('./components/PlayerProfileModal').then(m => ({ default: m.PlayerProfileModal })));
 // Beginner mode components
 const BeginnerTutorial = lazy(() => import('./components/BeginnerTutorial').then(m => ({ default: m.BeginnerTutorial })));
+// How to Play modal (for "Why Register" prompt)
+const HowToPlay = lazy(() => import('./components/HowToPlay').then(m => ({ default: m.HowToPlay })));
 // Sprint 19: Quest system components (integrated via Stats tab → ProfileProgressModal)
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
@@ -204,6 +206,9 @@ function AppContent() {
   // Player profile modal state
   const [profilePlayerName, setProfilePlayerName] = useState<string | null>(null);
 
+  // "Why Register" modal state (shows HowToPlay on register tab)
+  const [showWhyRegister, setShowWhyRegister] = useState(false);
+
   // Missing state variables for GlobalUI and DebugControls
   const [missedActions, setMissedActions] = useState<unknown[]>([]);
 
@@ -217,19 +222,30 @@ function AppContent() {
   // Authentication-gated feature handlers
   const handleOpenAchievements = useCallback(() => {
     if (!auth.isAuthenticated) {
-      showToast('Please register to access achievements', 'info', 3000);
+      setShowWhyRegister(true);
       return;
     }
     setShowAchievementsPanel(true);
-  }, [auth.isAuthenticated, showToast, setShowAchievementsPanel]);
+  }, [auth.isAuthenticated, setShowAchievementsPanel]);
 
   const handleOpenFriends = useCallback(() => {
     if (!auth.isAuthenticated) {
-      showToast('Please register to access friends', 'info', 3000);
+      setShowWhyRegister(true);
       return;
     }
     setShowFriendsPanel(true);
-  }, [auth.isAuthenticated, showToast, setShowFriendsPanel]);
+  }, [auth.isAuthenticated, setShowFriendsPanel]);
+
+  // Handler for "Why Register" modal buttons
+  const handleWhyRegisterToRegister = useCallback(() => {
+    setShowWhyRegister(false);
+    modals.openRegisterModal();
+  }, [modals]);
+
+  const handleWhyRegisterToLogin = useCallback(() => {
+    setShowWhyRegister(false);
+    modals.openLoginModal();
+  }, [modals]);
 
   // Load skin preferences from backend when user is authenticated
   useEffect(() => {
@@ -851,6 +867,7 @@ function AppContent() {
           onShowRegister={modals.openRegisterModal}
           onBotDifficultyChange={setBotDifficulty}
           onShowProgress={() => setShowPersonalHub(true)}
+          onShowWhyRegister={() => setShowWhyRegister(true)}
         />
       </>
     );
@@ -933,6 +950,7 @@ function AppContent() {
               voiceError={voiceError}
               onVoiceToggle={handleVoiceToggle}
               onVoiceMuteToggle={toggleVoiceMute}
+              onShowWhyRegister={() => setShowWhyRegister(true)}
             />
           </Suspense>
         </ErrorBoundary>
@@ -959,6 +977,10 @@ function AppContent() {
                 socket={socket}
                 isOpen={!!profilePlayerName}
                 onClose={() => setProfilePlayerName(null)}
+                onShowWhyRegister={() => {
+                  setProfilePlayerName(null);
+                  setShowWhyRegister(true);
+                }}
               />
             )}
           </Suspense>
@@ -1054,6 +1076,10 @@ function AppContent() {
                 socket={socket}
                 isOpen={!!profilePlayerName}
                 onClose={() => setProfilePlayerName(null)}
+                onShowWhyRegister={() => {
+                  setProfilePlayerName(null);
+                  setShowWhyRegister(true);
+                }}
               />
             )}
           </Suspense>
@@ -1147,6 +1173,10 @@ function AppContent() {
                 socket={socket}
                 isOpen={!!profilePlayerName}
                 onClose={() => setProfilePlayerName(null)}
+                onShowWhyRegister={() => {
+                  setProfilePlayerName(null);
+                  setShowWhyRegister(true);
+                }}
               />
             )}
           </Suspense>
@@ -1226,6 +1256,10 @@ function AppContent() {
                 socket={socket}
                 isOpen={!!profilePlayerName}
                 onClose={() => setProfilePlayerName(null)}
+                onShowWhyRegister={() => {
+                  setProfilePlayerName(null);
+                  setShowWhyRegister(true);
+                }}
               />
             )}
           </Suspense>
@@ -1650,8 +1684,26 @@ function AppContent() {
                 socket={socket}
                 isOpen={!!profilePlayerName}
                 onClose={() => setProfilePlayerName(null)}
+                onShowWhyRegister={() => {
+                  setProfilePlayerName(null);
+                  setShowWhyRegister(true);
+                }}
               />
             )}
+          </Suspense>
+        </ErrorBoundary>
+
+        {/* Why Register Modal - shows HowToPlay on register tab with action buttons */}
+        <ErrorBoundary componentName="HowToPlay">
+          <Suspense fallback={<div />}>
+            <HowToPlay
+              isModal
+              isOpen={showWhyRegister}
+              onClose={() => setShowWhyRegister(false)}
+              initialTab="register"
+              onRegister={handleWhyRegisterToRegister}
+              onLogin={handleWhyRegisterToLogin}
+            />
           </Suspense>
         </ErrorBoundary>
       </>

@@ -40,6 +40,7 @@ interface ProfileButtonProps {
   onShowLogin?: () => void;
   onShowProfileEditor?: () => void;
   onShowPersonalHub?: () => void;
+  onShowWhyRegister?: () => void;
   className?: string;
   compact?: boolean;
 }
@@ -51,6 +52,7 @@ export function ProfileButton({
   onShowLogin,
   onShowProfileEditor,
   onShowPersonalHub,
+  onShowWhyRegister,
   className = '',
   compact = false
 }: ProfileButtonProps) {
@@ -107,12 +109,21 @@ export function ProfileButton({
     },
   ];
 
+  // Handler for guest click - shows Why Register modal or login
+  const handleGuestClick = () => {
+    if (onShowWhyRegister) {
+      onShowWhyRegister();
+    } else if (onShowLogin) {
+      onShowLogin();
+    }
+  };
+
   // Trigger button element
   const triggerButton = (
     <button
-      onClick={!user ? onShowLogin : undefined}
+      onClick={!user ? handleGuestClick : undefined}
       className={`flex items-center gap-3 bg-gradient-to-r from-parchment-200 to-parchment-300 dark:from-gray-700 dark:to-gray-600 hover:from-parchment-300 hover:to-parchment-400 dark:hover:from-gray-600 dark:hover:to-gray-500 px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-parchment-400 dark:border-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
-      title={user ? `View ${user.username}'s profile` : 'Sign in to view your profile'}
+      title={user ? `View ${user.username}'s profile` : 'Click to learn why you should register!'}
     >
       <Avatar
         username={user?.username || playerName || 'Guest'}
@@ -170,6 +181,7 @@ export function ProfileButton({
           socket={socket}
           isOpen={showProfileModal}
           onClose={() => setShowProfileModal(false)}
+          onShowWhyRegister={onShowWhyRegister}
         />
       )}
     </>

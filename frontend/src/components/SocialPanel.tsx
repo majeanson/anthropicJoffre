@@ -42,6 +42,7 @@ interface SocialPanelProps {
   user: User | null;
   lobbyMessages?: ChatMessage[];
   sendLobbyMessage?: (message: string) => void;
+  onShowWhyRegister?: () => void;
 }
 
 export function SocialPanel({
@@ -56,6 +57,7 @@ export function SocialPanel({
   user,
   lobbyMessages = [],
   sendLobbyMessage = () => {},
+  onShowWhyRegister,
 }: SocialPanelProps) {
   const [friends, setFriends] = useState<FriendWithStatus[]>([]);
   const [isLoadingFriends, setIsLoadingFriends] = useState(false);
@@ -1109,6 +1111,10 @@ export function SocialPanel({
           socket={socket}
           isOpen={!!selectedPlayerProfile}
           onClose={() => setSelectedPlayerProfile(null)}
+          onShowWhyRegister={() => {
+            setSelectedPlayerProfile(null);
+            onShowWhyRegister?.();
+          }}
         />
       )}
     </>

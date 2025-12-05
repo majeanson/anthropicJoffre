@@ -17,13 +17,15 @@ interface TeamSelectionSocialSidebarProps {
   gameId: string;
   isOpen: boolean;
   onClose: () => void;
+  onShowWhyRegister?: () => void;
 }
 
 export function TeamSelectionSocialSidebar({
   socket,
   gameId,
   isOpen,
-  onClose
+  onClose,
+  onShowWhyRegister
 }: TeamSelectionSocialSidebarProps) {
   const { user, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'friends' | 'online' | 'recent'>('friends');
@@ -184,7 +186,20 @@ export function TeamSelectionSocialSidebar({
           <div className="space-y-2">
             {!isAuthenticated ? (
               <div className="text-center py-8 text-[var(--color-text-secondary)]">
-                <p className="mb-2">Please login to view friends</p>
+                <p className="mb-3">Sign in to view your friends</p>
+                {onShowWhyRegister && (
+                  <Button
+                    variant="success"
+                    size="sm"
+                    onClick={() => {
+                      onClose();
+                      onShowWhyRegister();
+                    }}
+                    leftIcon={<span>🚀</span>}
+                  >
+                    Why should I register?
+                  </Button>
+                )}
               </div>
             ) : friends.length === 0 ? (
               <div className="text-center py-8 text-[var(--color-text-secondary)]">

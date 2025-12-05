@@ -40,6 +40,8 @@ interface TeamSelectionProps {
   voiceError?: string | null;
   onVoiceToggle?: () => void;
   onVoiceMuteToggle?: () => void;
+  // Registration prompt
+  onShowWhyRegister?: () => void;
 }
 
 export function TeamSelection({
@@ -62,6 +64,7 @@ export function TeamSelection({
   // voiceError, // Available for error display
   onVoiceToggle,
   onVoiceMuteToggle,
+  onShowWhyRegister,
 }: TeamSelectionProps) {
   const [showCopyToast, setShowCopyToast] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -762,6 +765,7 @@ export function TeamSelection({
           gameId={gameId}
           isOpen={showSocialSidebar}
           onClose={() => setShowSocialSidebar(false)}
+          onShowWhyRegister={onShowWhyRegister}
         />
       )}
 
