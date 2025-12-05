@@ -161,18 +161,18 @@ export default function CreateBetModal({
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-md bg-[var(--color-surface)] rounded-xl shadow-2xl border border-[var(--color-border)] overflow-hidden"
+        className="relative w-full max-w-md bg-[var(--color-bg-secondary)] rounded-xl shadow-2xl border border-[var(--color-border-default)] overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)] bg-gradient-to-r from-yellow-500/10 to-amber-500/10">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-border-default)] bg-gradient-to-r from-yellow-500/10 to-amber-500/10">
           <h2 className="text-lg font-bold text-[var(--color-text-primary)] flex items-center gap-2">
             <span>🎲</span>
             Create Bet
           </h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-[var(--color-surface-hover)] rounded transition-colors"
+            className="p-1 hover:bg-[var(--color-bg-tertiary)] rounded transition-colors"
             aria-label="Close"
           >
             ✕
@@ -182,7 +182,7 @@ export default function CreateBetModal({
         {/* Content */}
         <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Balance display */}
-          <div className="flex items-center justify-between p-3 bg-[var(--color-surface-elevated)] rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-[var(--color-bg-tertiary)] rounded-lg">
             <span className="text-sm text-[var(--color-text-secondary)]">
               Your Balance
             </span>
@@ -202,7 +202,7 @@ export default function CreateBetModal({
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
                 betType === 'preset'
                   ? 'bg-yellow-500 text-white'
-                  : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+                  : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
               }`}
             >
               Preset Bets
@@ -215,7 +215,7 @@ export default function CreateBetModal({
               className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
                 betType === 'custom'
                   ? 'bg-yellow-500 text-white'
-                  : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+                  : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
               }`}
             >
               Custom Bet
@@ -239,7 +239,7 @@ export default function CreateBetModal({
                     className={`p-3 text-left rounded-lg border transition-colors ${
                       selectedPreset === preset.type
                         ? 'border-yellow-500 bg-yellow-500/10'
-                        : 'border-[var(--color-border)] bg-[var(--color-surface-elevated)] hover:border-[var(--color-border-hover)]'
+                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-hover)]'
                     }`}
                   >
                     <div className="font-medium text-[var(--color-text-primary)]">
@@ -266,7 +266,7 @@ export default function CreateBetModal({
                         className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-colors ${
                           prediction === pred.value
                             ? 'bg-green-500 text-white'
-                            : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+                            : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
                         }`}
                       >
                         {pred.label}
@@ -289,7 +289,7 @@ export default function CreateBetModal({
                 onChange={e => setCustomDescription(e.target.value)}
                 placeholder="e.g., Marc will play a trump on the first trick"
                 maxLength={200}
-                className="w-full p-3 bg-[var(--color-surface-elevated)] border border-[var(--color-border)] rounded-lg text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-yellow-500 resize-none"
+                className="w-full p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)] rounded-lg text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-yellow-500 resize-none"
                 rows={3}
               />
               <div className="text-xs text-[var(--color-text-secondary)] text-right">
@@ -318,7 +318,7 @@ export default function CreateBetModal({
               max={maxAmount}
               value={amount}
               onChange={e => setAmount(parseInt(e.target.value))}
-              className="w-full h-2 bg-[var(--color-surface-elevated)] rounded-lg appearance-none cursor-pointer accent-yellow-500"
+              className="w-full h-2 bg-[var(--color-bg-tertiary)] rounded-lg appearance-none cursor-pointer accent-yellow-500"
             />
             <div className="flex justify-between text-xs text-[var(--color-text-secondary)]">
               <span>{minAmount}</span>
@@ -334,7 +334,7 @@ export default function CreateBetModal({
                   className={`flex-1 py-1 text-xs rounded transition-colors ${
                     amount === quickAmount
                       ? 'bg-yellow-500 text-white'
-                      : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+                      : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
                   }`}
                 >
                   {quickAmount}
@@ -345,7 +345,7 @@ export default function CreateBetModal({
                 className={`flex-1 py-1 text-xs rounded transition-colors ${
                   amount === maxAmount
                     ? 'bg-yellow-500 text-white'
-                    : 'bg-[var(--color-surface-elevated)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
+                    : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
                 }`}
               >
                 All-in
@@ -362,11 +362,11 @@ export default function CreateBetModal({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+        <div className="p-4 border-t border-[var(--color-border-default)] bg-[var(--color-bg-secondary)]">
           <div className="flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-3 bg-[var(--color-surface-elevated)] hover:bg-[var(--color-surface-hover)] text-[var(--color-text-secondary)] font-medium rounded-lg transition-colors"
+              className="flex-1 py-3 bg-[var(--color-bg-tertiary)] hover:bg-[var(--color-bg-primary)] text-[var(--color-text-secondary)] font-medium rounded-lg transition-colors"
             >
               Cancel
             </button>

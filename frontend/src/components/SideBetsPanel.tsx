@@ -220,13 +220,12 @@ export default function SideBetsPanel({
     <>
       {/* Side panel - fully opaque */}
       <div
-        className={`fixed right-0 top-0 h-full w-80 max-w-[90vw] bg-[var(--color-surface)] border-l border-[var(--color-border)] shadow-2xl transform transition-transform duration-300 z-50 backdrop-blur-none ${
+        className={`fixed right-0 top-0 h-full w-80 max-w-[90vw] bg-[var(--color-bg-secondary)] border-l border-[var(--color-border-default)] shadow-2xl transform transition-transform duration-300 z-50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ backgroundColor: 'var(--color-surface)', opacity: 1 }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)] bg-gradient-to-r from-yellow-500/10 to-amber-500/10">
+        <div className="flex items-center justify-between p-4 border-b border-[var(--color-border-default)] bg-gradient-to-r from-yellow-500/10 to-amber-500/10">
           <div className="flex items-center gap-2">
             <span className="text-xl">🎲</span>
             <h2 className="font-bold text-[var(--color-text-primary)]">Side Bets</h2>
@@ -238,7 +237,7 @@ export default function SideBetsPanel({
             </div>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-[var(--color-surface-hover)] rounded"
+              className="p-1 hover:bg-[var(--color-bg-tertiary)] rounded"
               aria-label="Close panel"
             >
               ✕
@@ -273,7 +272,7 @@ export default function SideBetsPanel({
                 {openBets.map(bet => (
                   <div
                     key={bet.id}
-                    className="p-3 bg-[var(--color-surface-elevated)] rounded-lg border border-[var(--color-border)]"
+                    className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border-default)]"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <span className="text-xs text-[var(--color-text-secondary)]">
@@ -314,7 +313,7 @@ export default function SideBetsPanel({
                 {myOpenBets.map(bet => (
                   <div
                     key={bet.id}
-                    className="p-3 bg-[var(--color-surface-elevated)] rounded-lg border border-yellow-500/30"
+                    className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-yellow-500/30"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <span className="text-xs text-yellow-500">
@@ -354,7 +353,7 @@ export default function SideBetsPanel({
                   return (
                     <div
                       key={bet.id}
-                      className="p-3 bg-[var(--color-surface-elevated)] rounded-lg border border-green-500/30"
+                      className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-green-500/30"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <span className="text-xs text-green-400">
@@ -412,7 +411,7 @@ export default function SideBetsPanel({
                 {resolvedBets.slice(0, 5).map(bet => (
                   <div
                     key={bet.id}
-                    className="p-3 bg-[var(--color-surface-elevated)] rounded-lg border border-[var(--color-border)] opacity-75"
+                    className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border-default)] opacity-75"
                   >
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-[var(--color-text-secondary)]">
@@ -443,7 +442,7 @@ export default function SideBetsPanel({
         </div>
 
         {/* Footer - Create bet button */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[var(--color-border)] bg-[var(--color-surface)]">
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-[var(--color-border-default)] bg-[var(--color-bg-secondary)]">
           <button
             onClick={() => setShowCreateModal(true)}
             className="w-full py-3 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-white font-medium rounded-lg transition-all shadow-lg"
