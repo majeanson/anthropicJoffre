@@ -15,6 +15,8 @@ interface UseUIStateReturn {
   showQuestsPanel: boolean;
   showRewardsCalendar: boolean;
   showPersonalHub: boolean;
+  showDirectMessages: boolean;
+  dmRecipient: string | null;
 
   setShowBotManagement: (show: boolean) => void;
   setShowFriendsPanel: (show: boolean) => void;
@@ -23,6 +25,8 @@ interface UseUIStateReturn {
   setShowQuestsPanel: (show: boolean) => void;
   setShowRewardsCalendar: (show: boolean) => void;
   setShowPersonalHub: (show: boolean) => void;
+  setShowDirectMessages: (show: boolean) => void;
+  setDmRecipient: (recipient: string | null) => void;
 
   toggleBotManagement: () => void;
   toggleFriendsPanel: () => void;
@@ -31,6 +35,7 @@ interface UseUIStateReturn {
   toggleQuestsPanel: () => void;
   toggleRewardsCalendar: () => void;
   togglePersonalHub: () => void;
+  toggleDirectMessages: () => void;
 
   closeAllPanels: () => void;
 }
@@ -49,6 +54,8 @@ export function useUIState(): UseUIStateReturn {
   const [showQuestsPanel, setShowQuestsPanel] = useState<boolean>(false);
   const [showRewardsCalendar, setShowRewardsCalendar] = useState<boolean>(false);
   const [showPersonalHub, setShowPersonalHub] = useState<boolean>(false);
+  const [showDirectMessages, setShowDirectMessages] = useState<boolean>(false);
+  const [dmRecipient, setDmRecipient] = useState<string | null>(null);
 
   const toggleBotManagement = useCallback(() => {
     setShowBotManagement(prev => !prev);
@@ -78,6 +85,10 @@ export function useUIState(): UseUIStateReturn {
     setShowPersonalHub(prev => !prev);
   }, []);
 
+  const toggleDirectMessages = useCallback(() => {
+    setShowDirectMessages(prev => !prev);
+  }, []);
+
   const closeAllPanels = useCallback(() => {
     setShowBotManagement(false);
     setShowFriendsPanel(false);
@@ -86,6 +97,8 @@ export function useUIState(): UseUIStateReturn {
     setShowQuestsPanel(false);
     setShowRewardsCalendar(false);
     setShowPersonalHub(false);
+    setShowDirectMessages(false);
+    setDmRecipient(null);
   }, []);
 
   return {
@@ -96,6 +109,8 @@ export function useUIState(): UseUIStateReturn {
     showQuestsPanel,
     showRewardsCalendar,
     showPersonalHub,
+    showDirectMessages,
+    dmRecipient,
 
     setShowBotManagement,
     setShowFriendsPanel,
@@ -104,6 +119,8 @@ export function useUIState(): UseUIStateReturn {
     setShowQuestsPanel,
     setShowRewardsCalendar,
     setShowPersonalHub,
+    setShowDirectMessages,
+    setDmRecipient,
 
     toggleBotManagement,
     toggleFriendsPanel,
@@ -112,6 +129,7 @@ export function useUIState(): UseUIStateReturn {
     toggleQuestsPanel,
     toggleRewardsCalendar,
     togglePersonalHub,
+    toggleDirectMessages,
 
     closeAllPanels,
   };

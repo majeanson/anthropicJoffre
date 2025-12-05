@@ -125,18 +125,26 @@ export function TeamSelectionSocialSidebar({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-y-0 right-0 w-80 bg-parchment-50 dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto border-l-4 border-amber-700 dark:border-gray-600">
+    <>
+      {/* Mobile overlay backdrop */}
+      <div
+        className="fixed inset-0 bg-black/50 z-40 md:hidden"
+        onClick={onClose}
+      />
+
+      <div className="fixed inset-y-0 right-0 w-80 max-w-[90vw] bg-parchment-50 dark:bg-gray-800 shadow-2xl z-50 overflow-y-auto border-l-4 border-amber-700 dark:border-gray-600">
       {/* Header */}
       <UICard variant="gradient" gradient="warning" size="md" className="sticky top-0 rounded-none border-b-2 border-amber-800 dark:border-gray-600">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xl font-bold text-white">Find Players</h2>
           <Button
-            variant="ghost"
+            variant="danger"
             size="sm"
             onClick={onClose}
-            className="text-white hover:text-gray-200 text-2xl font-bold leading-none p-0"
+            className="!px-3 !py-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-xl font-bold"
+            title="Close panel"
           >
-            ×
+            ✕
           </Button>
         </div>
 
@@ -329,6 +337,7 @@ export function TeamSelectionSocialSidebar({
           <span aria-hidden="true">📋</span> Copy Game Link
         </Button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

@@ -28,9 +28,10 @@ interface FriendsPanelProps {
   currentPlayer: string;
   isOpen: boolean;
   onClose: () => void;
+  onStartConversation?: (username: string) => void;
 }
 
-export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }: FriendsPanelProps) {
+export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, onStartConversation }: FriendsPanelProps) {
   // Early returns BEFORE hooks
   if (!isOpen) return null;
   if (!socket || !currentPlayer) return null;
@@ -187,6 +188,16 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose }:
                   status={friend.status as PlayerStatus}
                   actions={
                     <div className="flex items-center gap-2">
+                      {onStartConversation && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => onStartConversation(friend.player_name)}
+                          className="bg-blue-600 hover:bg-blue-500 border-blue-700"
+                        >
+                          💬 Message
+                        </Button>
+                      )}
                       {friend.is_online && friend.game_id && (
                         <Button
                           variant="primary"

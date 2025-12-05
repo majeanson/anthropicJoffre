@@ -149,6 +149,7 @@ function AppContent() {
 
   // Sprint 3 Refactoring: UI state management hook
   // Sprint 19: Added quest and rewards calendar state
+  // Sprint 21: Added direct messages state
   const {
     showBotManagement,
     showFriendsPanel,
@@ -157,6 +158,8 @@ function AppContent() {
     showQuestsPanel,
     showRewardsCalendar,
     showPersonalHub,
+    showDirectMessages,
+    dmRecipient,
     setShowBotManagement,
     setShowFriendsPanel,
     setShowReplayModal,
@@ -164,6 +167,8 @@ function AppContent() {
     setShowQuestsPanel,
     setShowRewardsCalendar,
     setShowPersonalHub,
+    setShowDirectMessages,
+    setDmRecipient,
   } = useUIState();
 
   // UI state
@@ -790,6 +795,11 @@ function AppContent() {
     // Sprint 20: Level up celebration
     levelUpData,
     setLevelUpData,
+    // Sprint 21: Direct messages
+    showDirectMessages,
+    setShowDirectMessages,
+    dmRecipient,
+    setDmRecipient,
   };
 
   if (!gameState) {

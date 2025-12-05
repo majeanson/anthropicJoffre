@@ -33,6 +33,7 @@ const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => (
 const ProfileProgressModal = lazy(() => import('./ProfileProgressModal').then(m => ({ default: m.ProfileProgressModal })));
 import type { TabId } from './ProfileProgressModal';
 const LevelUpModal = lazy(() => import('./LevelUpModal').then(m => ({ default: m.LevelUpModal })));
+const DirectMessagesPanel = lazy(() => import('./DirectMessagesPanel').then(m => ({ default: m.DirectMessagesPanel })));
 
 interface GlobalUIProps {
   reconnecting: boolean;
@@ -68,6 +69,11 @@ interface GlobalUIProps {
   // Sprint 20: Level up celebration
   levelUpData: { oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null;
   setLevelUpData: (data: { oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null) => void;
+  // Direct Messages
+  showDirectMessages: boolean;
+  setShowDirectMessages: (show: boolean) => void;
+  dmRecipient: string | null;
+  setDmRecipient: (recipient: string | null) => void;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({
@@ -101,6 +107,10 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   onOpenProfile: _onOpenProfile,
   levelUpData,
   setLevelUpData,
+  showDirectMessages,
+  setShowDirectMessages,
+  dmRecipient,
+  setDmRecipient,
 }) => {
   void _onOpenProfile; // Reserved for future use
   const modals = useModals();
@@ -138,6 +148,13 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   const handleSwapPosition = (targetPlayerId: string) => {
     if (!socket || !gameId) return;
     socket.emit('swap_position', { gameId, targetPlayerId });
+  };
+
+  // Handler for starting a conversation with a friend
+  const handleStartConversation = (username: string) => {
+    setDmRecipient(username);
+    setShowDirectMessages(true);
+    setShowFriendsPanel(false); // Close friends panel when opening DMs
   };
 
   return (
@@ -185,7 +202,21 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
           onClose={() => setShowFriendsPanel(false)}
           socket={socket}
           currentPlayer={auth.user?.username || gameState?.players.find(p => p.id === socket?.id)?.name || ''}
+          onStartConversation={handleStartConversation}
         />
+        {/* Direct Messages Panel */}
+        {auth.user && (
+          <DirectMessagesPanel
+            isOpen={showDirectMessages}
+            onClose={() => {
+              setShowDirectMessages(false);
+              setDmRecipient(null);
+            }}
+            socket={socket}
+            currentUsername={auth.user.username}
+            initialRecipient={dmRecipient || undefined}
+          />
+        )}
       </Suspense>
 
       {/* Achievement & Social UI */}
