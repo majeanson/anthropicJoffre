@@ -139,21 +139,21 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
           {loading && (
             <div className="text-center py-12">
               <Spinner size="lg" color="primary" />
-              <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading match details...</p>
+              <p className="mt-4 text-gray-600 font-semibold">Loading match details...</p>
             </div>
           )}
 
           {!loading && !matchData && (
             <div className="text-center py-12">
               <span className="text-6xl mb-4 block">😞</span>
-              <p className="text-gray-600 dark:text-gray-400 font-semibold">Match data not found</p>
+              <p className="text-gray-600 font-semibold">Match data not found</p>
             </div>
           )}
 
           {!loading && matchData && (
             <>
               {/* Tabs */}
-              <div className="flex gap-2 border-b-2 border-gray-300 dark:border-gray-600">
+              <div className="flex gap-2 border-b-2 border-gray-300">
                 <Button
                   onClick={() => setSelectedTab('overview')}
                   variant={selectedTab === 'overview' ? 'secondary' : 'ghost'}
@@ -195,11 +195,11 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                       </div>
                     </div>
                   ) : (
-                    <UICard variant="bordered" size="lg" className="text-center border-4 border-gray-800 bg-gray-700 dark:bg-gray-800">
-                      <h3 className="text-3xl font-bold text-white mb-2">
+                    <UICard variant="bordered" size="lg" className="text-center border-4 border-amber-400 bg-amber-100">
+                      <h3 className="text-3xl font-bold text-amber-800 mb-2">
                         <span aria-hidden="true">⏳</span> Game In Progress
                       </h3>
-                      <div className="text-xl text-white font-semibold">
+                      <div className="text-xl text-amber-700 font-semibold">
                         Match not yet finished
                       </div>
                     </UICard>
@@ -208,28 +208,28 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                   {/* Game Stats Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <UICard variant="bordered" size="md" className="text-center">
-                      <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                        {matchData.team1_score} - {matchData.team2_score}
+                      <div className="text-3xl font-bold text-purple-600">
+                        {matchData.team1_score ?? 0} - {matchData.team2_score ?? 0}
                       </div>
-                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Final Score</div>
+                      <div className="text-sm text-umber-700 mt-1">{matchData.winning_team ? 'Final Score' : 'Current Score'}</div>
                     </UICard>
                     <UICard variant="bordered" size="md" className="text-center">
-                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                        {matchData.rounds}
+                      <div className="text-3xl font-bold text-blue-600">
+                        {matchData.rounds ?? 0}
                       </div>
-                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Rounds Played</div>
+                      <div className="text-sm text-umber-700 mt-1">Rounds Played</div>
                     </UICard>
                     <UICard variant="bordered" size="md" className="text-center">
-                      <div className="text-3xl font-bold text-green-600 dark:text-green-400">
-                        {formatDuration(matchData.game_duration_seconds)}
+                      <div className="text-3xl font-bold text-green-600">
+                        {matchData.game_duration_seconds ? formatDuration(matchData.game_duration_seconds) : 'N/A'}
                       </div>
-                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Duration</div>
+                      <div className="text-sm text-umber-700 mt-1">Duration</div>
                     </UICard>
                     <UICard variant="bordered" size="md" className="text-center">
-                      <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                      <div className="text-3xl font-bold text-amber-600">
                         {matchData.trump_suit || 'N/A'}
                       </div>
-                      <div className="text-sm text-umber-700 dark:text-gray-400 mt-1">Trump Suit</div>
+                      <div className="text-sm text-umber-700 mt-1">Trump Suit</div>
                     </UICard>
                   </div>
 
@@ -242,29 +242,33 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
                         size="lg"
                         className={`border-4 ${
                           teamId === 1
-                            ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-600'
-                            : 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-600'
+                            ? 'bg-orange-50 border-orange-300'
+                            : 'bg-purple-50 border-purple-300'
                         }`}
                       >
                         <h4 className={`text-xl font-bold mb-3 ${
                           teamId === 1
-                            ? 'text-orange-800 dark:text-orange-300'
-                            : 'text-purple-800 dark:text-purple-300'
+                            ? 'text-orange-800'
+                            : 'text-purple-800'
                         }`}>
                           Team {teamId} {matchData.winning_team === teamId && <span aria-hidden="true">👑</span>}
                         </h4>
                         <div className="space-y-2">
-                          {getTeamPlayers(teamId as 1 | 2).map(player => (
-                            <UICard
-                              key={player}
-                              variant="default"
-                              size="sm"
-                            >
-                              <div className="font-semibold text-umber-900 dark:text-gray-100">
-                                {player}
-                              </div>
-                            </UICard>
-                          ))}
+                          {getTeamPlayers(teamId as 1 | 2).length > 0 ? (
+                            getTeamPlayers(teamId as 1 | 2).map(player => (
+                              <UICard
+                                key={player}
+                                variant="default"
+                                size="sm"
+                              >
+                                <div className="font-semibold text-umber-900">
+                                  {player}
+                                </div>
+                              </UICard>
+                            ))
+                          ) : (
+                            <div className="text-gray-500 text-sm italic">No players assigned</div>
+                          )}
                         </div>
                       </UICard>
                     ))}
@@ -275,124 +279,163 @@ export function MatchStatsModal({ gameId, socket, isOpen, onClose, onViewReplay 
               {/* Rounds Tab */}
               {selectedTab === 'rounds' && (
                 <div className="space-y-4">
-                  {matchData.round_history.map((round, idx) => (
-                    <UICard
-                      key={idx}
-                      variant="bordered"
-                      size="lg"
-                    >
-                      <h4 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4">
-                        Round {round.roundNumber}
-                      </h4>
+                  {(!matchData.round_history || matchData.round_history.length === 0) ? (
+                    <div className="text-center py-8">
+                      <span className="text-4xl mb-2 block" aria-hidden="true">📋</span>
+                      <p className="text-gray-600 font-semibold">No rounds recorded yet</p>
+                      <p className="text-gray-500 text-sm">Round data will appear here once gameplay begins</p>
+                    </div>
+                  ) : (
+                    matchData.round_history.map((round, idx) => (
+                      <UICard
+                        key={idx}
+                        variant="bordered"
+                        size="lg"
+                      >
+                        <h4 className="text-xl font-bold text-umber-900 mb-4">
+                          Round {round.roundNumber || idx + 1}
+                        </h4>
 
-                      {/* Bets */}
-                      <div className="mb-4">
-                        <h5 className="font-semibold text-umber-800 dark:text-gray-300 mb-2">Bets:</h5>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {Object.entries(round.bets).map(([player, bet]) => (
-                            <div
-                              key={player}
-                              className="bg-parchment-100 dark:bg-gray-600 rounded p-2 text-sm"
-                            >
-                              <div className="font-semibold text-umber-900 dark:text-gray-100">{player}</div>
-                              <div className="text-umber-700 dark:text-gray-400">
-                                {bet.amount} pts {bet.withoutTrump && <span aria-hidden="true">🚫♠️</span>}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Results */}
-                      <div>
-                        <h5 className="font-semibold text-umber-800 dark:text-gray-300 mb-2">Results:</h5>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                          {round.pointsWon ? Object.entries(round.pointsWon).map(([player, points]) => {
-                            const bet = round.bets?.[player];
-                            const won = points >= (bet?.amount || 0);
-                            return (
-                              <div
-                                key={player}
-                                className={`rounded p-2 text-sm ${
-                                  won
-                                    ? 'bg-green-100 dark:bg-green-900/30 border-2 border-green-500'
-                                    : 'bg-red-100 dark:bg-red-900/30 border-2 border-red-500'
-                                }`}
-                              >
-                                <div className="font-semibold">{player}</div>
-                                <div className={won ? 'text-green-700 dark:text-green-300' : 'text-red-700 dark:text-red-300'}>
-                                  {points} pts {won ? '✓' : '✗'}
+                        {/* Bets */}
+                        <div className="mb-4">
+                          <h5 className="font-semibold text-umber-800 mb-2">Bets:</h5>
+                          {round.bets && Object.keys(round.bets).length > 0 ? (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              {Object.entries(round.bets).map(([player, bet]) => (
+                                <div
+                                  key={player}
+                                  className="bg-parchment-100 rounded p-2 text-sm"
+                                >
+                                  <div className="font-semibold text-umber-900">{player}</div>
+                                  <div className="text-umber-700">
+                                    {bet?.amount ?? '?'} pts {bet?.withoutTrump && <span aria-hidden="true">🚫♠️</span>}
+                                  </div>
                                 </div>
-                              </div>
-                            );
-                          }) : (
-                            <div className="col-span-full text-center text-gray-500 dark:text-gray-400 text-sm py-2">
-                              Round incomplete - no results yet
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-gray-500 text-sm italic">Betting phase not completed</div>
+                          )}
+                        </div>
+
+                        {/* Tricks Summary */}
+                        {round.tricks && round.tricks.length > 0 && (
+                          <div className="mb-4">
+                            <h5 className="font-semibold text-umber-800 mb-2">Tricks ({round.tricks.length}/8):</h5>
+                            <div className="flex flex-wrap gap-1">
+                              {round.tricks.map((trick, trickIdx) => (
+                                <span
+                                  key={trickIdx}
+                                  className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded"
+                                  title={`Trick ${trickIdx + 1}: Won by ${trick?.winner || 'Unknown'} (+${trick?.points ?? 0} pts)`}
+                                >
+                                  #{trickIdx + 1}: {trick?.winner?.substring(0, 8) || '?'}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Results */}
+                        <div>
+                          <h5 className="font-semibold text-umber-800 mb-2">Results:</h5>
+                          {round.pointsWon && Object.keys(round.pointsWon).length > 0 ? (
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                              {Object.entries(round.pointsWon).map(([player, points]) => {
+                                const bet = round.bets?.[player];
+                                const won = bet ? points >= bet.amount : false;
+                                return (
+                                  <div
+                                    key={player}
+                                    className={`rounded p-2 text-sm ${
+                                      won
+                                        ? 'bg-green-100 border-2 border-green-500'
+                                        : 'bg-red-100 border-2 border-red-500'
+                                    }`}
+                                  >
+                                    <div className="font-semibold text-gray-900">{player}</div>
+                                    <div className={won ? 'text-green-700' : 'text-red-700'}>
+                                      {points} pts {won ? '✓' : '✗'}
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            <div className="bg-amber-50 border border-amber-300 rounded p-3 text-center">
+                              <span className="text-amber-700 text-sm">⏳ Round in progress - results pending</span>
                             </div>
                           )}
                         </div>
-                      </div>
-                    </UICard>
-                  ))}
+                      </UICard>
+                    ))
+                  )}
                 </div>
               )}
 
               {/* Players Tab */}
               {selectedTab === 'players' && (
                 <div className="space-y-4">
-                  {matchData.player_names.map(player => {
-                    const stats = getPlayerStats(player);
-                    const teamId = matchData.player_teams[player];
-                    return (
-                      <div
-                        key={player}
-                        className={`p-6 rounded-xl border-4 ${
-                          teamId === 1
-                            ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-600'
-                            : 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-600'
-                        }`}
-                      >
-                        <h4 className={`text-xl font-bold mb-4 ${
-                          teamId === 1
-                            ? 'text-orange-800 dark:text-orange-300'
-                            : 'text-purple-800 dark:text-purple-300'
-                        }`}>
-                          {player} (Team {teamId})
-                        </h4>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
-                            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-                              {stats.totalPoints}
+                  {(!matchData.player_names || matchData.player_names.length === 0) ? (
+                    <div className="text-center py-8">
+                      <span className="text-4xl mb-2 block" aria-hidden="true">👥</span>
+                      <p className="text-gray-600 font-semibold">No player data available</p>
+                    </div>
+                  ) : (
+                    matchData.player_names.map(player => {
+                      const stats = getPlayerStats(player);
+                      const teamId = matchData.player_teams?.[player] || 1;
+                      return (
+                        <div
+                          key={player}
+                          className={`p-6 rounded-xl border-4 ${
+                            teamId === 1
+                              ? 'bg-orange-50 border-orange-300'
+                              : 'bg-purple-50 border-purple-300'
+                          }`}
+                        >
+                          <h4 className={`text-xl font-bold mb-4 ${
+                            teamId === 1
+                              ? 'text-orange-800'
+                              : 'text-purple-800'
+                          }`}>
+                            {player} (Team {teamId})
+                          </h4>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
+                              <div className="text-2xl font-bold text-purple-600">
+                                {stats.totalPoints}
+                              </div>
+                              <div className="text-xs text-umber-700 mt-1">Total Points</div>
                             </div>
-                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Total Points</div>
-                          </div>
-                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
-                            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                              {stats.roundsWon}
+                            <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
+                              <div className="text-2xl font-bold text-blue-600">
+                                {stats.roundsWon}
+                              </div>
+                              <div className="text-xs text-umber-700 mt-1">Rounds Won</div>
                             </div>
-                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Rounds Won</div>
-                          </div>
-                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
-                            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                              {stats.betsWon}
+                            <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
+                              <div className="text-2xl font-bold text-green-600">
+                                {stats.betsWon}
+                              </div>
+                              <div className="text-xs text-umber-700 mt-1">Bets Won</div>
                             </div>
-                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Bets Won</div>
-                          </div>
-                          <div className="bg-parchment-50 dark:bg-gray-700 rounded-lg p-3 text-center border border-parchment-400 dark:border-gray-600">
-                            <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">
-                              {stats.tricksWon}
+                            <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
+                              <div className="text-2xl font-bold text-amber-600">
+                                {stats.tricksWon}
+                              </div>
+                              <div className="text-xs text-umber-700 mt-1">Tricks Won</div>
                             </div>
-                            <div className="text-xs text-umber-700 dark:text-gray-400 mt-1">Tricks Won</div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               )}
 
               {/* Action Buttons */}
-              <div className="flex justify-center gap-3 pt-4 border-t-2 border-gray-300 dark:border-gray-600">
+              <div className="flex justify-center gap-3 pt-4 border-t-2 border-gray-300">
                 {onViewReplay && (
                   <Button
                     variant="primary"
