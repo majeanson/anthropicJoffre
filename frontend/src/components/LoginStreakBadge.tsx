@@ -145,7 +145,7 @@ export function LoginStreakBadge({
 
         {/* Tooltip */}
         {showTooltip && (
-          <div className="absolute top-full mt-2 left-0 z-50 min-w-[280px]">
+          <div className="absolute top-full mt-2 left-0 z-[10500] min-w-[280px]">
             <UICard variant="elevated" size="sm">
               <div className="space-y-2">
               <div className="flex justify-between items-center border-b border-gray-600 pb-2">

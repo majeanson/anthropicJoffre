@@ -1133,6 +1133,35 @@ io.on('connection', (socket) => {
     }
   }));
 
+  // Handle guest player registration (when they enter their name without logging in)
+  // This allows them to appear in online players and use LFG feature
+  socket.on('register_player', errorBoundaries.readOnly('register_player')(async ({ playerName }: { playerName: string }) => {
+    if (!playerName || typeof playerName !== 'string') {
+      return;
+    }
+
+    const sanitizedName = playerName.trim().substring(0, 20);
+    if (sanitizedName.length < 1) {
+      return;
+    }
+
+    // Don't override authenticated user's name
+    if (socket.data.playerName && socket.data.userId) {
+      return;
+    }
+
+    // Set player name and track as online
+    socket.data.playerName = sanitizedName;
+    socket.join(`player:${sanitizedName}`);
+    updateOnlinePlayer(socket.id, sanitizedName, 'in_lobby', undefined);
+
+    socket.emit('player_registered', { playerName: sanitizedName });
+    console.log(`[ONLINE] Guest player ${sanitizedName} registered and added to online list`);
+
+    // Broadcast updated online players
+    broadcastOnlinePlayers();
+  }));
+
   // ============================================================================
   // Lobby Handlers - Refactored (Sprint 3)
   // ============================================================================

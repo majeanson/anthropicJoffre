@@ -110,6 +110,15 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
     }
   }, [playerName, user]);
 
+  // Register player with server when name is set (for online players list & LFG feature)
+  useEffect(() => {
+    if (!socket || !playerName.trim()) return;
+
+    // Emit register_player to add to online players list
+    // Server will ignore if already authenticated
+    socket.emit('register_player', { playerName: playerName.trim() });
+  }, [socket, playerName]);
+
   // React to autoJoinGameId prop changes
   useEffect(() => {
     if (autoJoinGameId) {

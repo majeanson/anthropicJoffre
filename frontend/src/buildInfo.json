@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T18:05:57.923Z",
+  "buildDate": "2025-12-05T18:12:10.750Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "fix: Show bot takeover modal when joining full games from lobby\n\nThe BotTakeoverModal was only rendered in game phases, not in the lobby.\nWhen a player tried to join a game full of bots from the lobby browser,\nthe game_full_with_bots event was received but the modal couldn't display.\n\nAdded BotTakeoverModal render to the lobby section of App.tsx so users\ncan now see the modal and choose which bot to take over.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "c39c22e",
-    "commitDate": "2025-12-05 11:48:07 -0500",
+    "commitMessage": "feat: Add comprehensive social features - blocking, LFG status, friend expiration\n\n- Add player blocking system with database schema, backend handlers, and UI\n  - Block/unblock players from profile modal\n  - Blocks prevent friend requests and direct messages\n  - Blocking removes existing friendships and pending requests\n\n- Add \"Looking for Game\" (LFG) status feature\n  - Toggle in Online tab to signal you're looking for teammates\n  - LFG players display animated badge in online player list\n  - LFG status broadcasts to all connected clients\n\n- Add friend request expiration (30-day auto-expire)\n  - New expires_at column in friend_requests table\n  - Hourly scheduled task cleans up expired requests\n  - Cancel sent friend request functionality\n\n- Enhance notification center integration\n  - Add friend_request_accepted notification type\n  - Sync notification types between frontend and backend\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "1f83149",
+    "commitDate": "2025-12-05 13:06:43 -0500",
     "branch": "main"
   },
   "futureTodos": [
