@@ -476,24 +476,24 @@ export const modernMinimalSkin: Skin = {
   colors: {
     bg: {
       primary: '#f5f3f0',           // Softer warm cream (easier on eyes)
-      secondary: '#faf8f5',         // Light cream
+      secondary: '#ffffff',         // Pure white for panels
       tertiary: '#ebe8e4',          // Warm light gray
-      accent: '#374151',            // Softer dark gray (not pure black)
+      accent: '#1f2937',            // Dark gray accent (more contrast)
       overlay: 'rgba(245, 243, 240, 0.98)',
     },
 
     text: {
-      primary: '#374151',           // Softer dark gray (not pure black)
-      secondary: '#6b7280',         // Medium gray
-      accent: '#0284c7',            // Slightly softer blue
-      inverse: '#faf8f5',
-      muted: '#9ca3af',
+      primary: '#1f2937',           // Darker gray for better readability
+      secondary: '#4b5563',         // Medium gray
+      accent: '#0369a1',            // Strong blue
+      inverse: '#ffffff',
+      muted: '#6b7280',
     },
 
     border: {
       default: '#d1d5db',
-      accent: '#374151',
-      subtle: '#e4e4e7',
+      accent: '#1f2937',
+      subtle: '#e5e7eb',
     },
 
     success: '#15803d',
@@ -521,14 +521,14 @@ export const modernMinimalSkin: Skin = {
 
     glow: '#0369a1',
     highlight: '#0369a1',
-    shadow: 'rgba(0, 0, 0, 0.08)',
+    shadow: 'rgba(0, 0, 0, 0.1)',
   },
 
   typography: {
     fontFamily: {
-      display: '"Inter", "SF Pro Display", -apple-system, sans-serif',
-      body: '"Inter", "SF Pro Text", -apple-system, sans-serif',
-      mono: '"JetBrains Mono", "SF Mono", monospace',
+      display: '"Segoe UI", Tahoma, Verdana, Arial, sans-serif',
+      body: '"Segoe UI", Tahoma, Verdana, Arial, sans-serif',
+      mono: '"Consolas", "Courier New", monospace',
     },
     fontWeight: {
       normal: 400,
@@ -581,7 +581,7 @@ export const modernMinimalSkin: Skin = {
     },
     card: {
       borderWidth: '1px',
-      bgColor: '#fafaf8',           // Warm off-white for cards
+      bgColor: '#fefefe',           // Bright white for playing cards
       cornerRadius: '10px',
     },
     modal: {
@@ -662,9 +662,9 @@ export const modernMinimalDarkSkin: Skin = {
 
   typography: {
     fontFamily: {
-      display: '"Inter", "SF Pro Display", -apple-system, sans-serif',
-      body: '"Inter", "SF Pro Text", -apple-system, sans-serif',
-      mono: '"JetBrains Mono", "SF Mono", monospace',
+      display: '"Segoe UI", Tahoma, Verdana, Arial, sans-serif',
+      body: '"Segoe UI", Tahoma, Verdana, Arial, sans-serif',
+      mono: '"Consolas", "Courier New", monospace',
     },
     fontWeight: {
       normal: 400,
