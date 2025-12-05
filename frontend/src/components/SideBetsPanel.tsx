@@ -14,6 +14,7 @@ import type {
   SideBetResolvedEvent,
   SideBetCancelledEvent,
   SideBetDisputedEvent,
+  SideBetWinClaimedEvent,
   SideBetsListEvent,
   SideBetPromptResolutionEvent,
 } from '../types/game';
@@ -218,6 +219,21 @@ export default function SideBetsPanel({
       showNotification(`Bet disputed - ${refundAmount} coins refunded to both`, 'info');
     };
 
+    const handleWinClaimed = ({ betId, claimedBy, bet }: SideBetWinClaimedEvent) => {
+      // Update the bet status
+      setBets(prev =>
+        prev.map(b =>
+          b.id === betId ? { ...b, status: 'pending_resolution' as const, claimedWinner: claimedBy } : b
+        )
+      );
+      // Notify the other party
+      const isOtherParty = (bet.creatorName === playerName || bet.acceptorName === playerName) && claimedBy !== playerName;
+      if (isOtherParty) {
+        showNotification(`${claimedBy} claims they won! Please confirm or dispute.`, 'info');
+        sounds.chatNotification();
+      }
+    };
+
     const handleBalanceUpdated = ({ balance: newBalance }: { balance: number }) => {
       setBalance(newBalance);
     };
@@ -237,6 +253,7 @@ export default function SideBetsPanel({
     socket.on('side_bet_resolved', handleBetResolved);
     socket.on('side_bet_cancelled', handleBetCancelled);
     socket.on('side_bet_disputed', handleBetDisputed);
+    socket.on('side_bet_win_claimed', handleWinClaimed);
     socket.on('balance_updated', handleBalanceUpdated);
     socket.on('side_bet_prompt_resolution', handlePromptResolution);
 
@@ -247,6 +264,7 @@ export default function SideBetsPanel({
       socket.off('side_bet_resolved', handleBetResolved);
       socket.off('side_bet_cancelled', handleBetCancelled);
       socket.off('side_bet_disputed', handleBetDisputed);
+      socket.off('side_bet_win_claimed', handleWinClaimed);
       socket.off('balance_updated', handleBalanceUpdated);
       socket.off('side_bet_prompt_resolution', handlePromptResolution);
     };
@@ -267,9 +285,14 @@ export default function SideBetsPanel({
     socket.emit('cancel_side_bet', { gameId, betId });
   }, [socket, gameId]);
 
-  const handleResolveBet = useCallback((betId: number, creatorWon: boolean) => {
+  const handleClaimWin = useCallback((betId: number) => {
     if (!socket) return;
-    socket.emit('resolve_custom_bet', { gameId, betId, creatorWon });
+    socket.emit('claim_bet_win', { gameId, betId });
+  }, [socket, gameId]);
+
+  const handleConfirmResolution = useCallback((betId: number, confirmed: boolean) => {
+    if (!socket) return;
+    socket.emit('confirm_bet_resolution', { gameId, betId, confirmed });
   }, [socket, gameId]);
 
   const handleDisputeBet = useCallback((betId: number) => {
@@ -280,7 +303,7 @@ export default function SideBetsPanel({
   // Filter bets by status
   const openBets = bets.filter(b => b.status === 'open' && b.creatorName !== playerName);
   const myOpenBets = bets.filter(b => b.status === 'open' && b.creatorName === playerName);
-  const activeBets = bets.filter(b => b.status === 'active');
+  const activeBets = bets.filter(b => b.status === 'active' || b.status === 'pending_resolution');
   const resolvedBets = bets.filter(b => b.status === 'resolved' || b.status === 'disputed' || b.status === 'cancelled');
 
   // Get bet description with context
@@ -310,12 +333,12 @@ export default function SideBetsPanel({
     );
   };
 
-  // Handle prompt resolution action
-  const handlePromptResolve = useCallback((creatorWon: boolean) => {
+  // Handle prompt resolution action - now uses claim flow
+  const handlePromptClaimWin = useCallback(() => {
     if (!resolutionPrompt) return;
-    handleResolveBet(resolutionPrompt.bet.id, creatorWon);
+    handleClaimWin(resolutionPrompt.bet.id);
     setResolutionPrompt(null);
-  }, [resolutionPrompt, handleResolveBet]);
+  }, [resolutionPrompt, handleClaimWin]);
 
   const handlePromptDispute = useCallback(() => {
     if (!resolutionPrompt) return;
@@ -525,23 +548,13 @@ export default function SideBetsPanel({
                       )}
 
                       {/* Manual resolution for custom bets */}
-                      {isCustom && isParticipant && (
+                      {isCustom && isParticipant && bet.status === 'active' && (
                         <div className="flex gap-2 mt-2">
                           <button
-                            onClick={() =>
-                              handleResolveBet(bet.id, bet.creatorName === playerName)
-                            }
+                            onClick={() => handleClaimWin(bet.id)}
                             className="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white text-xs rounded transition-colors"
                           >
-                            I Won
-                          </button>
-                          <button
-                            onClick={() =>
-                              handleResolveBet(bet.id, bet.creatorName !== playerName)
-                            }
-                            className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs rounded transition-colors"
-                          >
-                            I Lost
+                            Claim Win
                           </button>
                           <button
                             onClick={() => handleDisputeBet(bet.id)}
@@ -549,6 +562,41 @@ export default function SideBetsPanel({
                           >
                             Dispute
                           </button>
+                        </div>
+                      )}
+
+                      {/* Pending resolution - waiting for confirmation */}
+                      {isCustom && bet.status === 'pending_resolution' && (
+                        <div className="mt-2">
+                          {bet.claimedWinner === playerName ? (
+                            <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
+                              Waiting for {bet.claimedWinner === bet.creatorName ? bet.acceptorName : bet.creatorName} to confirm...
+                            </div>
+                          ) : isParticipant ? (
+                            <div className="space-y-2">
+                              <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
+                                {bet.claimedWinner} claims they won!
+                              </div>
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => handleConfirmResolution(bet.id, true)}
+                                  className="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white text-xs rounded transition-colors"
+                                >
+                                  Confirm
+                                </button>
+                                <button
+                                  onClick={() => handleConfirmResolution(bet.id, false)}
+                                  className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs rounded transition-colors"
+                                >
+                                  Dispute
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
+                              {bet.claimedWinner} claims win - awaiting confirmation
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -716,28 +764,25 @@ export default function SideBetsPanel({
 
             <div className="flex flex-col gap-2">
               <p className="text-xs text-[var(--color-text-secondary)] text-center mb-1">
-                Who won this bet?
+                Did you win this bet?
               </p>
               <div className="flex gap-2">
                 <button
-                  onClick={() => handlePromptResolve(resolutionPrompt.bet.creatorName === playerName)}
+                  onClick={handlePromptClaimWin}
                   className="flex-1 py-3 bg-green-600 hover:bg-green-500 text-white font-medium rounded-lg transition-colors"
                 >
-                  ✓ I Won
+                  Claim Win
                 </button>
                 <button
-                  onClick={() => handlePromptResolve(resolutionPrompt.bet.creatorName !== playerName)}
-                  className="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white font-medium rounded-lg transition-colors"
+                  onClick={handlePromptDispute}
+                  className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors"
                 >
-                  ✗ I Lost
+                  Dispute
                 </button>
               </div>
-              <button
-                onClick={handlePromptDispute}
-                className="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white text-sm rounded-lg transition-colors mt-1"
-              >
-                Dispute (Refund Both)
-              </button>
+              <p className="text-xs text-[var(--color-text-secondary)] text-center">
+                The other player must confirm your claim
+              </p>
               <button
                 onClick={() => setResolutionPrompt(null)}
                 className="w-full py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-xs"

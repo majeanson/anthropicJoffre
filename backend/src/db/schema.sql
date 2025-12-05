@@ -261,17 +261,18 @@ CREATE TABLE IF NOT EXISTS side_bets (
     amount INT NOT NULL CHECK (amount >= 1 AND amount <= 1000),
     prediction VARCHAR(255),  -- The bet prediction (e.g., 'team1', '>=5', 'true')
     target_player VARCHAR(255),  -- Who the bet is about (if applicable)
-    status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'active', 'resolved', 'cancelled', 'expired', 'disputed')),
+    status VARCHAR(20) DEFAULT 'open' CHECK (status IN ('open', 'active', 'pending_resolution', 'resolved', 'cancelled', 'expired', 'disputed')),
     result BOOLEAN,  -- NULL until resolved, TRUE if creator won
     resolved_by VARCHAR(20) CHECK (resolved_by IN ('auto', 'manual', 'expired', 'refunded')),
     round_number INT,  -- Which round the bet applies to (NULL = whole game)
     trick_number INT,  -- Which trick the bet was created on (for trick-timed resolution)
+    claimed_winner VARCHAR(255),  -- For pending_resolution: who claimed they won
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     accepted_at TIMESTAMP,
     resolved_at TIMESTAMP
 );
 
--- Add resolution_timing column if missing (migration for existing tables)
+-- Add resolution_timing, trick_number, claimed_winner columns if missing (migration for existing tables)
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns
@@ -281,6 +282,10 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns
                    WHERE table_name='side_bets' AND column_name='trick_number') THEN
         ALTER TABLE side_bets ADD COLUMN trick_number INT;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='side_bets' AND column_name='claimed_winner') THEN
+        ALTER TABLE side_bets ADD COLUMN claimed_winner VARCHAR(255);
     END IF;
 END $$;
 

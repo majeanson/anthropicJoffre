@@ -157,7 +157,26 @@ export const resolveSideBet = async (
 };
 
 /**
+ * Claim a win on a bet (sets status to pending_resolution)
+ */
+export const claimBetWin = async (
+  betId: number,
+  claimerName: string
+): Promise<SideBet | null> => {
+  const text = `
+    UPDATE side_bets
+    SET status = 'pending_resolution',
+        claimed_winner = $1
+    WHERE id = $2 AND status = 'active'
+    RETURNING *
+  `;
+  const result = await query(text, [claimerName, betId]);
+  return result.rows[0] ? mapRowToSideBet(result.rows[0]) : null;
+};
+
+/**
  * Mark a bet as disputed (refund both parties)
+ * Works for both 'active' and 'pending_resolution' statuses
  */
 export const disputeSideBet = async (betId: number): Promise<SideBet | null> => {
   const text = `
@@ -165,7 +184,7 @@ export const disputeSideBet = async (betId: number): Promise<SideBet | null> => 
     SET status = 'disputed',
         resolved_by = 'refunded',
         resolved_at = CURRENT_TIMESTAMP
-    WHERE id = $1 AND status = 'active'
+    WHERE id = $1 AND status IN ('active', 'pending_resolution')
     RETURNING *
   `;
   const result = await query(text, [betId]);
@@ -372,6 +391,7 @@ function mapRowToSideBet(row: Record<string, unknown>): SideBet {
     resolvedBy: row.resolved_by as SideBetResolution | undefined,
     roundNumber: row.round_number as number | undefined,
     trickNumber: row.trick_number as number | undefined,
+    claimedWinner: row.claimed_winner as string | undefined,
     createdAt: new Date(row.created_at as string),
     acceptedAt: row.accepted_at ? new Date(row.accepted_at as string) : undefined,
     resolvedAt: row.resolved_at ? new Date(row.resolved_at as string) : undefined,

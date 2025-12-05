@@ -1,7 +1,8 @@
 -- Migration 028: Side Bets Enhancements
 -- Created: 2025-12-05
--- Adds resolution_timing and trick_number columns to side_bets table
+-- Adds resolution_timing, trick_number, and claimed_winner columns to side_bets table
 -- Adds bet streak columns to player_stats table
+-- Updates status enum to include 'pending_resolution'
 
 -- Add resolution_timing column to side_bets
 DO $$
@@ -18,6 +19,15 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns
                    WHERE table_name='side_bets' AND column_name='trick_number') THEN
         ALTER TABLE side_bets ADD COLUMN trick_number INT;
+    END IF;
+END $$;
+
+-- Add claimed_winner column for pending resolution flow
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='side_bets' AND column_name='claimed_winner') THEN
+        ALTER TABLE side_bets ADD COLUMN claimed_winner VARCHAR(255);
     END IF;
 END $$;
 

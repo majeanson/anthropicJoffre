@@ -18,6 +18,8 @@ import type {
   CancelSideBetPayload,
   ResolveCustomBetPayload,
   DisputeBetPayload,
+  ClaimBetWinPayload,
+  ConfirmBetResolutionPayload,
   SideBet,
   PresetBetType,
 } from '../types/game';
@@ -30,6 +32,7 @@ import {
   cancelSideBet,
   resolveSideBet,
   disputeSideBet,
+  claimBetWin,
   expireOpenBets,
   getBetsForAutoResolution,
   getPlayerBalance,
@@ -450,6 +453,200 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
       });
     } catch (error) {
       logger.warn('dispute_bet failed (database may not be ready)', { error });
+      socket.emit('error', { message: 'Side bets are not available yet. Database setup required.' });
+    }
+  });
+
+  // ============================================================================
+  // claim_bet_win - Claim victory (other party must confirm or dispute)
+  // ============================================================================
+  socket.on('claim_bet_win', async (payload: ClaimBetWinPayload) => {
+    try {
+      const { gameId, betId } = payload;
+
+      const { player } = findPlayerBySocket(socket, games, gameId);
+      let playerName = player?.name;
+
+      // Check if spectator
+      if (!playerName) {
+        playerName = spectatorNames.get(socket.id);
+      }
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Player or spectator not found' });
+        return;
+      }
+
+      // Get the bet
+      const bet = await getSideBetById(betId);
+      if (!bet) {
+        socket.emit('error', { message: 'Bet not found' });
+        return;
+      }
+
+      if (bet.betType !== 'custom') {
+        socket.emit('error', { message: 'Only custom bets can be claimed' });
+        return;
+      }
+
+      if (bet.status !== 'active') {
+        socket.emit('error', { message: 'Bet is not active' });
+        return;
+      }
+
+      // Only participants can claim
+      if (bet.creatorName !== playerName && bet.acceptorName !== playerName) {
+        socket.emit('error', { message: 'Only bet participants can claim' });
+        return;
+      }
+
+      // Set to pending_resolution with claimed_winner
+      const updatedBet = await claimBetWin(betId, playerName);
+      if (!updatedBet) {
+        socket.emit('error', { message: 'Failed to claim bet' });
+        return;
+      }
+
+      logger.info('Bet win claimed', { betId, gameId, claimedBy: playerName });
+
+      // Determine who needs to confirm
+      const otherParty = bet.creatorName === playerName ? bet.acceptorName! : bet.creatorName;
+
+      // Notify all about the claim
+      io.to(gameId).emit('side_bet_win_claimed', {
+        betId,
+        claimedBy: playerName,
+        otherParty,
+        bet: updatedBet,
+      });
+      io.to(`${gameId}-spectators`).emit('side_bet_win_claimed', {
+        betId,
+        claimedBy: playerName,
+        otherParty,
+        bet: updatedBet,
+      });
+    } catch (error) {
+      logger.warn('claim_bet_win failed (database may not be ready)', { error });
+      socket.emit('error', { message: 'Side bets are not available yet. Database setup required.' });
+    }
+  });
+
+  // ============================================================================
+  // confirm_bet_resolution - Confirm or reject a win claim
+  // ============================================================================
+  socket.on('confirm_bet_resolution', async (payload: ConfirmBetResolutionPayload) => {
+    try {
+      const { gameId, betId, confirmed } = payload;
+
+      const { player } = findPlayerBySocket(socket, games, gameId);
+      let playerName = player?.name;
+
+      // Check if spectator
+      if (!playerName) {
+        playerName = spectatorNames.get(socket.id);
+      }
+
+      if (!playerName) {
+        socket.emit('error', { message: 'Player or spectator not found' });
+        return;
+      }
+
+      // Get the bet
+      const bet = await getSideBetById(betId);
+      if (!bet) {
+        socket.emit('error', { message: 'Bet not found' });
+        return;
+      }
+
+      if (bet.status !== 'pending_resolution') {
+        socket.emit('error', { message: 'Bet is not pending resolution' });
+        return;
+      }
+
+      // Only the OTHER party (not the claimer) can confirm/reject
+      const claimer = bet.claimedWinner;
+      if (playerName === claimer) {
+        socket.emit('error', { message: 'You cannot confirm your own claim' });
+        return;
+      }
+
+      if (bet.creatorName !== playerName && bet.acceptorName !== playerName) {
+        socket.emit('error', { message: 'Only bet participants can confirm' });
+        return;
+      }
+
+      if (!confirmed) {
+        // Rejected = dispute, refund both
+        const disputedBet = await disputeSideBet(betId);
+        if (!disputedBet) {
+          socket.emit('error', { message: 'Failed to dispute bet' });
+          return;
+        }
+
+        // Refund both parties
+        await updatePlayerBalance(bet.creatorName, bet.amount);
+        if (bet.acceptorName) {
+          await updatePlayerBalance(bet.acceptorName, bet.amount);
+        }
+
+        logger.info('Bet claim rejected (disputed)', { betId, gameId, rejectedBy: playerName });
+
+        io.to(gameId).emit('side_bet_disputed', {
+          betId,
+          disputedBy: playerName,
+          refundAmount: bet.amount,
+        });
+        io.to(`${gameId}-spectators`).emit('side_bet_disputed', {
+          betId,
+          disputedBy: playerName,
+          refundAmount: bet.amount,
+        });
+        return;
+      }
+
+      // Confirmed - resolve in claimer's favor
+      const creatorWon = bet.claimedWinner === bet.creatorName;
+      const resolvedBet = await resolveSideBet(betId, creatorWon, 'manual');
+      if (!resolvedBet) {
+        socket.emit('error', { message: 'Failed to resolve bet' });
+        return;
+      }
+
+      // Transfer coins with streak multiplier
+      const winnerName = bet.claimedWinner!;
+      const loserName = winnerName === bet.creatorName ? bet.acceptorName! : bet.creatorName;
+
+      // Get winner's current streak before updating
+      const currentStreak = await getPlayerBetStreak(winnerName);
+      const streakMultiplier = calculateStreakMultiplier(currentStreak);
+
+      // Apply streak multiplier
+      const basePot = bet.amount * 2;
+      const bonus = Math.floor(basePot * (streakMultiplier - 1));
+      const totalPot = basePot + bonus;
+
+      await updatePlayerBalance(winnerName, totalPot);
+
+      // Update stats for both players
+      const winnerStats = await updateSideBetStats(winnerName, true, totalPot);
+      await updateSideBetStats(loserName, false, bet.amount);
+
+      logger.info('Bet claim confirmed', { betId, gameId, winner: winnerName, confirmedBy: playerName });
+
+      const resolvedEvent = {
+        betId,
+        result: creatorWon,
+        winnerName,
+        loserName,
+        coinsAwarded: totalPot,
+        streakBonus: bonus,
+        winnerStreak: winnerStats.currentStreak,
+        streakMultiplier,
+      };
+      io.to(gameId).emit('side_bet_resolved', resolvedEvent);
+      io.to(`${gameId}-spectators`).emit('side_bet_resolved', resolvedEvent);
+    } catch (error) {
+      logger.warn('confirm_bet_resolution failed (database may not be ready)', { error });
       socket.emit('error', { message: 'Side bets are not available yet. Database setup required.' });
     }
   });

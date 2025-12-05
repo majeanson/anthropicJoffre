@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T15:10:51.262Z",
+  "buildDate": "2025-12-05T15:35:57.071Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Enhanced side bets with streaks, timing, and notifications\n\n- Add resolution timing for custom bets (trick/round/game/manual)\n- Add trick_number tracking for trick-timed bets\n- Implement bet streak multipliers (1x, 1.25x, 1.5x, 2x based on wins)\n- Add current_bet_streak and best_bet_streak to player_stats\n- Create timed resolution prompts with modal UI\n- Add live betting toast notifications (SideBetToast component)\n- Add bet win/loss sound effects\n- Show resolution timing badges in SideBetsPanel\n- Support spectator betting with name tracking\n- Add CSS animations (slide-in-right, pulse-once, coin-celebrate)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "2b6d35d",
-    "commitDate": "2025-12-05 09:20:09 -0500",
+    "commitMessage": "feat: Add game invite acceptance flow with Join buttons\n\n- Add action button support to Toast component for interactive notifications\n- Update game invite handler to show \"Join\" button in toast notification\n- Fix NotificationCenter to always show when authenticated (not just with unread)\n- Add \"Join Game\" button to game_invite notifications in NotificationCenter\n- Add database migration 028 for side bets enhancements (resolution_timing, streak columns)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "b0267c9",
+    "commitDate": "2025-12-05 10:11:23 -0500",
     "branch": "main"
   },
   "futureTodos": [

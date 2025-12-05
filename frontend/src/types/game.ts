@@ -305,7 +305,7 @@ export type PresetBetType =
 /**
  * Status of a side bet
  */
-export type SideBetStatus = 'open' | 'active' | 'resolved' | 'cancelled' | 'expired' | 'disputed';
+export type SideBetStatus = 'open' | 'active' | 'pending_resolution' | 'resolved' | 'cancelled' | 'expired' | 'disputed';
 
 /**
  * How a bet was resolved
@@ -337,6 +337,7 @@ export interface SideBet {
   resolvedBy?: SideBetResolution;     // How it was resolved
   roundNumber?: number;               // Which round the bet applies to (null = whole game)
   trickNumber?: number;               // Which trick the bet was created on (for trick-timed resolution)
+  claimedWinner?: string;             // For pending_resolution: who claimed they won
   createdAt: Date;
   acceptedAt?: Date;
   resolvedAt?: Date;
@@ -389,6 +390,13 @@ export interface SideBetDisputedEvent {
   betId: number;
   disputedBy: string;
   refundAmount: number;
+}
+
+export interface SideBetWinClaimedEvent {
+  betId: number;
+  claimedBy: string;
+  otherParty: string;  // The person who needs to confirm
+  bet: SideBet;
 }
 
 export interface SideBetsListEvent {
