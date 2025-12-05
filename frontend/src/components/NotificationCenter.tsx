@@ -14,9 +14,10 @@ import { UICard, Button, EmptyState } from './ui';
 interface NotificationCenterProps {
   socket: Socket | null;
   isAuthenticated: boolean;
+  onJoinGame?: (gameId: string) => void;
 }
 
-export function NotificationCenter({ socket, isAuthenticated }: NotificationCenterProps) {
+export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -110,8 +111,8 @@ export function NotificationCenter({ socket, isAuthenticated }: NotificationCent
     }
   };
 
-  // Only show if authenticated AND has unread notifications
-  if (!isAuthenticated || unreadCount === 0) return null;
+  // Only show if authenticated
+  if (!isAuthenticated) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-40" ref={dropdownRef}>
@@ -124,9 +125,11 @@ export function NotificationCenter({ socket, isAuthenticated }: NotificationCent
         title="Notifications"
       >
         <span className="text-2xl">🔔</span>
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
-          {unreadCount > 9 ? '9+' : unreadCount}
-        </span>
+        {unreadCount > 0 && (
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
+            {unreadCount > 9 ? '9+' : unreadCount}
+          </span>
+        )}
       </Button>
 
       {/* Dropdown - Positioned above the floating button */}
@@ -188,9 +191,25 @@ export function NotificationCenter({ socket, isAuthenticated }: NotificationCent
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {notification.message}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-                        {formatTime(notification.created_at)}
-                      </p>
+                      <div className="flex items-center justify-between mt-2">
+                        <p className="text-xs text-gray-500 dark:text-gray-500">
+                          {formatTime(notification.created_at)}
+                        </p>
+                        {notification.notification_type === 'game_invite' && notification.data?.game_id && onJoinGame && (
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMarkAsRead(notification.notification_id);
+                              onJoinGame(notification.data!.game_id);
+                              setIsOpen(false);
+                            }}
+                          >
+                            Join Game
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>

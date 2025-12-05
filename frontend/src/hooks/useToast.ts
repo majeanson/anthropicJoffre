@@ -6,7 +6,7 @@
  */
 
 import { useState, useRef } from 'react';
-import { ToastProps } from '../components/Toast';
+import { ToastProps, ToastAction } from '../components/Toast';
 
 /**
  * Toast notifications management hook
@@ -14,6 +14,7 @@ import { ToastProps } from '../components/Toast';
  * Features:
  * - Duplicate prevention via lastToastRef
  * - Auto-clear ref after duration
+ * - Optional action button support
  *
  * @returns Toast state, setter, and show function with duplicate prevention
  */
@@ -28,15 +29,21 @@ export function useToast() {
    * @param message - Toast message
    * @param type - Toast type (info, success, error, warning)
    * @param duration - Duration in milliseconds (default: 3000)
+   * @param action - Optional action button with label and onClick handler
    */
-  const showToast = (message: string, type: 'info' | 'success' | 'error' | 'warning' = 'info', duration: number = 3000) => {
+  const showToast = (
+    message: string,
+    type: 'info' | 'success' | 'error' | 'warning' = 'info',
+    duration: number = 3000,
+    action?: ToastAction
+  ) => {
     // Prevent duplicate toasts
     if (lastToastRef.current === message) {
       return;
     }
 
     lastToastRef.current = message;
-    setToast({ message, type, duration });
+    setToast({ message, type, duration, action });
 
     // Clear the ref after duration
     setTimeout(() => {

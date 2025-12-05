@@ -74,6 +74,8 @@ interface GlobalUIProps {
   setShowDirectMessages: (show: boolean) => void;
   dmRecipient: string | null;
   setDmRecipient: (recipient: string | null) => void;
+  // Game invite join action
+  onJoinGame?: (gameId: string) => void;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({
@@ -111,6 +113,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   setShowDirectMessages,
   dmRecipient,
   setDmRecipient,
+  onJoinGame,
 }) => {
   void _onOpenProfile; // Reserved for future use
   const modals = useModals();
@@ -237,6 +240,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
         <NotificationCenter
           socket={socket}
           isAuthenticated={auth.isAuthenticated}
+          onJoinGame={onJoinGame}
         />
       </Suspense>
       <EmailVerificationBanner />

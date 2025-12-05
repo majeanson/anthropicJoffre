@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T14:19:27.480Z",
+  "buildDate": "2025-12-05T15:10:51.262Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Improve side bet UX with team labels and context-aware options\n\n- Changed \"Team 1\" / \"Team 2\" to \"My Team\" / \"Their Team\" in bet choices\n- Predictions are mapped to actual team IDs when submitting\n- \"Without Trump\" bet only shows when round is played without trump\n- \"First Trump\" bet only shows when there IS a trump suit\n- Pass playerTeamId and isWithoutTrump through component chain\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "b207f95",
-    "commitDate": "2025-12-05 08:31:35 -0500",
+    "commitMessage": "feat: Enhanced side bets with streaks, timing, and notifications\n\n- Add resolution timing for custom bets (trick/round/game/manual)\n- Add trick_number tracking for trick-timed bets\n- Implement bet streak multipliers (1x, 1.25x, 1.5x, 2x based on wins)\n- Add current_bet_streak and best_bet_streak to player_stats\n- Create timed resolution prompts with modal UI\n- Add live betting toast notifications (SideBetToast component)\n- Add bet win/loss sound effects\n- Show resolution timing badges in SideBetsPanel\n- Support spectator betting with name tracking\n- Add CSS animations (slide-in-right, pulse-once, coin-celebrate)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "2b6d35d",
+    "commitDate": "2025-12-05 09:20:09 -0500",
     "branch": "main"
   },
   "futureTodos": [

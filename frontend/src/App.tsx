@@ -378,7 +378,7 @@ function AppContent() {
     };
   }, [socket, auth.isAuthenticated])
 
-  // Sprint 22A: Game invite listener
+  // Sprint 22A: Game invite listener with Join action
   useEffect(() => {
     if (!socket) return;
 
@@ -390,12 +390,25 @@ function AppContent() {
       fromPlayer: string;
       timestamp: number;
     }) => {
+      // Get current player name for join action
+      const playerName = currentPlayerName || localStorage.getItem('playerName') || '';
+
       showToast(
         `${fromPlayer} invited you to join their game!`,
         'info',
-        8000
+        10000, // Longer duration to give time to click Join
+        {
+          label: 'Join',
+          onClick: () => {
+            if (playerName && inviteGameId) {
+              // Store player name and join game
+              localStorage.setItem('playerName', playerName);
+              socket.emit('join_game', { gameId: inviteGameId, playerName, beginnerMode });
+              setGameId(inviteGameId);
+            }
+          }
+        }
       );
-      // Store invite for potential "Join Now" action
       console.log(`[Social] Game invite received from ${fromPlayer} for game ${inviteGameId}`);
     };
 
@@ -404,7 +417,7 @@ function AppContent() {
     return () => {
       socket.off('game_invite_received', handleGameInviteReceived);
     };
-  }, [socket, showToast]);
+  }, [socket, showToast, currentPlayerName, beginnerMode]);
 
   // Sprint 4 Phase 4.4: Game event listeners extracted to custom hook
   useGameEventListeners({
@@ -807,6 +820,15 @@ function AppContent() {
     setShowDirectMessages,
     dmRecipient,
     setDmRecipient,
+    // Sprint 22A: Game invite join action
+    onJoinGame: (inviteGameId: string) => {
+      const playerName = currentPlayerName || localStorage.getItem('playerName') || '';
+      if (playerName && socket) {
+        localStorage.setItem('playerName', playerName);
+        socket.emit('join_game', { gameId: inviteGameId, playerName, beginnerMode });
+        setGameId(inviteGameId);
+      }
+    },
   };
 
   if (!gameState) {
