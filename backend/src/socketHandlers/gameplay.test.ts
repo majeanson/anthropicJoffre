@@ -87,7 +87,7 @@ describe('gameplay handlers', () => {
       expect(canDealerEqualize).toBe(true);
     });
 
-    it('should reject dealer skip', () => {
+    it('should allow dealer skip when there are valid bets', () => {
       const game = createTestGame({
         dealerIndex: 3,
         bettingPlayerIndex: 3,
@@ -98,7 +98,27 @@ describe('gameplay handlers', () => {
 
       const isDealerTurn = game.bettingPlayerIndex === game.dealerIndex;
       const hasBets = game.currentBets.length > 0;
-      const canDealerSkip = !(isDealerTurn && hasBets);
+      // Dealer CAN skip when there are valid bets (someone else already bet)
+      const canDealerSkip = !isDealerTurn || hasBets;
+
+      expect(canDealerSkip).toBe(true);
+    });
+
+    it('should reject dealer skip when no one has bet', () => {
+      const game = createTestGame({
+        dealerIndex: 3,
+        bettingPlayerIndex: 3,
+        currentBets: [
+          { playerId: '1', amount: 0, withoutTrump: false, skipped: true },
+          { playerId: '2', amount: 0, withoutTrump: false, skipped: true },
+          { playerId: '3', amount: 0, withoutTrump: false, skipped: true },
+        ],
+      });
+
+      const isDealerTurn = game.bettingPlayerIndex === game.dealerIndex;
+      const hasValidBets = game.currentBets.some(b => !b.skipped);
+      // Dealer CANNOT skip when no valid bets exist
+      const canDealerSkip = !isDealerTurn || hasValidBets;
 
       expect(canDealerSkip).toBe(false);
     });

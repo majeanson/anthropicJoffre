@@ -131,9 +131,10 @@ export function placeBet(
       }
     }
   } else {
-    // Skip validation
-    if (isDealer && hasActiveBets) {
-      throw new Error('Dealer cannot skip when there are active bets');
+    // Skip validation: Dealer CANNOT skip if NO active bets (must start betting)
+    // Dealer CAN skip if there ARE active bets (someone else already bet)
+    if (isDealer && !hasActiveBets) {
+      throw new Error('Dealer cannot skip when no one has bet. You must place a bet.');
     }
   }
 
