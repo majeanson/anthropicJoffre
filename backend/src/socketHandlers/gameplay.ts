@@ -135,7 +135,12 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     const game = games.get(gameId);
     if (!game) return;
 
-    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+    // Find player by name (stable identifier) - socket IDs are volatile
+    const playerName = socket.data.playerName || game.players.find(p => p.id === socket.id)?.name;
+    if (!playerName) {
+      socket.emit('error', { message: 'Player not found' });
+      return;
+    }
 
     // Rate limiting: Check per-player rate limit (Sprint 2)
     const ipAddress = getSocketIP(socket);
@@ -284,7 +289,12 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
     if (!game) return;
 
     const currentPlayer = game.players[game.currentPlayerIndex];
-    const playerName = game.players.find(p => p.id === socket.id)?.name || socket.id;
+    // Find player by name (stable identifier) - socket IDs are volatile
+    const playerName = socket.data.playerName || game.players.find(p => p.id === socket.id)?.name;
+    if (!playerName) {
+      socket.emit('error', { message: 'Player not found' });
+      return;
+    }
 
     // Rate limiting: Check per-player rate limit (Sprint 2)
     const ipAddress = getSocketIP(socket);

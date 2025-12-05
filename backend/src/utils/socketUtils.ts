@@ -67,16 +67,41 @@ export function requirePlayer(game: GameState, playerId: string) {
 }
 
 /**
+ * Find player in game by name from socket.data.playerName
+ * IMPORTANT: Always use this instead of finding by socket.id - socket IDs are volatile
+ */
+export function findPlayerInGame(socket: Socket, game: GameState) {
+  const playerName = socket.data?.playerName;
+  if (!playerName) return undefined;
+  return game.players.find(p => p.name === playerName);
+}
+
+/**
+ * Get player name from socket - the stable identifier
+ */
+export function getPlayerName(socket: Socket): string | undefined {
+  return socket.data?.playerName;
+}
+
+/**
  * Gets the player ID from socket data
- * Handles both direct socket.data.playerId and game lookup
+ * Handles socket.data.playerId, playerName lookup, and socket ID fallback
  */
 export function getPlayerId(socket: Socket, game?: GameState): string | null {
-  // First check socket data
+  // First check socket data for stored playerId
   if (socket.data?.playerId) {
     return socket.data.playerId;
   }
 
-  // If game provided, try to find player by socket ID
+  // If game provided, try to find player by name (preferred - stable identifier)
+  if (game && socket.data?.playerName) {
+    const player = game.players.find(p => p.name === socket.data.playerName);
+    if (player) {
+      return player.id;
+    }
+  }
+
+  // Fallback to socket.id (for backwards compatibility, but not reliable)
   if (game) {
     const player = game.players.find(p => p.id === socket.id);
     if (player) {

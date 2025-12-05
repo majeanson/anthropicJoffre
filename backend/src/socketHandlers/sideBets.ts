@@ -59,12 +59,15 @@ export interface SideBetsHandlersDependencies {
  * Register all side bets Socket.io handlers
  */
 /**
- * Helper to find player by socket ID in a game
+ * Helper to find player by name in a game (socket IDs are volatile, always use names)
  */
-function findPlayerBySocket(socket: Socket, games: Map<string, GameState>, gameId: string) {
+function findPlayerByName(socket: Socket, games: Map<string, GameState>, gameId: string) {
   const game = games.get(gameId);
   if (!game) return { player: undefined, game: undefined };
-  const player = game.players.find(p => p.id === socket.id);
+  // Always find by player name - socket IDs are volatile
+  const playerName = socket.data.playerName;
+  if (!playerName) return { player: undefined, game };
+  const player = game.players.find(p => p.name === playerName);
   return { player, game };
 }
 
@@ -85,7 +88,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
       }
 
       // Find creator (player or spectator)
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let creatorName = player?.name;
 
       // Check if spectator
@@ -178,7 +181,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
       }
 
       // Find acceptor (player or spectator)
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let acceptorName = player?.name;
 
       // Check if spectator
@@ -252,7 +255,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
     try {
       const { gameId, betId } = payload;
 
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let playerName = player?.name;
 
       // Check if spectator
@@ -308,7 +311,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
     try {
       const { gameId, betId, creatorWon } = payload;
 
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let playerName = player?.name;
 
       // Check if spectator
@@ -399,7 +402,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
     try {
       const { gameId, betId } = payload;
 
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let playerName = player?.name;
 
       // Check if spectator
@@ -464,7 +467,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
     try {
       const { gameId, betId } = payload;
 
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let playerName = player?.name;
 
       // Check if spectator
@@ -538,7 +541,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
     try {
       const { gameId, betId, confirmed } = payload;
 
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let playerName = player?.name;
 
       // Check if spectator
@@ -670,7 +673,7 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
   // ============================================================================
   socket.on('get_balance', async ({ gameId }: { gameId: string }) => {
     try {
-      const { player } = findPlayerBySocket(socket, games, gameId);
+      const { player } = findPlayerByName(socket, games, gameId);
       let playerName = player?.name;
 
       // Check if spectator
