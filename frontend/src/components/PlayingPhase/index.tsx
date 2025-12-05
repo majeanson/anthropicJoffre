@@ -154,6 +154,8 @@ function PlayingPhaseComponent({
 
   // Card queue state
   const [queuedCard, setQueuedCard] = useState<CardType | null>(null);
+  // Track if the card was queued while it was the player's turn (for continuous play flow)
+  const [queuedDuringOwnTurn, setQueuedDuringOwnTurn] = useState(false);
 
   // Trick winner celebration state
   const [trickWinner, setTrickWinner] = useState<{
@@ -320,6 +322,18 @@ function PlayingPhaseComponent({
     );
     if (!cardInHand) {
       setQueuedCard(null);
+      setQueuedDuringOwnTurn(false);
+      return;
+    }
+
+    // Don't auto-play if:
+    // 1. Player just won the trick and is now leading AND
+    // 2. The card was queued while waiting (not during own turn)
+    // This allows continuous play flow when winning tricks (queue 7, play, queue 6, auto-play, etc.)
+    const justWonTrick = gameState.currentTrick.length === 0 &&
+      gameState.previousTrick?.winnerName === currentPlayer.name;
+    if (justWonTrick && !queuedDuringOwnTurn) {
+      // Keep the card queued but don't auto-play - player queued while waiting, now they're leading
       return;
     }
 
@@ -338,6 +352,7 @@ function PlayingPhaseComponent({
 
     if (!isValidToPlay) {
       setQueuedCard(null);
+      setQueuedDuringOwnTurn(false);
       return;
     }
 
@@ -345,29 +360,36 @@ function PlayingPhaseComponent({
       sounds.cardConfirm(queuedCard.value);
       onPlayCard(queuedCard);
       setQueuedCard(null);
+      setQueuedDuringOwnTurn(false);
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [isCurrentTurn, queuedCard, currentPlayer, gameState.currentTrick, onPlayCard]);
+  }, [isCurrentTurn, queuedCard, queuedDuringOwnTurn, currentPlayer, gameState.currentTrick, gameState.previousTrick, onPlayCard]);
 
   // Clear queue on new round
   useEffect(() => {
     setQueuedCard(null);
+    setQueuedDuringOwnTurn(false);
   }, [gameState.roundNumber]);
 
   // Handler to queue/unqueue a card
   const handleQueueCard = useCallback((card: CardType | null) => {
     if (!card) {
       setQueuedCard(null);
+      setQueuedDuringOwnTurn(false);
       return;
     }
     if (queuedCard && queuedCard.color === card.color && queuedCard.value === card.value) {
+      // Unqueue - clicking same card
       setQueuedCard(null);
+      setQueuedDuringOwnTurn(false);
     } else {
+      // Queue new card - track if it was queued during own turn for continuous play flow
       setQueuedCard(card);
+      setQueuedDuringOwnTurn(isCurrentTurn);
       sounds.cardDeal();
     }
-  }, [queuedCard]);
+  }, [queuedCard, isCurrentTurn]);
 
   // Empty state message when no trick
   const EmptyTrickMessage = () => {
