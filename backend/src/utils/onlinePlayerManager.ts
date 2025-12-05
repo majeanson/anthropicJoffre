@@ -17,6 +17,7 @@ export interface OnlinePlayer {
   status: 'in_lobby' | 'in_game' | 'in_team_selection';
   gameId?: string;
   lastActivity: number;
+  lookingForGame?: boolean;  // True if player is actively looking for teammates
 }
 
 // Activity threshold: Players inactive for >30s are filtered out
@@ -37,15 +38,54 @@ export function updateOnlinePlayer(
   playerName: string,
   status: 'in_lobby' | 'in_game' | 'in_team_selection',
   gameId: string | undefined,
-  onlinePlayers: Map<string, OnlinePlayer>
+  onlinePlayers: Map<string, OnlinePlayer>,
+  lookingForGame?: boolean
 ): void {
+  const existing = onlinePlayers.get(socketId);
   onlinePlayers.set(socketId, {
     socketId,
     playerName,
     status,
     gameId,
-    lastActivity: Date.now()
+    lastActivity: Date.now(),
+    // Preserve LFG status if not explicitly set, clear if joining a game
+    lookingForGame: lookingForGame !== undefined
+      ? lookingForGame
+      : (status === 'in_lobby' ? existing?.lookingForGame : false)
   });
+}
+
+/**
+ * Set "Looking for Game" status for a player
+ */
+export function setLookingForGame(
+  socketId: string,
+  lookingForGame: boolean,
+  onlinePlayers: Map<string, OnlinePlayer>
+): boolean {
+  const player = onlinePlayers.get(socketId);
+  if (!player) return false;
+
+  // Can only set LFG when in lobby
+  if (player.status !== 'in_lobby') return false;
+
+  player.lookingForGame = lookingForGame;
+  player.lastActivity = Date.now();
+  return true;
+}
+
+/**
+ * Get list of players looking for game
+ */
+export function getPlayersLookingForGame(
+  onlinePlayers: Map<string, OnlinePlayer>
+): OnlinePlayer[] {
+  const now = Date.now();
+  return Array.from(onlinePlayers.values())
+    .filter(p => p.lookingForGame === true)
+    .filter(p => p.status === 'in_lobby')
+    .filter(p => now - p.lastActivity < ACTIVITY_THRESHOLD)
+    .filter(p => !p.playerName.startsWith('Bot '));
 }
 
 /**

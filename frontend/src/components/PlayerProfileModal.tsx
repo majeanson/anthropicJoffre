@@ -82,6 +82,8 @@ export function PlayerProfileModal({
   const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
   const [achievementPoints, setAchievementPoints] = useState(0);
   const [mutualFriends, setMutualFriends] = useState<string[]>([]);
+  const [blockStatus, setBlockStatus] = useState<{ isBlocked: boolean; blockedByThem: boolean }>({ isBlocked: false, blockedByThem: false });
+  const [blockingInProgress, setBlockingInProgress] = useState(false);
 
   const { user, isAuthenticated } = useAuth();
   const isOwnProfile = isAuthenticated && user?.username === playerName;
@@ -208,6 +210,25 @@ export function PlayerProfileModal({
     };
   }, [socket, isAuthenticated, isOwnProfile, playerName]);
 
+  // Check block status
+  useEffect(() => {
+    if (!socket || !isAuthenticated || isOwnProfile || !playerName) return;
+
+    socket.emit('check_block_status', { playerName });
+
+    const handleBlockStatus = (data: { playerName: string; isBlocked: boolean; blockedByThem: boolean }) => {
+      if (data.playerName === playerName) {
+        setBlockStatus({ isBlocked: data.isBlocked, blockedByThem: data.blockedByThem });
+      }
+    };
+
+    socket.on('block_status', handleBlockStatus);
+
+    return () => {
+      socket.off('block_status', handleBlockStatus);
+    };
+  }, [socket, isAuthenticated, isOwnProfile, playerName]);
+
   // Handle friend request
   const handleSendFriendRequest = () => {
     if (!socket || !isAuthenticated) return;
@@ -239,6 +260,47 @@ export function PlayerProfileModal({
     };
 
     socket.once('friend_removed', handleRemoved);
+  };
+
+  // Handle block player
+  const handleBlockPlayer = () => {
+    if (!socket || !isAuthenticated) return;
+
+    setBlockingInProgress(true);
+    socket.emit('block_player', { blockedName: playerName });
+
+    const handleBlocked = () => {
+      setBlockStatus({ isBlocked: true, blockedByThem: false });
+      setFriendStatus('none'); // Blocking removes friendship
+      setBlockingInProgress(false);
+    };
+
+    const handleError = () => {
+      setBlockingInProgress(false);
+    };
+
+    socket.once('player_blocked', handleBlocked);
+    socket.once('block_player_error', handleError);
+  };
+
+  // Handle unblock player
+  const handleUnblockPlayer = () => {
+    if (!socket || !isAuthenticated) return;
+
+    setBlockingInProgress(true);
+    socket.emit('unblock_player', { blockedName: playerName });
+
+    const handleUnblocked = () => {
+      setBlockStatus({ ...blockStatus, isBlocked: false });
+      setBlockingInProgress(false);
+    };
+
+    const handleError = () => {
+      setBlockingInProgress(false);
+    };
+
+    socket.once('player_unblocked', handleUnblocked);
+    socket.once('unblock_player_error', handleError);
   };
 
   // Tier badge styling
@@ -565,38 +627,79 @@ export function PlayerProfileModal({
             {/* Friend Actions - Only show if authenticated and not own profile */}
             {isAuthenticated && !isOwnProfile && (
               <>
-                {friendStatus === 'none' && (
-                  <Button
-                    variant="success"
-                    fullWidth
-                    onClick={handleSendFriendRequest}
-                    disabled={sendingRequest}
-                    loading={sendingRequest}
-                    leftIcon={!sendingRequest ? <span>➕</span> : undefined}
-                  >
-                    {sendingRequest ? 'Sending...' : 'Add Friend'}
-                  </Button>
+                {/* Show blocked by them notice */}
+                {blockStatus.blockedByThem && (
+                  <UICard variant="gradient" gradient="warning" size="sm" className="text-center">
+                    <p className="text-sm text-yellow-100">
+                      This player has blocked you
+                    </p>
+                  </UICard>
                 )}
-                {friendStatus === 'pending' && (
-                  <Button
-                    variant="secondary"
-                    fullWidth
-                    disabled
-                    leftIcon={<span>⏳</span>}
-                  >
-                    Friend Request Pending
-                  </Button>
+
+                {/* Friend buttons - only if not blocked either way */}
+                {!blockStatus.isBlocked && !blockStatus.blockedByThem && (
+                  <>
+                    {friendStatus === 'none' && (
+                      <Button
+                        variant="success"
+                        fullWidth
+                        onClick={handleSendFriendRequest}
+                        disabled={sendingRequest}
+                        loading={sendingRequest}
+                        leftIcon={!sendingRequest ? <span>➕</span> : undefined}
+                      >
+                        {sendingRequest ? 'Sending...' : 'Add Friend'}
+                      </Button>
+                    )}
+                    {friendStatus === 'pending' && (
+                      <Button
+                        variant="secondary"
+                        fullWidth
+                        disabled
+                        leftIcon={<span>⏳</span>}
+                      >
+                        Friend Request Pending
+                      </Button>
+                    )}
+                    {friendStatus === 'friends' && (
+                      <Button
+                        variant="danger"
+                        fullWidth
+                        onClick={handleRemoveFriend}
+                        leftIcon={<span>🗑️</span>}
+                      >
+                        Remove Friend
+                      </Button>
+                    )}
+                  </>
                 )}
-                {friendStatus === 'friends' && (
-                  <Button
-                    variant="danger"
-                    fullWidth
-                    onClick={handleRemoveFriend}
-                    leftIcon={<span>🗑️</span>}
-                  >
-                    Remove Friend
-                  </Button>
-                )}
+
+                {/* Block/Unblock Button */}
+                <div className="pt-2 border-t border-gray-700">
+                  {blockStatus.isBlocked ? (
+                    <Button
+                      variant="secondary"
+                      fullWidth
+                      onClick={handleUnblockPlayer}
+                      disabled={blockingInProgress}
+                      loading={blockingInProgress}
+                      leftIcon={!blockingInProgress ? <span>🔓</span> : undefined}
+                    >
+                      {blockingInProgress ? 'Unblocking...' : 'Unblock Player'}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="danger"
+                      fullWidth
+                      onClick={handleBlockPlayer}
+                      disabled={blockingInProgress}
+                      loading={blockingInProgress}
+                      leftIcon={!blockingInProgress ? <span>🚫</span> : undefined}
+                    >
+                      {blockingInProgress ? 'Blocking...' : 'Block Player'}
+                    </Button>
+                  )}
+                </div>
               </>
             )}
 

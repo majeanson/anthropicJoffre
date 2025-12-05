@@ -307,3 +307,47 @@ export async function getFriendsCount(playerName: string): Promise<number> {
     return 0;
   }
 }
+
+/**
+ * Expire old friend requests (30 days)
+ * Returns the number of expired requests
+ */
+export async function expireOldFriendRequests(): Promise<number> {
+  try {
+    const result = await query(
+      `UPDATE friend_requests
+       SET status = 'expired', responded_at = CURRENT_TIMESTAMP
+       WHERE status = 'pending'
+         AND (expires_at IS NOT NULL AND expires_at < CURRENT_TIMESTAMP
+              OR expires_at IS NULL AND created_at < CURRENT_TIMESTAMP - INTERVAL '30 days')
+       RETURNING id`
+    );
+
+    const expiredCount = result.rows.length;
+    if (expiredCount > 0) {
+      console.log(`Expired ${expiredCount} old friend requests`);
+    }
+    return expiredCount;
+  } catch (error) {
+    console.error('Error expiring friend requests:', error);
+    return 0;
+  }
+}
+
+/**
+ * Cancel a sent friend request
+ */
+export async function cancelFriendRequest(requestId: number, fromPlayer: string): Promise<boolean> {
+  try {
+    const result = await query(
+      `DELETE FROM friend_requests
+       WHERE id = $1 AND from_player = $2 AND status = 'pending'`,
+      [requestId, fromPlayer]
+    );
+
+    return (result.rowCount ?? 0) > 0;
+  } catch (error) {
+    console.error('Error cancelling friend request:', error);
+    return false;
+  }
+}

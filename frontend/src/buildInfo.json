@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T15:35:57.071Z",
+  "buildDate": "2025-12-05T18:05:57.923Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Add game invite acceptance flow with Join buttons\n\n- Add action button support to Toast component for interactive notifications\n- Update game invite handler to show \"Join\" button in toast notification\n- Fix NotificationCenter to always show when authenticated (not just with unread)\n- Add \"Join Game\" button to game_invite notifications in NotificationCenter\n- Add database migration 028 for side bets enhancements (resolution_timing, streak columns)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "b0267c9",
-    "commitDate": "2025-12-05 10:11:23 -0500",
+    "commitMessage": "fix: Show bot takeover modal when joining full games from lobby\n\nThe BotTakeoverModal was only rendered in game phases, not in the lobby.\nWhen a player tried to join a game full of bots from the lobby browser,\nthe game_full_with_bots event was received but the modal couldn't display.\n\nAdded BotTakeoverModal render to the lobby section of App.tsx so users\ncan now see the modal and choose which bot to take over.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "c39c22e",
+    "commitDate": "2025-12-05 11:48:07 -0500",
     "branch": "main"
   },
   "futureTodos": [

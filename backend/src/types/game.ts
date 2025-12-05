@@ -244,16 +244,9 @@ export interface GameReplayData {
   finished_at: Date | null;
 }
 
-/**
- * Online player status
- */
-export interface OnlinePlayer {
-  socketId: string;
-  playerName: string;
-  status: 'in_lobby' | 'in_game' | 'in_team_selection';
-  gameId?: string;
-  lastActivity: number;
-}
+// OnlinePlayer interface is now defined in utils/onlinePlayerManager.ts
+// Re-export for backward compatibility
+export { OnlinePlayer } from '../utils/onlinePlayerManager';
 
 /**
  * Player statistics from database

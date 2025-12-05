@@ -268,6 +268,7 @@ export interface OnlinePlayer {
   status: 'in_lobby' | 'in_game' | 'in_team_selection';
   gameId?: string;
   lastActivity: number;
+  lookingForGame?: boolean;  // True if player is actively looking for teammates
 }
 
 /**

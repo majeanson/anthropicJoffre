@@ -240,6 +240,70 @@ export function useGameEventListeners({
       if (setSessionCoins) setSessionCoins(0);
     };
 
+    // Connection status update - updates player's reconnection countdown timer
+    const handleConnectionStatusUpdate = ({ playerId, playerName, status, reconnectTimeLeft }: {
+      playerId: string;
+      playerName: string;
+      status: 'disconnected' | 'connected';
+      reconnectTimeLeft: number;
+    }) => {
+      if (!gameState) return;
+
+      // Find and update the player's reconnectTimeLeft
+      const playerIndex = gameState.players.findIndex(p => p.id === playerId || p.name === playerName);
+      if (playerIndex === -1) return;
+
+      // Only update if the value actually changed to avoid unnecessary re-renders
+      const player = gameState.players[playerIndex];
+      if (player.reconnectTimeLeft === reconnectTimeLeft && player.connectionStatus === status) {
+        return;
+      }
+
+      // Create updated game state with new reconnectTimeLeft
+      const updatedPlayers = [...gameState.players];
+      updatedPlayers[playerIndex] = {
+        ...player,
+        connectionStatus: status,
+        reconnectTimeLeft,
+      };
+
+      setGameState({
+        ...gameState,
+        players: updatedPlayers,
+      });
+    };
+
+    // Player reconnected - update their connection status
+    const handlePlayerReconnected = ({ playerId, playerName }: {
+      playerId: string;
+      playerName: string;
+      oldSocketId: string;
+    }) => {
+      if (!gameState) return;
+
+      const playerIndex = gameState.players.findIndex(p => p.name === playerName);
+      if (playerIndex === -1) return;
+
+      const player = gameState.players[playerIndex];
+
+      // Update player's connection status and socket ID
+      const updatedPlayers = [...gameState.players];
+      updatedPlayers[playerIndex] = {
+        ...player,
+        id: playerId,
+        connectionStatus: 'connected',
+        reconnectTimeLeft: undefined,
+        disconnectedAt: undefined,
+      };
+
+      setGameState({
+        ...gameState,
+        players: updatedPlayers,
+      });
+
+      showToast(`${playerName} reconnected`, 'success', 2000);
+    };
+
     // Register all event listeners
     socket.on('player_disconnected', handlePlayerDisconnected);
     socket.on('online_players_update', handleOnlinePlayersUpdate);
@@ -257,6 +321,8 @@ export function useGameEventListeners({
     socket.on('game_full_with_bots', handleGameFullWithBots);
     socket.on('rewards_earned', handleRewardsEarned);
     socket.on('rematch_started', handleRematchStarted);
+    socket.on('connection_status_update', handleConnectionStatusUpdate);
+    socket.on('player_reconnected', handlePlayerReconnected);
 
     // Cleanup function
     return () => {
@@ -276,6 +342,8 @@ export function useGameEventListeners({
       socket.off('game_full_with_bots', handleGameFullWithBots);
       socket.off('rewards_earned', handleRewardsEarned);
       socket.off('rematch_started', handleRematchStarted);
+      socket.off('connection_status_update', handleConnectionStatusUpdate);
+      socket.off('player_reconnected', handlePlayerReconnected);
     };
   }, [socket, gameState, showToast, setToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound, setSessionXp, setSessionCoins]);
 }

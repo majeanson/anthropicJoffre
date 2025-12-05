@@ -15,6 +15,7 @@ import {
   deleteConversationForUser,
   searchMessages
 } from '../db/directMessages.js';
+import { isBlockedEitherWay } from '../db/blocks';
 import { errorBoundaries } from '../middleware/errorBoundary.js';
 
 interface DirectMessageHandlerDependencies {
@@ -59,6 +60,13 @@ export function registerDirectMessageHandlers(
 
       if (senderUsername === recipientUsername) {
         socket.emit('error', { message: 'Cannot send message to yourself' });
+        return;
+      }
+
+      // Check if either player has blocked the other
+      const blocked = await isBlockedEitherWay(senderUsername, recipientUsername);
+      if (blocked) {
+        socket.emit('error', { message: 'Cannot send message to this player' });
         return;
       }
 

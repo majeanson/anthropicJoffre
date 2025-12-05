@@ -14,15 +14,7 @@ import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
 import { clearAllGameSnapshots } from '../db/index';
 import * as Sentry from '@sentry/node';
-
-/**
- * Online player tracking data
- */
-interface OnlinePlayer {
-  playerName: string;
-  socketId: string;
-  lastActivity?: number;
-}
+import { OnlinePlayer } from '../utils/onlinePlayerManager';
 
 /**
  * Dependencies needed by the admin handlers

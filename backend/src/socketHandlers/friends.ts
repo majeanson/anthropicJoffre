@@ -15,8 +15,9 @@ import {
   getFriendsWithStatus,
   areFriends
 } from '../db/friends';
+import { isBlockedEitherWay } from '../db/blocks';
 import { errorBoundaries } from '../middleware/errorBoundary.js';
-import { OnlinePlayer } from '../types/game';
+import { OnlinePlayer } from '../utils/onlinePlayerManager';
 
 interface FriendHandlerDependencies {
   errorBoundaries: typeof errorBoundaries;
@@ -45,6 +46,13 @@ export function registerFriendHandlers(
 
       if (fromPlayer === toPlayer) {
         socket.emit('error', { message: 'Cannot send friend request to yourself' });
+        return;
+      }
+
+      // Check if either player has blocked the other
+      const blocked = await isBlockedEitherWay(fromPlayer, toPlayer);
+      if (blocked) {
+        socket.emit('error', { message: 'Cannot send friend request to this player' });
         return;
       }
 

@@ -24,17 +24,7 @@ import {
   ChangeBotDifficultyPayload,
 } from '../validation/schemas';
 import { logValidationError } from '../utils/logger';
-
-/**
- * Online player tracking data
- */
-interface OnlinePlayer {
-  playerName: string;
-  socketId: string;
-  status?: 'in_lobby' | 'in_game' | 'in_team_selection';
-  gameId?: string;
-  lastActivity?: number;
-}
+import { OnlinePlayer } from '../utils/onlinePlayerManager';
 
 /**
  * Dependencies needed by the bot handlers

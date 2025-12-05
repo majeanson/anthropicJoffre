@@ -78,6 +78,9 @@ export function SocialPanel({
   const [profileBio, setProfileBio] = useState('');
   const [profileCountry, setProfileCountry] = useState('');
   const [profileFavoriteTeam, setProfileFavoriteTeam] = useState<1 | 2 | null>(null);
+
+  // Looking for Game (LFG) state
+  const [isLookingForGame, setIsLookingForGame] = useState(false);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
 
   // Fetch user's own profile when profile tab is opened
@@ -189,6 +192,27 @@ export function SocialPanel({
       socket.off('friend_request_sent', handleFriendRequestSent);
     };
   }, [socket, socialTab]);
+
+  // Listen for LFG status updates
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleLfgUpdated = ({ lookingForGame }: { lookingForGame: boolean }) => {
+      setIsLookingForGame(lookingForGame);
+    };
+
+    socket.on('looking_for_game_updated', handleLfgUpdated);
+
+    return () => {
+      socket.off('looking_for_game_updated', handleLfgUpdated);
+    };
+  }, [socket]);
+
+  // Handle LFG toggle
+  const handleToggleLfg = () => {
+    if (!socket) return;
+    socket.emit('set_looking_for_game', { lookingForGame: !isLookingForGame });
+  };
 
   // Listen for unread DM count
   useEffect(() => {
@@ -417,6 +441,27 @@ export function SocialPanel({
         {/* Online Tab */}
         {socialTab === 'online' && (
           <div className="space-y-2">
+            {/* LFG Toggle */}
+            <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg p-3 border-2 border-purple-500/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-[var(--color-text-primary)]">
+                    Looking for Game
+                  </p>
+                  <p className="text-xs text-[var(--color-text-secondary)]">
+                    Let others know you're looking for teammates
+                  </p>
+                </div>
+                <Button
+                  onClick={handleToggleLfg}
+                  variant={isLookingForGame ? 'success' : 'secondary'}
+                  size="sm"
+                >
+                  {isLookingForGame ? '🔍 ON' : '🔍 OFF'}
+                </Button>
+              </div>
+            </div>
+
             {onlinePlayers.length === 0 ? (
               <div className="text-center text-[var(--color-text-secondary)] py-16">
                 <p className="text-2xl mb-2">😴</p>
@@ -429,22 +474,37 @@ export function SocialPanel({
                 const isSelf = player.playerName === playerName;
                 const isFriend = friends.some(f => f.player_name === player.playerName);
                 const showFriendButton = user && !isBot && !isSelf && !isFriend;
+                const isLfg = player.lookingForGame === true;
 
                 return (
                   <div
                     key={player.socketId}
-                    className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-green-400 dark:hover:border-green-500 transition-colors"
+                    className={`bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 transition-colors ${
+                      isLfg
+                        ? 'border-purple-400 dark:border-purple-500 bg-gradient-to-r from-purple-50 to-parchment-100 dark:from-purple-900/20 dark:to-gray-600'
+                        : 'border-parchment-400 dark:border-gray-500 hover:border-green-400 dark:hover:border-green-500'
+                    }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <span className="text-green-500 text-lg flex-shrink-0">🟢</span>
                         <div className="min-w-0 flex-1">
-                          <PlayerNameButton
-                            playerName={player.playerName || player.socketId || 'Unknown'}
-                            onClick={() => setSelectedPlayerProfile(player.playerName || 'Unknown')}
-                            variant="plain"
-                            className="font-bold truncate text-left"
-                          />
+                          <div className="flex items-center gap-1.5">
+                            <PlayerNameButton
+                              playerName={player.playerName || player.socketId || 'Unknown'}
+                              onClick={() => setSelectedPlayerProfile(player.playerName || 'Unknown')}
+                              variant="plain"
+                              className="font-bold truncate text-left"
+                            />
+                            {isLfg && (
+                              <span
+                                className="text-xs bg-purple-500 text-white px-1.5 py-0.5 rounded-full font-bold animate-pulse flex-shrink-0"
+                                title="Looking for Game"
+                              >
+                                🔍 LFG
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-[var(--color-text-secondary)]">{getStatusLabel(player.status)}</p>
                         </div>
                       </div>

@@ -6,6 +6,7 @@
 export type NotificationType =
   | 'achievement_unlocked'
   | 'friend_request'
+  | 'friend_request_accepted'
   | 'friend_accepted'
   | 'game_invite'
   | 'mention'

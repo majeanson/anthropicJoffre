@@ -471,14 +471,22 @@ function AppContent() {
       showToast(data.message, 'info', 3000);
     };
 
+    const handleSwapRequestCancelled = (data: { message: string }) => {
+      // Clear any pending swap request modal since the requester disconnected
+      setSwapRequest(null);
+      showToast(data.message, 'info', 3000);
+    };
+
     socket.on('swap_request_received', handleSwapRequestReceived);
     socket.on('swap_accepted', handleSwapAccepted);
     socket.on('swap_rejected', handleSwapRejected);
+    socket.on('swap_request_cancelled', handleSwapRequestCancelled);
 
     return () => {
       socket.off('swap_request_received', handleSwapRequestReceived);
       socket.off('swap_accepted', handleSwapAccepted);
       socket.off('swap_rejected', handleSwapRejected);
+      socket.off('swap_request_cancelled', handleSwapRequestCancelled);
     };
   }, [socket, gameId, showToast]);
 

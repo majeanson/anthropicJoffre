@@ -13,15 +13,8 @@ import { Logger } from 'winston';
 import * as PersistenceManager from '../db/persistenceManager';
 import { migratePlayerIdentity } from '../utils/playerMigrationHelpers';
 import { RoundStatsData } from '../game/roundStatistics';
-
-/**
- * Online player tracking data
- */
-interface OnlinePlayer {
-  playerName: string;
-  socketId: string;
-  lastActivity?: number;
-}
+import { SwapRequest } from './teamSelection';
+import { OnlinePlayer } from '../utils/onlinePlayerManager';
 
 /**
  * Rate limiter data for socket events
@@ -44,6 +37,7 @@ export interface ConnectionHandlersDependencies {
   gameDeletionTimeouts: Map<string, NodeJS.Timeout>;
   countdownIntervals: Map<string, NodeJS.Timeout>;
   onlinePlayers: Map<string, OnlinePlayer>;
+  pendingSwapRequests: Map<string, SwapRequest>;
   socketRateLimiters: {
     chat: Map<string, RateLimiterData>;
     bet: Map<string, RateLimiterData>;
@@ -90,6 +84,7 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     gameDeletionTimeouts,
     countdownIntervals,
     onlinePlayers,
+    pendingSwapRequests,
     socketRateLimiters,
     io,
     validateDBSession,
@@ -300,6 +295,32 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
     socketRateLimiters.bet.delete(socket.id);
     socketRateLimiters.card.delete(socket.id);
 
+    // Clean up pending swap requests where this player is involved
+    // Either as requester or target - prevents stale requests from blocking future swaps
+    const swapRequestsToDelete: string[] = [];
+    pendingSwapRequests.forEach((request, key) => {
+      if (request.requesterId === socket.id || request.targetId === socket.id) {
+        // Clear the timeout to prevent memory leaks
+        clearTimeout(request.timeout);
+        swapRequestsToDelete.push(key);
+
+        // Notify the other party if they're still connected
+        if (request.requesterId === socket.id) {
+          // Requester disconnected - notify target that request was cancelled
+          io.to(request.targetId).emit('swap_request_cancelled', {
+            message: 'Swap request cancelled (player disconnected)'
+          });
+        } else {
+          // Target disconnected - notify requester that request was cancelled
+          io.to(request.requesterId).emit('swap_rejected', {
+            message: 'Swap request cancelled (player disconnected)'
+          });
+        }
+        console.log(`Cleaned up swap request ${key} due to player disconnect`);
+      }
+    });
+    swapRequestsToDelete.forEach(key => pendingSwapRequests.delete(key));
+
     // Remove from online players
     const onlinePlayer = onlinePlayers.get(socket.id);
     onlinePlayers.delete(socket.id);
@@ -360,19 +381,43 @@ export function registerConnectionHandlers(socket: Socket, deps: ConnectionHandl
       const player = currentGame.players.find(p => p.id === socket.id);
       if (player && player.connectionStatus === 'disconnected' && player.reconnectTimeLeft) {
         player.reconnectTimeLeft = Math.max(0, player.reconnectTimeLeft - 1);
+        const timeLeft = player.reconnectTimeLeft;
 
-        // Emit connection status update every 5 seconds to reduce bandwidth
-        if (player.reconnectTimeLeft % 5 === 0 || player.reconnectTimeLeft < 5) {
+        // Smart broadcast frequency based on time remaining:
+        // - First minute (840-900s): every 30 seconds
+        // - Minutes 1-5 (600-840s): every 15 seconds
+        // - Minutes 5-10 (300-600s): every 10 seconds
+        // - Last 5 minutes (0-300s): every 5 seconds
+        // - Last 10 seconds: every second
+        let shouldBroadcast = false;
+        if (timeLeft <= 10) {
+          // Last 10 seconds: broadcast every second
+          shouldBroadcast = true;
+        } else if (timeLeft <= 300) {
+          // Last 5 minutes: every 5 seconds
+          shouldBroadcast = timeLeft % 5 === 0;
+        } else if (timeLeft <= 600) {
+          // Minutes 5-10: every 10 seconds
+          shouldBroadcast = timeLeft % 10 === 0;
+        } else if (timeLeft <= 840) {
+          // Minutes 1-5: every 15 seconds
+          shouldBroadcast = timeLeft % 15 === 0;
+        } else {
+          // First minute: every 30 seconds
+          shouldBroadcast = timeLeft % 30 === 0;
+        }
+
+        if (shouldBroadcast) {
           io.to(gameId).emit('connection_status_update', {
             playerId: socket.id,
             playerName: player.name,
             status: 'disconnected',
-            reconnectTimeLeft: player.reconnectTimeLeft
+            reconnectTimeLeft: timeLeft
           });
         }
 
         // Clear interval when timer reaches 0
-        if (player.reconnectTimeLeft === 0) {
+        if (timeLeft === 0) {
           const interval = countdownIntervals.get(socket.id);
           if (interval) {
             clearInterval(interval);

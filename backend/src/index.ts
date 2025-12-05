@@ -205,6 +205,8 @@ import { registerAdminHandlers } from './socketHandlers/admin';
 import { registerAchievementHandlers, triggerAchievementCheck, emitAchievementUnlocked } from './socketHandlers/achievements'; // Sprint 2 Phase 1
 import { checkSecretAchievements } from './utils/achievementChecker'; // Achievement integration
 import { registerFriendHandlers } from './socketHandlers/friends'; // Sprint 2 Phase 2
+import { registerBlockHandlers } from './socketHandlers/blocks'; // User blocking system
+import { registerLfgHandlers } from './socketHandlers/lfg'; // Looking for Game status
 import { registerNotificationHandlers } from './socketHandlers/notifications'; // Sprint 3 Phase 5
 import { registerDirectMessageHandlers } from './socketHandlers/directMessages'; // Sprint 16 Day 4
 import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 Day 6
@@ -1259,6 +1261,8 @@ io.on('connection', (socket) => {
   // ============================================================================
   registerAchievementHandlers(io, socket, { errorBoundaries });
   registerFriendHandlers(io, socket, { errorBoundaries, onlinePlayers });
+  registerBlockHandlers(io, socket, { errorBoundaries });
+  registerLfgHandlers(socket, { errorBoundaries, onlinePlayers, io });
 
   // ============================================================================
   // Notification Handlers - Sprint 3 Phase 5
@@ -1318,6 +1322,7 @@ io.on('connection', (socket) => {
     gameDeletionTimeouts,
     countdownIntervals,
     onlinePlayers,
+    pendingSwapRequests,
     socketRateLimiters: {
       chat: socketRateLimiters.chat,
       bet: socketRateLimiters.bet,
@@ -2134,6 +2139,20 @@ httpServer.listen(PORT, HOST, async () => {
       }
     } catch (error) {
       console.error('[Cleanup] Error during cleanup:', error);
+    }
+  }, 3600000); // Run every hour
+
+  // ============= FRIEND REQUEST EXPIRATION =============
+  // Expire old friend requests every hour (30-day expiration)
+  setInterval(async () => {
+    try {
+      const { expireOldFriendRequests } = await import('./db/friends');
+      const expiredCount = await expireOldFriendRequests();
+      if (expiredCount > 0) {
+        logger.info(`Expired ${expiredCount} old friend requests`);
+      }
+    } catch (error) {
+      console.error('[Cleanup] Error expiring friend requests:', error);
     }
   }, 3600000); // Run every hour
 

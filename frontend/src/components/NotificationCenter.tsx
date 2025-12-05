@@ -103,6 +103,7 @@ export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: Noti
     switch (type) {
       case 'achievement_unlocked': return '🏆';
       case 'friend_request': return '👥';
+      case 'friend_request_accepted': return '🤝';
       case 'friend_accepted': return '✅';
       case 'game_invite': return '🎮';
       case 'mention': return '💬';
