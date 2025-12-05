@@ -343,4 +343,114 @@ BEGIN
                    WHERE table_name='player_stats' AND column_name='best_bet_streak') THEN
         ALTER TABLE player_stats ADD COLUMN best_bet_streak INTEGER DEFAULT 0;
     END IF;
+
+    -- Round-level statistics (Sprint 20: Data Integrity Fix)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='total_rounds_played') THEN
+        ALTER TABLE player_stats ADD COLUMN total_rounds_played INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='rounds_won') THEN
+        ALTER TABLE player_stats ADD COLUMN rounds_won INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='rounds_lost') THEN
+        ALTER TABLE player_stats ADD COLUMN rounds_lost INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='rounds_win_percentage') THEN
+        ALTER TABLE player_stats ADD COLUMN rounds_win_percentage DECIMAL(5,2) DEFAULT 0.00;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='avg_tricks_per_round') THEN
+        ALTER TABLE player_stats ADD COLUMN avg_tricks_per_round DECIMAL(5,2) DEFAULT 0.00;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='most_tricks_in_round') THEN
+        ALTER TABLE player_stats ADD COLUMN most_tricks_in_round INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='zero_trick_rounds') THEN
+        ALTER TABLE player_stats ADD COLUMN zero_trick_rounds INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='highest_points_in_round') THEN
+        ALTER TABLE player_stats ADD COLUMN highest_points_in_round INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='avg_points_per_round') THEN
+        ALTER TABLE player_stats ADD COLUMN avg_points_per_round DECIMAL(5,2) DEFAULT 0.00;
+    END IF;
+
+    -- Betting statistics (expanded) (Sprint 20: Data Integrity Fix)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='total_bets_placed') THEN
+        ALTER TABLE player_stats ADD COLUMN total_bets_placed INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='bets_made') THEN
+        ALTER TABLE player_stats ADD COLUMN bets_made INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='bets_failed') THEN
+        ALTER TABLE player_stats ADD COLUMN bets_failed INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='bet_success_rate') THEN
+        ALTER TABLE player_stats ADD COLUMN bet_success_rate DECIMAL(5,2) DEFAULT 0.00;
+    END IF;
+
+    -- ELO tracking (Sprint 20: Data Integrity Fix)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='lowest_rating') THEN
+        ALTER TABLE player_stats ADD COLUMN lowest_rating INTEGER DEFAULT 1200;
+    END IF;
+
+    -- Win/Loss streaks (Sprint 20: Data Integrity Fix)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='current_win_streak') THEN
+        ALTER TABLE player_stats ADD COLUMN current_win_streak INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='current_loss_streak') THEN
+        ALTER TABLE player_stats ADD COLUMN current_loss_streak INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='best_win_streak') THEN
+        ALTER TABLE player_stats ADD COLUMN best_win_streak INTEGER DEFAULT 0;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='worst_loss_streak') THEN
+        ALTER TABLE player_stats ADD COLUMN worst_loss_streak INTEGER DEFAULT 0;
+    END IF;
+
+    -- Game duration tracking (Sprint 20: Data Integrity Fix)
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='fastest_win') THEN
+        ALTER TABLE player_stats ADD COLUMN fastest_win INTEGER;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='longest_game') THEN
+        ALTER TABLE player_stats ADD COLUMN longest_game INTEGER;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name='player_stats' AND column_name='avg_game_duration_minutes') THEN
+        ALTER TABLE player_stats ADD COLUMN avg_game_duration_minutes DECIMAL(6,2) DEFAULT 0.00;
+    END IF;
 END $$;

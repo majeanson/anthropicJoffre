@@ -89,7 +89,6 @@ import {
   saveOrUpdateGame as dbSaveOrUpdateGame,
   markGameFinished as dbMarkGameFinished,
   saveGameParticipants as dbSaveGameParticipants,
-  updatePlayerStats,
   updateRoundStats as dbUpdateRoundStats,
   updateGameStats as dbUpdateGameStats,
   calculateEloChange,

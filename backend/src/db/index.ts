@@ -321,77 +321,22 @@ export const calculateEloChange = (
 };
 
 /**
- * Update player statistics after a game
+ * @deprecated Use updateRoundStats() and updateGameStats() instead.
+ * This function was replaced by the two new functions that separate
+ * round-level stats from game-level stats. Kept for backwards compatibility
+ * but no longer called anywhere in the codebase.
+ *
+ * TODO: Remove this function in a future cleanup sprint once confirmed
+ * that it's not used by any external callers.
  */
-/**
- * Update player statistics after a game
- * Sprint 3: Invalidate player stats cache after update
- */
-export const updatePlayerStats = async (
-  playerName: string,
-  update: PlayerStatsUpdate,
-  eloChange: number
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _deprecatedUpdatePlayerStats = async (
+  _playerName: string,
+  _update: PlayerStatsUpdate,
+  _eloChange: number
 ) => {
-  // First, get or create player
-  const getOrCreate = `
-    INSERT INTO player_stats (player_name, is_bot)
-    VALUES ($1, FALSE)
-    ON CONFLICT (player_name) DO NOTHING
-  `;
-  await query(getOrCreate, [playerName]);
-
-  // Then update stats
-  const text = `
-    UPDATE player_stats SET
-      games_played = games_played + 1,
-      games_won = games_won + CASE WHEN $2 THEN 1 ELSE 0 END,
-      games_lost = games_lost + CASE WHEN $2 THEN 0 ELSE 1 END,
-      total_tricks_won = total_tricks_won + $3,
-      total_points_earned = total_points_earned + $4,
-      total_bets_made = total_bets_made + CASE WHEN $5 IS NOT NULL THEN 1 ELSE 0 END,
-      total_bet_amount = total_bet_amount + COALESCE($5, 0),
-      bets_won = bets_won + CASE WHEN $6 = TRUE THEN 1 ELSE 0 END,
-      bets_lost = bets_lost + CASE WHEN $6 = FALSE THEN 1 ELSE 0 END,
-      highest_bet = GREATEST(highest_bet, COALESCE($5, 0)),
-      without_trump_bets = without_trump_bets + CASE WHEN $7 = TRUE THEN 1 ELSE 0 END,
-      trump_cards_played = trump_cards_played + COALESCE($8, 0),
-      red_zeros_collected = red_zeros_collected + COALESCE($9, 0),
-      brown_zeros_received = brown_zeros_received + COALESCE($10, 0),
-      elo_rating = elo_rating + $11,
-      highest_rating = GREATEST(highest_rating, elo_rating + $11),
-      updated_at = CURRENT_TIMESTAMP
-    WHERE player_name = $1
-    RETURNING *
-  `;
-
-  const result = await query(text, [
-    playerName,
-    update.won,
-    update.tricksWon,
-    update.pointsEarned,
-    update.betAmount,
-    update.betMade,
-    update.withoutTrump,
-    update.trumpsPlayed,
-    update.redZerosCollected,
-    update.brownZerosReceived,
-    eloChange
-  ]);
-
-  // Update calculated fields (win percentage, averages)
-  await query(`
-    UPDATE player_stats SET
-      win_percentage = ROUND((games_won::numeric / NULLIF(games_played, 0) * 100), 2),
-      avg_tricks_per_game = ROUND((total_tricks_won::numeric / NULLIF(games_played, 0)), 2),
-      avg_bet_amount = ROUND((total_bet_amount::numeric / NULLIF(total_bets_made, 0)), 2)
-    WHERE player_name = $1
-  `, [playerName]);
-
-  // Invalidate caches since stats have changed
-  queryCache.invalidate(`player_stats:${playerName}`);
-  queryCache.invalidatePattern('leaderboard:'); // Rankings may have changed
-
-  return result.rows[0];
+  console.warn('updatePlayerStats is deprecated. Use updateRoundStats and updateGameStats instead.');
+  return null;
 };
 
 /**
