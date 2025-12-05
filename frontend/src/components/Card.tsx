@@ -165,13 +165,17 @@ function CardComponent({
   // Get suit-specific style overrides from card skin
   const cardSkinSuitStyle = cardSkin.suits[card.color];
 
-  // Determine which image to show
+  // Determine which image to show (or use center icon if skin specifies)
   const cardImage = useMemo(() => {
     if (isSpecial) {
       return `/cards/production/${card.color}_bon.jpg`;
     }
     return `/cards/production/${card.color}_emblem.jpg`;
   }, [isSpecial, card.color]);
+
+  // Get center icon from card skin (used when useCenterIcons is true)
+  const centerIcon = cardSkinSuitStyle.centerIcon;
+  const useCenterIcons = cardSkin.useCenterIcons && !isSpecial;
 
   // Generate aria-label for accessibility
   const ariaLabel = isSpecial
@@ -344,21 +348,36 @@ function CardComponent({
         </div>
       )}
 
-      {/* Center emblem or special card image */}
-      <img
-        src={cardImage}
-        alt={`${card.color} ${isSpecial ? 'bon' : 'emblem'}`}
-        decoding="async"
-        loading="lazy"
-        className={`
-          ${sizeConfig.emblem}
-          object-contain
-          ${isSpecial ? '' : 'opacity-85'}
-        `}
-        style={{
-          filter: `drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)) ${isPlayable ? 'brightness(1.05)' : ''}`,
-        }}
-      />
+      {/* Center emblem: emoji icon or image depending on skin */}
+      {useCenterIcons ? (
+        <div
+          className={`
+            ${sizeConfig.emblem}
+            flex items-center justify-center
+            text-3xl md:text-4xl
+          `}
+          style={{
+            filter: isPlayable ? 'brightness(1.1)' : undefined,
+          }}
+        >
+          {centerIcon}
+        </div>
+      ) : (
+        <img
+          src={cardImage}
+          alt={`${card.color} ${isSpecial ? 'bon' : 'emblem'}`}
+          decoding="async"
+          loading="lazy"
+          className={`
+            ${sizeConfig.emblem}
+            object-contain
+            ${isSpecial ? '' : 'opacity-85'}
+          `}
+          style={{
+            filter: `drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)) ${isPlayable ? 'brightness(1.05)' : ''}`,
+          }}
+        />
+      )}
 
       {/* Bottom-right value badge (rotated) - colored background with white text */}
       {!isSpecial && (

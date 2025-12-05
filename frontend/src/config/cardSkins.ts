@@ -5,8 +5,8 @@
  * They work independently of the main UI skin system and can be mixed freely.
  *
  * Features:
- * - Custom value display (numbers, symbols, etc.)
- * - Custom suit icons/emblems
+ * - Custom value display (always readable: 1-7, Roman I-VII, A-7, etc.)
+ * - Custom suit icons/emblems displayed in card center
  * - Custom colors per suit
  * - Special effects for bonus cards (red 0, brown 0)
  * - Level-based unlocking (2 free + 6 unlockable)
@@ -18,19 +18,19 @@
 
 export type CardSkinId =
   | 'classic'           // Free: Default numeric style
-  | 'roman'             // Free: Roman numerals
-  | 'elemental'         // Level 5: Element symbols (fire, earth, water, nature)
-  | 'runic'             // Level 10: Nordic runes
-  | 'alchemical'        // Level 15: Alchemical symbols
-  | 'celestial'         // Level 20: Zodiac/constellation symbols
-  | 'royal'             // Level 25: Playing card style (J, Q, K inspired)
-  | 'arcane';           // Level 30: Mystical arcane symbols
+  | 'roman'             // Free: Roman numerals with laurel theme
+  | 'elemental'         // Level 5: Fire, earth, water, nature elements
+  | 'nordic'            // Level 10: Viking/Norse theme with runes decorations
+  | 'alchemical'        // Level 15: Alchemical elements theme
+  | 'celestial'         // Level 20: Stars and cosmos theme
+  | 'royal'             // Level 25: Playing card style (hearts, diamonds, etc.)
+  | 'neon';             // Level 30: Cyberpunk neon style
 
 export interface CardSkinSuitStyle {
   /** Color for this suit (CSS color value) */
   color: string;
-  /** Optional icon/symbol for this suit */
-  icon?: string;
+  /** Center icon/emoji for this suit (displayed in card center) */
+  centerIcon: string;
   /** Glow color for special effects */
   glowColor: string;
 }
@@ -51,6 +51,7 @@ export interface CardSkin {
 
   /**
    * Transform card value to display string
+   * IMPORTANT: Always use readable values (numbers, letters, etc.)
    * @param value - Card value (0-9)
    * @param isSpecial - Whether this is a special card (red 0 or brown 0)
    */
@@ -81,6 +82,9 @@ export interface CardSkin {
   /** Font family override (optional) */
   fontFamily?: string;
 
+  /** Whether to show center icons instead of emblem images */
+  useCenterIcons: boolean;
+
   /** Additional CSS classes for card container */
   containerClass?: string;
 }
@@ -101,12 +105,13 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
     requiredLevel: 0,
     preview: 'linear-gradient(135deg, #f5f0e6 0%, #d4c4a8 100%)',
     isPremium: false,
+    useCenterIcons: false, // Use default emblem images
     formatValue: (value) => value.toString(),
     suits: {
-      red: { color: '#dc2626', icon: undefined, glowColor: 'rgba(220, 38, 38, 0.5)' },
-      brown: { color: '#92400e', icon: undefined, glowColor: 'rgba(146, 64, 14, 0.5)' },
-      green: { color: '#16a34a', icon: undefined, glowColor: 'rgba(22, 163, 74, 0.5)' },
-      blue: { color: '#2563eb', icon: undefined, glowColor: 'rgba(37, 99, 235, 0.5)' },
+      red: { color: '#dc2626', centerIcon: '🔴', glowColor: 'rgba(220, 38, 38, 0.5)' },
+      brown: { color: '#92400e', centerIcon: '🟤', glowColor: 'rgba(146, 64, 14, 0.5)' },
+      green: { color: '#16a34a', centerIcon: '🟢', glowColor: 'rgba(22, 163, 74, 0.5)' },
+      blue: { color: '#2563eb', centerIcon: '🔵', glowColor: 'rgba(37, 99, 235, 0.5)' },
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+5' },
@@ -116,25 +121,26 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
 
   roman: {
     id: 'roman',
-    name: 'Roman Numerals',
-    description: 'Ancient Roman style numbering system',
+    name: 'Roman Empire',
+    description: 'Ancient Roman numerals with laurel wreath theme',
     requiredLevel: 0,
     preview: 'linear-gradient(135deg, #1a1a2e 0%, #4a3f35 100%)',
     isPremium: false,
+    useCenterIcons: true,
     formatValue: (value, isSpecial) => {
       if (isSpecial) return '0';
       const romanNumerals = ['0', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
       return romanNumerals[value] || value.toString();
     },
     suits: {
-      red: { color: '#b91c1c', icon: undefined, glowColor: 'rgba(185, 28, 28, 0.5)' },
-      brown: { color: '#78350f', icon: undefined, glowColor: 'rgba(120, 53, 15, 0.5)' },
-      green: { color: '#166534', icon: undefined, glowColor: 'rgba(22, 101, 52, 0.5)' },
-      blue: { color: '#1e40af', icon: undefined, glowColor: 'rgba(30, 64, 175, 0.5)' },
+      red: { color: '#b91c1c', centerIcon: '🦅', glowColor: 'rgba(185, 28, 28, 0.5)' },   // Eagle
+      brown: { color: '#78350f', centerIcon: '🏛️', glowColor: 'rgba(120, 53, 15, 0.5)' },  // Temple
+      green: { color: '#166534', centerIcon: '🌿', glowColor: 'rgba(22, 101, 52, 0.5)' },  // Laurel
+      blue: { color: '#1e40af', centerIcon: '⚔️', glowColor: 'rgba(30, 64, 175, 0.5)' },   // Swords
     },
     specialCards: {
-      redBonus: { symbol: 'N', label: '+V' },  // N for Nihil (nothing/zero)
-      brownPenalty: { symbol: 'N', label: '-II' },
+      redBonus: { symbol: '0', label: '+V' },
+      brownPenalty: { symbol: '0', label: '-II' },
     },
     fontFamily: 'Cinzel, serif',
   },
@@ -145,150 +151,135 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
 
   elemental: {
     id: 'elemental',
-    name: 'Elemental',
+    name: 'Elemental Forces',
     description: 'Harness the power of fire, earth, water, and nature',
     requiredLevel: 5,
     preview: 'linear-gradient(135deg, #ef4444 0%, #22c55e 50%, #3b82f6 100%)',
     isPremium: true,
+    useCenterIcons: true,
     formatValue: (value) => value.toString(),
     suits: {
-      red: { color: '#ef4444', icon: '🔥', glowColor: 'rgba(239, 68, 68, 0.6)' },
-      brown: { color: '#a16207', icon: '🌍', glowColor: 'rgba(161, 98, 7, 0.6)' },
-      green: { color: '#22c55e', icon: '🌿', glowColor: 'rgba(34, 197, 94, 0.6)' },
-      blue: { color: '#3b82f6', icon: '💧', glowColor: 'rgba(59, 130, 246, 0.6)' },
+      red: { color: '#ef4444', centerIcon: '🔥', glowColor: 'rgba(239, 68, 68, 0.6)' },    // Fire
+      brown: { color: '#a16207', centerIcon: '🌍', glowColor: 'rgba(161, 98, 7, 0.6)' },   // Earth
+      green: { color: '#22c55e', centerIcon: '🌿', glowColor: 'rgba(34, 197, 94, 0.6)' },  // Nature
+      blue: { color: '#3b82f6', centerIcon: '💧', glowColor: 'rgba(59, 130, 246, 0.6)' },  // Water
     },
     specialCards: {
-      redBonus: { symbol: '☀️', label: '+5' },
-      brownPenalty: { symbol: '🌑', label: '-2' },
+      redBonus: { symbol: '0', label: '+5' },
+      brownPenalty: { symbol: '0', label: '-2' },
     },
   },
 
-  runic: {
-    id: 'runic',
-    name: 'Runic',
-    description: 'Ancient Nordic runes imbued with mystical power',
+  nordic: {
+    id: 'nordic',
+    name: 'Nordic Saga',
+    description: 'Viking warriors and Norse mythology theme',
     requiredLevel: 10,
     preview: 'linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%)',
     isPremium: true,
-    formatValue: (value, isSpecial) => {
-      if (isSpecial) return 'ᛟ';  // Othala rune
-      // Elder Futhark inspired symbols (0-7)
-      const runes = ['ᛟ', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ'];
-      return runes[value] || value.toString();
-    },
+    useCenterIcons: true,
+    formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#f87171', icon: 'ᚠ', glowColor: 'rgba(248, 113, 113, 0.6)' },
-      brown: { color: '#d97706', icon: 'ᚢ', glowColor: 'rgba(217, 119, 6, 0.6)' },
-      green: { color: '#4ade80', icon: 'ᚦ', glowColor: 'rgba(74, 222, 128, 0.6)' },
-      blue: { color: '#60a5fa', icon: 'ᚨ', glowColor: 'rgba(96, 165, 250, 0.6)' },
+      red: { color: '#f87171', centerIcon: '⚡', glowColor: 'rgba(248, 113, 113, 0.6)' },  // Thor's lightning
+      brown: { color: '#d97706', centerIcon: '🪓', glowColor: 'rgba(217, 119, 6, 0.6)' },  // Axe
+      green: { color: '#4ade80', centerIcon: '🌲', glowColor: 'rgba(74, 222, 128, 0.6)' }, // Yggdrasil
+      blue: { color: '#60a5fa', centerIcon: '❄️', glowColor: 'rgba(96, 165, 250, 0.6)' },  // Ice
     },
     specialCards: {
-      redBonus: { symbol: 'ᛊ', label: '+5' },   // Sowilo (sun)
-      brownPenalty: { symbol: 'ᚾ', label: '-2' }, // Nauthiz (need/hardship)
+      redBonus: { symbol: '0', label: '+5' },
+      brownPenalty: { symbol: '0', label: '-2' },
     },
-    fontFamily: 'Noto Sans Runic, serif',
   },
 
   alchemical: {
     id: 'alchemical',
-    name: 'Alchemical',
-    description: 'Transmutation symbols from the great work',
+    name: 'Alchemist\'s Lab',
+    description: 'Ancient alchemical elements and transmutation',
     requiredLevel: 15,
     preview: 'linear-gradient(135deg, #fbbf24 0%, #78350f 50%, #1e1b4b 100%)',
     isPremium: true,
-    formatValue: (value, isSpecial) => {
-      if (isSpecial) return '☿';  // Mercury symbol
-      // Alchemical and astrological symbols (0-7)
-      const symbols = ['☿', '☉', '☽', '♂', '♀', '♃', '♄', '♅'];
-      return symbols[value] || value.toString();
-    },
+    useCenterIcons: true,
+    formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#f59e0b', icon: '🜂', glowColor: 'rgba(245, 158, 11, 0.6)' },  // Fire
-      brown: { color: '#92400e', icon: '🜃', glowColor: 'rgba(146, 64, 14, 0.6)' },  // Earth
-      green: { color: '#84cc16', icon: '🜁', glowColor: 'rgba(132, 204, 22, 0.6)' },  // Air
-      blue: { color: '#0ea5e9', icon: '🜄', glowColor: 'rgba(14, 165, 233, 0.6)' },  // Water
+      red: { color: '#f59e0b', centerIcon: '🔥', glowColor: 'rgba(245, 158, 11, 0.6)' },   // Fire element
+      brown: { color: '#92400e', centerIcon: '⚗️', glowColor: 'rgba(146, 64, 14, 0.6)' },  // Flask
+      green: { color: '#84cc16', centerIcon: '🧪', glowColor: 'rgba(132, 204, 22, 0.6)' }, // Potion
+      blue: { color: '#0ea5e9', centerIcon: '💎', glowColor: 'rgba(14, 165, 233, 0.6)' },  // Crystal
     },
     specialCards: {
-      redBonus: { symbol: '🜍', label: '+5' },    // Sulfur (soul)
-      brownPenalty: { symbol: '🜔', label: '-2' }, // Salt (body)
+      redBonus: { symbol: '0', label: '+5' },
+      brownPenalty: { symbol: '0', label: '-2' },
     },
   },
 
   celestial: {
     id: 'celestial',
     name: 'Celestial',
-    description: 'Written in the stars - zodiac and constellation symbols',
+    description: 'Stars, moons, and cosmic wonders',
     requiredLevel: 20,
     preview: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
     isPremium: true,
-    formatValue: (value, isSpecial) => {
-      if (isSpecial) return '✧';
-      // Zodiac symbols (0-7)
-      const zodiac = ['✧', '♈', '♉', '♊', '♋', '♌', '♍', '♎'];
-      return zodiac[value] || value.toString();
-    },
+    useCenterIcons: true,
+    formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#fb7185', icon: '☄️', glowColor: 'rgba(251, 113, 133, 0.6)' },
-      brown: { color: '#d4a574', icon: '🌙', glowColor: 'rgba(212, 165, 116, 0.6)' },
-      green: { color: '#86efac', icon: '🌟', glowColor: 'rgba(134, 239, 172, 0.6)' },
-      blue: { color: '#93c5fd', icon: '💫', glowColor: 'rgba(147, 197, 253, 0.6)' },
+      red: { color: '#fb7185', centerIcon: '☄️', glowColor: 'rgba(251, 113, 133, 0.6)' },  // Comet
+      brown: { color: '#d4a574', centerIcon: '🌙', glowColor: 'rgba(212, 165, 116, 0.6)' }, // Moon
+      green: { color: '#86efac', centerIcon: '🌟', glowColor: 'rgba(134, 239, 172, 0.6)' }, // Star
+      blue: { color: '#93c5fd', centerIcon: '🌌', glowColor: 'rgba(147, 197, 253, 0.6)' },  // Galaxy
     },
     specialCards: {
-      redBonus: { symbol: '☀', label: '+5' },
-      brownPenalty: { symbol: '🌑', label: '-2' },
+      redBonus: { symbol: '0', label: '+5' },
+      brownPenalty: { symbol: '0', label: '-2' },
     },
   },
 
   royal: {
     id: 'royal',
     name: 'Royal Court',
-    description: 'Inspired by classic playing cards with court figures',
+    description: 'Classic playing card suits with elegant styling',
     requiredLevel: 25,
     preview: 'linear-gradient(135deg, #7c3aed 0%, #c026d3 50%, #db2777 100%)',
     isPremium: true,
+    useCenterIcons: true,
     formatValue: (value, isSpecial) => {
-      if (isSpecial) return '♔';  // King symbol for special
-      // A, 2-7, with face card style for higher values (0-7)
-      const royalValues = ['♔', 'A', '2', '3', '4', '5', '6', '7'];
+      if (isSpecial) return '0';
+      // A, 2-7 style (like playing cards)
+      const royalValues = ['0', 'A', '2', '3', '4', '5', '6', '7'];
       return royalValues[value] || value.toString();
     },
     suits: {
-      red: { color: '#dc2626', icon: '♥', glowColor: 'rgba(220, 38, 38, 0.6)' },
-      brown: { color: '#b45309', icon: '♦', glowColor: 'rgba(180, 83, 9, 0.6)' },
-      green: { color: '#059669', icon: '♣', glowColor: 'rgba(5, 150, 105, 0.6)' },
-      blue: { color: '#2563eb', icon: '♠', glowColor: 'rgba(37, 99, 235, 0.6)' },
+      red: { color: '#dc2626', centerIcon: '♥️', glowColor: 'rgba(220, 38, 38, 0.6)' },    // Heart
+      brown: { color: '#b45309', centerIcon: '♦️', glowColor: 'rgba(180, 83, 9, 0.6)' },   // Diamond
+      green: { color: '#059669', centerIcon: '♣️', glowColor: 'rgba(5, 150, 105, 0.6)' },  // Club
+      blue: { color: '#2563eb', centerIcon: '♠️', glowColor: 'rgba(37, 99, 235, 0.6)' },   // Spade
     },
     specialCards: {
-      redBonus: { symbol: '♔', label: '+5' },
-      brownPenalty: { symbol: '☠', label: '-2' },
+      redBonus: { symbol: '0', label: '+5' },
+      brownPenalty: { symbol: '0', label: '-2' },
     },
     fontFamily: 'Cinzel Decorative, serif',
   },
 
-  arcane: {
-    id: 'arcane',
-    name: 'Arcane Mysteries',
-    description: 'Forbidden symbols from ancient grimoires',
+  neon: {
+    id: 'neon',
+    name: 'Neon Nights',
+    description: 'Cyberpunk neon glow aesthetic',
     requiredLevel: 30,
     preview: 'linear-gradient(135deg, #581c87 0%, #1e1b4b 50%, #0c0a09 100%)',
     isPremium: true,
-    formatValue: (value, isSpecial) => {
-      if (isSpecial) return '⍟';
-      // Mystical/magical symbols
-      const arcane = ['⍟', '⌬', '⏣', '⎔', '⌘', '⍜', '⌖', '⏚'];
-      return arcane[value] || value.toString();
-    },
+    useCenterIcons: true,
+    formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#a855f7', icon: '✦', glowColor: 'rgba(168, 85, 247, 0.7)' },
-      brown: { color: '#f97316', icon: '✧', glowColor: 'rgba(249, 115, 22, 0.7)' },
-      green: { color: '#10b981', icon: '✶', glowColor: 'rgba(16, 185, 129, 0.7)' },
-      blue: { color: '#06b6d4', icon: '✴', glowColor: 'rgba(6, 182, 212, 0.7)' },
+      red: { color: '#f43f5e', centerIcon: '🎮', glowColor: 'rgba(244, 63, 94, 0.7)' },    // Gaming
+      brown: { color: '#f97316', centerIcon: '⚡', glowColor: 'rgba(249, 115, 22, 0.7)' }, // Electric
+      green: { color: '#10b981', centerIcon: '🔋', glowColor: 'rgba(16, 185, 129, 0.7)' }, // Battery
+      blue: { color: '#06b6d4', centerIcon: '💠', glowColor: 'rgba(6, 182, 212, 0.7)' },   // Gem
     },
     specialCards: {
-      redBonus: { symbol: '☯', label: '+5' },
-      brownPenalty: { symbol: '☠', label: '-2' },
+      redBonus: { symbol: '0', label: '+5' },
+      brownPenalty: { symbol: '0', label: '-2' },
     },
-    containerClass: 'arcane-glow',
+    containerClass: 'neon-glow',
   },
 };
 
@@ -346,11 +337,11 @@ export const cardSkinPricing: Record<CardSkinId, CardSkinPricingInfo> = {
   'classic': { price: 0, suggestedLevel: 0 },       // Free
   'roman': { price: 0, suggestedLevel: 0 },         // Free
   'elemental': { price: 150, suggestedLevel: 5 },   // Cheap
-  'runic': { price: 300, suggestedLevel: 10 },      // Medium
+  'nordic': { price: 300, suggestedLevel: 10 },     // Medium
   'alchemical': { price: 500, suggestedLevel: 15 }, // Medium
   'celestial': { price: 750, suggestedLevel: 20 },  // Premium
   'royal': { price: 1000, suggestedLevel: 25 },     // Premium
-  'arcane': { price: 1500, suggestedLevel: 30 },    // Most expensive
+  'neon': { price: 1500, suggestedLevel: 30 },      // Most expensive
 };
 
 /**

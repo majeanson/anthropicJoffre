@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-04T23:50:53.165Z",
+  "buildDate": "2025-12-05T00:30:53.691Z",
   "version": "2.3.1",
   "git": {
-    "commitMessage": "fix: Resolve Lobby build error and update buildInfo\n\n- Fix remaining onShowPersonalHub references in Lobby.tsx\n- Update buildInfo.json with latest commit details\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "486954d",
-    "commitDate": "2025-12-03 22:25:04 -0500",
+    "commitMessage": "feat: Add skin purchase system with live previews and fix social features\n\nSkin Purchase System:\n- Add purchaseSkin() database function with transaction safety\n- Add purchase_skin socket handler in social handlers\n- Add pricing configs for UI skins (0-1000) and card skins (0-1500)\n- Update ProfileProgressModal with purchase buttons and balance display\n- Add preview mode to SkinContext (hover to preview, visual-only)\n- Show purchase notifications and affordability states\n\nSocial Features Fixes:\n- Fix friends list always empty by adding socket.join() for player rooms\n- Track authenticated users as online on connection (not just game join)\n- Filter bots from online players in gameLifecycle, lobby, and broadcast\n- Check allow_friend_requests preference before sending friend requests\n- Add friend search UI to SocialPanel friends tab\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "32e9f9f",
+    "commitDate": "2025-12-04 18:51:42 -0500",
     "branch": "main"
   },
   "futureTodos": [

@@ -101,7 +101,7 @@ export function ProfileProgressModal({
 }: ProfileProgressModalProps) {
   const [activeTab, setActiveTab] = useState<TabId>(initialTab);
   const [progression, setProgression] = useState<PlayerProgression | null>(null);
-  const [skinRequirements, setSkinRequirements] = useState<SkinRequirement[]>([]);
+  const [_skinRequirements, setSkinRequirements] = useState<SkinRequirement[]>([]);
   const [weeklyCalendar, setWeeklyCalendar] = useState<WeeklyCalendarDay[]>([]);
   const [weeklyProgress, setWeeklyProgress] = useState<WeeklyProgress | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -121,7 +121,6 @@ export function ProfileProgressModal({
     isPreviewActive,
     setCosmeticCurrency,
     setUnlockedSkinIds,
-    isCardSkinUnlocked: contextIsCardSkinUnlocked,
   } = useSkin();
 
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
@@ -264,14 +263,6 @@ export function ProfileProgressModal({
     setClaimingQuestId(questId);
     socket.emit('claim_quest_reward', { playerName, questId });
   }, [socket, playerName, claimingQuestId]);
-
-  const isSkinUnlocked = useCallback((skinId: string) => {
-    if (!progression) return false;
-    // Default skins (level 0) are always unlocked
-    const requirement = skinRequirements.find(r => r.skinId === skinId);
-    if (!requirement || requirement.requiredLevel === 0) return true;
-    return progression.unlockedSkins.includes(skinId);
-  }, [progression, skinRequirements]);
 
   // Purchase skin handler
   const handlePurchaseSkin = useCallback((skinIdToBuy: string, skinType: 'ui' | 'card') => {
@@ -657,11 +648,11 @@ export function ProfileProgressModal({
 
                   {/* Preview indicator */}
                   {isPreviewActive && (
-                    <div className="p-2 rounded-lg bg-purple-500/20 text-purple-300 text-xs text-center flex items-center justify-center gap-2">
-                      <span>👁️ Preview Mode</span>
+                    <div className="p-2 rounded-lg bg-blue-600/30 border border-blue-400/50 text-white text-xs text-center flex items-center justify-center gap-2">
+                      <span>👁️ Preview Mode - Hover to preview skins</span>
                       <button
                         onClick={stopPreview}
-                        className="underline hover:text-purple-200"
+                        className="underline hover:text-blue-200 font-medium"
                       >
                         Stop
                       </button>
@@ -700,8 +691,9 @@ export function ProfileProgressModal({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {cardSkinList.map((cardSkinItem) => {
-                        const isUnlocked = contextIsCardSkinUnlocked(cardSkinItem.id) || progression.unlockedSkins.includes(cardSkinItem.id);
                         const pricing = getCardSkinPricing(cardSkinItem.id);
+                        // A skin is unlocked if: it's free (price 0) OR player has purchased it
+                        const isUnlocked = pricing.price === 0 || progression.unlockedSkins.includes(cardSkinItem.id);
                         const isActive = cardSkinId === cardSkinItem.id;
                         const canAfford = progression.cosmeticCurrency >= pricing.price;
 
@@ -779,16 +771,19 @@ export function ProfileProgressModal({
                                 <>
                                   {pricing.price > 0 ? (
                                     <button
-                                      onClick={() => handlePurchaseSkin(cardSkinItem.id, 'card')}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePurchaseSkin(cardSkinItem.id, 'card');
+                                      }}
                                       disabled={!canAfford || isPurchasing}
-                                      className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                                      className={`text-xs px-3 py-1.5 rounded flex items-center gap-1 font-medium transition-colors ${
                                         canAfford
-                                          ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                          ? 'bg-yellow-500/30 text-yellow-300 hover:bg-yellow-500/50 border border-yellow-500/50'
                                           : 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
                                       }`}
                                     >
                                       <span>💰</span>
-                                      <span>{pricing.price}</span>
+                                      <span>Buy {pricing.price}</span>
                                     </button>
                                   ) : (
                                     <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
@@ -823,8 +818,9 @@ export function ProfileProgressModal({
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {skinList.map((skinItem) => {
-                        const isUnlocked = isSkinUnlocked(skinItem.id) || progression.unlockedSkins.includes(skinItem.id);
                         const pricing = getSkinPricing(skinItem.id as SkinId);
+                        // A skin is unlocked if: it's free (price 0) OR player has purchased it
+                        const isUnlocked = pricing.price === 0 || progression.unlockedSkins.includes(skinItem.id);
                         const isActive = skinId === skinItem.id;
                         const canAfford = progression.cosmeticCurrency >= pricing.price;
 
@@ -889,16 +885,19 @@ export function ProfileProgressModal({
                                 <>
                                   {pricing.price > 0 ? (
                                     <button
-                                      onClick={() => handlePurchaseSkin(skinItem.id, 'ui')}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePurchaseSkin(skinItem.id, 'ui');
+                                      }}
                                       disabled={!canAfford || isPurchasing}
-                                      className={`text-xs px-2 py-1 rounded flex items-center gap-1 ${
+                                      className={`text-xs px-3 py-1.5 rounded flex items-center gap-1 font-medium transition-colors ${
                                         canAfford
-                                          ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                                          ? 'bg-yellow-500/30 text-yellow-300 hover:bg-yellow-500/50 border border-yellow-500/50'
                                           : 'bg-gray-500/20 text-gray-400 cursor-not-allowed'
                                       }`}
                                     >
                                       <span>💰</span>
-                                      <span>{pricing.price}</span>
+                                      <span>Buy {pricing.price}</span>
                                     </button>
                                   ) : (
                                     <span className="text-xs px-2 py-1 rounded bg-green-500/20 text-green-400">
