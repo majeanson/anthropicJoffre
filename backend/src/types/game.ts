@@ -307,3 +307,137 @@ export interface VoiceParticipant {
   isMuted: boolean;    // Mute state
   isSpeaking: boolean; // Voice activity indicator
 }
+
+// ==================== SIDE BETTING SYSTEM ====================
+
+/**
+ * Type of side bet
+ */
+export type SideBetType = 'preset' | 'custom';
+
+/**
+ * Preset bet types that can be auto-resolved by the game
+ */
+export type PresetBetType =
+  | 'red_zero_winner'      // Which team wins the trick containing red 0
+  | 'brown_zero_victim'    // Which team takes the brown 0 (loses points)
+  | 'tricks_over_under'    // Target player wins >= X tricks
+  | 'team_score_over_under' // Team scores >= X points in round
+  | 'bet_made'             // Betting team makes their bet
+  | 'without_trump_success' // "Without trump" bet succeeds
+  | 'first_trump_played';  // Who plays the first trump card
+
+/**
+ * Status of a side bet
+ */
+export type SideBetStatus = 'open' | 'active' | 'resolved' | 'cancelled' | 'expired' | 'disputed';
+
+/**
+ * How a bet was resolved
+ */
+export type SideBetResolution = 'auto' | 'manual' | 'expired' | 'refunded';
+
+/**
+ * Side bet between players/spectators
+ */
+export interface SideBet {
+  id: number;
+  gameId: string;
+  betType: SideBetType;
+  presetType?: PresetBetType;        // For preset bets
+  customDescription?: string;         // For custom bets (free text)
+  creatorName: string;                // Who created the bet
+  acceptorName?: string;              // Who accepted (null if open)
+  amount: number;                     // Coins wagered (1 to creator's balance)
+  prediction?: string;                // The bet prediction (e.g., 'team1', '>=5', 'true')
+  targetPlayer?: string;              // Who the bet is about (if applicable)
+  status: SideBetStatus;
+  result?: boolean;                   // null until resolved, true if creator won
+  resolvedBy?: SideBetResolution;     // How it was resolved
+  roundNumber?: number;               // Which round the bet applies to (null = whole game)
+  createdAt: Date;
+  acceptedAt?: Date;
+  resolvedAt?: Date;
+}
+
+/**
+ * Socket event payload for creating a side bet
+ */
+export interface CreateSideBetPayload {
+  gameId: string;
+  betType: SideBetType;
+  presetType?: PresetBetType;
+  customDescription?: string;
+  amount: number;
+  prediction?: string;
+  targetPlayer?: string;
+  roundNumber?: number;
+}
+
+/**
+ * Socket event payload for accepting a side bet
+ */
+export interface AcceptSideBetPayload {
+  gameId: string;
+  betId: number;
+}
+
+/**
+ * Socket event payload for cancelling a side bet
+ */
+export interface CancelSideBetPayload {
+  gameId: string;
+  betId: number;
+}
+
+/**
+ * Socket event payload for resolving a custom bet manually
+ */
+export interface ResolveCustomBetPayload {
+  gameId: string;
+  betId: number;
+  creatorWon: boolean;  // true = creator wins, false = acceptor wins
+}
+
+/**
+ * Socket event payload for disputing a custom bet resolution
+ */
+export interface DisputeBetPayload {
+  gameId: string;
+  betId: number;
+}
+
+/**
+ * Server response for side bet events
+ */
+export interface SideBetCreatedEvent {
+  bet: SideBet;
+}
+
+export interface SideBetAcceptedEvent {
+  betId: number;
+  acceptorName: string;
+}
+
+export interface SideBetResolvedEvent {
+  betId: number;
+  result: boolean;       // true = creator won
+  winnerName: string;
+  loserName: string;
+  coinsAwarded: number;
+}
+
+export interface SideBetCancelledEvent {
+  betId: number;
+  reason: 'creator_cancelled' | 'expired' | 'game_ended';
+}
+
+export interface SideBetDisputedEvent {
+  betId: number;
+  disputedBy: string;
+  refundAmount: number;
+}
+
+export interface SideBetsListEvent {
+  bets: SideBet[];
+}

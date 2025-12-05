@@ -210,6 +210,7 @@ import { registerDirectMessageHandlers } from './socketHandlers/directMessages';
 import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 Day 6
 import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: Daily Engagement System
 import { registerVoiceHandlers } from './socketHandlers/voice'; // Voice chat WebRTC signaling
+import { registerSideBetsHandlers } from './socketHandlers/sideBets'; // Side betting system
 import {
   generateSessionToken as generateSessionTokenUtil,
   createPlayerSession as createPlayerSessionUtil,
@@ -1281,6 +1282,16 @@ io.on('connection', (socket) => {
   registerVoiceHandlers(socket, {
     games,
     voiceParticipants,
+    io,
+    logger,
+    errorBoundaries,
+  });
+
+  // ============================================================================
+  // Side Bets Handlers - Coin betting system
+  // ============================================================================
+  registerSideBetsHandlers(socket, {
+    games,
     io,
     logger,
     errorBoundaries,

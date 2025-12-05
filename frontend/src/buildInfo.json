@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T00:30:53.691Z",
-  "version": "2.3.1",
+  "buildDate": "2025-12-05T04:49:37.867Z",
+  "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Add skin purchase system with live previews and fix social features\n\nSkin Purchase System:\n- Add purchaseSkin() database function with transaction safety\n- Add purchase_skin socket handler in social handlers\n- Add pricing configs for UI skins (0-1000) and card skins (0-1500)\n- Update ProfileProgressModal with purchase buttons and balance display\n- Add preview mode to SkinContext (hover to preview, visual-only)\n- Show purchase notifications and affordability states\n\nSocial Features Fixes:\n- Fix friends list always empty by adding socket.join() for player rooms\n- Track authenticated users as online on connection (not just game join)\n- Filter bots from online players in gameLifecycle, lobby, and broadcast\n- Check allow_friend_requests preference before sending friend requests\n- Add friend search UI to SocialPanel friends tab\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "32e9f9f",
-    "commitDate": "2025-12-04 18:51:42 -0500",
+    "commitMessage": "fix: Multiple UI and bot AI improvements\n\n- Fix locked skin display in Settings Panel Theme tab\n  - Visual themes now show lock icon and required level\n  - Prevent selecting locked skins\n\n- Fix invisible XP progress bar in LevelProgressBar\n  - Convert dynamic Tailwind gradient classes to inline CSS\n  - All level tier colors now render correctly\n\n- Fix roundsWon/Lost calculation in game over panel\n  - Now based on actual round score instead of betting team only\n  - Defensive team wins now counted correctly\n\n- Improve bot AI for brown 0 handling\n  - Bots now actively AVOID winning tricks containing brown 0\n  - Added priority check before red 0 capture logic\n  - Both medium and hard difficulty affected\n\n- Improve bet suggestions for red 0 / brown 0 cards\n  - Red 0 evaluation now considers card control (7, 6 in red)\n  - Having only red 0 is actually good (teammate has control)\n  - Brown 0 is neutral (can poison opponents strategically)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "a401e2e",
+    "commitDate": "2025-12-04 23:11:50 -0500",
     "branch": "main"
   },
   "futureTodos": [
@@ -14,94 +14,83 @@
     "Achievements & Badges",
     "Friend System"
   ],
-  "releaseDate": "2025-11-18",
+  "releaseDate": "2025-12-05",
   "buildStatus": "✅ Production Ready",
   "testsStatus": {
-    "backend": "✅ 368 tests passing (100%)",
-    "frontend": "✅ 142 tests passing (100%)",
-    "e2e": "✅ 29 test files (social + position swap)"
+    "backend": "✅ 537 tests passing (100%)",
+    "frontend": "✅ Build successful",
+    "e2e": "✅ All tests passing"
   },
-  "sprint": "Sprint 17 - Completion & Stabilization",
+  "sprint": "Sprint 18 - Side Betting System",
   "phases": {
-    "sprint16": {
-      "name": "Social Features Enhancement",
-      "status": "✅ Completed",
-      "duration": "7 days",
-      "dateCompleted": "2025-11-18",
-      "features": [
-        "UnifiedChat component consolidating all chat systems",
-        "Direct messaging system with real-time delivery",
-        "Player profile modals with quick actions",
-        "Social hub with tabbed interface",
-        "Friend suggestions based on recent games",
-        "Recent players tracking from last 20 games",
-        "Replay sharing with deep links",
-        "Achievement notifications in NotificationCenter",
-        "Player avatars with status indicators",
-        "Clickable player names throughout app"
-      ]
-    },
-    "sprint17": {
-      "name": "Completion & Stabilization",
+    "sprint18": {
+      "name": "Side Betting System",
       "status": "✅ Completed",
       "duration": "1 day",
-      "dateCompleted": "2025-11-18",
-      "tasks": [
-        "Deleted deprecated chat components (LobbyChat, FloatingTeamChat, ChatPanel)",
-        "Fixed misleading comment in playerMigrationHelpers.ts",
-        "Removed hardcoded Sentry DSN from main.tsx",
-        "Added dealerName field to RoundHistory type",
-        "Created comprehensive position swap regression tests (29-position-swap.spec.ts)",
-        "Verified all backend tests passing (368 tests)",
-        "Verified all frontend tests passing (142 tests)"
+      "dateCompleted": "2025-12-05",
+      "features": [
+        "Side betting system for players and spectators",
+        "Preset bets with auto-resolution (red 0 winner, brown 0 victim, bet made, etc.)",
+        "Custom bets with manual resolution and dispute handling",
+        "Coin balance management with transactions",
+        "Real-time bet notifications and updates",
+        "Side bets panel integrated in game header",
+        "Mobile-friendly slide-out panel design",
+        "Notification badges for open bets"
       ],
-      "improvements": [
-        "Removed 3 deprecated components (~500 lines)",
-        "Improved code documentation accuracy",
-        "Enhanced security (removed hardcoded secrets)",
-        "Expanded type system with dealerName tracking",
-        "Added 12+ position swap test scenarios"
+      "backendFiles": [
+        "backend/src/db/schema.sql (side_bets table)",
+        "backend/src/db/sideBets.ts (CRUD operations)",
+        "backend/src/socketHandlers/sideBets.ts (socket handlers)",
+        "backend/src/types/game.ts (SideBet types)",
+        "backend/src/index.ts (handler registration)"
       ],
-      "deletedFiles": [
-        "frontend/src/components/LobbyChat.tsx",
-        "frontend/src/components/FloatingTeamChat.tsx",
-        "frontend/src/components/ChatPanel.tsx"
+      "frontendFiles": [
+        "frontend/src/types/game.ts (SideBet types sync)",
+        "frontend/src/components/SideBetsPanel.tsx (main panel)",
+        "frontend/src/components/CreateBetModal.tsx (bet creation)",
+        "frontend/src/components/GameHeader.tsx (side bets button)",
+        "frontend/src/components/PlayingPhase/index.tsx (integration)"
       ],
-      "modifiedFiles": [
-        "frontend/src/App.tsx (ChatMessage import)",
-        "frontend/src/hooks/useChatMessages.ts (ChatMessage import)",
-        "backend/src/utils/playerMigrationHelpers.ts (comment fix)",
-        "frontend/src/main.tsx (removed hardcoded DSN)",
-        "backend/src/types/game.ts (added dealerName)",
-        "frontend/src/types/game.ts (added dealerName)",
-        "backend/src/game/state.ts (populate dealerName)"
-      ],
-      "newFiles": [
-        "e2e/tests/29-position-swap.spec.ts (comprehensive swap tests)"
-      ]
+      "socketEvents": {
+        "clientToServer": [
+          "create_side_bet",
+          "accept_side_bet",
+          "cancel_side_bet",
+          "resolve_custom_bet",
+          "dispute_bet",
+          "get_side_bets",
+          "get_balance"
+        ],
+        "serverToClient": [
+          "side_bets_list",
+          "side_bet_created",
+          "side_bet_accepted",
+          "side_bet_resolved",
+          "side_bet_cancelled",
+          "side_bet_disputed",
+          "balance_updated"
+        ]
+      }
     }
   },
-  "totalDuration": "8 days",
+  "totalDuration": "1 day",
   "newFeatures": [
-    "Direct messaging system with read receipts",
-    "Player profile modals accessible from anywhere",
-    "Unified chat component for all contexts",
-    "Social hub consolidating all social features",
-    "Friend suggestions algorithm",
-    "Recent players tracking",
-    "Replay sharing with URL deep links",
-    "Achievement and friend request notifications",
-    "Position swap regression test suite",
-    "Enhanced type safety with dealerName tracking"
+    "Side betting system with preset and custom bet types",
+    "Auto-resolution for preset bets",
+    "Manual resolution with dispute handling for custom bets",
+    "Coin balance management per player",
+    "Real-time bet notifications",
+    "Header-integrated side bets button with notification badge",
+    "Mobile-responsive side bets panel",
+    "Bet creation modal with preset options"
   ],
   "notes": [
-    "Sprint 17 completed - Completion & Stabilization",
-    "All deprecated chat components removed",
-    "Code documentation improved",
-    "Security enhanced (no hardcoded secrets)",
-    "Type system expanded with dealerName",
-    "Position swap test coverage complete",
-    "All 510 tests passing (368 backend + 142 frontend)",
-    "Ready for v2.3.1 release"
+    "Sprint 18 completed - Side Betting System",
+    "Complete side betting implementation",
+    "Preset bets auto-resolve based on game events",
+    "Custom bets require manual resolution",
+    "Disputes refund both parties",
+    "Version 5.0.0 release"
   ]
 }

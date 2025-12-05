@@ -13,6 +13,7 @@ import { Leaderboard } from '../Leaderboard';
 import { UnifiedChat } from '../UnifiedChat';
 import { GameHeader } from '../GameHeader';
 import { HowToPlay } from '../HowToPlay';
+import SideBetsPanel from '../SideBetsPanel';
 import { ChatMessage, VoiceParticipant } from '../../types/game';
 import { GameState, Card as CardType } from '../../types/game';
 import { sounds } from '../../utils/sounds';
@@ -137,6 +138,8 @@ function PlayingPhaseComponent({
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [sideBetsOpen, setSideBetsOpen] = useState(false);
+  const [openSideBetsCount, setOpenSideBetsCount] = useState(0);
 
   // Use chat notifications hook
   const { unreadChatCount } = useChatNotifications({
@@ -469,6 +472,8 @@ function PlayingPhaseComponent({
         onOpenRules={() => setShowHowToPlay(true)}
         onOpenChat={() => setChatOpen(!chatOpen)}
         unreadChatCount={unreadChatCount}
+        onOpenSideBets={() => setSideBetsOpen(!sideBetsOpen)}
+        openSideBetsCount={openSideBetsCount}
         connectionStats={connectionStats}
         highestBet={gameState.highestBet ? { amount: gameState.highestBet.amount, withoutTrump: gameState.highestBet.withoutTrump, playerId: gameState.highestBet.playerId } : undefined}
         trump={gameState.trump}
@@ -585,6 +590,19 @@ function PlayingPhaseComponent({
           points={trickWinner.points}
           position={trickWinner.position}
           teamColor={trickWinner.teamId === 1 ? 'orange' : 'purple'}
+        />
+      )}
+
+      {/* Side Bets Panel */}
+      {socket && gameId && (
+        <SideBetsPanel
+          socket={socket}
+          gameId={gameId}
+          playerName={currentPlayerId}
+          isSpectator={isSpectator}
+          isOpen={sideBetsOpen}
+          onClose={() => setSideBetsOpen(false)}
+          onOpenBetsCountChange={setOpenSideBetsCount}
         />
       )}
     </div>

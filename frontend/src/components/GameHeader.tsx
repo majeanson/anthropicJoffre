@@ -28,8 +28,10 @@ interface GameHeaderProps {
   onOpenAchievements?: () => void;
   onOpenFriends?: () => void;
   onOpenNotifications?: () => void;
+  onOpenSideBets?: () => void;
   unreadNotificationsCount?: number;
   pendingFriendRequestsCount?: number;
+  openSideBetsCount?: number;
   botCount?: number;
   autoplayEnabled?: boolean;
   onAutoplayToggle?: () => void;
@@ -63,8 +65,10 @@ export function GameHeader({
   onOpenAchievements,
   onOpenFriends,
   onOpenNotifications,
+  onOpenSideBets,
   unreadNotificationsCount = 0,
   pendingFriendRequestsCount = 0,
+  openSideBetsCount = 0,
   botCount = 0,
   autoplayEnabled = false,
   onAutoplayToggle,
@@ -341,6 +345,17 @@ export function GameHeader({
               />
             )}
 
+            {onOpenSideBets && (
+              <HeaderActionButton
+                onClick={onOpenSideBets}
+                icon="🎲"
+                label="Bets"
+                badgeCount={openSideBetsCount}
+                title="Side Bets"
+                testId="header-sidebets-button"
+              />
+            )}
+
             {onOpenNotifications && (
               <HeaderActionButton
                 onClick={onOpenNotifications}
@@ -522,6 +537,17 @@ export function GameHeader({
                 icon="👥"
                 badgeCount={pendingFriendRequestsCount}
                 title="Friends"
+                size="sm"
+                className="p-1.5"
+              />
+            )}
+
+            {onOpenSideBets && (
+              <HeaderActionButton
+                onClick={onOpenSideBets}
+                icon="🎲"
+                badgeCount={openSideBetsCount}
+                title="Side Bets"
                 size="sm"
                 className="p-1.5"
               />
