@@ -16,9 +16,11 @@ import {
   areFriends
 } from '../db/friends';
 import { errorBoundaries } from '../middleware/errorBoundary.js';
+import { OnlinePlayer } from '../types/game';
 
 interface FriendHandlerDependencies {
   errorBoundaries: typeof errorBoundaries;
+  onlinePlayers: Map<string, OnlinePlayer>;
 }
 
 export function registerFriendHandlers(
@@ -26,7 +28,7 @@ export function registerFriendHandlers(
   socket: Socket,
   deps: FriendHandlerDependencies
 ) {
-  const { errorBoundaries } = deps;
+  const { errorBoundaries, onlinePlayers } = deps;
 
   /**
    * Send a friend request
@@ -292,6 +294,7 @@ export function registerFriendHandlers(
 
   /**
    * Get friends list with status
+   * Enriches database results with real-time online status from onlinePlayers map
    */
   socket.on(
     'get_friends_list',
@@ -304,7 +307,34 @@ export function registerFriendHandlers(
       }
 
       const friends = await getFriendsWithStatus(playerName);
-      socket.emit('friends_list', { friends });
+
+      // Enrich with real-time online status from onlinePlayers map
+      const enrichedFriends = friends.map(friend => {
+        // Find this friend in the online players map
+        const onlinePlayer = Array.from(onlinePlayers.values()).find(
+          op => op.playerName === friend.player_name
+        );
+
+        if (onlinePlayer) {
+          return {
+            ...friend,
+            is_online: true,
+            status: onlinePlayer.status || 'in_lobby',
+            game_id: onlinePlayer.gameId || friend.game_id,
+          };
+        }
+
+        return friend;
+      });
+
+      // Sort: online friends first, then by friendship date
+      enrichedFriends.sort((a, b) => {
+        if (a.is_online && !b.is_online) return -1;
+        if (!a.is_online && b.is_online) return 1;
+        return new Date(b.friendship_date).getTime() - new Date(a.friendship_date).getTime();
+      });
+
+      socket.emit('friends_list', { friends: enrichedFriends });
     })
   );
 

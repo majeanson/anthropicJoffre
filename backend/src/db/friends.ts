@@ -8,12 +8,10 @@ import { Friendship, FriendRequest, FriendWithStatus } from '../types/friends';
 
 /**
  * Database row for friend with status query
+ * Note: is_online and status are tracked in-memory via onlinePlayers map, not in DB
  */
 interface FriendWithStatusRow {
   player_name: string;
-  is_online: boolean;
-  status: string | null;
-  game_id: string | null;
   friendship_date: string;
 }
 
@@ -231,61 +229,32 @@ export async function getFriendship(player1: string, player2: string): Promise<F
 
 /**
  * Get all friends for a player with their online status
+ * Note: Online status is tracked in-memory (onlinePlayers map), not in the database.
+ * This function returns all friends with is_online=false and status='offline'.
+ * The socket handler should enrich this with real-time online status and game info.
  */
 export async function getFriendsWithStatus(playerName: string): Promise<FriendWithStatus[]> {
   try {
     // Get all friendships where player is either player1 or player2
+    // Note: is_online and status will be enriched by the socket handler with real-time data
     const result = await query(
       `SELECT
          CASE
            WHEN f.player1_name = $1 THEN f.player2_name
            ELSE f.player1_name
          END as player_name,
-         f.created_at as friendship_date,
-         COALESCE(ps.is_online, false) as is_online,
-         CASE
-           WHEN g.id IS NOT NULL AND g.status = 'playing' THEN 'in_game'
-           WHEN g.id IS NOT NULL AND g.status = 'betting' THEN 'in_game'
-           WHEN g.id IS NOT NULL AND g.status = 'team_selection' THEN 'in_team_selection'
-           WHEN g.id IS NOT NULL THEN 'in_lobby'
-           WHEN COALESCE(ps.is_online, false) THEN 'in_lobby'
-           ELSE 'offline'
-         END as status,
-         g.id as game_id
+         f.created_at as friendship_date
        FROM friendships f
-       LEFT JOIN player_stats ps ON (
-         CASE
-           WHEN f.player1_name = $1 THEN f.player2_name
-           ELSE f.player1_name
-         END = ps.player_name
-       )
-       LEFT JOIN (
-         SELECT DISTINCT g.id, g.status, p.player_name
-         FROM games g
-         JOIN LATERAL jsonb_array_elements(g.players) AS p(player) ON true
-         JOIN LATERAL jsonb_to_record(p.player) AS p(player_name text)
-         WHERE g.status IN ('team_selection', 'betting', 'playing')
-       ) g ON (
-         CASE
-           WHEN f.player1_name = $1 THEN f.player2_name
-           ELSE f.player1_name
-         END = g.player_name
-       )
        WHERE f.player1_name = $1 OR f.player2_name = $1
-       ORDER BY
-         CASE
-           WHEN COALESCE(ps.is_online, false) THEN 0
-           ELSE 1
-         END,
-         f.created_at DESC`,
+       ORDER BY f.created_at DESC`,
       [playerName]
     );
 
     return result.rows.map((row: FriendWithStatusRow) => ({
       player_name: row.player_name,
-      is_online: row.is_online,
-      status: (row.status as 'in_lobby' | 'in_game' | 'in_team_selection') || 'offline',
-      game_id: row.game_id || undefined,
+      is_online: false, // Will be enriched by socket handler with real-time data
+      status: 'offline' as const, // Will be enriched by socket handler
+      game_id: undefined,
       friendship_date: new Date(row.friendship_date)
     }));
   } catch (error) {
