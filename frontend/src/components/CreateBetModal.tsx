@@ -15,6 +15,7 @@ interface CreateBetModalProps {
   playerName: string;
   playerTeamId: 1 | 2;
   isWithoutTrump?: boolean;
+  isSpectator?: boolean;
   balance: number;
   onClose: () => void;
 }
@@ -79,16 +80,33 @@ export default function CreateBetModal({
   playerName: _playerName, // Reserved for future use
   playerTeamId,
   isWithoutTrump = false,
+  isSpectator = false,
   balance,
   onClose,
 }: CreateBetModalProps) {
   void _playerName; // Silence unused warning
 
   // Helper to convert myTeam/theirTeam to actual team values
+  // For spectators, use team1/team2 directly since they have no team
   const mapPredictionToTeam = (pred: string): string => {
-    if (pred === 'myTeam') return `team${playerTeamId}`;
-    if (pred === 'theirTeam') return `team${playerTeamId === 1 ? 2 : 1}`;
+    if (isSpectator) {
+      // Spectators bet on team1 or team2 directly
+      if (pred === 'myTeam') return 'team1';
+      if (pred === 'theirTeam') return 'team2';
+    } else {
+      if (pred === 'myTeam') return `team${playerTeamId}`;
+      if (pred === 'theirTeam') return `team${playerTeamId === 1 ? 2 : 1}`;
+    }
     return pred; // For 'true'/'false' predictions, return as-is
+  };
+
+  // Helper to get prediction label (spectators see Team 1/Team 2)
+  const getPredictionLabel = (value: string, label: string): string => {
+    if (isSpectator) {
+      if (value === 'myTeam') return 'Team 1';
+      if (value === 'theirTeam') return 'Team 2';
+    }
+    return label;
   };
 
   // Filter preset bets based on game state
@@ -103,9 +121,18 @@ export default function CreateBetModal({
   const [selectedPreset, setSelectedPreset] = useState<PresetBetType | null>(null);
   const [prediction, setPrediction] = useState<string>('');
   const [customDescription, setCustomDescription] = useState('');
+  const [resolutionTiming, setResolutionTiming] = useState<'trick' | 'round' | 'game' | 'manual'>('manual');
   const [amount, setAmount] = useState(Math.min(10, balance));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Resolution timing options for custom bets
+  const RESOLUTION_TIMING_OPTIONS = [
+    { value: 'trick' as const, label: 'After This Trick', description: 'Resolve when current trick ends' },
+    { value: 'round' as const, label: 'End of Round', description: 'Resolve when this round ends' },
+    { value: 'game' as const, label: 'End of Game', description: 'Resolve when the game ends' },
+    { value: 'manual' as const, label: 'Manual', description: 'Participants decide the winner' },
+  ];
 
   const selectedPresetConfig = availablePresetBets.find(p => p.type === selectedPreset);
   const maxAmount = balance;
@@ -149,7 +176,7 @@ export default function CreateBetModal({
       amount,
       ...(betType === 'preset'
         ? { presetType: selectedPreset!, prediction: mapPredictionToTeam(prediction) }
-        : { customDescription: customDescription.trim() }),
+        : { customDescription: customDescription.trim(), resolutionTiming }),
     };
 
     socket.emit('create_side_bet', payload);
@@ -165,6 +192,7 @@ export default function CreateBetModal({
     selectedPreset,
     prediction,
     customDescription,
+    resolutionTiming,
     amount,
     minAmount,
     maxAmount,
@@ -290,7 +318,7 @@ export default function CreateBetModal({
                             : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
                         }`}
                       >
-                        {pred.label}
+                        {getPredictionLabel(pred.value, pred.label)}
                       </button>
                     ))}
                   </div>
@@ -301,23 +329,61 @@ export default function CreateBetModal({
 
           {/* Custom bet input */}
           {betType === 'custom' && (
-            <div className="space-y-2">
-              <label className="text-sm text-[var(--color-text-secondary)]">
-                Describe Your Bet
-              </label>
-              <textarea
-                value={customDescription}
-                onChange={e => setCustomDescription(e.target.value)}
-                placeholder="e.g., Marc will play a trump on the first trick"
-                maxLength={200}
-                className="w-full p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)] rounded-lg text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-yellow-500 resize-none"
-                rows={3}
-              />
-              <div className="text-xs text-[var(--color-text-secondary)] text-right">
-                {customDescription.length}/200
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm text-[var(--color-text-secondary)]">
+                  Describe Your Bet
+                </label>
+                <textarea
+                  value={customDescription}
+                  onChange={e => setCustomDescription(e.target.value)}
+                  placeholder="e.g., Marc will play a trump on the first trick"
+                  maxLength={200}
+                  className="w-full p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)] rounded-lg text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-yellow-500 resize-none"
+                  rows={3}
+                />
+                <div className="text-xs text-[var(--color-text-secondary)] text-right">
+                  {customDescription.length}/200
+                </div>
               </div>
+
+              {/* Resolution timing */}
+              <div className="space-y-2">
+                <label className="text-sm text-[var(--color-text-secondary)]">
+                  When to Resolve
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {RESOLUTION_TIMING_OPTIONS.map(option => (
+                    <button
+                      key={option.value}
+                      onClick={() => setResolutionTiming(option.value)}
+                      className={`p-2 text-left rounded-lg border transition-colors ${
+                        resolutionTiming === option.value
+                          ? 'border-yellow-500 bg-yellow-500/10'
+                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-hover)]'
+                      }`}
+                    >
+                      <div className="text-sm font-medium text-[var(--color-text-primary)]">
+                        {option.label}
+                      </div>
+                      <div className="text-xs text-[var(--color-text-secondary)]">
+                        {option.description}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <p className="text-xs text-[var(--color-text-secondary)]">
-                Custom bets require manual resolution. If disputed, both players get refunded.
+                {resolutionTiming === 'manual'
+                  ? 'Participants will decide the winner. If disputed, both players get refunded.'
+                  : `You will be reminded to resolve this bet ${
+                      resolutionTiming === 'trick'
+                        ? 'when the current trick ends'
+                        : resolutionTiming === 'round'
+                        ? 'at the end of this round'
+                        : 'when the game ends'
+                    }.`}
               </p>
             </div>
           )}

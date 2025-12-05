@@ -210,7 +210,7 @@ import { registerDirectMessageHandlers } from './socketHandlers/directMessages';
 import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 Day 6
 import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: Daily Engagement System
 import { registerVoiceHandlers } from './socketHandlers/voice'; // Voice chat WebRTC signaling
-import { registerSideBetsHandlers } from './socketHandlers/sideBets'; // Side betting system
+import { registerSideBetsHandlers, autoResolveBets, expireGameBets } from './socketHandlers/sideBets'; // Side betting system
 import {
   generateSessionToken as generateSessionTokenUtil,
   createPlayerSession as createPlayerSessionUtil,
@@ -510,6 +510,9 @@ const gameSaveTimeouts = new Map<string, NodeJS.Timeout>();
 
 const onlinePlayers = new Map<string, OnlinePlayer>();
 
+// Spectator names (maps socket.id to spectator name) - used for side bets
+const spectatorNames = new Map<string, string>();
+
 // Wrapper functions that use closure over Maps for handler compatibility
 function generateSessionToken(): string {
   return generateSessionTokenUtil();
@@ -562,6 +565,9 @@ function broadcastGameUpdate(
 
 // Round statistics tracking (imported types from game/roundStatistics.ts)
 const roundStats = new Map<string, RoundStatsData>(); // gameId -> stats data
+
+// Track if first trump has been played this round (for 'first_trump_played' side bets)
+const firstTrumpPlayed = new Map<string, boolean>(); // gameId -> boolean
 
 // ============================================================================
 // ACHIEVEMENT HELPER FUNCTIONS
@@ -1207,6 +1213,7 @@ io.on('connection', (socket) => {
   // ============================================================================
   registerSpectatorHandlers(socket, {
     games,
+    spectatorNames,
     io,
     logger,
     errorBoundaries,
@@ -1292,6 +1299,7 @@ io.on('connection', (socket) => {
   // ============================================================================
   registerSideBetsHandlers(socket, {
     games,
+    spectatorNames,
     io,
     logger,
     errorBoundaries,
@@ -1381,6 +1389,12 @@ function startNewRound(gameId: string) {
 
   // Initialize round statistics tracking
   roundStats.set(gameId, initializeRoundStats(game.players));
+
+  // Reset first trump tracking for side bets
+  firstTrumpPlayed.set(gameId, false);
+
+  // Expire any open side bets from previous round
+  expireGameBets(io, gameId);
 
   // Store initial hands in round stats for end-of-round display
   const stats = roundStats.get(gameId);
@@ -1500,6 +1514,35 @@ function resolveTrick(gameId: string) {
   // 4. I/O - Emit trick resolution event with trick still visible
   broadcastGameUpdate(gameId, 'trick_resolved', { winnerId, winnerName, points: totalPoints, gameState: gameToSend || game });
 
+  // 4.5 AUTO-RESOLVE SIDE BETS based on trick contents
+  const winnerPlayer = game.players.find(p => p.name === winnerName);
+  const winningTeam = winnerPlayer?.teamId as 1 | 2;
+
+  // Check for red zero in trick - resolve 'red_zero_winner' bets
+  if (hasRedZero(game.currentTrick)) {
+    autoResolveBets(io, gameId, 'red_zero_winner', winningTeam, game.roundNumber);
+  }
+
+  // Check for brown zero in trick - resolve 'brown_zero_victim' bets
+  if (hasBrownZero(game.currentTrick)) {
+    autoResolveBets(io, gameId, 'brown_zero_victim', winningTeam, game.roundNumber);
+  }
+
+  // Check for first trump played (only if trump exists and this trick has a trump card)
+  if (game.trump && !firstTrumpPlayed.get(gameId)) {
+    const hasTrumpInTrick = game.currentTrick.some(tc => tc.card.color === game.trump);
+    if (hasTrumpInTrick) {
+      // Find who played the first trump in this trick
+      const firstTrumpCard = game.currentTrick.find(tc => tc.card.color === game.trump);
+      if (firstTrumpCard) {
+        const trumpPlayer = game.players.find(p => p.name === firstTrumpCard.playerName);
+        const trumpTeam = trumpPlayer?.teamId as 1 | 2;
+        autoResolveBets(io, gameId, 'first_trump_played', trumpTeam, game.roundNumber);
+        firstTrumpPlayed.set(gameId, true);
+      }
+    }
+  }
+
   // 5. ORCHESTRATION - Handle round completion or continue playing
   // Sprint 5 Phase 2.3: Extracted setTimeout logic to schedulePostTrickActions()
   schedulePostTrickActions(gameId, winnerName, result.isRoundOver);
@@ -1518,6 +1561,18 @@ async function endRound(gameId: string) {
 
   // 2. STATE TRANSFORMATION - Apply scoring to game state (updates scores, adds to history, checks game over)
   applyRoundScoring(game, scoring);
+
+  // 2.5 AUTO-RESOLVE SIDE BETS for round-end events
+  // Resolve 'bet_made' bets - pass 1 if bet was made (TRUE), 2 if not (FALSE)
+  const betMadeOutcome = scoring.betMade ? 1 : 2;
+  autoResolveBets(io, gameId, 'bet_made', betMadeOutcome as 1 | 2, game.roundNumber);
+
+  // Resolve 'without_trump_success' bets if this was a without trump round
+  if (game.highestBet?.withoutTrump) {
+    // Pass 1 if bet was made (TRUE), 2 if not (FALSE)
+    const withoutTrumpOutcome = scoring.betMade ? 1 : 2;
+    autoResolveBets(io, gameId, 'without_trump_success', withoutTrumpOutcome as 1 | 2, game.roundNumber);
+  }
 
   // 3. Add round statistics and player stats to the round history entry
   const statsData = roundStats.get(gameId);

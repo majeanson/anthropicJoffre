@@ -15,8 +15,10 @@ import type {
   SideBetCancelledEvent,
   SideBetDisputedEvent,
   SideBetsListEvent,
+  SideBetPromptResolutionEvent,
 } from '../types/game';
 import CreateBetModal from './CreateBetModal';
+import { sounds } from '../utils/sounds';
 
 interface SideBetsPanelProps {
   socket: Socket | null;
@@ -41,24 +43,54 @@ const PRESET_LABELS: Record<string, string> = {
   first_trump_played: 'First Trump',
 };
 
+// Resolution timing labels
+const RESOLUTION_TIMING_LABELS: Record<string, { label: string; icon: string; color: string }> = {
+  trick: { label: 'After Trick', icon: '⚡', color: 'text-blue-400' },
+  round: { label: 'End of Round', icon: '🔄', color: 'text-purple-400' },
+  game: { label: 'End of Game', icon: '🏁', color: 'text-orange-400' },
+  manual: { label: 'Manual', icon: '👆', color: 'text-gray-400' },
+};
+
+// Helper to format team prediction relative to viewer
+const formatTeamPrediction = (prediction: string | undefined, viewerTeamId: 1 | 2, isSpectator: boolean = false): string => {
+  if (!prediction) return '';
+  if (prediction === 'true') return 'Yes';
+  if (prediction === 'false') return 'No';
+  if (isSpectator) {
+    // Spectators see Team 1/Team 2
+    if (prediction === 'team1') return 'Team 1';
+    if (prediction === 'team2') return 'Team 2';
+  } else {
+    // Players see My Team/Their Team
+    if (prediction === 'team1') return viewerTeamId === 1 ? 'My Team' : 'Their Team';
+    if (prediction === 'team2') return viewerTeamId === 2 ? 'My Team' : 'Their Team';
+  }
+  return prediction;
+};
+
 export default function SideBetsPanel({
   socket,
   gameId,
   playerName,
   playerTeamId,
   isWithoutTrump = false,
-  isSpectator: _isSpectator = false,
+  isSpectator = false,
   isOpen,
   onClose,
   onOpenBetsCountChange,
 }: SideBetsPanelProps) {
-  void _isSpectator; // Reserved for future spectator-specific features
   const [bets, setBets] = useState<SideBet[]>([]);
   const [balance, setBalance] = useState(100);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const [notification, setNotification] = useState<{
     message: string;
     type: 'success' | 'error' | 'info';
+  } | null>(null);
+  const [resolutionPrompt, setResolutionPrompt] = useState<{
+    bet: SideBet;
+    timing: string;
+    message: string;
   } | null>(null);
 
   // Fetch bets only when panel is opened
@@ -120,7 +152,11 @@ export default function SideBetsPanel({
     const handleBetResolved = ({
       betId,
       winnerName,
+      loserName,
       coinsAwarded,
+      streakBonus,
+      winnerStreak,
+      streakMultiplier,
     }: SideBetResolvedEvent) => {
       setBets(prev =>
         prev.map(b =>
@@ -130,12 +166,35 @@ export default function SideBetsPanel({
         )
       );
       const isWinner = winnerName === playerName;
-      showNotification(
-        isWinner
-          ? `You won ${coinsAwarded} coins!`
-          : `${winnerName} won ${coinsAwarded} coins`,
-        isWinner ? 'success' : 'info'
-      );
+      const isLoser = loserName === playerName;
+
+      // Play sound if player was a participant
+      if (isWinner) {
+        sounds.sideBetWon();
+      } else if (isLoser) {
+        sounds.sideBetLost();
+      }
+
+      // Build notification message with streak info
+      let message: string;
+      if (isWinner) {
+        message = `You won ${coinsAwarded} coins!`;
+        if (streakBonus && streakBonus > 0) {
+          message += ` 🔥 ${streakMultiplier}x streak bonus (+${streakBonus})!`;
+        }
+        if (winnerStreak && winnerStreak >= 3) {
+          message += ` Win streak: ${winnerStreak}`;
+        }
+      } else if (isLoser) {
+        message = `You lost! ${winnerName} won ${coinsAwarded} coins`;
+      } else {
+        message = `${winnerName} won ${coinsAwarded} coins`;
+        if (winnerStreak && winnerStreak >= 3) {
+          message += ` (${winnerStreak} win streak!)`;
+        }
+      }
+
+      showNotification(message, isWinner ? 'success' : 'info');
     };
 
     const handleBetCancelled = ({ betId }: SideBetCancelledEvent) => {
@@ -163,6 +222,15 @@ export default function SideBetsPanel({
       setBalance(newBalance);
     };
 
+    const handlePromptResolution = ({ bet, timing, message }: SideBetPromptResolutionEvent) => {
+      // Only show prompt if player is a participant
+      const isParticipant = bet.creatorName === playerName || bet.acceptorName === playerName;
+      if (isParticipant) {
+        setResolutionPrompt({ bet, timing, message });
+        sounds.chatNotification();
+      }
+    };
+
     socket.on('side_bets_list', handleBetsList);
     socket.on('side_bet_created', handleBetCreated);
     socket.on('side_bet_accepted', handleBetAccepted);
@@ -170,6 +238,7 @@ export default function SideBetsPanel({
     socket.on('side_bet_cancelled', handleBetCancelled);
     socket.on('side_bet_disputed', handleBetDisputed);
     socket.on('balance_updated', handleBalanceUpdated);
+    socket.on('side_bet_prompt_resolution', handlePromptResolution);
 
     return () => {
       socket.off('side_bets_list', handleBetsList);
@@ -179,6 +248,7 @@ export default function SideBetsPanel({
       socket.off('side_bet_cancelled', handleBetCancelled);
       socket.off('side_bet_disputed', handleBetDisputed);
       socket.off('balance_updated', handleBalanceUpdated);
+      socket.off('side_bet_prompt_resolution', handlePromptResolution);
     };
   }, [socket, playerName, onOpenBetsCountChange]);
 
@@ -211,14 +281,48 @@ export default function SideBetsPanel({
   const openBets = bets.filter(b => b.status === 'open' && b.creatorName !== playerName);
   const myOpenBets = bets.filter(b => b.status === 'open' && b.creatorName === playerName);
   const activeBets = bets.filter(b => b.status === 'active');
-  const resolvedBets = bets.filter(b => b.status === 'resolved' || b.status === 'disputed');
+  const resolvedBets = bets.filter(b => b.status === 'resolved' || b.status === 'disputed' || b.status === 'cancelled');
 
+  // Get bet description with context
   const getBetDescription = (bet: SideBet): string => {
     if (bet.betType === 'custom') {
       return bet.customDescription || 'Custom bet';
     }
     return PRESET_LABELS[bet.presetType || ''] || bet.presetType || 'Preset bet';
   };
+
+  // Get resolution timing badge for custom bets
+  const getResolutionTimingBadge = (bet: SideBet) => {
+    if (bet.betType !== 'custom' || !bet.resolutionTiming) return null;
+    const timing = RESOLUTION_TIMING_LABELS[bet.resolutionTiming];
+    if (!timing) return null;
+    return (
+      <span className={`inline-flex items-center gap-1 text-xs ${timing.color}`}>
+        <span>{timing.icon}</span>
+        <span>{timing.label}</span>
+        {bet.resolutionTiming === 'trick' && bet.trickNumber && (
+          <span className="text-[var(--color-text-secondary)]">(Trick {bet.trickNumber})</span>
+        )}
+        {bet.resolutionTiming === 'round' && bet.roundNumber && (
+          <span className="text-[var(--color-text-secondary)]">(R{bet.roundNumber})</span>
+        )}
+      </span>
+    );
+  };
+
+  // Handle prompt resolution action
+  const handlePromptResolve = useCallback((creatorWon: boolean) => {
+    if (!resolutionPrompt) return;
+    handleResolveBet(resolutionPrompt.bet.id, creatorWon);
+    setResolutionPrompt(null);
+  }, [resolutionPrompt, handleResolveBet]);
+
+  const handlePromptDispute = useCallback(() => {
+    if (!resolutionPrompt) return;
+    handleDisputeBet(resolutionPrompt.bet.id);
+    setResolutionPrompt(null);
+  }, [resolutionPrompt, handleDisputeBet]);
+
 
   return (
     <>
@@ -249,8 +353,32 @@ export default function SideBetsPanel({
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="flex border-b border-[var(--color-border-default)]">
+          <button
+            onClick={() => setActiveTab('active')}
+            className={`flex-1 py-2 px-4 text-sm font-medium transition-colors ${
+              activeTab === 'active'
+                ? 'text-yellow-500 border-b-2 border-yellow-500'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+            }`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setActiveTab('history')}
+            className={`flex-1 py-2 px-4 text-sm font-medium transition-colors ${
+              activeTab === 'history'
+                ? 'text-yellow-500 border-b-2 border-yellow-500'
+                : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+            }`}
+          >
+            History
+          </button>
+        </div>
+
         {/* Content */}
-        <div className="h-[calc(100%-8rem)] overflow-y-auto p-4 space-y-4">
+        <div className="h-[calc(100%-10rem)] overflow-y-auto p-4 space-y-4">
           {/* Notification */}
           {notification && (
             <div
@@ -266,6 +394,9 @@ export default function SideBetsPanel({
             </div>
           )}
 
+          {/* Active Tab Content */}
+          {activeTab === 'active' && (
+            <>
           {/* Open bets to accept */}
           {openBets.length > 0 && (
             <section>
@@ -286,12 +417,12 @@ export default function SideBetsPanel({
                         🪙 {bet.amount}
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--color-text-primary)] mb-2">
+                    <p className="text-sm text-[var(--color-text-primary)] mb-1">
                       {getBetDescription(bet)}
                     </p>
                     {bet.prediction && (
                       <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-                        Prediction: {bet.prediction}
+                        {bet.creatorName} bets: <span className="text-[var(--color-text-primary)] font-medium">{formatTeamPrediction(bet.prediction, playerTeamId, isSpectator)}</span>
                       </p>
                     )}
                     <button
@@ -299,7 +430,7 @@ export default function SideBetsPanel({
                       disabled={balance < bet.amount}
                       className="w-full py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
                     >
-                      {balance < bet.amount ? 'Not enough coins' : 'Accept Bet'}
+                      {balance < bet.amount ? 'Not enough coins' : 'Accept Bet (opposite side)'}
                     </button>
                   </div>
                 ))}
@@ -327,9 +458,14 @@ export default function SideBetsPanel({
                         🪙 {bet.amount}
                       </span>
                     </div>
-                    <p className="text-sm text-[var(--color-text-primary)] mb-2">
+                    <p className="text-sm text-[var(--color-text-primary)] mb-1">
                       {getBetDescription(bet)}
                     </p>
+                    {bet.prediction && (
+                      <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                        Your bet: <span className="text-yellow-400 font-medium">{formatTeamPrediction(bet.prediction, playerTeamId, isSpectator)}</span>
+                      </p>
+                    )}
                     <button
                       onClick={() => handleCancelBet(bet.id)}
                       className="w-full py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 text-sm rounded border border-red-500/30 transition-colors"
@@ -353,6 +489,8 @@ export default function SideBetsPanel({
                   const isParticipant =
                     bet.creatorName === playerName || bet.acceptorName === playerName;
                   const isCustom = bet.betType === 'custom';
+                  const isCreator = bet.creatorName === playerName;
+                  const creatorPrediction = formatTeamPrediction(bet.prediction, playerTeamId, isSpectator);
 
                   return (
                     <div
@@ -367,9 +505,24 @@ export default function SideBetsPanel({
                           🪙 {bet.amount * 2}
                         </span>
                       </div>
-                      <p className="text-sm text-[var(--color-text-primary)] mb-2">
+                      <p className="text-sm text-[var(--color-text-primary)] mb-1">
                         {getBetDescription(bet)}
                       </p>
+                      {/* Resolution timing badge for custom bets */}
+                      {getResolutionTimingBadge(bet) && (
+                        <div className="mb-2">
+                          {getResolutionTimingBadge(bet)}
+                        </div>
+                      )}
+                      {bet.prediction && isParticipant && (
+                        <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                          {isCreator ? (
+                            <>You bet: <span className="text-green-400 font-medium">{creatorPrediction}</span></>
+                          ) : (
+                            <>You bet against: <span className="text-purple-400 font-medium">{creatorPrediction}</span></>
+                          )}
+                        </p>
+                      )}
 
                       {/* Manual resolution for custom bets */}
                       {isCustom && isParticipant && (
@@ -405,43 +558,99 @@ export default function SideBetsPanel({
             </section>
           )}
 
-          {/* Recent resolved */}
-          {resolvedBets.length > 0 && (
-            <section>
-              <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-                Recent Results
-              </h3>
-              <div className="space-y-2">
-                {resolvedBets.slice(0, 5).map(bet => (
-                  <div
-                    key={bet.id}
-                    className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border-default)] opacity-75"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-[var(--color-text-secondary)]">
-                        {getBetDescription(bet)}
-                      </span>
-                      <span
-                        className={`text-xs font-medium ${
-                          bet.status === 'disputed' ? 'text-gray-400' : 'text-green-400'
-                        }`}
-                      >
-                        {bet.status === 'disputed' ? 'Refunded' : 'Resolved'}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Empty state */}
-          {bets.length === 0 && (
+          {/* Empty state for active tab */}
+          {openBets.length === 0 && myOpenBets.length === 0 && activeBets.length === 0 && (
             <div className="text-center py-8 text-[var(--color-text-secondary)]">
               <span className="text-4xl mb-2 block">🎲</span>
-              <p className="text-sm">No bets yet</p>
+              <p className="text-sm">No active bets</p>
               <p className="text-xs mt-1">Create a bet to get started!</p>
             </div>
+          )}
+            </>
+          )}
+
+          {/* History Tab Content */}
+          {activeTab === 'history' && (
+            <>
+              {resolvedBets.length > 0 ? (
+                <div className="space-y-2">
+                  {resolvedBets.map(bet => {
+                    const isWinner = bet.status === 'resolved' &&
+                      ((bet.result === true && bet.creatorName === playerName) ||
+                       (bet.result === false && bet.acceptorName === playerName));
+                    const isLoser = bet.status === 'resolved' &&
+                      ((bet.result === true && bet.acceptorName === playerName) ||
+                       (bet.result === false && bet.creatorName === playerName));
+                    const wasParticipant = bet.creatorName === playerName || bet.acceptorName === playerName;
+
+                    return (
+                      <div
+                        key={bet.id}
+                        className={`p-3 bg-[var(--color-bg-tertiary)] rounded-lg border ${
+                          isWinner
+                            ? 'border-green-500/50'
+                            : isLoser
+                            ? 'border-red-500/50'
+                            : bet.status === 'disputed'
+                            ? 'border-gray-500/50'
+                            : bet.status === 'cancelled'
+                            ? 'border-yellow-500/30'
+                            : 'border-[var(--color-border-default)]'
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="text-sm text-[var(--color-text-primary)]">
+                            {getBetDescription(bet)}
+                          </span>
+                          <span className="text-yellow-500 font-medium text-sm">
+                            🪙 {bet.status === 'cancelled' ? bet.amount : bet.amount * 2}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-[var(--color-text-secondary)]">
+                            {bet.creatorName} vs {bet.acceptorName || '?'}
+                          </span>
+                          <span
+                            className={`text-xs font-medium ${
+                              bet.status === 'disputed'
+                                ? 'text-gray-400'
+                                : bet.status === 'cancelled'
+                                ? 'text-yellow-400'
+                                : isWinner
+                                ? 'text-green-400'
+                                : isLoser
+                                ? 'text-red-400'
+                                : 'text-blue-400'
+                            }`}
+                          >
+                            {bet.status === 'disputed'
+                              ? 'Disputed (Refunded)'
+                              : bet.status === 'cancelled'
+                              ? 'Cancelled'
+                              : wasParticipant
+                              ? isWinner
+                                ? `+${bet.amount * 2} (Won)`
+                                : `-${bet.amount} (Lost)`
+                              : 'Resolved'}
+                          </span>
+                        </div>
+                        {bet.resolvedAt && (
+                          <div className="text-xs text-[var(--color-text-secondary)] mt-1 opacity-75">
+                            {new Date(bet.resolvedAt).toLocaleString()}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-[var(--color-text-secondary)]">
+                  <span className="text-4xl mb-2 block">📜</span>
+                  <p className="text-sm">No bet history</p>
+                  <p className="text-xs mt-1">Completed bets will appear here</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -464,9 +673,80 @@ export default function SideBetsPanel({
           playerName={playerName}
           playerTeamId={playerTeamId}
           isWithoutTrump={isWithoutTrump}
+          isSpectator={isSpectator}
           balance={balance}
           onClose={() => setShowCreateModal(false)}
         />
+      )}
+
+      {/* Resolution Prompt Modal - appears when timing triggers */}
+      {resolutionPrompt && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setResolutionPrompt(null)}
+          />
+          <div
+            className="relative bg-[var(--color-bg-secondary)] rounded-xl border-2 border-yellow-500/50 shadow-2xl max-w-md w-full p-6 animate-pulse-once"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="text-center mb-4">
+              <span className="text-4xl">⏰</span>
+              <h3 className="text-lg font-bold text-[var(--color-text-primary)] mt-2">
+                Time to Resolve Your Bet!
+              </h3>
+              <p className="text-sm text-yellow-500 mt-1">
+                {resolutionPrompt.message}
+              </p>
+            </div>
+
+            <div className="bg-[var(--color-bg-tertiary)] rounded-lg p-4 mb-4">
+              <p className="text-sm text-[var(--color-text-primary)] font-medium">
+                "{resolutionPrompt.bet.customDescription}"
+              </p>
+              <div className="flex justify-between items-center mt-2 text-xs">
+                <span className="text-[var(--color-text-secondary)]">
+                  {resolutionPrompt.bet.creatorName} vs {resolutionPrompt.bet.acceptorName}
+                </span>
+                <span className="text-yellow-500 font-medium">
+                  🪙 {resolutionPrompt.bet.amount * 2} pot
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <p className="text-xs text-[var(--color-text-secondary)] text-center mb-1">
+                Who won this bet?
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePromptResolve(resolutionPrompt.bet.creatorName === playerName)}
+                  className="flex-1 py-3 bg-green-600 hover:bg-green-500 text-white font-medium rounded-lg transition-colors"
+                >
+                  ✓ I Won
+                </button>
+                <button
+                  onClick={() => handlePromptResolve(resolutionPrompt.bet.creatorName !== playerName)}
+                  className="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white font-medium rounded-lg transition-colors"
+                >
+                  ✗ I Lost
+                </button>
+              </div>
+              <button
+                onClick={handlePromptDispute}
+                className="w-full py-2 bg-gray-600 hover:bg-gray-500 text-white text-sm rounded-lg transition-colors mt-1"
+              >
+                Dispute (Refund Both)
+              </button>
+              <button
+                onClick={() => setResolutionPrompt(null)}
+                className="w-full py-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-xs"
+              >
+                Decide Later
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Overlay when panel is open - reduced opacity */}

@@ -540,6 +540,99 @@ class SoundManager {
     });
   }
 
+  // Side Bet Won - coins/jackpot sound
+  playSideBetWon() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Cascading coin sounds with shimmer
+    const coinFreqs = [800, 1000, 1200, 1400, 1600];
+    coinFreqs.forEach((freq, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      const delay = index * 0.06;
+      osc.frequency.setValueAtTime(freq, now + delay);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.9, now + delay + 0.1);
+
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.25, now + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.2);
+
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.2);
+    });
+
+    // Add a triumphant chord at the end
+    setTimeout(() => {
+      if (!this.audioContext || this.audioContext.state === 'closed') return;
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      // Major chord: C5, E5, G5
+      [523, 659, 784].forEach((freq) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(this.masterVolume * 0.2, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.4);
+      });
+    }, 300);
+  }
+
+  // Side Bet Lost - sad descending tone
+  playSideBetLost() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Descending minor notes with wobble
+    const notes = [
+      { freq: 440, delay: 0 },      // A4
+      { freq: 349, delay: 0.15 },   // F4
+      { freq: 294, delay: 0.3 },    // D4
+    ];
+
+    notes.forEach(({ freq, delay }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.frequency.setValueAtTime(freq, now + delay);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.85, now + delay + 0.2);
+
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.2, now + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.25);
+
+      osc.type = 'sawtooth';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.25);
+    });
+  }
+
   // Level Up - triumphant fanfare
   playLevelUp() {
     if (!this.enabled) return;
@@ -624,6 +717,9 @@ export const sounds = {
   // Sprint 21: XP/Rewards sounds
   xpGain: () => soundManager.playXpGain(),
   levelUp: () => soundManager.playLevelUp(),
+  // Side Bet sounds
+  sideBetWon: () => soundManager.playSideBetWon(),
+  sideBetLost: () => soundManager.playSideBetLost(),
   setEnabled: (enabled: boolean) => soundManager.setEnabled(enabled),
   setVolume: (volume: number) => soundManager.setVolume(volume),
   isEnabled: () => soundManager['enabled'],

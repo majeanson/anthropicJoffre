@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T13:10:21.604Z",
+  "buildDate": "2025-12-05T14:19:27.480Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Add side_bets database migration\n\nCreates migration 027_side_bets.sql:\n- side_bets table for storing bet data\n- cosmetic_currency column in player_stats (default 100 coins)\n- Side bet tracking columns (won, lost, coins_won, coins_lost)\n- Indexes for efficient queries\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "cd30338",
-    "commitDate": "2025-12-05 08:04:29 -0500",
+    "commitMessage": "feat: Improve side bet UX with team labels and context-aware options\n\n- Changed \"Team 1\" / \"Team 2\" to \"My Team\" / \"Their Team\" in bet choices\n- Predictions are mapped to actual team IDs when submitting\n- \"Without Trump\" bet only shows when round is played without trump\n- \"First Trump\" bet only shows when there IS a trump suit\n- Pass playerTeamId and isWithoutTrump through component chain\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "b207f95",
+    "commitDate": "2025-12-05 08:31:35 -0500",
     "branch": "main"
   },
   "futureTodos": [

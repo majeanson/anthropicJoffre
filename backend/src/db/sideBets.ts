@@ -12,6 +12,7 @@ import type {
   PresetBetType,
   SideBetStatus,
   SideBetResolution,
+  ResolutionTiming,
 } from '../types/game';
 
 // ==================== SIDE BET CRUD ====================
@@ -27,17 +28,19 @@ export const createSideBet = async (
   options: {
     presetType?: PresetBetType;
     customDescription?: string;
+    resolutionTiming?: ResolutionTiming;
     prediction?: string;
     targetPlayer?: string;
     roundNumber?: number;
+    trickNumber?: number;
   }
 ): Promise<SideBet | null> => {
   const text = `
     INSERT INTO side_bets (
-      game_id, bet_type, preset_type, custom_description,
-      creator_name, amount, prediction, target_player, round_number
+      game_id, bet_type, preset_type, custom_description, resolution_timing,
+      creator_name, amount, prediction, target_player, round_number, trick_number
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     RETURNING *
   `;
 
@@ -46,11 +49,13 @@ export const createSideBet = async (
     betType,
     options.presetType || null,
     options.customDescription || null,
+    options.resolutionTiming || 'manual',
     creatorName,
     amount,
     options.prediction || null,
     options.targetPlayer || null,
     options.roundNumber || null,
+    options.trickNumber || null,
   ];
 
   const result = await query(text, values);
@@ -288,22 +293,60 @@ export const transferCoins = async (
 
 /**
  * Update side bet statistics for a player
+ * Also updates bet streak tracking
  */
 export const updateSideBetStats = async (
   playerName: string,
   won: boolean,
   coinsWonOrLost: number
-): Promise<void> => {
+): Promise<{ currentStreak: number; bestStreak: number }> => {
+  // First, update the streak: if won, increment; if lost, reset to 0
+  // Also update best_bet_streak if current exceeds it
   const text = `
     UPDATE player_stats
     SET side_bets_won = side_bets_won + CASE WHEN $2 THEN 1 ELSE 0 END,
         side_bets_lost = side_bets_lost + CASE WHEN $2 THEN 0 ELSE 1 END,
         side_bets_coins_won = side_bets_coins_won + CASE WHEN $2 THEN $3 ELSE 0 END,
         side_bets_coins_lost = side_bets_coins_lost + CASE WHEN $2 THEN 0 ELSE $3 END,
+        current_bet_streak = CASE WHEN $2 THEN current_bet_streak + 1 ELSE 0 END,
+        best_bet_streak = CASE
+          WHEN $2 AND current_bet_streak + 1 > best_bet_streak
+          THEN current_bet_streak + 1
+          ELSE best_bet_streak
+        END,
         updated_at = CURRENT_TIMESTAMP
     WHERE player_name = $1
+    RETURNING current_bet_streak, best_bet_streak
   `;
-  await query(text, [playerName, won, coinsWonOrLost]);
+  const result = await query(text, [playerName, won, coinsWonOrLost]);
+  return {
+    currentStreak: result.rows[0]?.current_bet_streak ?? 0,
+    bestStreak: result.rows[0]?.best_bet_streak ?? 0,
+  };
+};
+
+/**
+ * Get player's current bet streak for multiplier calculation
+ */
+export const getPlayerBetStreak = async (playerName: string): Promise<number> => {
+  const text = `
+    SELECT COALESCE(current_bet_streak, 0) as streak
+    FROM player_stats
+    WHERE player_name = $1
+  `;
+  const result = await query(text, [playerName]);
+  return result.rows[0]?.streak ?? 0;
+};
+
+/**
+ * Calculate streak multiplier
+ * 1x for 0-2 streak, 1.25x for 3-4, 1.5x for 5-6, 2x for 7+
+ */
+export const calculateStreakMultiplier = (streak: number): number => {
+  if (streak >= 7) return 2.0;
+  if (streak >= 5) return 1.5;
+  if (streak >= 3) return 1.25;
+  return 1.0;
 };
 
 // ==================== HELPER FUNCTIONS ====================
@@ -318,6 +361,7 @@ function mapRowToSideBet(row: Record<string, unknown>): SideBet {
     betType: row.bet_type as SideBetType,
     presetType: row.preset_type as PresetBetType | undefined,
     customDescription: row.custom_description as string | undefined,
+    resolutionTiming: row.resolution_timing as ResolutionTiming | undefined,
     creatorName: row.creator_name as string,
     acceptorName: row.acceptor_name as string | undefined,
     amount: row.amount as number,
@@ -327,6 +371,7 @@ function mapRowToSideBet(row: Record<string, unknown>): SideBet {
     result: row.result as boolean | undefined,
     resolvedBy: row.resolved_by as SideBetResolution | undefined,
     roundNumber: row.round_number as number | undefined,
+    trickNumber: row.trick_number as number | undefined,
     createdAt: new Date(row.created_at as string),
     acceptedAt: row.accepted_at ? new Date(row.accepted_at as string) : undefined,
     resolvedAt: row.resolved_at ? new Date(row.resolved_at as string) : undefined,

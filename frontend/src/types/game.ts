@@ -313,6 +313,11 @@ export type SideBetStatus = 'open' | 'active' | 'resolved' | 'cancelled' | 'expi
 export type SideBetResolution = 'auto' | 'manual' | 'expired' | 'refunded';
 
 /**
+ * Resolution timing options for custom bets
+ */
+export type ResolutionTiming = 'trick' | 'round' | 'game' | 'manual';
+
+/**
  * Side bet between players/spectators
  */
 export interface SideBet {
@@ -321,6 +326,7 @@ export interface SideBet {
   betType: SideBetType;
   presetType?: PresetBetType;        // For preset bets
   customDescription?: string;         // For custom bets (free text)
+  resolutionTiming?: ResolutionTiming; // When to resolve custom bet (trick/round/game/manual)
   creatorName: string;                // Who created the bet
   acceptorName?: string;              // Who accepted (null if open)
   amount: number;                     // Coins wagered (1 to creator's balance)
@@ -330,6 +336,7 @@ export interface SideBet {
   result?: boolean;                   // null until resolved, true if creator won
   resolvedBy?: SideBetResolution;     // How it was resolved
   roundNumber?: number;               // Which round the bet applies to (null = whole game)
+  trickNumber?: number;               // Which trick the bet was created on (for trick-timed resolution)
   createdAt: Date;
   acceptedAt?: Date;
   resolvedAt?: Date;
@@ -343,6 +350,7 @@ export interface CreateSideBetPayload {
   betType: SideBetType;
   presetType?: PresetBetType;
   customDescription?: string;
+  resolutionTiming?: ResolutionTiming;
   amount: number;
   prediction?: string;
   targetPlayer?: string;
@@ -367,6 +375,9 @@ export interface SideBetResolvedEvent {
   winnerName: string;
   loserName: string;
   coinsAwarded: number;
+  streakBonus?: number;       // Bonus coins from streak multiplier
+  winnerStreak?: number;      // Winner's new streak count
+  streakMultiplier?: number;  // Applied multiplier (1.0, 1.25, 1.5, 2.0)
 }
 
 export interface SideBetCancelledEvent {
@@ -382,4 +393,10 @@ export interface SideBetDisputedEvent {
 
 export interface SideBetsListEvent {
   bets: SideBet[];
+}
+
+export interface SideBetPromptResolutionEvent {
+  bet: SideBet;
+  timing: 'trick' | 'round' | 'game';
+  message: string;
 }

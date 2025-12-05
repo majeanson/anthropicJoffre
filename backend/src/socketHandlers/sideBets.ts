@@ -36,6 +36,8 @@ import {
   updatePlayerBalance,
   transferCoins,
   updateSideBetStats,
+  getPlayerBetStreak,
+  calculateStreakMultiplier,
 } from '../db/sideBets';
 import { Logger } from 'winston';
 
@@ -44,6 +46,7 @@ import { Logger } from 'winston';
  */
 export interface SideBetsHandlersDependencies {
   games: Map<string, GameState>;
+  spectatorNames: Map<string, string>; // socket.id -> spectator name
   io: Server;
   logger: Logger;
   errorBoundaries: import('../middleware/errorBoundary').ErrorBoundaries;
@@ -63,14 +66,14 @@ function findPlayerBySocket(socket: Socket, games: Map<string, GameState>, gameI
 }
 
 export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersDependencies): void {
-  const { games, io, logger } = deps;
+  const { games, spectatorNames, io, logger } = deps;
 
   // ============================================================================
   // create_side_bet - Create a new side bet
   // ============================================================================
   socket.on('create_side_bet', async (payload: CreateSideBetPayload) => {
     try {
-      const { gameId, betType, presetType, customDescription, amount, prediction, targetPlayer, roundNumber } = payload;
+      const { gameId, betType, presetType, customDescription, resolutionTiming, amount, prediction, targetPlayer, roundNumber } = payload;
 
       const game = games.get(gameId);
       if (!game) {
@@ -80,11 +83,15 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
 
       // Find creator (player or spectator)
       const { player } = findPlayerBySocket(socket, games, gameId);
-      const creatorName = player?.name;
+      let creatorName = player?.name;
+
+      // Check if spectator
+      if (!creatorName) {
+        creatorName = spectatorNames.get(socket.id);
+      }
 
       if (!creatorName) {
-        // Check if spectator (they may have a name stored differently)
-        socket.emit('error', { message: 'You must be a player or spectator to create bets' });
+        socket.emit('error', { message: 'You must be a player or named spectator to create bets' });
         return;
       }
 
@@ -119,13 +126,18 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
         return;
       }
 
+      // Calculate trick number for trick-timed resolution
+      const trickNumber = game.currentRoundTricks ? game.currentRoundTricks.length + 1 : 1;
+
       // Create the bet
       const bet = await createSideBet(gameId, creatorName, betType, amount, {
         presetType,
         customDescription,
+        resolutionTiming,
         prediction,
         targetPlayer,
-        roundNumber,
+        roundNumber: roundNumber ?? game.roundNumber,
+        trickNumber: resolutionTiming === 'trick' ? trickNumber : undefined,
       });
 
       if (!bet) {
@@ -162,12 +174,17 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
         return;
       }
 
-      // Find acceptor
+      // Find acceptor (player or spectator)
       const { player } = findPlayerBySocket(socket, games, gameId);
-      const acceptorName = player?.name;
+      let acceptorName = player?.name;
+
+      // Check if spectator
+      if (!acceptorName) {
+        acceptorName = spectatorNames.get(socket.id);
+      }
 
       if (!acceptorName) {
-        socket.emit('error', { message: 'You must be a player to accept bets' });
+        socket.emit('error', { message: 'You must be a player or named spectator to accept bets' });
         return;
       }
 
@@ -233,10 +250,15 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
       const { gameId, betId } = payload;
 
       const { player } = findPlayerBySocket(socket, games, gameId);
-      const playerName = player?.name;
+      let playerName = player?.name;
+
+      // Check if spectator
+      if (!playerName) {
+        playerName = spectatorNames.get(socket.id);
+      }
 
       if (!playerName) {
-        socket.emit('error', { message: 'Player not found' });
+        socket.emit('error', { message: 'Player or spectator not found' });
         return;
       }
 
@@ -284,10 +306,15 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
       const { gameId, betId, creatorWon } = payload;
 
       const { player } = findPlayerBySocket(socket, games, gameId);
-      const playerName = player?.name;
+      let playerName = player?.name;
+
+      // Check if spectator
+      if (!playerName) {
+        playerName = spectatorNames.get(socket.id);
+      }
 
       if (!playerName) {
-        socket.emit('error', { message: 'Player not found' });
+        socket.emit('error', { message: 'Player or spectator not found' });
         return;
       }
 
@@ -321,32 +348,41 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
         return;
       }
 
-      // Transfer coins
+      // Transfer coins with streak multiplier
       const winnerName = creatorWon ? bet.creatorName : bet.acceptorName!;
       const loserName = creatorWon ? bet.acceptorName! : bet.creatorName;
-      const totalPot = bet.amount * 2;
+
+      // Get winner's current streak before updating
+      const currentStreak = await getPlayerBetStreak(winnerName);
+      const streakMultiplier = calculateStreakMultiplier(currentStreak);
+
+      // Apply streak multiplier to winnings (base pot + bonus from streak)
+      const basePot = bet.amount * 2;
+      const bonus = Math.floor(basePot * (streakMultiplier - 1));
+      const totalPot = basePot + bonus;
 
       await updatePlayerBalance(winnerName, totalPot);
-      await updateSideBetStats(winnerName, true, bet.amount);
+      const winnerStats = await updateSideBetStats(winnerName, true, bet.amount);
       await updateSideBetStats(loserName, false, bet.amount);
 
-      logger.info('Custom bet resolved', { betId, gameId, winnerName, amount: totalPot });
+      logger.info('Custom bet resolved', {
+        betId, gameId, winnerName, amount: totalPot,
+        streak: winnerStats.currentStreak, multiplier: streakMultiplier
+      });
 
-      // Notify all
-      io.to(gameId).emit('side_bet_resolved', {
+      // Notify all with streak info
+      const resolvedEvent = {
         betId,
         result: creatorWon,
         winnerName,
         loserName,
         coinsAwarded: totalPot,
-      });
-      io.to(`${gameId}-spectators`).emit('side_bet_resolved', {
-        betId,
-        result: creatorWon,
-        winnerName,
-        loserName,
-        coinsAwarded: totalPot,
-      });
+        streakBonus: bonus,
+        winnerStreak: winnerStats.currentStreak,
+        streakMultiplier,
+      };
+      io.to(gameId).emit('side_bet_resolved', resolvedEvent);
+      io.to(`${gameId}-spectators`).emit('side_bet_resolved', resolvedEvent);
     } catch (error) {
       logger.warn('resolve_custom_bet failed (database may not be ready)', { error });
       socket.emit('error', { message: 'Side bets are not available yet. Database setup required.' });
@@ -361,10 +397,15 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
       const { gameId, betId } = payload;
 
       const { player } = findPlayerBySocket(socket, games, gameId);
-      const playerName = player?.name;
+      let playerName = player?.name;
+
+      // Check if spectator
+      if (!playerName) {
+        playerName = spectatorNames.get(socket.id);
+      }
 
       if (!playerName) {
-        socket.emit('error', { message: 'Player not found' });
+        socket.emit('error', { message: 'Player or spectator not found' });
         return;
       }
 
@@ -428,18 +469,25 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
   });
 
   // ============================================================================
-  // get_balance - Get player's coin balance
+  // get_balance - Get player's or spectator's coin balance
   // ============================================================================
   socket.on('get_balance', async ({ gameId }: { gameId: string }) => {
     try {
       const { player } = findPlayerBySocket(socket, games, gameId);
-      if (!player) {
-        // Return default balance instead of error
+      let playerName = player?.name;
+
+      // Check if spectator
+      if (!playerName) {
+        playerName = spectatorNames.get(socket.id);
+      }
+
+      if (!playerName) {
+        // Anonymous spectator - return default balance
         socket.emit('balance_updated', { balance: 100 });
         return;
       }
 
-      const balance = await getPlayerBalance(player.name);
+      const balance = await getPlayerBalance(playerName);
       socket.emit('balance_updated', { balance });
     } catch (error) {
       // Table may not exist yet - return default balance gracefully
@@ -449,11 +497,94 @@ export function registerSideBetsHandlers(socket: Socket, deps: SideBetsHandlersD
   });
 }
 
-// ==================== AUTO-RESOLUTION HELPERS ====================
+// ==================== AUTO-RESOLUTION & PROMPTING HELPERS ====================
+
+/**
+ * Get active custom bets that need prompting for resolution
+ * Called at trick end, round end, or game end
+ */
+export async function getCustomBetsForPrompting(
+  gameId: string,
+  timing: 'trick' | 'round' | 'game',
+  currentRound?: number,
+  currentTrick?: number
+): Promise<SideBet[]> {
+  try {
+    const allBets = await getActiveSideBets(gameId);
+    return allBets.filter(bet => {
+      if (bet.betType !== 'custom') return false;
+      if (bet.resolutionTiming !== timing) return false;
+
+      // For trick-timed, check if this is the right trick
+      if (timing === 'trick' && bet.trickNumber !== undefined) {
+        return bet.trickNumber === currentTrick && bet.roundNumber === currentRound;
+      }
+
+      // For round-timed, check if this is the right round
+      if (timing === 'round' && bet.roundNumber !== undefined) {
+        return bet.roundNumber === currentRound;
+      }
+
+      return true;
+    });
+  } catch (error) {
+    console.debug('[SideBets] getCustomBetsForPrompting failed', error);
+    return [];
+  }
+}
+
+/**
+ * Prompt participants to resolve custom bets
+ * Emits 'side_bet_prompt_resolution' to both creator and acceptor
+ */
+export async function promptCustomBetResolution(
+  io: Server,
+  gameId: string,
+  timing: 'trick' | 'round' | 'game',
+  currentRound?: number,
+  currentTrick?: number
+): Promise<void> {
+  try {
+    const betsToPrompt = await getCustomBetsForPrompting(gameId, timing, currentRound, currentTrick);
+
+    for (const bet of betsToPrompt) {
+      // Emit to the game room - client will show prompt to participants
+      io.to(gameId).emit('side_bet_prompt_resolution', {
+        bet,
+        timing,
+        message: getPromptMessage(bet, timing),
+      });
+      io.to(`${gameId}-spectators`).emit('side_bet_prompt_resolution', {
+        bet,
+        timing,
+        message: getPromptMessage(bet, timing),
+      });
+    }
+  } catch (error) {
+    console.debug('[SideBets] promptCustomBetResolution failed', error);
+  }
+}
+
+function getPromptMessage(bet: SideBet, timing: 'trick' | 'round' | 'game'): string {
+  const timingLabels = {
+    trick: 'Trick ended',
+    round: 'Round ended',
+    game: 'Game ended',
+  };
+  return `${timingLabels[timing]}! Time to resolve: "${bet.customDescription}"`;
+}
 
 /**
  * Auto-resolve preset bets when game events occur
  * Called from game logic (trick resolved, round ended, etc.)
+ *
+ * For team-based bets (red_zero_winner, brown_zero_victim, first_trump_played):
+ *   - winningTeam is the team that "wins" (gets red 0, gets brown 0, plays first trump)
+ *   - Prediction is 'team1' or 'team2'
+ *
+ * For boolean bets (bet_made, without_trump_success):
+ *   - winningTeam is 1 if the outcome is TRUE (bet was made), 2 if FALSE
+ *   - Prediction is 'true' or 'false'
  */
 export async function autoResolveBets(
   io: Server,
@@ -466,36 +597,52 @@ export async function autoResolveBets(
     const bets = await getBetsForAutoResolution(gameId, presetType, roundNumber);
 
     for (const bet of bets) {
-      // Determine winner based on prediction
-      const creatorWon = bet.prediction === `team${winningTeam}`;
+      // Determine winner based on prediction type
+      let creatorWon: boolean;
+
+      if (presetType === 'bet_made' || presetType === 'without_trump_success') {
+        // Boolean bets: winningTeam=1 means TRUE (bet made), winningTeam=2 means FALSE
+        const outcomeIsTrue = winningTeam === 1;
+        const creatorPredictedTrue = bet.prediction === 'true';
+        creatorWon = outcomeIsTrue === creatorPredictedTrue;
+      } else {
+        // Team bets: prediction matches the winning team
+        creatorWon = bet.prediction === `team${winningTeam}`;
+      }
 
       const resolvedBet = await resolveSideBet(bet.id, creatorWon, 'auto');
       if (!resolvedBet) continue;
 
-      // Transfer coins
+      // Transfer coins with streak multiplier
       const winnerName = creatorWon ? bet.creatorName : bet.acceptorName!;
       const loserName = creatorWon ? bet.acceptorName! : bet.creatorName;
-      const totalPot = bet.amount * 2;
+
+      // Get winner's current streak before updating
+      const currentStreak = await getPlayerBetStreak(winnerName);
+      const streakMultiplier = calculateStreakMultiplier(currentStreak);
+
+      // Apply streak multiplier to winnings
+      const basePot = bet.amount * 2;
+      const bonus = Math.floor(basePot * (streakMultiplier - 1));
+      const totalPot = basePot + bonus;
 
       await updatePlayerBalance(winnerName, totalPot);
-      await updateSideBetStats(winnerName, true, bet.amount);
+      const winnerStats = await updateSideBetStats(winnerName, true, bet.amount);
       await updateSideBetStats(loserName, false, bet.amount);
 
-      // Notify all
-      io.to(gameId).emit('side_bet_resolved', {
+      // Notify all with streak info
+      const resolvedEvent = {
         betId: bet.id,
         result: creatorWon,
         winnerName,
         loserName,
         coinsAwarded: totalPot,
-      });
-      io.to(`${gameId}-spectators`).emit('side_bet_resolved', {
-        betId: bet.id,
-        result: creatorWon,
-        winnerName,
-        loserName,
-        coinsAwarded: totalPot,
-      });
+        streakBonus: bonus,
+        winnerStreak: winnerStats.currentStreak,
+        streakMultiplier,
+      };
+      io.to(gameId).emit('side_bet_resolved', resolvedEvent);
+      io.to(`${gameId}-spectators`).emit('side_bet_resolved', resolvedEvent);
     }
   } catch (error) {
     // Silently fail if database not ready - side bets are optional

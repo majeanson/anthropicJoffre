@@ -14,6 +14,7 @@ import { UnifiedChat } from '../UnifiedChat';
 import { GameHeader } from '../GameHeader';
 import { HowToPlay } from '../HowToPlay';
 import SideBetsPanel from '../SideBetsPanel';
+import { SideBetToast } from '../SideBetToast';
 import { ChatMessage, VoiceParticipant } from '../../types/game';
 import { GameState, Card as CardType } from '../../types/game';
 import { sounds } from '../../utils/sounds';
@@ -605,6 +606,15 @@ function PlayingPhaseComponent({
           isOpen={sideBetsOpen}
           onClose={() => setSideBetsOpen(false)}
           onOpenBetsCountChange={setOpenSideBetsCount}
+        />
+      )}
+
+      {/* Side Bet Toast Notifications - visible when panel is closed */}
+      {socket && (
+        <SideBetToast
+          socket={socket}
+          playerName={currentPlayerId}
+          enabled={!sideBetsOpen}
         />
       )}
     </div>

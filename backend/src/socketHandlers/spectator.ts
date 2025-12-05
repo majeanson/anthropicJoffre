@@ -17,6 +17,7 @@ import { Logger } from 'winston';
 export interface SpectatorHandlersDependencies {
   // State Maps
   games: Map<string, GameState>;
+  spectatorNames: Map<string, string>; // socket.id -> spectator name (for side bets)
 
   // Socket.io
   io: Server;
@@ -33,6 +34,7 @@ export interface SpectatorHandlersDependencies {
 export function registerSpectatorHandlers(socket: Socket, deps: SpectatorHandlersDependencies): void {
   const {
     games,
+    spectatorNames,
     io,
     logger,
     errorBoundaries,
@@ -50,6 +52,12 @@ export function registerSpectatorHandlers(socket: Socket, deps: SpectatorHandler
 
     // Join spectator room
     socket.join(`${gameId}-spectators`);
+
+    // Store spectator name for side bets (if provided)
+    if (spectatorName) {
+      spectatorNames.set(socket.id, spectatorName);
+    }
+
     console.log(`Spectator ${socket.id} (${spectatorName || 'Anonymous'}) joined game ${gameId}`);
 
     // Create spectator game state (hide player hands)
@@ -83,6 +91,10 @@ export function registerSpectatorHandlers(socket: Socket, deps: SpectatorHandler
   // ============================================================================
   socket.on('leave_spectate', errorBoundaries.gameAction('leave_spectate')(({ gameId }: { gameId: string }) => {
     socket.leave(`${gameId}-spectators`);
+
+    // Remove spectator name
+    spectatorNames.delete(socket.id);
+
     console.log(`Spectator ${socket.id} left game ${gameId}`);
 
     // Notify remaining players
