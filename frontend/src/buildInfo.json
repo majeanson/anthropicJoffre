@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T18:12:10.750Z",
+  "buildDate": "2025-12-05T18:16:16.953Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Add comprehensive social features - blocking, LFG status, friend expiration\n\n- Add player blocking system with database schema, backend handlers, and UI\n  - Block/unblock players from profile modal\n  - Blocks prevent friend requests and direct messages\n  - Blocking removes existing friendships and pending requests\n\n- Add \"Looking for Game\" (LFG) status feature\n  - Toggle in Online tab to signal you're looking for teammates\n  - LFG players display animated badge in online player list\n  - LFG status broadcasts to all connected clients\n\n- Add friend request expiration (30-day auto-expire)\n  - New expires_at column in friend_requests table\n  - Hourly scheduled task cleans up expired requests\n  - Cancel sent friend request functionality\n\n- Enhance notification center integration\n  - Add friend_request_accepted notification type\n  - Sync notification types between frontend and backend\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "1f83149",
-    "commitDate": "2025-12-05 13:06:43 -0500",
+    "commitMessage": "fix: LFG status now works and LoginStreak tooltip z-index\n\n- Add register_player socket event to track guest players in online list\n- Players are now registered when they enter their name in lobby\n- LFG handler now provides meaningful error messages\n- Fix LoginStreak tooltip z-index from z-50 to z-[10500] to appear above lobby UI\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "e3fcc1e",
+    "commitDate": "2025-12-05 13:12:43 -0500",
     "branch": "main"
   },
   "futureTodos": [

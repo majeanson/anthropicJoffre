@@ -201,16 +201,28 @@ export function SocialPanel({
       setIsLookingForGame(lookingForGame);
     };
 
+    const handleError = ({ message, context }: { message: string; context?: string }) => {
+      if (context === 'set_looking_for_game') {
+        alert(message);
+      }
+    };
+
     socket.on('looking_for_game_updated', handleLfgUpdated);
+    socket.on('error', handleError);
 
     return () => {
       socket.off('looking_for_game_updated', handleLfgUpdated);
+      socket.off('error', handleError);
     };
   }, [socket]);
 
   // Handle LFG toggle
   const handleToggleLfg = () => {
     if (!socket) return;
+    if (!playerName.trim()) {
+      alert('Please enter your name first to use Looking for Game');
+      return;
+    }
     socket.emit('set_looking_for_game', { lookingForGame: !isLookingForGame });
   };
 
