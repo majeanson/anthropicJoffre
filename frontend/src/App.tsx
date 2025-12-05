@@ -851,7 +851,7 @@ function AppContent() {
     return (
       <>
         <GlobalUI {...globalUIProps} />
-    
+
         <Lobby
           onCreateGame={handleCreateGame}
           onJoinGame={handleJoinGame}
@@ -869,6 +869,20 @@ function AppContent() {
           onShowProgress={() => setShowPersonalHub(true)}
           onShowWhyRegister={() => setShowWhyRegister(true)}
         />
+
+        {/* Bot Takeover Modal - for joining games that are full with bots */}
+        {botTakeoverModal && (
+          <ErrorBoundary componentName="BotTakeoverModal">
+            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+              <BotTakeoverModal
+                isOpen={!!botTakeoverModal}
+                availableBots={botTakeoverModal.availableBots}
+                onTakeOver={handleTakeOverBot}
+                onCancel={() => setBotTakeoverModal(null)}
+              />
+            </Suspense>
+          </ErrorBoundary>
+        )}
       </>
     );
   }
