@@ -130,41 +130,41 @@ export function BeginnerTutorial({
           return gameState.phase === 'team_selection';
 
         case 'betting_intro':
-          return gameState.phase === 'betting' && gameState.currentBets.length === 0;
+          return gameState.phase === 'betting' && (gameState.currentBets?.length || 0) === 0;
 
         case 'betting_decision':
           // Show when betting phase has at least one bet placed (so user can see the mechanics)
           return (
             gameState.phase === 'betting' &&
-            gameState.currentBets.length >= 1
+            (gameState.currentBets?.length || 0) >= 1
           );
 
         case 'playing_intro':
           return (
             gameState.phase === 'playing' &&
-            gameState.currentTrick.length === 0 &&
-            gameState.currentRoundTricks.length === 0
+            (gameState.currentTrick?.length || 0) === 0 &&
+            (gameState.currentRoundTricks?.length || 0) === 0
           );
 
         case 'playing_suit':
           return (
             gameState.phase === 'playing' &&
-            gameState.currentTrick.length > 0 &&
-            gameState.currentRoundTricks.length <= 1
+            (gameState.currentTrick?.length || 0) > 0 &&
+            (gameState.currentRoundTricks?.length || 0) <= 1
           );
 
         case 'playing_trump':
           return (
             gameState.phase === 'playing' &&
             gameState.trump !== null &&
-            gameState.currentRoundTricks.length === 1
+            (gameState.currentRoundTricks?.length || 0) === 1
           );
 
         case 'trick_complete':
           return (
             gameState.phase === 'playing' &&
-            gameState.currentTrick.length === 4 &&
-            gameState.currentRoundTricks.length === 1
+            (gameState.currentTrick?.length || 0) === 4 &&
+            (gameState.currentRoundTricks?.length || 0) === 1
           );
 
         case 'special_cards':
@@ -172,8 +172,8 @@ export function BeginnerTutorial({
           // Don't require the player to have a special card - just inform them
           return (
             gameState.phase === 'playing' &&
-            gameState.currentRoundTricks.length >= 2 &&
-            gameState.currentRoundTricks.length <= 4
+            (gameState.currentRoundTricks?.length || 0) >= 2 &&
+            (gameState.currentRoundTricks?.length || 0) <= 4
           );
 
         case 'round_summary':

@@ -56,6 +56,12 @@ export function ScoringPhase({
 
   // Check if round data is ready (prevents showing stale data during transition)
   useEffect(() => {
+    // Safety check: ensure roundHistory exists and has entries
+    if (!gameState.roundHistory || gameState.roundHistory.length === 0) {
+      setDataReady(false);
+      return;
+    }
+
     const latestRound = gameState.roundHistory[gameState.roundHistory.length - 1];
     const expectedRoundNumber = gameState.roundNumber;
 
@@ -94,8 +100,10 @@ export function ScoringPhase({
     socket.emit('player_ready', { gameId });
   };
 
-  // Get latest round statistics
-  const latestRound = gameState.roundHistory[gameState.roundHistory.length - 1];
+  // Get latest round statistics (with safety check)
+  const latestRound = gameState.roundHistory?.length > 0
+    ? gameState.roundHistory[gameState.roundHistory.length - 1]
+    : undefined;
   const statistics: RoundStatistics | undefined = latestRound?.statistics;
 
   return (

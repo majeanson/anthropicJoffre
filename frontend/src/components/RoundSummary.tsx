@@ -107,7 +107,10 @@ interface RoundSummaryProps {
 const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
   // ✅ CRITICAL: Check data BEFORE hooks to prevent "Rendered more hooks than during the previous render" error
   // Rules of Hooks: All early returns must happen BEFORE calling any hooks
-  const lastRound = gameState.roundHistory[gameState.roundHistory.length - 1];
+  // Safety check: ensure roundHistory exists and has entries
+  const lastRound = gameState.roundHistory?.length > 0
+    ? gameState.roundHistory[gameState.roundHistory.length - 1]
+    : undefined;
 
   // Early return BEFORE any hooks
   if (!lastRound) {
@@ -127,6 +130,12 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
 
   // Check if round data is ready (prevents showing stale data during transition)
   useEffect(() => {
+    // Safety check: ensure roundHistory exists and has entries
+    if (!gameState.roundHistory || gameState.roundHistory.length === 0) {
+      setDataReady(false);
+      return;
+    }
+
     const latestRound = gameState.roundHistory[gameState.roundHistory.length - 1];
     const expectedRoundNumber = gameState.roundNumber;
 

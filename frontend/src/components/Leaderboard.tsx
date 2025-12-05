@@ -22,8 +22,9 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
   const team2Players = useMemo(() => gameState.players.filter(p => p.teamId === 2), [gameState.players]);
 
   // Memoize reversed round history to avoid creating new array on every render
+  // Safety check: ensure roundHistory exists
   const reversedRoundHistory = useMemo(
-    () => gameState.roundHistory.slice().reverse(),
+    () => (gameState.roundHistory || []).slice().reverse(),
     [gameState.roundHistory]
   );
 
@@ -278,7 +279,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
             </section>
           )}
 
-          {gameState.roundHistory.length === 0 && (
+          {(!gameState.roundHistory || gameState.roundHistory.length === 0) && (
             <section>
               <UICard variant="bordered" size="lg" className="bg-parchment-100 dark:bg-gray-700 text-center">
                 <p className="text-umber-600 dark:text-gray-400 text-lg">
