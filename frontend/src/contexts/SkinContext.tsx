@@ -148,7 +148,13 @@ interface SkinContextValue {
   /** Start previewing a card skin (applies visually but doesn't save) */
   startPreviewCardSkin: (id: CardSkinId) => void;
 
-  /** Stop previewing and restore actual skin */
+  /** Stop previewing UI skin only */
+  stopPreviewSkin: () => void;
+
+  /** Stop previewing card skin only */
+  stopPreviewCardSkin: () => void;
+
+  /** Stop all previews and restore actual skins */
   stopPreview: () => void;
 
   /** Whether we're currently in preview mode */
@@ -408,6 +414,14 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
     setPreviewCardSkinId(id);
   }, []);
 
+  const stopPreviewSkin = useCallback(() => {
+    setPreviewSkinId(null);
+  }, []);
+
+  const stopPreviewCardSkin = useCallback(() => {
+    setPreviewCardSkinId(null);
+  }, []);
+
   const stopPreview = useCallback(() => {
     setPreviewSkinId(null);
     setPreviewCardSkinId(null);
@@ -448,13 +462,15 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
       previewCardSkinId,
       startPreviewSkin,
       startPreviewCardSkin,
+      stopPreviewSkin,
+      stopPreviewCardSkin,
       stopPreview,
       isPreviewActive,
       // Cosmetic currency
       cosmeticCurrency,
       setCosmeticCurrency,
     }),
-    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded, previewSkinId, previewCardSkinId, startPreviewSkin, startPreviewCardSkin, stopPreview, isPreviewActive, cosmeticCurrency, setCosmeticCurrency]
+    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded, previewSkinId, previewCardSkinId, startPreviewSkin, startPreviewCardSkin, stopPreviewSkin, stopPreviewCardSkin, stopPreview, isPreviewActive, cosmeticCurrency, setCosmeticCurrency]
   );
 
   return (

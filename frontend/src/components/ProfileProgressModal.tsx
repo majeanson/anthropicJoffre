@@ -117,6 +117,8 @@ export function ProfileProgressModal({
     setCardSkin,
     startPreviewSkin,
     startPreviewCardSkin,
+    stopPreviewSkin,
+    stopPreviewCardSkin,
     stopPreview,
     isPreviewActive,
     setCosmeticCurrency,
@@ -712,7 +714,7 @@ export function ProfileProgressModal({
                               border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
                             }}
                             onMouseEnter={() => startPreviewCardSkin(cardSkinItem.id)}
-                            onMouseLeave={stopPreview}
+                            onMouseLeave={stopPreviewCardSkin}
                           >
                             {/* Preview gradient with mini cards */}
                             <div
@@ -839,7 +841,7 @@ export function ProfileProgressModal({
                               border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
                             }}
                             onMouseEnter={() => startPreviewSkin(skinItem.id as SkinId)}
-                            onMouseLeave={stopPreview}
+                            onMouseLeave={stopPreviewSkin}
                           >
                             {/* Preview gradient */}
                             <div
