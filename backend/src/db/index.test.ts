@@ -69,8 +69,8 @@ describe('Database Stats Functions', () => {
       const afterStats = await getPlayerStats(playerName);
       expect(afterStats).not.toBeNull();
       expect(afterStats?.player_name).toBe(playerName);
-      expect(afterStats?.total_bets_made).toBe(1);
-      expect(afterStats?.bets_won).toBe(1);
+      expect(afterStats?.total_bets_placed).toBe(1);
+      expect(afterStats?.bets_made).toBe(1);
     });
   });
 
@@ -277,9 +277,9 @@ describe('Database Stats Functions', () => {
       });
 
       const stats = await getPlayerStats(playerName);
-      expect(stats?.total_bets_made).toBe(1);
-      expect(stats?.bets_won).toBe(1);
-      expect(stats?.bets_lost).toBe(0);
+      expect(stats?.total_bets_placed).toBe(1);
+      expect(stats?.bets_made).toBe(1);
+      expect(stats?.bets_failed).toBe(0);
       expect(stats?.total_tricks_won).toBe(9);
       expect(stats?.total_points_earned).toBe(10);
       expect(stats?.avg_bet_amount).toBeCloseTo(8.00, 1);
@@ -301,9 +301,9 @@ describe('Database Stats Functions', () => {
       });
 
       const stats = await getPlayerStats(playerName);
-      expect(stats?.total_bets_made).toBe(1);
-      expect(stats?.bets_won).toBe(0);
-      expect(stats?.bets_lost).toBe(1);
+      expect(stats?.total_bets_placed).toBe(1);
+      expect(stats?.bets_made).toBe(0);
+      expect(stats?.bets_failed).toBe(1);
       expect(stats?.avg_bet_amount).toBeCloseTo(10.00, 1);
     });
 
@@ -582,9 +582,9 @@ describe('Database Stats Functions', () => {
       expect(stats?.elo_rating).toBe(1235); // 1200 + 35
 
       // Round stats
-      expect(stats?.total_bets_made).toBe(3);
-      expect(stats?.bets_won).toBe(2);
-      expect(stats?.bets_lost).toBe(1);
+      expect(stats?.total_bets_placed).toBe(3);
+      expect(stats?.bets_made).toBe(2);
+      expect(stats?.bets_failed).toBe(1);
       expect(stats?.total_tricks_won).toBe(27); // 9 + 8 + 10
       expect(stats?.total_points_earned).toBe(30); // 10 + 9 + 11
       expect(stats?.without_trump_bets).toBe(1);

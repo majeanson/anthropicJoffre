@@ -434,10 +434,10 @@ export const updateRoundStats = async (
       most_tricks_in_round = GREATEST(most_tricks_in_round, $3),
       zero_trick_rounds = zero_trick_rounds + CASE WHEN $3 = 0 THEN 1 ELSE 0 END,
       highest_points_in_round = GREATEST(highest_points_in_round, $4),
-      total_bets_made = total_bets_made + CASE WHEN $5 = TRUE THEN 1 ELSE 0 END,
+      total_bets_placed = total_bets_placed + CASE WHEN $5 = TRUE THEN 1 ELSE 0 END,
       total_bet_amount = total_bet_amount + COALESCE($7, 0),
-      bets_won = bets_won + CASE WHEN $6 = TRUE THEN 1 ELSE 0 END,
-      bets_lost = bets_lost + CASE WHEN $6 = FALSE THEN 1 ELSE 0 END,
+      bets_made = bets_made + CASE WHEN $5 = TRUE AND $6 = TRUE THEN 1 ELSE 0 END,
+      bets_failed = bets_failed + CASE WHEN $5 = TRUE AND $6 = FALSE THEN 1 ELSE 0 END,
       highest_bet = GREATEST(highest_bet, COALESCE($7, 0)),
       without_trump_bets = without_trump_bets + CASE WHEN $8 = TRUE THEN 1 ELSE 0 END,
       red_zeros_collected = red_zeros_collected + COALESCE($9, 0),
@@ -468,8 +468,8 @@ export const updateRoundStats = async (
       rounds_win_percentage = ROUND((rounds_won::numeric / NULLIF(total_rounds_played, 0) * 100), 2),
       avg_tricks_per_round = ROUND((total_tricks_won::numeric / NULLIF(total_rounds_played, 0)), 2),
       avg_points_per_round = ROUND((total_points_earned::numeric / NULLIF(total_rounds_played, 0)), 2),
-      bet_success_rate = ROUND((bets_won::numeric / NULLIF(total_bets_made, 0) * 100), 2),
-      avg_bet_amount = ROUND((total_bet_amount::numeric / NULLIF(total_bets_made, 0)), 2)
+      bet_success_rate = ROUND((bets_made::numeric / NULLIF(total_bets_placed, 0) * 100), 2),
+      avg_bet_amount = ROUND((total_bet_amount::numeric / NULLIF(total_bets_placed, 0)), 2)
     WHERE player_name = $1
   `, [playerName]);
 
@@ -582,9 +582,10 @@ export const getPlayerStats = async (playerName: string) => {
         elo_rating, highest_rating, lowest_rating, current_win_streak,
         best_win_streak, current_loss_streak, worst_loss_streak,
         fastest_win, longest_game, avg_game_duration_minutes,
-        total_tricks_won, total_points_earned, total_rounds_played, rounds_won,
-        rounds_win_percentage, avg_tricks_per_round, avg_points_per_round,
-        total_bets_made, bets_won, bets_lost, bet_success_rate, avg_bet_amount,
+        total_tricks_won, total_points_earned, total_rounds_played, rounds_won, rounds_lost,
+        rounds_win_percentage, avg_tricks_per_round, most_tricks_in_round, zero_trick_rounds,
+        avg_points_per_round, highest_points_in_round,
+        total_bets_placed, bets_made, bets_failed, bet_success_rate, avg_bet_amount,
         highest_bet, without_trump_bets, trump_cards_played, red_zeros_collected,
         brown_zeros_received, is_bot, created_at, updated_at,
         COALESCE(total_xp, 0) as total_xp,
