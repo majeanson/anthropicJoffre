@@ -211,6 +211,7 @@ import { registerSocialHandlers } from './socketHandlers/social'; // Sprint 16 D
 import { registerQuestHandlers } from './socketHandlers/quests'; // Sprint 19: Daily Engagement System
 import { registerVoiceHandlers } from './socketHandlers/voice'; // Voice chat WebRTC signaling
 import { registerSideBetsHandlers, autoResolveBets, expireGameBets } from './socketHandlers/sideBets'; // Side betting system
+import { updatePlayerBalance } from './db/sideBets'; // For coin rewards
 import {
   generateSessionToken as generateSessionTokenUtil,
   createPlayerSession as createPlayerSessionUtil,
@@ -1393,9 +1394,6 @@ function startNewRound(gameId: string) {
   // Reset first trump tracking for side bets
   firstTrumpPlayed.set(gameId, false);
 
-  // Expire any open side bets from previous round
-  expireGameBets(io, gameId);
-
   // Store initial hands in round stats for end-of-round display
   const stats = roundStats.get(gameId);
   if (stats) {
@@ -1818,6 +1816,23 @@ async function endRound(gameId: string) {
       }
 
       // ============================================================================
+      // COIN REWARDS - Award coins for game completion (non-bot games only)
+      // ============================================================================
+      if (!game.isBotGame && game.persistenceMode === 'elo') {
+        for (const player of humanPlayers) {
+          const won = player.teamId === winningTeam;
+          // 5 coins for finishing, +10 bonus for winning = 15 total for winner
+          const coinReward = won ? 15 : 5;
+          try {
+            await updatePlayerBalance(player.name, coinReward);
+            logger.debug(`[Game Complete] Awarded ${coinReward} coins to ${player.name} (${won ? 'winner' : 'participant'})`);
+          } catch (err) {
+            logger.warn(`[Game Complete] Failed to award coins to ${player.name}`, err);
+          }
+        }
+      }
+
+      // ============================================================================
       // ACHIEVEMENT INTEGRATION - Check game-end achievements for human players
       // ============================================================================
       const stats = roundStats.get(gameId);
@@ -1960,6 +1975,9 @@ async function endRound(gameId: string) {
 
     // Clean up round stats after all database updates
     roundStats.delete(gameId);
+
+    // Expire any open side bets that weren't accepted
+    expireGameBets(io, gameId);
 
     // Track when game finished for cleanup (15 min TTL)
     gameFinishTimes.set(gameId, Date.now());

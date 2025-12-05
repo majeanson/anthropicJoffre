@@ -590,7 +590,13 @@ export const getPlayerStats = async (playerName: string) => {
         brown_zeros_received, is_bot, created_at, updated_at,
         COALESCE(total_xp, 0) as total_xp,
         COALESCE(current_level, 1) as current_level,
-        COALESCE(cosmetic_currency, 0) as cosmetic_currency,
+        COALESCE(cosmetic_currency, 100) as cosmetic_currency,
+        COALESCE(side_bets_won, 0) as side_bets_won,
+        COALESCE(side_bets_lost, 0) as side_bets_lost,
+        COALESCE(side_bets_coins_won, 0) as side_bets_coins_won,
+        COALESCE(side_bets_coins_lost, 0) as side_bets_coins_lost,
+        COALESCE(current_bet_streak, 0) as current_bet_streak,
+        COALESCE(best_bet_streak, 0) as best_bet_streak,
         CASE
           WHEN elo_rating >= 1600 THEN 'Diamond'
           WHEN elo_rating >= 1400 THEN 'Platinum'

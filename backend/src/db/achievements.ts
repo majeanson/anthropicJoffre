@@ -125,13 +125,23 @@ export async function updateAchievementProgress(
   const newProgress = result.rows[0].progress;
   const unlocked = newProgress >= maxProgress;
 
-  // If just unlocked, update achievement points
+  // If just unlocked, update achievement points AND award coins based on tier
   if (unlocked && newProgress - progressIncrement < maxProgress) {
+    // Calculate coin reward based on tier
+    const coinRewardByTier: Record<string, number> = {
+      bronze: 10,
+      silver: 25,
+      gold: 50,
+      platinum: 100,
+    };
+    const coinReward = coinRewardByTier[achievement.tier] || 10;
+
     await query(
       `UPDATE player_stats
-       SET achievement_points = achievement_points + $1
-       WHERE player_name = $2`,
-      [achievement.points, playerName]
+       SET achievement_points = achievement_points + $1,
+           cosmetic_currency = COALESCE(cosmetic_currency, 100) + $2
+       WHERE player_name = $3`,
+      [achievement.points, coinReward, playerName]
     );
   }
 

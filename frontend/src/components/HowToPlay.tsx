@@ -1,10 +1,27 @@
+import { useState } from 'react';
 import { Modal, Button } from './ui';
 
 interface HowToPlayProps {
   isModal?: boolean;
   isOpen?: boolean;
   onClose?: () => void;
+  initialTab?: TabId;
 }
+
+type TabId = 'rules' | 'features' | 'rewards' | 'register';
+
+interface Tab {
+  id: TabId;
+  label: string;
+  icon: string;
+}
+
+const TABS: Tab[] = [
+  { id: 'rules', label: 'Game Rules', icon: '📖' },
+  { id: 'features', label: 'Features', icon: '⚙️' },
+  { id: 'rewards', label: 'XP & Coins', icon: '🪙' },
+  { id: 'register', label: 'Why Register', icon: '🔐' },
+];
 
 // Helper for section cards - uses CSS variables for consistent theming
 const SectionCard = ({
@@ -27,7 +44,7 @@ const SectionCard = ({
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
   <h3
-    className="text-2xl font-bold mb-3 flex items-center gap-2"
+    className="text-xl font-bold mb-3 flex items-center gap-2"
     style={{ color: 'var(--color-text-primary)' }}
   >
     {children}
@@ -47,223 +64,426 @@ const Kbd = ({ children }: { children: React.ReactNode }) => (
   </kbd>
 );
 
-export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlayProps) {
-  // If it's a modal and not open, don't render
-  if (isModal && !isOpen) return null;
+// Tab navigation component
+const TabNavigation = ({
+  activeTab,
+  onTabChange,
+}: {
+  activeTab: TabId;
+  onTabChange: (tab: TabId) => void;
+}) => (
+  <div
+    className="flex flex-wrap gap-2 mb-6 p-1 rounded-lg"
+    style={{ backgroundColor: 'var(--color-bg-primary)' }}
+  >
+    {TABS.map((tab) => (
+      <button
+        key={tab.id}
+        onClick={() => onTabChange(tab.id)}
+        className={`
+          flex items-center gap-2 px-4 py-2 rounded-md font-medium transition-all
+          ${activeTab === tab.id
+            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+            : 'hover:bg-white/10 text-gray-400 hover:text-white'
+          }
+        `}
+      >
+        <span>{tab.icon}</span>
+        <span className="hidden sm:inline">{tab.label}</span>
+      </button>
+    ))}
+  </div>
+);
 
-  const content = (
-    <div className="space-y-6" style={{ color: 'var(--color-text-primary)' }}>
-      {/* Overview */}
-      <SectionCard borderColor="var(--color-text-accent)">
-        <SectionTitle>Overview</SectionTitle>
-        <p className="text-lg leading-relaxed">
-          J⋀ffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
-          The first team to reach 41 points wins the game!
-        </p>
-      </SectionCard>
+// ============================================================================
+// TAB CONTENT: Game Rules
+// ============================================================================
+const RulesContent = () => (
+  <div className="space-y-5">
+    {/* Overview */}
+    <SectionCard borderColor="var(--color-text-accent)">
+      <SectionTitle>Overview</SectionTitle>
+      <p className="text-base leading-relaxed">
+        J⋀ffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
+        The first team to reach 41 points wins the game!
+      </p>
+    </SectionCard>
 
-      {/* Special Cards */}
-      <SectionCard borderColor="var(--color-success)">
-        <SectionTitle>Cards</SectionTitle>
-        <ul className="space-y-2 text-lg">
-          <li>• 4 colors (Red, Brown, Green, Blue) with cards going from [0-7]</li>
-          <li>• Two special cards that you WANT to get ... or AVOID!</li>
-          <li>
-            • <strong style={{ color: 'var(--color-suit-red)' }}>Red 0:</strong> +5 bonus points (6 total for that trick)
-          </li>
-          <li>
-            • <strong style={{ color: 'var(--color-suit-brown)' }}>Brown 0:</strong> -3 penalty points (-2 total for that trick)
-          </li>
-          <li>• All other tricks worth 1 point</li>
-        </ul>
-      </SectionCard>
+    {/* Special Cards */}
+    <SectionCard borderColor="var(--color-success)">
+      <SectionTitle>Cards</SectionTitle>
+      <ul className="space-y-2 text-base">
+        <li>• 4 colors (Red, Brown, Green, Blue) with cards going from [0-7]</li>
+        <li>• Two special cards that you WANT to get ... or AVOID!</li>
+        <li>
+          • <strong style={{ color: 'var(--color-suit-red)' }}>Red 0:</strong> +5 bonus points (6 total for that trick)
+        </li>
+        <li>
+          • <strong style={{ color: 'var(--color-suit-brown)' }}>Brown 0:</strong> -3 penalty points (-2 total for that trick)
+        </li>
+        <li>• All other tricks worth 1 point</li>
+      </ul>
+    </SectionCard>
 
-      {/* Betting Phase */}
-      <SectionCard borderColor="var(--color-warning)">
-        <SectionTitle>Betting Phase</SectionTitle>
-        <ul className="space-y-2 text-lg">
-          <li>• The winning bet starts the round. First card played chooses the trump color!</li>
-          <li>• Each round starts with betting (7-12 points)</li>
-          <li>• Players take turns bidding after the dealer</li>
-          <li>• <strong>Non-dealers must raise</strong> or skip (if no bets yet)</li>
-          <li>• <strong>Dealer can equalize or raise</strong> - dealer wins ties!</li>
-          <li>• Dealer cannot skip if no players bet beforehand</li>
-          <li>• "Without Trump" doubles the bet stakes</li>
-          <li>• Highest bidder becomes the offensive team</li>
-        </ul>
-      </SectionCard>
+    {/* Betting Phase */}
+    <SectionCard borderColor="var(--color-warning)">
+      <SectionTitle>Betting Phase</SectionTitle>
+      <ul className="space-y-2 text-base">
+        <li>• The winning bet starts the round. First card played chooses the trump color!</li>
+        <li>• Each round starts with betting (7-12 points)</li>
+        <li>• Players take turns bidding after the dealer</li>
+        <li>• <strong>Non-dealers must raise</strong> or skip (if no bets yet)</li>
+        <li>• <strong>Dealer can equalize or raise</strong> - dealer wins ties!</li>
+        <li>• Dealer cannot skip if no players bet beforehand</li>
+        <li>• "Without Trump" doubles the bet stakes</li>
+        <li>• Highest bidder becomes the offensive team</li>
+      </ul>
+    </SectionCard>
 
-      {/* Playing Phase */}
-      <SectionCard borderColor="var(--color-info)">
-        <SectionTitle>Playing Phase</SectionTitle>
-        <ul className="space-y-2 text-lg">
-          <li>• Highest bidder leads the first trick. First card played chooses the trump color!</li>
-          <li>• <strong>You must follow suit</strong> if you have the led color</li>
-          <li>• Trump (bet color) beats non-trump cards</li>
-          <li>• Highest card in led suit wins if no trump played</li>
-          <li>• Winner of each trick leads the next</li>
-        </ul>
-      </SectionCard>
+    {/* Playing Phase */}
+    <SectionCard borderColor="var(--color-info)">
+      <SectionTitle>Playing Phase</SectionTitle>
+      <ul className="space-y-2 text-base">
+        <li>• Highest bidder leads the first trick. First card played chooses the trump color!</li>
+        <li>• <strong>You must follow suit</strong> if you have the led color</li>
+        <li>• Trump (bet color) beats non-trump cards</li>
+        <li>• Highest card in led suit wins if no trump played</li>
+        <li>• Winner of each trick leads the next</li>
+      </ul>
+    </SectionCard>
 
-      {/* Scoring */}
-      <SectionCard borderColor="var(--color-team2-primary)">
-        <SectionTitle>Scoring</SectionTitle>
-        <ul className="space-y-2 text-lg">
-          <li>• Offensive team wins if they meet their bet</li>
-          <li>• They gain points equal to their bet</li>
-          <li>• Defensive team gains points from tricks won</li>
-          <li>• If offensive fails, they lose bet points</li>
-        </ul>
-      </SectionCard>
+    {/* Scoring */}
+    <SectionCard borderColor="var(--color-team2-primary)">
+      <SectionTitle>Scoring</SectionTitle>
+      <ul className="space-y-2 text-base">
+        <li>• Offensive team wins if they meet their bet</li>
+        <li>• They gain points equal to their bet</li>
+        <li>• Defensive team gains points from tricks won</li>
+        <li>• If offensive fails, they lose bet points</li>
+      </ul>
+    </SectionCard>
 
-      {/* Beginner Mode Features */}
-      <SectionCard borderColor="var(--color-success)">
-        <SectionTitle>Beginner Mode Features (Toggle in settings)</SectionTitle>
-        <div className="space-y-4">
-          {/* Move Suggestions */}
-          <div>
-            <p className="font-semibold mb-2 text-lg" style={{ color: 'var(--color-success)' }}>
-              Move Suggestions (Press to Show)
-            </p>
-            <ul className="space-y-2 ml-4 text-base">
-              <li>• A <strong>suggestion button</strong> appears next to your name during your turn</li>
-              <li>• <strong>Press and hold</strong> to peek at the AI's recommended card</li>
-              <li>• See reasoning for the suggestion and alternative options</li>
-              <li>• Release to hide - you control when to see hints</li>
-              <li>• Suggestions include defensive strategies (like using Brown 0 to poison opponent's trick)</li>
-            </ul>
-          </div>
-
-          {/* Bot Thinking Insights */}
-          <div>
-            <p className="font-semibold mb-2 text-lg" style={{ color: 'var(--color-success)' }}>
-              Bot Thinking Insights
-            </p>
-            <ul className="space-y-2 ml-4 text-base">
-              <li>• Bot difficulty badges (Easy/Med/Hard) show next to bot player names</li>
-              <li>• <strong>Press and hold the badge</strong> to see what the bot is thinking</li>
-              <li>• Learn strategic concepts like trump bleed, defensive plays, and trick control</li>
-              <li>• Release to hide - great for learning without spoiling your own decisions</li>
-            </ul>
-          </div>
-
-          {/* Clickable Player Names */}
-          <div>
-            <p className="font-semibold mb-2 text-lg" style={{ color: 'var(--color-success)' }}>
-              Clickable Player Names
-            </p>
-            <ul className="space-y-2 ml-4 text-base">
-              <li>• Click any human player's name to view their profile and stats</li>
-              <li>• Works during betting phase, playing phase, and team selection</li>
-              <li>• See win rates, game history, and recent performance</li>
-              <li>• Bot names are not clickable (they don't have profiles)</li>
-            </ul>
-          </div>
-
-          <p
-            className="text-sm italic mt-3 p-2 rounded"
-            style={{
-              backgroundColor: 'color-mix(in srgb, var(--color-success) 15%, var(--color-bg-tertiary))',
-              color: 'var(--color-text-secondary)',
-            }}
-          >
-            Learning Tip: Use bot thinking insights to understand advanced strategies, then apply them yourself!
+    {/* Teams */}
+    <SectionCard borderColor="var(--color-border-accent)">
+      <SectionTitle>Teams</SectionTitle>
+      <div className="grid grid-cols-2 gap-4">
+        <div
+          className="rounded-lg p-3 border-2"
+          style={{
+            borderColor: 'var(--color-team1-primary)',
+            backgroundColor: 'color-mix(in srgb, var(--color-team1-primary) 15%, var(--color-bg-tertiary))',
+          }}
+        >
+          <p className="font-bold" style={{ color: 'var(--color-team1-primary)' }}>
+            Team 1 (Orange)
+          </p>
+          <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+            Players 1 & 3
           </p>
         </div>
-      </SectionCard>
-
-      {/* Card Queuing */}
-      <SectionCard borderColor="var(--color-info)">
-        <SectionTitle>Card Queuing</SectionTitle>
-        <div className="space-y-2 text-lg">
-          <p>
-            <strong>Pre-select your next card</strong> while waiting for your turn!
-            Click any card in your hand when it's <em>not</em> your turn to queue it.
+        <div
+          className="rounded-lg p-3 border-2"
+          style={{
+            borderColor: 'var(--color-team2-primary)',
+            backgroundColor: 'color-mix(in srgb, var(--color-team2-primary) 15%, var(--color-bg-tertiary))',
+          }}
+        >
+          <p className="font-bold" style={{ color: 'var(--color-team2-primary)' }}>
+            Team 2 (Purple)
           </p>
-          <ul className="space-y-2 ml-4">
-            <li>• <strong>Queued cards</strong> are marked with a gold "QUEUED" badge</li>
-            <li>• The card will <strong>auto-play instantly</strong> when your turn arrives</li>
-            <li>• Click the same card again to <strong>unqueue</strong> it</li>
-            <li>• Only one card can be queued at a time</li>
-            <li>• Great for fast-paced gameplay and quick decision-making!</li>
+          <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+            Players 2 & 4
+          </p>
+        </div>
+      </div>
+    </SectionCard>
+  </div>
+);
+
+// ============================================================================
+// TAB CONTENT: Features
+// ============================================================================
+const FeaturesContent = () => (
+  <div className="space-y-5">
+    {/* Beginner Mode Features */}
+    <SectionCard borderColor="var(--color-success)">
+      <SectionTitle>Beginner Mode (Toggle in settings)</SectionTitle>
+      <div className="space-y-4">
+        {/* Move Suggestions */}
+        <div>
+          <p className="font-semibold mb-2" style={{ color: 'var(--color-success)' }}>
+            Move Suggestions (Press to Show)
+          </p>
+          <ul className="space-y-1 ml-4 text-sm">
+            <li>• A <strong>suggestion button</strong> appears next to your name during your turn</li>
+            <li>• <strong>Press and hold</strong> to peek at the AI's recommended card</li>
+            <li>• See reasoning for the suggestion and alternative options</li>
+            <li>• Suggestions include defensive strategies (like using Brown 0 to poison opponent's trick)</li>
           </ul>
-          <p
-            className="text-sm italic mt-3 p-2 rounded"
-            style={{
-              backgroundColor: 'color-mix(in srgb, var(--color-info) 15%, var(--color-bg-tertiary))',
-              color: 'var(--color-text-secondary)',
-            }}
-          >
-            Pro tip: Queue your card early to think ahead while others play!
+        </div>
+
+        {/* Bot Thinking Insights */}
+        <div>
+          <p className="font-semibold mb-2" style={{ color: 'var(--color-success)' }}>
+            Bot Thinking Insights
           </p>
+          <ul className="space-y-1 ml-4 text-sm">
+            <li>• Bot difficulty badges (Easy/Med/Hard) show next to bot player names</li>
+            <li>• <strong>Press and hold the badge</strong> to see what the bot is thinking</li>
+            <li>• Learn strategic concepts like trump bleed, defensive plays, and trick control</li>
+          </ul>
+        </div>
+
+        {/* Clickable Player Names */}
+        <div>
+          <p className="font-semibold mb-2" style={{ color: 'var(--color-success)' }}>
+            Clickable Player Names
+          </p>
+          <ul className="space-y-1 ml-4 text-sm">
+            <li>• Click any human player's name to view their profile and stats</li>
+            <li>• Works during betting phase, playing phase, and team selection</li>
+          </ul>
+        </div>
+      </div>
+    </SectionCard>
+
+    {/* Card Queuing */}
+    <SectionCard borderColor="var(--color-info)">
+      <SectionTitle>Card Queuing</SectionTitle>
+      <div className="space-y-2 text-base">
+        <p>
+          <strong>Pre-select your next card</strong> while waiting for your turn!
+          Click any card in your hand when it's <em>not</em> your turn to queue it.
+        </p>
+        <ul className="space-y-1 ml-4 text-sm">
+          <li>• <strong>Queued cards</strong> are marked with a gold "QUEUED" badge</li>
+          <li>• The card will <strong>auto-play instantly</strong> when your turn arrives</li>
+          <li>• Click the same card again to <strong>unqueue</strong> it</li>
+        </ul>
+      </div>
+    </SectionCard>
+
+    {/* Keyboard Navigation - Desktop only */}
+    <div className="hidden md:block">
+      <SectionCard borderColor="var(--color-team2-primary)">
+        <SectionTitle>Keyboard Shortcuts</SectionTitle>
+        <div className="space-y-3 text-base">
+          <div>
+            <p className="font-semibold mb-1" style={{ color: 'var(--color-text-accent)' }}>
+              Card Navigation:
+            </p>
+            <ul className="space-y-1 ml-4 text-sm">
+              <li>• <Kbd>←</Kbd> <Kbd>→</Kbd> Navigate between cards</li>
+              <li>• <Kbd>1</Kbd>-<Kbd>9</Kbd> Quick select by position</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-semibold mb-1" style={{ color: 'var(--color-text-accent)' }}>
+              Card Actions:
+            </p>
+            <ul className="space-y-1 ml-4 text-sm">
+              <li>• <Kbd>Enter</Kbd> / <Kbd>Space</Kbd> Play selected card (or queue if not your turn)</li>
+              <li>• <Kbd>Esc</Kbd> Clear selection</li>
+            </ul>
+          </div>
         </div>
       </SectionCard>
+    </div>
 
-      {/* Keyboard Navigation - Desktop only */}
-      <div className="hidden md:block">
-        <SectionCard borderColor="var(--color-team2-primary)">
-          <SectionTitle>Keyboard Shortcuts</SectionTitle>
-          <div className="space-y-3 text-lg">
-            <div>
-              <p className="font-semibold mb-1" style={{ color: 'var(--color-text-accent)' }}>
-                Card Navigation:
-              </p>
-              <ul className="space-y-1 ml-4">
-                <li>• <Kbd>←</Kbd> <Kbd>→</Kbd> Navigate between cards</li>
-                <li>• <Kbd>Tab</Kbd> / <Kbd>Shift+Tab</Kbd> Cycle through cards</li>
-                <li>• <Kbd>1</Kbd>-<Kbd>9</Kbd> Quick select by position</li>
-              </ul>
-            </div>
-            <div>
-              <p className="font-semibold mb-1" style={{ color: 'var(--color-text-accent)' }}>
-                Card Actions:
-              </p>
-              <ul className="space-y-1 ml-4">
-                <li>• <Kbd>Enter</Kbd> / <Kbd>Space</Kbd> Play selected card (or queue if not your turn)</li>
-                <li>• <Kbd>Esc</Kbd> Clear selection</li>
-              </ul>
-            </div>
-            <p className="text-sm italic mt-2" style={{ color: 'var(--color-text-muted)' }}>
-              Tip: You can queue a card before your turn for instant auto-play!
-            </p>
-          </div>
-        </SectionCard>
+    {/* Side Bets Feature */}
+    <SectionCard borderColor="#f97316">
+      <SectionTitle>🎲 Side Bets</SectionTitle>
+      <ul className="space-y-1 ml-4 text-sm">
+        <li>• Create bets during gameplay using coins</li>
+        <li>• <strong>Preset bets</strong> (auto-resolve): Red 0 winner, Brown 0 victim, Bet made, etc.</li>
+        <li>• <strong>Custom bets</strong> (manual): Create any bet, both parties agree on winner</li>
+        <li>• Win streaks give <strong>multipliers</strong>: 3+ wins = 1.25x, 5+ = 1.5x, 7+ = 2x!</li>
+        <li>• Click the 🎲 button in the game header to open the side bets panel</li>
+      </ul>
+    </SectionCard>
+  </div>
+);
+
+// ============================================================================
+// TAB CONTENT: XP & Coins (Rewards)
+// ============================================================================
+const RewardsContent = () => (
+  <div className="space-y-5">
+    {/* XP Sources */}
+    <SectionCard borderColor="#a855f7">
+      <SectionTitle>⭐ Experience Points (XP)</SectionTitle>
+      <ul className="space-y-1 ml-4 text-sm">
+        <li>• <strong>Win tricks</strong> - XP for each trick won</li>
+        <li>• <strong>Win rounds</strong> - Bonus XP for successful bets</li>
+        <li>• <strong>Win games</strong> - Major XP boost for victory</li>
+        <li>• <strong>Complete daily quests</strong> - Bonus XP rewards</li>
+        <li>• <strong>Claim weekly calendar</strong> - Daily login XP</li>
+        <li>• <strong>Special plays</strong> - XP for red zeros, trump plays, etc.</li>
+      </ul>
+      <p className="text-sm mt-3" style={{ color: 'var(--color-text-secondary)' }}>
+        Level up to unlock new card backs, avatars, and skins!
+      </p>
+    </SectionCard>
+
+    {/* Coin Sources */}
+    <SectionCard borderColor="#eab308">
+      <SectionTitle>🪙 Coins (Cosmetic Currency)</SectionTitle>
+      <ul className="space-y-1 ml-4 text-sm">
+        <li>• <strong>Complete games (ranked)</strong> - 5 coins for finishing, +10 bonus for winning</li>
+        <li>• <strong>Daily quests</strong> - Complete objectives for coin rewards</li>
+        <li>• <strong>Weekly calendar</strong> - Claim daily rewards (up to 100 coins on special days!)</li>
+        <li>• <strong>Unlock achievements</strong> - Bronze (10), Silver (25), Gold (50), Platinum (100)</li>
+        <li>• <strong>Win side bets</strong> - Double your bet on correct predictions!</li>
+      </ul>
+    </SectionCard>
+
+    {/* Daily Quests */}
+    <SectionCard borderColor="#f97316">
+      <SectionTitle>📅 Daily Quests & Calendar</SectionTitle>
+      <ul className="space-y-1 ml-4 text-sm">
+        <li>• <strong>3 daily quests</strong> reset each day - Win X games, collect red zeros, etc.</li>
+        <li>• <strong>Weekly calendar</strong> - Claim rewards each day you log in</li>
+        <li>• <strong>Streak bonuses</strong> - Maintain login streaks for better rewards</li>
+        <li>• Click the 📅 calendar icon to view your quests and progress</li>
+      </ul>
+      <p
+        className="text-sm italic mt-3 p-2 rounded"
+        style={{
+          backgroundColor: 'color-mix(in srgb, #f97316 15%, var(--color-bg-tertiary))',
+          color: 'var(--color-text-secondary)',
+        }}
+      >
+        Tip: Complete all 3 daily quests for bonus XP!
+      </p>
+    </SectionCard>
+
+    {/* Achievements */}
+    <SectionCard borderColor="#14b8a6">
+      <SectionTitle>🏆 Achievements</SectionTitle>
+      <ul className="space-y-1 ml-4 text-sm">
+        <li>• <strong>50+ achievements</strong> to unlock across multiple categories</li>
+        <li>• <strong>Tiers</strong>: Bronze → Silver → Gold → Platinum</li>
+        <li>• <strong>Secret achievements</strong> - Discover hidden challenges!</li>
+        <li>• Each unlock rewards coins and achievement points</li>
+      </ul>
+    </SectionCard>
+  </div>
+);
+
+// ============================================================================
+// TAB CONTENT: Why Register
+// ============================================================================
+const RegisterContent = () => (
+  <div className="space-y-5">
+    <SectionCard borderColor="#22c55e">
+      <p className="text-base mb-4" style={{ color: 'var(--color-text-secondary)' }}>
+        You can play as a guest, but registering unlocks the full experience:
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {/* Progression */}
+        <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+          <p className="font-semibold mb-1" style={{ color: '#a855f7' }}>⭐ XP & Leveling</p>
+          <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <li>• Track XP across all games</li>
+            <li>• Level up (1-100+)</li>
+            <li>• Unlock titles & borders</li>
+          </ul>
+        </div>
+
+        {/* Currency */}
+        <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+          <p className="font-semibold mb-1" style={{ color: '#eab308' }}>🪙 Coins & Cosmetics</p>
+          <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <li>• Earn & save coins</li>
+            <li>• Unlock card backs & skins</li>
+            <li>• Place side bets</li>
+          </ul>
+        </div>
+
+        {/* Stats */}
+        <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+          <p className="font-semibold mb-1" style={{ color: '#3b82f6' }}>📊 Stats & ELO Rating</p>
+          <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <li>• Track wins, losses, streaks</li>
+            <li>• ELO rating system</li>
+            <li>• Appear on leaderboards</li>
+          </ul>
+        </div>
+
+        {/* Social */}
+        <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+          <p className="font-semibold mb-1" style={{ color: '#ec4899' }}>👥 Friends & Social</p>
+          <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <li>• Add friends</li>
+            <li>• Direct messages</li>
+            <li>• Invite to games</li>
+          </ul>
+        </div>
+
+        {/* Daily Rewards */}
+        <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+          <p className="font-semibold mb-1" style={{ color: '#f97316' }}>📅 Daily Rewards</p>
+          <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <li>• Daily quests</li>
+            <li>• Weekly calendar rewards</li>
+            <li>• Login streak bonuses</li>
+          </ul>
+        </div>
+
+        {/* Achievements */}
+        <div className="p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+          <p className="font-semibold mb-1" style={{ color: '#14b8a6' }}>🏆 Achievements</p>
+          <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+            <li>• 50+ achievements</li>
+            <li>• Bronze → Platinum tiers</li>
+            <li>• Secret achievements</li>
+          </ul>
+        </div>
       </div>
 
-      {/* Teams */}
-      <SectionCard borderColor="var(--color-border-accent)">
-        <SectionTitle>Teams</SectionTitle>
-        <div className="grid grid-cols-2 gap-4">
-          <div
-            className="rounded-lg p-4 border-2"
-            style={{
-              borderColor: 'var(--color-team1-primary)',
-              backgroundColor: 'color-mix(in srgb, var(--color-team1-primary) 15%, var(--color-bg-tertiary))',
-            }}
-          >
-            <p className="text-lg font-bold" style={{ color: 'var(--color-team1-primary)' }}>
-              Team 1 (Orange)
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-              Players 1 & 3
-            </p>
-          </div>
-          <div
-            className="rounded-lg p-4 border-2"
-            style={{
-              borderColor: 'var(--color-team2-primary)',
-              backgroundColor: 'color-mix(in srgb, var(--color-team2-primary) 15%, var(--color-bg-tertiary))',
-            }}
-          >
-            <p className="text-lg font-bold" style={{ color: 'var(--color-team2-primary)' }}>
-              Team 2 (Purple)
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-              Players 2 & 4
-            </p>
-          </div>
-        </div>
-      </SectionCard>
+      <p
+        className="text-sm italic mt-4 p-2 rounded text-center"
+        style={{
+          backgroundColor: 'color-mix(in srgb, #22c55e 15%, var(--color-bg-tertiary))',
+          color: 'var(--color-text-secondary)',
+        }}
+      >
+        Registration is free! Click "Register" in the top-right corner to get started.
+      </p>
+    </SectionCard>
+  </div>
+);
+
+// ============================================================================
+// MAIN COMPONENT
+// ============================================================================
+export function HowToPlay({ isModal = false, isOpen = true, onClose, initialTab = 'rules' }: HowToPlayProps) {
+  // Early return BEFORE hooks (for modal closed state)
+  if (isModal && !isOpen) return null;
+
+  // Now safe to use hooks
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'rules':
+        return <RulesContent />;
+      case 'features':
+        return <FeaturesContent />;
+      case 'rewards':
+        return <RewardsContent />;
+      case 'register':
+        return <RegisterContent />;
+      default:
+        return <RulesContent />;
+    }
+  };
+
+  const content = (
+    <div style={{ color: 'var(--color-text-primary)' }}>
+      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      {renderTabContent()}
     </div>
   );
 
@@ -273,7 +493,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
       <Modal
         isOpen={isOpen}
         onClose={onClose || (() => {})}
-        title="Game Rules"
+        title="How to Play"
         icon="📖"
         theme="arcane"
         size="lg"
@@ -287,7 +507,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
           size="lg"
           fullWidth
           autoFocus
-          className="mt-8"
+          className="mt-6"
         >
           Got it!
         </Button>
