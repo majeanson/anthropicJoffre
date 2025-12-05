@@ -13,11 +13,13 @@ interface CreateBetModalProps {
   socket: Socket | null;
   gameId: string;
   playerName: string;
+  playerTeamId: 1 | 2;
+  isWithoutTrump?: boolean;
   balance: number;
   onClose: () => void;
 }
 
-// Preset bet configurations
+// Preset bet configurations - predictions use 'myTeam'/'theirTeam' which get mapped to team1/team2 based on player's team
 const PRESET_BETS: {
   type: PresetBetType;
   label: string;
@@ -29,8 +31,8 @@ const PRESET_BETS: {
     label: 'Red 0 Winner',
     description: 'Which team wins the trick with Red 0?',
     predictions: [
-      { value: 'team1', label: 'Team 1' },
-      { value: 'team2', label: 'Team 2' },
+      { value: 'myTeam', label: 'My Team' },
+      { value: 'theirTeam', label: 'Their Team' },
     ],
   },
   {
@@ -38,8 +40,8 @@ const PRESET_BETS: {
     label: 'Brown 0 Victim',
     description: 'Which team gets stuck with Brown 0?',
     predictions: [
-      { value: 'team1', label: 'Team 1' },
-      { value: 'team2', label: 'Team 2' },
+      { value: 'myTeam', label: 'My Team' },
+      { value: 'theirTeam', label: 'Their Team' },
     ],
   },
   {
@@ -65,8 +67,8 @@ const PRESET_BETS: {
     label: 'First Trump',
     description: 'Which team plays the first trump card?',
     predictions: [
-      { value: 'team1', label: 'Team 1' },
-      { value: 'team2', label: 'Team 2' },
+      { value: 'myTeam', label: 'My Team' },
+      { value: 'theirTeam', label: 'Their Team' },
     ],
   },
 ];
@@ -75,10 +77,28 @@ export default function CreateBetModal({
   socket,
   gameId,
   playerName: _playerName, // Reserved for future use
+  playerTeamId,
+  isWithoutTrump = false,
   balance,
   onClose,
 }: CreateBetModalProps) {
   void _playerName; // Silence unused warning
+
+  // Helper to convert myTeam/theirTeam to actual team values
+  const mapPredictionToTeam = (pred: string): string => {
+    if (pred === 'myTeam') return `team${playerTeamId}`;
+    if (pred === 'theirTeam') return `team${playerTeamId === 1 ? 2 : 1}`;
+    return pred; // For 'true'/'false' predictions, return as-is
+  };
+
+  // Filter preset bets based on game state
+  // - "Without Trump" bet only available when the round is played without trump
+  // - "First Trump" bet only available when there IS a trump suit
+  const availablePresetBets = PRESET_BETS.filter(bet => {
+    if (bet.type === 'without_trump_success') return isWithoutTrump;
+    if (bet.type === 'first_trump_played') return !isWithoutTrump;
+    return true;
+  });
   const [betType, setBetType] = useState<'preset' | 'custom'>('preset');
   const [selectedPreset, setSelectedPreset] = useState<PresetBetType | null>(null);
   const [prediction, setPrediction] = useState<string>('');
@@ -87,7 +107,7 @@ export default function CreateBetModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedPresetConfig = PRESET_BETS.find(p => p.type === selectedPreset);
+  const selectedPresetConfig = availablePresetBets.find(p => p.type === selectedPreset);
   const maxAmount = balance;
   const minAmount = 1;
 
@@ -128,7 +148,7 @@ export default function CreateBetModal({
       betType,
       amount,
       ...(betType === 'preset'
-        ? { presetType: selectedPreset!, prediction }
+        ? { presetType: selectedPreset!, prediction: mapPredictionToTeam(prediction) }
         : { customDescription: customDescription.trim() }),
     };
 
@@ -149,6 +169,7 @@ export default function CreateBetModal({
     minAmount,
     maxAmount,
     onClose,
+    mapPredictionToTeam,
   ]);
 
   return (
@@ -229,7 +250,7 @@ export default function CreateBetModal({
                 Select Bet Type
               </label>
               <div className="grid gap-2">
-                {PRESET_BETS.map(preset => (
+                {availablePresetBets.map(preset => (
                   <button
                     key={preset.type}
                     onClick={() => {

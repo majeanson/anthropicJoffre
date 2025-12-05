@@ -594,11 +594,13 @@ function PlayingPhaseComponent({
       )}
 
       {/* Side Bets Panel */}
-      {socket && gameId && (
+      {socket && gameId && currentPlayer && (
         <SideBetsPanel
           socket={socket}
           gameId={gameId}
           playerName={currentPlayerId}
+          playerTeamId={currentPlayer.teamId}
+          isWithoutTrump={gameState.highestBet?.withoutTrump ?? false}
           isSpectator={isSpectator}
           isOpen={sideBetsOpen}
           onClose={() => setSideBetsOpen(false)}

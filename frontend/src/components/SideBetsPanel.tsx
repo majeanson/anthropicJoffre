@@ -22,6 +22,8 @@ interface SideBetsPanelProps {
   socket: Socket | null;
   gameId: string;
   playerName: string;
+  playerTeamId: 1 | 2;
+  isWithoutTrump?: boolean;
   isSpectator?: boolean;
   isOpen: boolean;
   onClose: () => void;
@@ -43,6 +45,8 @@ export default function SideBetsPanel({
   socket,
   gameId,
   playerName,
+  playerTeamId,
+  isWithoutTrump = false,
   isSpectator: _isSpectator = false,
   isOpen,
   onClose,
@@ -458,6 +462,8 @@ export default function SideBetsPanel({
           socket={socket}
           gameId={gameId}
           playerName={playerName}
+          playerTeamId={playerTeamId}
+          isWithoutTrump={isWithoutTrump}
           balance={balance}
           onClose={() => setShowCreateModal(false)}
         />
