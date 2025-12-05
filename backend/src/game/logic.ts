@@ -201,10 +201,11 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
  * Rules:
  * - Skipped bets are filtered out
  * - Compares bets using isBetHigher() (amount, then withoutTrump)
- * - Tie-breaker: If bets are exactly equal, dealer wins
+ * - Tie-breaker: If bets are exactly equal, the FIRST bet wins (chronological)
+ * - Dealer has NO special priority - they can match but not steal the winning bet
  *
- * @param bets - Array of all bets placed
- * @param dealerPlayerId - Optional dealer ID (for tie-breaking)
+ * @param bets - Array of all bets placed (in chronological order)
+ * @param _dealerPlayerId - Unused (kept for API compatibility)
  * @returns Highest bet, or null if no valid bets exist
  *
  * @example
@@ -215,33 +216,26 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
  * ];
  * getHighestBet(bets); // returns p2's bet (11 points)
  *
- * // Dealer tie-breaker
+ * // Equal bets - first bet wins
  * const equalBets = [
- *   { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false, skipped: false },
- *   { playerId: 'p2', playerName: 'Player 2', amount: 10, withoutTrump: false, skipped: false } // dealer
+ *   { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false },
+ *   { playerId: 'p2', playerName: 'Player 2', amount: 10, withoutTrump: false } // dealer matched
  * ];
- * getHighestBet(equalBets, 'p2'); // returns p2's bet (dealer wins tie)
+ * getHighestBet(equalBets, 'p2'); // returns p1's bet (first bet wins, dealer cannot steal)
  */
-export const getHighestBet = (bets: Bet[], dealerPlayerId?: string): Bet | null => {
+export const getHighestBet = (bets: Bet[], _dealerPlayerId?: string): Bet | null => {
   if (bets.length === 0) return null;
 
   // Filter out skipped bets
   const validBets = bets.filter(bet => !bet.skipped);
   if (validBets.length === 0) return null;
 
+  // Find the highest bet using isBetHigher comparison
+  // For equal bets (same amount and withoutTrump), the FIRST bet wins (chronological order)
+  // Dealer has NO special tie-breaking privilege - they can only MATCH, not steal the bet
   return validBets.reduce((highest, current) => {
     if (isBetHigher(current, highest)) return current;
-
-    // If bets are exactly equal (same amount and withoutTrump status), dealer wins
-    if (
-      current.amount === highest.amount &&
-      current.withoutTrump === highest.withoutTrump &&
-      dealerPlayerId &&
-      current.playerId === dealerPlayerId
-    ) {
-      return current;
-    }
-
+    // Keep the first bet if equal (no dealer tie-breaker)
     return highest;
   });
 };
