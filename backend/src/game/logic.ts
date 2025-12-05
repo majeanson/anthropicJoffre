@@ -201,11 +201,10 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
  * Rules:
  * - Skipped bets are filtered out
  * - Compares bets using isBetHigher() (amount, then withoutTrump)
- * - Tie-breaker: If bets are exactly equal, the FIRST bet wins (chronological)
- * - Dealer has NO special priority - they can match but not steal the winning bet
+ * - Tie-breaker: Dealer wins when bets are exactly equal (dealer can "steal" by matching)
  *
  * @param bets - Array of all bets placed (in chronological order)
- * @param _dealerPlayerId - Unused (kept for API compatibility)
+ * @param dealerPlayerId - Dealer's player ID for tie-breaking
  * @returns Highest bet, or null if no valid bets exist
  *
  * @example
@@ -216,26 +215,35 @@ export const isBetHigher = (bet1: Bet, bet2: Bet): boolean => {
  * ];
  * getHighestBet(bets); // returns p2's bet (11 points)
  *
- * // Equal bets - first bet wins
+ * // Dealer tie-breaker - dealer wins when matching
  * const equalBets = [
  *   { playerId: 'p1', playerName: 'Player 1', amount: 10, withoutTrump: false },
  *   { playerId: 'p2', playerName: 'Player 2', amount: 10, withoutTrump: false } // dealer matched
  * ];
- * getHighestBet(equalBets, 'p2'); // returns p1's bet (first bet wins, dealer cannot steal)
+ * getHighestBet(equalBets, 'p2'); // returns p2's bet (dealer steals by matching)
  */
-export const getHighestBet = (bets: Bet[], _dealerPlayerId?: string): Bet | null => {
+export const getHighestBet = (bets: Bet[], dealerPlayerId?: string): Bet | null => {
   if (bets.length === 0) return null;
 
   // Filter out skipped bets
   const validBets = bets.filter(bet => !bet.skipped);
   if (validBets.length === 0) return null;
 
-  // Find the highest bet using isBetHigher comparison
-  // For equal bets (same amount and withoutTrump), the FIRST bet wins (chronological order)
-  // Dealer has NO special tie-breaking privilege - they can only MATCH, not steal the bet
   return validBets.reduce((highest, current) => {
+    // Current bet strictly higher? It wins.
     if (isBetHigher(current, highest)) return current;
-    // Keep the first bet if equal (no dealer tie-breaker)
+
+    // If bets are exactly equal (same amount AND same withoutTrump), dealer wins the tie
+    if (
+      current.amount === highest.amount &&
+      current.withoutTrump === highest.withoutTrump &&
+      dealerPlayerId &&
+      current.playerId === dealerPlayerId
+    ) {
+      return current;
+    }
+
+    // Otherwise keep the current highest
     return highest;
   });
 };

@@ -278,14 +278,14 @@ describe('Game Logic', () => {
       expect(highest).toBeNull();
     });
 
-    it('should give first bet priority when bets are exactly equal (no dealer advantage)', () => {
+    it('should give dealer priority when bets are exactly equal (dealer steals)', () => {
       const bets: Bet[] = [
         { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: false },
         { playerId: 'dealer', playerName: 'Dealer', amount: 8, withoutTrump: false },
       ];
 
       const highest = getHighestBet(bets, 'dealer');
-      expect(highest?.playerId).toBe('p1'); // first bet wins, dealer cannot steal
+      expect(highest?.playerId).toBe('dealer'); // dealer steals by matching
     });
 
     it('should give without trump priority over regular bet at same amount', () => {
@@ -295,21 +295,32 @@ describe('Game Logic', () => {
       ];
 
       const highest = getHighestBet(bets, 'p1');
-      expect(highest?.playerId).toBe('p2'); // without trump wins
+      expect(highest?.playerId).toBe('p2'); // without trump wins over regular
     });
 
-    it('should give first without-trump bet priority when dealer matches it', () => {
-      // Critical bug fix: Team 2 bets 7 without trump, dealer matches - Team 2 should win
+    it('should give dealer priority when both are without trump and equal', () => {
+      // Dealer can steal by matching a without-trump bet with their own without-trump
       const bets: Bet[] = [
         { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: true },
         { playerId: 'dealer', playerName: 'Dealer', amount: 8, withoutTrump: true },
       ];
 
       const highest = getHighestBet(bets, 'dealer');
-      expect(highest?.playerId).toBe('p1'); // first without-trump bet wins, dealer cannot steal
+      expect(highest?.playerId).toBe('dealer'); // dealer steals by matching without-trump
     });
 
-    it('should handle multiple equal bets - first bet wins', () => {
+    it('should not give dealer priority when without trump differs', () => {
+      // Dealer bets regular, other player bets without trump - without trump wins
+      const bets: Bet[] = [
+        { playerId: 'dealer', playerName: 'Dealer', amount: 8, withoutTrump: false },
+        { playerId: 'p1', playerName: 'Player 1', amount: 8, withoutTrump: true },
+      ];
+
+      const highest = getHighestBet(bets, 'dealer');
+      expect(highest?.playerId).toBe('p1'); // without trump beats dealer's regular bet
+    });
+
+    it('should handle multiple equal bets - dealer wins', () => {
       const bets: Bet[] = [
         { playerId: 'p1', playerName: 'Player 1', amount: 9, withoutTrump: false },
         { playerId: 'dealer', playerName: 'Dealer', amount: 9, withoutTrump: false },
@@ -317,7 +328,7 @@ describe('Game Logic', () => {
       ];
 
       const highest = getHighestBet(bets, 'dealer');
-      expect(highest?.playerId).toBe('p1'); // first bet wins
+      expect(highest?.playerId).toBe('dealer'); // dealer wins tie
     });
   });
 });
