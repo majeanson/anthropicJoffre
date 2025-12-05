@@ -1301,8 +1301,15 @@ function AppContent() {
               if (gameState.roundHistory) {
                 for (const round of gameState.roundHistory) {
                   const wasBettingTeam = round.offensiveTeam === currentPlayer.teamId;
+                  // Count successful bets (player was on betting team AND bet was made)
                   if (wasBettingTeam && round.betMade) {
                     betsSuccessful++;
+                  }
+                  // Count rounds won/lost based on round score (positive = team scored points)
+                  const playerTeamScore = currentPlayer.teamId === 1
+                    ? round.roundScore.team1
+                    : round.roundScore.team2;
+                  if (playerTeamScore > 0) {
                     roundsWon++;
                   } else {
                     roundsLost++;

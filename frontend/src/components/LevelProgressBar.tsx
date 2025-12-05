@@ -43,15 +43,16 @@ export function LevelProgressBar({
     return Math.min(100, (currentLevelXP / nextLevelXP) * 100);
   }, [currentLevelXP, nextLevelXP]);
 
-  // Get level tier styling based on level
+  // Get level tier styling based on level - using inline CSS colors for proper rendering
+  // Dynamic Tailwind classes don't work at runtime, so we use inline styles
   const levelTier = useMemo(() => {
-    if (level >= 50) return { color: 'from-purple-500 to-pink-500', glow: 'shadow-purple-500/50', name: 'Legendary' };
-    if (level >= 40) return { color: 'from-yellow-400 to-orange-500', glow: 'shadow-yellow-500/50', name: 'Master' };
-    if (level >= 30) return { color: 'from-cyan-400 to-blue-500', glow: 'shadow-cyan-500/50', name: 'Expert' };
-    if (level >= 20) return { color: 'from-emerald-400 to-green-500', glow: 'shadow-emerald-500/50', name: 'Veteran' };
-    if (level >= 10) return { color: 'from-blue-400 to-indigo-500', glow: 'shadow-blue-500/50', name: 'Skilled' };
-    if (level >= 5) return { color: 'from-slate-400 to-slate-500', glow: 'shadow-slate-500/50', name: 'Apprentice' };
-    return { color: 'from-amber-600 to-amber-700', glow: 'shadow-amber-600/50', name: 'Beginner' };
+    if (level >= 50) return { gradient: 'linear-gradient(to bottom right, #a855f7, #ec4899)', glowColor: 'rgba(168, 85, 247, 0.5)', name: 'Legendary' };
+    if (level >= 40) return { gradient: 'linear-gradient(to bottom right, #facc15, #f97316)', glowColor: 'rgba(234, 179, 8, 0.5)', name: 'Master' };
+    if (level >= 30) return { gradient: 'linear-gradient(to bottom right, #22d3ee, #3b82f6)', glowColor: 'rgba(34, 211, 238, 0.5)', name: 'Expert' };
+    if (level >= 20) return { gradient: 'linear-gradient(to bottom right, #34d399, #22c55e)', glowColor: 'rgba(52, 211, 153, 0.5)', name: 'Veteran' };
+    if (level >= 10) return { gradient: 'linear-gradient(to bottom right, #60a5fa, #6366f1)', glowColor: 'rgba(96, 165, 250, 0.5)', name: 'Skilled' };
+    if (level >= 5) return { gradient: 'linear-gradient(to bottom right, #94a3b8, #64748b)', glowColor: 'rgba(148, 163, 184, 0.5)', name: 'Apprentice' };
+    return { gradient: 'linear-gradient(to bottom right, #d97706, #b45309)', glowColor: 'rgba(217, 119, 6, 0.5)', name: 'Beginner' };
   }, [level]);
 
   // Level badge component
@@ -61,10 +62,12 @@ export function LevelProgressBar({
         relative flex items-center justify-center
         ${compact ? 'w-8 h-8 text-sm' : 'w-12 h-12 text-lg'}
         rounded-full font-bold text-white
-        bg-gradient-to-br ${levelTier.color}
-        shadow-lg ${levelTier.glow}
         ${animate ? 'transition-all duration-300' : ''}
       `}
+      style={{
+        background: levelTier.gradient,
+        boxShadow: `0 10px 15px -3px ${levelTier.glowColor}, 0 4px 6px -4px ${levelTier.glowColor}`,
+      }}
       title={`Level ${level} - ${levelTier.name}`}
     >
       <span className="relative z-10">{level}</span>
@@ -73,10 +76,10 @@ export function LevelProgressBar({
         <div
           className={`
             absolute inset-0 rounded-full
-            bg-gradient-to-br ${levelTier.color}
             opacity-50 blur-sm
             ${animate ? 'animate-pulse' : ''}
           `}
+          style={{ background: levelTier.gradient }}
         />
       )}
     </div>
@@ -131,10 +134,12 @@ export function LevelProgressBar({
           <div
             className={`
               absolute inset-y-0 left-0 rounded-full
-              bg-gradient-to-r ${levelTier.color}
               ${animate ? 'transition-all duration-500 ease-out' : ''}
             `}
-            style={{ width: `${progressPercent}%` }}
+            style={{
+              width: `${progressPercent}%`,
+              background: levelTier.gradient.replace('to bottom right', 'to right'),
+            }}
           />
           {/* Animated shimmer effect */}
           {animate && progressPercent > 0 && (
@@ -167,24 +172,20 @@ export function LevelProgressBar({
  * LevelBadgeInline - A small inline level badge for use in player names
  */
 export function LevelBadgeInline({ level }: { level: number }) {
-  const tierColor = useMemo(() => {
-    if (level >= 50) return 'from-purple-500 to-pink-500';
-    if (level >= 40) return 'from-yellow-400 to-orange-500';
-    if (level >= 30) return 'from-cyan-400 to-blue-500';
-    if (level >= 20) return 'from-emerald-400 to-green-500';
-    if (level >= 10) return 'from-blue-400 to-indigo-500';
-    if (level >= 5) return 'from-slate-400 to-slate-500';
-    return 'from-amber-600 to-amber-700';
+  const tierStyle = useMemo(() => {
+    if (level >= 50) return { gradient: 'linear-gradient(to bottom right, #a855f7, #ec4899)' };
+    if (level >= 40) return { gradient: 'linear-gradient(to bottom right, #facc15, #f97316)' };
+    if (level >= 30) return { gradient: 'linear-gradient(to bottom right, #22d3ee, #3b82f6)' };
+    if (level >= 20) return { gradient: 'linear-gradient(to bottom right, #34d399, #22c55e)' };
+    if (level >= 10) return { gradient: 'linear-gradient(to bottom right, #60a5fa, #6366f1)' };
+    if (level >= 5) return { gradient: 'linear-gradient(to bottom right, #94a3b8, #64748b)' };
+    return { gradient: 'linear-gradient(to bottom right, #d97706, #b45309)' };
   }, [level]);
 
   return (
     <span
-      className={`
-        inline-flex items-center justify-center
-        w-5 h-5 text-[10px] font-bold text-white
-        rounded-full bg-gradient-to-br ${tierColor}
-        shadow-sm
-      `}
+      className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white rounded-full shadow-sm"
+      style={{ background: tierStyle.gradient }}
       title={`Level ${level}`}
     >
       {level}

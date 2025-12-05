@@ -257,11 +257,39 @@ export class BotPlayer {
     // Longest suit strength (potential to win if led)
     estimatedTricks += longestSuitColor.count * 0.5;
 
-    // Red 0 bonus (worth going for)
-    if (redZero) estimatedTricks += 0.5;
+    // RED 0 EVALUATION: Having red 0 in hand is complex
+    // - It's +5 points if your TEAM wins the trick containing it
+    // - Value 0 means you can NEVER win with it directly
+    // - Options: (1) teammate wins it, (2) bleed red with 7,6 then it's last red, (3) strong trump control
+    if (redZero) {
+      const redCardCount = hand.filter(c => c.color === 'red').length;
+      const has7Red = hand.some(c => c.color === 'red' && c.value === 7);
+      const has6Red = hand.some(c => c.color === 'red' && c.value === 6);
 
-    // Brown 0 penalty (want to avoid)
-    if (brownZero) estimatedTricks -= 0.3;
+      if (has7Red && has6Red) {
+        // Excellent: Can lead 7, then 6, bleed out red, then red 0 is secured
+        estimatedTricks += 1.5;
+      } else if (has7Red) {
+        // Good: 7 red helps control, decent chance
+        estimatedTricks += 0.8;
+      } else if (redCardCount === 1) {
+        // Only red 0 - actually good! Teammate likely has red control
+        // You can pass it to teammate when they win a trick
+        estimatedTricks += 0.5;
+      } else if (redCardCount >= 3) {
+        // Many reds but no 7 - harder to control, moderate
+        estimatedTricks += 0.2;
+      } else {
+        // Few reds, no 7 - uncertain, slight bonus for having red 0 at all
+        estimatedTricks += 0.3;
+      }
+    }
+
+    // BROWN 0 EVALUATION: Not really a penalty!
+    // - You can strategically dump it on opponents when they're winning
+    // - Having it gives you a "poison card" to hurt opponents
+    // - No bonus or penalty - it's neutral to slightly useful
+    // (Brown 0 avoidance is handled in card play logic, not betting)
 
     // IMPROVEMENT: Long trump suit bonus (5+ trump = trump bleed strategy)
     // With 5+ trump, you can:
@@ -390,7 +418,17 @@ export class BotPlayer {
       }
     }
 
-    // PRIORITY 2: Try to win red 0 trick (opponent has Red 0)
+    // PRIORITY 2: AVOID winning tricks with brown 0 - it's -2 points!
+    const brownZeroInTrick = currentTrick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
+    if (brownZeroInTrick && position > 1) {
+      // Brown 0 is in the trick - avoid winning it!
+      const nonWinningCards = impacts.filter(i => !i.canWinTrick);
+      if (nonWinningCards.length > 0) {
+        return nonWinningCards.sort((a, b) => a.card.value - b.card.value)[0].card;
+      }
+    }
+
+    // PRIORITY 3: Try to win red 0 trick (opponent has Red 0)
     const redZeroInTrick = currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
     if (redZeroInTrick && position > 1) {
       const winningCards = impacts.filter(i => i.canWinTrick);
@@ -402,7 +440,7 @@ export class BotPlayer {
       }
     }
 
-    // PRIORITY 3: Get rid of brown 0 when safe (only if partner not winning)
+    // PRIORITY 4: Get rid of brown 0 when safe (only if partner not winning)
     const brownZero = impacts.find(i => i.card.color === 'brown' && i.card.value === 0);
     if (brownZero && position > 1 && (!partner || currentWinner !== partner.id) && Math.random() < 0.6) {
       return brownZero.card;
@@ -471,7 +509,24 @@ export class BotPlayer {
       }
     }
 
-    // PRIORITY 2: Win red 0 at minimal cost (opponent has Red 0)
+    // PRIORITY 2: AVOID winning tricks with brown 0 - it's -2 points!
+    const brownZeroInTrick = currentTrick.some(tc => tc.card.color === 'brown' && tc.card.value === 0);
+    if (brownZeroInTrick && position > 1) {
+      // Brown 0 is in the trick - we do NOT want to win this!
+      // Try to play a non-winning card to let opponents take the penalty
+      const nonWinningCards = impacts.filter(i => !i.canWinTrick);
+      if (nonWinningCards.length > 0) {
+        // Play lowest non-winning card (save good cards for later)
+        return nonWinningCards.sort((a, b) => a.card.value - b.card.value)[0].card;
+      }
+      // If we MUST win (only winning cards available), use the lowest
+      const mustWinCards = impacts.filter(i => i.canWinTrick);
+      if (mustWinCards.length > 0) {
+        return mustWinCards.sort((a, b) => a.card.value - b.card.value)[0].card;
+      }
+    }
+
+    // PRIORITY 3: Win red 0 at minimal cost (opponent has Red 0)
     const redZeroInTrick = currentTrick.some(tc => tc.card.color === 'red' && tc.card.value === 0);
     if (redZeroInTrick && position > 1) {
       const winningCards = impacts.filter(i => i.canWinTrick).sort((a, b) => a.card.value - b.card.value);

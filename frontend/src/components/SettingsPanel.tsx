@@ -45,7 +45,7 @@ export function SettingsPanel({
   connectionStats
 }: SettingsPanelProps) {
   const { animationsEnabled, setAnimationsEnabled, beginnerMode, setBeginnerMode } = useSettings();
-  const { skinId, setSkin, availableSkins, cardSkinId, setCardSkin, availableCardSkins, isCardSkinUnlocked, getCardSkinRequiredLevel, playerLevel } = useSkin();
+  const { skinId, setSkin, availableSkins, cardSkinId, setCardSkin, availableCardSkins, isCardSkinUnlocked, getCardSkinRequiredLevel, isSkinUnlocked, getRequiredLevel, playerLevel } = useSkin();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
   if (!isOpen) return null;
@@ -71,11 +71,16 @@ export function SettingsPanel({
     { id: 'advanced', label: 'Advanced', icon: '🔧' },
   ];
 
-  // Convert skins to Select options (skin names already include emoji indicators)
-  const skinOptions = availableSkins.map(skin => ({
-    value: skin.id,
-    label: skin.name,
-  }));
+  // Convert skins to Select options with lock indicators
+  const skinOptions = availableSkins.map(skin => {
+    const isLocked = !isSkinUnlocked(skin.id);
+    const requiredLevel = getRequiredLevel(skin.id);
+    return {
+      value: skin.id,
+      label: isLocked ? `🔒 ${skin.name} (Lvl ${requiredLevel})` : skin.name,
+      disabled: isLocked,
+    };
+  });
 
   // Convert card skins to Select options with lock indicators
   const cardSkinOptions = availableCardSkins.map(cardSkin => {
@@ -178,12 +183,22 @@ export function SettingsPanel({
                 label="Visual Theme"
                 options={skinOptions}
                 value={skinId}
-                onChange={(e) => setSkin(e.target.value as SkinId)}
+                onChange={(e) => {
+                  const newId = e.target.value as SkinId;
+                  if (isSkinUnlocked(newId)) {
+                    setSkin(newId);
+                  }
+                }}
                 fullWidth
                 variant="arcane"
               />
               <p className="text-xs text-[var(--color-text-muted)] mt-2 ml-1">
                 {availableSkins.find(s => s.id === skinId)?.description}
+                {playerLevel < 15 && (
+                  <span className="block mt-1 text-[var(--color-text-accent)]">
+                    Level up to unlock more visual themes!
+                  </span>
+                )}
               </p>
             </div>
 
