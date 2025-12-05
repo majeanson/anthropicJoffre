@@ -332,7 +332,7 @@ const RewardsContent = () => (
         <li>• <strong>Complete games (ranked)</strong> - 5 coins for finishing, +10 bonus for winning</li>
         <li>• <strong>Daily quests</strong> - Complete objectives for coin rewards</li>
         <li>• <strong>Weekly calendar</strong> - Claim daily rewards (up to 100 coins on special days!)</li>
-        <li>• <strong>Unlock achievements</strong> - Bronze (10), Silver (25), Gold (50), Platinum (100)</li>
+        <li>• <strong>Unlock achievements</strong> - Bronze (100), Silver (250), Gold (500), Platinum (1000)</li>
         <li>• <strong>Win side bets</strong> - Double your bet on correct predictions!</li>
       </ul>
     </SectionCard>

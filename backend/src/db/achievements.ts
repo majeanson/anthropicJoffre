@@ -129,12 +129,12 @@ export async function updateAchievementProgress(
   if (unlocked && newProgress - progressIncrement < maxProgress) {
     // Calculate coin reward based on tier
     const coinRewardByTier: Record<string, number> = {
-      bronze: 10,
-      silver: 25,
-      gold: 50,
-      platinum: 100,
+      bronze: 100,
+      silver: 250,
+      gold: 500,
+      platinum: 1000,
     };
-    const coinReward = coinRewardByTier[achievement.tier] || 10;
+    const coinReward = coinRewardByTier[achievement.tier] || 100;
 
     await query(
       `UPDATE player_stats
