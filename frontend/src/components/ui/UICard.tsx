@@ -97,38 +97,39 @@ export const UICard: React.FC<UICardProps> = ({
       }[padding]
     : '';
 
-  // Variant-specific styles - use parchment theme for light mode consistency
-  // Using parchment-100 for warmer, less white backgrounds
+  // Variant-specific styles - use parchment theme for consistent light backgrounds
+  // Note: Removed dark: variants since UICard is primarily used in parchment-themed modals
   const variantStyles = {
-    default: 'bg-parchment-100 dark:bg-gray-800 shadow-md',
-    elevated: 'bg-parchment-100 dark:bg-gray-800 shadow-lg',
-    bordered: 'bg-parchment-100 dark:bg-gray-800 border-2 shadow-sm',
+    default: 'bg-parchment-100 shadow-md',
+    elevated: 'bg-parchment-100 shadow-lg',
+    bordered: 'bg-parchment-100 border-2 shadow-sm',
     gradient: '',
   }[variant];
 
   // Border color for bordered variant
   const borderColor =
     variant === 'bordered'
-      ? 'border-parchment-400 dark:border-gray-600'
+      ? 'border-parchment-400'
       : '';
 
   // Gradient styles (only for gradient variant) - fully opaque backgrounds
+  // Note: Removed dark: variants since UICard is primarily used in parchment-themed modals
   const gradientStyles =
     variant === 'gradient'
       ? {
           team1:
-            'bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900 dark:to-orange-800 border border-orange-200 dark:border-orange-600',
+            'bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200',
           team2:
-            'bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900 dark:to-purple-800 border border-purple-200 dark:border-purple-600',
+            'bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200',
           success:
-            'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900 dark:to-green-800 border border-green-200 dark:border-green-600',
+            'bg-gradient-to-br from-green-50 to-green-100 border border-green-200',
           warning:
-            'bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-900 dark:to-yellow-800 border border-yellow-200 dark:border-yellow-600',
+            'bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200',
           error:
-            'bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900 dark:to-red-800 border border-red-200 dark:border-red-600',
-          info: 'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900 dark:to-blue-800 border border-blue-200 dark:border-blue-600',
+            'bg-gradient-to-br from-red-50 to-red-100 border border-red-200',
+          info: 'bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200',
           primary:
-            'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-900 dark:to-indigo-800 border border-indigo-200 dark:border-indigo-600',
+            'bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200',
         }[gradient]
       : '';
 

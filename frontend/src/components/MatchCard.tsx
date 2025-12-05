@@ -17,12 +17,31 @@ interface MatchCardProps {
 }
 
 export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps) {
+  const isFinished = game.is_finished;
   const isWin = game.won_game;
+
+  // Determine the gradient/status based on game state
+  const getGradient = () => {
+    if (!isFinished) return 'warning'; // Yellow/amber for in-progress
+    return isWin ? 'success' : 'error';
+  };
+
+  // Get status text
+  const getStatusText = () => {
+    if (!isFinished) return '⏳ In Progress';
+    return isWin ? '✓ Victory' : '✗ Defeat';
+  };
+
+  // Get status color class
+  const getStatusColorClass = () => {
+    if (!isFinished) return 'text-amber-700';
+    return isWin ? 'text-green-700' : 'text-red-700';
+  };
 
   return (
     <UICard
       variant="gradient"
-      gradient={isWin ? 'success' : 'error'}
+      gradient={getGradient()}
       onClick={onViewDetails ? () => onViewDetails(game.game_id) : undefined}
       className={onViewDetails ? 'cursor-pointer' : ''}
     >
@@ -30,70 +49,97 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
       <div className="flex items-center justify-between gap-4 mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-lg font-bold ${
-              isWin
-                ? 'text-green-700 dark:text-green-300'
-                : 'text-red-700 dark:text-red-300'
-            }`}>
-              {isWin ? '✓ Victory' : '✗ Defeat'}
+            <span className={`text-lg font-bold ${getStatusColorClass()}`}>
+              {getStatusText()}
             </span>
-            <UIBadge variant="solid" color={game.team_id === 1 ? 'team1' : 'team2'} size="xs" shape="pill">
-              Team {game.team_id}
-            </UIBadge>
+            {game.team_id && (
+              <UIBadge variant="solid" color={game.team_id === 1 ? 'team1' : 'team2'} size="xs" shape="pill">
+                Team {game.team_id}
+              </UIBadge>
+            )}
           </div>
-          <div className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="text-sm text-gray-600">
             {game.finished_at ? new Date(game.finished_at).toLocaleDateString('en-US', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
               hour: '2-digit',
               minute: '2-digit'
-            }) : 'In Progress'}
+            }) : game.created_at ? `Started ${new Date(game.created_at).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}` : 'In Progress'}
           </div>
         </div>
 
         {/* Score */}
         <div className="text-right">
-          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-            {game.team1_score} - {game.team2_score}
+          <div className="text-2xl font-bold text-gray-900">
+            {game.team1_score ?? 0} - {game.team2_score ?? 0}
           </div>
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            {game.rounds} rounds
+          <div className="text-xs text-gray-600">
+            {game.rounds ?? 0} round{(game.rounds ?? 0) !== 1 ? 's' : ''}
           </div>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 text-sm mb-3 pt-3 border-t border-gray-300 dark:border-gray-600">
+      {/* Stats - Only show if we have data */}
+      <div className="grid grid-cols-3 gap-3 text-sm mb-3 pt-3 border-t border-gray-300">
         <div>
-          <p className="text-gray-600 dark:text-gray-400">Tricks Won</p>
-          <p className="font-bold text-gray-900 dark:text-gray-100">{game.tricks_won}</p>
+          <p className="text-gray-600">Tricks Won</p>
+          <p className="font-bold text-gray-900">{game.tricks_won ?? '-'}</p>
         </div>
         <div>
-          <p className="text-gray-600 dark:text-gray-400">Points Earned</p>
-          <p className="font-bold text-gray-900 dark:text-gray-100">{game.points_earned}</p>
+          <p className="text-gray-600">Points Earned</p>
+          <p className="font-bold text-gray-900">{game.points_earned ?? '-'}</p>
         </div>
-        {game.bet_amount !== null && (
+        {game.bet_amount !== null && game.bet_amount !== undefined ? (
           <div>
-            <p className="text-gray-600 dark:text-gray-400">Bet</p>
-            <p className="font-bold text-gray-900 dark:text-gray-100">
+            <p className="text-gray-600">Bet</p>
+            <p className="font-bold text-gray-900">
               {game.bet_amount} {game.bet_won === true ? '✓' : game.bet_won === false ? '✗' : ''}
             </p>
+          </div>
+        ) : (
+          <div>
+            <p className="text-gray-600">Status</p>
+            <p className="font-bold text-gray-900">{isFinished ? 'N/A' : 'Active'}</p>
           </div>
         )}
       </div>
 
-      {/* View Replay Button */}
-      {onViewReplay && game.is_finished && (
+      {/* Action Buttons */}
+      {game.is_finished ? (
+        // View Replay for finished games
+        onViewReplay && (
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewReplay(game.game_id);
+            }}
+          >
+            <span aria-hidden="true">📺</span> View Replay
+          </Button>
+        )
+      ) : (
+        // Resume button for unfinished games
         <Button
-          variant="secondary"
+          variant="warning"
           fullWidth
           onClick={(e) => {
             e.stopPropagation();
-            onViewReplay(game.game_id);
+            // TODO: Implement resume game functionality
+            console.log('Resume game:', game.game_id);
           }}
+          disabled
+          title="Resume functionality coming soon"
         >
-          <span aria-hidden="true">📺</span> View Replay
+          <span aria-hidden="true">▶️</span> Resume Game (Coming Soon)
         </Button>
       )}
     </UICard>

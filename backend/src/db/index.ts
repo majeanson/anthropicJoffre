@@ -615,6 +615,8 @@ export const getLeaderboard = async (limit: number = 100, excludeBots: boolean =
 
 /**
  * Get player's game history
+ * Uses LEFT JOIN to include games even if game_participants isn't populated yet
+ * Falls back to player_names array for unfinished games without participant data
  */
 export const getPlayerGameHistory = async (playerName: string, limit: number = 20) => {
   const cacheKey = `player_history:${playerName}:${limit}`;
@@ -630,18 +632,34 @@ export const getPlayerGameHistory = async (playerName: string, limit: number = 2
         gh.is_finished,
         gh.created_at,
         gh.finished_at,
-        gp.team_id,
-        gp.tricks_won,
-        gp.points_earned,
+        gh.player_names,
+        gh.player_teams,
+        COALESCE(gp.team_id, (
+          SELECT gh.player_teams[idx]
+          FROM generate_subscripts(gh.player_names, 1) AS idx
+          WHERE gh.player_names[idx] = $1
+          LIMIT 1
+        )) as team_id,
+        COALESCE(gp.tricks_won, 0) as tricks_won,
+        COALESCE(gp.points_earned, 0) as points_earned,
         gp.bet_amount,
         gp.bet_won,
         CASE
-          WHEN gh.winning_team = gp.team_id THEN TRUE
+          WHEN gh.winning_team IS NULL THEN NULL
+          WHEN gh.winning_team = COALESCE(gp.team_id, (
+            SELECT gh.player_teams[idx]
+            FROM generate_subscripts(gh.player_names, 1) AS idx
+            WHERE gh.player_names[idx] = $1
+            LIMIT 1
+          )) THEN TRUE
           ELSE FALSE
         END as won_game
       FROM game_history gh
-      JOIN game_participants gp ON gh.game_id = gp.game_id
-      WHERE gp.player_name = $1
+      LEFT JOIN game_participants gp ON gh.game_id = gp.game_id AND gp.player_name = $1
+      WHERE (
+          gp.player_name = $1
+          OR $1 = ANY(gh.player_names)
+        )
         AND (
           gh.is_finished = FALSE
           OR (gh.is_finished = TRUE AND gh.round_history IS NOT NULL AND jsonb_array_length(gh.round_history) > 0)

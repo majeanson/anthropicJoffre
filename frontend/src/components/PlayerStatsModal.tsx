@@ -260,7 +260,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
           <div>
             <h2 className="text-2xl font-bold text-parchment-50">{playerName}</h2>
             <div className="flex items-center gap-2 mt-1">
-              <span className="text-amber-200 dark:text-gray-300 text-sm">
+              <span className="text-amber-200 text-sm">
                 {stats ? `Joined ${new Date(stats.created_at).toLocaleDateString()}` : 'Loading...'}
               </span>
               {isOwnProfile && (
@@ -286,15 +286,15 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
 
           {/* Sprint 6: Error State */}
           {!loading && error && (
-            <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+            <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4">
               <div className="flex items-start gap-3">
                 <span className="text-2xl" aria-hidden="true">⚠️</span>
                 <div className="flex-1">
-                  <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                  <p className="text-red-800 font-semibold mb-1">
                     {error}
                   </p>
                   {correlationId && (
-                    <p className="text-xs text-red-700 dark:text-red-300 font-mono mt-2">
+                    <p className="text-xs text-red-700 font-mono mt-2">
                       Error ID: {correlationId}
                       <br />
                       <span className="text-xs opacity-75">
@@ -322,10 +322,10 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
           {!loading && !error && !stats && (
             <div className="text-center py-12">
               <span className="text-6xl" aria-hidden="true">❌</span>
-              <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold text-lg">
+              <p className="mt-4 text-gray-700 font-bold text-lg">
                 No statistics found for {playerName}
               </p>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600">
                 Play some games to start building your stats!
               </p>
             </div>
@@ -372,122 +372,122 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                 <div className="space-y-6 animate-fadeIn">
                   {/* Round Performance */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-4 border-2 border-blue-300 dark:border-blue-600">
-                      <p className="text-blue-700 dark:text-blue-300 font-bold text-sm">Total Rounds</p>
-                      <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.total_rounds_played || 0}</p>
+                    <div className="bg-blue-100 rounded-lg p-4 border-2 border-blue-300">
+                      <p className="text-blue-700 font-bold text-sm">Total Rounds</p>
+                      <p className="text-3xl font-bold text-blue-900">{stats.total_rounds_played || 0}</p>
                     </div>
-                    <div className="bg-green-100 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
-                      <p className="text-green-700 dark:text-green-300 font-bold text-sm">Rounds Won</p>
-                      <p className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.rounds_won || 0}</p>
+                    <div className="bg-green-100 rounded-lg p-4 border-2 border-green-300">
+                      <p className="text-green-700 font-bold text-sm">Rounds Won</p>
+                      <p className="text-3xl font-bold text-green-900">{stats.rounds_won || 0}</p>
                     </div>
-                    <div className="bg-red-100 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-300 dark:border-red-600">
-                      <p className="text-red-700 dark:text-red-300 font-bold text-sm">Rounds Lost</p>
-                      <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.rounds_lost || 0}</p>
+                    <div className="bg-red-100 rounded-lg p-4 border-2 border-red-300">
+                      <p className="text-red-700 font-bold text-sm">Rounds Lost</p>
+                      <p className="text-3xl font-bold text-red-900">{stats.rounds_lost || 0}</p>
                     </div>
-                    <div className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-4 border-2 border-purple-300 dark:border-purple-600">
-                      <p className="text-purple-700 dark:text-purple-300 font-bold text-sm">Win Rate</p>
-                      <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.rounds_win_percentage || 0}%</p>
+                    <div className="bg-purple-100 rounded-lg p-4 border-2 border-purple-300">
+                      <p className="text-purple-700 font-bold text-sm">Win Rate</p>
+                      <p className="text-3xl font-bold text-purple-900">{stats.rounds_win_percentage || 0}%</p>
                     </div>
                   </div>
 
                   {/* Trick Performance */}
-                  <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 dark:from-indigo-900/40 dark:to-cyan-900/40 rounded-lg p-6 border-2 border-indigo-200 dark:border-indigo-600">
-                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 rounded-lg p-6 border-2 border-indigo-200">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                       <span aria-hidden="true">🎯</span> Trick Performance
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Total Tricks</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_tricks_won || 0}</p>
+                        <p className="text-gray-600 text-sm">Total Tricks</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.total_tricks_won || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Per Round</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_tricks_per_round || 0}</p>
+                        <p className="text-gray-600 text-sm">Avg Per Round</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.avg_tricks_per_round || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Best Round</p>
-                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.most_tricks_in_round || 0}</p>
+                        <p className="text-gray-600 text-sm">Best Round</p>
+                        <p className="text-2xl font-bold text-green-700">{stats.most_tricks_in_round || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Zero Tricks</p>
-                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.zero_trick_rounds || 0}</p>
+                        <p className="text-gray-600 text-sm">Zero Tricks</p>
+                        <p className="text-2xl font-bold text-red-700">{stats.zero_trick_rounds || 0}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Betting Performance */}
-                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 dark:from-orange-900/40 dark:to-yellow-900/40 rounded-lg p-6 border-2 border-orange-200 dark:border-orange-600">
-                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-orange-50 to-yellow-50 rounded-lg p-6 border-2 border-orange-200">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                       <span aria-hidden="true">💰</span> Betting Performance
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Placed</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_bets_placed || 0}</p>
+                        <p className="text-gray-600 text-sm">Bets Placed</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.total_bets_placed || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Made</p>
-                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.bets_made || 0}</p>
+                        <p className="text-gray-600 text-sm">Bets Made</p>
+                        <p className="text-2xl font-bold text-green-700">{stats.bets_made || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Bets Failed</p>
-                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.bets_failed || 0}</p>
+                        <p className="text-gray-600 text-sm">Bets Failed</p>
+                        <p className="text-2xl font-bold text-red-700">{stats.bets_failed || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Success Rate</p>
-                        <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{stats.bet_success_rate || 0}%</p>
+                        <p className="text-gray-600 text-sm">Success Rate</p>
+                        <p className="text-2xl font-bold text-purple-700">{stats.bet_success_rate || 0}%</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Bet</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_bet_amount || 0}</p>
+                        <p className="text-gray-600 text-sm">Avg Bet</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.avg_bet_amount || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Highest Bet</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.highest_bet || 0}</p>
+                        <p className="text-gray-600 text-sm">Highest Bet</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.highest_bet || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Without Trump</p>
-                        <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{stats.without_trump_bets || 0}</p>
+                        <p className="text-gray-600 text-sm">Without Trump</p>
+                        <p className="text-2xl font-bold text-purple-700">{stats.without_trump_bets || 0}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Points Performance */}
-                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/40 dark:to-teal-900/40 rounded-lg p-6 border-2 border-emerald-200 dark:border-emerald-600">
-                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-6 border-2 border-emerald-200">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                       <span aria-hidden="true">⭐</span> Points Performance
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Total Points</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total_points_earned || 0}</p>
+                        <p className="text-gray-600 text-sm">Total Points</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.total_points_earned || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Per Round</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_points_per_round || 0}</p>
+                        <p className="text-gray-600 text-sm">Avg Per Round</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.avg_points_per_round || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Best Round</p>
-                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.highest_points_in_round || 0}</p>
+                        <p className="text-gray-600 text-sm">Best Round</p>
+                        <p className="text-2xl font-bold text-green-700">{stats.highest_points_in_round || 0}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Special Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-red-50 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-200 dark:border-red-600">
-                      <p className="text-red-700 dark:text-red-300 font-bold mb-2 flex items-center gap-2">
+                    <div className="bg-red-50 rounded-lg p-4 border-2 border-red-200">
+                      <p className="text-red-700 font-bold mb-2 flex items-center gap-2">
                         <span aria-hidden="true">🔴</span> Red Zeros Collected
                       </p>
-                      <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.red_zeros_collected || 0}</p>
-                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">+5 bonus points each</p>
+                      <p className="text-3xl font-bold text-red-900">{stats.red_zeros_collected || 0}</p>
+                      <p className="text-xs text-red-600 mt-1">+5 bonus points each</p>
                     </div>
-                    <div className="bg-amber-50 dark:bg-amber-900/40 rounded-lg p-4 border-2 border-amber-200 dark:border-amber-600">
-                      <p className="text-amber-700 dark:text-amber-300 font-bold mb-2 flex items-center gap-2">
+                    <div className="bg-amber-50 rounded-lg p-4 border-2 border-amber-200">
+                      <p className="text-amber-700 font-bold mb-2 flex items-center gap-2">
                         <span aria-hidden="true">🟤</span> Brown Zeros Received
                       </p>
-                      <p className="text-3xl font-bold text-amber-900 dark:text-amber-100">{stats.brown_zeros_received || 0}</p>
-                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">-3 penalty points each</p>
+                      <p className="text-3xl font-bold text-amber-900">{stats.brown_zeros_received || 0}</p>
+                      <p className="text-xs text-amber-600 mt-1">-3 penalty points each</p>
                     </div>
                   </div>
                 </div>
@@ -498,66 +498,66 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                 <div className="space-y-6 animate-fadeIn">
                   {/* Win/Loss Record */}
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-4 border-2 border-blue-300 dark:border-blue-600">
-                      <p className="text-blue-700 dark:text-blue-300 font-bold text-sm">Games Played</p>
-                      <p className="text-3xl font-bold text-blue-900 dark:text-blue-100">{stats.games_played}</p>
+                    <div className="bg-blue-100 rounded-lg p-4 border-2 border-blue-300">
+                      <p className="text-blue-700 font-bold text-sm">Games Played</p>
+                      <p className="text-3xl font-bold text-blue-900">{stats.games_played}</p>
                     </div>
-                    <div className="bg-green-100 dark:bg-green-900/40 rounded-lg p-4 border-2 border-green-300 dark:border-green-600">
-                      <p className="text-green-700 dark:text-green-300 font-bold text-sm">Games Won</p>
-                      <p className="text-3xl font-bold text-green-900 dark:text-green-100">{stats.games_won}</p>
+                    <div className="bg-green-100 rounded-lg p-4 border-2 border-green-300">
+                      <p className="text-green-700 font-bold text-sm">Games Won</p>
+                      <p className="text-3xl font-bold text-green-900">{stats.games_won}</p>
                     </div>
-                    <div className="bg-red-100 dark:bg-red-900/40 rounded-lg p-4 border-2 border-red-300 dark:border-red-600">
-                      <p className="text-red-700 dark:text-red-300 font-bold text-sm">Games Lost</p>
-                      <p className="text-3xl font-bold text-red-900 dark:text-red-100">{stats.games_lost}</p>
+                    <div className="bg-red-100 rounded-lg p-4 border-2 border-red-300">
+                      <p className="text-red-700 font-bold text-sm">Games Lost</p>
+                      <p className="text-3xl font-bold text-red-900">{stats.games_lost}</p>
                     </div>
-                    <div className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-4 border-2 border-purple-300 dark:border-purple-600">
-                      <p className="text-purple-700 dark:text-purple-300 font-bold text-sm">Win Rate</p>
-                      <p className="text-3xl font-bold text-purple-900 dark:text-purple-100">{stats.win_percentage}%</p>
+                    <div className="bg-purple-100 rounded-lg p-4 border-2 border-purple-300">
+                      <p className="text-purple-700 font-bold text-sm">Win Rate</p>
+                      <p className="text-3xl font-bold text-purple-900">{stats.win_percentage}%</p>
                     </div>
                   </div>
 
                   {/* Streaks */}
-                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/40 dark:to-orange-900/40 rounded-lg p-6 border-2 border-yellow-200 dark:border-yellow-600">
-                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg p-6 border-2 border-yellow-200">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                       <span aria-hidden="true">🔥</span> Streaks
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Current Win</p>
-                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.current_win_streak || 0}</p>
+                        <p className="text-gray-600 text-sm">Current Win</p>
+                        <p className="text-2xl font-bold text-green-700">{stats.current_win_streak || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Best Win</p>
-                        <p className="text-2xl font-bold text-green-700 dark:text-green-400">{stats.best_win_streak || 0}</p>
+                        <p className="text-gray-600 text-sm">Best Win</p>
+                        <p className="text-2xl font-bold text-green-700">{stats.best_win_streak || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Current Loss</p>
-                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.current_loss_streak || 0}</p>
+                        <p className="text-gray-600 text-sm">Current Loss</p>
+                        <p className="text-2xl font-bold text-red-700">{stats.current_loss_streak || 0}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Worst Loss</p>
-                        <p className="text-2xl font-bold text-red-700 dark:text-red-400">{stats.worst_loss_streak || 0}</p>
+                        <p className="text-gray-600 text-sm">Worst Loss</p>
+                        <p className="text-2xl font-bold text-red-700">{stats.worst_loss_streak || 0}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Game Records */}
-                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-900/40 dark:to-blue-900/40 rounded-lg p-6 border-2 border-cyan-200 dark:border-cyan-600">
-                    <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg p-6 border-2 border-cyan-200">
+                    <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
                       <span aria-hidden="true">📈</span> Game Records
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Fastest Win</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.fastest_win || 'N/A'} {stats.fastest_win && 'rounds'}</p>
+                        <p className="text-gray-600 text-sm">Fastest Win</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.fastest_win || 'N/A'} {stats.fastest_win && 'rounds'}</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Longest Game</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.longest_game || 0} rounds</p>
+                        <p className="text-gray-600 text-sm">Longest Game</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.longest_game || 0} rounds</p>
                       </div>
                       <div>
-                        <p className="text-gray-600 dark:text-gray-400 text-sm">Avg Duration</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.avg_game_duration_minutes || 0} min</p>
+                        <p className="text-gray-600 text-sm">Avg Duration</p>
+                        <p className="text-2xl font-bold text-gray-900">{stats.avg_game_duration_minutes || 0} min</p>
                       </div>
                     </div>
                   </div>
@@ -582,7 +582,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {/* Result Filter - Only show for finished games */}
                   {historyTab === 'finished' && (
                     <div className="flex gap-2 items-center flex-wrap">
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Filter:</span>
+                      <span className="text-sm font-semibold text-gray-700">Filter:</span>
                       <Button
                         onClick={() => setResultFilter('all')}
                         variant={resultFilter === 'all' ? 'secondary' : 'ghost'}
@@ -605,7 +605,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                         ❌ Losses
                       </Button>
 
-                      <span className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-4">Sort by:</span>
+                      <span className="text-sm font-semibold text-gray-700 ml-4">Sort by:</span>
                       <Button
                         onClick={() => setSortBy('date')}
                         variant={sortBy === 'date' ? 'primary' : 'ghost'}
@@ -642,17 +642,17 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {historyLoading && (
                     <div className="text-center py-12">
                       <Spinner size="lg" color="success" />
-                      <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading game history...</p>
+                      <p className="mt-4 text-gray-600 font-semibold">Loading game history...</p>
                     </div>
                   )}
 
                   {/* Sprint 6: History Error State */}
                   {!historyLoading && historyError && (
-                    <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+                    <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <span className="text-2xl" aria-hidden="true">⚠️</span>
                         <div className="flex-1">
-                          <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                          <p className="text-red-800 font-semibold mb-1">
                             {historyError}
                           </p>
                           <Button
@@ -674,10 +674,10 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {!historyLoading && !historyError && gameHistory.length === 0 && (
                     <div className="text-center py-12">
                       <span className="text-6xl" aria-hidden="true">📭</span>
-                      <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold text-lg">
+                      <p className="mt-4 text-gray-700 font-bold text-lg">
                         No game history found
                       </p>
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-gray-600">
                         Play some games to build your history!
                       </p>
                     </div>
@@ -688,13 +688,13 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                       {filteredAndSortedGames.length === 0 ? (
                         <div className="text-center py-12">
                           <span className="text-4xl" aria-hidden="true">🔍</span>
-                          <p className="mt-4 text-gray-700 dark:text-gray-300 font-bold">
+                          <p className="mt-4 text-gray-700 font-bold">
                             No {resultFilter === 'won' ? 'wins' : resultFilter === 'lost' ? 'losses' : historyTab + ' games'} found
                           </p>
                         </div>
                       ) : (
                         <>
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
+                          <p className="text-sm text-gray-600">
                             Showing {filteredAndSortedGames.length} {historyTab} game{filteredAndSortedGames.length !== 1 ? 's' : ''}
                             {historyTab === 'finished' && resultFilter !== 'all' && (
                               <span className="font-semibold"> ({resultFilter === 'won' ? 'wins only' : 'losses only'})</span>
@@ -729,17 +729,17 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
                   {profileLoading && (
                     <div className="text-center py-12">
                       <Spinner size="lg" color="warning" />
-                      <p className="mt-4 text-gray-600 dark:text-gray-400 font-semibold">Loading profile...</p>
+                      <p className="mt-4 text-gray-600 font-semibold">Loading profile...</p>
                     </div>
                   )}
 
                   {/* Sprint 6: Profile Error State */}
                   {!profileLoading && profileError && (
-                    <div className="bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4">
+                    <div className="bg-red-50 border-2 border-red-400 rounded-lg p-4">
                       <div className="flex items-start gap-3">
                         <span className="text-2xl" aria-hidden="true">⚠️</span>
                         <div className="flex-1">
-                          <p className="text-red-800 dark:text-red-200 font-semibold mb-1">
+                          <p className="text-red-800 font-semibold mb-1">
                             {profileError}
                           </p>
                           <Button
@@ -788,7 +788,7 @@ export function PlayerStatsModal({ playerName, socket, isOpen, onClose, onViewRe
               )}
 
               {/* Footer */}
-              <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-4 border-t-2 border-gray-300 dark:border-gray-600">
+              <div className="text-center text-sm text-gray-500 pt-4 border-t-2 border-gray-300">
                 <p>Member since: {new Date(stats.created_at).toLocaleDateString()}</p>
                 <p>Last updated: {new Date(stats.updated_at).toLocaleString()}</p>
               </div>
