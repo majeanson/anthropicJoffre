@@ -57,9 +57,9 @@ export default function SideBetsPanel({
     type: 'success' | 'error' | 'info';
   } | null>(null);
 
-  // Fetch bets on mount and when panel opens
+  // Fetch bets only when panel is opened
   useEffect(() => {
-    if (!socket || !gameId) return;
+    if (!socket || !gameId || !isOpen) return;
 
     socket.emit('get_side_bets', { gameId });
     socket.emit('get_balance', { gameId });

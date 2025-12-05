@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T04:49:37.867Z",
+  "buildDate": "2025-12-05T12:42:38.579Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "fix: Multiple UI and bot AI improvements\n\n- Fix locked skin display in Settings Panel Theme tab\n  - Visual themes now show lock icon and required level\n  - Prevent selecting locked skins\n\n- Fix invisible XP progress bar in LevelProgressBar\n  - Convert dynamic Tailwind gradient classes to inline CSS\n  - All level tier colors now render correctly\n\n- Fix roundsWon/Lost calculation in game over panel\n  - Now based on actual round score instead of betting team only\n  - Defensive team wins now counted correctly\n\n- Improve bot AI for brown 0 handling\n  - Bots now actively AVOID winning tricks containing brown 0\n  - Added priority check before red 0 capture logic\n  - Both medium and hard difficulty affected\n\n- Improve bet suggestions for red 0 / brown 0 cards\n  - Red 0 evaluation now considers card control (7, 6 in red)\n  - Having only red 0 is actually good (teammate has control)\n  - Brown 0 is neutral (can poison opponents strategically)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "a401e2e",
-    "commitDate": "2025-12-04 23:11:50 -0500",
+    "commitMessage": "feat: Add side betting system v5.0.0\n\nImplement complete side betting system for players and spectators:\n\nBackend:\n- Add side_bets table to schema.sql\n- Create sideBets.ts with CRUD operations and coin management\n- Create sideBets socket handlers for real-time betting\n- Add SideBet types to game.ts\n\nFrontend:\n- Add SideBetsPanel component with slide-out panel design\n- Add CreateBetModal for preset/custom bet creation\n- Add Side Bets button to GameHeader with notification badge\n- Integrate into PlayingPhase with controlled props\n\nFeatures:\n- Preset bets: red 0 winner, brown 0 victim, bet made, etc.\n- Custom bets with free-text description\n- Auto-resolution for preset bets\n- Manual resolution with dispute handling for custom bets\n- Coin balance management with transactions\n- Real-time notifications for bet events\n- Mobile-friendly responsive design\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "a1a655f",
+    "commitDate": "2025-12-04 23:50:30 -0500",
     "branch": "main"
   },
   "futureTodos": [
