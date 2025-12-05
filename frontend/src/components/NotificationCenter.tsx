@@ -111,8 +111,9 @@ export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: Noti
     }
   };
 
-  // Only show if authenticated
-  if (!isAuthenticated) return null;
+  // Only show if authenticated and has notifications (either unread count > 0 OR has any notifications)
+  const hasNotifications = unreadCount > 0 || notifications.length > 0;
+  if (!isAuthenticated || !hasNotifications) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-40" ref={dropdownRef}>

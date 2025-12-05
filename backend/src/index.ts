@@ -1355,7 +1355,15 @@ io.on('connection', (socket) => {
   // Connection Quality - Sprint 6
   // ============================================================================
   // Simple ping measurement for connection quality monitoring
+  // Also refreshes player's online activity timestamp to prevent being filtered out
   socket.on('ping_measurement', ({ timestamp }, callback) => {
+    // Refresh online player activity to prevent being filtered out after 30s idle
+    if (socket.data.playerName) {
+      const existing = onlinePlayers.get(socket.id);
+      if (existing) {
+        existing.lastActivity = Date.now();
+      }
+    }
     // Echo back the timestamp so client can calculate latency
     callback({ timestamp });
   });
