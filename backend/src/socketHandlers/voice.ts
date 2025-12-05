@@ -71,8 +71,11 @@ export function registerVoiceHandlers(socket: Socket, deps: VoiceHandlersDepende
       return;
     }
 
-    // Check if user is a player or spectator (spectators are in socket.io room)
-    const player = game.players.find(p => p.id === socket.id);
+    // Find player by name (stable identifier) - socket IDs are volatile
+    const playerName = socket.data.playerName;
+    const player = playerName
+      ? game.players.find(p => p.name === playerName)
+      : game.players.find(p => p.id === socket.id);
     const spectatorRoom = io.sockets.adapter.rooms.get(`${gameId}-spectators`);
     const isSpectator = !player && spectatorRoom?.has(socket.id);
 

@@ -107,7 +107,11 @@ export function registerGameLifecycleHandlers(socket: Socket, deps: GameLifecycl
       return;
     }
 
-    const player = game.players.find(p => p.id === socket.id);
+    // Find player by name (stable identifier) - socket IDs are volatile
+    const playerName = socket.data.playerName;
+    const player = playerName
+      ? game.players.find(p => p.name === playerName)
+      : game.players.find(p => p.id === socket.id);
     if (!player) {
       socket.emit('error', { message: 'You are not in this game' });
       return;
@@ -117,7 +121,7 @@ export function registerGameLifecycleHandlers(socket: Socket, deps: GameLifecycl
     await PersistenceManager.deletePlayerSessions(player.name, gameId, game.persistenceMode);
 
     // Instead of removing player, convert to empty seat
-    const playerIndex = game.players.findIndex(p => p.id === socket.id);
+    const playerIndex = game.players.findIndex(p => p.id === player.id);
     if (playerIndex !== -1) {
       console.log(`Player ${player.name} (${socket.id}) leaving game ${gameId} - converting to empty seat`);
 

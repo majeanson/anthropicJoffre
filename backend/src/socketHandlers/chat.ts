@@ -364,7 +364,11 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
           return;
         }
 
-        const teamPlayer = teamGame.players.find(p => p.id === socket.id);
+        // Find player by name (stable identifier) - socket IDs are volatile
+        const teamPlayerName = socket.data.playerName;
+        const teamPlayer = teamPlayerName
+          ? teamGame.players.find(p => p.name === teamPlayerName)
+          : teamGame.players.find(p => p.id === socket.id);
         if (!teamPlayer) {
           socket.emit('error', { message: 'You are not in this game' });
           return;
@@ -408,7 +412,11 @@ export function registerChatHandlers(socket: Socket, deps: ChatHandlersDependenc
           return;
         }
 
-        const gamePlayer = game.players.find(p => p.id === socket.id);
+        // Find player by name (stable identifier) - socket IDs are volatile
+        const gamePlayerName = socket.data.playerName;
+        const gamePlayer = gamePlayerName
+          ? game.players.find(p => p.name === gamePlayerName)
+          : game.players.find(p => p.id === socket.id);
         if (!gamePlayer) {
           socket.emit('error', { message: 'You are not in this game' });
           return;

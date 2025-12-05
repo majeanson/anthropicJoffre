@@ -199,19 +199,23 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
       }
     }
 
-    // STATE TRANSFORMATION - Use pure state function
-    const result = applyBet(game, socket.id, playerName, amount, withoutTrump, skipped);
+    // Find player by name for stable identification
+    const player = game.players.find(p => p.name === playerName);
+    if (!player) {
+      socket.emit('error', { message: 'Player not found in game' });
+      return;
+    }
+
+    // STATE TRANSFORMATION - Use pure state function with player.id
+    const result = applyBet(game, player.id, playerName, amount, withoutTrump, skipped);
 
     // Save bet to round stats for end-of-round display
     const stats = roundStats.get(gameId);
     if (stats) {
-      const player = game.players.find(p => p.id === socket.id);
-      if (player) {
-        if (skipped) {
-          stats.playerBets.set(player.name, null); // null indicates skip
-        } else {
-          stats.playerBets.set(player.name, { amount, withoutTrump });
-        }
+      if (skipped) {
+        stats.playerBets.set(player.name, null); // null indicates skip
+      } else {
+        stats.playerBets.set(player.name, { amount, withoutTrump });
       }
     }
 
@@ -402,7 +406,11 @@ export function registerGameplayHandlers(socket: Socket, deps: GameplayHandlersD
       return;
     }
 
-    const player = game.players.find(p => p.id === socket.id);
+    // Find player by name (stable identifier) - socket IDs are volatile
+    const playerName = socket.data.playerName;
+    const player = playerName
+      ? game.players.find(p => p.name === playerName)
+      : game.players.find(p => p.id === socket.id);
     if (!player) {
       socket.emit('error', { message: 'You are not in this game' });
       return;

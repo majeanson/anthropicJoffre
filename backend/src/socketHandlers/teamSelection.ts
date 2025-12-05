@@ -128,24 +128,34 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
       return;
     }
 
+    // Find requester by name (stable identifier) - socket IDs are volatile
+    const requesterName = socket.data.playerName;
+    const requester = requesterName
+      ? game.players.find(p => p.name === requesterName)
+      : game.players.find(p => p.id === socket.id);
+
+    if (!requester) {
+      socket.emit('error', { message: 'Player not found' });
+      return;
+    }
+
     // VALIDATION
-    const validation = validatePositionSwap(game, socket.id, targetPlayerId);
+    const validation = validatePositionSwap(game, requester.id, targetPlayerId);
     if (!validation.success) {
       socket.emit('error', { message: validation.error });
       return;
     }
 
-    const requester = game.players.find(p => p.id === socket.id);
     const target = game.players.find(p => p.id === targetPlayerId);
 
-    if (!requester || !target) {
-      socket.emit('error', { message: 'Player not found' });
+    if (!target) {
+      socket.emit('error', { message: 'Target player not found' });
       return;
     }
 
     // If target is a bot, execute swap immediately
     if (target.isBot) {
-      applyPositionSwap(game, socket.id, targetPlayerId);
+      applyPositionSwap(game, requester.id, targetPlayerId);
       emitGameUpdate(gameId, game);
       return;
     }
@@ -153,7 +163,7 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
     // Cancel any existing request from this requester (1 request per player limit)
     const existingRequestKey = Array.from(pendingSwapRequests.keys()).find(key => {
       const request = pendingSwapRequests.get(key);
-      return request && request.requesterId === socket.id;
+      return request && request.requesterId === requester.id;
     });
     if (existingRequestKey) {
       const existingRequest = pendingSwapRequests.get(existingRequestKey);
@@ -164,7 +174,7 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
     }
 
     // Determine if swap will change teams
-    const requesterIndex = game.players.findIndex(p => p.id === socket.id);
+    const requesterIndex = game.players.findIndex(p => p.id === requester.id);
     const targetIndex = game.players.findIndex(p => p.id === targetPlayerId);
     const requesterTeam = requesterIndex % 2 === 0 ? 1 : 2;
     const targetTeam = targetIndex % 2 === 0 ? 1 : 2;
@@ -209,8 +219,19 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
       return;
     }
 
-    // Find and validate pending request
-    const requestKey = `${gameId}-${socket.id}`;
+    // Find target (responder) by name (stable identifier) - socket IDs are volatile
+    const targetName = socket.data.playerName;
+    const target = targetName
+      ? game.players.find(p => p.name === targetName)
+      : game.players.find(p => p.id === socket.id);
+
+    if (!target) {
+      socket.emit('error', { message: 'Player not found' });
+      return;
+    }
+
+    // Find and validate pending request - use target's player ID
+    const requestKey = `${gameId}-${target.id}`;
     const swapRequest = pendingSwapRequests.get(requestKey);
 
     if (!swapRequest || swapRequest.requesterId !== requesterId) {
@@ -223,22 +244,21 @@ export function registerTeamSelectionHandlers(socket: Socket, deps: TeamSelectio
     pendingSwapRequests.delete(requestKey);
 
     const requester = game.players.find(p => p.id === requesterId);
-    const target = game.players.find(p => p.id === socket.id);
 
-    if (!requester || !target) {
-      socket.emit('error', { message: 'Player not found' });
+    if (!requester) {
+      socket.emit('error', { message: 'Requester not found' });
       return;
     }
 
     if (accepted) {
       // Execute the swap
-      applyPositionSwap(game, requesterId, socket.id);
+      applyPositionSwap(game, requesterId, target.id);
 
       // Notify both players
       io.to(requesterId).emit('swap_accepted', {
         message: `${target.name} accepted your swap request`
       });
-      io.to(socket.id).emit('swap_accepted', {
+      socket.emit('swap_accepted', {
         message: `You swapped positions with ${requester.name}`
       });
 

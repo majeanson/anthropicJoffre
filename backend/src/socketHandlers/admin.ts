@@ -293,8 +293,11 @@ export function registerAdminHandlers(socket: Socket, deps: AdminHandlersDepende
       return;
     }
 
-    // Verify player is in game - check both current socket.id and by name (for reconnected players)
-    const player = game.players.find(p => p.id === socket.id || (!p.isBot && p.name));
+    // Find player by name (stable identifier) - socket IDs are volatile
+    const playerName = socket.data.playerName;
+    const player = playerName
+      ? game.players.find(p => p.name === playerName)
+      : game.players.find(p => p.id === socket.id);
     if (!player) {
       socket.emit('error', { message: 'You are not in this game' });
       return;
