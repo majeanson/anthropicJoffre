@@ -20,9 +20,9 @@ import { useBotManagement } from '../hooks/useBotManagement';
 
 // Lazy load heavy modals for better initial load performance
 // Sprint 8 Task 3: Added NotificationCenter to lazy loading
+// Note: AchievementsPanel removed - now integrated into ProfileProgressModal as "Achievements" tab
 const BotManagementPanel = lazy(() => import('./BotManagementPanel').then(m => ({ default: m.BotManagementPanel })));
 const FriendsPanel = lazy(() => import('./FriendsPanel'));
-const AchievementsPanel = lazy(() => import('./AchievementsPanel').then(m => ({ default: m.AchievementsPanel })));
 const CatchUpModal = lazy(() => import('./CatchUpModal').then(m => ({ default: m.CatchUpModal })));
 const LoginModal = lazy(() => import('./LoginModal'));
 const RegisterModal = lazy(() => import('./RegisterModal'));
@@ -117,19 +117,22 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
 
   // Compute initial tab for ProfileProgressModal based on which button was clicked
   const getProfileModalInitialTab = (): TabId => {
+    if (showAchievementsPanel) return 'achievements';
     if (showQuestsPanel) return 'quests';
     if (_showRewardsCalendar) return 'calendar';
     return 'overview';
   };
 
   // Check if ProfileProgressModal should be open (from any source)
-  const isProfileModalOpen = showPersonalHub || showQuestsPanel || _showRewardsCalendar;
+  // Sprint 21: Added showAchievementsPanel - achievements now opens ProfileProgressModal with achievements tab
+  const isProfileModalOpen = showPersonalHub || showQuestsPanel || _showRewardsCalendar || showAchievementsPanel;
 
   // Close handler that resets all related states
   const handleProfileModalClose = () => {
     setShowPersonalHub(false);
     setShowQuestsPanel(false);
     _setShowRewardsCalendar(false);
+    setShowAchievementsPanel(false);
   };
   const auth = useAuth();
 
@@ -186,12 +189,7 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
             onSwapPosition={handleSwapPosition}
             creatorId={gameState.creatorId}
           />
-          <AchievementsPanel
-            isOpen={showAchievementsPanel}
-            onClose={() => setShowAchievementsPanel(false)}
-            socket={socket}
-            playerName={gameState.players.find(p => p.id === socket?.id)?.name || ''}
-          />
+          {/* Note: AchievementsPanel removed - now integrated into ProfileProgressModal as "Achievements" tab */}
         </Suspense>
       )}
 

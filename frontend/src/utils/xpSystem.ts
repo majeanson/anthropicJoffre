@@ -2,47 +2,69 @@
  * XP and Level System (Frontend)
  *
  * Utility functions for displaying XP and level information.
- * Mirrors backend calculations for consistent display.
+ * MUST match backend calculations in backend/src/game/quests.ts
+ *
+ * Formula: 75 * (1.25 ^ (level - 1))
+ * - Level 1→2: 75 XP (1-2 games)
+ * - Level 5: ~117 XP
+ * - Level 10: ~186 XP
+ * - Level 20: ~423 XP
+ * - Level 30: ~963 XP
  */
 
-// Level calculation constants (must match backend)
-const BASE_XP = 100;
-const LEVEL_EXPONENT = 1.8;
+// Level calculation constants (MUST match backend/src/game/quests.ts)
+const BASE_XP = 75;
+const LEVEL_MULTIPLIER = 1.25;
 
 /**
- * Calculate XP required to reach a specific level
+ * Calculate XP required for a specific level (not cumulative)
+ * Matches backend calculateXPForLevel()
  */
 export function getXpForLevel(level: number): number {
-  if (level <= 1) return 0;
-  return Math.floor(BASE_XP * Math.pow(level, LEVEL_EXPONENT));
+  return Math.floor(BASE_XP * Math.pow(LEVEL_MULTIPLIER, level - 1));
+}
+
+/**
+ * Calculate total XP required to reach a target level (cumulative)
+ * Matches backend calculateTotalXPForLevel()
+ */
+export function getTotalXpForLevel(targetLevel: number): number {
+  let totalXP = 0;
+  for (let level = 1; level < targetLevel; level++) {
+    totalXP += getXpForLevel(level);
+  }
+  return totalXP;
 }
 
 /**
  * Calculate level from total XP
+ * Matches backend calculateLevelFromXP()
  */
-export function getLevelFromXp(xp: number): number {
-  if (xp <= 0) return 1;
+export function getLevelFromXp(totalXP: number): number {
+  if (totalXP <= 0) return 1;
 
-  // Binary search for the level
-  let low = 1;
-  let high = 200; // Max level cap
+  let level = 1;
+  let xpSoFar = 0;
 
-  while (low < high) {
-    const mid = Math.floor((low + high + 1) / 2);
-    if (getXpForLevel(mid) <= xp) {
-      low = mid;
-    } else {
-      high = mid - 1;
+  while (level < 50) {
+    const xpForNextLevel = getXpForLevel(level);
+
+    if (xpSoFar + xpForNextLevel > totalXP) {
+      return level;
     }
+
+    xpSoFar += xpForNextLevel;
+    level++;
   }
 
-  return low;
+  return 50; // Cap at level 50
 }
 
 /**
  * Get XP progress within current level
+ * Matches backend calculateLevelFromXP() return values
  */
-export function getLevelProgress(xp: number): {
+export function getLevelProgress(totalXP: number): {
   level: number;
   currentLevelXp: number;
   nextLevelXp: number;
@@ -50,21 +72,51 @@ export function getLevelProgress(xp: number): {
   progressPercent: number;
   xpToNextLevel: number;
 } {
-  const level = getLevelFromXp(xp);
-  const currentLevelXp = getXpForLevel(level);
-  const nextLevelXp = getXpForLevel(level + 1);
-  const progressXp = xp - currentLevelXp;
-  const xpNeeded = nextLevelXp - currentLevelXp;
-  const progressPercent = Math.min(100, Math.round((progressXp / xpNeeded) * 100));
-  const xpToNextLevel = nextLevelXp - xp;
+  if (totalXP <= 0) {
+    return {
+      level: 1,
+      currentLevelXp: 0,
+      nextLevelXp: getXpForLevel(1),
+      progressXp: 0,
+      progressPercent: 0,
+      xpToNextLevel: getXpForLevel(1),
+    };
+  }
 
+  let level = 1;
+  let xpSoFar = 0;
+
+  while (level < 50) {
+    const xpForNextLevel = getXpForLevel(level);
+
+    if (xpSoFar + xpForNextLevel > totalXP) {
+      // Found the level!
+      const progressXp = totalXP - xpSoFar;
+      const progressPercent = Math.min(100, Math.round((progressXp / xpForNextLevel) * 100));
+      const xpToNextLevel = xpForNextLevel - progressXp;
+
+      return {
+        level,
+        currentLevelXp: progressXp,
+        nextLevelXp: xpForNextLevel,
+        progressXp,
+        progressPercent,
+        xpToNextLevel,
+      };
+    }
+
+    xpSoFar += xpForNextLevel;
+    level++;
+  }
+
+  // Capped at level 50
   return {
-    level,
-    currentLevelXp,
-    nextLevelXp,
-    progressXp,
-    progressPercent,
-    xpToNextLevel,
+    level: 50,
+    currentLevelXp: totalXP - xpSoFar,
+    nextLevelXp: getXpForLevel(50),
+    progressXp: totalXP - xpSoFar,
+    progressPercent: 100,
+    xpToNextLevel: 0,
   };
 }
 

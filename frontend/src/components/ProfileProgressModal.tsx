@@ -16,13 +16,15 @@ import { Socket } from 'socket.io-client';
 import { LevelProgressBar } from './LevelProgressBar';
 import { WeeklyCalendar, WeeklyCalendarDay } from './WeeklyCalendar';
 import { RewardsTab } from './RewardsTab';
+import { AchievementCard } from './AchievementCard';
 import { useSkin, type SkinId, type CardSkinId } from '../contexts/SkinContext';
 import { skinList, getSkinPricing } from '../config/skins';
 import { cardSkinList, getCardSkinPricing } from '../config/cardSkins';
 import { Card } from './Card';
-import { Button, ProgressBar, UIBadge, UICard } from './ui';
+import { Button, ProgressBar, UIBadge, UICard, Select, Checkbox, LoadingState, EmptyState } from './ui';
+import { AchievementProgress, AchievementCategory, AchievementTier } from '../types/achievements';
 
-export type TabId = 'overview' | 'quests' | 'calendar' | 'skins' | 'rewards';
+export type TabId = 'overview' | 'quests' | 'calendar' | 'skins' | 'rewards' | 'achievements';
 
 interface QuestTemplate {
   id: number;
@@ -110,6 +112,14 @@ export function ProfileProgressModal({
   const [claimingQuestId, setClaimingQuestId] = useState<number | null>(null);
   const [questNotification, setQuestNotification] = useState<string | null>(null);
 
+  // Achievements state
+  const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
+  const [achievementsLoading, setAchievementsLoading] = useState(false);
+  const [achievementPoints, setAchievementPoints] = useState(0);
+  const [achievementFilterCategory, setAchievementFilterCategory] = useState<AchievementCategory | 'all'>('all');
+  const [achievementFilterTier, setAchievementFilterTier] = useState<AchievementTier | 'all'>('all');
+  const [showUnlockedOnly, setShowUnlockedOnly] = useState(false);
+
   const {
     skinId,
     setSkin,
@@ -148,6 +158,16 @@ export function ProfileProgressModal({
     socket.emit('get_weekly_calendar');
     socket.emit('get_player_weekly_progress', { playerName });
     socket.emit('get_daily_quests', { playerName });
+
+    // Request achievements
+    setAchievementsLoading(true);
+    socket.emit('get_player_achievements', { playerName }, (response: { success: boolean; achievements?: AchievementProgress[]; points?: number; error?: string }) => {
+      if (response.success && response.achievements) {
+        setAchievements(response.achievements);
+        setAchievementPoints(response.points || 0);
+      }
+      setAchievementsLoading(false);
+    });
 
     // Set up listeners
     const handleProgression = (data: PlayerProgression) => {
@@ -296,6 +316,7 @@ export function ProfileProgressModal({
 
   const tabs: { id: TabId; label: string; icon: string }[] = [
     { id: 'overview', label: 'Overview', icon: '📊' },
+    { id: 'achievements', label: 'Achievements', icon: '🏆' },
     { id: 'rewards', label: 'Rewards', icon: '🎁' },
     { id: 'quests', label: 'Quests', icon: '🎯' },
     { id: 'calendar', label: 'Calendar', icon: '📅' },
@@ -436,6 +457,119 @@ export function ProfileProgressModal({
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Achievements Tab */}
+              {activeTab === 'achievements' && (
+                <div className="space-y-4">
+                  {/* Achievements summary */}
+                  {(() => {
+                    const unlockedCount = achievements.filter(a => a.is_unlocked).length;
+                    const totalCount = achievements.length;
+                    const completionPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+
+                    return (
+                      <>
+                        <div
+                          className="p-4 rounded-lg"
+                          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <h3
+                              className="font-semibold"
+                              style={{ color: 'var(--color-text-primary)' }}
+                            >
+                              🏆 Achievement Progress
+                            </h3>
+                            <span
+                              className="text-sm font-bold"
+                              style={{ color: 'var(--color-text-accent)' }}
+                            >
+                              {unlockedCount}/{totalCount} ({completionPercent}%) • {achievementPoints} pts
+                            </span>
+                          </div>
+                          <ProgressBar
+                            value={completionPercent}
+                            max={100}
+                            variant="gradient"
+                            color="warning"
+                            size="md"
+                          />
+                        </div>
+
+                        {/* Filters */}
+                        <UICard variant="bordered" size="sm">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <Select
+                              label="Category"
+                              value={achievementFilterCategory}
+                              onChange={(e) => setAchievementFilterCategory(e.target.value as AchievementCategory | 'all')}
+                              size="sm"
+                              options={[
+                                { value: 'all', label: 'All' },
+                                { value: 'gameplay', label: 'Gameplay' },
+                                { value: 'milestone', label: 'Milestone' },
+                                { value: 'social', label: 'Social' },
+                                { value: 'special', label: 'Special' },
+                              ]}
+                            />
+                            <Select
+                              label="Tier"
+                              value={achievementFilterTier}
+                              onChange={(e) => setAchievementFilterTier(e.target.value as AchievementTier | 'all')}
+                              size="sm"
+                              options={[
+                                { value: 'all', label: 'All' },
+                                { value: 'bronze', label: 'Bronze' },
+                                { value: 'silver', label: 'Silver' },
+                                { value: 'gold', label: 'Gold' },
+                                { value: 'platinum', label: 'Platinum' },
+                              ]}
+                            />
+                            <Checkbox
+                              label="Unlocked only"
+                              checked={showUnlockedOnly}
+                              onChange={(e) => setShowUnlockedOnly(e.target.checked)}
+                              size="sm"
+                            />
+                          </div>
+                        </UICard>
+
+                        {/* Achievements grid */}
+                        {achievementsLoading ? (
+                          <LoadingState message="Loading achievements..." card />
+                        ) : (() => {
+                          const filteredAchievements = achievements.filter(achievement => {
+                            if (achievementFilterCategory !== 'all' && achievement.category !== achievementFilterCategory) return false;
+                            if (achievementFilterTier !== 'all' && achievement.tier !== achievementFilterTier) return false;
+                            if (showUnlockedOnly && !achievement.is_unlocked) return false;
+                            return true;
+                          });
+
+                          return filteredAchievements.length === 0 ? (
+                            <EmptyState
+                              icon="🏆"
+                              title="No achievements found"
+                              description="No achievements match your current filters"
+                              card
+                              compact
+                            />
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              {filteredAchievements.map((achievement) => (
+                                <AchievementCard
+                                  key={achievement.achievement_id}
+                                  achievement={achievement}
+                                  size="medium"
+                                />
+                              ))}
+                            </div>
+                          );
+                        })()}
+                      </>
+                    );
+                  })()}
                 </div>
               )}
 
@@ -651,7 +785,7 @@ export function ProfileProgressModal({
                   {/* Preview indicator */}
                   {isPreviewActive && (
                     <div className="p-2 rounded-lg bg-blue-600/30 border border-blue-400/50 text-white text-xs text-center flex items-center justify-center gap-2">
-                      <span>👁️ Preview Mode - Hover to preview skins</span>
+                      <span>👁️ Preview Mode - Hover/tap to preview skins</span>
                       <button
                         onClick={stopPreview}
                         className="underline hover:text-blue-200 font-medium"
@@ -660,6 +794,32 @@ export function ProfileProgressModal({
                       </button>
                     </div>
                   )}
+
+                  {/* Combined Live Preview - Shows both card fronts AND backs */}
+                  <div className="p-4 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)]">
+                    <p className="text-xs text-[var(--color-text-muted)] mb-3 text-center uppercase tracking-wider">
+                      👁️ Live Preview (Cards & Backs)
+                    </p>
+                    <div className="flex flex-col items-center gap-3">
+                      {/* Card fronts row */}
+                      <div className="flex justify-center gap-1.5 flex-wrap">
+                        <Card card={{ color: 'red', value: 5 }} size="small" />
+                        <Card card={{ color: 'blue', value: 6 }} size="small" />
+                        <Card card={{ color: 'green', value: 1 }} size="small" />
+                        <Card card={{ color: 'brown', value: 7 }} size="small" />
+                      </div>
+                      {/* Card backs row - shows the back design */}
+                      <div className="flex justify-center gap-1.5 flex-wrap">
+                        <Card card={{ color: 'red', value: 1 }} size="small" faceDown />
+                        <Card card={{ color: 'blue', value: 1 }} size="small" faceDown />
+                        <Card card={{ color: 'red', value: 0 }} size="small" />
+                        <Card card={{ color: 'brown', value: 0 }} size="small" />
+                      </div>
+                    </div>
+                    <p className="text-xs text-[var(--color-text-muted)] mt-3 text-center">
+                      Top: Card fronts • Bottom: Card backs & special cards
+                    </p>
+                  </div>
 
                   {/* Card Skins Section */}
                   <div>
@@ -673,23 +833,8 @@ export function ProfileProgressModal({
                       className="text-xs mb-3"
                       style={{ color: 'var(--color-text-muted)' }}
                     >
-                      Hover to preview. Purchase to own permanently.
+                      Tap to preview on mobile. Purchase to own permanently.
                     </p>
-
-                    {/* Live Preview */}
-                    <div className="p-4 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)] mb-4">
-                      <p className="text-xs text-[var(--color-text-muted)] mb-3 text-center uppercase tracking-wider">
-                        Live Preview
-                      </p>
-                      <div className="flex justify-center gap-2 flex-wrap">
-                        <Card card={{ color: 'red', value: 5 }} size="small" />
-                        <Card card={{ color: 'blue', value: 6 }} size="small" />
-                        <Card card={{ color: 'green', value: 1 }} size="small" />
-                        <Card card={{ color: 'brown', value: 7 }} size="small" />
-                        <Card card={{ color: 'red', value: 0 }} size="small" />
-                        <Card card={{ color: 'brown', value: 0 }} size="small" />
-                      </div>
-                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {cardSkinList.map((cardSkinItem) => {
@@ -703,7 +848,7 @@ export function ProfileProgressModal({
                           <div
                             key={cardSkinItem.id}
                             className={`
-                              relative p-3 rounded-lg text-left transition-all
+                              relative p-3 rounded-lg text-left transition-all cursor-pointer
                               ${isActive
                                 ? 'ring-2 ring-blue-500'
                                 : 'hover:ring-1 hover:ring-purple-500/50'
@@ -715,6 +860,7 @@ export function ProfileProgressModal({
                             }}
                             onMouseEnter={() => startPreviewCardSkin(cardSkinItem.id)}
                             onMouseLeave={stopPreviewCardSkin}
+                            onClick={() => startPreviewCardSkin(cardSkinItem.id)}
                           >
                             {/* Preview gradient with mini cards */}
                             <div
@@ -816,7 +962,7 @@ export function ProfileProgressModal({
                       className="text-xs mb-3"
                       style={{ color: 'var(--color-text-muted)' }}
                     >
-                      Hover to preview. The entire interface will change!
+                      Tap to preview on mobile. The entire interface will change!
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {skinList.map((skinItem) => {
@@ -830,7 +976,7 @@ export function ProfileProgressModal({
                           <div
                             key={skinItem.id}
                             className={`
-                              relative p-3 rounded-lg text-left transition-all
+                              relative p-3 rounded-lg text-left transition-all cursor-pointer
                               ${isActive
                                 ? 'ring-2 ring-blue-500'
                                 : 'hover:ring-1 hover:ring-purple-500/50'
@@ -842,6 +988,7 @@ export function ProfileProgressModal({
                             }}
                             onMouseEnter={() => startPreviewSkin(skinItem.id as SkinId)}
                             onMouseLeave={stopPreviewSkin}
+                            onClick={() => startPreviewSkin(skinItem.id as SkinId)}
                           >
                             {/* Preview gradient */}
                             <div
