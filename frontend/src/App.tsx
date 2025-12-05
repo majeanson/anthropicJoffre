@@ -33,7 +33,7 @@ import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal sta
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
 import { useSettings } from './contexts/SettingsContext'; // Settings including beginner mode
 import { preloadCardImages } from './utils/imagePreloader';
-import { calculateGameXp, XP_REWARDS } from './utils/xpSystem';
+import { calculateGameXp, calculateGameCoins, XP_REWARDS, CURRENCY_REWARDS } from './utils/xpSystem';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ReplayErrorFallback } from './components/fallbacks/ReplayErrorFallback';
 // Sprint 5 Phase 2: Custom hooks for state management
@@ -193,6 +193,10 @@ function AppContent() {
 
   // Sprint 20: Level up celebration state
   const [levelUpData, setLevelUpData] = useState<{ oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null>(null);
+
+  // Sprint 21: Session XP/Coins tracking
+  const [sessionXp, setSessionXp] = useState(0);
+  const [sessionCoins, setSessionCoins] = useState(0);
 
   // Task 10 Phase 2: Keyboard shortcuts help modal
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
@@ -418,6 +422,8 @@ function AppContent() {
     spawnBotsForGame,
     cleanupBotSocket,
     playErrorSound,
+    setSessionXp,
+    setSessionCoins,
   });
 
   // Sprint 16: Swap request event listeners
@@ -1169,6 +1175,7 @@ function AppContent() {
                 <RoundSummary
                   gameState={gameState}
                   onReady={handleReady}
+                  currentPlayerId={isSpectator ? undefined : currentPlayerName}
                 />
               </div>
             </div>
@@ -1270,9 +1277,12 @@ function AppContent() {
               </div>
             </div>
 
-            {/* XP Earned This Game */}
+            {/* XP & Coins Earned This Game */}
             {(() => {
-              // Calculate XP for current player
+              // Don't show rewards for spectators
+              if (isSpectator) return null;
+
+              // Calculate rewards for current player
               const currentPlayer = gameState.players.find(
                 p => p.name === currentPlayerName || p.id === currentPlayerName
               );
@@ -1282,8 +1292,10 @@ function AppContent() {
               const won = winningTeam === currentPlayer.teamId;
               const tricksWon = currentPlayer.tricksWon || 0;
 
-              // Count successful bets from round history
+              // Count stats from round history
               let betsSuccessful = 0;
+              let roundsWon = 0;
+              let roundsLost = 0;
               let redZerosCollected = 0;
 
               if (gameState.roundHistory) {
@@ -1291,8 +1303,11 @@ function AppContent() {
                   const wasBettingTeam = round.offensiveTeam === currentPlayer.teamId;
                   if (wasBettingTeam && round.betMade) {
                     betsSuccessful++;
+                    roundsWon++;
+                  } else {
+                    roundsLost++;
                   }
-                  // Count red zeros from player stats
+                  // Count special cards from player stats
                   const playerStats = round.playerStats?.find(ps => ps.playerName === currentPlayer.name);
                   if (playerStats?.redZerosCollected) {
                     redZerosCollected += playerStats.redZerosCollected;
@@ -1307,29 +1322,91 @@ function AppContent() {
                 redZerosCollected,
               });
 
+              const coins = calculateGameCoins({
+                won,
+                roundsWon,
+                roundsLost,
+                redZerosCollected,
+                brownZerosDodged: 0, // Not tracked per-player; kept for interface compatibility
+              });
+
               return (
-                <div className="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl p-6 border-4 border-emerald-400 dark:border-emerald-600">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <span className="text-5xl">✨</span>
+                <section
+                  className="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl p-4 md:p-6 border-4 border-emerald-400 dark:border-emerald-600"
+                  aria-label="Game rewards summary"
+                  role="region"
+                >
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    {/* XP Section */}
+                    <div className="flex items-center gap-3 md:gap-4" role="group" aria-label="Experience points earned">
+                      <span className="text-4xl md:text-5xl" aria-hidden="true">✨</span>
                       <div>
-                        <h3 className="text-lg font-bold text-emerald-800 dark:text-emerald-300">Total XP Earned</h3>
-                        <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400">
+                        <h3 className="text-base md:text-lg font-bold text-emerald-800 dark:text-emerald-300" id="game-xp-label">Total XP</h3>
+                        <div className="text-3xl md:text-4xl font-black text-emerald-600 dark:text-emerald-400" aria-labelledby="game-xp-label">
                           +{xp} XP
                         </div>
                       </div>
                     </div>
-                    <div className="text-right text-sm text-emerald-700 dark:text-emerald-400 space-y-1">
-                      <div>Game completion = +{XP_REWARDS.GAME_COMPLETION} XP</div>
-                      {won && <div>Victory bonus = +{XP_REWARDS.GAME_WIN} XP</div>}
-                      {tricksWon > 0 && <div>{tricksWon} tricks = +{tricksWon * XP_REWARDS.TRICK_WON} XP</div>}
-                      {betsSuccessful > 0 && <div>{betsSuccessful} bets won = +{betsSuccessful * XP_REWARDS.SUCCESSFUL_BET} XP</div>}
-                      {redZerosCollected > 0 && <div>{redZerosCollected} red 0s = +{redZerosCollected * XP_REWARDS.RED_ZERO_COLLECTED} XP</div>}
+
+                    {/* Coins Section */}
+                    <div className="flex items-center gap-3 md:gap-4 md:border-l md:border-emerald-300 dark:md:border-emerald-700 md:pl-6" role="group" aria-label="Coins earned">
+                      <span className="text-4xl md:text-5xl" aria-hidden="true">🪙</span>
+                      <div>
+                        <h3 className="text-base md:text-lg font-bold text-amber-700 dark:text-amber-400" id="game-coins-label">Total Coins</h3>
+                        <div className="text-3xl md:text-4xl font-black text-amber-600 dark:text-amber-400" aria-labelledby="game-coins-label">
+                          +{coins}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Breakdown */}
+                    <div className="text-xs md:text-sm space-y-1 border-t md:border-t-0 md:border-l border-emerald-300 dark:border-emerald-700 pt-3 md:pt-0 md:pl-6" aria-label="Reward breakdown">
+                      <div className="text-emerald-700 dark:text-emerald-400">
+                        <div>Game = +{XP_REWARDS.GAME_COMPLETION} XP</div>
+                        {won && <div>Victory = +{XP_REWARDS.GAME_WIN} XP</div>}
+                        {tricksWon > 0 && <div>{tricksWon} tricks = +{tricksWon * XP_REWARDS.TRICK_WON} XP</div>}
+                        {betsSuccessful > 0 && <div>{betsSuccessful} bets = +{betsSuccessful * XP_REWARDS.SUCCESSFUL_BET} XP</div>}
+                      </div>
+                      <div className="text-amber-600 dark:text-amber-400">
+                        {won ? (
+                          <div>Win bonus = +{CURRENCY_REWARDS.GAME_WON} coins</div>
+                        ) : (
+                          <div>Participation = +{CURRENCY_REWARDS.GAME_LOST} coins</div>
+                        )}
+                        {roundsWon > 0 && <div>{roundsWon} rounds won = +{roundsWon * (CURRENCY_REWARDS.ROUND_WON + CURRENCY_REWARDS.BET_MADE)} coins</div>}
+                        {redZerosCollected > 0 && <div>{redZerosCollected} red 0s = +{redZerosCollected * CURRENCY_REWARDS.RED_ZERO_COLLECTED} coins</div>}
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              );
+            })()}
+
+            {/* Session Totals - Show accumulated XP/Coins across all games this session */}
+            {sessionXp > 0 && (
+              <section
+                className="mb-6 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-900/30 dark:to-violet-900/30 rounded-lg p-3 md:p-4 border-2 border-indigo-300 dark:border-indigo-600"
+                aria-label="Session rewards summary"
+                role="region"
+              >
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl" aria-hidden="true">📊</span>
+                    <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">This Session:</span>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1">
+                      <span className="text-lg" aria-hidden="true">✨</span>
+                      <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{sessionXp} XP</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-lg" aria-hidden="true">🪙</span>
+                      <span className="text-lg font-bold text-amber-600 dark:text-amber-400">{sessionCoins} coins</span>
                     </div>
                   </div>
                 </div>
-              );
-            })()}
+              </section>
+            )}
 
             {/* Player Stats */}
             <div className="grid grid-cols-2 gap-6 mb-8">

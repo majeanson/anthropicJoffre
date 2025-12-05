@@ -510,6 +510,93 @@ class SoundManager {
       osc.stop(now + delay + 0.1);
     });
   }
+
+  // XP Gain - short ascending chime (coins/points sound)
+  playXpGain() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Quick ascending arpeggio
+    [0, 0.08, 0.16].forEach((delay, index) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      const freq = 600 + index * 200; // 600, 800, 1000 Hz
+      osc.frequency.setValueAtTime(freq, now + delay);
+
+      gain.gain.setValueAtTime(this.masterVolume * 0.2, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.15);
+
+      osc.type = 'sine';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.15);
+    });
+  }
+
+  // Level Up - triumphant fanfare
+  playLevelUp() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Triumphant ascending notes
+    const notes = [
+      { freq: 523, delay: 0 },      // C5
+      { freq: 659, delay: 0.12 },   // E5
+      { freq: 784, delay: 0.24 },   // G5
+      { freq: 1047, delay: 0.36 },  // C6
+    ];
+
+    notes.forEach(({ freq, delay }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.frequency.setValueAtTime(freq, now + delay);
+
+      gain.gain.setValueAtTime(this.masterVolume * 0.3, now + delay);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.3);
+
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.3);
+    });
+
+    // Add a shimmer effect
+    setTimeout(() => {
+      if (!this.audioContext || this.audioContext.state === 'closed') return;
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      for (let i = 0; i < 5; i++) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.frequency.setValueAtTime(1200 + Math.random() * 800, now + i * 0.05);
+        gain.gain.setValueAtTime(this.masterVolume * 0.1, now + i * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.1);
+
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + i * 0.05);
+        osc.stop(now + i * 0.05 + 0.1);
+      }
+    }, 400);
+  }
 }
 
 // Create singleton instance
@@ -534,6 +621,9 @@ export const sounds = {
   gameStart: () => soundManager.playGameStart(),
   gameOver: () => soundManager.playGameOver(),
   error: () => soundManager.playError(),
+  // Sprint 21: XP/Rewards sounds
+  xpGain: () => soundManager.playXpGain(),
+  levelUp: () => soundManager.playLevelUp(),
   setEnabled: (enabled: boolean) => soundManager.setEnabled(enabled),
   setVolume: (volume: number) => soundManager.setVolume(volume),
   isEnabled: () => soundManager['enabled'],

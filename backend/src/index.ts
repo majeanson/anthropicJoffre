@@ -108,7 +108,7 @@ import {
 // Import conditional persistence manager
 import * as PersistenceManager from './db/persistenceManager';
 // Import skin/reward system
-import { awardGameEventReward } from './db/skins';
+import { awardGameEventReward, updatePlayerLevel, checkAndUnlockSkins, getPlayerUnlockedSkins } from './db/skins';
 // Import quest system (Sprint 19: Daily Engagement System)
 import { updateQuestProgress, updateRoundQuestProgress } from './db/quests';
 import { extractQuestContext, extractRoundQuestContext } from './game/quests';
@@ -1635,27 +1635,48 @@ async function endRound(gameId: string) {
       // ========================================================================
       // XP/CURRENCY REWARDS - Award for round events
       // ========================================================================
+      let roundXpTotal = 0;
+      let roundCoinsTotal = 0;
+
       try {
-        // Award for round win/loss
+        // Award for tricks won (5 XP per trick)
+        const tricksWon = player.tricksWon || 0;
+        if (tricksWon > 0) {
+          const result = await awardGameEventReward(player.name, 'trick_won', tricksWon);
+          roundXpTotal += result.xpAwarded;
+          roundCoinsTotal += result.currencyAwarded;
+        }
+
+        // Award for round win/loss (bet success)
         if (roundWon) {
-          await awardGameEventReward(player.name, 'round_won');
+          const result = await awardGameEventReward(player.name, 'round_won');
+          roundXpTotal += result.xpAwarded;
+          roundCoinsTotal += result.currencyAwarded;
         } else {
-          await awardGameEventReward(player.name, 'round_lost');
+          const result = await awardGameEventReward(player.name, 'round_lost');
+          roundXpTotal += result.xpAwarded;
+          roundCoinsTotal += result.currencyAwarded;
         }
 
         // Award for successful bet (if player was bidder and made their bet)
         if (wasBidder && scoring.betMade) {
-          await awardGameEventReward(player.name, 'bet_made');
+          const result = await awardGameEventReward(player.name, 'bet_made');
+          roundXpTotal += result.xpAwarded;
+          roundCoinsTotal += result.currencyAwarded;
           // Bonus for "without trump" win
           if (game.highestBet?.withoutTrump) {
-            await awardGameEventReward(player.name, 'without_trump_won');
+            const wtResult = await awardGameEventReward(player.name, 'without_trump_won');
+            roundXpTotal += wtResult.xpAwarded;
+            roundCoinsTotal += wtResult.currencyAwarded;
           }
         }
 
         // Award for collecting red zeros (per card)
         const redZerosCollected = stats?.redZerosCollected.get(player.name) || 0;
         if (redZerosCollected > 0) {
-          await awardGameEventReward(player.name, 'red_zero_collected', redZerosCollected);
+          const result = await awardGameEventReward(player.name, 'red_zero_collected', redZerosCollected);
+          roundXpTotal += result.xpAwarded;
+          roundCoinsTotal += result.currencyAwarded;
         }
 
         // Award for avoiding brown zeros (if opponent got them)
@@ -1665,7 +1686,22 @@ async function endRound(gameId: string) {
           let totalBrownZeros = 0;
           stats.brownZerosReceived.forEach(count => totalBrownZeros += count);
           if (totalBrownZeros > 0) {
-            await awardGameEventReward(player.name, 'brown_zero_dodged');
+            const result = await awardGameEventReward(player.name, 'brown_zero_dodged');
+            roundXpTotal += result.xpAwarded;
+            roundCoinsTotal += result.currencyAwarded;
+          }
+        }
+
+        // Emit rewards_earned event to the player
+        if (roundXpTotal > 0 || roundCoinsTotal > 0) {
+          const playerSocket = connectionManager.getSocketIdForPlayer(player.name);
+          if (playerSocket) {
+            io.to(playerSocket).emit('rewards_earned', {
+              xp: roundXpTotal,
+              coins: roundCoinsTotal,
+              source: 'round',
+              roundNumber: game.roundNumber,
+            });
           }
         }
       } catch (rewardError) {
@@ -1800,14 +1836,56 @@ async function endRound(gameId: string) {
       for (const player of humanPlayers) {
         try {
           const won = player.teamId === winningTeam;
-          if (won) {
-            await awardGameEventReward(player.name, 'game_won');
-          } else {
-            await awardGameEventReward(player.name, 'game_lost');
+          const eventType = won ? 'game_won' : 'game_lost';
+          const rewardResult = await awardGameEventReward(player.name, eventType);
+
+          // Emit rewards_earned event for session tracking
+          if (rewardResult.success) {
+            const playerSocket = connectionManager.getSocketIdForPlayer(player.name);
+            if (playerSocket) {
+              io.to(playerSocket).emit('rewards_earned', {
+                xp: rewardResult.xpAwarded,
+                coins: rewardResult.currencyAwarded,
+                source: 'game_end',
+                won,
+              });
+            }
           }
         } catch (rewardError) {
           console.error(`[Rewards] Error awarding game rewards for ${player.name}:`, rewardError);
           // Don't throw - reward errors shouldn't break the game
+        }
+      }
+
+      // ========================================================================
+      // LEVEL-UP CHECK - After all XP is awarded, check for level-ups
+      // ========================================================================
+      for (const player of humanPlayers) {
+        try {
+          const levelResult = await updatePlayerLevel(player.name);
+
+          if (levelResult.leveledUp) {
+            // Check for new skin unlocks
+            const skinResult = await checkAndUnlockSkins(player.name);
+            // Get all currently unlocked skins
+            const allUnlockedSkins = await getPlayerUnlockedSkins(player.name);
+
+            // Emit level_up event to the player
+            const playerSocket = connectionManager.getSocketIdForPlayer(player.name);
+            if (playerSocket) {
+              io.to(playerSocket).emit('player_leveled_up', {
+                playerName: player.name,
+                oldLevel: levelResult.oldLevel,
+                newLevel: levelResult.newLevel,
+                newlyUnlockedSkins: skinResult.newlyUnlocked,
+                allUnlockedSkins,
+              });
+              console.log(`[Level Up] ${player.name} leveled up from ${levelResult.oldLevel} to ${levelResult.newLevel}`);
+            }
+          }
+        } catch (levelError) {
+          console.error(`[Level Up] Error checking level for ${player.name}:`, levelError);
+          // Don't throw - level errors shouldn't break the game
         }
       }
     } catch (error) {

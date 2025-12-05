@@ -28,6 +28,8 @@ interface UseGameEventListenersProps {
   spawnBotsForGame: (gameState: GameState) => void;
   cleanupBotSocket: (botName: string) => void;
   playErrorSound: () => void;
+  setSessionXp?: Dispatch<SetStateAction<number>>;
+  setSessionCoins?: Dispatch<SetStateAction<number>>;
 }
 
 /**
@@ -49,6 +51,8 @@ export function useGameEventListeners({
   spawnBotsForGame,
   cleanupBotSocket,
   playErrorSound,
+  setSessionXp,
+  setSessionCoins,
 }: UseGameEventListenersProps) {
   const lastAutoActionRef = useRef<{ message: string; timestamp: number } | null>(null);
 
@@ -115,6 +119,9 @@ export function useGameEventListeners({
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
+      // Reset session rewards when kicked from game
+      if (setSessionXp) setSessionXp(0);
+      if (setSessionCoins) setSessionCoins(0);
     };
 
     // Leave game success
@@ -124,6 +131,9 @@ export function useGameEventListeners({
       setGameState(null);
       setGameId('');
       setIsSpectator(false);
+      // Reset session rewards when leaving game
+      if (setSessionXp) setSessionXp(0);
+      if (setSessionCoins) setSessionCoins(0);
     };
 
     // Spectator joined
@@ -208,6 +218,28 @@ export function useGameEventListeners({
       });
     };
 
+    // Session XP/coins tracking
+    const handleRewardsEarned = ({ xp, coins }: {
+      xp: number;
+      coins: number;
+      source: 'round' | 'game_end';
+      roundNumber?: number;
+      won?: boolean;
+    }) => {
+      if (setSessionXp) {
+        setSessionXp(prev => prev + xp);
+      }
+      if (setSessionCoins) {
+        setSessionCoins(prev => prev + coins);
+      }
+    };
+
+    // Reset session rewards when rematch starts (new game = fresh session)
+    const handleRematchStarted = () => {
+      if (setSessionXp) setSessionXp(0);
+      if (setSessionCoins) setSessionCoins(0);
+    };
+
     // Register all event listeners
     socket.on('player_disconnected', handlePlayerDisconnected);
     socket.on('online_players_update', handleOnlinePlayersUpdate);
@@ -223,6 +255,8 @@ export function useGameEventListeners({
     socket.on('bot_taken_over', handleBotTakenOver);
     socket.on('replaced_by_bot', handleReplacedByBot);
     socket.on('game_full_with_bots', handleGameFullWithBots);
+    socket.on('rewards_earned', handleRewardsEarned);
+    socket.on('rematch_started', handleRematchStarted);
 
     // Cleanup function
     return () => {
@@ -240,6 +274,8 @@ export function useGameEventListeners({
       socket.off('bot_taken_over', handleBotTakenOver);
       socket.off('replaced_by_bot', handleReplacedByBot);
       socket.off('game_full_with_bots', handleGameFullWithBots);
+      socket.off('rewards_earned', handleRewardsEarned);
+      socket.off('rematch_started', handleRematchStarted);
     };
-  }, [socket, gameState, showToast, setToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound]);
+  }, [socket, gameState, showToast, setToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound, setSessionXp, setSessionCoins]);
 }

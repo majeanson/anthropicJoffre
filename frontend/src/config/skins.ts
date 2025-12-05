@@ -1332,3 +1332,23 @@ export const skinPricing: Record<SkinId, SkinPricingInfo> = {
 export function getSkinPricing(skinId: SkinId): SkinPricingInfo {
   return skinPricing[skinId] || { price: 0, suggestedLevel: 0 };
 }
+
+/**
+ * Get upcoming skins that will be available at higher levels
+ * Returns skins that have suggestedLevel > currentLevel, sorted by level
+ */
+export function getUpcomingSkins(currentLevel: number, limit: number = 3): Array<{
+  skin: Skin;
+  pricing: SkinPricingInfo;
+  levelsToGo: number;
+}> {
+  return Object.entries(skinPricing)
+    .filter(([, pricing]) => pricing.suggestedLevel > currentLevel)
+    .sort((a, b) => a[1].suggestedLevel - b[1].suggestedLevel)
+    .slice(0, limit)
+    .map(([id, pricing]) => ({
+      skin: skins[id as SkinId],
+      pricing,
+      levelsToGo: pricing.suggestedLevel - currentLevel,
+    }));
+}

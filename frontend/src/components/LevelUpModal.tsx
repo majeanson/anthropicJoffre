@@ -10,8 +10,9 @@
  * - Confetti-style celebration
  */
 
-import { useEffect, useState } from 'react';
-import { skinList } from '../config/skins';
+import { useEffect, useState, useMemo } from 'react';
+import { skinList, getUpcomingSkins } from '../config/skins';
+import { sounds } from '../utils/sounds';
 
 export interface LevelUpModalProps {
   isOpen: boolean;
@@ -31,11 +32,14 @@ export function LevelUpModal({
   const [showContent, setShowContent] = useState(false);
   const [showSkins, setShowSkins] = useState(false);
 
-  // Staged animation
+  // Staged animation and sound
   useEffect(() => {
     if (isOpen) {
       setShowContent(false);
       setShowSkins(false);
+
+      // Play level up sound when modal opens
+      sounds.levelUp();
 
       const contentTimer = setTimeout(() => setShowContent(true), 300);
       const skinsTimer = setTimeout(() => setShowSkins(true), 800);
@@ -65,11 +69,21 @@ export function LevelUpModal({
     .map(id => skinList.find(s => s.id === id))
     .filter(Boolean);
 
+  // Get upcoming skins as a teaser (only if no skins were just unlocked)
+  const upcomingSkins = useMemo(() => {
+    if (unlockedSkinItems.length > 0) return []; // Don't show teaser if skins just unlocked
+    return getUpcomingSkins(newLevel, 1); // Show next 1 upcoming skin
+  }, [newLevel, unlockedSkinItems.length]);
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-[100]"
       style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="levelup-title"
+      aria-describedby="levelup-description"
     >
       {/* Celebration particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -108,20 +122,22 @@ export function LevelUpModal({
           onClick={onClose}
           className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-500/20"
           style={{ color: 'var(--color-text-secondary)' }}
+          aria-label="Close level up modal"
         >
-          ✕
+          <span aria-hidden="true">✕</span>
         </button>
 
         {/* Level Up Header */}
         <div className="mb-6">
           <h2
+            id="levelup-title"
             className="text-3xl font-bold mb-2"
             style={{ color: 'var(--color-text-primary)' }}
           >
             Level Up!
           </h2>
-          <p style={{ color: 'var(--color-text-muted)' }}>
-            Congratulations!
+          <p id="levelup-description" style={{ color: 'var(--color-text-muted)' }}>
+            Congratulations! You reached level {newLevel}.
           </p>
         </div>
 
@@ -219,6 +235,62 @@ export function LevelUpModal({
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Upcoming skin teaser */}
+        {upcomingSkins.length > 0 && (
+          <div
+            className={`
+              mt-4 pt-4 border-t transition-all duration-500
+              ${showSkins ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+            `}
+            style={{ borderColor: 'var(--color-border-subtle)' }}
+          >
+            <p
+              className="text-xs mb-2"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              Coming soon at Level {upcomingSkins[0].pricing.suggestedLevel}...
+            </p>
+            <div
+              className="flex items-center gap-2 p-2 rounded-lg opacity-60"
+              style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+            >
+              <div
+                className="w-8 h-8 rounded grayscale"
+                style={{ background: upcomingSkins[0].skin.preview }}
+              />
+              <div className="text-left text-xs">
+                <span style={{ color: 'var(--color-text-secondary)' }}>
+                  {upcomingSkins[0].skin.name} ({upcomingSkins[0].levelsToGo} levels to go)
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Max level congratulations - shown when level 50 reached and no more skins */}
+        {newLevel >= 50 && upcomingSkins.length === 0 && unlockedSkinItems.length === 0 && (
+          <div
+            className={`
+              mt-4 pt-4 border-t text-center transition-all duration-500
+              ${showSkins ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+            `}
+            style={{ borderColor: 'var(--color-border-subtle)' }}
+          >
+            <p
+              className="text-sm font-semibold"
+              style={{ color: 'var(--color-text-accent)' }}
+            >
+              🎖️ Maximum Level Reached!
+            </p>
+            <p
+              className="text-xs mt-1"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
+              You've unlocked all level-based rewards. Keep playing to earn more coins!
+            </p>
           </div>
         )}
 

@@ -237,13 +237,17 @@ export async function updatePlayerLevel(playerName: string): Promise<{
     const oldLevel = statsResult.rows[0].current_level || 1;
 
     // Calculate new level based on XP
-    // Level formula: XP needed = 100 * (1.5 ^ (level - 1))
-    // Level 1: 0 XP, Level 2: 100 XP, Level 3: 250 XP, etc.
+    // Formula: 75 * (1.25 ^ (level - 1)) - MUST match backend/src/utils/xpSystem.ts and frontend
+    // Level 1→2: 75 XP, Level 5: ~117 XP, Level 10: ~186 XP
+    const BASE_XP = 75;
+    const LEVEL_MULTIPLIER = 1.25;
+    const MAX_LEVEL = 50;
+
     let newLevel = 1;
     let xpNeeded = 0;
 
-    while (newLevel < 50) { // Cap at level 50
-      const xpForNextLevel = Math.floor(100 * Math.pow(1.5, newLevel - 1));
+    while (newLevel < MAX_LEVEL) {
+      const xpForNextLevel = Math.floor(BASE_XP * Math.pow(LEVEL_MULTIPLIER, newLevel - 1));
       if (totalXp < xpNeeded + xpForNextLevel) {
         break;
       }
@@ -282,25 +286,33 @@ export async function updatePlayerLevel(playerName: string): Promise<{
 // XP and currency awarded for various game actions
 // ============================================================================
 
+/**
+ * Game event rewards - XP and currency awarded for various game actions
+ * IMPORTANT: XP values MUST match frontend/src/utils/xpSystem.ts XP_REWARDS
+ * and backend/src/utils/xpSystem.ts XP_REWARDS for display consistency
+ */
 export const GAME_EVENT_REWARDS = {
-  // Round events
-  round_won: { xp: 5, currency: 2 },        // Team made their bet
-  round_lost: { xp: 2, currency: 1 },       // Played the round but lost
+  // Trick events (awarded at round end, per trick won)
+  trick_won: { xp: 5, currency: 0 },         // Per trick won (5 XP each, no coins)
 
-  // Game events
-  game_won: { xp: 15, currency: 8 },        // Won the whole game
-  game_lost: { xp: 5, currency: 3 },        // Completed a game but lost
+  // Round events (awarded at round end)
+  round_won: { xp: 25, currency: 2 },        // Team made their bet (SUCCESSFUL_BET)
+  round_lost: { xp: 0, currency: 1 },        // Played the round but lost (no XP for losing)
 
-  // Special card events (per card)
-  red_zero_collected: { xp: 3, currency: 2 },   // Got the Red 0
-  brown_zero_dodged: { xp: 2, currency: 1 },    // Avoided the Brown 0
+  // Game events (awarded at game end)
+  game_won: { xp: 150, currency: 8 },        // Won the game: 50 (completion) + 100 (win bonus)
+  game_lost: { xp: 50, currency: 3 },        // Completed a game but lost: 50 (completion only)
+
+  // Special card events (per card, awarded at round end)
+  red_zero_collected: { xp: 15, currency: 2 },   // Got the Red 0
+  brown_zero_dodged: { xp: 0, currency: 1 },     // Avoided the Brown 0 (only coins, no XP)
 
   // Betting events
-  bet_made: { xp: 3, currency: 1 },         // Successfully made your bet
-  without_trump_won: { xp: 5, currency: 3 }, // Won a "without trump" bet
+  bet_made: { xp: 0, currency: 1 },          // Made a bet (coins only, XP handled by round_won)
+  without_trump_won: { xp: 0, currency: 3 }, // Won a "without trump" bet (coins only)
 
   // Tutorial
-  tutorial_step: { xp: 5, currency: 3 },    // Completed a tutorial step
+  tutorial_step: { xp: 10, currency: 3 },    // Completed a tutorial step
 } as const;
 
 /**

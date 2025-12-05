@@ -14,7 +14,8 @@ import { TrickHistory } from './TrickHistory';
 import { Card as CardComponent } from './Card';
 import { colors } from '../design-system';
 import { UICard, Button } from './ui';
-import { calculateRoundXp, XP_REWARDS } from '../utils/xpSystem';
+import { calculateRoundXp, XP_REWARDS, CURRENCY_REWARDS } from '../utils/xpSystem';
+import { XP_STRINGS } from '../constants/xpStrings';
 
 interface RoundStatistics {
   // Performance-based stats
@@ -263,8 +264,8 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
       .slice(0, 3);
   }, [allStats]);
 
-  // Calculate XP earned this round for current player
-  const xpEarned = useMemo(() => {
+  // Calculate XP and coins earned this round for current player
+  const rewardsEarned = useMemo(() => {
     if (!currentPlayerId) return null;
 
     // Find current player
@@ -283,7 +284,7 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
     const wasBettingTeam = lastRound.offensiveTeam === playerTeam;
     const betSuccessful = wasBettingTeam && lastRound.betMade;
 
-    // Calculate XP
+    // Calculate XP and coins
     const tricksWon = currentPlayer.tricksWon || 0;
     const redZerosCollected = playerStats?.redZerosCollected || 0;
 
@@ -293,12 +294,27 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
       redZerosCollected,
     });
 
+    // Simplified coin calculation for round (brownZerosDodged is game-level stat)
+    let coins = betSuccessful
+      ? CURRENCY_REWARDS.ROUND_WON + CURRENCY_REWARDS.BET_MADE
+      : CURRENCY_REWARDS.ROUND_LOST;
+    coins += redZerosCollected * CURRENCY_REWARDS.RED_ZERO_COLLECTED;
+
     return {
-      total: xp,
-      breakdown: {
-        tricks: tricksWon * XP_REWARDS.TRICK_WON,
-        bet: betSuccessful ? XP_REWARDS.SUCCESSFUL_BET : 0,
-        redZeros: redZerosCollected * XP_REWARDS.RED_ZERO_COLLECTED,
+      xp: {
+        total: xp,
+        breakdown: {
+          tricks: tricksWon * XP_REWARDS.TRICK_WON,
+          bet: betSuccessful ? XP_REWARDS.SUCCESSFUL_BET : 0,
+          redZeros: redZerosCollected * XP_REWARDS.RED_ZERO_COLLECTED,
+        },
+      },
+      coins: {
+        total: coins,
+        breakdown: {
+          round: betSuccessful ? CURRENCY_REWARDS.ROUND_WON + CURRENCY_REWARDS.BET_MADE : CURRENCY_REWARDS.ROUND_LOST,
+          redZeros: redZerosCollected * CURRENCY_REWARDS.RED_ZERO_COLLECTED,
+        },
       },
       tricksWon,
       betSuccessful,
@@ -545,37 +561,66 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, current
         </UICard>
       </div>
 
-      {/* XP Earned This Round */}
-      {xpEarned && xpEarned.total > 0 && (
-        <div className="animate-fadeInUp" style={{ animationDelay: '150ms' }}>
+      {/* Rewards Earned This Round (XP + Coins) */}
+      {rewardsEarned && (rewardsEarned.xp.total > 0 || rewardsEarned.coins.total > 0) && (
+        <section
+          className="animate-fadeInUp"
+          style={{ animationDelay: '150ms' }}
+          aria-label="Round rewards"
+          role="region"
+        >
           <UICard
             variant="bordered"
             className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 border-2 border-emerald-300 dark:border-emerald-700"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl">✨</span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              {/* XP Section */}
+              <div className="flex items-center gap-3" role="group" aria-label="Experience points earned">
+                <span className="text-3xl" aria-hidden="true">✨</span>
                 <div>
-                  <h4 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">XP Earned This Round</h4>
-                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                    +{xpEarned.total} XP
+                  <h4 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300" id="xp-label">{XP_STRINGS.XP_EARNED}</h4>
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400" aria-labelledby="xp-label">
+                    +{rewardsEarned.xp.total} XP
                   </div>
                 </div>
               </div>
-              <div className="text-right text-xs text-emerald-700 dark:text-emerald-400 space-y-1">
-                {xpEarned.breakdown.tricks > 0 && (
-                  <div>{xpEarned.tricksWon} tricks = +{xpEarned.breakdown.tricks} XP</div>
-                )}
-                {xpEarned.breakdown.bet > 0 && (
-                  <div>Bet won = +{xpEarned.breakdown.bet} XP</div>
-                )}
-                {xpEarned.breakdown.redZeros > 0 && (
-                  <div>{xpEarned.redZerosCollected} red 0s = +{xpEarned.breakdown.redZeros} XP</div>
-                )}
+
+              {/* Coins Section */}
+              <div className="flex items-center gap-3 sm:border-l sm:border-emerald-300 dark:sm:border-emerald-700 sm:pl-4" role="group" aria-label="Coins earned">
+                <span className="text-3xl" aria-hidden="true">🪙</span>
+                <div>
+                  <h4 className="text-sm font-semibold text-amber-700 dark:text-amber-400" id="coins-label">{XP_STRINGS.COINS_EARNED}</h4>
+                  <div className="text-2xl font-black text-amber-600 dark:text-amber-400" aria-labelledby="coins-label">
+                    +{rewardsEarned.coins.total}
+                  </div>
+                </div>
+              </div>
+
+              {/* Breakdown */}
+              <div className="text-right text-xs space-y-1 border-t sm:border-t-0 sm:border-l border-emerald-300 dark:border-emerald-700 pt-3 sm:pt-0 sm:pl-4" aria-label="Reward breakdown">
+                <div className="text-emerald-700 dark:text-emerald-400">
+                  {rewardsEarned.xp.breakdown.tricks > 0 && (
+                    <div>{rewardsEarned.tricksWon} tricks = +{rewardsEarned.xp.breakdown.tricks} XP</div>
+                  )}
+                  {rewardsEarned.xp.breakdown.bet > 0 && (
+                    <div>Bet won = +{rewardsEarned.xp.breakdown.bet} XP</div>
+                  )}
+                  {rewardsEarned.xp.breakdown.redZeros > 0 && (
+                    <div>{rewardsEarned.redZerosCollected} red 0s = +{rewardsEarned.xp.breakdown.redZeros} XP</div>
+                  )}
+                </div>
+                <div className="text-amber-600 dark:text-amber-400">
+                  {rewardsEarned.coins.breakdown.round > 0 && (
+                    <div>Round = +{rewardsEarned.coins.breakdown.round} coins</div>
+                  )}
+                  {rewardsEarned.coins.breakdown.redZeros > 0 && (
+                    <div>Red 0s = +{rewardsEarned.coins.breakdown.redZeros} coins</div>
+                  )}
+                </div>
               </div>
             </div>
           </UICard>
-        </div>
+        </section>
       )}
 
       {/* Round Highlights - Only 3 stats, cycling */}
