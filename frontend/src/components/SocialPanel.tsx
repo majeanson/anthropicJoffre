@@ -382,7 +382,7 @@ export function SocialPanel({
         {socialTab === 'messages' && (
           <div className="space-y-2">
             {!user ? (
-              <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+              <div className="text-center text-[var(--color-text-secondary)] py-16">
                 <p className="text-2xl mb-2">🔒</p>
                 <p className="text-lg font-semibold">Login Required</p>
                 <p className="text-sm mt-2">Please log in to view messages</p>
@@ -404,7 +404,7 @@ export function SocialPanel({
                     </span>
                   )}
                 </Button>
-                <p className="text-sm text-umber-600 dark:text-gray-400 mt-4">
+                <p className="text-sm text-[var(--color-text-secondary)] mt-4">
                   Send private messages to friends and recent players
                 </p>
               </div>
@@ -416,7 +416,7 @@ export function SocialPanel({
         {socialTab === 'online' && (
           <div className="space-y-2">
             {onlinePlayers.length === 0 ? (
-              <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+              <div className="text-center text-[var(--color-text-secondary)] py-16">
                 <p className="text-2xl mb-2">😴</p>
                 <p className="text-lg font-semibold">No players online</p>
                 <p className="text-sm mt-2">Online players will appear here</p>
@@ -441,9 +441,9 @@ export function SocialPanel({
                             playerName={player.playerName || player.socketId || 'Unknown'}
                             onClick={() => setSelectedPlayerProfile(player.playerName || 'Unknown')}
                             variant="plain"
-                            className="font-bold text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400 truncate text-left"
+                            className="font-bold truncate text-left"
                           />
-                          <p className="text-xs text-umber-600 dark:text-gray-400">{getStatusLabel(player.status)}</p>
+                          <p className="text-xs text-[var(--color-text-secondary)]">{getStatusLabel(player.status)}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -497,7 +497,7 @@ export function SocialPanel({
 
               if (humanPlayers.length === 0) {
                 return (
-                  <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+                  <div className="text-center text-[var(--color-text-secondary)] py-16">
                     <p className="text-2xl mb-2">📭</p>
                     <p className="text-lg font-semibold">No recent players yet</p>
                     <p className="text-sm mt-2">Players you've played with will appear here</p>
@@ -516,9 +516,9 @@ export function SocialPanel({
                         playerName={player.name}
                         onClick={() => setSelectedPlayerProfile(player.name)}
                         variant="plain"
-                        className="font-bold text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400"
+                        className="font-bold"
                       />
-                      <p className="text-xs text-umber-600 dark:text-gray-400">
+                      <p className="text-xs text-[var(--color-text-secondary)]">
                         {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} • {new Date(player.lastPlayed).toLocaleDateString()}
                       </p>
                     </div>
@@ -532,13 +532,13 @@ export function SocialPanel({
         {socialTab === 'friends' && (
           <div className="space-y-3">
             {!user ? (
-              <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+              <div className="text-center text-[var(--color-text-secondary)] py-16">
                 <p className="text-2xl mb-2">🔒</p>
                 <p className="text-lg font-semibold">Login Required</p>
                 <p className="text-sm mt-2">Please log in to view your friends</p>
               </div>
             ) : isLoadingFriends ? (
-              <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+              <div className="text-center text-[var(--color-text-secondary)] py-16">
                 <p className="text-2xl mb-2">⏳</p>
                 <p className="text-lg font-semibold">Loading friends...</p>
               </div>
@@ -546,7 +546,7 @@ export function SocialPanel({
               <>
                 {/* Find Friends Search */}
                 <div className="mb-4">
-                  <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                  <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-2 uppercase">
                     🔍 Find Friends
                   </h4>
                   <div className="flex gap-2">
@@ -556,7 +556,7 @@ export function SocialPanel({
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                       placeholder="Search by name..."
-                      className="flex-1 px-3 py-2 text-sm rounded-lg border-2 border-parchment-400 dark:border-gray-500 bg-parchment-50 dark:bg-gray-700 text-umber-900 dark:text-gray-100 placeholder-umber-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border-2 border-parchment-400 dark:border-gray-500 bg-parchment-50 dark:bg-gray-700 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                     <Button
                       onClick={handleSearch}
@@ -589,9 +589,9 @@ export function SocialPanel({
                                   playerName={player.player_name}
                                   onClick={() => setSelectedPlayerProfile(player.player_name)}
                                   variant="plain"
-                                  className="font-semibold text-sm text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400 truncate text-left"
+                                  className="font-semibold text-sm truncate text-left"
                                 />
-                                <p className="text-xs text-umber-600 dark:text-gray-400">
+                                <p className="text-xs text-[var(--color-text-secondary)]">
                                   {player.games_played} games • {player.games_won} wins
                                 </p>
                               </div>
@@ -624,7 +624,7 @@ export function SocialPanel({
                   )}
 
                   {searchQuery.length >= 2 && !isSearching && searchResults.length === 0 && (
-                    <p className="mt-2 text-xs text-umber-500 dark:text-gray-400 text-center">
+                    <p className="mt-2 text-xs text-[var(--color-text-muted)] text-center">
                       No players found matching "{searchQuery}"
                     </p>
                   )}
@@ -633,7 +633,7 @@ export function SocialPanel({
                 {/* Pending Friend Requests */}
                 {pendingRequests.length > 0 && (
                   <div className="mb-4">
-                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                    <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-2 uppercase">
                       Friend Requests ({pendingRequests.length})
                     </h4>
                     <div className="space-y-2">
@@ -644,10 +644,10 @@ export function SocialPanel({
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div>
-                              <p className="font-semibold text-umber-900 dark:text-gray-100">
+                              <p className="font-semibold text-[var(--color-text-primary)]">
                                 {request.from_player}
                               </p>
-                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                              <p className="text-xs text-[var(--color-text-secondary)]">
                                 {new Date(request.created_at).toLocaleDateString()}
                               </p>
                             </div>
@@ -677,7 +677,7 @@ export function SocialPanel({
                 {/* Sent Friend Requests */}
                 {sentRequests.length > 0 && (
                   <div className="mb-4">
-                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                    <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-2 uppercase">
                       Sent Requests ({sentRequests.length})
                     </h4>
                     <div className="space-y-2">
@@ -688,10 +688,10 @@ export function SocialPanel({
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div>
-                              <p className="font-semibold text-umber-900 dark:text-gray-100">
+                              <p className="font-semibold text-[var(--color-text-primary)]">
                                 {request.to_player}
                               </p>
-                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                              <p className="text-xs text-[var(--color-text-secondary)]">
                                 Sent {new Date(request.created_at).toLocaleDateString()}
                               </p>
                             </div>
@@ -708,7 +708,7 @@ export function SocialPanel({
                 {/* Friends List */}
                 {friends.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                    <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-2 uppercase">
                       Your Friends ({friends.length})
                     </h4>
                     <div className="space-y-2">
@@ -731,9 +731,9 @@ export function SocialPanel({
                                     playerName={friend.player_name}
                                     onClick={() => setSelectedPlayerProfile(friend.player_name)}
                                     variant="plain"
-                                    className="font-semibold text-sm text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400 truncate text-left"
+                                    className="font-semibold text-sm truncate text-left"
                                   />
-                                  <p className="text-xs text-umber-600 dark:text-gray-400">
+                                  <p className="text-xs text-[var(--color-text-secondary)]">
                                     {isOnline ? (
                                       onlinePlayer?.status ? getStatusLabel(onlinePlayer.status) : 'Online'
                                     ) : (
@@ -783,7 +783,7 @@ export function SocialPanel({
                 {/* Friend Suggestions */}
                 {friendSuggestions.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                    <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-2 uppercase">
                       ✨ Suggested Friends
                     </h4>
                     <div className="space-y-2">
@@ -798,7 +798,7 @@ export function SocialPanel({
                                 playerName={suggestion}
                                 onClick={() => setSelectedPlayerProfile(suggestion)}
                                 variant="plain"
-                                className="font-semibold text-sm text-umber-900 dark:text-gray-100 hover:text-orange-600 dark:hover:text-orange-400 truncate text-left"
+                                className="font-semibold text-sm truncate text-left"
                               />
                               <p className="text-xs text-emerald-600 dark:text-emerald-400">
                                 Played together recently
@@ -820,7 +820,7 @@ export function SocialPanel({
 
                 {/* Empty State */}
                 {friends.length === 0 && friendSuggestions.length === 0 && (
-                  <div className="text-center text-umber-600 dark:text-gray-400 py-12">
+                  <div className="text-center text-[var(--color-text-secondary)] py-12">
                     <p className="text-2xl mb-2">👥</p>
                     <p className="text-sm font-semibold">No friends yet</p>
                     <p className="text-xs mt-2">Play some games to get friend suggestions!</p>
@@ -863,7 +863,7 @@ export function SocialPanel({
         {socialTab === 'profile' && (
           <div className="space-y-3">
             {!user ? (
-              <div className="text-center text-umber-600 dark:text-gray-400 py-16">
+              <div className="text-center text-[var(--color-text-secondary)] py-16">
                 <p className="text-2xl mb-2">🔒</p>
                 <p className="text-lg font-semibold">Login Required</p>
                 <p className="text-sm mt-2">Please log in to view your profile</p>
@@ -874,7 +874,7 @@ export function SocialPanel({
                 <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-500">
                   <div className="text-center">
                     <div className="text-4xl mb-2">👤</div>
-                    <h3 className="text-lg font-bold text-umber-900 dark:text-gray-100">
+                    <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
                       {user.username}
                     </h3>
                     {user.is_verified && (
@@ -920,17 +920,17 @@ export function SocialPanel({
 
                 {/* Profile Info */}
                 <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border border-parchment-400 dark:border-gray-500">
-                  <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 mb-2 uppercase">
+                  <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-2 uppercase">
                     Account Info
                   </h4>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-umber-600 dark:text-gray-400">Email:</span>
-                      <span className="text-umber-900 dark:text-gray-100 font-medium">{user.email}</span>
+                      <span className="text-[var(--color-text-secondary)]">Email:</span>
+                      <span className="text-[var(--color-text-primary)] font-medium">{user.email}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-umber-600 dark:text-gray-400">Member Since:</span>
-                      <span className="text-umber-900 dark:text-gray-100 font-medium">
+                      <span className="text-[var(--color-text-secondary)]">Member Since:</span>
+                      <span className="text-[var(--color-text-primary)] font-medium">
                         {new Date(user.created_at).toLocaleDateString()}
                       </span>
                     </div>
@@ -940,7 +940,7 @@ export function SocialPanel({
                 {/* Profile Editor */}
                 <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border border-parchment-400 dark:border-gray-500">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="text-xs font-bold text-umber-700 dark:text-gray-300 uppercase">
+                    <h4 className="text-xs font-bold text-[var(--color-text-secondary)] uppercase">
                       Profile
                     </h4>
                     {!isEditingProfile ? (
@@ -986,19 +986,19 @@ export function SocialPanel({
                     // View Mode
                     <div className="space-y-2 text-sm">
                       <div>
-                        <span className="text-umber-600 dark:text-gray-400 block text-xs mb-1">Bio:</span>
-                        <p className="text-umber-900 dark:text-gray-100">
+                        <span className="text-[var(--color-text-secondary)] block text-xs mb-1">Bio:</span>
+                        <p className="text-[var(--color-text-primary)]">
                           {profileBio || <span className="text-gray-400 italic">Not set</span>}
                         </p>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-umber-600 dark:text-gray-400">Country:</span>
-                        <span className="text-umber-900 dark:text-gray-100 font-medium">
+                        <span className="text-[var(--color-text-secondary)]">Country:</span>
+                        <span className="text-[var(--color-text-primary)] font-medium">
                           {profileCountry || <span className="text-gray-400 italic">Not set</span>}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-umber-600 dark:text-gray-400">Favorite Team:</span>
+                        <span className="text-[var(--color-text-secondary)]">Favorite Team:</span>
                         <span className={`font-medium ${profileFavoriteTeam === 1 ? 'text-orange-600' : profileFavoriteTeam === 2 ? 'text-purple-600' : 'text-gray-400'}`}>
                           {profileFavoriteTeam ? `Team ${profileFavoriteTeam}` : <span className="text-gray-400 italic">Not set</span>}
                         </span>
@@ -1008,14 +1008,14 @@ export function SocialPanel({
                     // Edit Mode
                     <div className="space-y-3">
                       <div>
-                        <label className="text-xs font-semibold text-umber-700 dark:text-gray-300 block mb-1">
+                        <label className="text-xs font-semibold text-[var(--color-text-secondary)] block mb-1">
                           Bio (max 200 characters)
                         </label>
                         <textarea
                           value={profileBio}
                           onChange={(e) => setProfileBio(e.target.value.slice(0, 200))}
                           placeholder="Tell others about yourself..."
-                          className="w-full px-2 py-1.5 text-sm rounded border border-parchment-400 dark:border-gray-500 bg-white dark:bg-gray-700 text-umber-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm rounded border border-parchment-400 dark:border-gray-500 bg-white dark:bg-gray-700 text-[var(--color-text-primary)] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           rows={3}
                           maxLength={200}
                         />
@@ -1047,7 +1047,7 @@ export function SocialPanel({
                       />
 
                       <div>
-                        <label className="text-xs font-semibold text-umber-700 dark:text-gray-300 block mb-1">
+                        <label className="text-xs font-semibold text-[var(--color-text-secondary)] block mb-1">
                           Favorite Team
                         </label>
                         <div className="flex gap-2">

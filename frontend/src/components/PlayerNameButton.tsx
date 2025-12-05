@@ -40,10 +40,11 @@ export function PlayerNameButton({
   children
 }: PlayerNameButtonProps) {
   // Variant-specific styles that extend Button's link/ghost variants
+  // Use CSS variables for theme-adaptive colors
   const variantStyles = {
-    inline: 'text-orange-400 hover:text-orange-300 hover:underline font-semibold !p-0',
-    badge: 'px-2 py-1 bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 hover:text-orange-300 border border-orange-500/30 rounded-lg font-semibold',
-    plain: 'text-white hover:text-orange-400 !p-0'
+    inline: 'text-[var(--color-text-accent)] hover:opacity-80 hover:underline font-semibold !p-0',
+    badge: 'px-2 py-1 bg-[var(--color-text-accent)]/20 hover:bg-[var(--color-text-accent)]/30 text-[var(--color-text-accent)] hover:opacity-80 border border-[var(--color-text-accent)]/30 rounded-lg font-semibold',
+    plain: 'text-[var(--color-text-primary)] hover:text-[var(--color-text-accent)] !p-0'
   };
 
   // Map PlayerNameButton variants to Button variants

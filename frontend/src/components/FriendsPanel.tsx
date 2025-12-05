@@ -227,7 +227,7 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
           <div className="space-y-6">
             {/* Received Requests */}
             <div>
-              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">Received Requests</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-3">Received Requests</h3>
               <div className="space-y-3">
                 {pendingRequests.length === 0 ? (
                   <EmptyState icon="📬" title="No pending requests" compact />
@@ -264,7 +264,7 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
 
             {/* Sent Requests */}
             <div>
-              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">Sent Requests</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-3">Sent Requests</h3>
               <div className="space-y-3">
                 {sentRequests.length === 0 ? (
                   <EmptyState icon="📤" title="No sent requests" compact />

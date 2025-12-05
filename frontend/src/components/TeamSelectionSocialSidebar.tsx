@@ -183,11 +183,11 @@ export function TeamSelectionSocialSidebar({
         {activeTab === 'friends' && (
           <div className="space-y-2">
             {!isAuthenticated ? (
-              <div className="text-center py-8 text-umber-600 dark:text-gray-400">
+              <div className="text-center py-8 text-[var(--color-text-secondary)]">
                 <p className="mb-2">Please login to view friends</p>
               </div>
             ) : friends.length === 0 ? (
-              <div className="text-center py-8 text-umber-600 dark:text-gray-400">
+              <div className="text-center py-8 text-[var(--color-text-secondary)]">
                 <p className="mb-2">No friends yet</p>
                 <p className="text-sm">Add friends to see them here!</p>
               </div>
@@ -204,7 +204,7 @@ export function TeamSelectionSocialSidebar({
                           friend.is_online ? 'bg-green-500' : 'bg-gray-400'
                         }`}
                       />
-                      <span className="font-medium text-umber-900 dark:text-gray-100">
+                      <span className="font-medium text-[var(--color-text-primary)]">
                         {friend.player_name}
                       </span>
                     </div>
@@ -218,7 +218,7 @@ export function TeamSelectionSocialSidebar({
                     </Button>
                   </div>
                   {friend.status !== 'offline' && (
-                    <div className="mt-1 text-xs text-umber-600 dark:text-gray-400">
+                    <div className="mt-1 text-xs text-[var(--color-text-secondary)]">
                       {friend.status === 'in_game' && '🎮 In game'}
                       {friend.status === 'in_team_selection' && '👥 In team selection'}
                       {friend.status === 'in_lobby' && '🏠 In lobby'}
@@ -234,7 +234,7 @@ export function TeamSelectionSocialSidebar({
         {activeTab === 'online' && (
           <div className="space-y-2">
             {onlinePlayers.filter(p => p.playerName !== user?.username && !p.playerName.startsWith('Bot ')).length === 0 ? (
-              <div className="text-center py-8 text-umber-600 dark:text-gray-400">
+              <div className="text-center py-8 text-[var(--color-text-secondary)]">
                 <p className="mb-2">No other players online</p>
                 <p className="text-sm">Invite your friends to play!</p>
               </div>
@@ -249,7 +249,7 @@ export function TeamSelectionSocialSidebar({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-green-500" />
-                        <span className="font-medium text-umber-900 dark:text-gray-100">
+                        <span className="font-medium text-[var(--color-text-primary)]">
                           {player.playerName}
                         </span>
                       </div>
@@ -262,7 +262,7 @@ export function TeamSelectionSocialSidebar({
                         {invitedPlayers.has(player.playerName) ? 'Invited' : 'Invite'}
                       </Button>
                     </div>
-                    <div className="mt-1 text-xs text-umber-600 dark:text-gray-400">
+                    <div className="mt-1 text-xs text-[var(--color-text-secondary)]">
                       {player.status === 'in_game' && '🎮 In game'}
                       {player.status === 'in_team_selection' && '👥 In team selection'}
                       {player.status === 'in_lobby' && '🏠 Available'}
@@ -277,7 +277,7 @@ export function TeamSelectionSocialSidebar({
         {activeTab === 'recent' && (
           <div className="space-y-2">
             {recentPlayers.filter(p => p.name !== user?.username && !p.name.startsWith('Bot ')).length === 0 ? (
-              <div className="text-center py-8 text-umber-600 dark:text-gray-400">
+              <div className="text-center py-8 text-[var(--color-text-secondary)]">
                 <p className="mb-2">No recent players</p>
                 <p className="text-sm">Play some games to see recent players!</p>
               </div>
@@ -298,7 +298,7 @@ export function TeamSelectionSocialSidebar({
                               isOnline ? 'bg-green-500' : 'bg-gray-400'
                             }`}
                           />
-                          <span className="font-medium text-umber-900 dark:text-gray-100">
+                          <span className="font-medium text-[var(--color-text-primary)]">
                             {player.name}
                           </span>
                         </div>
@@ -311,7 +311,7 @@ export function TeamSelectionSocialSidebar({
                           {invitedPlayers.has(player.name) ? 'Invited' : 'Invite'}
                         </Button>
                       </div>
-                      <div className="mt-1 text-xs text-umber-600 dark:text-gray-400">
+                      <div className="mt-1 text-xs text-[var(--color-text-secondary)]">
                         {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} together
                       </div>
                     </div>
