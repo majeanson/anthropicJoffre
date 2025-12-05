@@ -54,13 +54,13 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
   const content = (
     <div className="space-y-6" style={{ color: 'var(--color-text-primary)' }}>
       {/* Overview */}
-      <section>
+      <SectionCard borderColor="var(--color-text-accent)">
         <SectionTitle>Overview</SectionTitle>
         <p className="text-lg leading-relaxed">
           J⋀ffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and accumulate points.
           The first team to reach 41 points wins the game!
         </p>
-      </section>
+      </SectionCard>
 
       {/* Special Cards */}
       <SectionCard borderColor="var(--color-success)">
@@ -231,7 +231,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
       </div>
 
       {/* Teams */}
-      <section>
+      <SectionCard borderColor="var(--color-border-accent)">
         <SectionTitle>Teams</SectionTitle>
         <div className="grid grid-cols-2 gap-4">
           <div
@@ -263,7 +263,7 @@ export function HowToPlay({ isModal = false, isOpen = true, onClose }: HowToPlay
             </p>
           </div>
         </div>
-      </section>
+      </SectionCard>
     </div>
   );
 

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getTutorialStats, ALL_TUTORIAL_PHASES, TutorialPhase } from '../utils/tutorialProgress';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
+import { HowToPlay } from './HowToPlay';
 
 interface TutorialProgressModalProps {
   isOpen: boolean;
@@ -56,6 +57,7 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
   const lastCompletedRef = useRef<HTMLDivElement>(null);
   const listContainerRef = useRef<HTMLDivElement>(null);
   const [expandedPhase, setExpandedPhase] = useState<TutorialPhase | null>(null);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
 
   // Scroll to the most recently completed tutorial when modal opens
   useEffect(() => {
@@ -214,15 +216,27 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
           </div>
         )}
 
-        {/* Close Button */}
-        <Button
-          variant="primary"
-          fullWidth
-          onClick={onClose}
-        >
-          Close
-        </Button>
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <Button
+            variant="secondary"
+            fullWidth
+            onClick={() => setShowHowToPlay(true)}
+          >
+            📖 How to Play
+          </Button>
+          <Button
+            variant="primary"
+            fullWidth
+            onClick={onClose}
+          >
+            Close
+          </Button>
+        </div>
       </div>
+
+      {/* How to Play Modal */}
+      <HowToPlay isModal={true} isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} />
     </Modal>
   );
 }

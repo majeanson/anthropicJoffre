@@ -277,6 +277,76 @@ export async function updatePlayerLevel(playerName: string): Promise<{
   }
 }
 
+// ============================================================================
+// Game Event Rewards
+// XP and currency awarded for various game actions
+// ============================================================================
+
+export const GAME_EVENT_REWARDS = {
+  // Round events
+  round_won: { xp: 5, currency: 2 },        // Team made their bet
+  round_lost: { xp: 2, currency: 1 },       // Played the round but lost
+
+  // Game events
+  game_won: { xp: 15, currency: 8 },        // Won the whole game
+  game_lost: { xp: 5, currency: 3 },        // Completed a game but lost
+
+  // Special card events (per card)
+  red_zero_collected: { xp: 3, currency: 2 },   // Got the Red 0
+  brown_zero_dodged: { xp: 2, currency: 1 },    // Avoided the Brown 0
+
+  // Betting events
+  bet_made: { xp: 3, currency: 1 },         // Successfully made your bet
+  without_trump_won: { xp: 5, currency: 3 }, // Won a "without trump" bet
+
+  // Tutorial
+  tutorial_step: { xp: 5, currency: 3 },    // Completed a tutorial step
+} as const;
+
+/**
+ * Award XP and currency to a player for a game event
+ * Silently handles missing players (e.g., guests without stats)
+ */
+export async function awardGameEventReward(
+  playerName: string,
+  eventType: keyof typeof GAME_EVENT_REWARDS,
+  multiplier: number = 1
+): Promise<{
+  xpAwarded: number;
+  currencyAwarded: number;
+  success: boolean;
+}> {
+  if (!pool) {
+    return { xpAwarded: 0, currencyAwarded: 0, success: false };
+  }
+
+  const reward = GAME_EVENT_REWARDS[eventType];
+  const xpAmount = Math.floor(reward.xp * multiplier);
+  const currencyAmount = Math.floor(reward.currency * multiplier);
+
+  try {
+    // Update stats (will be ignored if player doesn't exist)
+    const result = await pool.query(
+      `UPDATE player_stats
+       SET total_xp = total_xp + $1,
+           cosmetic_currency = cosmetic_currency + $2
+       WHERE player_name = $3
+       RETURNING player_name`,
+      [xpAmount, currencyAmount, playerName]
+    );
+
+    if (result.rows.length === 0) {
+      // Player doesn't exist in stats (might be a guest)
+      return { xpAwarded: 0, currencyAwarded: 0, success: false };
+    }
+
+    return { xpAwarded: xpAmount, currencyAwarded: currencyAmount, success: true };
+  } catch (error) {
+    console.error(`[Skins DB] Error awarding ${eventType} reward to ${playerName}:`, error);
+    return { xpAwarded: 0, currencyAwarded: 0, success: false };
+  }
+}
+
 /**
  * Award XP to a player and check for level up
  * Returns level-up info and any newly unlocked skins

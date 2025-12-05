@@ -36,6 +36,12 @@ import {
   updatePlayerLevel,
 } from '../db/skins';
 
+// Tutorial step rewards (XP and currency)
+const TUTORIAL_REWARDS = {
+  xp: 5,       // XP per tutorial step
+  currency: 3, // Coins per tutorial step
+} as const;
+
 /**
  * Register all quest-related socket handlers
  */
@@ -46,6 +52,11 @@ export function registerQuestHandlers(socket: Socket): void {
 
   socket.on('claim_quest_reward', async function(this: Socket, data: { playerName: string; questId: number }) {
     await handleClaimQuestReward.call(this, data);
+  });
+
+  // Tutorial completion rewards
+  socket.on('complete_tutorial_step', async function(this: Socket, data: { playerName: string; stepId: string }) {
+    await handleCompleteTutorialStep.call(this, data);
   });
 
   socket.on('update_login_streak', async function(this: Socket, data: { playerName: string }) {
@@ -625,6 +636,104 @@ async function handleCheckSkinUnlocks(
     console.error('[Quests] Error checking skin unlocks:', error);
     this.emit('error', {
       message: 'Failed to check skin unlocks. Please try again.',
+    });
+  }
+}
+
+// ============================================================================
+// Tutorial Completion Handlers
+// ============================================================================
+
+/**
+ * Handle tutorial step completion - awards XP and currency
+ */
+async function handleCompleteTutorialStep(
+  this: Socket,
+  data: { playerName: string; stepId: string }
+): Promise<void> {
+  try {
+    const { playerName, stepId } = data;
+
+    if (!playerName || !stepId) {
+      this.emit('error', { message: 'Player name and step ID are required' });
+      return;
+    }
+
+    if (!pool) {
+      this.emit('error', { message: 'Database not available' });
+      return;
+    }
+
+    // Check if this tutorial step was already completed (to prevent double rewards)
+    const checkResult = await pool.query(
+      `SELECT 1 FROM player_tutorial_progress WHERE player_name = $1 AND step_id = $2`,
+      [playerName, stepId]
+    );
+
+    if (checkResult.rows.length > 0) {
+      // Already completed, don't award again but still emit success
+      this.emit('tutorial_step_completed', {
+        stepId,
+        xp: 0,
+        currency: 0,
+        alreadyCompleted: true,
+      });
+      return;
+    }
+
+    // Record the tutorial completion
+    await pool.query(
+      `INSERT INTO player_tutorial_progress (player_name, step_id, completed_at)
+       VALUES ($1, $2, NOW())
+       ON CONFLICT (player_name, step_id) DO NOTHING`,
+      [playerName, stepId]
+    );
+
+    // Award XP and currency
+    await pool.query(
+      `UPDATE player_stats
+       SET total_xp = total_xp + $1,
+           cosmetic_currency = cosmetic_currency + $2
+       WHERE player_name = $3`,
+      [TUTORIAL_REWARDS.xp, TUTORIAL_REWARDS.currency, playerName]
+    );
+
+    // Check for level up
+    const levelResult = await updatePlayerLevel(playerName);
+
+    // Check for new skin unlocks if leveled up
+    let newlyUnlockedSkins: string[] = [];
+    if (levelResult.leveledUp) {
+      const skinResult = await checkAndUnlockSkins(playerName);
+      newlyUnlockedSkins = skinResult.newlyUnlocked;
+    }
+
+    // Get updated stats
+    const statsResult = await pool.query(
+      `SELECT total_xp, current_level, cosmetic_currency FROM player_stats WHERE player_name = $1`,
+      [playerName]
+    );
+
+    const totalXp = statsResult.rows[0]?.total_xp || 0;
+    const xpInfo = calculateLevelFromXP(totalXp);
+
+    this.emit('tutorial_step_completed', {
+      stepId,
+      xp: TUTORIAL_REWARDS.xp,
+      currency: TUTORIAL_REWARDS.currency,
+      alreadyCompleted: false,
+      leveledUp: levelResult.leveledUp,
+      newLevel: levelResult.newLevel,
+      currentLevelXP: xpInfo.currentLevelXP,
+      nextLevelXP: xpInfo.nextLevelXP,
+      totalXP: totalXp,
+      totalCurrency: statsResult.rows[0]?.cosmetic_currency || 0,
+      newlyUnlockedSkins,
+    });
+  } catch (error) {
+    console.error('[Quests] Error completing tutorial step:', error);
+    this.emit('error', {
+      message: 'Failed to complete tutorial step. Please try again.',
     });
   }
 }

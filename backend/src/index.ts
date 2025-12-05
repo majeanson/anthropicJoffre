@@ -107,6 +107,8 @@ import {
 } from './db';
 // Import conditional persistence manager
 import * as PersistenceManager from './db/persistenceManager';
+// Import skin/reward system
+import { awardGameEventReward } from './db/skins';
 // Import quest system (Sprint 19: Daily Engagement System)
 import { updateQuestProgress, updateRoundQuestProgress } from './db/quests';
 import { extractQuestContext, extractRoundQuestContext } from './game/quests';
@@ -1629,6 +1631,47 @@ async function endRound(gameId: string) {
         console.error(`[Quests] Error updating quest progress for ${player.name}:`, questError);
         // Don't throw - quest errors shouldn't break the game
       }
+
+      // ========================================================================
+      // XP/CURRENCY REWARDS - Award for round events
+      // ========================================================================
+      try {
+        // Award for round win/loss
+        if (roundWon) {
+          await awardGameEventReward(player.name, 'round_won');
+        } else {
+          await awardGameEventReward(player.name, 'round_lost');
+        }
+
+        // Award for successful bet (if player was bidder and made their bet)
+        if (wasBidder && scoring.betMade) {
+          await awardGameEventReward(player.name, 'bet_made');
+          // Bonus for "without trump" win
+          if (game.highestBet?.withoutTrump) {
+            await awardGameEventReward(player.name, 'without_trump_won');
+          }
+        }
+
+        // Award for collecting red zeros (per card)
+        const redZerosCollected = stats?.redZerosCollected.get(player.name) || 0;
+        if (redZerosCollected > 0) {
+          await awardGameEventReward(player.name, 'red_zero_collected', redZerosCollected);
+        }
+
+        // Award for avoiding brown zeros (if opponent got them)
+        const brownZerosReceived = stats?.brownZerosReceived.get(player.name) || 0;
+        if (brownZerosReceived === 0 && stats) {
+          // Check if any brown zeros were given out this round
+          let totalBrownZeros = 0;
+          stats.brownZerosReceived.forEach(count => totalBrownZeros += count);
+          if (totalBrownZeros > 0) {
+            await awardGameEventReward(player.name, 'brown_zero_dodged');
+          }
+        }
+      } catch (rewardError) {
+        console.error(`[Rewards] Error awarding round rewards for ${player.name}:`, rewardError);
+        // Don't throw - reward errors shouldn't break the game
+      }
     }
   } catch (error) {
     console.error('Error saving game progress:', error);
@@ -1748,6 +1791,23 @@ async function endRound(gameId: string) {
         } catch (error) {
           console.error(`[Quests] Error updating quest progress for ${player.name}:`, error);
           // Don't block game completion if quest update fails
+        }
+      }
+
+      // ========================================================================
+      // XP/CURRENCY REWARDS - Award for game completion
+      // ========================================================================
+      for (const player of humanPlayers) {
+        try {
+          const won = player.teamId === winningTeam;
+          if (won) {
+            await awardGameEventReward(player.name, 'game_won');
+          } else {
+            await awardGameEventReward(player.name, 'game_lost');
+          }
+        } catch (rewardError) {
+          console.error(`[Rewards] Error awarding game rewards for ${player.name}:`, rewardError);
+          // Don't throw - reward errors shouldn't break the game
         }
       }
     } catch (error) {
