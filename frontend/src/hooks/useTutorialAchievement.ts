@@ -47,10 +47,14 @@ export function useTutorialAchievement({ socket }: UseTutorialAchievementProps):
     }
   }, [socket, isAuthenticated, user]);
 
-  // Check on mount (for users who already completed all tutorials)
+  // Check on mount and when socket/auth becomes available
+  // This handles retroactive unlocks for users who already completed tutorials
   useEffect(() => {
-    checkTutorialAchievement();
-  }, [checkTutorialAchievement]);
+    // Only run when all dependencies are available
+    if (socket && isAuthenticated && user) {
+      checkTutorialAchievement();
+    }
+  }, [socket, isAuthenticated, user, checkTutorialAchievement]);
 
   return { checkTutorialAchievement };
 }
