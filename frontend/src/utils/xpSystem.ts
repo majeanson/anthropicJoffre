@@ -171,3 +171,57 @@ export function getLevelGradient(level: number): string {
 export function formatXp(xp: number): string {
   return xp.toLocaleString();
 }
+
+/**
+ * XP rewards configuration (must match backend/src/utils/xpSystem.ts)
+ */
+export const XP_REWARDS = {
+  GAME_COMPLETION: 50,
+  GAME_WIN: 100,
+  TRICK_WON: 5,
+  SUCCESSFUL_BET: 25,
+  RED_ZERO_COLLECTED: 15,
+};
+
+/**
+ * Calculate XP earned from a round
+ */
+export function calculateRoundXp(params: {
+  tricksWon: number;
+  betSuccessful: boolean;
+  redZerosCollected: number;
+}): number {
+  let xp = 0;
+
+  xp += params.tricksWon * XP_REWARDS.TRICK_WON;
+
+  if (params.betSuccessful) {
+    xp += XP_REWARDS.SUCCESSFUL_BET;
+  }
+
+  xp += params.redZerosCollected * XP_REWARDS.RED_ZERO_COLLECTED;
+
+  return xp;
+}
+
+/**
+ * Calculate total XP earned from a game
+ */
+export function calculateGameXp(params: {
+  won: boolean;
+  tricksWon: number;
+  betsSuccessful: number;
+  redZerosCollected: number;
+}): number {
+  let xp = XP_REWARDS.GAME_COMPLETION;
+
+  if (params.won) {
+    xp += XP_REWARDS.GAME_WIN;
+  }
+
+  xp += params.tricksWon * XP_REWARDS.TRICK_WON;
+  xp += params.betsSuccessful * XP_REWARDS.SUCCESSFUL_BET;
+  xp += params.redZerosCollected * XP_REWARDS.RED_ZERO_COLLECTED;
+
+  return xp;
+}

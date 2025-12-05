@@ -14,6 +14,7 @@ import { TrickHistory } from './TrickHistory';
 import { Card as CardComponent } from './Card';
 import { colors } from '../design-system';
 import { UICard, Button } from './ui';
+import { calculateRoundXp, XP_REWARDS } from '../utils/xpSystem';
 
 interface RoundStatistics {
   // Performance-based stats
@@ -102,9 +103,10 @@ function hasBetAmount(stat: StatValue | undefined): stat is NonNullable<RoundSta
 interface RoundSummaryProps {
   gameState: GameState;
   onReady: () => void;
+  currentPlayerId?: string;
 }
 
-const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
+const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady, currentPlayerId }) => {
   // ✅ CRITICAL: Check data BEFORE hooks to prevent "Rendered more hooks than during the previous render" error
   // Rules of Hooks: All early returns must happen BEFORE calling any hooks
   // Safety check: ensure roundHistory exists and has entries
@@ -260,6 +262,49 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
       .sort((a, b) => b.score - a.score)
       .slice(0, 3);
   }, [allStats]);
+
+  // Calculate XP earned this round for current player
+  const xpEarned = useMemo(() => {
+    if (!currentPlayerId) return null;
+
+    // Find current player
+    const currentPlayer = gameState.players.find(
+      p => p.name === currentPlayerId || p.id === currentPlayerId
+    );
+    if (!currentPlayer || currentPlayer.isBot) return null;
+
+    // Get player stats for this round
+    const playerStats = lastRound?.playerStats?.find(
+      ps => ps.playerName === currentPlayer.name
+    );
+
+    // Check if player's team made the bet
+    const playerTeam = currentPlayer.teamId;
+    const wasBettingTeam = lastRound.offensiveTeam === playerTeam;
+    const betSuccessful = wasBettingTeam && lastRound.betMade;
+
+    // Calculate XP
+    const tricksWon = currentPlayer.tricksWon || 0;
+    const redZerosCollected = playerStats?.redZerosCollected || 0;
+
+    const xp = calculateRoundXp({
+      tricksWon,
+      betSuccessful,
+      redZerosCollected,
+    });
+
+    return {
+      total: xp,
+      breakdown: {
+        tricks: tricksWon * XP_REWARDS.TRICK_WON,
+        bet: betSuccessful ? XP_REWARDS.SUCCESSFUL_BET : 0,
+        redZeros: redZerosCollected * XP_REWARDS.RED_ZERO_COLLECTED,
+      },
+      tricksWon,
+      betSuccessful,
+      redZerosCollected,
+    };
+  }, [currentPlayerId, gameState.players, lastRound]);
 
   // ✅ NOW hooks are done - render functions can be defined here
 
@@ -499,6 +544,39 @@ const RoundSummary: React.FC<RoundSummaryProps> = ({ gameState, onReady }) => {
           </div>
         </UICard>
       </div>
+
+      {/* XP Earned This Round */}
+      {xpEarned && xpEarned.total > 0 && (
+        <div className="animate-fadeInUp" style={{ animationDelay: '150ms' }}>
+          <UICard
+            variant="bordered"
+            className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 border-2 border-emerald-300 dark:border-emerald-700"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">✨</span>
+                <div>
+                  <h4 className="text-sm font-semibold text-emerald-800 dark:text-emerald-300">XP Earned This Round</h4>
+                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+                    +{xpEarned.total} XP
+                  </div>
+                </div>
+              </div>
+              <div className="text-right text-xs text-emerald-700 dark:text-emerald-400 space-y-1">
+                {xpEarned.breakdown.tricks > 0 && (
+                  <div>{xpEarned.tricksWon} tricks = +{xpEarned.breakdown.tricks} XP</div>
+                )}
+                {xpEarned.breakdown.bet > 0 && (
+                  <div>Bet won = +{xpEarned.breakdown.bet} XP</div>
+                )}
+                {xpEarned.breakdown.redZeros > 0 && (
+                  <div>{xpEarned.redZerosCollected} red 0s = +{xpEarned.breakdown.redZeros} XP</div>
+                )}
+              </div>
+            </div>
+          </UICard>
+        </div>
+      )}
 
       {/* Round Highlights - Only 3 stats, cycling */}
       {displayedStats.length > 0 && (

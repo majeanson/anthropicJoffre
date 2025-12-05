@@ -33,6 +33,7 @@ import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal sta
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
 import { useSettings } from './contexts/SettingsContext'; // Settings including beginner mode
 import { preloadCardImages } from './utils/imagePreloader';
+import { calculateGameXp, XP_REWARDS } from './utils/xpSystem';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ReplayErrorFallback } from './components/fallbacks/ReplayErrorFallback';
 // Sprint 5 Phase 2: Custom hooks for state management
@@ -1268,6 +1269,67 @@ function AppContent() {
                 <p className="text-sm text-purple-700 mt-2">Final Score</p>
               </div>
             </div>
+
+            {/* XP Earned This Game */}
+            {(() => {
+              // Calculate XP for current player
+              const currentPlayer = gameState.players.find(
+                p => p.name === currentPlayerName || p.id === currentPlayerName
+              );
+              if (!currentPlayer || currentPlayer.isBot) return null;
+
+              // Calculate stats from game
+              const won = winningTeam === currentPlayer.teamId;
+              const tricksWon = currentPlayer.tricksWon || 0;
+
+              // Count successful bets from round history
+              let betsSuccessful = 0;
+              let redZerosCollected = 0;
+
+              if (gameState.roundHistory) {
+                for (const round of gameState.roundHistory) {
+                  const wasBettingTeam = round.offensiveTeam === currentPlayer.teamId;
+                  if (wasBettingTeam && round.betMade) {
+                    betsSuccessful++;
+                  }
+                  // Count red zeros from player stats
+                  const playerStats = round.playerStats?.find(ps => ps.playerName === currentPlayer.name);
+                  if (playerStats?.redZerosCollected) {
+                    redZerosCollected += playerStats.redZerosCollected;
+                  }
+                }
+              }
+
+              const xp = calculateGameXp({
+                won,
+                tricksWon,
+                betsSuccessful,
+                redZerosCollected,
+              });
+
+              return (
+                <div className="mb-8 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl p-6 border-4 border-emerald-400 dark:border-emerald-600">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-5xl">✨</span>
+                      <div>
+                        <h3 className="text-lg font-bold text-emerald-800 dark:text-emerald-300">Total XP Earned</h3>
+                        <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400">
+                          +{xp} XP
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right text-sm text-emerald-700 dark:text-emerald-400 space-y-1">
+                      <div>Game completion = +{XP_REWARDS.GAME_COMPLETION} XP</div>
+                      {won && <div>Victory bonus = +{XP_REWARDS.GAME_WIN} XP</div>}
+                      {tricksWon > 0 && <div>{tricksWon} tricks = +{tricksWon * XP_REWARDS.TRICK_WON} XP</div>}
+                      {betsSuccessful > 0 && <div>{betsSuccessful} bets won = +{betsSuccessful * XP_REWARDS.SUCCESSFUL_BET} XP</div>}
+                      {redZerosCollected > 0 && <div>{redZerosCollected} red 0s = +{redZerosCollected * XP_REWARDS.RED_ZERO_COLLECTED} XP</div>}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Player Stats */}
             <div className="grid grid-cols-2 gap-6 mb-8">
