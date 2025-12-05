@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T12:42:38.579Z",
+  "buildDate": "2025-12-05T12:51:12.614Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "feat: Add side betting system v5.0.0\n\nImplement complete side betting system for players and spectators:\n\nBackend:\n- Add side_bets table to schema.sql\n- Create sideBets.ts with CRUD operations and coin management\n- Create sideBets socket handlers for real-time betting\n- Add SideBet types to game.ts\n\nFrontend:\n- Add SideBetsPanel component with slide-out panel design\n- Add CreateBetModal for preset/custom bet creation\n- Add Side Bets button to GameHeader with notification badge\n- Integrate into PlayingPhase with controlled props\n\nFeatures:\n- Preset bets: red 0 winner, brown 0 victim, bet made, etc.\n- Custom bets with free-text description\n- Auto-resolution for preset bets\n- Manual resolution with dispute handling for custom bets\n- Coin balance management with transactions\n- Real-time notifications for bet events\n- Mobile-friendly responsive design\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "a1a655f",
-    "commitDate": "2025-12-04 23:50:30 -0500",
+    "commitMessage": "fix: Make side bets handlers resilient to missing database table\n\n- Only fetch bets when panel is opened (not on every mount)\n- Return graceful defaults when side_bets table doesn't exist\n- Prevents \"Game action failed\" error in playing phase\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "0f7b854",
+    "commitDate": "2025-12-05 07:43:04 -0500",
     "branch": "main"
   },
   "futureTodos": [
