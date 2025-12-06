@@ -307,11 +307,11 @@ export const TrickArea = memo(function TrickArea({
         // Current Trick View
         <>
           <div
-            className="relative h-[280px] sm:h-[320px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto"
+            className="relative h-[320px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto"
             data-testid="trick-area"
           >
             {/* Bottom - card above name, positioned from bottom edge */}
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0">
               {renderCard(cardPositions[0], cardPositions[0]?.playerId === currentTrickWinnerId, 0)}
               {renderPlayerPosition(0)}
             </div>
@@ -323,7 +323,7 @@ export const TrickArea = memo(function TrickArea({
             </div>
 
             {/* Top - name above card, positioned from top edge */}
-            <div className="absolute top-1 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0">
               {renderPlayerPosition(2)}
               {renderCard(cardPositions[2], cardPositions[2]?.playerId === currentTrickWinnerId, 2)}
             </div>
