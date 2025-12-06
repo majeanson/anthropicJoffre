@@ -157,30 +157,26 @@ export function ScoringPhase({
       )}
 
       <div className="flex-1 flex items-center justify-center p-4 md:p-6">
-        <UICard variant="elevated" size="lg" className="bg-white dark:bg-gray-800 max-w-4xl w-full">
+        <UICard variant="elevated" size="lg" className="bg-parchment-100 max-w-4xl w-full">
           <h2
-            className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-800 dark:text-gray-200 text-center"
+            className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-gray-900 text-center"
             data-testid="scoring-phase-heading"
           >
             Round {gameState.roundNumber} Complete!
           </h2>
 
           {/* Timer and Ready Status */}
-          <UICard
-            variant="bordered"
-            gradient="info"
-            className="mb-6 border-2 border-blue-200 dark:border-blue-600"
-          >
+          <UICard variant="gradient" gradient="info" className="mb-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
               {/* Timer - Centered on mobile, left on desktop */}
               <div className="flex items-center gap-3">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-300">
+                <div className="text-3xl md:text-4xl font-bold text-blue-700">
                   {timeRemaining}s
                 </div>
               </div>
               {/* Ready Status and Button - Stacked on mobile, horizontal on desktop */}
               <div className="flex flex-col md:flex-row items-center gap-2 md:gap-3 w-full md:w-auto">
-                <span className="text-xs md:text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                <span className="text-xs md:text-sm text-blue-800 whitespace-nowrap">
                   {readyCount}/4 players ready
                 </span>
                 <Button
@@ -202,7 +198,7 @@ export function ScoringPhase({
                 <div
                   key={i}
                   className={`w-3 h-3 rounded-full transition-all ${
-                    i < readyCount ? 'bg-green-500 scale-110' : 'bg-gray-300'
+                    i < readyCount ? 'bg-green-600 scale-110' : 'bg-gray-400'
                   }`}
                 />
               ))}
@@ -232,7 +228,7 @@ export function ScoringPhase({
                     style={{ animationDelay: '0.3s' }}
                   ></div>
                 </div>
-                <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
+                <p className="text-center text-lg font-semibold text-gray-700 animate-pulse">
                   Calculating round results...
                 </p>
               </div>
@@ -242,82 +238,64 @@ export function ScoringPhase({
               {/* Team Scores - Large and Clear */}
               <div className="grid grid-cols-2 gap-6 mb-8">
                 <UICard
-                  variant="bordered"
+                  variant="gradient"
                   gradient="team1"
-                  className="text-center border-2 border-orange-200 dark:border-orange-600"
+                  className="text-center"
                   data-testid="team-1-score-card"
                 >
-                  <h3 className="text-lg font-semibold text-orange-800 dark:text-orange-200 mb-2">
-                    Team 1
-                  </h3>
+                  <h3 className="text-lg font-semibold text-orange-800 mb-2">Team 1</h3>
                   <p
-                    className="text-5xl font-bold text-orange-600 dark:text-orange-300"
+                    className="text-5xl font-bold text-orange-700"
                     data-testid="team-1-score"
                   >
                     {gameState.teamScores.team1}
                   </p>
-                  <p className="text-xs text-orange-700 dark:text-orange-300 mt-2">Total Score</p>
+                  <p className="text-xs text-orange-600 mt-2">Total Score</p>
                 </UICard>
                 <UICard
-                  variant="bordered"
+                  variant="gradient"
                   gradient="team2"
-                  className="text-center border-2 border-purple-200 dark:border-purple-600"
+                  className="text-center"
                   data-testid="team-2-score-card"
                 >
-                  <h3 className="text-lg font-semibold text-purple-800 dark:text-purple-200 mb-2">
-                    Team 2
-                  </h3>
+                  <h3 className="text-lg font-semibold text-purple-800 mb-2">Team 2</h3>
                   <p
-                    className="text-5xl font-bold text-purple-600 dark:text-purple-300"
+                    className="text-5xl font-bold text-purple-700"
                     data-testid="team-2-score"
                   >
                     {gameState.teamScores.team2}
                   </p>
-                  <p className="text-xs text-purple-700 dark:text-purple-300 mt-2">Total Score</p>
+                  <p className="text-xs text-purple-600 mt-2">Total Score</p>
                 </UICard>
               </div>
 
               {/* Current Bet Information */}
               {latestRound && (
                 <section className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b-2 border-gray-300 dark:border-gray-600 pb-2">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
                     <span aria-hidden="true">🎲</span> Round Bet
                   </h3>
-                  <UICard
-                    variant="bordered"
-                    gradient="info"
-                    className="border-2 border-blue-200 dark:border-blue-600"
-                  >
+                  <UICard variant="gradient" gradient="info">
                     <div className="grid grid-cols-3 gap-4 text-center">
                       <div>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                          Highest Bidder
-                        </p>
-                        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                        <p className="text-sm text-blue-700 font-semibold mb-1">Highest Bidder</p>
+                        <p className="text-lg font-bold text-gray-900">
                           {gameState.players.find((p) => p.id === latestRound.highestBet.playerId)
                             ?.name || 'Unknown'}
                         </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                          Team {latestRound.offensiveTeam}
-                        </p>
+                        <p className="text-xs text-blue-600">Team {latestRound.offensiveTeam}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                          Bet Amount
-                        </p>
-                        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                        <p className="text-sm text-blue-700 font-semibold mb-1">Bet Amount</p>
+                        <p className="text-lg font-bold text-gray-900">
                           {latestRound.betAmount} points
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                          Type
-                        </p>
-                        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                        <p className="text-sm text-blue-700 font-semibold mb-1">Type</p>
+                        <p className="text-lg font-bold text-gray-900">
                           {latestRound.withoutTrump ? (
-                            <span className="text-red-600 dark:text-red-400">
-                              Without Trump (2x)
-                            </span>
+                            <span className="text-red-600">Without Trump (2x)</span>
                           ) : (
                             'With Trump'
                           )}
@@ -331,65 +309,47 @@ export function ScoringPhase({
               {/* Round Results */}
               {latestRound && (
                 <section className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b-2 border-gray-300 dark:border-gray-600 pb-2">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
                     <span aria-hidden="true">📊</span> Round Results
                   </h3>
-                  <UICard
-                    variant="bordered"
-                    gradient="primary"
-                    className="border-2 border-gray-300 dark:border-gray-600"
-                  >
+                  <UICard variant="gradient" gradient="primary">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
                       <div>
-                        <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                          Offensive Team
-                        </p>
-                        <p className="font-bold text-gray-900 dark:text-gray-100">
-                          Team {latestRound.offensiveTeam}
-                        </p>
+                        <p className="text-indigo-700 font-semibold mb-1">Offensive Team</p>
+                        <p className="font-bold text-gray-900">Team {latestRound.offensiveTeam}</p>
                       </div>
                       <div>
-                        <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                          Points Earned
-                        </p>
-                        <p className="font-bold text-gray-900 dark:text-gray-100">
+                        <p className="text-indigo-700 font-semibold mb-1">Points Earned</p>
+                        <p className="font-bold text-gray-900">
                           {latestRound.offensivePoints} / {latestRound.betAmount}
                         </p>
                       </div>
                       <div>
-                        <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                          Defensive Points
-                        </p>
-                        <p className="font-bold text-gray-900 dark:text-gray-100">
-                          {latestRound.defensivePoints}
-                        </p>
+                        <p className="text-indigo-700 font-semibold mb-1">Defensive Points</p>
+                        <p className="font-bold text-gray-900">{latestRound.defensivePoints}</p>
                       </div>
                       <div>
-                        <p className="text-gray-700 dark:text-gray-300 font-semibold mb-1">
-                          Result
-                        </p>
+                        <p className="text-indigo-700 font-semibold mb-1">Result</p>
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border-2 ${
                             latestRound.betMade
-                              ? 'bg-green-100 text-green-800 border-green-400 dark:bg-green-900/40 dark:text-green-200'
-                              : 'bg-red-100 text-red-800 border-red-400 dark:bg-red-900/40 dark:text-red-200'
+                              ? 'bg-green-100 text-green-800 border-green-400'
+                              : 'bg-red-100 text-red-800 border-red-400'
                           }`}
                         >
                           {latestRound.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
                         </span>
                       </div>
                     </div>
-                    <div className="border-t-2 border-gray-300 dark:border-gray-600 pt-3">
-                      <p className="text-sm text-gray-700 dark:text-gray-300 font-semibold mb-2">
-                        Round Score:
-                      </p>
+                    <div className="border-t-2 border-indigo-200 pt-3">
+                      <p className="text-sm text-indigo-700 font-semibold mb-2">Round Score:</p>
                       <p className="font-bold">
-                        <span className="text-orange-600 dark:text-orange-400">
+                        <span className="text-orange-600">
                           Team 1: {latestRound.roundScore.team1 >= 0 ? '+' : ''}
                           {latestRound.roundScore.team1}
                         </span>
                         {' | '}
-                        <span className="text-purple-600 dark:text-purple-400">
+                        <span className="text-purple-600">
                           Team 2: {latestRound.roundScore.team2 >= 0 ? '+' : ''}
                           {latestRound.roundScore.team2}
                         </span>
@@ -402,17 +362,13 @@ export function ScoringPhase({
               {/* Detailed Trick History */}
               {latestRound?.tricks && latestRound.tricks.length > 0 && (
                 <section className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 border-b-2 border-gray-300 dark:border-gray-600 pb-2">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
                     <span aria-hidden="true">🃏</span> Tricks Played
                   </h3>
-                  <UICard
-                    variant="bordered"
-                    gradient="info"
-                    className="border-2 border-indigo-200 dark:border-indigo-600"
-                  >
+                  <UICard variant="gradient" gradient="info">
                     {latestRound.trump && (
                       <div className="mb-4 flex items-center justify-center gap-2">
-                        <span className="text-sm bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200 px-3 py-1 rounded-full font-semibold border-2 border-blue-300 dark:border-blue-700">
+                        <span className="text-sm bg-blue-200 text-blue-800 px-3 py-1 rounded-full font-semibold border-2 border-blue-400">
                           Trump: <span className="capitalize">{latestRound.trump}</span>
                         </span>
                       </div>
@@ -429,28 +385,22 @@ export function ScoringPhase({
 
               {/* Round Statistics */}
               {statistics && (
-                <UICard
-                  variant="bordered"
-                  gradient="warning"
-                  className="border-2 border-amber-200 dark:border-amber-600 mb-4"
-                >
-                  <h3 className="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 text-center">
+                <UICard variant="gradient" gradient="warning" className="mb-4">
+                  <h3 className="text-xl font-bold mb-4 text-gray-800 text-center">
                     <span aria-hidden="true">🏅</span> Round Highlights
                   </h3>
                   <div className="grid grid-cols-2 gap-4">
                     {statistics.trickMaster && (
                       <UICard
                         variant="bordered"
-                        className="bg-white dark:bg-gray-800 border-2 border-yellow-300"
+                        className="bg-yellow-50 border-2 border-yellow-400"
                       >
                         <div className="text-3xl mb-2 text-center">🏆</div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                          Trick Master
-                        </p>
-                        <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
+                        <p className="text-sm text-yellow-700 text-center">Trick Master</p>
+                        <p className="font-bold text-lg text-center text-gray-800">
                           {statistics.trickMaster.playerName}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                        <p className="text-xs text-yellow-600 text-center">
                           {statistics.trickMaster.tricksWon} tricks
                         </p>
                       </UICard>
@@ -459,16 +409,14 @@ export function ScoringPhase({
                     {statistics.pointLeader && (
                       <UICard
                         variant="bordered"
-                        className="bg-white dark:bg-gray-800 border-2 border-red-300"
+                        className="bg-red-50 border-2 border-red-300"
                       >
                         <div className="text-3xl mb-2 text-center">💎</div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                          Point Leader
-                        </p>
-                        <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
+                        <p className="text-sm text-red-700 text-center">Point Leader</p>
+                        <p className="font-bold text-lg text-center text-gray-800">
                           {statistics.pointLeader.playerName}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                        <p className="text-xs text-red-600 text-center">
                           {statistics.pointLeader.pointsEarned} pts
                         </p>
                       </UICard>
@@ -477,16 +425,14 @@ export function ScoringPhase({
                     {statistics.trumpMaster && (
                       <UICard
                         variant="bordered"
-                        className="bg-white dark:bg-gray-800 border-2 border-purple-300"
+                        className="bg-purple-50 border-2 border-purple-300"
                       >
                         <div className="text-3xl mb-2 text-center">👑</div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                          Trump Master
-                        </p>
-                        <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
+                        <p className="text-sm text-purple-700 text-center">Trump Master</p>
+                        <p className="font-bold text-lg text-center text-gray-800">
                           {statistics.trumpMaster.playerName}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                        <p className="text-xs text-purple-600 text-center">
                           {statistics.trumpMaster.trumpsPlayed} trumps played
                         </p>
                       </UICard>
@@ -495,16 +441,14 @@ export function ScoringPhase({
                     {statistics.luckyPlayer && (
                       <UICard
                         variant="bordered"
-                        className="bg-white dark:bg-gray-800 border-2 border-green-300"
+                        className="bg-green-50 border-2 border-green-300"
                       >
                         <div className="text-3xl mb-2 text-center">🍀</div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                          Lucky Player
-                        </p>
-                        <p className="font-bold text-lg text-center text-gray-800 dark:text-gray-100">
+                        <p className="text-sm text-green-700 text-center">Lucky Player</p>
+                        <p className="font-bold text-lg text-center text-gray-800">
                           {statistics.luckyPlayer.playerName}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                        <p className="text-xs text-green-600 text-center">
                           {statistics.luckyPlayer.redZeros} red 0
                           {statistics.luckyPlayer.redZeros > 1 ? 's' : ''}
                         </p>

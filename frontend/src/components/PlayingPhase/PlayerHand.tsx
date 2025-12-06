@@ -396,7 +396,7 @@ export const PlayerHand = memo(function PlayerHand({
         onTouchEnd={handleTouchEnd}
       >
         {/* Mobile: Fan-style card layout - swipe to navigate, tap to play */}
-        <div className="md:hidden relative h-52 sm:h-56 flex items-end justify-center overflow-visible">
+        <div className="md:hidden relative h-36 sm:h-40 flex items-end justify-center overflow-visible">
           {/* Fan of cards - overlapping like a real hand, swipe to navigate */}
           <div className="relative flex items-end justify-center w-full h-full">
             {displayHand.map((card, index) => {

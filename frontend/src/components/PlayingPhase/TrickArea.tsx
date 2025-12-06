@@ -127,7 +127,7 @@ export const TrickArea = memo(function TrickArea({
   const renderCard = (tc: TrickCard | null, isWinner: boolean = false, positionIndex?: number) => {
     if (!tc) {
       return (
-        <div className="w-[3.25rem] h-[5rem] sm:w-16 sm:h-24 md:w-16 md:h-28 border-2 border-dashed border-skin-subtle bg-skin-tertiary rounded-[var(--radius-lg)] flex items-center justify-center">
+        <div className="w-[4rem] h-[6rem] sm:w-[4.5rem] sm:h-[6.75rem] md:w-16 md:h-28 border-2 border-dashed border-skin-subtle bg-skin-tertiary rounded-[var(--radius-lg)] flex items-center justify-center">
           <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-full border-2 border-dashed border-skin-subtle flex items-center justify-center">
             <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-skin-muted opacity-40" />
           </div>
@@ -161,7 +161,7 @@ export const TrickArea = memo(function TrickArea({
           isWinner ? 'scale-110 rounded-lg shadow-turn-active' : ''
         } ${animationClass}`}
       >
-        <CardComponent card={tc.card} size="small" />
+        <CardComponent card={tc.card} size="medium" />
       </div>
     );
   };
