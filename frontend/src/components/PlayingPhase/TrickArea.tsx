@@ -307,7 +307,7 @@ export const TrickArea = memo(function TrickArea({
         // Current Trick View
         <>
           <div
-            className="relative h-[240px] sm:h-[300px] md:h-[380px] w-full min-w-[260px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto"
+            className="relative h-[260px] sm:h-[300px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto"
             data-testid="trick-area"
           >
             {/* Bottom */}
@@ -317,7 +317,7 @@ export const TrickArea = memo(function TrickArea({
             </div>
 
             {/* Left */}
-            <div className="absolute top-1/2 left-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+            <div className="absolute top-1/2 left-2 sm:left-0 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2">
               {renderCard(cardPositions[1], cardPositions[1]?.playerId === currentTrickWinnerId, 1)}
               {renderPlayerPosition(1)}
             </div>
@@ -329,7 +329,7 @@ export const TrickArea = memo(function TrickArea({
             </div>
 
             {/* Right */}
-            <div className="absolute top-1/2 right-0 -translate-y-1/2 flex flex-col items-center gap-1.5 md:gap-2">
+            <div className="absolute top-1/2 right-2 sm:right-0 -translate-y-1/2 flex flex-col items-center gap-1 md:gap-2">
               {renderCard(cardPositions[3], cardPositions[3]?.playerId === currentTrickWinnerId, 3)}
               {renderPlayerPosition(3)}
             </div>

@@ -294,7 +294,7 @@ export const PlayerHand = memo(function PlayerHand({
     }
   }, [hand.length, focusedCardIndex]);
 
-  // Touch handlers for mobile swipe navigation
+  // Touch handlers for mobile swipe navigation - proportional to swipe distance
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
@@ -308,16 +308,20 @@ export const PlayerHand = memo(function PlayerHand({
       const deltaY = touchEndY - touchStartY.current;
 
       // Only handle horizontal swipes (ignore vertical scrolls)
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 30) {
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
+        // Calculate how many cards to skip based on swipe distance
+        // Every 40px of swipe = 1 card movement
+        const cardsToMove = Math.round(Math.abs(deltaX) / 40);
+        const clampedMove = Math.max(1, Math.min(cardsToMove, hand.length - 1));
+
         if (deltaX > 0) {
-          // Swipe right - go to previous card
-          setFocusedCardIndex((prev) => Math.max(0, prev - 1));
-          sounds.cardDeal();
+          // Swipe right - go to previous cards
+          setFocusedCardIndex((prev) => Math.max(0, prev - clampedMove));
         } else {
-          // Swipe left - go to next card
-          setFocusedCardIndex((prev) => Math.min(hand.length - 1, prev + 1));
-          sounds.cardDeal();
+          // Swipe left - go to next cards
+          setFocusedCardIndex((prev) => Math.min(hand.length - 1, prev + clampedMove));
         }
+        sounds.cardDeal();
       }
     },
     [hand.length]
@@ -407,26 +411,26 @@ export const PlayerHand = memo(function PlayerHand({
               const isQueued = isCardQueued(card);
               const isFocused = focusedCardIndex === index;
 
-              // Calculate fan position - cards overlap significantly
+              // Calculate fan position - spread cards to use full width
               const centerOffset = index - focusedCardIndex;
-              // Non-focused cards show only ~24px of their edge (like holding cards in hand)
-              const cardVisibleEdge = 24;
+              // Show more of each card (~45px visible edge) to use screen width
+              const cardVisibleEdge = 45;
               const xOffset = centerOffset * cardVisibleEdge;
 
               // Z-index: focused card always on top, others stack by distance
               const zIndex = isFocused ? 100 : 50 - Math.abs(centerOffset);
 
-              // Focused card is scaled up prominently; others are smaller and tucked behind
-              const scale = isFocused ? 1.1 : 0.65;
+              // Focused card is scaled up prominently; others are slightly smaller
+              const scale = isFocused ? 1.15 : 0.75;
 
-              // Focused card pops up significantly above the others
-              const yOffset = isFocused ? -24 : 8;
+              // Focused card pops up above the others
+              const yOffset = isFocused ? -20 : 6;
 
-              // Rotation for natural fan effect - focused card straight, others angled
-              const rotation = isFocused ? 0 : centerOffset * 4;
+              // Subtle rotation for natural fan effect
+              const rotation = isFocused ? 0 : centerOffset * 3;
 
-              // Opacity: dim non-focused cards more
-              const opacity = isFocused ? 1 : 0.7;
+              // Opacity: slightly dim non-focused cards
+              const opacity = isFocused ? 1 : 0.8;
 
               return (
                 <div
