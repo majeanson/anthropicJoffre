@@ -128,10 +128,10 @@ export function ProfileProgressModal({
     setCardSkin,
     startPreviewSkin,
     startPreviewCardSkin,
-    stopPreviewSkin,
-    stopPreviewCardSkin,
     stopPreview,
     isPreviewActive,
+    previewSkinId,
+    previewCardSkinId,
     setCosmeticCurrency,
     setUnlockedSkinIds,
   } = useSkin();
@@ -142,7 +142,7 @@ export function ProfileProgressModal({
     redZeroSkins,
     brownZeroSkins,
     startPreviewSpecialSkin,
-    stopPreviewSpecialSkin,
+    previewSpecialSkins,
   } = useSpecialCardSkins();
 
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
@@ -792,16 +792,44 @@ export function ProfileProgressModal({
                     </div>
                   )}
 
-                  {/* Preview indicator */}
+                  {/* Preview indicator with Apply All */}
                   {isPreviewActive && (
-                    <div className="p-2 rounded-lg bg-blue-600/30 border border-blue-400/50 text-white text-xs text-center flex items-center justify-center gap-2">
-                      <span>👁️ Preview Mode - Hover/tap to preview skins</span>
-                      <button
-                        onClick={stopPreview}
-                        className="underline hover:text-blue-200 font-medium"
-                      >
-                        Stop
-                      </button>
+                    <div className="p-3 rounded-lg bg-blue-600/30 border border-blue-400/50 text-white text-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">👁️ Preview Mode</span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              // Apply all previewed skins
+                              if (previewSkinId) setSkin(previewSkinId);
+                              if (previewCardSkinId) setCardSkin(previewCardSkinId);
+                              if (previewSpecialSkins) {
+                                setEquippedSpecialSkins(previewSpecialSkins);
+                              }
+                              stopPreview();
+                            }}
+                            className="px-3 py-1 rounded bg-green-500 hover:bg-green-600 text-white text-xs font-medium transition-colors"
+                          >
+                            Apply All
+                          </button>
+                          <button
+                            onClick={stopPreview}
+                            className="px-3 py-1 rounded bg-gray-500/50 hover:bg-gray-500/70 text-white text-xs font-medium transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                      <div className="text-xs text-blue-200 space-y-1">
+                        {previewSkinId && <div>UI Theme: <span className="text-white">{skinList.find(s => s.id === previewSkinId)?.name || previewSkinId}</span></div>}
+                        {previewCardSkinId && <div>Card Style: <span className="text-white">{cardSkinList.find(s => s.id === previewCardSkinId)?.name || previewCardSkinId}</span></div>}
+                        {previewSpecialSkins?.redZeroSkin && previewSpecialSkins.redZeroSkin !== equippedSpecialSkins.redZeroSkin && (
+                          <div>Red Zero: <span className="text-white">{redZeroSkins.find(s => s.skinId === previewSpecialSkins.redZeroSkin)?.skinName || previewSpecialSkins.redZeroSkin}</span></div>
+                        )}
+                        {previewSpecialSkins?.brownZeroSkin && previewSpecialSkins.brownZeroSkin !== equippedSpecialSkins.brownZeroSkin && (
+                          <div>Brown Zero: <span className="text-white">{brownZeroSkins.find(s => s.skinId === previewSpecialSkins.brownZeroSkin)?.skinName || previewSpecialSkins.brownZeroSkin}</span></div>
+                        )}
+                      </div>
                     </div>
                   )}
 
@@ -843,7 +871,7 @@ export function ProfileProgressModal({
                       className="text-xs mb-3"
                       style={{ color: 'var(--color-text-muted)' }}
                     >
-                      Tap to preview on mobile. Purchase to own permanently.
+                      Click to preview. Mix and match across all skin types!
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -852,6 +880,7 @@ export function ProfileProgressModal({
                         // A skin is unlocked if: it's free (price 0) OR player has purchased it
                         const isUnlocked = pricing.price === 0 || progression.unlockedSkins.includes(cardSkinItem.id);
                         const isActive = cardSkinId === cardSkinItem.id;
+                        const isPreviewing = previewCardSkinId === cardSkinItem.id;
                         const canAfford = progression.cosmeticCurrency >= pricing.price;
 
                         return (
@@ -861,15 +890,15 @@ export function ProfileProgressModal({
                               relative p-3 rounded-lg text-left transition-all cursor-pointer
                               ${isActive
                                 ? 'ring-2 ring-blue-500'
-                                : 'hover:ring-1 hover:ring-purple-500/50'
+                                : isPreviewing
+                                  ? 'ring-2 ring-purple-500'
+                                  : 'hover:ring-1 hover:ring-purple-500/50'
                               }
                             `}
                             style={{
                               backgroundColor: 'var(--color-bg-secondary)',
-                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
+                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
                             }}
-                            onMouseEnter={() => startPreviewCardSkin(cardSkinItem.id)}
-                            onMouseLeave={stopPreviewCardSkin}
                             onClick={() => startPreviewCardSkin(cardSkinItem.id)}
                           >
                             {/* Preview gradient with mini cards */}
@@ -987,6 +1016,7 @@ export function ProfileProgressModal({
                         {redZeroSkins.map((skin) => {
                             const isUnlocked = skin.isUnlocked;
                             const isEquipped = equippedSpecialSkins.redZeroSkin === skin.skinId;
+                            const isPreviewing = previewSpecialSkins?.redZeroSkin === skin.skinId;
                             const rarityStyle = rarityStyles[skin.rarity];
 
                             return (
@@ -996,25 +1026,17 @@ export function ProfileProgressModal({
                                   relative p-2 rounded-lg text-center transition-all cursor-pointer
                                   ${isEquipped
                                     ? 'ring-2 ring-orange-500'
-                                    : 'hover:ring-1 hover:ring-orange-400/50'
+                                    : isPreviewing
+                                      ? 'ring-2 ring-purple-500'
+                                      : 'hover:ring-1 hover:ring-orange-400/50'
                                   }
                                   ${!isUnlocked ? 'opacity-60' : ''}
                                 `}
                                 style={{
                                   backgroundColor: 'var(--color-bg-secondary)',
-                                  border: `1px solid ${isEquipped ? '#f97316' : 'var(--color-border-subtle)'}`,
+                                  border: `1px solid ${isEquipped ? '#f97316' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
                                 }}
-                                onMouseEnter={() => startPreviewSpecialSkin('red_zero', skin.skinId)}
-                                onMouseLeave={stopPreviewSpecialSkin}
-                                onClick={() => {
-                                  startPreviewSpecialSkin('red_zero', skin.skinId);
-                                  if (isUnlocked && !isEquipped) {
-                                    setEquippedSpecialSkins({
-                                      ...equippedSpecialSkins,
-                                      redZeroSkin: skin.skinId,
-                                    });
-                                  }
-                                }}
+                                onClick={() => startPreviewSpecialSkin('red_zero', skin.skinId)}
                               >
                                 {/* Rarity badge */}
                                 <div className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}>
@@ -1075,6 +1097,7 @@ export function ProfileProgressModal({
                         {brownZeroSkins.map((skin) => {
                             const isUnlocked = skin.isUnlocked;
                             const isEquipped = equippedSpecialSkins.brownZeroSkin === skin.skinId;
+                            const isPreviewing = previewSpecialSkins?.brownZeroSkin === skin.skinId;
                             const rarityStyle = rarityStyles[skin.rarity];
 
                             return (
@@ -1084,25 +1107,17 @@ export function ProfileProgressModal({
                                   relative p-2 rounded-lg text-center transition-all cursor-pointer
                                   ${isEquipped
                                     ? 'ring-2 ring-amber-700'
-                                    : 'hover:ring-1 hover:ring-amber-600/50'
+                                    : isPreviewing
+                                      ? 'ring-2 ring-purple-500'
+                                      : 'hover:ring-1 hover:ring-amber-600/50'
                                   }
                                   ${!isUnlocked ? 'opacity-60' : ''}
                                 `}
                                 style={{
                                   backgroundColor: 'var(--color-bg-secondary)',
-                                  border: `1px solid ${isEquipped ? '#92400e' : 'var(--color-border-subtle)'}`,
+                                  border: `1px solid ${isEquipped ? '#92400e' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
                                 }}
-                                onMouseEnter={() => startPreviewSpecialSkin('brown_zero', skin.skinId)}
-                                onMouseLeave={stopPreviewSpecialSkin}
-                                onClick={() => {
-                                  startPreviewSpecialSkin('brown_zero', skin.skinId);
-                                  if (isUnlocked && !isEquipped) {
-                                    setEquippedSpecialSkins({
-                                      ...equippedSpecialSkins,
-                                      brownZeroSkin: skin.skinId,
-                                    });
-                                  }
-                                }}
+                                onClick={() => startPreviewSpecialSkin('brown_zero', skin.skinId)}
                               >
                                 {/* Rarity badge */}
                                 <div className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}>
@@ -1164,7 +1179,7 @@ export function ProfileProgressModal({
                       className="text-xs mb-3"
                       style={{ color: 'var(--color-text-muted)' }}
                     >
-                      Tap to preview on mobile. The entire interface will change!
+                      Click to preview. Mix and match across all skin types!
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {skinList.map((skinItem) => {
@@ -1172,6 +1187,7 @@ export function ProfileProgressModal({
                         // A skin is unlocked if: it's free (price 0) OR player has purchased it
                         const isUnlocked = pricing.price === 0 || progression.unlockedSkins.includes(skinItem.id);
                         const isActive = skinId === skinItem.id;
+                        const isPreviewing = previewSkinId === skinItem.id;
                         const canAfford = progression.cosmeticCurrency >= pricing.price;
 
                         return (
@@ -1181,15 +1197,15 @@ export function ProfileProgressModal({
                               relative p-3 rounded-lg text-left transition-all cursor-pointer
                               ${isActive
                                 ? 'ring-2 ring-blue-500'
-                                : 'hover:ring-1 hover:ring-purple-500/50'
+                                : isPreviewing
+                                  ? 'ring-2 ring-purple-500'
+                                  : 'hover:ring-1 hover:ring-purple-500/50'
                               }
                             `}
                             style={{
                               backgroundColor: 'var(--color-bg-secondary)',
-                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : 'var(--color-border-subtle)'}`,
+                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
                             }}
-                            onMouseEnter={() => startPreviewSkin(skinItem.id as SkinId)}
-                            onMouseLeave={stopPreviewSkin}
                             onClick={() => startPreviewSkin(skinItem.id as SkinId)}
                           >
                             {/* Preview gradient */}
