@@ -26,14 +26,32 @@ const TABS: Tab[] = [
 ];
 
 // Helper for section cards - uses CSS variables for consistent theming
+type SectionVariant = 'orange' | 'purple' | 'yellow' | 'teal' | 'green' | 'blue' | 'accent' | 'success' | 'warning' | 'info' | 'team1' | 'team2' | 'default';
+
+const sectionBorderClasses: Record<SectionVariant, string> = {
+  orange: 'border-orange-500',
+  purple: 'border-purple-500',
+  yellow: 'border-yellow-500',
+  teal: 'border-teal-500',
+  green: 'border-green-500',
+  blue: 'border-blue-500',
+  accent: 'border-skin-border-accent',
+  success: 'border-skin-status-success',
+  warning: 'border-skin-status-warning',
+  info: 'border-skin-status-info',
+  team1: 'border-skin-team1-primary',
+  team2: 'border-skin-team2-primary',
+  default: 'border-skin-border-default',
+};
+
 const SectionCard = ({
   children,
-  borderColor,
+  variant = 'default',
 }: {
   children: React.ReactNode;
-  borderColor: string;
+  variant?: SectionVariant;
 }) => (
-  <div className="rounded-lg p-4 border-2 bg-skin-tertiary" style={{ borderColor }}>
+  <div className={`rounded-lg p-4 border-2 bg-skin-tertiary ${sectionBorderClasses[variant]}`}>
     {children}
   </div>
 );
@@ -83,7 +101,7 @@ const TabNavigation = ({
 const RulesContent = () => (
   <div className="space-y-5">
     {/* Overview */}
-    <SectionCard borderColor="var(--color-text-accent)">
+    <SectionCard variant="accent">
       <SectionTitle>Overview</SectionTitle>
       <p className="text-base leading-relaxed">
         J⋀ffre is a 4-player, 2-team trick-taking card game. Teams compete to win tricks and
@@ -92,7 +110,7 @@ const RulesContent = () => (
     </SectionCard>
 
     {/* Special Cards */}
-    <SectionCard borderColor="var(--color-success)">
+    <SectionCard variant="success">
       <SectionTitle>Cards</SectionTitle>
       <ul className="space-y-2 text-base">
         <li>• 4 colors (Red, Brown, Green, Blue) with cards going from [0-7]</li>
@@ -110,7 +128,7 @@ const RulesContent = () => (
     </SectionCard>
 
     {/* Betting Phase */}
-    <SectionCard borderColor="var(--color-warning)">
+    <SectionCard variant="warning">
       <SectionTitle>Betting Phase</SectionTitle>
       <ul className="space-y-2 text-base">
         <li>• The winning bet starts the round. First card played chooses the trump color!</li>
@@ -129,7 +147,7 @@ const RulesContent = () => (
     </SectionCard>
 
     {/* Playing Phase */}
-    <SectionCard borderColor="var(--color-info)">
+    <SectionCard variant="info">
       <SectionTitle>Playing Phase</SectionTitle>
       <ul className="space-y-2 text-base">
         <li>• Highest bidder leads the first trick. First card played chooses the trump color!</li>
@@ -143,7 +161,7 @@ const RulesContent = () => (
     </SectionCard>
 
     {/* Scoring */}
-    <SectionCard borderColor="var(--color-team2-primary)">
+    <SectionCard variant="team2">
       <SectionTitle>Scoring</SectionTitle>
       <ul className="space-y-2 text-base">
         <li>• Offensive team wins if they meet their bet</li>
@@ -154,7 +172,7 @@ const RulesContent = () => (
     </SectionCard>
 
     {/* Teams */}
-    <SectionCard borderColor="var(--color-border-accent)">
+    <SectionCard variant="accent">
       <SectionTitle>Teams</SectionTitle>
       <div className="grid grid-cols-2 gap-4">
         <div className="rounded-lg p-3 border-2 border-skin-team1-primary bg-skin-team1-primary/15">
@@ -163,7 +181,7 @@ const RulesContent = () => (
         </div>
         <div className="rounded-lg p-3 border-2 border-skin-team2-primary bg-skin-team2-primary/15">
           <p className="font-bold text-skin-team2-primary">Team 2 (Purple)</p>
-          <p className="text-sm mt-1 text-skin-secondary">Players 1 & 3</p>
+          <p className="text-sm mt-1 text-skin-secondary">Players 2 & 4</p>
         </div>
       </div>
     </SectionCard>
@@ -176,7 +194,7 @@ const RulesContent = () => (
 const FeaturesContent = () => (
   <div className="space-y-5">
     {/* Beginner Mode Features */}
-    <SectionCard borderColor="var(--color-success)">
+    <SectionCard variant="success">
       <SectionTitle>Beginner Mode (Toggle in settings)</SectionTitle>
       <div className="space-y-4">
         {/* Move Suggestions */}
@@ -221,7 +239,7 @@ const FeaturesContent = () => (
     </SectionCard>
 
     {/* Card Queuing */}
-    <SectionCard borderColor="var(--color-info)">
+    <SectionCard variant="info">
       <SectionTitle>Card Queuing</SectionTitle>
       <div className="space-y-2 text-base">
         <p>
@@ -244,7 +262,7 @@ const FeaturesContent = () => (
 
     {/* Keyboard Navigation - Desktop only */}
     <div className="hidden md:block">
-      <SectionCard borderColor="var(--color-team2-primary)">
+      <SectionCard variant="team2">
         <SectionTitle>Keyboard Shortcuts</SectionTitle>
         <div className="space-y-3 text-base">
           <div>
@@ -274,7 +292,7 @@ const FeaturesContent = () => (
     </div>
 
     {/* Side Bets Feature */}
-    <SectionCard borderColor="#f97316">
+    <SectionCard variant="orange">
       <SectionTitle>🎲 Side Bets</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>• Create bets during gameplay using coins</li>
@@ -300,7 +318,7 @@ const FeaturesContent = () => (
 const RewardsContent = () => (
   <div className="space-y-5">
     {/* XP Sources */}
-    <SectionCard borderColor="#a855f7">
+    <SectionCard variant="purple">
       <SectionTitle>⭐ Experience Points (XP)</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>
@@ -328,7 +346,7 @@ const RewardsContent = () => (
     </SectionCard>
 
     {/* Coin Sources */}
-    <SectionCard borderColor="#eab308">
+    <SectionCard variant="yellow">
       <SectionTitle>🪙 Coins (Cosmetic Currency)</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>
@@ -352,7 +370,7 @@ const RewardsContent = () => (
     </SectionCard>
 
     {/* Daily Quests */}
-    <SectionCard borderColor="#f97316">
+    <SectionCard variant="orange">
       <SectionTitle>📅 Daily Quests & Calendar</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>
@@ -372,7 +390,7 @@ const RewardsContent = () => (
     </SectionCard>
 
     {/* Achievements */}
-    <SectionCard borderColor="#14b8a6">
+    <SectionCard variant="teal">
       <SectionTitle>🏆 Achievements</SectionTitle>
       <ul className="space-y-1 ml-4 text-sm">
         <li>
@@ -429,7 +447,7 @@ const RegisterContent = ({
       </div>
     )}
 
-    <SectionCard borderColor="#22c55e">
+    <SectionCard variant="green">
       <p className="text-base mb-4 text-skin-secondary">
         You can play as a guest, but registering unlocks the full experience:
       </p>

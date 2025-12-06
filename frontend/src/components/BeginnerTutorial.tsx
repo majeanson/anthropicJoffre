@@ -216,7 +216,6 @@ export function BeginnerTutorial({
       // Check if this was the last tutorial and trigger achievement check
       const stats = getTutorialStats();
       if (stats.allCompleted) {
-        console.log('🎉 All tutorials completed! Triggering achievement unlock...');
         onAllTutorialsCompleted?.();
       }
 

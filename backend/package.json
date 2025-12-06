@@ -61,6 +61,7 @@
     "@types/validator": "^13.15.4",
     "@typescript-eslint/eslint-plugin": "^8.46.4",
     "@typescript-eslint/parser": "^8.46.4",
+    "@vitest/coverage-v8": "^4.0.15",
     "@vitest/ui": "^4.0.2",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",

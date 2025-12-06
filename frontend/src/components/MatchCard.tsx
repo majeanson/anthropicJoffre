@@ -141,7 +141,6 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
           onClick={(e) => {
             e.stopPropagation();
             // TODO: Implement resume game functionality
-            console.log('Resume game:', game.game_id);
           }}
           disabled
           title="Resume functionality coming soon"

@@ -99,8 +99,8 @@ export function TeamSelectionSocialSidebar({
   useEffect(() => {
     if (!socket) return;
 
-    const handleInviteSent = ({ toPlayer }: { toPlayer: string }) => {
-      console.log(`[Social] Game invite sent to ${toPlayer}`);
+    const handleInviteSent = (_data: { toPlayer: string }) => {
+      // Invite sent successfully - could show a toast here
     };
 
     socket.on('game_invite_sent', handleInviteSent);

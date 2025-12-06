@@ -3,6 +3,14 @@
  *
  * Renders player's hand with card dealing animation and keyboard navigation.
  * Uses CSS variables for skin compatibility.
+ *
+ * Mobile: Fan-style layout with horizontal scroll/swipe
+ * - Cards overlap like a real hand of cards
+ * - Active/selected card pops up and is fully visible
+ * - Swipe left/right to cycle through cards
+ * - Larger cards for better touch targets
+ *
+ * Desktop: Traditional grid layout with wrapping
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
@@ -43,6 +51,12 @@ export const PlayerHand = memo(function PlayerHand({
   const [selectedCardIndex, setSelectedCardIndex] = useState<number | null>(null);
   const [isPlayingCard, setIsPlayingCard] = useState(false);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  // Mobile fan-style: track focused card index for swipe navigation
+  const [focusedCardIndex, setFocusedCardIndex] = useState<number>(Math.floor(hand.length / 2));
+  const handContainerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
 
   // Calculate playable cards (suit-following rules)
   const playableCards = useMemo(() => {
@@ -273,6 +287,47 @@ export const PlayerHand = memo(function PlayerHand({
     }
   }, [selectedCardIndex]);
 
+  // Keep focused card index in bounds when hand changes
+  useEffect(() => {
+    if (hand.length > 0 && focusedCardIndex >= hand.length) {
+      setFocusedCardIndex(hand.length - 1);
+    }
+  }, [hand.length, focusedCardIndex]);
+
+  // Touch handlers for mobile swipe navigation
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      const touchEndX = e.changedTouches[0].clientX;
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaX = touchEndX - touchStartX.current;
+      const deltaY = touchEndY - touchStartY.current;
+
+      // Only handle horizontal swipes (ignore vertical scrolls)
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 30) {
+        if (deltaX > 0) {
+          // Swipe right - go to previous card
+          setFocusedCardIndex((prev) => Math.max(0, prev - 1));
+          sounds.cardDeal();
+        } else {
+          // Swipe left - go to next card
+          setFocusedCardIndex((prev) => Math.min(hand.length - 1, prev + 1));
+          sounds.cardDeal();
+        }
+      }
+    },
+    [hand.length]
+  );
+
+  // Click on a card in mobile fan mode sets it as focused
+  const handleCardFocus = useCallback((index: number) => {
+    setFocusedCardIndex(index);
+  }, []);
+
   if (isSpectator) {
     return (
       <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-10">
@@ -311,8 +366,179 @@ export const PlayerHand = memo(function PlayerHand({
       <div
         className="rounded-[var(--radius-xl)] p-2 sm:p-4 border-2 border-skin-accent bg-skin-secondary shadow-[var(--shadow-glow)] backdrop-blur-xl overflow-visible touch-manipulation"
         data-testid="player-hand"
+        ref={handContainerRef}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
-        <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-1 sm:-mx-2 md:mx-0 px-1 sm:px-2 md:px-0 pt-4 sm:pt-6 -mt-2 sm:-mt-4 pb-2 scrollbar-none">
+        {/* Mobile: Fan-style card layout - cards overlap like a real hand */}
+        <div className="md:hidden relative h-44 sm:h-48 flex items-end justify-center overflow-visible pb-6">
+          {/* Navigation arrows - larger touch targets */}
+          {hand.length > 1 && (
+            <>
+              <button
+                className="absolute left-1 top-1/2 -translate-y-1/2 z-[200] w-10 h-10 flex items-center justify-center rounded-full bg-skin-primary/90 text-skin-primary shadow-xl active:scale-90 transition-transform border-2 border-skin-accent"
+                onClick={() => {
+                  setFocusedCardIndex((prev) => Math.max(0, prev - 1));
+                  sounds.cardDeal();
+                }}
+                aria-label="Previous card"
+              >
+                <span className="text-lg font-bold">‹</span>
+              </button>
+              <button
+                className="absolute right-1 top-1/2 -translate-y-1/2 z-[200] w-10 h-10 flex items-center justify-center rounded-full bg-skin-primary/90 text-skin-primary shadow-xl active:scale-90 transition-transform border-2 border-skin-accent"
+                onClick={() => {
+                  setFocusedCardIndex((prev) => Math.min(hand.length - 1, prev + 1));
+                  sounds.cardDeal();
+                }}
+                aria-label="Next card"
+              >
+                <span className="text-lg font-bold">›</span>
+              </button>
+            </>
+          )}
+
+          {/* Card position indicator dots */}
+          {hand.length > 1 && (
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-1.5 z-[150]">
+              {hand.map((_, i) => (
+                <button
+                  key={i}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${
+                    i === focusedCardIndex
+                      ? 'bg-skin-accent scale-125 shadow-lg'
+                      : 'bg-skin-muted/60 hover:bg-skin-muted active:scale-110'
+                  }`}
+                  onClick={() => {
+                    setFocusedCardIndex(i);
+                    sounds.cardDeal();
+                  }}
+                  aria-label={`Go to card ${i + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Card counter */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 text-xs font-semibold text-skin-secondary bg-skin-tertiary/80 px-2 py-0.5 rounded-full z-[150]">
+            {focusedCardIndex + 1} / {hand.length}
+          </div>
+
+          {/* Fan of cards - overlapping like a real hand */}
+          <div className="relative flex items-end justify-center w-full h-full">
+            {displayHand.map((card, index) => {
+              const playable = isCardPlayable(card);
+              const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
+              const dealDelay = index * 120;
+              const isTransitioning =
+                cardInTransition &&
+                card.color === cardInTransition.color &&
+                card.value === cardInTransition.value;
+              const isSelected = selectedCardIndex === index;
+              const isQueued = isCardQueued(card);
+              const isFocused = focusedCardIndex === index;
+
+              // Calculate fan position - cards overlap significantly
+              const centerOffset = index - focusedCardIndex;
+              // Non-focused cards show only ~28px of their edge (like holding cards in hand)
+              const cardVisibleEdge = 28;
+              const xOffset = centerOffset * cardVisibleEdge;
+
+              // Z-index: focused card always on top, others stack by distance
+              const zIndex = isFocused ? 100 : 50 - Math.abs(centerOffset);
+
+              // Focused card is full size and raised; others are smaller and tucked
+              const scale = isFocused ? 1 : 0.7;
+
+              // Focused card pops up significantly above the others
+              const yOffset = isFocused ? -20 : 12;
+
+              // Slight rotation for natural fan effect
+              const rotation = isFocused ? 0 : centerOffset * 3;
+
+              // Opacity: slightly dim non-focused cards
+              const opacity = isFocused ? 1 : 0.85;
+
+              return (
+                <div
+                  key={`${card.color}-${card.value}-${index}`}
+                  ref={(el) => {
+                    cardRefs.current[index] = el;
+                  }}
+                  className={`absolute bottom-8 transition-all duration-300 ease-out ${
+                    showDealingAnimation && !isCardDealt
+                      ? 'opacity-0 scale-50'
+                      : isTransitioning
+                        ? 'opacity-0 -translate-y-20'
+                        : ''
+                  }`}
+                  style={{
+                    transform: `translateX(${xOffset}px) translateY(${yOffset}px) scale(${scale}) rotate(${rotation}deg)`,
+                    zIndex: isQueued ? 9999 : zIndex,
+                    opacity: showDealingAnimation && !isCardDealt ? 0 : isTransitioning ? 0 : opacity,
+                    transition: isTransitioning
+                      ? 'opacity 400ms ease-out, transform 400ms ease-out'
+                      : `all 300ms ease-out ${dealDelay}ms`,
+                  }}
+                  onClick={() => {
+                    if (!isFocused) {
+                      handleCardFocus(index);
+                      sounds.cardDeal();
+                    }
+                  }}
+                >
+                  {/* Glow effect for focused playable card */}
+                  {isFocused && isCurrentTurn && playable && (
+                    <div className="absolute -inset-2 rounded-xl bg-green-400/30 animate-pulse pointer-events-none z-0" />
+                  )}
+                  {/* Selection indicator ring */}
+                  {isSelected && (
+                    <div className="absolute -inset-2 rounded-xl animate-pulse pointer-events-none z-10 shadow-[0_0_0_4px_var(--color-info)]" />
+                  )}
+                  {/* Queued indicator */}
+                  {isQueued && (
+                    <>
+                      <div className="absolute -inset-2 rounded-xl animate-pulse pointer-events-none z-20 shadow-[0_0_0_4px_var(--color-warning)]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none bg-warning text-skin-primary border-warning">
+                        QUEUED
+                      </div>
+                    </>
+                  )}
+                  {/* TAP hint for focused playable card */}
+                  {isFocused && isCurrentTurn && playable && (
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-sm font-bold text-green-500 animate-bounce z-40 bg-skin-primary/90 px-2 py-0.5 rounded-full shadow-lg">
+                      TAP TO PLAY
+                    </div>
+                  )}
+                  {/* Not your turn hint */}
+                  {isFocused && !isCurrentTurn && !isQueued && (
+                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-medium text-skin-muted z-40 bg-skin-primary/90 px-2 py-0.5 rounded-full whitespace-nowrap">
+                      Tap to queue
+                    </div>
+                  )}
+                  <CardComponent
+                    card={card}
+                    size={isFocused ? 'large' : 'medium'}
+                    onClick={(e) => {
+                      if (isFocused) {
+                        handleCardClick(card, e);
+                      } else {
+                        handleCardFocus(index);
+                        sounds.cardDeal();
+                      }
+                    }}
+                    disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
+                    isPlayable={isCurrentTurn ? playable : !isQueued}
+                    isKeyboardSelected={isSelected}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Desktop: Traditional grid layout */}
+        <div className="hidden md:block overflow-x-auto overflow-y-visible md:overflow-visible -mx-1 sm:-mx-2 md:mx-0 px-1 sm:px-2 md:px-0 pt-4 sm:pt-6 -mt-2 sm:-mt-4 pb-2 scrollbar-none">
           <div className="flex gap-0.5 sm:gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min px-1 sm:px-2">
             {displayHand.map((card, index) => {
               const playable = isCardPlayable(card);
