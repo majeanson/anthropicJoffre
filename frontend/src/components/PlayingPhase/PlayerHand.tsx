@@ -396,7 +396,7 @@ export const PlayerHand = memo(function PlayerHand({
         onTouchEnd={handleTouchEnd}
       >
         {/* Mobile: Fan-style card layout - swipe to navigate, tap to play */}
-        <div className="md:hidden relative h-36 sm:h-40 flex items-end justify-center overflow-visible">
+        <div className="md:hidden relative h-40 sm:h-44 flex items-end justify-center overflow-visible">
           {/* Fan of cards - overlapping like a real hand, swipe to navigate */}
           <div className="relative flex items-end justify-center w-full h-full">
             {displayHand.map((card, index) => {
@@ -425,10 +425,10 @@ export const PlayerHand = memo(function PlayerHand({
               const zIndex = isFocused ? 100 : 50 - Math.abs(centerOffset);
 
               // Focused card is scaled up prominently; others are slightly smaller
-              const scale = isFocused ? 1.15 : 0.75;
+              const scale = isFocused ? 1.25 : 0.8;
 
               // Focused card pops up above the others
-              const yOffset = isFocused ? -20 : 6;
+              const yOffset = isFocused ? -16 : 8;
 
               // Subtle rotation for natural fan effect
               const rotation = isFocused ? 0 : centerOffset * 3;
