@@ -12,11 +12,12 @@
 import { useState } from 'react';
 import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
-import { useSkin, useCardSkin } from '../contexts/SkinContext';
+import { useSkin, useCardSkin, useSpecialCardSkins } from '../contexts/SkinContext';
 import { resetTutorialProgress, getTutorialStats } from '../utils/tutorialProgress';
 import { Button, NeonButton } from './ui/Button';
 import { SkinSelectorDropdown } from './SkinSelector';
 import { CardSkinDropdown } from './CardSkinSelector';
+import { SpecialCardSkinDropdown } from './SpecialCardSkinSelector';
 
 interface SettingsContentProps {
   onShowRules: () => void;
@@ -80,6 +81,7 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
   const { animationsEnabled, setAnimationsEnabled } = useSettings();
   useSkin();
   useCardSkin(); // Initialize card skin context
+  useSpecialCardSkins(); // Initialize special card skin context
   const [soundEnabled, setSoundEnabled] = useState(sounds.isEnabled());
   const [soundVolume, setSoundVolume] = useState(sounds.getVolume());
   const [tutorialStats, setTutorialStats] = useState(getTutorialStats());
@@ -128,6 +130,24 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
             <CardSkinDropdown />
             <p className="text-xs text-[var(--color-text-muted)] mt-2">
               Unlock more card styles by leveling up!
+            </p>
+          </div>
+
+          {/* Special Card Skins - Red 0 & Brown 0 */}
+          <div>
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+              🔥 Red Zero Skin (+5 Points)
+            </label>
+            <SpecialCardSkinDropdown cardType="red_zero" />
+          </div>
+
+          <div>
+            <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
+              🌍 Brown Zero Skin (-2 Points)
+            </label>
+            <SpecialCardSkinDropdown cardType="brown_zero" />
+            <p className="text-xs text-[var(--color-text-muted)] mt-2">
+              Unlock special card skins through achievements!
             </p>
           </div>
 

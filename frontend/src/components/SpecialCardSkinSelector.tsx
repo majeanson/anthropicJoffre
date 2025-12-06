@@ -420,3 +420,149 @@ export function SpecialCardSkinSelector({ socket, onClose }: SpecialCardSkinSele
 }
 
 export default SpecialCardSkinSelector;
+
+// ============================================================================
+// DROPDOWN VARIANT (for Settings panel)
+// ============================================================================
+
+interface SpecialCardSkinDropdownProps {
+  cardType: SpecialCardType;
+}
+
+export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownProps) {
+  const {
+    specialCardSkins,
+    equippedSpecialSkins,
+    setEquippedSpecialSkins,
+  } = useSpecialCardSkins();
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Filter skins by card type
+  const skins = specialCardSkins.filter(s => s.cardType === cardType);
+
+  // Get currently equipped skin
+  const equippedSkinId = cardType === 'red_zero'
+    ? equippedSpecialSkins.redZeroSkin
+    : equippedSpecialSkins.brownZeroSkin;
+
+  const equippedSkin = skins.find(s => s.skinId === equippedSkinId) || skins[0];
+
+  const handleSelect = (skinId: string) => {
+    const skin = skins.find(s => s.skinId === skinId);
+    if (!skin?.isUnlocked) return;
+
+    // Update equipped skins
+    if (cardType === 'red_zero') {
+      setEquippedSpecialSkins({ ...equippedSpecialSkins, redZeroSkin: skinId });
+    } else {
+      setEquippedSpecialSkins({ ...equippedSpecialSkins, brownZeroSkin: skinId });
+    }
+
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative">
+      {/* Dropdown trigger */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="
+          w-full
+          flex items-center justify-between
+          px-4 py-3
+          rounded-[var(--radius-md)]
+          border border-[var(--color-border-default)]
+          bg-[var(--color-bg-secondary)]
+          text-[var(--color-text-primary)]
+          hover:border-[var(--color-border-accent)]
+          transition-colors
+        "
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{equippedSkin?.centerIcon || '❓'}</span>
+          <div className="text-left">
+            <div className="font-display text-sm">{equippedSkin?.skinName || 'Select Skin'}</div>
+            <div className="text-xs text-[var(--color-text-muted)] capitalize">
+              {equippedSkin?.rarity || 'common'}
+            </div>
+          </div>
+        </div>
+        <span className={`transition-transform ${isOpen ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {/* Dropdown menu */}
+      {isOpen && (
+        <div
+          className="
+            absolute z-50 mt-2 w-full
+            rounded-[var(--radius-md)]
+            border border-[var(--color-border-default)]
+            bg-[var(--color-bg-tertiary)]
+            shadow-lg
+            max-h-64 overflow-y-auto
+          "
+        >
+          {skins.map(skin => {
+            const isEquipped = skin.skinId === equippedSkinId;
+            const isLocked = !skin.isUnlocked;
+            const rarity = rarityStyles[skin.rarity];
+
+            return (
+              <button
+                key={skin.skinId}
+                onClick={() => handleSelect(skin.skinId)}
+                disabled={isLocked}
+                className={`
+                  w-full
+                  flex items-center gap-3
+                  px-4 py-3
+                  text-left
+                  transition-colors
+                  ${isEquipped
+                    ? 'bg-[var(--color-text-accent)]/20 border-l-4 border-[var(--color-text-accent)]'
+                    : isLocked
+                      ? 'opacity-50 cursor-not-allowed'
+                      : 'hover:bg-[var(--color-bg-secondary)]'
+                  }
+                  border-b border-[var(--color-border-subtle)] last:border-b-0
+                `}
+              >
+                <span className="text-2xl">{skin.centerIcon || '❓'}</span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-display text-sm text-[var(--color-text-primary)]">
+                      {skin.skinName}
+                    </span>
+                    {isEquipped && (
+                      <span className="text-xs text-[var(--color-text-accent)]">✓</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
+                    <span className={`capitalize ${rarity.badgeColor.replace('bg-', 'text-').replace('-500', '-400')}`}>
+                      {skin.rarity}
+                    </span>
+                    {isLocked && (
+                      <span className="flex items-center gap-1">
+                        <span>🔒</span>
+                        {getUnlockRequirementText(skin)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Click outside to close */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
