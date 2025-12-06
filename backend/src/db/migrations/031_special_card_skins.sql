@@ -56,8 +56,8 @@ INSERT INTO special_card_skins (skin_id, skin_name, description, card_type, rari
   -- Achievement unlock: Games Won 100
   ('red_zero_sun', 'Solar Flare', 'The power of a thousand suns burns in your hands', 'red_zero', 'legendary', 'achievement', 'games_won_100', 0, '☀️', 'rgba(250, 204, 21, 0.8)', 'animate-glow-intense', '#fbbf24'),
 
-  -- Purchase with coins
-  ('red_zero_dragon', 'Dragon Heart', 'Ancient dragon fire burns eternal within this card', 'red_zero', 'rare', 'purchase', NULL, 500, '🐉', 'rgba(220, 38, 38, 0.7)', 'animate-flicker', '#b91c1c'),
+  -- Purchase with coins (-35% price reduction)
+  ('red_zero_dragon', 'Dragon Heart', 'Ancient dragon fire burns eternal within this card', 'red_zero', 'rare', 'purchase', NULL, 325, '🐉', 'rgba(220, 38, 38, 0.7)', 'animate-flicker', '#b91c1c'),
 
   -- Level unlock (level 15)
   ('red_zero_ruby', 'Ruby Essence', 'Crystallized fire compressed into gem form', 'red_zero', 'rare', 'level', '15', 0, '💎', 'rgba(239, 68, 68, 0.6)', 'animate-shimmer', '#ef4444')
@@ -77,8 +77,8 @@ INSERT INTO special_card_skins (skin_id, skin_name, description, card_type, rari
   -- Achievement unlock: Perfect Game
   ('brown_zero_void', 'Void Walker', 'Darkness incarnate, drawn from the space between stars', 'brown_zero', 'legendary', 'achievement', 'perfect_game', 0, '🌑', 'rgba(17, 24, 39, 0.8)', 'animate-void-pulse', '#111827'),
 
-  -- Purchase with coins
-  ('brown_zero_stone', 'Petrified', 'Turned to stone by ancient and terrible magic', 'brown_zero', 'rare', 'purchase', NULL, 500, '🪨', 'rgba(120, 113, 108, 0.6)', NULL, '#78716c'),
+  -- Purchase with coins (-35% price reduction)
+  ('brown_zero_stone', 'Petrified', 'Turned to stone by ancient and terrible magic', 'brown_zero', 'rare', 'purchase', NULL, 325, '🪨', 'rgba(120, 113, 108, 0.6)', NULL, '#78716c'),
 
   -- Level unlock (level 15)
   ('brown_zero_shadow', 'Shadow Form', 'Consumed by shadows, yet wielding their power', 'brown_zero', 'rare', 'level', '15', 0, '👤', 'rgba(30, 41, 59, 0.7)', 'animate-shadow-drift', '#1e293b')

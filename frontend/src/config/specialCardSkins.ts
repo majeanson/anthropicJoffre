@@ -138,7 +138,7 @@ export const defaultSpecialCardSkins: SpecialCardSkin[] = [
     rarity: 'rare',
     unlockType: 'purchase',
     unlockRequirement: null,
-    price: 500,
+    price: 325, // (-35%)
     centerIcon: '🐉',
     glowColor: 'rgba(220, 38, 38, 0.7)',
     animationClass: 'animate-flicker',
@@ -210,7 +210,7 @@ export const defaultSpecialCardSkins: SpecialCardSkin[] = [
     rarity: 'rare',
     unlockType: 'purchase',
     unlockRequirement: null,
-    price: 500,
+    price: 325, // (-35%)
     centerIcon: '🪨',
     glowColor: 'rgba(120, 113, 108, 0.6)',
     animationClass: null,

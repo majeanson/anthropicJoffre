@@ -336,12 +336,12 @@ export interface CardSkinPricingInfo {
 export const cardSkinPricing: Record<CardSkinId, CardSkinPricingInfo> = {
   'classic': { price: 0, suggestedLevel: 0 },       // Free
   'roman': { price: 0, suggestedLevel: 0 },         // Free
-  'elemental': { price: 150, suggestedLevel: 5 },   // Cheap
-  'nordic': { price: 300, suggestedLevel: 10 },     // Medium
-  'alchemical': { price: 500, suggestedLevel: 15 }, // Medium
-  'celestial': { price: 750, suggestedLevel: 20 },  // Premium
-  'royal': { price: 1000, suggestedLevel: 25 },     // Premium
-  'neon': { price: 1500, suggestedLevel: 30 },      // Most expensive
+  'elemental': { price: 100, suggestedLevel: 5 },   // Cheap (-35%)
+  'nordic': { price: 195, suggestedLevel: 10 },     // Medium (-35%)
+  'alchemical': { price: 325, suggestedLevel: 15 }, // Medium (-35%)
+  'celestial': { price: 490, suggestedLevel: 20 },  // Premium (-35%)
+  'royal': { price: 650, suggestedLevel: 25 },      // Premium (-35%)
+  'neon': { price: 975, suggestedLevel: 30 },       // Most expensive (-35%)
 };
 
 /**

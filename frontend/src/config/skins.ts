@@ -1744,15 +1744,15 @@ export interface SkinPricingInfo {
 export const skinPricing: Record<SkinId, SkinPricingInfo> = {
   'midnight-alchemy': { price: 0, suggestedLevel: 0 },       // Free (default dark)
   'classic-parchment': { price: 0, suggestedLevel: 0 },      // Free (default light)
-  'modern-minimal': { price: 100, suggestedLevel: 3 },       // Cheap
-  'tavern-noir': { price: 250, suggestedLevel: 5 },          // Medium
-  'modern-minimal-dark': { price: 400, suggestedLevel: 8 },  // Medium
-  'luxury-casino': { price: 750, suggestedLevel: 12 },       // Premium
-  'cyberpunk-neon': { price: 1000, suggestedLevel: 15 },     // Most expensive
+  'modern-minimal': { price: 65, suggestedLevel: 3 },        // Cheap (-35%)
+  'tavern-noir': { price: 160, suggestedLevel: 5 },          // Medium (-35%)
+  'modern-minimal-dark': { price: 260, suggestedLevel: 8 },  // Medium (-35%)
+  'luxury-casino': { price: 490, suggestedLevel: 12 },       // Premium (-35%)
+  'cyberpunk-neon': { price: 650, suggestedLevel: 15 },      // Most expensive (-35%)
   // Sprint 21: New skins
-  'sakura-spring': { price: 300, suggestedLevel: 6 },        // Medium-low
-  'ocean-depths': { price: 600, suggestedLevel: 10 },        // Medium-high
-  'forest-enchanted': { price: 850, suggestedLevel: 14 },    // Premium
+  'sakura-spring': { price: 195, suggestedLevel: 6 },        // Medium-low (-35%)
+  'ocean-depths': { price: 390, suggestedLevel: 10 },        // Medium-high (-35%)
+  'forest-enchanted': { price: 550, suggestedLevel: 14 },    // Premium (-35%)
 };
 
 /**
