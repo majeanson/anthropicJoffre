@@ -76,6 +76,9 @@ interface GlobalUIProps {
   setDmRecipient: (recipient: string | null) => void;
   // Game invite join action
   onJoinGame?: (gameId: string) => void;
+  // Retention features: XP popup and quest toast
+  xpPopupComponent?: React.ReactNode;
+  questToastComponent?: React.ReactNode;
 }
 
 const GlobalUI: React.FC<GlobalUIProps> = ({
@@ -114,6 +117,8 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   dmRecipient,
   setDmRecipient,
   onJoinGame,
+  xpPopupComponent,
+  questToastComponent,
 }) => {
   void _onOpenProfile; // Reserved for future use
   const modals = useModals();
@@ -285,6 +290,10 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
           />
         )}
       </Suspense>
+
+      {/* Retention Features: XP Popup and Quest Toast */}
+      {xpPopupComponent}
+      {questToastComponent}
     </>
   );
 };

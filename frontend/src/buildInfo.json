@@ -1,10 +1,10 @@
 {
-  "buildDate": "2025-12-05T18:21:28.388Z",
+  "buildDate": "2025-12-06T01:25:49.683Z",
   "version": "5.0.0",
   "git": {
-    "commitMessage": "fix: Add error handling and validation for LFG toggle\n\n- Show alert if player hasn't entered their name\n- Listen for server errors specific to LFG context\n- Provide meaningful feedback when LFG fails\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
-    "commitHash": "f7afe67",
-    "commitDate": "2025-12-05 13:16:47 -0500",
+    "commitMessage": "fix: Improve MatchStatsModal for incomplete games\n\n- Remove all dark: class prefixes (parchment theme is always light)\n- Add empty state for no rounds recorded yet\n- Add tricks summary display with winners per trick\n- Handle missing bets/results gracefully with informative messages\n- Handle missing player_teams data with fallback to team 1\n- Add empty state for no player data\n- Show \"Current Score\" vs \"Final Score\" based on game completion\n- Improve in-progress game display with amber styling\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>",
+    "commitHash": "48809ac",
+    "commitDate": "2025-12-05 18:18:43 -0500",
     "branch": "main"
   },
   "futureTodos": [

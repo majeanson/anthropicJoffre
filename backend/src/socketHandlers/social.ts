@@ -12,6 +12,15 @@ import { getUserByUsername } from '../db/users.js';
 import { getUserProfile, updateUserProfile, ProfileUpdateData } from '../db/profiles.js';
 import { createNotification } from '../db/notifications.js';
 import { purchaseSkin, getPlayerLevel, getPlayerUnlockedSkins } from '../db/skins.js';
+import {
+  getPlayerSpecialCardSkins,
+  getPlayerEquippedSpecialSkins,
+  equipSpecialCardSkin,
+  purchaseSpecialCardSkin,
+  unlockDefaultSpecialSkins,
+  checkAndUnlockLevelSkins,
+  SpecialCardType
+} from '../db/specialCardSkins.js';
 
 interface SocialHandlerDependencies {
   errorBoundaries: typeof errorBoundaries;
@@ -274,6 +283,159 @@ export function registerSocialHandlers(
       } catch (error) {
         console.error('[Social] Error purchasing skin:', error);
         socket.emit('skin_purchase_result', {
+          success: false,
+          error: 'Purchase failed'
+        });
+      }
+    })
+  );
+
+  // ============================================================================
+  // SPECIAL CARD SKINS (Red 0 & Brown 0)
+  // Sprint 21B - Special Card Skin System
+  // ============================================================================
+
+  /**
+   * Get all special card skins with unlock status
+   */
+  socket.on(
+    'get_special_card_skins',
+    errorBoundaries.readOnly('get_special_card_skins')(async () => {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('special_card_skins_response', {
+          skins: [],
+          equipped: { redZeroSkin: 'red_zero_default', brownZeroSkin: 'brown_zero_default' },
+          error: 'Not logged in'
+        });
+        return;
+      }
+
+      try {
+        // Ensure default skins are unlocked
+        await unlockDefaultSpecialSkins(playerName);
+
+        // Check for level-based unlocks
+        const playerData = await getPlayerLevel(playerName);
+        await checkAndUnlockLevelSkins(playerName, playerData.level);
+
+        // Get all skins with unlock status
+        const skins = await getPlayerSpecialCardSkins(playerName);
+        const equipped = await getPlayerEquippedSpecialSkins(playerName);
+
+        socket.emit('special_card_skins_response', {
+          skins,
+          equipped,
+          playerLevel: playerData.level,
+          cosmeticCurrency: playerData.cosmeticCurrency
+        });
+      } catch (error) {
+        console.error('[Social] Error fetching special card skins:', error);
+        socket.emit('special_card_skins_response', {
+          skins: [],
+          equipped: { redZeroSkin: 'red_zero_default', brownZeroSkin: 'brown_zero_default' },
+          error: 'Failed to fetch skins'
+        });
+      }
+    })
+  );
+
+  /**
+   * Equip a special card skin
+   */
+  socket.on(
+    'equip_special_card_skin',
+    errorBoundaries.gameAction('equip_special_card_skin')(async ({
+      skinId,
+      cardType
+    }: {
+      skinId: string;
+      cardType: SpecialCardType;
+    }) => {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('special_card_skin_equipped', {
+          success: false,
+          error: 'Not logged in'
+        });
+        return;
+      }
+
+      try {
+        const result = await equipSpecialCardSkin(playerName, skinId, cardType);
+
+        if (result.success) {
+          const equipped = await getPlayerEquippedSpecialSkins(playerName);
+          socket.emit('special_card_skin_equipped', {
+            success: true,
+            skinId,
+            cardType,
+            equipped
+          });
+          console.log(`[Social] ${playerName} equipped ${cardType} skin: ${skinId}`);
+        } else {
+          socket.emit('special_card_skin_equipped', {
+            success: false,
+            error: result.error
+          });
+        }
+      } catch (error) {
+        console.error('[Social] Error equipping special card skin:', error);
+        socket.emit('special_card_skin_equipped', {
+          success: false,
+          error: 'Failed to equip skin'
+        });
+      }
+    })
+  );
+
+  /**
+   * Purchase a special card skin
+   */
+  socket.on(
+    'purchase_special_card_skin',
+    errorBoundaries.gameAction('purchase_special_card_skin')(async ({
+      skinId
+    }: {
+      skinId: string;
+    }) => {
+      const playerName = socket.data.playerName;
+
+      if (!playerName) {
+        socket.emit('special_card_skin_purchased', {
+          success: false,
+          error: 'Not logged in'
+        });
+        return;
+      }
+
+      try {
+        const result = await purchaseSpecialCardSkin(playerName, skinId);
+
+        if (result.success) {
+          // Get updated data
+          const skins = await getPlayerSpecialCardSkins(playerName);
+          const equipped = await getPlayerEquippedSpecialSkins(playerName);
+
+          socket.emit('special_card_skin_purchased', {
+            success: true,
+            skinId,
+            newBalance: result.newBalance,
+            skins,
+            equipped
+          });
+          console.log(`[Social] ${playerName} purchased special card skin: ${skinId}`);
+        } else {
+          socket.emit('special_card_skin_purchased', {
+            success: false,
+            error: result.error
+          });
+        }
+      } catch (error) {
+        console.error('[Social] Error purchasing special card skin:', error);
+        socket.emit('special_card_skin_purchased', {
           success: false,
           error: 'Purchase failed'
         });

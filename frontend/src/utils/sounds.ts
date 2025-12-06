@@ -633,6 +633,130 @@ class SoundManager {
     });
   }
 
+  // Achievement Unlock - magical ascending chime with shimmer
+  playAchievementUnlock() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Magical ascending arpeggio (C5 → E5 → G5 → C6 → E6)
+    const notes = [
+      { freq: 523, delay: 0 },      // C5
+      { freq: 659, delay: 0.08 },   // E5
+      { freq: 784, delay: 0.16 },   // G5
+      { freq: 1047, delay: 0.24 },  // C6
+      { freq: 1319, delay: 0.32 },  // E6
+    ];
+
+    notes.forEach(({ freq, delay }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.frequency.setValueAtTime(freq, now + delay);
+
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.25, now + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.4);
+
+      osc.type = 'sine';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.4);
+    });
+
+    // Add sparkle shimmer effect
+    setTimeout(() => {
+      if (!this.audioContext || this.audioContext.state === 'closed') return;
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      // Random high-frequency sparkles
+      for (let i = 0; i < 6; i++) {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        const sparkleFreq = 1500 + Math.random() * 1500; // 1500-3000 Hz
+        osc.frequency.setValueAtTime(sparkleFreq, now + i * 0.04);
+
+        gain.gain.setValueAtTime(0, now + i * 0.04);
+        gain.gain.linearRampToValueAtTime(this.masterVolume * 0.12, now + i * 0.04 + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.08);
+
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + i * 0.04);
+        osc.stop(now + i * 0.04 + 0.08);
+      }
+    }, 350);
+  }
+
+  // Quest Complete - celebratory fanfare with coins
+  playQuestComplete() {
+    if (!this.enabled) return;
+    this.ensureContext();
+    if (!this.audioContext) return;
+
+    const ctx = this.audioContext;
+    const now = ctx.currentTime;
+
+    // Two-note celebratory fanfare
+    const notes = [
+      { freq: 784, delay: 0 },    // G5
+      { freq: 1047, delay: 0.1 }, // C6
+    ];
+
+    notes.forEach(({ freq, delay }) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.frequency.setValueAtTime(freq, now + delay);
+
+      gain.gain.setValueAtTime(0, now + delay);
+      gain.gain.linearRampToValueAtTime(this.masterVolume * 0.3, now + delay + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.25);
+
+      osc.type = 'triangle';
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start(now + delay);
+      osc.stop(now + delay + 0.25);
+    });
+
+    // Add coin collection sounds
+    setTimeout(() => {
+      if (!this.audioContext || this.audioContext.state === 'closed') return;
+      const ctx = this.audioContext;
+      const now = ctx.currentTime;
+
+      // Quick coin clinks
+      [800, 1000, 1200].forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        const delay = i * 0.05;
+        osc.frequency.setValueAtTime(freq, now + delay);
+
+        gain.gain.setValueAtTime(this.masterVolume * 0.15, now + delay);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.1);
+
+        osc.type = 'triangle';
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(now + delay);
+        osc.stop(now + delay + 0.1);
+      });
+    }, 200);
+  }
+
   // Level Up - triumphant fanfare
   playLevelUp() {
     if (!this.enabled) return;
@@ -720,6 +844,9 @@ export const sounds = {
   // Side Bet sounds
   sideBetWon: () => soundManager.playSideBetWon(),
   sideBetLost: () => soundManager.playSideBetLost(),
+  // Achievement/Quest sounds
+  achievementUnlock: () => soundManager.playAchievementUnlock(),
+  questComplete: () => soundManager.playQuestComplete(),
   setEnabled: (enabled: boolean) => soundManager.setEnabled(enabled),
   setVolume: (volume: number) => soundManager.setVolume(volume),
   isEnabled: () => soundManager['enabled'],

@@ -35,6 +35,7 @@ import {
   getPlayerSkinStatus,
   updatePlayerLevel,
 } from '../db/skins';
+import { unlockAchievement } from '../db/achievements';
 
 // Tutorial step rewards (XP and currency)
 const TUTORIAL_REWARDS = {
@@ -226,11 +227,87 @@ async function handleUpdateLoginStreak(
       freezeUsed: streakInfo.freezeUsed,
     });
 
-    // If freeze was used, show notification
+    // If freeze was used, show notification and check for freeze achievement
     if (streakInfo.freezeUsed) {
       this.emit('streak_freeze_used', {
         message: 'Streak freeze used! Your streak continues.',
       });
+
+      // Sprint 21: Unlock "Saved by the Bell" achievement
+      try {
+        const result = await unlockAchievement(playerName, 'login_streak_freeze_save');
+        if (result.isNewUnlock) {
+          this.emit('achievement_unlocked', {
+            playerName,
+            achievement: result.achievement,
+            isNewUnlock: true,
+          });
+        }
+      } catch {
+        // Achievement may not exist yet, ignore
+      }
+    }
+
+    // Sprint 21: Check login streak achievements
+    const streakMilestones = [
+      { threshold: 3, key: 'login_streak_3' },
+      { threshold: 7, key: 'login_streak_7' },
+      { threshold: 14, key: 'login_streak_14' },
+      { threshold: 30, key: 'login_streak_30' },
+    ];
+
+    for (const { threshold, key } of streakMilestones) {
+      if (streakInfo.currentStreak >= threshold) {
+        try {
+          const result = await unlockAchievement(playerName, key);
+          if (result.isNewUnlock) {
+            this.emit('achievement_unlocked', {
+              playerName,
+              achievement: result.achievement,
+              isNewUnlock: true,
+            });
+          }
+        } catch {
+          // Achievement may not exist yet, ignore
+        }
+      }
+    }
+
+    // Sprint 21: Check total logins achievements (get from login_streaks table)
+    if (pool) {
+      try {
+        const loginResult = await pool.query(
+          'SELECT total_logins FROM login_streaks WHERE player_name = $1',
+          [playerName]
+        );
+        if (loginResult.rows.length > 0) {
+          const totalLogins = loginResult.rows[0].total_logins || 0;
+          const loginMilestones = [
+            { threshold: 50, key: 'total_logins_50' },
+            { threshold: 100, key: 'total_logins_100' },
+            { threshold: 365, key: 'total_logins_365' },
+          ];
+
+          for (const { threshold, key } of loginMilestones) {
+            if (totalLogins >= threshold) {
+              try {
+                const result = await unlockAchievement(playerName, key);
+                if (result.isNewUnlock) {
+                  this.emit('achievement_unlocked', {
+                    playerName,
+                    achievement: result.achievement,
+                    isNewUnlock: true,
+                  });
+                }
+              } catch {
+                // Achievement may not exist yet, ignore
+              }
+            }
+          }
+        }
+      } catch {
+        // Error checking total logins, ignore
+      }
     }
   } catch (error) {
     console.error('[Quests] Error updating login streak:', error);

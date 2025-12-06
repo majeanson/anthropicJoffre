@@ -1059,3 +1059,52 @@ button:not(:disabled):active {
 .card-play {
   animation: card-play var(--duration-normal) var(--easing);
 }
+
+/* ============================================================================
+   CARD SKIN SELECTION ANIMATIONS (Sprint 21)
+   ============================================================================ */
+
+/* Flash effect when a skin is selected */
+@keyframes skinSelectFlash {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+/* Bounce effect for preview cards */
+@keyframes skinCardBounce {
+  0% {
+    transform: scale(1) translateY(0);
+  }
+  25% {
+    transform: scale(0.95) translateY(2px);
+  }
+  50% {
+    transform: scale(1.08) translateY(-8px);
+  }
+  75% {
+    transform: scale(1.02) translateY(-2px);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Glow pulse for selected card */
+@keyframes skinSelectGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px var(--color-glow);
+  }
+  50% {
+    box-shadow: 0 0 25px var(--color-glow), 0 0 40px var(--color-glow);
+  }
+}

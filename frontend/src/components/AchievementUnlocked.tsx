@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { Achievement } from '../types/achievements';
 import { UICard, UICardGradient } from './ui/UICard';
 import { Button } from './ui/Button';
+import { sounds } from '../utils/sounds';
 
 interface AchievementUnlockedProps {
   achievement: Achievement | null;
@@ -26,6 +27,9 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
   useEffect(() => {
     if (achievement) {
       setIsVisible(true);
+      // Play achievement unlock sound
+      sounds.achievementUnlock();
+
       const timer = setTimeout(() => {
         handleClose();
       }, 5000);

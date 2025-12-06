@@ -288,6 +288,12 @@ export interface PlayerStats {
   current_win_streak?: number;
   current_loss_streak?: number;
   best_win_streak?: number;
+  // Achievement expansion tracking (Sprint 21)
+  perfect_bets_won?: number;
+  clean_games_won?: number;
+  clean_game_streak?: number;
+  max_bet_won?: number;
+  double_red_zeros?: number;
 }
 
 /**

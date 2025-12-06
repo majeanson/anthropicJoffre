@@ -35,6 +35,11 @@ export interface AchievementProgress extends Achievement {
   max_progress: number;
   is_unlocked: boolean;
   unlocked_at?: Date;
+  // Sprint 21: Skin unlocks linked to this achievement
+  skin_unlocks?: Array<{
+    skin_id: string;
+    skin_type: 'special' | 'card' | 'ui';
+  }>;
 }
 
 export interface AchievementUnlockNotification {

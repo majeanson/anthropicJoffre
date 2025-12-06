@@ -114,6 +114,30 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
               </span>
             )}
           </div>
+
+          {/* Sprint 21: Skin unlock indicator */}
+          {achievement.skin_unlocks && achievement.skin_unlocks.length > 0 && (
+            <div className="flex items-center gap-1 mt-2">
+              <span className={`text-xs ${isLocked ? 'text-gray-500 dark:text-gray-400' : 'text-white/70'}`}>
+                Unlocks:
+              </span>
+              {achievement.skin_unlocks.map((skin, index) => (
+                <span
+                  key={index}
+                  className={`text-xs px-1.5 py-0.5 rounded ${
+                    skin.skin_type === 'special'
+                      ? 'bg-purple-500/30 text-purple-200'
+                      : skin.skin_type === 'card'
+                        ? 'bg-blue-500/30 text-blue-200'
+                        : 'bg-green-500/30 text-green-200'
+                  }`}
+                  title={`${skin.skin_type} skin: ${skin.skin_id}`}
+                >
+                  {skin.skin_type === 'special' ? '🃏' : skin.skin_type === 'card' ? '🎴' : '🎨'}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </UICard>

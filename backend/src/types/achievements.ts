@@ -48,16 +48,28 @@ export interface GameWonEventData {
   wasComeback?: boolean;
   perfectGame?: boolean;
   winStreak?: number;
+  // Sprint 21: Clean game tracking
+  noBrownZeros?: boolean;
 }
 
 export interface BetWonEventData {
   hadTrump?: boolean;
+  // Sprint 21: Track bet amount for max bet achievement
+  betAmount?: number;
+}
+
+// Sprint 21: Red zero event data
+export interface RedZeroEventData {
+  redZerosThisRound?: number;
 }
 
 export interface GameEndData {
   won: boolean;
   brownZerosCollected: number;
   roundsAsLowestScorer: number;
+  // Sprint 21: Secret achievement data
+  lastCardSecuredVictory?: boolean;
+  trumpCardsPlayedInRound?: number;
 }
 
 export type AchievementEventData = GameWonEventData | BetWonEventData | Record<string, never>;

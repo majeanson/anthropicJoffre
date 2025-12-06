@@ -11,11 +11,13 @@
  * - Current selection highlighting
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCardSkin } from '../contexts/SkinContext';
 import { CardSkin, CardSkinId } from '../config/cardSkins';
 import { Card } from './Card';
+import { Card as CardType } from '../types/game';
 import { UIBadge } from './ui/UIBadge';
+import { sounds } from '../utils/sounds';
 
 // ============================================================================
 // CARD SKIN CARD COMPONENT
@@ -28,6 +30,7 @@ interface CardSkinCardProps {
   requiredLevel: number;
   currentLevel: number;
   onSelect: (id: CardSkinId) => void;
+  justSelected?: boolean; // Animation trigger
 }
 
 function CardSkinCard({
@@ -37,8 +40,19 @@ function CardSkinCard({
   requiredLevel,
   currentLevel,
   onSelect,
+  justSelected = false,
 }: CardSkinCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const [showSelectFlash, setShowSelectFlash] = useState(false);
+
+  // Trigger flash animation when justSelected changes to true
+  useEffect(() => {
+    if (justSelected) {
+      setShowSelectFlash(true);
+      const timer = setTimeout(() => setShowSelectFlash(false), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [justSelected]);
 
   // Sample cards for preview
   const sampleCards = [
@@ -71,8 +85,20 @@ function CardSkinCard({
         focus-visible:outline-none
         focus-visible:ring-[var(--input-focus-ring-width)]
         focus-visible:ring-[var(--color-text-accent)]
+        overflow-hidden
       `}
     >
+      {/* Selection flash overlay */}
+      {showSelectFlash && (
+        <div
+          className="absolute inset-0 z-20 pointer-events-none rounded-[var(--radius-lg)]"
+          style={{
+            background: 'radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%)',
+            animation: 'skinSelectFlash 0.6s ease-out forwards',
+          }}
+        />
+      )}
+
       {/* Lock overlay */}
       {isLocked && (
         <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[var(--radius-lg)] bg-black/50 z-10">
@@ -114,16 +140,21 @@ function CardSkinCard({
             className="transform scale-75 origin-center"
             style={{
               opacity: isHovered || isSelected ? 1 : 0.9,
-              transition: 'opacity 0.2s ease',
+              transition: 'all 0.2s ease',
+              animation: showSelectFlash
+                ? `skinCardBounce 0.5s ease-out ${index * 0.08}s both`
+                : 'none',
             }}
           >
             {/* Mini card preview showing the value format */}
             <div
-              className="w-10 h-14 rounded-md flex items-center justify-center text-white font-bold text-sm"
+              className="w-10 h-14 rounded-md flex items-center justify-center text-white font-bold text-sm transition-shadow duration-200"
               style={{
                 backgroundColor: cardSkin.suits[card.color].color,
                 fontFamily: cardSkin.fontFamily,
-                boxShadow: isHovered ? `0 0 10px ${cardSkin.suits[card.color].glowColor}` : 'none',
+                boxShadow: isHovered || showSelectFlash
+                  ? `0 0 15px ${cardSkin.suits[card.color].glowColor}`
+                  : 'none',
               }}
             >
               {cardSkin.formatValue(card.value, false)}
@@ -183,8 +214,30 @@ export function CardSkinSelector({
     playerLevel,
   } = useCardSkin();
 
+  // Track the just-selected skin for animation
+  const [justSelectedId, setJustSelectedId] = useState<CardSkinId | null>(null);
+  const [previewBounce, setPreviewBounce] = useState(false);
+
   const handleSelect = (id: CardSkinId) => {
+    // Skip if already selected
+    if (id === cardSkinId) return;
+
+    // Play selection sound
+    sounds.buttonClick();
+
+    // Trigger animations
+    setJustSelectedId(id);
+    setPreviewBounce(true);
+
+    // Set the new skin
     setCardSkin(id);
+
+    // Clear animation states after animation completes
+    setTimeout(() => {
+      setJustSelectedId(null);
+      setPreviewBounce(false);
+    }, 700);
+
     const selectedSkin = availableCardSkins.find(s => s.id === id);
     if (selectedSkin && onSkinChange) {
       onSkinChange(selectedSkin);
@@ -207,18 +260,30 @@ export function CardSkinSelector({
     <div className="space-y-4">
       {/* Live Preview with actual Card component */}
       {showPreview && (
-        <div className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)]">
+        <div className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)] overflow-hidden">
           <p className="text-xs text-[var(--color-text-muted)] mb-3 text-center uppercase tracking-wider">
             Live Preview
           </p>
           <div className="flex justify-center gap-2 flex-wrap">
-            <Card card={{ color: 'red', value: 5 }} size="small" />
-            <Card card={{ color: 'blue', value: 6 }} size="small" />
-            <Card card={{ color: 'green', value: 1 }} size="small" />
-            <Card card={{ color: 'brown', value: 7 }} size="small" />
-            {/* Special cards */}
-            <Card card={{ color: 'red', value: 0 }} size="small" />
-            <Card card={{ color: 'brown', value: 0 }} size="small" />
+            {([
+              { color: 'red', value: 5 },
+              { color: 'blue', value: 6 },
+              { color: 'green', value: 1 },
+              { color: 'brown', value: 7 },
+              { color: 'red', value: 0 },  // Special card
+              { color: 'brown', value: 0 }, // Special card
+            ] as CardType[]).map((card, index) => (
+              <div
+                key={`${card.color}-${card.value}`}
+                style={{
+                  animation: previewBounce
+                    ? `skinCardBounce 0.5s ease-out ${index * 0.06}s both`
+                    : 'none',
+                }}
+              >
+                <Card card={card} size="small" />
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -234,6 +299,7 @@ export function CardSkinSelector({
             requiredLevel={getCardSkinRequiredLevel(skin.id)}
             currentLevel={playerLevel}
             onSelect={handleSelect}
+            justSelected={justSelectedId === skin.id}
           />
         ))}
       </div>
@@ -284,6 +350,14 @@ export function CardSkinDropdown({ onSkinChange }: CardSkinDropdownProps) {
 
   const handleSelect = (id: CardSkinId) => {
     if (!isCardSkinUnlocked(id)) return;
+    if (id === cardSkinId) {
+      setIsOpen(false);
+      return;
+    }
+
+    // Play selection sound
+    sounds.buttonClick();
+
     setCardSkin(id);
     setIsOpen(false);
     const selectedSkin = availableCardSkins.find(s => s.id === id);

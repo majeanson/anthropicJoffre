@@ -19,7 +19,7 @@
 
 import { memo, useMemo } from 'react';
 import { Card as CardType, CardColor } from '../types/game';
-import { useCardSkin } from '../contexts/SkinContext';
+import { useCardSkin, useSpecialCardSkins } from '../contexts/SkinContext';
 
 interface CardProps {
   card: CardType;
@@ -138,11 +138,21 @@ function CardComponent({
   // Get card skin for value formatting
   const { cardSkin } = useCardSkin();
 
+  // Get special card skins (Red 0 & Brown 0)
+  const { getEquippedSpecialSkin } = useSpecialCardSkins();
+
   // Memoize expensive calculations
   const isSpecial = useMemo(
     () => (card.color === 'red' || card.color === 'brown') && card.value === 0,
     [card.color, card.value]
   );
+
+  // Get equipped special skin for this card type
+  const equippedSpecialSkin = useMemo(() => {
+    if (!isSpecial) return null;
+    const cardType = card.color === 'red' ? 'red_zero' : 'brown_zero';
+    return getEquippedSpecialSkin(cardType);
+  }, [isSpecial, card.color, getEquippedSpecialSkin]);
 
   const suitStyle = suitStyles[card.color];
   const sizeConfig = sizeStyles[size];
@@ -277,9 +287,14 @@ function CardComponent({
         backgroundColor: 'var(--card-bg-color)',
         borderWidth: card.color === 'brown' ? '4px' : sizeConfig.borderWidth, // Thicker border for brown
         borderStyle: suitStyle.borderStyle,
-        borderColor: suitStyle.border,
+        // Use special skin border color if available
+        borderColor: isSpecial && equippedSpecialSkin?.borderColor
+          ? equippedSpecialSkin.borderColor
+          : suitStyle.border,
         boxShadow: isPlayable && !disabled
-          ? suitStyle.shadowHover
+          ? (isSpecial && equippedSpecialSkin?.glowColor
+            ? `${suitStyle.shadowHover}, 0 0 25px ${equippedSpecialSkin.glowColor}`
+            : suitStyle.shadowHover)
           : disabled
             ? '0 2px 4px rgba(0, 0, 0, 0.2)'
             : suitStyle.shadow,
@@ -348,8 +363,26 @@ function CardComponent({
         </div>
       )}
 
-      {/* Center emblem: emoji icon or image depending on skin */}
-      {useCenterIcons ? (
+      {/* Center emblem: special skin icon, emoji icon, or image depending on skin */}
+      {isSpecial && equippedSpecialSkin?.centerIcon ? (
+        // Use special card skin icon for Red 0 / Brown 0
+        <div
+          className={`
+            ${sizeConfig.emblem}
+            flex items-center justify-center
+            text-3xl md:text-4xl
+            ${equippedSpecialSkin.animationClass || ''}
+          `}
+          style={{
+            filter: isPlayable ? 'brightness(1.1)' : undefined,
+            textShadow: equippedSpecialSkin.glowColor
+              ? `0 0 15px ${equippedSpecialSkin.glowColor}`
+              : undefined,
+          }}
+        >
+          {equippedSpecialSkin.centerIcon}
+        </div>
+      ) : useCenterIcons ? (
         <div
           className={`
             ${sizeConfig.emblem}

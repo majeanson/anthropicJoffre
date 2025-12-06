@@ -19,7 +19,11 @@ export type SkinId =
   | 'modern-minimal'
   | 'modern-minimal-dark'
   | 'cyberpunk-neon'
-  | 'classic-parchment';
+  | 'classic-parchment'
+  // Sprint 21: New UI skins
+  | 'sakura-spring'
+  | 'ocean-depths'
+  | 'forest-enchanted';
 
 export interface SkinColors {
   // Background layers
@@ -1155,6 +1159,423 @@ export const midnightAlchemySkin: Skin = {
 };
 
 // ============================================================================
+// SAKURA SPRING SKIN (Sprint 21)
+// Light Japanese-inspired theme with cherry blossom pink accents
+// ============================================================================
+
+export const sakuraSpringSkin: Skin = {
+  id: 'sakura-spring',
+  name: '🌸 Sakura Spring',
+  description: 'Delicate cherry blossom aesthetics with soft pink and cream tones',
+  preview: 'linear-gradient(135deg, #fdf6f8 0%, #fce7ef 50%, #fbd4e0 100%)',
+  isDark: false,
+
+  colors: {
+    bg: {
+      primary: '#fdf6f8',           // Soft cream pink
+      secondary: '#ffffff',         // Pure white
+      tertiary: '#fce7ef',          // Light sakura
+      accent: '#e91e63',            // Vivid cherry blossom
+      overlay: 'rgba(253, 246, 248, 0.98)',
+    },
+
+    text: {
+      primary: '#3d2c35',           // Deep rose brown
+      secondary: '#6b5660',         // Muted plum
+      accent: '#c2185b',            // Cherry accent
+      inverse: '#ffffff',
+      muted: '#9e8d95',
+    },
+
+    border: {
+      default: '#f3d1dc',
+      accent: '#e91e63',
+      subtle: '#fce7ef',
+    },
+
+    success: '#43a047',
+    warning: '#ef6c00',
+    error: '#c62828',
+    info: '#1976d2',
+
+    team1: {
+      primary: '#d81b60',           // Deep pink
+      secondary: '#ec407a',
+      text: '#ffffff',
+    },
+    team2: {
+      primary: '#5e35b1',           // Deep purple
+      secondary: '#7e57c2',
+      text: '#ffffff',
+    },
+
+    suits: {
+      red: '#c62828',
+      brown: '#6d4c41',
+      green: '#2e7d32',
+      blue: '#1565c0',
+    },
+
+    glow: '#f48fb1',
+    highlight: '#e91e63',
+    shadow: 'rgba(61, 44, 53, 0.1)',
+  },
+
+  typography: {
+    fontFamily: {
+      display: '"Noto Serif JP", "Playfair Display", Georgia, serif',
+      body: '"Noto Sans JP", "Source Sans 3", sans-serif',
+      mono: '"JetBrains Mono", monospace',
+    },
+    fontWeight: {
+      normal: 400,
+      medium: 500,
+      bold: 600,
+      black: 700,
+    },
+  },
+
+  effects: {
+    radius: {
+      sm: '8px',
+      md: '12px',
+      lg: '16px',
+      xl: '24px',
+      full: '9999px',
+    },
+
+    shadows: {
+      sm: '0 2px 6px rgba(233, 30, 99, 0.08)',
+      md: '0 4px 12px rgba(233, 30, 99, 0.1)',
+      lg: '0 8px 24px rgba(233, 30, 99, 0.12)',
+      glow: '0 0 20px rgba(244, 143, 177, 0.3)',
+      inset: 'inset 0 2px 4px rgba(233, 30, 99, 0.05)',
+    },
+
+    animations: {
+      duration: {
+        fast: '150ms',
+        normal: '280ms',
+        slow: '450ms',
+      },
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+
+    specialEffects: {
+      scanlines: false,
+      noise: false,
+      glow: true,
+      pixelated: false,
+      gradientOverlay: false,
+    },
+  },
+
+  components: {
+    button: {
+      borderWidth: '1px',
+      textTransform: 'none',
+      letterSpacing: '0.02em',
+    },
+    card: {
+      borderWidth: '1px',
+      bgColor: '#fffbfc',
+      cornerRadius: '12px',
+    },
+    modal: {
+      backdropBlur: '16px',
+      borderWidth: '1px',
+    },
+    input: {
+      borderWidth: '1px',
+      focusRingWidth: '2px',
+    },
+  },
+
+  cssVariables: {
+    '--skin-petal-fall': '1',
+  },
+};
+
+// ============================================================================
+// OCEAN DEPTHS SKIN (Sprint 21)
+// Deep sea blue theme with bioluminescent accents
+// ============================================================================
+
+export const oceanDepthsSkin: Skin = {
+  id: 'ocean-depths',
+  name: '🌊 Ocean Depths',
+  description: 'Mysterious deep sea atmosphere with bioluminescent glow',
+  preview: 'linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0f2b47 100%)',
+  isDark: true,
+
+  colors: {
+    bg: {
+      primary: '#0a1628',           // Abyssal blue
+      secondary: '#0d2137',         // Deep ocean
+      tertiary: '#0f2b47',          // Twilight zone
+      accent: '#00bcd4',            // Bioluminescent cyan
+      overlay: 'rgba(10, 22, 40, 0.96)',
+    },
+
+    text: {
+      primary: '#e0f4f8',           // Sea foam white
+      secondary: '#8cb4c9',         // Pale blue
+      accent: '#4dd0e1',            // Bright cyan
+      inverse: '#0a1628',
+      muted: '#5a8599',
+    },
+
+    border: {
+      default: '#1a3a52',
+      accent: '#00bcd4',
+      subtle: '#0d2137',
+    },
+
+    success: '#26a69a',             // Teal coral
+    warning: '#ffb74d',             // Amber fish
+    error: '#ef5350',               // Crimson anemone
+    info: '#29b6f6',                // Light blue
+
+    team1: {
+      primary: '#e65100',           // Orange coral
+      secondary: '#ff6d00',
+      text: '#ffffff',
+    },
+    team2: {
+      primary: '#0288d1',           // Ocean blue
+      secondary: '#03a9f4',
+      text: '#ffffff',
+    },
+
+    suits: {
+      red: '#ef5350',
+      brown: '#8d6e63',
+      green: '#26a69a',
+      blue: '#29b6f6',
+    },
+
+    glow: '#4dd0e1',
+    highlight: '#00bcd4',
+    shadow: '#000000',
+  },
+
+  typography: {
+    fontFamily: {
+      display: '"Montserrat", "Segoe UI", sans-serif',
+      body: '"Open Sans", "Roboto", sans-serif',
+      mono: '"Fira Code", monospace',
+    },
+    fontWeight: {
+      normal: 400,
+      medium: 500,
+      bold: 600,
+      black: 700,
+    },
+  },
+
+  effects: {
+    radius: {
+      sm: '6px',
+      md: '10px',
+      lg: '16px',
+      xl: '24px',
+      full: '9999px',
+    },
+
+    shadows: {
+      sm: '0 2px 8px rgba(0, 188, 212, 0.15)',
+      md: '0 4px 16px rgba(0, 188, 212, 0.2)',
+      lg: '0 8px 32px rgba(0, 188, 212, 0.25), 0 0 60px rgba(0, 188, 212, 0.1)',
+      glow: '0 0 30px rgba(77, 208, 225, 0.4), 0 0 60px rgba(0, 188, 212, 0.2)',
+      inset: 'inset 0 2px 8px rgba(0, 0, 0, 0.4)',
+    },
+
+    animations: {
+      duration: {
+        fast: '180ms',
+        normal: '350ms',
+        slow: '600ms',
+      },
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+
+    specialEffects: {
+      scanlines: false,
+      noise: true,
+      glow: true,
+      pixelated: false,
+      gradientOverlay: true,
+    },
+  },
+
+  components: {
+    button: {
+      borderWidth: '2px',
+      textTransform: 'uppercase',
+      letterSpacing: '0.1em',
+    },
+    card: {
+      borderWidth: '2px',
+      bgColor: '#e0f7fa',
+      cornerRadius: '10px',
+    },
+    modal: {
+      backdropBlur: '12px',
+      borderWidth: '2px',
+    },
+    input: {
+      borderWidth: '2px',
+      focusRingWidth: '3px',
+    },
+  },
+
+  cssVariables: {
+    '--skin-wave-intensity': '1',
+    '--skin-bioluminescent-glow': '1.3',
+  },
+};
+
+// ============================================================================
+// FOREST ENCHANTED SKIN (Sprint 21)
+// Dark green mystical forest theme with magical accents
+// ============================================================================
+
+export const forestEnchantedSkin: Skin = {
+  id: 'forest-enchanted',
+  name: '🌲 Forest Enchanted',
+  description: 'Mystical woodland atmosphere with ethereal green magic',
+  preview: 'linear-gradient(135deg, #0f1f16 0%, #1a3325 50%, #234430 100%)',
+  isDark: true,
+
+  colors: {
+    bg: {
+      primary: '#0f1f16',           // Deep forest floor
+      secondary: '#1a3325',         // Shadowy undergrowth
+      tertiary: '#234430',          // Mossy stone
+      accent: '#4caf50',            // Magical green
+      overlay: 'rgba(15, 31, 22, 0.96)',
+    },
+
+    text: {
+      primary: '#e8f5e9',           // Moonlit leaf
+      secondary: '#a5d6a7',         // Pale moss
+      accent: '#69f0ae',            // Fairy light
+      inverse: '#0f1f16',
+      muted: '#5d8a66',
+    },
+
+    border: {
+      default: '#2e5a3a',
+      accent: '#4caf50',
+      subtle: '#1a3325',
+    },
+
+    success: '#66bb6a',             // Fresh leaf
+    warning: '#ffa726',             // Amber resin
+    error: '#ef5350',               // Red berry
+    info: '#42a5f5',                // Sky through canopy
+
+    team1: {
+      primary: '#bf360c',           // Autumn ember
+      secondary: '#e64a19',
+      text: '#ffffff',
+    },
+    team2: {
+      primary: '#1565c0',           // Deep stream
+      secondary: '#1e88e5',
+      text: '#ffffff',
+    },
+
+    suits: {
+      red: '#d32f2f',
+      brown: '#795548',
+      green: '#388e3c',
+      blue: '#1976d2',
+    },
+
+    glow: '#69f0ae',
+    highlight: '#4caf50',
+    shadow: '#000000',
+  },
+
+  typography: {
+    fontFamily: {
+      display: '"Cinzel Decorative", "Georgia", serif',
+      body: '"Lora", "Georgia", serif',
+      mono: '"Fira Code", monospace',
+    },
+    fontWeight: {
+      normal: 400,
+      medium: 500,
+      bold: 700,
+      black: 900,
+    },
+  },
+
+  effects: {
+    radius: {
+      sm: '4px',
+      md: '8px',
+      lg: '14px',
+      xl: '22px',
+      full: '9999px',
+    },
+
+    shadows: {
+      sm: '0 2px 8px rgba(76, 175, 80, 0.12)',
+      md: '0 4px 16px rgba(76, 175, 80, 0.18)',
+      lg: '0 8px 32px rgba(76, 175, 80, 0.22), 0 0 60px rgba(105, 240, 174, 0.08)',
+      glow: '0 0 25px rgba(105, 240, 174, 0.35), 0 0 50px rgba(76, 175, 80, 0.15)',
+      inset: 'inset 0 2px 8px rgba(0, 0, 0, 0.45)',
+    },
+
+    animations: {
+      duration: {
+        fast: '150ms',
+        normal: '320ms',
+        slow: '550ms',
+      },
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+
+    specialEffects: {
+      scanlines: false,
+      noise: true,
+      glow: true,
+      pixelated: false,
+      gradientOverlay: true,
+    },
+  },
+
+  components: {
+    button: {
+      borderWidth: '2px',
+      textTransform: 'none',
+      letterSpacing: '0.05em',
+    },
+    card: {
+      borderWidth: '2px',
+      bgColor: '#e8f5e9',
+      cornerRadius: '10px',
+    },
+    modal: {
+      backdropBlur: '14px',
+      borderWidth: '2px',
+    },
+    input: {
+      borderWidth: '2px',
+      focusRingWidth: '3px',
+    },
+  },
+
+  cssVariables: {
+    '--skin-noise-opacity': '0.035',
+    '--skin-fairy-dust': '1',
+    '--skin-glow-intensity': '1.1',
+  },
+};
+
+// ============================================================================
 // SKIN REGISTRY
 // ============================================================================
 
@@ -1166,6 +1587,10 @@ export const skins: Record<SkinId, Skin> = {
   'modern-minimal-dark': modernMinimalDarkSkin,
   'cyberpunk-neon': cyberpunkNeonSkin,
   'classic-parchment': classicParchmentSkin,
+  // Sprint 21: New skins
+  'sakura-spring': sakuraSpringSkin,
+  'ocean-depths': oceanDepthsSkin,
+  'forest-enchanted': forestEnchantedSkin,
 };
 
 export const skinList: Skin[] = Object.values(skins);
@@ -1324,6 +1749,10 @@ export const skinPricing: Record<SkinId, SkinPricingInfo> = {
   'modern-minimal-dark': { price: 400, suggestedLevel: 8 },  // Medium
   'luxury-casino': { price: 750, suggestedLevel: 12 },       // Premium
   'cyberpunk-neon': { price: 1000, suggestedLevel: 15 },     // Most expensive
+  // Sprint 21: New skins
+  'sakura-spring': { price: 300, suggestedLevel: 6 },        // Medium-low
+  'ocean-depths': { price: 600, suggestedLevel: 10 },        // Medium-high
+  'forest-enchanted': { price: 850, suggestedLevel: 14 },    // Premium
 };
 
 /**

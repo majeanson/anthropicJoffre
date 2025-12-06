@@ -67,6 +67,13 @@ interface PlayerStats {
   red_zeros_collected: number;
   brown_zeros_received: number;
 
+  // Achievement expansion tracking (Sprint 21)
+  perfect_bets_won?: number;
+  clean_games_won?: number;
+  clean_game_streak?: number;
+  max_bet_won?: number;
+  double_red_zeros?: number;
+
   created_at: string;
   updated_at: string;
 }

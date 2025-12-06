@@ -30,6 +30,7 @@ interface UseGameEventListenersProps {
   playErrorSound: () => void;
   setSessionXp?: Dispatch<SetStateAction<number>>;
   setSessionCoins?: Dispatch<SetStateAction<number>>;
+  onXpGained?: (amount: number) => void;
 }
 
 /**
@@ -53,6 +54,7 @@ export function useGameEventListeners({
   playErrorSound,
   setSessionXp,
   setSessionCoins,
+  onXpGained,
 }: UseGameEventListenersProps) {
   const lastAutoActionRef = useRef<{ message: string; timestamp: number } | null>(null);
 
@@ -232,6 +234,10 @@ export function useGameEventListeners({
       if (setSessionCoins) {
         setSessionCoins(prev => prev + coins);
       }
+      // Trigger XP popup for visual feedback
+      if (xp > 0 && onXpGained) {
+        onXpGained(xp);
+      }
     };
 
     // Reset session rewards when rematch starts (new game = fresh session)
@@ -345,5 +351,5 @@ export function useGameEventListeners({
       socket.off('connection_status_update', handleConnectionStatusUpdate);
       socket.off('player_reconnected', handlePlayerReconnected);
     };
-  }, [socket, gameState, showToast, setToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound, setSessionXp, setSessionCoins]);
+  }, [socket, gameState, showToast, setToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound, setSessionXp, setSessionCoins, onXpGained]);
 }

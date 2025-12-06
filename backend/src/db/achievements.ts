@@ -44,12 +44,86 @@ export async function getPlayerAchievements(
 }
 
 /**
+ * Sprint 21: Achievement skin unlock types and helpers
+ * Defined before unlockAchievement to avoid forward reference
+ */
+export interface AchievementSkinUnlock {
+  achievement_key: string;
+  skin_id: string;
+  skin_type: 'special' | 'card' | 'ui';
+}
+
+async function getAchievementSkinUnlocksInternal(
+  achievementKey: string
+): Promise<AchievementSkinUnlock[]> {
+  try {
+    const result = await query(
+      `SELECT achievement_key, skin_id, skin_type
+       FROM achievement_skin_unlocks
+       WHERE achievement_key = $1`,
+      [achievementKey]
+    );
+    return result.rows;
+  } catch (error) {
+    // Table may not exist yet
+    return [];
+  }
+}
+
+async function awardAchievementSkinsInternal(
+  playerName: string,
+  achievementKey: string
+): Promise<string[]> {
+  const unlockedSkins: string[] = [];
+
+  try {
+    const skinUnlocks = await getAchievementSkinUnlocksInternal(achievementKey);
+
+    for (const unlock of skinUnlocks) {
+      if (unlock.skin_type === 'special') {
+        await query(
+          `INSERT INTO player_special_card_skins (player_name, skin_id)
+           VALUES ($1, $2)
+           ON CONFLICT (player_name, skin_id) DO NOTHING`,
+          [playerName, unlock.skin_id]
+        );
+        unlockedSkins.push(unlock.skin_id);
+      } else if (unlock.skin_type === 'card') {
+        await query(
+          `INSERT INTO player_card_skin_purchases (player_name, card_skin_id, price_paid)
+           VALUES ($1, $2, 0)
+           ON CONFLICT (player_name, card_skin_id) DO NOTHING`,
+          [playerName, unlock.skin_id]
+        );
+        unlockedSkins.push(unlock.skin_id);
+      } else if (unlock.skin_type === 'ui') {
+        await query(
+          `INSERT INTO player_skin_unlocks (player_name, skin_id)
+           VALUES ($1, $2)
+           ON CONFLICT (player_name, skin_id) DO NOTHING`,
+          [playerName, unlock.skin_id]
+        );
+        unlockedSkins.push(unlock.skin_id);
+      }
+    }
+
+    if (unlockedSkins.length > 0) {
+      console.log(`[Achievement] Awarded ${unlockedSkins.length} skins to ${playerName} for ${achievementKey}:`, unlockedSkins);
+    }
+  } catch (error) {
+    console.error('Error awarding achievement skins:', error);
+  }
+
+  return unlockedSkins;
+}
+
+/**
  * Unlock achievement for player
  */
 export async function unlockAchievement(
   playerName: string,
   achievementKey: string
-): Promise<{ achievement: Achievement; isNewUnlock: boolean }> {
+): Promise<{ achievement: Achievement; isNewUnlock: boolean; unlockedSkins: string[] }> {
   // Get achievement
   const achievementResult = await query(
     'SELECT achievement_id, achievement_key, achievement_name, description, icon, tier, points, is_secret, category, created_at FROM achievements WHERE achievement_key = $1',
@@ -61,6 +135,7 @@ export async function unlockAchievement(
   }
 
   const achievement = achievementResult.rows[0];
+  let unlockedSkins: string[] = [];
 
   // Check if already unlocked
   const existingResult = await query(
@@ -79,16 +154,29 @@ export async function unlockAchievement(
       [playerName, achievement.achievement_id, achievement.max_progress || 1]
     );
 
-    // Update player's achievement points
+    // Calculate coin reward based on tier
+    const coinRewardByTier: Record<string, number> = {
+      bronze: 100,
+      silver: 250,
+      gold: 500,
+      platinum: 1000,
+    };
+    const coinReward = coinRewardByTier[achievement.tier] || 100;
+
+    // Update player's achievement points and award coins
     await query(
       `UPDATE player_stats
-       SET achievement_points = achievement_points + $1
-       WHERE player_name = $2`,
-      [achievement.points, playerName]
+       SET achievement_points = achievement_points + $1,
+           cosmetic_currency = COALESCE(cosmetic_currency, 100) + $2
+       WHERE player_name = $3`,
+      [achievement.points, coinReward, playerName]
     );
+
+    // Sprint 21: Award any skins linked to this achievement
+    unlockedSkins = await awardAchievementSkinsInternal(playerName, achievementKey);
   }
 
-  return { achievement, isNewUnlock };
+  return { achievement, isNewUnlock, unlockedSkins };
 }
 
 /**
@@ -198,4 +286,49 @@ export async function resetPlayerAchievements(playerName: string): Promise<void>
     `DELETE FROM player_achievements WHERE player_name = $1`,
     [playerName]
   );
+}
+
+/**
+ * Sprint 21: Public exports for skin unlock functions
+ * (Internal functions are defined above unlockAchievement to avoid forward references)
+ */
+export async function getAchievementSkinUnlocks(
+  achievementKey: string
+): Promise<AchievementSkinUnlock[]> {
+  return getAchievementSkinUnlocksInternal(achievementKey);
+}
+
+/**
+ * Sprint 21: Get all skins unlocked by a player's achievements
+ */
+export async function getPlayerAchievementSkinUnlocks(
+  playerName: string
+): Promise<AchievementSkinUnlock[]> {
+  try {
+    const result = await query(
+      `SELECT asu.achievement_key, asu.skin_id, asu.skin_type
+       FROM achievement_skin_unlocks asu
+       INNER JOIN player_achievements pa
+         ON pa.achievement_id = (
+           SELECT a.achievement_id FROM achievements a WHERE a.achievement_key = asu.achievement_key
+         )
+       WHERE pa.player_name = $1`,
+      [playerName]
+    );
+    return result.rows;
+  } catch (error) {
+    // Table may not exist yet
+    console.warn('Error getting player achievement skin unlocks:', error);
+    return [];
+  }
+}
+
+/**
+ * Sprint 21: Award skin when achievement is unlocked (public export)
+ */
+export async function awardAchievementSkins(
+  playerName: string,
+  achievementKey: string
+): Promise<string[]> {
+  return awardAchievementSkinsInternal(playerName, achievementKey);
 }

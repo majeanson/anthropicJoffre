@@ -41,6 +41,12 @@ import {
   defaultCardSkinId,
   cardSkinList,
 } from '../config/cardSkins';
+import {
+  SpecialCardSkinWithStatus,
+  PlayerEquippedSpecialSkins,
+  SpecialCardType,
+  defaultSpecialCardSkins,
+} from '../config/specialCardSkins';
 import { API_ENDPOINTS } from '../config/constants';
 import { fetchWithCsrf } from '../utils/csrf';
 
@@ -166,6 +172,25 @@ interface SkinContextValue {
 
   /** Set cosmetic currency balance (called by App.tsx) */
   setCosmeticCurrency: (amount: number) => void;
+
+  // Special Card Skins (Red 0 & Brown 0)
+  /** All special card skins with unlock status */
+  specialCardSkins: SpecialCardSkinWithStatus[];
+
+  /** Set special card skins (from backend) */
+  setSpecialCardSkins: (skins: SpecialCardSkinWithStatus[]) => void;
+
+  /** Currently equipped special card skins */
+  equippedSpecialSkins: PlayerEquippedSpecialSkins;
+
+  /** Set equipped special skins (from backend) */
+  setEquippedSpecialSkins: (equipped: PlayerEquippedSpecialSkins) => void;
+
+  /** Get the skin to display for a special card type */
+  getEquippedSpecialSkin: (cardType: SpecialCardType) => SpecialCardSkinWithStatus | undefined;
+
+  /** Check if a special card skin is unlocked */
+  isSpecialCardSkinUnlocked: (skinId: string) => boolean;
 }
 
 const SkinContext = createContext<SkinContextValue | undefined>(undefined);
@@ -232,6 +257,21 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
 
   // Cosmetic currency state
   const [cosmeticCurrency, setCosmeticCurrency] = useState<number>(0);
+
+  // Special Card Skins state
+  const [specialCardSkins, setSpecialCardSkins] = useState<SpecialCardSkinWithStatus[]>(() => {
+    // Initialize with default skins marked as unlocked
+    return defaultSpecialCardSkins.map(skin => ({
+      ...skin,
+      isUnlocked: skin.unlockType === 'default',
+      unlockedAt: skin.unlockType === 'default' ? new Date().toISOString() : null,
+    }));
+  });
+
+  const [equippedSpecialSkins, setEquippedSpecialSkins] = useState<PlayerEquippedSpecialSkins>({
+    redZeroSkin: 'red_zero_default',
+    brownZeroSkin: 'brown_zero_default',
+  });
 
   // Determine which skin to actually display (preview takes precedence)
   const effectiveSkinId = previewSkinId ?? skinId;
@@ -429,6 +469,22 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
 
   const isPreviewActive = previewSkinId !== null || previewCardSkinId !== null;
 
+  // Special Card Skin helper functions
+  const getEquippedSpecialSkin = useCallback((cardType: SpecialCardType): SpecialCardSkinWithStatus | undefined => {
+    const skinId = cardType === 'red_zero'
+      ? equippedSpecialSkins.redZeroSkin
+      : equippedSpecialSkins.brownZeroSkin;
+
+    if (!skinId) return undefined;
+
+    return specialCardSkins.find(s => s.skinId === skinId);
+  }, [specialCardSkins, equippedSpecialSkins]);
+
+  const isSpecialCardSkinUnlocked = useCallback((skinId: string): boolean => {
+    const skin = specialCardSkins.find(s => s.skinId === skinId);
+    return skin?.isUnlocked ?? false;
+  }, [specialCardSkins]);
+
   // Context value
   const value = useMemo<SkinContextValue>(
     () => ({
@@ -469,8 +525,15 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
       // Cosmetic currency
       cosmeticCurrency,
       setCosmeticCurrency,
+      // Special Card Skins
+      specialCardSkins,
+      setSpecialCardSkins,
+      equippedSpecialSkins,
+      setEquippedSpecialSkins,
+      getEquippedSpecialSkin,
+      isSpecialCardSkinUnlocked,
     }),
-    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded, previewSkinId, previewCardSkinId, startPreviewSkin, startPreviewCardSkin, stopPreviewSkin, stopPreviewCardSkin, stopPreview, isPreviewActive, cosmeticCurrency, setCosmeticCurrency]
+    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded, previewSkinId, previewCardSkinId, startPreviewSkin, startPreviewCardSkin, stopPreviewSkin, stopPreviewCardSkin, stopPreview, isPreviewActive, cosmeticCurrency, setCosmeticCurrency, specialCardSkins, setSpecialCardSkins, equippedSpecialSkins, setEquippedSpecialSkins, getEquippedSpecialSkin, isSpecialCardSkinUnlocked]
   );
 
   return (
@@ -648,5 +711,35 @@ export function useCardSkin() {
     isCardSkinUnlocked,
     getCardSkinRequiredLevel,
     playerLevel,
+  };
+}
+
+/**
+ * Hook for accessing special card skins (Red 0 & Brown 0)
+ */
+export function useSpecialCardSkins() {
+  const {
+    specialCardSkins,
+    setSpecialCardSkins,
+    equippedSpecialSkins,
+    setEquippedSpecialSkins,
+    getEquippedSpecialSkin,
+    isSpecialCardSkinUnlocked,
+    cosmeticCurrency,
+    playerLevel,
+  } = useSkin();
+
+  return {
+    specialCardSkins,
+    setSpecialCardSkins,
+    equippedSpecialSkins,
+    setEquippedSpecialSkins,
+    getEquippedSpecialSkin,
+    isSpecialCardSkinUnlocked,
+    cosmeticCurrency,
+    playerLevel,
+    // Convenience getters
+    redZeroSkins: specialCardSkins.filter(s => s.cardType === 'red_zero'),
+    brownZeroSkins: specialCardSkins.filter(s => s.cardType === 'brown_zero'),
   };
 }

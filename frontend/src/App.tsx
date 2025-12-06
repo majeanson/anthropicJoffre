@@ -63,6 +63,9 @@ import { useGameEventListeners } from './hooks/useGameEventListeners';
 import { useTutorialAchievement } from './hooks/useTutorialAchievement';
 // Sprint 20: Skin context for level-based unlocks
 import { useSkin } from './contexts/SkinContext';
+// Retention features: XP popup and quest completion toast
+import { useXPGainPopup } from './components/XPGainPopup';
+import { useQuestCompletedToast } from './components/QuestCompletedToast';
 
 function AppContent() {
   // Sprint 5 Phase 2: Use custom hooks for socket connection and core game state
@@ -199,6 +202,10 @@ function AppContent() {
   // Sprint 21: Session XP/Coins tracking
   const [sessionXp, setSessionXp] = useState(0);
   const [sessionCoins, setSessionCoins] = useState(0);
+
+  // Retention features: XP popup and quest completion toast
+  const { addGain: addXpGain, XPGainPopupComponent } = useXPGainPopup();
+  const { showQuestCompleted, QuestCompletedToastComponent } = useQuestCompletedToast();
 
   // Task 10 Phase 2: Keyboard shortcuts help modal
   const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
@@ -453,6 +460,7 @@ function AppContent() {
     playErrorSound,
     setSessionXp,
     setSessionCoins,
+    onXpGained: addXpGain,
   });
 
   // Sprint 16: Swap request event listeners
@@ -489,6 +497,42 @@ function AppContent() {
       socket.off('swap_request_cancelled', handleSwapRequestCancelled);
     };
   }, [socket, gameId, showToast]);
+
+  // Quest progress and completion listener for toast notifications
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleQuestProgressUpdate = (data: {
+      updates: Array<{
+        questId: number;
+        progressDelta: number;
+        newProgress: number;
+        completed: boolean;
+        questName: string;
+      }>;
+    }) => {
+      // Show toast for completed quests
+      for (const update of data.updates) {
+        if (update.completed) {
+          // Get quest details from DailyQuestsPanel context or use defaults
+          showQuestCompleted({
+            id: `quest-${update.questId}-${Date.now()}`,
+            questName: update.questName,
+            rewardXp: 50, // Default - actual rewards are shown when claimed
+            rewardCurrency: 25,
+            icon: '🎯',
+            questType: 'medium',
+          });
+        }
+      }
+    };
+
+    socket.on('quest_progress_update', handleQuestProgressUpdate);
+
+    return () => {
+      socket.off('quest_progress_update', handleQuestProgressUpdate);
+    };
+  }, [socket, showQuestCompleted]);
 
   // Task 10 Phase 2: Global keyboard shortcuts (? for help)
   useEffect(() => {
@@ -853,6 +897,9 @@ function AppContent() {
         setGameId(inviteGameId);
       }
     },
+    // Retention features: XP popup and quest toast
+    xpPopupComponent: XPGainPopupComponent,
+    questToastComponent: QuestCompletedToastComponent,
   };
 
   if (!gameState) {
