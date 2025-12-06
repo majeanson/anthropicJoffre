@@ -370,44 +370,18 @@ export const PlayerHand = memo(function PlayerHand({
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Mobile: Fan-style card layout - cards overlap like a real hand */}
-        <div className="md:hidden relative h-44 sm:h-48 flex items-end justify-center overflow-visible pb-6">
-          {/* Navigation arrows - larger touch targets */}
-          {hand.length > 1 && (
-            <>
-              <button
-                className="absolute left-1 top-1/2 -translate-y-1/2 z-[200] w-10 h-10 flex items-center justify-center rounded-full bg-skin-primary/90 text-skin-primary shadow-xl active:scale-90 transition-transform border-2 border-skin-accent"
-                onClick={() => {
-                  setFocusedCardIndex((prev) => Math.max(0, prev - 1));
-                  sounds.cardDeal();
-                }}
-                aria-label="Previous card"
-              >
-                <span className="text-lg font-bold">‹</span>
-              </button>
-              <button
-                className="absolute right-1 top-1/2 -translate-y-1/2 z-[200] w-10 h-10 flex items-center justify-center rounded-full bg-skin-primary/90 text-skin-primary shadow-xl active:scale-90 transition-transform border-2 border-skin-accent"
-                onClick={() => {
-                  setFocusedCardIndex((prev) => Math.min(hand.length - 1, prev + 1));
-                  sounds.cardDeal();
-                }}
-                aria-label="Next card"
-              >
-                <span className="text-lg font-bold">›</span>
-              </button>
-            </>
-          )}
-
+        {/* Mobile: Fan-style card layout - swipe to navigate, tap to play */}
+        <div className="md:hidden relative h-52 sm:h-56 flex items-end justify-center overflow-visible pb-5">
           {/* Card position indicator dots */}
           {hand.length > 1 && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-1.5 z-[150]">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 z-[150]">
               {hand.map((_, i) => (
                 <button
                   key={i}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${
+                  className={`rounded-full transition-all duration-200 ${
                     i === focusedCardIndex
-                      ? 'bg-skin-accent scale-125 shadow-lg'
-                      : 'bg-skin-muted/60 hover:bg-skin-muted active:scale-110'
+                      ? 'w-6 h-2 bg-skin-accent shadow-lg'
+                      : 'w-2 h-2 bg-skin-muted/50 active:scale-125'
                   }`}
                   onClick={() => {
                     setFocusedCardIndex(i);
@@ -419,12 +393,7 @@ export const PlayerHand = memo(function PlayerHand({
             </div>
           )}
 
-          {/* Card counter */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 text-xs font-semibold text-skin-secondary bg-skin-tertiary/80 px-2 py-0.5 rounded-full z-[150]">
-            {focusedCardIndex + 1} / {hand.length}
-          </div>
-
-          {/* Fan of cards - overlapping like a real hand */}
+          {/* Fan of cards - overlapping like a real hand, swipe to navigate */}
           <div className="relative flex items-end justify-center w-full h-full">
             {displayHand.map((card, index) => {
               const playable = isCardPlayable(card);
@@ -440,24 +409,24 @@ export const PlayerHand = memo(function PlayerHand({
 
               // Calculate fan position - cards overlap significantly
               const centerOffset = index - focusedCardIndex;
-              // Non-focused cards show only ~28px of their edge (like holding cards in hand)
-              const cardVisibleEdge = 28;
+              // Non-focused cards show only ~24px of their edge (like holding cards in hand)
+              const cardVisibleEdge = 24;
               const xOffset = centerOffset * cardVisibleEdge;
 
               // Z-index: focused card always on top, others stack by distance
               const zIndex = isFocused ? 100 : 50 - Math.abs(centerOffset);
 
-              // Focused card is full size and raised; others are smaller and tucked
-              const scale = isFocused ? 1 : 0.7;
+              // Focused card is scaled up prominently; others are smaller and tucked behind
+              const scale = isFocused ? 1.1 : 0.65;
 
               // Focused card pops up significantly above the others
-              const yOffset = isFocused ? -20 : 12;
+              const yOffset = isFocused ? -24 : 8;
 
-              // Slight rotation for natural fan effect
-              const rotation = isFocused ? 0 : centerOffset * 3;
+              // Rotation for natural fan effect - focused card straight, others angled
+              const rotation = isFocused ? 0 : centerOffset * 4;
 
-              // Opacity: slightly dim non-focused cards
-              const opacity = isFocused ? 1 : 0.85;
+              // Opacity: dim non-focused cards more
+              const opacity = isFocused ? 1 : 0.7;
 
               return (
                 <div
@@ -465,7 +434,7 @@ export const PlayerHand = memo(function PlayerHand({
                   ref={(el) => {
                     cardRefs.current[index] = el;
                   }}
-                  className={`absolute bottom-8 transition-all duration-300 ease-out ${
+                  className={`absolute bottom-6 will-change-transform ${
                     showDealingAnimation && !isCardDealt
                       ? 'opacity-0 scale-50'
                       : isTransitioning
@@ -477,8 +446,9 @@ export const PlayerHand = memo(function PlayerHand({
                     zIndex: isQueued ? 9999 : zIndex,
                     opacity: showDealingAnimation && !isCardDealt ? 0 : isTransitioning ? 0 : opacity,
                     transition: isTransitioning
-                      ? 'opacity 400ms ease-out, transform 400ms ease-out'
-                      : `all 300ms ease-out ${dealDelay}ms`,
+                      ? 'opacity 350ms ease-out, transform 350ms ease-out'
+                      : `transform 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease-out`,
+                    transitionDelay: showDealingAnimation && !isCardDealt ? `${dealDelay}ms` : '0ms',
                   }}
                   onClick={() => {
                     if (!isFocused) {
@@ -489,36 +459,24 @@ export const PlayerHand = memo(function PlayerHand({
                 >
                   {/* Glow effect for focused playable card */}
                   {isFocused && isCurrentTurn && playable && (
-                    <div className="absolute -inset-2 rounded-xl bg-green-400/30 animate-pulse pointer-events-none z-0" />
+                    <div className="absolute -inset-3 rounded-2xl bg-green-400/40 animate-pulse pointer-events-none z-0" />
                   )}
                   {/* Selection indicator ring */}
                   {isSelected && (
-                    <div className="absolute -inset-2 rounded-xl animate-pulse pointer-events-none z-10 shadow-[0_0_0_4px_var(--color-info)]" />
+                    <div className="absolute -inset-3 rounded-2xl animate-pulse pointer-events-none z-10 shadow-[0_0_0_4px_var(--color-info)]" />
                   )}
                   {/* Queued indicator */}
                   {isQueued && (
                     <>
-                      <div className="absolute -inset-2 rounded-xl animate-pulse pointer-events-none z-20 shadow-[0_0_0_4px_var(--color-warning)]" />
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none bg-warning text-skin-primary border-warning">
+                      <div className="absolute -inset-3 rounded-2xl animate-pulse pointer-events-none z-20 shadow-[0_0_0_4px_var(--color-warning)]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold px-4 py-1.5 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none bg-warning text-skin-primary border-warning">
                         QUEUED
                       </div>
                     </>
                   )}
-                  {/* TAP hint for focused playable card */}
-                  {isFocused && isCurrentTurn && playable && (
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-sm font-bold text-green-500 animate-bounce z-40 bg-skin-primary/90 px-2 py-0.5 rounded-full shadow-lg">
-                      TAP TO PLAY
-                    </div>
-                  )}
-                  {/* Not your turn hint */}
-                  {isFocused && !isCurrentTurn && !isQueued && (
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-xs font-medium text-skin-muted z-40 bg-skin-primary/90 px-2 py-0.5 rounded-full whitespace-nowrap">
-                      Tap to queue
-                    </div>
-                  )}
                   <CardComponent
                     card={card}
-                    size={isFocused ? 'large' : 'medium'}
+                    size="large"
                     onClick={(e) => {
                       if (isFocused) {
                         handleCardClick(card, e);
