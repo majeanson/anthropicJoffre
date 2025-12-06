@@ -480,7 +480,15 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
         "
       >
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{equippedSkin?.centerIcon || '❓'}</span>
+          {equippedSkin?.centerIcon ? (
+            <span className="text-2xl">{equippedSkin.centerIcon}</span>
+          ) : (
+            <img
+              src={`/cards/production/${cardType === 'red_zero' ? 'red' : 'brown'}_bon.jpg`}
+              alt={equippedSkin?.skinName || 'Default'}
+              className="w-8 h-8 rounded object-cover"
+            />
+          )}
           <div className="text-left">
             <div className="font-display text-sm">{equippedSkin?.skinName || 'Select Skin'}</div>
             <div className="text-xs text-[var(--color-text-muted)] capitalize">
@@ -528,7 +536,15 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
                   border-b border-[var(--color-border-subtle)] last:border-b-0
                 `}
               >
-                <span className="text-2xl">{skin.centerIcon || '❓'}</span>
+                {skin.centerIcon ? (
+                  <span className="text-2xl">{skin.centerIcon}</span>
+                ) : (
+                  <img
+                    src={`/cards/production/${cardType === 'red_zero' ? 'red' : 'brown'}_bon.jpg`}
+                    alt={skin.skinName}
+                    className="w-8 h-8 rounded object-cover"
+                  />
+                )}
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-display text-sm text-[var(--color-text-primary)]">

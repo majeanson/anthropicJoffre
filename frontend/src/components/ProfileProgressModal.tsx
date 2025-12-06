@@ -17,7 +17,8 @@ import { LevelProgressBar } from './LevelProgressBar';
 import { WeeklyCalendar, WeeklyCalendarDay } from './WeeklyCalendar';
 import { RewardsTab } from './RewardsTab';
 import { AchievementCard } from './AchievementCard';
-import { useSkin, type SkinId, type CardSkinId } from '../contexts/SkinContext';
+import { useSkin, useSpecialCardSkins, type SkinId, type CardSkinId } from '../contexts/SkinContext';
+import { rarityStyles, getUnlockRequirementText } from '../config/specialCardSkins';
 import { skinList, getSkinPricing } from '../config/skins';
 import { cardSkinList, getCardSkinPricing } from '../config/cardSkins';
 import { Card } from './Card';
@@ -134,6 +135,13 @@ export function ProfileProgressModal({
     setCosmeticCurrency,
     setUnlockedSkinIds,
   } = useSkin();
+
+  const {
+    equippedSpecialSkins,
+    setEquippedSpecialSkins,
+    redZeroSkins,
+    brownZeroSkins,
+  } = useSpecialCardSkins();
 
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [purchaseSuccess, setPurchaseSuccess] = useState<string | null>(null);
@@ -947,6 +955,194 @@ export function ProfileProgressModal({
                           </div>
                         );
                       })}
+                    </div>
+                  </div>
+
+                  {/* Special Card Skins Section (Red 0 & Brown 0) */}
+                  <div>
+                    <h3
+                      className="font-semibold mb-3 flex items-center gap-2"
+                      style={{ color: 'var(--color-text-primary)' }}
+                    >
+                      <span>✨</span> Special Card Skins
+                    </h3>
+                    <p
+                      className="text-xs mb-3"
+                      style={{ color: 'var(--color-text-muted)' }}
+                    >
+                      Customize your Red 0 (+5 pts) and Brown 0 (-2 pts) cards. Unlock skins via achievements!
+                    </p>
+
+                    {/* Red Zero Skins */}
+                    <div className="mb-4">
+                      <h4
+                        className="text-sm font-medium mb-2 flex items-center gap-2"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                      >
+                        <span className="text-lg">🔥</span> Red Zero (+5 Points)
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {redZeroSkins.map((skin) => {
+                            const isUnlocked = skin.isUnlocked;
+                            const isEquipped = equippedSpecialSkins.redZeroSkin === skin.skinId;
+                            const rarityStyle = rarityStyles[skin.rarity];
+
+                            return (
+                              <div
+                                key={skin.skinId}
+                                className={`
+                                  relative p-2 rounded-lg text-center transition-all
+                                  ${isEquipped
+                                    ? 'ring-2 ring-orange-500'
+                                    : isUnlocked
+                                      ? 'hover:ring-1 hover:ring-orange-400/50 cursor-pointer'
+                                      : 'opacity-60'
+                                  }
+                                `}
+                                style={{
+                                  backgroundColor: 'var(--color-bg-secondary)',
+                                  border: `1px solid ${isEquipped ? '#f97316' : 'var(--color-border-subtle)'}`,
+                                }}
+                                onClick={() => {
+                                  if (isUnlocked && !isEquipped) {
+                                    setEquippedSpecialSkins({
+                                      ...equippedSpecialSkins,
+                                      redZeroSkin: skin.skinId,
+                                    });
+                                  }
+                                }}
+                              >
+                                {/* Rarity badge */}
+                                <div className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}>
+                                  {skin.rarity}
+                                </div>
+
+                                {/* Icon or image preview */}
+                                <div
+                                  className="w-12 h-16 mx-auto mb-1 rounded flex items-center justify-center"
+                                  style={{
+                                    backgroundColor: skin.borderColor || '#dc2626',
+                                    boxShadow: skin.glowColor ? `0 0 12px ${skin.glowColor}` : undefined,
+                                  }}
+                                >
+                                  {skin.centerIcon ? (
+                                    <span className="text-2xl">{skin.centerIcon}</span>
+                                  ) : (
+                                    <img
+                                      src="/cards/production/red_bon.jpg"
+                                      alt={skin.skinName}
+                                      className="w-full h-full object-cover rounded"
+                                    />
+                                  )}
+                                </div>
+
+                                <p
+                                  className="text-xs font-medium truncate"
+                                  style={{ color: 'var(--color-text-primary)' }}
+                                >
+                                  {skin.skinName}
+                                </p>
+
+                                {/* Status */}
+                                {isEquipped ? (
+                                  <span className="text-[10px] text-orange-400">Equipped</span>
+                                ) : isUnlocked ? (
+                                  <span className="text-[10px] text-green-400">Owned</span>
+                                ) : (
+                                  <span className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
+                                    {getUnlockRequirementText(skin)}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+
+                    {/* Brown Zero Skins */}
+                    <div>
+                      <h4
+                        className="text-sm font-medium mb-2 flex items-center gap-2"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                      >
+                        <span className="text-lg">🌍</span> Brown Zero (-2 Points)
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {brownZeroSkins.map((skin) => {
+                            const isUnlocked = skin.isUnlocked;
+                            const isEquipped = equippedSpecialSkins.brownZeroSkin === skin.skinId;
+                            const rarityStyle = rarityStyles[skin.rarity];
+
+                            return (
+                              <div
+                                key={skin.skinId}
+                                className={`
+                                  relative p-2 rounded-lg text-center transition-all
+                                  ${isEquipped
+                                    ? 'ring-2 ring-amber-700'
+                                    : isUnlocked
+                                      ? 'hover:ring-1 hover:ring-amber-600/50 cursor-pointer'
+                                      : 'opacity-60'
+                                  }
+                                `}
+                                style={{
+                                  backgroundColor: 'var(--color-bg-secondary)',
+                                  border: `1px solid ${isEquipped ? '#92400e' : 'var(--color-border-subtle)'}`,
+                                }}
+                                onClick={() => {
+                                  if (isUnlocked && !isEquipped) {
+                                    setEquippedSpecialSkins({
+                                      ...equippedSpecialSkins,
+                                      brownZeroSkin: skin.skinId,
+                                    });
+                                  }
+                                }}
+                              >
+                                {/* Rarity badge */}
+                                <div className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}>
+                                  {skin.rarity}
+                                </div>
+
+                                {/* Icon or image preview */}
+                                <div
+                                  className="w-12 h-16 mx-auto mb-1 rounded flex items-center justify-center"
+                                  style={{
+                                    backgroundColor: skin.borderColor || '#78350f',
+                                    boxShadow: skin.glowColor ? `0 0 12px ${skin.glowColor}` : undefined,
+                                  }}
+                                >
+                                  {skin.centerIcon ? (
+                                    <span className="text-2xl">{skin.centerIcon}</span>
+                                  ) : (
+                                    <img
+                                      src="/cards/production/brown_bon.jpg"
+                                      alt={skin.skinName}
+                                      className="w-full h-full object-cover rounded"
+                                    />
+                                  )}
+                                </div>
+
+                                <p
+                                  className="text-xs font-medium truncate"
+                                  style={{ color: 'var(--color-text-primary)' }}
+                                >
+                                  {skin.skinName}
+                                </p>
+
+                                {/* Status */}
+                                {isEquipped ? (
+                                  <span className="text-[10px] text-amber-600">Equipped</span>
+                                ) : isUnlocked ? (
+                                  <span className="text-[10px] text-green-400">Owned</span>
+                                ) : (
+                                  <span className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
+                                    {getUnlockRequirementText(skin)}
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                      </div>
                     </div>
                   </div>
 

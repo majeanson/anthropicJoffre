@@ -1204,7 +1204,7 @@ export const sakuraSpringSkin: Skin = {
       text: '#ffffff',
     },
     team2: {
-      primary: '#5e35b1',           // Deep purple
+      primary: '#5e35b1',         // Deep purple
       secondary: '#7e57c2',
       text: '#ffffff',
     },

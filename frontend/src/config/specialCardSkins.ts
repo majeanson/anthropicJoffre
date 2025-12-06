@@ -90,17 +90,17 @@ export const defaultSpecialCardSkins: SpecialCardSkin[] = [
   // Red Zero Skins
   {
     skinId: 'red_zero_default',
-    skinName: 'Classic Flame',
-    description: 'The original red zero design with timeless appeal',
+    skinName: 'Original Art',
+    description: 'The original red zero artwork - classic and iconic',
     cardType: 'red_zero',
     rarity: 'common',
     unlockType: 'default',
     unlockRequirement: null,
     price: 0,
-    centerIcon: '🔥',
-    glowColor: 'rgba(239, 68, 68, 0.6)',
+    centerIcon: null, // Uses original image from /cards/production/red_bon.jpg
+    glowColor: null,
     animationClass: null,
-    borderColor: '#dc2626',
+    borderColor: null, // Uses default suit border
   },
   {
     skinId: 'red_zero_phoenix',
@@ -162,17 +162,17 @@ export const defaultSpecialCardSkins: SpecialCardSkin[] = [
   // Brown Zero Skins
   {
     skinId: 'brown_zero_default',
-    skinName: 'Classic Earth',
-    description: 'The original brown zero design, grounded and reliable',
+    skinName: 'Original Art',
+    description: 'The original brown zero artwork - classic and iconic',
     cardType: 'brown_zero',
     rarity: 'common',
     unlockType: 'default',
     unlockRequirement: null,
     price: 0,
-    centerIcon: '🌍',
-    glowColor: 'rgba(146, 64, 14, 0.5)',
+    centerIcon: null, // Uses original image from /cards/production/brown_bon.jpg
+    glowColor: null,
     animationClass: null,
-    borderColor: '#92400e',
+    borderColor: null, // Uses default suit border
   },
   {
     skinId: 'brown_zero_skull',

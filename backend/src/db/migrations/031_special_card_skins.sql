@@ -47,8 +47,8 @@ CREATE INDEX IF NOT EXISTS idx_special_card_skins_type ON special_card_skins(car
 -- ============================================================================
 
 INSERT INTO special_card_skins (skin_id, skin_name, description, card_type, rarity, unlock_type, unlock_requirement, price, center_icon, glow_color, animation_class, border_color) VALUES
-  -- Default (free, everyone has it)
-  ('red_zero_default', 'Classic Flame', 'The original red zero design with timeless appeal', 'red_zero', 'common', 'default', NULL, 0, '🔥', 'rgba(239, 68, 68, 0.6)', NULL, '#dc2626'),
+  -- Default (free, everyone has it) - Uses original artwork image
+  ('red_zero_default', 'Original Art', 'The original red zero artwork - classic and iconic', 'red_zero', 'common', 'default', NULL, 0, NULL, NULL, NULL, NULL),
 
   -- Achievement unlock: Red Zero Hunter (collect 10 red zeros)
   ('red_zero_phoenix', 'Phoenix Rising', 'A majestic phoenix emerges from the flames of victory', 'red_zero', 'epic', 'achievement', 'red_zero_hunter', 0, '🦅', 'rgba(251, 146, 60, 0.7)', 'animate-pulse', '#f97316'),
@@ -68,8 +68,8 @@ ON CONFLICT (skin_id) DO NOTHING;
 -- ============================================================================
 
 INSERT INTO special_card_skins (skin_id, skin_name, description, card_type, rarity, unlock_type, unlock_requirement, price, center_icon, glow_color, animation_class, border_color) VALUES
-  -- Default (free, everyone has it)
-  ('brown_zero_default', 'Classic Earth', 'The original brown zero design, grounded and reliable', 'brown_zero', 'common', 'default', NULL, 0, '🌍', 'rgba(146, 64, 14, 0.5)', NULL, '#92400e'),
+  -- Default (free, everyone has it) - Uses original artwork image
+  ('brown_zero_default', 'Original Art', 'The original brown zero artwork - classic and iconic', 'brown_zero', 'common', 'default', NULL, 0, NULL, NULL, NULL, NULL),
 
   -- Achievement unlock: Avoid brown zeros (new achievement to be added)
   ('brown_zero_skull', 'Memento Mori', 'A reminder that even the mightiest can fall', 'brown_zero', 'epic', 'achievement', 'no_brown_10', 0, '💀', 'rgba(107, 114, 128, 0.7)', 'animate-pulse', '#4b5563'),
