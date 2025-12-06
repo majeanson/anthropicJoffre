@@ -191,6 +191,15 @@ interface SkinContextValue {
 
   /** Check if a special card skin is unlocked */
   isSpecialCardSkinUnlocked: (skinId: string) => boolean;
+
+  /** Start previewing a special card skin (applies visually but doesn't save) */
+  startPreviewSpecialSkin: (cardType: SpecialCardType, skinId: string) => void;
+
+  /** Stop previewing special card skins */
+  stopPreviewSpecialSkin: () => void;
+
+  /** Current preview special skins (null = no preview active) */
+  previewSpecialSkins: PlayerEquippedSpecialSkins | null;
 }
 
 const SkinContext = createContext<SkinContextValue | undefined>(undefined);
@@ -254,6 +263,7 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
   // Preview mode state (for skin shop - applies skin visually without persisting)
   const [previewSkinId, setPreviewSkinId] = useState<SkinId | null>(null);
   const [previewCardSkinId, setPreviewCardSkinId] = useState<CardSkinId | null>(null);
+  const [previewSpecialSkins, setPreviewSpecialSkins] = useState<PlayerEquippedSpecialSkins | null>(null);
 
   // Cosmetic currency state
   const [cosmeticCurrency, setCosmeticCurrency] = useState<number>(0);
@@ -276,6 +286,7 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
   // Determine which skin to actually display (preview takes precedence)
   const effectiveSkinId = previewSkinId ?? skinId;
   const effectiveCardSkinId = previewCardSkinId ?? cardSkinId;
+  const effectiveSpecialSkins = previewSpecialSkins ?? equippedSpecialSkins;
 
   // Get the full skin object (uses preview if active)
   const skin = useMemo(() => getSkin(effectiveSkinId), [effectiveSkinId]);
@@ -465,20 +476,37 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
   const stopPreview = useCallback(() => {
     setPreviewSkinId(null);
     setPreviewCardSkinId(null);
+    setPreviewSpecialSkins(null);
   }, []);
 
-  const isPreviewActive = previewSkinId !== null || previewCardSkinId !== null;
+  // Special card skin preview functions
+  const startPreviewSpecialSkin = useCallback((cardType: SpecialCardType, skinId: string) => {
+    setPreviewSpecialSkins(prev => {
+      const current = prev ?? equippedSpecialSkins;
+      if (cardType === 'red_zero') {
+        return { ...current, redZeroSkin: skinId };
+      } else {
+        return { ...current, brownZeroSkin: skinId };
+      }
+    });
+  }, [equippedSpecialSkins]);
+
+  const stopPreviewSpecialSkin = useCallback(() => {
+    setPreviewSpecialSkins(null);
+  }, []);
+
+  const isPreviewActive = previewSkinId !== null || previewCardSkinId !== null || previewSpecialSkins !== null;
 
   // Special Card Skin helper functions
   const getEquippedSpecialSkin = useCallback((cardType: SpecialCardType): SpecialCardSkinWithStatus | undefined => {
     const skinId = cardType === 'red_zero'
-      ? equippedSpecialSkins.redZeroSkin
-      : equippedSpecialSkins.brownZeroSkin;
+      ? effectiveSpecialSkins.redZeroSkin
+      : effectiveSpecialSkins.brownZeroSkin;
 
     if (!skinId) return undefined;
 
     return specialCardSkins.find(s => s.skinId === skinId);
-  }, [specialCardSkins, equippedSpecialSkins]);
+  }, [specialCardSkins, effectiveSpecialSkins]);
 
   const isSpecialCardSkinUnlocked = useCallback((skinId: string): boolean => {
     const skin = specialCardSkins.find(s => s.skinId === skinId);
@@ -532,8 +560,11 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
       setEquippedSpecialSkins,
       getEquippedSpecialSkin,
       isSpecialCardSkinUnlocked,
+      startPreviewSpecialSkin,
+      stopPreviewSpecialSkin,
+      previewSpecialSkins,
     }),
-    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded, previewSkinId, previewCardSkinId, startPreviewSkin, startPreviewCardSkin, stopPreviewSkin, stopPreviewCardSkin, stopPreview, isPreviewActive, cosmeticCurrency, setCosmeticCurrency, specialCardSkins, setSpecialCardSkins, equippedSpecialSkins, setEquippedSpecialSkins, getEquippedSpecialSkin, isSpecialCardSkinUnlocked]
+    [skin, skinId, setSkin, toggleDarkMode, playerLevel, unlockedSkinIds, skinRequirements, isSkinUnlocked, getRequiredLevel, cardSkin, cardSkinId, setCardSkin, isCardSkinUnlocked, getCardSkinRequiredLevel, loadPreferencesFromBackend, isPreferencesLoaded, previewSkinId, previewCardSkinId, startPreviewSkin, startPreviewCardSkin, stopPreviewSkin, stopPreviewCardSkin, stopPreview, isPreviewActive, cosmeticCurrency, setCosmeticCurrency, specialCardSkins, setSpecialCardSkins, equippedSpecialSkins, setEquippedSpecialSkins, getEquippedSpecialSkin, isSpecialCardSkinUnlocked, startPreviewSpecialSkin, stopPreviewSpecialSkin, previewSpecialSkins]
   );
 
   return (
@@ -727,6 +758,11 @@ export function useSpecialCardSkins() {
     isSpecialCardSkinUnlocked,
     cosmeticCurrency,
     playerLevel,
+    startPreviewSpecialSkin,
+    stopPreviewSpecialSkin,
+    previewSpecialSkins,
+    isPreviewActive,
+    stopPreview,
   } = useSkin();
 
   return {
@@ -738,6 +774,12 @@ export function useSpecialCardSkins() {
     isSpecialCardSkinUnlocked,
     cosmeticCurrency,
     playerLevel,
+    // Preview functionality
+    startPreviewSpecialSkin,
+    stopPreviewSpecialSkin,
+    previewSpecialSkins,
+    isPreviewActive,
+    stopPreview,
     // Convenience getters
     redZeroSkins: specialCardSkins.filter(s => s.cardType === 'red_zero'),
     brownZeroSkins: specialCardSkins.filter(s => s.cardType === 'brown_zero'),

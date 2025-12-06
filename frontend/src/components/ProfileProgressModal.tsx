@@ -141,6 +141,8 @@ export function ProfileProgressModal({
     setEquippedSpecialSkins,
     redZeroSkins,
     brownZeroSkins,
+    startPreviewSpecialSkin,
+    stopPreviewSpecialSkin,
   } = useSpecialCardSkins();
 
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
@@ -991,19 +993,21 @@ export function ProfileProgressModal({
                               <div
                                 key={skin.skinId}
                                 className={`
-                                  relative p-2 rounded-lg text-center transition-all
+                                  relative p-2 rounded-lg text-center transition-all cursor-pointer
                                   ${isEquipped
                                     ? 'ring-2 ring-orange-500'
-                                    : isUnlocked
-                                      ? 'hover:ring-1 hover:ring-orange-400/50 cursor-pointer'
-                                      : 'opacity-60'
+                                    : 'hover:ring-1 hover:ring-orange-400/50'
                                   }
+                                  ${!isUnlocked ? 'opacity-60' : ''}
                                 `}
                                 style={{
                                   backgroundColor: 'var(--color-bg-secondary)',
                                   border: `1px solid ${isEquipped ? '#f97316' : 'var(--color-border-subtle)'}`,
                                 }}
+                                onMouseEnter={() => startPreviewSpecialSkin('red_zero', skin.skinId)}
+                                onMouseLeave={stopPreviewSpecialSkin}
                                 onClick={() => {
+                                  startPreviewSpecialSkin('red_zero', skin.skinId);
                                   if (isUnlocked && !isEquipped) {
                                     setEquippedSpecialSkins({
                                       ...equippedSpecialSkins,
@@ -1047,7 +1051,7 @@ export function ProfileProgressModal({
                                 {isEquipped ? (
                                   <span className="text-[10px] text-orange-400">Equipped</span>
                                 ) : isUnlocked ? (
-                                  <span className="text-[10px] text-green-400">Owned</span>
+                                  <span className="text-[10px] text-green-400">Select</span>
                                 ) : (
                                   <span className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
                                     {getUnlockRequirementText(skin)}
@@ -1077,19 +1081,21 @@ export function ProfileProgressModal({
                               <div
                                 key={skin.skinId}
                                 className={`
-                                  relative p-2 rounded-lg text-center transition-all
+                                  relative p-2 rounded-lg text-center transition-all cursor-pointer
                                   ${isEquipped
                                     ? 'ring-2 ring-amber-700'
-                                    : isUnlocked
-                                      ? 'hover:ring-1 hover:ring-amber-600/50 cursor-pointer'
-                                      : 'opacity-60'
+                                    : 'hover:ring-1 hover:ring-amber-600/50'
                                   }
+                                  ${!isUnlocked ? 'opacity-60' : ''}
                                 `}
                                 style={{
                                   backgroundColor: 'var(--color-bg-secondary)',
                                   border: `1px solid ${isEquipped ? '#92400e' : 'var(--color-border-subtle)'}`,
                                 }}
+                                onMouseEnter={() => startPreviewSpecialSkin('brown_zero', skin.skinId)}
+                                onMouseLeave={stopPreviewSpecialSkin}
                                 onClick={() => {
+                                  startPreviewSpecialSkin('brown_zero', skin.skinId);
                                   if (isUnlocked && !isEquipped) {
                                     setEquippedSpecialSkins({
                                       ...equippedSpecialSkins,
@@ -1133,7 +1139,7 @@ export function ProfileProgressModal({
                                 {isEquipped ? (
                                   <span className="text-[10px] text-amber-600">Equipped</span>
                                 ) : isUnlocked ? (
-                                  <span className="text-[10px] text-green-400">Owned</span>
+                                  <span className="text-[10px] text-green-400">Select</span>
                                 ) : (
                                   <span className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
                                     {getUnlockRequirementText(skin)}
