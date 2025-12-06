@@ -42,11 +42,11 @@ export const spacing = {
  */
 export const sizes = {
   modal: {
-    sm: 'max-w-sm',       // ~384px
-    md: 'max-w-2xl',      // ~672px
-    lg: 'max-w-4xl',      // ~896px
-    xl: 'max-w-6xl',      // ~1152px
-    full: 'max-w-7xl',    // ~1280px
+    sm: 'max-w-sm', // ~384px
+    md: 'max-w-2xl', // ~672px
+    lg: 'max-w-4xl', // ~896px
+    xl: 'max-w-6xl', // ~1152px
+    full: 'max-w-7xl', // ~1280px
   },
   button: {
     xs: 'px-3 py-1.5 text-xs',

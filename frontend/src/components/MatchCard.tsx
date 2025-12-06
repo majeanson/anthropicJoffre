@@ -49,29 +49,36 @@ export function MatchCard({ game, onViewReplay, onViewDetails }: MatchCardProps)
       <div className="flex items-center justify-between gap-4 mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span className={`text-lg font-bold ${getStatusColorClass()}`}>
-              {getStatusText()}
-            </span>
+            <span className={`text-lg font-bold ${getStatusColorClass()}`}>{getStatusText()}</span>
             {game.team_id && (
-              <UIBadge variant="solid" color={game.team_id === 1 ? 'team1' : 'team2'} size="xs" shape="pill">
+              <UIBadge
+                variant="solid"
+                color={game.team_id === 1 ? 'team1' : 'team2'}
+                size="xs"
+                shape="pill"
+              >
                 Team {game.team_id}
               </UIBadge>
             )}
           </div>
           <div className="text-sm text-gray-600">
-            {game.finished_at ? new Date(game.finished_at).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            }) : game.created_at ? `Started ${new Date(game.created_at).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })}` : 'In Progress'}
+            {game.finished_at
+              ? new Date(game.finished_at).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })
+              : game.created_at
+                ? `Started ${new Date(game.created_at).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}`
+                : 'In Progress'}
           </div>
         </div>
 

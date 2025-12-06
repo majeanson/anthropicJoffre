@@ -16,73 +16,57 @@ interface BettingHistoryProps {
   onClickPlayer?: (playerName: string) => void;
 }
 
-export function BettingHistory({ players, currentBets, dealerIndex, onClickPlayer }: BettingHistoryProps) {
+export function BettingHistory({
+  players,
+  currentBets,
+  dealerIndex,
+  onClickPlayer,
+}: BettingHistoryProps) {
   // Determine betting order (player after dealer goes first)
   const bettingOrder = [...Array(4)].map((_, i) => (dealerIndex + 1 + i) % 4);
 
   // Map bets by player index
   const betsByPlayerIndex = new Map<number, Bet>();
-  currentBets.forEach(bet => {
-    const playerIndex = players.findIndex(p => p.name === bet.playerName);
+  currentBets.forEach((bet) => {
+    const playerIndex = players.findIndex((p) => p.name === bet.playerName);
     if (playerIndex !== -1) {
       betsByPlayerIndex.set(playerIndex, bet);
     }
   });
 
   // Find highest bet
-  const validBets = currentBets.filter(b => !b.skipped);
-  const highestBet = validBets.length > 0
-    ? validBets.reduce((highest, current) => {
-        if (current.amount > highest.amount) return current;
-        if (current.amount === highest.amount && current.withoutTrump && !highest.withoutTrump) return current;
-        return highest;
-      })
-    : null;
+  const validBets = currentBets.filter((b) => !b.skipped);
+  const highestBet =
+    validBets.length > 0
+      ? validBets.reduce((highest, current) => {
+          if (current.amount > highest.amount) return current;
+          if (current.amount === highest.amount && current.withoutTrump && !highest.withoutTrump)
+            return current;
+          return highest;
+        })
+      : null;
 
-  // Helper to get background style based on bet status
-  const getBetBackgroundStyle = (
+  // Helper to get background class based on bet status
+  const getBetBackgroundClass = (
     bet: Bet | undefined,
     isHighestBet: boolean,
     teamId: 1 | 2
-  ): React.CSSProperties => {
+  ): string => {
     if (!bet) {
-      return {
-        backgroundColor: 'var(--color-bg-tertiary)',
-        border: '1px dashed var(--color-border-default)',
-      };
+      return 'bg-skin-tertiary border-dashed-default';
     }
     if (bet.skipped) {
-      return {
-        backgroundColor: 'var(--color-bg-tertiary)',
-        opacity: 0.6,
-      };
+      return 'bg-skin-tertiary opacity-60';
     }
     if (isHighestBet) {
-      return {
-        background: `linear-gradient(to right, var(--color-success), color-mix(in srgb, var(--color-success) 80%, black))`,
-        color: 'white',
-        boxShadow: '0 4px 12px color-mix(in srgb, var(--color-success) 40%, transparent)',
-      };
+      return 'bg-gradient-highest-bet text-white';
     }
-    return {
-      backgroundColor: teamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)',
-      color: teamId === 1 ? 'var(--color-team1-text)' : 'var(--color-team2-text)',
-    };
+    return teamId === 1 ? 'bg-team1 text-skin-team1-text' : 'bg-team2 text-skin-team2-text';
   };
 
   return (
-    <UICard
-      variant="bordered"
-      size="md"
-      className="shadow-md"
-      style={{
-        background: 'linear-gradient(to bottom right, var(--color-bg-secondary), var(--color-bg-tertiary))',
-      }}
-    >
-      <div
-        className="font-bold text-sm mb-3 flex items-center gap-2"
-        style={{ color: 'var(--color-text-primary)' }}
-      >
+    <UICard variant="bordered" size="md" className="shadow-md bg-gradient-betting-card">
+      <div className="font-bold text-sm mb-3 flex items-center gap-2 text-skin-primary">
         <span className="text-lg">📜</span>
         <span>Betting History</span>
       </div>
@@ -92,27 +76,31 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
           const player = players[playerIndex];
           const bet = betsByPlayerIndex.get(playerIndex);
           const isDealer = playerIndex === dealerIndex;
-          const isHighestBet = !!(bet && highestBet && bet.playerName === highestBet.playerName && !bet.skipped);
+          const isHighestBet = !!(
+            bet &&
+            highestBet &&
+            bet.playerName === highestBet.playerName &&
+            !bet.skipped
+          );
 
           if (!player) return null;
 
           return (
             <div
               key={player.id}
-              className="flex items-center justify-between p-2 rounded-lg transition-all border-l-4"
-              style={{
-                borderLeftColor: player.teamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)',
-                ...getBetBackgroundStyle(bet, isHighestBet, player.teamId),
-              }}
+              className={`
+                flex items-center justify-between p-2 rounded-lg transition-all border-l-4
+                ${player.teamId === 1 ? 'border-l-team1' : 'border-l-team2'}
+                ${getBetBackgroundClass(bet, isHighestBet, player.teamId)}
+              `}
             >
               {/* Left side: Order number + Player name + Team badge */}
               <div className="flex items-center gap-2">
                 <span
-                  className="flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold"
-                  style={{
-                    backgroundColor: bet && !bet.skipped ? 'rgba(255,255,255,0.2)' : 'var(--color-bg-tertiary)',
-                    color: bet && !bet.skipped ? 'inherit' : 'var(--color-text-secondary)',
-                  }}
+                  className={`
+                    flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold
+                    ${bet && !bet.skipped ? 'bg-white/20' : 'bg-skin-tertiary text-skin-secondary'}
+                  `}
                 >
                   {orderIndex + 1}
                 </span>
@@ -130,9 +118,7 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
                         {player.name}
                       </Button>
                     ) : (
-                      <span className="font-bold text-sm">
-                        {player.name}
-                      </span>
+                      <span className="font-bold text-sm">{player.name}</span>
                     )}
                     {/* Team color badge - ALWAYS visible */}
                     <span title={`Team ${player.teamId}`}>
@@ -146,11 +132,7 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
                     </span>
                     {isDealer && (
                       <span title="Dealer">
-                        <UIBadge
-                          variant="subtle"
-                          color="gray"
-                          size="xs"
-                        >
+                        <UIBadge variant="subtle" color="gray" size="xs">
                           🎴
                         </UIBadge>
                       </span>
@@ -168,16 +150,10 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
                     </UIBadge>
                   ) : (
                     <>
-                      <span className="text-xl font-black">
-                        {bet.amount}
-                      </span>
+                      <span className="text-xl font-black">{bet.amount}</span>
                       {bet.withoutTrump && (
                         <span title="Without Trump (2x points)">
-                          <UIBadge
-                            variant="subtle"
-                            color="gray"
-                            size="xs"
-                          >
+                          <UIBadge variant="subtle" color="gray" size="xs">
                             ×2
                           </UIBadge>
                         </span>
@@ -190,12 +166,7 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
                     </>
                   )
                 ) : (
-                  <span
-                    className="text-xs italic"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
-                    Waiting...
-                  </span>
+                  <span className="text-xs italic text-skin-muted">Waiting...</span>
                 )}
               </div>
             </div>
@@ -204,16 +175,10 @@ export function BettingHistory({ players, currentBets, dealerIndex, onClickPlaye
       </div>
 
       {/* Legend */}
-      <div
-        className="mt-3 pt-3"
-        style={{ borderTop: '1px solid var(--color-border-default)' }}
-      >
-        <div className="text-xs space-y-1" style={{ color: 'var(--color-text-muted)' }}>
+      <div className="mt-3 pt-3 border-t-skin-default">
+        <div className="text-xs space-y-1 text-skin-muted">
           <div className="flex items-center gap-2">
-            <span
-              className="w-4 h-4 rounded inline-block"
-              style={{ background: `linear-gradient(to right, var(--color-success), color-mix(in srgb, var(--color-success) 80%, black))` }}
-            ></span>
+            <span className="w-4 h-4 rounded inline-block bg-gradient-highest-bet"></span>
             <span>Highest Bet</span>
           </div>
           <div className="flex items-center gap-2">

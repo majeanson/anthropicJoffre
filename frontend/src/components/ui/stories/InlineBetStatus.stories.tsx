@@ -92,7 +92,9 @@ export const AllStates: Story = {
 
         {/* Mid-betting */}
         <div>
-          <p className="text-[var(--color-text-secondary)] text-sm mb-2">Mid-betting (Alice bet, Bob skipped)</p>
+          <p className="text-[var(--color-text-secondary)] text-sm mb-2">
+            Mid-betting (Alice bet, Bob skipped)
+          </p>
           <InlineBetStatus
             players={mockPlayers}
             currentBets={new Map([['Alice', { amount: 8, withoutTrump: false }]])}
@@ -104,13 +106,17 @@ export const AllStates: Story = {
 
         {/* Almost done */}
         <div>
-          <p className="text-[var(--color-text-secondary)] text-sm mb-2">Almost Done (Diana betting)</p>
+          <p className="text-[var(--color-text-secondary)] text-sm mb-2">
+            Almost Done (Diana betting)
+          </p>
           <InlineBetStatus
             players={mockPlayers}
-            currentBets={new Map([
-              ['Alice', { amount: 8, withoutTrump: false }],
-              ['Charlie', { amount: 9, withoutTrump: false }],
-            ])}
+            currentBets={
+              new Map([
+                ['Alice', { amount: 8, withoutTrump: false }],
+                ['Charlie', { amount: 9, withoutTrump: false }],
+              ])
+            }
             skippedPlayers={new Set(['Bob'])}
             currentPlayerIndex={3}
             onClickPlayer={() => {}}
@@ -122,11 +128,13 @@ export const AllStates: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">All Bets Placed</p>
           <InlineBetStatus
             players={mockPlayers}
-            currentBets={new Map([
-              ['Alice', { amount: 8, withoutTrump: false }],
-              ['Charlie', { amount: 9, withoutTrump: false }],
-              ['Diana', { amount: 10, withoutTrump: true }],
-            ])}
+            currentBets={
+              new Map([
+                ['Alice', { amount: 8, withoutTrump: false }],
+                ['Charlie', { amount: 9, withoutTrump: false }],
+                ['Diana', { amount: 10, withoutTrump: true }],
+              ])
+            }
             skippedPlayers={new Set(['Bob'])}
             currentPlayerIndex={-1}
             onClickPlayer={() => {}}
@@ -152,12 +160,14 @@ export const WithoutTrumpBets: Story = {
 
       <InlineBetStatus
         players={mockPlayers}
-        currentBets={new Map([
-          ['Alice', { amount: 8, withoutTrump: false }],
-          ['Bob', { amount: 8, withoutTrump: true }],  // Same amount but without trump = higher
-          ['Charlie', { amount: 9, withoutTrump: false }],
-          ['Diana', { amount: 9, withoutTrump: true }], // Highest bid
-        ])}
+        currentBets={
+          new Map([
+            ['Alice', { amount: 8, withoutTrump: false }],
+            ['Bob', { amount: 8, withoutTrump: true }], // Same amount but without trump = higher
+            ['Charlie', { amount: 9, withoutTrump: false }],
+            ['Diana', { amount: 9, withoutTrump: true }], // Highest bid
+          ])
+        }
         skippedPlayers={new Set()}
         currentPlayerIndex={-1}
         onClickPlayer={() => {}}
@@ -193,10 +203,12 @@ export const WithBots: Story = {
 
         <InlineBetStatus
           players={playersWithBots}
-          currentBets={new Map([
-            ['Alice', { amount: 7, withoutTrump: false }],
-            ['Bot_Easy', { amount: 8, withoutTrump: false }],
-          ])}
+          currentBets={
+            new Map([
+              ['Alice', { amount: 7, withoutTrump: false }],
+              ['Bot_Easy', { amount: 8, withoutTrump: false }],
+            ])
+          }
           skippedPlayers={new Set()}
           currentPlayerIndex={2}
           onClickPlayer={(name) => alert(`Opening profile for: ${name}`)}
@@ -258,12 +270,14 @@ export const SkipScenarios: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">No Skips</p>
           <InlineBetStatus
             players={mockPlayers}
-            currentBets={new Map([
-              ['Alice', { amount: 7, withoutTrump: false }],
-              ['Bob', { amount: 8, withoutTrump: false }],
-              ['Charlie', { amount: 9, withoutTrump: false }],
-              ['Diana', { amount: 10, withoutTrump: false }],
-            ])}
+            currentBets={
+              new Map([
+                ['Alice', { amount: 7, withoutTrump: false }],
+                ['Bob', { amount: 8, withoutTrump: false }],
+                ['Charlie', { amount: 9, withoutTrump: false }],
+                ['Diana', { amount: 10, withoutTrump: false }],
+              ])
+            }
             skippedPlayers={new Set()}
             currentPlayerIndex={-1}
             onClickPlayer={() => {}}
@@ -275,10 +289,12 @@ export const SkipScenarios: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Some Skips</p>
           <InlineBetStatus
             players={mockPlayers}
-            currentBets={new Map([
-              ['Bob', { amount: 8, withoutTrump: false }],
-              ['Diana', { amount: 9, withoutTrump: false }],
-            ])}
+            currentBets={
+              new Map([
+                ['Bob', { amount: 8, withoutTrump: false }],
+                ['Diana', { amount: 9, withoutTrump: false }],
+              ])
+            }
             skippedPlayers={new Set(['Alice', 'Charlie'])}
             currentPlayerIndex={-1}
             onClickPlayer={() => {}}
@@ -287,12 +303,16 @@ export const SkipScenarios: Story = {
 
         {/* All skip (dealer must bet) */}
         <div>
-          <p className="text-[var(--color-text-secondary)] text-sm mb-2">All Skip (Dealer Must Bet)</p>
+          <p className="text-[var(--color-text-secondary)] text-sm mb-2">
+            All Skip (Dealer Must Bet)
+          </p>
           <InlineBetStatus
             players={mockPlayers}
-            currentBets={new Map([
-              ['Diana', { amount: 7, withoutTrump: false }], // Dealer had to bet
-            ])}
+            currentBets={
+              new Map([
+                ['Diana', { amount: 7, withoutTrump: false }], // Dealer had to bet
+              ])
+            }
             skippedPlayers={new Set(['Alice', 'Bob', 'Charlie'])}
             currentPlayerIndex={-1}
             onClickPlayer={() => {}}
@@ -316,10 +336,7 @@ export const Default: Story = {
   },
   render: (args) => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[200px]">
-      <InlineBetStatus
-        {...args}
-        onClickPlayer={(name) => alert(`Opening profile for: ${name}`)}
-      />
+      <InlineBetStatus {...args} onClickPlayer={(name) => alert(`Opening profile for: ${name}`)} />
     </div>
   ),
 };

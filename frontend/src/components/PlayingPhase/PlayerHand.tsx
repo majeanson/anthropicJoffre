@@ -53,10 +53,10 @@ export const PlayerHand = memo(function PlayerHand({
     if (currentTrick.length === 0 || currentTrick.length === 4) return hand;
 
     const ledSuit = currentTrick[0].card.color;
-    const hasLedSuit = hand.some(c => c.color === ledSuit);
+    const hasLedSuit = hand.some((c) => c.color === ledSuit);
 
     if (hasLedSuit) {
-      return hand.filter(c => c.color === ledSuit);
+      return hand.filter((c) => c.color === ledSuit);
     }
 
     return hand;
@@ -65,7 +65,7 @@ export const PlayerHand = memo(function PlayerHand({
   // Check if specific card is playable
   const isCardPlayable = useCallback(
     (card: CardType) => {
-      return playableCards.some(c => c.color === card.color && c.value === card.value);
+      return playableCards.some((c) => c.color === card.color && c.value === card.value);
     },
     [playableCards]
   );
@@ -135,7 +135,7 @@ export const PlayerHand = memo(function PlayerHand({
       sounds.roundStart();
 
       const interval = setInterval(() => {
-        setDealingCardIndex(prev => {
+        setDealingCardIndex((prev) => {
           if (prev >= hand.length - 1) {
             clearInterval(interval);
             setTimeout(() => setShowDealingAnimation(false), 300);
@@ -197,7 +197,8 @@ export const PlayerHand = memo(function PlayerHand({
             const nextPos = (currentPos + 1) % navigableCardsIndexes.length;
             setSelectedCardIndex(navigableCardsIndexes[nextPos]);
           } else {
-            const prevPos = (currentPos - 1 + navigableCardsIndexes.length) % navigableCardsIndexes.length;
+            const prevPos =
+              (currentPos - 1 + navigableCardsIndexes.length) % navigableCardsIndexes.length;
             setSelectedCardIndex(navigableCardsIndexes[prevPos]);
           }
         }
@@ -276,31 +277,15 @@ export const PlayerHand = memo(function PlayerHand({
     return (
       <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-10">
         <div
-          className="rounded-[var(--radius-xl)] p-4 border-2 backdrop-blur-xl shadow-2xl"
-          style={{
-            backgroundColor: 'var(--color-bg-secondary)',
-            borderColor: 'var(--color-border-accent)',
-          }}
+          className="rounded-[var(--radius-xl)] p-4 border-2 border-skin-accent bg-skin-secondary backdrop-blur-xl shadow-2xl"
           data-testid="player-hand"
         >
           <div className="text-center py-8">
-            <div
-              className="inline-block rounded-[var(--radius-lg)] px-6 py-3 border-2"
-              style={{
-                backgroundColor: 'var(--color-bg-tertiary)',
-                borderColor: 'var(--color-border-default)',
-                boxShadow: 'var(--shadow-glow)',
-              }}
-            >
-              <span
-                className="text-base font-semibold flex items-center gap-2"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
+            <div className="inline-block rounded-[var(--radius-lg)] px-6 py-3 border-2 border-skin-default bg-skin-tertiary shadow-[var(--shadow-glow)]">
+              <span className="text-base font-semibold flex items-center gap-2 text-skin-secondary">
                 <span aria-hidden="true">🔒</span> Hands Hidden
               </span>
-              <p className="text-sm mt-1.5" style={{ color: 'var(--color-text-muted)' }}>
-                Spectator Mode
-              </p>
+              <p className="text-sm mt-1.5 text-skin-muted">Spectator Mode</p>
             </div>
           </div>
         </div>
@@ -316,24 +301,19 @@ export const PlayerHand = memo(function PlayerHand({
   const displayHand = [...hand];
   if (
     cardInTransition &&
-    !hand.some(c => c.color === cardInTransition.color && c.value === cardInTransition.value)
+    !hand.some((c) => c.color === cardInTransition.color && c.value === cardInTransition.value)
   ) {
     displayHand.push(cardInTransition);
   }
 
   return (
-    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-2 md:px-6 lg:px-8 z-[11] overflow-visible">
+    <div className="md:max-w-6xl lg:max-w-7xl md:mx-auto px-1 sm:px-2 md:px-6 lg:px-8 z-[11] overflow-visible">
       <div
-        className="rounded-[var(--radius-xl)] p-4 border-2 backdrop-blur-xl shadow-2xl overflow-visible"
-        style={{
-          backgroundColor: 'var(--color-bg-secondary)',
-          borderColor: 'var(--color-border-accent)',
-          boxShadow: 'var(--shadow-glow)',
-        }}
+        className="rounded-[var(--radius-xl)] p-2 sm:p-4 border-2 border-skin-accent bg-skin-secondary shadow-[var(--shadow-glow)] backdrop-blur-xl overflow-visible touch-manipulation"
         data-testid="player-hand"
       >
-        <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-2 md:mx-0 px-2 md:px-0 pt-6 -mt-4 pb-2">
-          <div className="flex gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min px-2">
+        <div className="overflow-x-auto overflow-y-visible md:overflow-visible -mx-1 sm:-mx-2 md:mx-0 px-1 sm:px-2 md:px-0 pt-4 sm:pt-6 -mt-2 sm:-mt-4 pb-2 scrollbar-none">
+          <div className="flex gap-0.5 sm:gap-2 md:gap-4 lg:gap-6 md:flex-wrap justify-center min-w-min px-1 sm:px-2">
             {displayHand.map((card, index) => {
               const playable = isCardPlayable(card);
               const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
@@ -348,13 +328,15 @@ export const PlayerHand = memo(function PlayerHand({
               return (
                 <div
                   key={`${card.color}-${card.value}-${index}`}
-                  ref={(el) => { cardRefs.current[index] = el; }}
+                  ref={(el) => {
+                    cardRefs.current[index] = el;
+                  }}
                   className={`relative flex-shrink-0 md:flex-shrink transition-all duration-200 overflow-visible ${
                     showDealingAnimation && !isCardDealt
                       ? 'opacity-0 scale-50'
                       : isTransitioning
-                      ? 'opacity-0 motion-safe:animate-card-play-arc'
-                      : 'opacity-100 scale-100'
+                        ? 'opacity-0 motion-safe:animate-card-play-arc'
+                        : 'opacity-100 scale-100'
                   } ${isSelected || isQueued ? '-translate-y-2 scale-110' : ''}`}
                   style={{
                     transition: isTransitioning
@@ -365,30 +347,13 @@ export const PlayerHand = memo(function PlayerHand({
                 >
                   {/* Selection indicator ring */}
                   {isSelected && (
-                    <div
-                      className="absolute -inset-2 rounded-lg animate-pulse pointer-events-none z-10"
-                      style={{
-                        boxShadow: '0 0 0 4px var(--color-info)',
-                      }}
-                    />
+                    <div className="absolute -inset-2 rounded-lg animate-pulse pointer-events-none z-10 shadow-[0_0_0_4px_var(--color-info)]" />
                   )}
                   {/* Queued indicator - pulsing ring and badge */}
                   {isQueued && (
                     <>
-                      <div
-                        className="absolute -inset-2 rounded-lg animate-pulse pointer-events-none z-20"
-                        style={{
-                          boxShadow: '0 0 0 4px var(--color-warning)',
-                        }}
-                      />
-                      <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none"
-                        style={{
-                          backgroundColor: 'var(--color-warning)',
-                          color: 'var(--color-bg-primary)',
-                          borderColor: 'var(--color-warning)',
-                        }}
-                      >
+                      <div className="absolute -inset-2 rounded-lg animate-pulse pointer-events-none z-20 shadow-[0_0_0_4px_var(--color-warning)]" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs md:text-sm font-bold px-3 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none bg-warning text-skin-primary border-warning">
                         QUEUED
                       </div>
                     </>
@@ -396,9 +361,9 @@ export const PlayerHand = memo(function PlayerHand({
                   <CardComponent
                     card={card}
                     size="small"
-                    onClick={e => handleCardClick(card, e)}
-                    disabled={isCurrentTurn ? (!playable || !!isTransitioning) : false}
-                    isPlayable={isCurrentTurn ? (playable && isCurrentTurn) : !isQueued}
+                    onClick={(e) => handleCardClick(card, e)}
+                    disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
+                    isPlayable={isCurrentTurn ? playable && isCurrentTurn : !isQueued}
                     isKeyboardSelected={isSelected}
                   />
                 </div>

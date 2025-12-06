@@ -82,10 +82,7 @@ function createTestReplayData(overrides = {}) {
     rounds: 5,
     player_names: ['Player 1', 'Player 2', 'Player 3', 'Player 4'],
     player_teams: [1, 2, 1, 2],
-    round_history: [
-      createTestRound(1),
-      createTestRound(2),
-    ],
+    round_history: [createTestRound(1), createTestRound(2)],
     trump_suit: 'red',
     game_duration_seconds: 300,
     is_bot_game: false,
@@ -111,11 +108,7 @@ describe('GameReplay', () => {
   describe('Loading State', () => {
     it('should show loading spinner on mount', () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       expect(screen.getByTestId('loading-message')).toBeInTheDocument();
@@ -123,11 +116,7 @@ describe('GameReplay', () => {
 
     it('should emit get_game_replay on mount', () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       expect(mockSocket.emit).toHaveBeenCalledWith('get_game_replay', {
@@ -137,17 +126,10 @@ describe('GameReplay', () => {
 
     it('should register socket event handlers', () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
-      expect(mockSocket.on).toHaveBeenCalledWith(
-        'game_replay_data',
-        expect.any(Function)
-      );
+      expect(mockSocket.on).toHaveBeenCalledWith('game_replay_data', expect.any(Function));
       expect(mockSocket.on).toHaveBeenCalledWith('error', expect.any(Function));
     });
   });
@@ -155,11 +137,7 @@ describe('GameReplay', () => {
   describe('Data Loading', () => {
     it('should display replay data when loaded successfully', async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       const replayDataHandler = mockSocket.on.mock.calls.find(
@@ -180,16 +158,10 @@ describe('GameReplay', () => {
 
     it('should handle 404 errors with correlation ID', async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
-      const errorHandler = mockSocket.on.mock.calls.find(
-        (call) => call[0] === 'error'
-      )?.[1];
+      const errorHandler = mockSocket.on.mock.calls.find((call) => call[0] === 'error')?.[1];
 
       expect(errorHandler).toBeDefined();
 
@@ -209,16 +181,10 @@ describe('GameReplay', () => {
 
     it('should handle network errors', async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
-      const errorHandler = mockSocket.on.mock.calls.find(
-        (call) => call[0] === 'error'
-      )?.[1];
+      const errorHandler = mockSocket.on.mock.calls.find((call) => call[0] === 'error')?.[1];
 
       act(() => {
         errorHandler({
@@ -233,11 +199,7 @@ describe('GameReplay', () => {
 
     it('should show warning when replay has no rounds', async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       const replayDataHandler = mockSocket.on.mock.calls.find(
@@ -260,11 +222,7 @@ describe('GameReplay', () => {
   describe('Playback Controls', () => {
     beforeEach(async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       const replayDataHandler = mockSocket.on.mock.calls.find(
@@ -322,19 +280,11 @@ describe('GameReplay', () => {
   describe('Navigation', () => {
     beforeEach(async () => {
       const replayData = createTestReplayData({
-        round_history: [
-          createTestRound(1),
-          createTestRound(2),
-          createTestRound(3),
-        ],
+        round_history: [createTestRound(1), createTestRound(2), createTestRound(3)],
       });
 
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       const replayDataHandler = mockSocket.on.mock.calls.find(
@@ -385,11 +335,7 @@ describe('GameReplay', () => {
   describe('State Visualization', () => {
     beforeEach(async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       const replayDataHandler = mockSocket.on.mock.calls.find(
@@ -430,16 +376,10 @@ describe('GameReplay', () => {
   describe('Error Recovery', () => {
     it('should have Try Again button on error', async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
-      const errorHandler = mockSocket.on.mock.calls.find(
-        (call) => call[0] === 'error'
-      )?.[1];
+      const errorHandler = mockSocket.on.mock.calls.find((call) => call[0] === 'error')?.[1];
 
       act(() => {
         errorHandler({ message: 'Connection failed' });
@@ -452,16 +392,10 @@ describe('GameReplay', () => {
 
     it('should retry fetching on Try Again click', async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
-      const errorHandler = mockSocket.on.mock.calls.find(
-        (call) => call[0] === 'error'
-      )?.[1];
+      const errorHandler = mockSocket.on.mock.calls.find((call) => call[0] === 'error')?.[1];
 
       act(() => {
         errorHandler({ message: 'Connection failed' });
@@ -483,16 +417,10 @@ describe('GameReplay', () => {
 
     it('should close on Close button click', async () => {
       render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
-      const errorHandler = mockSocket.on.mock.calls.find(
-        (call) => call[0] === 'error'
-      )?.[1];
+      const errorHandler = mockSocket.on.mock.calls.find((call) => call[0] === 'error')?.[1];
 
       act(() => {
         errorHandler({ message: 'Connection failed' });
@@ -512,19 +440,12 @@ describe('GameReplay', () => {
   describe('Cleanup', () => {
     it('should unregister socket handlers on unmount', () => {
       const { unmount } = render(
-        <GameReplay
-          gameId="test-game-123"
-          socket={mockSocket as any}
-          onClose={mockOnClose}
-        />
+        <GameReplay gameId="test-game-123" socket={mockSocket as any} onClose={mockOnClose} />
       );
 
       unmount();
 
-      expect(mockSocket.off).toHaveBeenCalledWith(
-        'game_replay_data',
-        expect.any(Function)
-      );
+      expect(mockSocket.off).toHaveBeenCalledWith('game_replay_data', expect.any(Function));
       expect(mockSocket.off).toHaveBeenCalledWith('error', expect.any(Function));
     });
   });

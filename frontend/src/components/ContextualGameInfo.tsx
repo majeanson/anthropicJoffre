@@ -22,40 +22,45 @@ export function ContextualGameInfo({
   timeRemaining,
   trickWinnerName,
   trickPoints,
-  bettingTeamId
+  bettingTeamId,
 }: ContextualGameInfoProps) {
   const colorNames: Record<CardColor, string> = {
     red: 'Red',
     brown: 'Brown',
     green: 'Green',
-    blue: 'Blue'
+    blue: 'Blue',
   };
 
   const colorClasses: Record<CardColor, string> = {
     red: 'text-red-600 dark:text-red-400',
     brown: 'text-amber-800 dark:text-amber-600',
     green: 'text-green-600 dark:text-green-400',
-    blue: 'text-blue-600 dark:text-blue-400'
+    blue: 'text-blue-600 dark:text-blue-400',
   };
 
   // Waiting or in progress - unified display with consistent height
   if ((state === 'waiting' || state === 'in_progress') && (betAmount || trumpColor)) {
-    const teamColorClass = bettingTeamId === 1
-      ? 'text-orange-600 dark:text-orange-400'
-      : bettingTeamId === 2
-      ? 'text-purple-600 dark:text-purple-400'
-      : 'text-umber-900 dark:text-gray-100';
+    const teamColorClass =
+      bettingTeamId === 1
+        ? 'text-orange-600 dark:text-orange-400'
+        : bettingTeamId === 2
+          ? 'text-purple-600 dark:text-purple-400'
+          : 'text-umber-900 dark:text-gray-100';
 
     return (
       <UICard
         variant="bordered"
         size="sm"
         className="bg-parchment-100 dark:bg-gray-800 border-umber-700 dark:border-gray-600 text-center max-w-xs mx-auto"
-        data-testid={state === 'waiting' ? 'contextual-info-waiting' : 'contextual-info-in-progress'}
+        data-testid={
+          state === 'waiting' ? 'contextual-info-waiting' : 'contextual-info-in-progress'
+        }
       >
         <div className="flex items-center justify-center gap-3 text-sm">
           <div className="flex items-center gap-1">
-            <span className="text-lg" aria-hidden="true">🎲</span>
+            <span className="text-lg" aria-hidden="true">
+              🎲
+            </span>
             <span className={`font-bold ${teamColorClass}`}>{betAmount}</span>
             {withoutTrump && (
               <span className="text-umber-700 dark:text-gray-400 text-xs">(No Trump)</span>
@@ -71,7 +76,11 @@ export function ContextualGameInfo({
           <div className="text-umber-700 dark:text-gray-400 text-xs mt-1 flex items-center justify-center gap-1">
             {state === 'waiting' && <span className="font-semibold">(Waiting...)</span>}
             <span>{currentPlayerName}</span>
-            {timeRemaining !== undefined && <span><span aria-hidden="true">⏱️</span> {timeRemaining}s</span>}
+            {timeRemaining !== undefined && (
+              <span>
+                <span aria-hidden="true">⏱️</span> {timeRemaining}s
+              </span>
+            )}
           </div>
         )}
       </UICard>
@@ -93,9 +102,7 @@ export function ContextualGameInfo({
           <span>{trickWinnerName} wins!</span>
         </div>
         {trickPoints !== undefined && (
-          <div className="text-white text-sm mt-1">
-            +{trickPoints} points
-          </div>
+          <div className="text-white text-sm mt-1">+{trickPoints} points</div>
         )}
       </UICard>
     );

@@ -347,9 +347,7 @@ export const Interactive: Story = {
 
         <div className="space-y-3 mt-4">
           <div>
-            <label className="text-white text-sm block mb-2">
-              Streak Days: {currentStreak}
-            </label>
+            <label className="text-white text-sm block mb-2">Streak Days: {currentStreak}</label>
             <input
               type="range"
               min="0"

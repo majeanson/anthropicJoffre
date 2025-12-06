@@ -20,7 +20,9 @@ interface UseTutorialAchievementReturn {
  * Hook to check and unlock tutorial completion achievement
  * Returns a function to manually trigger achievement check
  */
-export function useTutorialAchievement({ socket }: UseTutorialAchievementProps): UseTutorialAchievementReturn {
+export function useTutorialAchievement({
+  socket,
+}: UseTutorialAchievementProps): UseTutorialAchievementReturn {
   const { user, isAuthenticated } = useAuth();
   const hasUnlockedRef = useRef(false);
 

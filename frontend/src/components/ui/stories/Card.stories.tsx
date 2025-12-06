@@ -88,7 +88,8 @@ export const FireElement: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Fire element card (Red) - Represents passion and transformation with crimson ethereal glow.',
+        story:
+          'Fire element card (Red) - Represents passion and transformation with crimson ethereal glow.',
       },
     },
   },
@@ -362,7 +363,8 @@ export const Playable: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Playable state with ethereal pulse animation - indicates the card can be channeled this turn.',
+        story:
+          'Playable state with ethereal pulse animation - indicates the card can be channeled this turn.',
       },
     },
   },
@@ -718,7 +720,9 @@ export const RitualInProgress: RenderOnlyStory = {
               className="w-24 h-36 rounded-lg border-2 border-dashed flex items-center justify-center"
               style={{ borderColor: '#C17F59' }}
             >
-              <span style={{ color: '#6B7280' }} className="text-2xl">?</span>
+              <span style={{ color: '#6B7280' }} className="text-2xl">
+                ?
+              </span>
             </div>
             <span
               className="text-xs"

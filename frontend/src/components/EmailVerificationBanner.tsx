@@ -17,7 +17,12 @@ export default function EmailVerificationBanner() {
   }
 
   return (
-    <UICard variant="bordered" size="sm" gradient="warning" className="text-center border-b-2 border-yellow-500 rounded-none">
+    <UICard
+      variant="bordered"
+      size="sm"
+      gradient="warning"
+      className="text-center border-b-2 border-yellow-500 rounded-none"
+    >
       <div className="flex items-center justify-center gap-2 text-yellow-800 dark:text-yellow-200">
         <span className="text-xl">⚠️</span>
         <p className="text-sm font-semibold">

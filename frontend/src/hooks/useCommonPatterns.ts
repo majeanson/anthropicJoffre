@@ -55,7 +55,7 @@ export function useLocalStorage<T>(
   const setValue = useCallback(
     (value: T | ((prev: T) => T)) => {
       try {
-        setStoredValue(prevValue => {
+        setStoredValue((prevValue) => {
           const valueToStore = value instanceof Function ? value(prevValue) : value;
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
           return valueToStore;
@@ -116,7 +116,7 @@ export function useModal(initialState: boolean = false): {
 
   const open = useCallback(() => setIsOpen(true), []);
   const close = useCallback(() => setIsOpen(false), []);
-  const toggle = useCallback(() => setIsOpen(prev => !prev), []);
+  const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
   return { isOpen, open, close, toggle, setIsOpen };
 }
@@ -222,10 +222,7 @@ export function usePrevious<T>(value: T): T | undefined {
 /**
  * Click outside detection hook
  */
-export function useClickOutside(
-  ref: React.RefObject<HTMLElement>,
-  handler: () => void
-): void {
+export function useClickOutside(ref: React.RefObject<HTMLElement>, handler: () => void): void {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -312,7 +309,7 @@ export function useCountdown(
     if (!isActive || timeLeft <= 0) return;
 
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           setIsActive(false);
           onComplete?.();
@@ -342,7 +339,7 @@ export function useToggle(
   initialValue: boolean = false
 ): [boolean, () => void, (value: boolean) => void] {
   const [value, setValue] = useState(initialValue);
-  const toggle = useCallback(() => setValue(prev => !prev), []);
+  const toggle = useCallback(() => setValue((prev) => !prev), []);
 
   return [value, toggle, setValue];
 }

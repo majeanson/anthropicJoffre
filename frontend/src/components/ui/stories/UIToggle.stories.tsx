@@ -18,7 +18,13 @@ const meta: Meta<typeof UIToggle> = {
 export default meta;
 
 // Use a wrapper for interactive stories
-function ToggleWrapper(props: { enabled?: boolean; size?: 'sm' | 'md' | 'lg'; color?: 'green' | 'blue' | 'amber' | 'purple'; disabled?: boolean; label?: string }) {
+function ToggleWrapper(props: {
+  enabled?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  color?: 'green' | 'blue' | 'amber' | 'purple';
+  disabled?: boolean;
+  label?: string;
+}) {
   const [enabled, setEnabled] = useState(props.enabled ?? false);
   return (
     <UIToggle
@@ -228,9 +234,7 @@ export const InteractiveDemo: StoryObj = {
           <p className="text-gray-700 dark:text-gray-300">
             State: <strong>{enabled ? 'ON' : 'OFF'}</strong>
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Toggled {count} times
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Toggled {count} times</p>
         </div>
       </div>
     );

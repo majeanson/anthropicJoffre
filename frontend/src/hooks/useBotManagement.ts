@@ -46,7 +46,11 @@ interface BotTakeoverModalState {
  * @param gameState - Current game state
  * @returns Bot management state and handler functions
  */
-export function useBotManagement(socket: Socket | null, gameId: string, gameState: GameState | null) {
+export function useBotManagement(
+  socket: Socket | null,
+  gameId: string,
+  gameState: GameState | null
+) {
   // Bot state management
   const botSocketsRef = useRef<Map<string, Socket>>(new Map());
   const botTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
@@ -63,7 +67,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
    */
   const handleBotAction = useCallback((botSocket: Socket, state: GameState, botId: string) => {
     // Find bot player and set difficulty
-    const bot = state.players.find(p => p.id === botId && p.isBot);
+    const bot = state.players.find((p) => p.id === botId && p.isBot);
     if (!bot) return; // Not a bot, exit early
 
     // Store the latest state for this bot (needed for delta updates)
@@ -82,7 +86,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     if (state.phase === 'team_selection') {
       // If bot hasn't selected a team yet, select one
       if (bot && !bot.teamId) {
-        const playerIndex = state.players.findIndex(p => p.id === botId);
+        const playerIndex = state.players.findIndex((p) => p.id === botId);
         const teamId = BotPlayer.selectTeam(playerIndex);
 
         const timeout = setTimeout(() => {
@@ -97,8 +101,8 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     // Scoring phase - bot marks ready after delay
     if (state.phase === 'scoring') {
       // Check if this bot is already ready (playersReady stores names, not IDs)
-      const bot = state.players.find(p => p.id === botId);
-      const isAlreadyReady = bot ? (state.playersReady?.includes(bot.name) || false) : false;
+      const bot = state.players.find((p) => p.id === botId);
+      const isAlreadyReady = bot ? state.playersReady?.includes(bot.name) || false : false;
 
       if (!isAlreadyReady) {
         const timeout = setTimeout(() => {
@@ -117,7 +121,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     // Betting phase: Check if bot has already placed a bet OR has pending action
     if (state.phase === 'betting') {
-      if (state.currentBets?.some(bet => bet.playerName === currentPlayer.name)) {
+      if (state.currentBets?.some((bet) => bet.playerName === currentPlayer.name)) {
         return;
       }
       // Check if bot already has a pending bet action
@@ -128,7 +132,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     // Playing phase: Check if bot has already played in this trick OR has pending action
     if (state.phase === 'playing') {
-      const hasAlreadyPlayed = state.currentTrick.some(play => play.playerId === botId);
+      const hasAlreadyPlayed = state.currentTrick.some((play) => play.playerId === botId);
       if (hasAlreadyPlayed) {
         return;
       }
@@ -147,7 +151,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
           gameId: state.id,
           amount: bet.amount,
           withoutTrump: bet.withoutTrump,
-          skipped: bet.skipped
+          skipped: bet.skipped,
         });
       }
 
@@ -169,105 +173,125 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
    * Spawn bot sockets for all bot players in the game
    * Used for reconnection and initial game setup
    */
-  const spawnBotsForGame = useCallback((gameState: GameState) => {
-    const botPlayers = gameState.players.filter(p => p.isBot);
+  const spawnBotsForGame = useCallback(
+    (gameState: GameState) => {
+      const botPlayers = gameState.players.filter((p) => p.isBot);
 
-    if (botPlayers.length === 0) return;
+      if (botPlayers.length === 0) return;
 
-    botPlayers.forEach(botPlayer => {
-      const botName = botPlayer.name;
+      botPlayers.forEach((botPlayer) => {
+        const botName = botPlayer.name;
 
-      // Initialize bot difficulty from gameState if not already set
-      if (botPlayer.botDifficulty && !botDifficultiesRef.current.has(botName)) {
-        botDifficultiesRef.current.set(botName, botPlayer.botDifficulty);
-      } else if (!botDifficultiesRef.current.has(botName)) {
-        // Default to 'hard' if not specified
-        botDifficultiesRef.current.set(botName, 'hard');
-      }
-
-      // Skip if bot socket already exists and is connected (using name as stable key)
-      const existingBotSocket = botSocketsRef.current.get(botName);
-      if (existingBotSocket && existingBotSocket.connected) {
-        return;
-      }
-
-      // Disconnect existing socket if any
-      if (existingBotSocket) {
-        existingBotSocket.disconnect();
-        botSocketsRef.current.delete(botName);
-      }
-
-      // Create new socket for the bot
-      const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
-
-      // Store the bot socket reference using NAME as key (stable across reconnects)
-      botSocketsRef.current.set(botName, botSocket);
-
-      botSocket.on('connect', () => {
-        // Join as a fresh bot connection (server will handle reconnection internally)
-        const difficulty = botDifficultiesRef.current.get(botName) || botPlayer.botDifficulty || 'medium';
-        botSocket.emit('join_game', { gameId: gameState.id, playerName: botName, isBot: true, botDifficulty: difficulty });
-      });
-
-      botSocket.on('player_joined', ({ player, gameState: newState }: { player?: Player; gameState: GameState; session?: PlayerSession }) => {
-        // Use the player ID from the game state, not botSocket.id
-        const botPlayerId = player?.id || newState.players.find(p => p.name === botName && p.isBot)?.id;
-        if (botPlayerId) {
-          handleBotAction(botSocket, newState, botPlayerId);
+        // Initialize bot difficulty from gameState if not already set
+        if (botPlayer.botDifficulty && !botDifficultiesRef.current.has(botName)) {
+          botDifficultiesRef.current.set(botName, botPlayer.botDifficulty);
+        } else if (!botDifficultiesRef.current.has(botName)) {
+          // Default to 'hard' if not specified
+          botDifficultiesRef.current.set(botName, 'hard');
         }
-      });
 
-      // Listen to all game state updates
-      botSocket.on('game_updated', (state: GameState) => {
-        // Find the bot's current player ID in the game state
-        const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
-        if (botPlayerId) {
-          handleBotAction(botSocket, state, botPlayerId);
-        }
-      });
-
-      botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
-        // Get the last known state for this bot
-        const lastState = botStatesRef.current.get(botName);
-        if (!lastState) {
+        // Skip if bot socket already exists and is connected (using name as stable key)
+        const existingBotSocket = botSocketsRef.current.get(botName);
+        if (existingBotSocket && existingBotSocket.connected) {
           return;
         }
 
-        // Apply delta to get new state
-        const newState = applyStateDelta(lastState, delta);
-
-        // Store the new state for next delta (CRITICAL: prevents state drift)
-        botStatesRef.current.set(botName, newState);
-
-        // Find bot player ID and handle action
-        const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
-        if (botPlayerId) {
-          handleBotAction(botSocket, newState, botPlayerId);
+        // Disconnect existing socket if any
+        if (existingBotSocket) {
+          existingBotSocket.disconnect();
+          botSocketsRef.current.delete(botName);
         }
-      });
 
-      botSocket.on('round_started', (state: GameState) => {
-        const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
-        if (botPlayerId) {
-          handleBotAction(botSocket, state, botPlayerId);
-        }
-      });
+        // Create new socket for the bot
+        const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
 
-      botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) => {
-        const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
-        if (botPlayerId) {
-          handleBotAction(botSocket, newState, botPlayerId);
-        }
-      });
+        // Store the bot socket reference using NAME as key (stable across reconnects)
+        botSocketsRef.current.set(botName, botSocket);
 
-      botSocket.on('round_ended', (state: GameState) => {
-        const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
-        if (botPlayerId) {
-          handleBotAction(botSocket, state, botPlayerId);
-        }
+        botSocket.on('connect', () => {
+          // Join as a fresh bot connection (server will handle reconnection internally)
+          const difficulty =
+            botDifficultiesRef.current.get(botName) || botPlayer.botDifficulty || 'medium';
+          botSocket.emit('join_game', {
+            gameId: gameState.id,
+            playerName: botName,
+            isBot: true,
+            botDifficulty: difficulty,
+          });
+        });
+
+        botSocket.on(
+          'player_joined',
+          ({
+            player,
+            gameState: newState,
+          }: {
+            player?: Player;
+            gameState: GameState;
+            session?: PlayerSession;
+          }) => {
+            // Use the player ID from the game state, not botSocket.id
+            const botPlayerId =
+              player?.id || newState.players.find((p) => p.name === botName && p.isBot)?.id;
+            if (botPlayerId) {
+              handleBotAction(botSocket, newState, botPlayerId);
+            }
+          }
+        );
+
+        // Listen to all game state updates
+        botSocket.on('game_updated', (state: GameState) => {
+          // Find the bot's current player ID in the game state
+          const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
+          if (botPlayerId) {
+            handleBotAction(botSocket, state, botPlayerId);
+          }
+        });
+
+        botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
+          // Get the last known state for this bot
+          const lastState = botStatesRef.current.get(botName);
+          if (!lastState) {
+            return;
+          }
+
+          // Apply delta to get new state
+          const newState = applyStateDelta(lastState, delta);
+
+          // Store the new state for next delta (CRITICAL: prevents state drift)
+          botStatesRef.current.set(botName, newState);
+
+          // Find bot player ID and handle action
+          const botPlayerId = newState.players.find((p) => p.name === botName && p.isBot)?.id;
+          if (botPlayerId) {
+            handleBotAction(botSocket, newState, botPlayerId);
+          }
+        });
+
+        botSocket.on('round_started', (state: GameState) => {
+          const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
+          if (botPlayerId) {
+            handleBotAction(botSocket, state, botPlayerId);
+          }
+        });
+
+        botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) => {
+          const botPlayerId = newState.players.find((p) => p.name === botName && p.isBot)?.id;
+          if (botPlayerId) {
+            handleBotAction(botSocket, newState, botPlayerId);
+          }
+        });
+
+        botSocket.on('round_ended', (state: GameState) => {
+          const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
+          if (botPlayerId) {
+            handleBotAction(botSocket, state, botPlayerId);
+          }
+        });
       });
-    });
-  }, [handleBotAction]);
+    },
+    [handleBotAction]
+  );
 
   /**
    * Add a single bot to existing game
@@ -276,10 +300,11 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     if (!socket || !gameId) return;
 
     // Find next available bot number (1-3, matching backend limit)
-    const existingBotNumbers = gameState?.players
-      .filter(p => p.name.startsWith('Bot '))
-      .map(p => parseInt(p.name.replace('Bot ', '')))
-      .filter(n => !isNaN(n)) || [];
+    const existingBotNumbers =
+      gameState?.players
+        .filter((p) => p.name.startsWith('Bot '))
+        .map((p) => parseInt(p.name.replace('Bot ', '')))
+        .filter((n) => !isNaN(n)) || [];
 
     let botNumber = 1;
     while (existingBotNumbers.includes(botNumber) && botNumber <= 3) {
@@ -296,7 +321,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
 
     botSocket.on('player_joined', ({ gameState: state }: { gameState: GameState }) => {
       // Store bot socket reference
-      const botPlayer = state.players.find(p => p.name === botName && p.isBot);
+      const botPlayer = state.players.find((p) => p.name === botName && p.isBot);
       if (botPlayer) {
         botSocketsRef.current.set(botPlayer.id, botSocket);
         handleBotAction(botSocket, state, botPlayer.id);
@@ -304,7 +329,7 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
     });
 
     botSocket.on('game_updated', (state: GameState) => {
-      const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+      const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
       if (botPlayerId) {
         handleBotAction(botSocket, state, botPlayerId);
       }
@@ -324,28 +349,28 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
       botStatesRef.current.set(botName, newState);
 
       // Find bot player ID and handle action
-      const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
+      const botPlayerId = newState.players.find((p) => p.name === botName && p.isBot)?.id;
       if (botPlayerId) {
         handleBotAction(botSocket, newState, botPlayerId);
       }
     });
 
     botSocket.on('round_started', (state: GameState) => {
-      const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+      const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
       if (botPlayerId) {
         handleBotAction(botSocket, state, botPlayerId);
       }
     });
 
     botSocket.on('trick_resolved', ({ gameState: newState }: { gameState: GameState }) => {
-      const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
+      const botPlayerId = newState.players.find((p) => p.name === botName && p.isBot)?.id;
       if (botPlayerId) {
         handleBotAction(botSocket, newState, botPlayerId);
       }
     });
 
     botSocket.on('round_ended', (state: GameState) => {
-      const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
+      const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
       if (botPlayerId) {
         handleBotAction(botSocket, state, botPlayerId);
       }
@@ -355,146 +380,170 @@ export function useBotManagement(socket: Socket | null, gameId: string, gameStat
   /**
    * Quick Play: Create game with 3 bots
    */
-  const handleQuickPlay = useCallback((difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual' = 'casual', playerName?: string) => {
-    if (!socket) return;
+  const handleQuickPlay = useCallback(
+    (
+      difficulty: BotDifficulty,
+      persistenceMode: 'elo' | 'casual' = 'casual',
+      playerName?: string
+    ) => {
+      if (!socket) return;
 
-    // Use provided playerName or fallback to 'You'
-    const effectivePlayerName = playerName?.trim() || 'You';
+      // Use provided playerName or fallback to 'You'
+      const effectivePlayerName = playerName?.trim() || 'You';
 
-    // Set the bot difficulty globally
-    BotPlayer.setDifficulty(difficulty);
+      // Set the bot difficulty globally
+      BotPlayer.setDifficulty(difficulty);
 
-    // Listen for game creation to spawn bots
-    const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string }) => {
-      // Spawn 3 bot players after game is created
-      setTimeout(() => {
-        for (let i = 0; i < 3; i++) {
-          const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
-          const botName = `Bot ${i + 1}`;
+      // Listen for game creation to spawn bots
+      const gameCreatedHandler = ({ gameId: createdGameId }: { gameId: string }) => {
+        // Spawn 3 bot players after game is created
+        setTimeout(() => {
+          for (let i = 0; i < 3; i++) {
+            const botSocket = io(SOCKET_URL, BOT_SOCKET_CONFIG);
+            const botName = `Bot ${i + 1}`;
 
-          botSocket.on('connect', () => {
-            botSocket.emit('join_game', { gameId: createdGameId, playerName: botName, isBot: true, botDifficulty: difficulty });
-          });
+            botSocket.on('connect', () => {
+              botSocket.emit('join_game', {
+                gameId: createdGameId,
+                playerName: botName,
+                isBot: true,
+                botDifficulty: difficulty,
+              });
+            });
 
-          // Listen to all game state updates
-          botSocket.on('player_joined', ({ gameState: newGameState }: { gameState: GameState; session?: PlayerSession }) => {
-            // Store bot socket reference using the bot's player ID
-            const botPlayer = newGameState.players.find(p => p.name === botName && p.isBot);
-            if (botPlayer) {
-              botSocketsRef.current.set(botPlayer.id, botSocket);
-              handleBotAction(botSocket, newGameState, botPlayer.id);
-            }
-          });
+            // Listen to all game state updates
+            botSocket.on(
+              'player_joined',
+              ({ gameState: newGameState }: { gameState: GameState; session?: PlayerSession }) => {
+                // Store bot socket reference using the bot's player ID
+                const botPlayer = newGameState.players.find((p) => p.name === botName && p.isBot);
+                if (botPlayer) {
+                  botSocketsRef.current.set(botPlayer.id, botSocket);
+                  handleBotAction(botSocket, newGameState, botPlayer.id);
+                }
+              }
+            );
 
-          botSocket.on('game_updated', (state: GameState) => {
-            const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
-            if (botPlayerId) {
-              handleBotAction(botSocket, state, botPlayerId);
-            }
-          });
+            botSocket.on('game_updated', (state: GameState) => {
+              const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
+              if (botPlayerId) {
+                handleBotAction(botSocket, state, botPlayerId);
+              }
+            });
 
-          botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
-            // Get the last known state for this bot
-            const lastState = botStatesRef.current.get(botName);
-            if (!lastState) {
-              return;
-            }
+            botSocket.on('game_updated_delta', (delta: GameStateDelta) => {
+              // Get the last known state for this bot
+              const lastState = botStatesRef.current.get(botName);
+              if (!lastState) {
+                return;
+              }
 
-            // Apply delta to get new state
-            const newState = applyStateDelta(lastState, delta);
+              // Apply delta to get new state
+              const newState = applyStateDelta(lastState, delta);
 
-            // Store the new state for next delta (CRITICAL: prevents state drift)
-            botStatesRef.current.set(botName, newState);
+              // Store the new state for next delta (CRITICAL: prevents state drift)
+              botStatesRef.current.set(botName, newState);
 
-            // Find bot player ID and handle action
-            const botPlayerId = newState.players.find(p => p.name === botName && p.isBot)?.id;
-            if (botPlayerId) {
-              handleBotAction(botSocket, newState, botPlayerId);
-            }
-          });
+              // Find bot player ID and handle action
+              const botPlayerId = newState.players.find((p) => p.name === botName && p.isBot)?.id;
+              if (botPlayerId) {
+                handleBotAction(botSocket, newState, botPlayerId);
+              }
+            });
 
-          botSocket.on('round_started', (state: GameState) => {
-            const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
-            if (botPlayerId) {
-              handleBotAction(botSocket, state, botPlayerId);
-            }
-          });
+            botSocket.on('round_started', (state: GameState) => {
+              const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
+              if (botPlayerId) {
+                handleBotAction(botSocket, state, botPlayerId);
+              }
+            });
 
-          botSocket.on('trick_resolved', ({ gameState }: { gameState: GameState }) => {
-            const botPlayerId = gameState.players.find(p => p.name === botName && p.isBot)?.id;
-            if (botPlayerId) {
-              handleBotAction(botSocket, gameState, botPlayerId);
-            }
-          });
+            botSocket.on('trick_resolved', ({ gameState }: { gameState: GameState }) => {
+              const botPlayerId = gameState.players.find((p) => p.name === botName && p.isBot)?.id;
+              if (botPlayerId) {
+                handleBotAction(botSocket, gameState, botPlayerId);
+              }
+            });
 
-          botSocket.on('round_ended', (state: GameState) => {
-            const botPlayerId = state.players.find(p => p.name === botName && p.isBot)?.id;
-            if (botPlayerId) {
-              handleBotAction(botSocket, state, botPlayerId);
-            }
-          });
-        }
-      }, 500);
+            botSocket.on('round_ended', (state: GameState) => {
+              const botPlayerId = state.players.find((p) => p.name === botName && p.isBot)?.id;
+              if (botPlayerId) {
+                handleBotAction(botSocket, state, botPlayerId);
+              }
+            });
+          }
+        }, 500);
 
-      // Remove the listener after bots are spawned
-      socket.off('game_created', gameCreatedHandler);
-    };
+        // Remove the listener after bots are spawned
+        socket.off('game_created', gameCreatedHandler);
+      };
 
-    socket.on('game_created', gameCreatedHandler);
+      socket.on('game_created', gameCreatedHandler);
 
-    // Create game with player and persistence mode
-    socket.emit('create_game', { playerName: effectivePlayerName, persistenceMode });
-  }, [socket, handleBotAction]);
+      // Create game with player and persistence mode
+      socket.emit('create_game', { playerName: effectivePlayerName, persistenceMode });
+    },
+    [socket, handleBotAction]
+  );
 
   /**
    * Replace a player with a bot
    */
-  const handleReplaceWithBot = useCallback((playerNameToReplace: string) => {
-    if (socket && gameId && gameState) {
-      const currentPlayer = gameState.players.find(p => p.id === socket.id);
-      if (currentPlayer) {
-        socket.emit('replace_with_bot', {
-          gameId,
-          playerNameToReplace,
-          requestingPlayerName: currentPlayer.name
-        });
+  const handleReplaceWithBot = useCallback(
+    (playerNameToReplace: string) => {
+      if (socket && gameId && gameState) {
+        const currentPlayer = gameState.players.find((p) => p.id === socket.id);
+        if (currentPlayer) {
+          socket.emit('replace_with_bot', {
+            gameId,
+            playerNameToReplace,
+            requestingPlayerName: currentPlayer.name,
+          });
+        }
       }
-    }
-  }, [socket, gameId, gameState]);
+    },
+    [socket, gameId, gameState]
+  );
 
   /**
    * Change bot difficulty
    */
-  const handleChangeBotDifficulty = useCallback((botName: string, difficulty: BotDifficulty) => {
-    // Update local ref immediately for responsiveness
-    botDifficultiesRef.current.set(botName, difficulty);
+  const handleChangeBotDifficulty = useCallback(
+    (botName: string, difficulty: BotDifficulty) => {
+      // Update local ref immediately for responsiveness
+      botDifficultiesRef.current.set(botName, difficulty);
 
-    // Emit to server to update game state
-    if (socket && gameId) {
-      socket.emit('change_bot_difficulty', {
-        gameId,
-        botName,
-        difficulty
-      });
-    }
-  }, [socket, gameId]);
+      // Emit to server to update game state
+      if (socket && gameId) {
+        socket.emit('change_bot_difficulty', {
+          gameId,
+          botName,
+          difficulty,
+        });
+      }
+    },
+    [socket, gameId]
+  );
 
   /**
    * Take over a bot player
    */
-  const handleTakeOverBot = useCallback((botName: string) => {
-    if (socket && botTakeoverModal) {
-      socket.emit('take_over_bot', {
-        gameId: botTakeoverModal.gameId,
-        botNameToReplace: botName,
-        newPlayerName: botTakeoverModal.playerName
-      });
-      // Clear the pending player name
-      localStorage.removeItem('pendingPlayerName');
-      // Close the modal
-      setBotTakeoverModal(null);
-    }
-  }, [socket, botTakeoverModal]);
+  const handleTakeOverBot = useCallback(
+    (botName: string) => {
+      if (socket && botTakeoverModal) {
+        socket.emit('take_over_bot', {
+          gameId: botTakeoverModal.gameId,
+          botNameToReplace: botName,
+          newPlayerName: botTakeoverModal.playerName,
+        });
+        // Clear the pending player name
+        localStorage.removeItem('pendingPlayerName');
+        // Close the modal
+        setBotTakeoverModal(null);
+      }
+    },
+    [socket, botTakeoverModal]
+  );
 
   /**
    * Cleanup bot socket by name

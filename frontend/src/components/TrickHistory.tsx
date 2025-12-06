@@ -33,7 +33,7 @@ const TrickItem = memo(function TrickItem({
   showWinner,
 }: TrickItemProps) {
   // Find winner's team for color coding
-  const winner = players.find(p => p.name === trick.winnerName);
+  const winner = players.find((p) => p.name === trick.winnerName);
   const winnerTeamColor = winner?.teamId === 1 ? 'team1' : 'team2';
 
   return (
@@ -44,12 +44,15 @@ const TrickItem = memo(function TrickItem({
     >
       {/* Trick Header */}
       <div className="flex items-center justify-between mb-3">
-        <span className={`font-bold text-gray-800 dark:text-gray-200 ${compact ? 'text-xs' : 'text-sm'}`}>
+        <span
+          className={`font-bold text-gray-800 dark:text-gray-200 ${compact ? 'text-xs' : 'text-sm'}`}
+        >
           Trick {trickIndex + 1}
         </span>
         {showWinner && (
           <UIBadge variant="solid" color={winnerTeamColor} size="xs" shape="pill">
-            👑 {trick.winnerName || 'Unknown'} ({trick.points >= 0 ? '+' : ''}{trick.points} pts)
+            👑 {trick.winnerName || 'Unknown'} ({trick.points >= 0 ? '+' : ''}
+            {trick.points} pts)
           </UIBadge>
         )}
       </div>
@@ -61,14 +64,18 @@ const TrickItem = memo(function TrickItem({
 
           return (
             <div key={cardIndex} className="text-center">
-              <div className={`mb-1 inline-block ${isWinner ? 'ring-2 ring-yellow-400 rounded-lg' : ''}`}>
+              <div
+                className={`mb-1 inline-block ${isWinner ? 'ring-2 ring-yellow-400 rounded-lg' : ''}`}
+              >
                 <CardComponent
                   card={trickCard.card}
-                  size={compact ? "tiny" : "small"}
+                  size={compact ? 'tiny' : 'small'}
                   disabled={true}
                 />
               </div>
-              <p className={`font-medium text-gray-700 dark:text-gray-300 truncate ${compact ? 'text-xs' : 'text-xs'}`}>
+              <p
+                className={`font-medium text-gray-700 dark:text-gray-300 truncate ${compact ? 'text-xs' : 'text-xs'}`}
+              >
                 {trickCard.playerName || 'Unknown'}
               </p>
             </div>
@@ -85,7 +92,7 @@ export const TrickHistory = memo(function TrickHistory({
   currentTrickIndex,
   compact = false,
   showWinner = true,
-  className = ''
+  className = '',
 }: TrickHistoryProps) {
   if (!tricks || tricks.length === 0) {
     return (
@@ -113,9 +120,5 @@ export const TrickHistory = memo(function TrickHistory({
     });
   }, [tricks, currentTrickIndex, players, compact, showWinner]);
 
-  return (
-    <div className={`space-y-3 ${className}`}>
-      {trickItems}
-    </div>
-  );
+  return <div className={`space-y-3 ${className}`}>{trickItems}</div>;
 });

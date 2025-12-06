@@ -51,12 +51,7 @@ interface DailyQuestsPanelProps {
   onClose: () => void;
 }
 
-export function DailyQuestsPanel({
-  socket,
-  playerName,
-  isOpen,
-  onClose,
-}: DailyQuestsPanelProps) {
+export function DailyQuestsPanel({ socket, playerName, isOpen, onClose }: DailyQuestsPanelProps) {
   const [quests, setQuests] = useState<PlayerQuest[]>([]);
   const [loading, setLoading] = useState(true);
   const [claimingQuestId, setClaimingQuestId] = useState<number | null>(null);
@@ -117,9 +112,7 @@ export function DailyQuestsPanel({
         )
       );
 
-      setNotification(
-        `✅ Claimed: +${data.rewards.xp} XP, +${data.rewards.currency} coins!`
-      );
+      setNotification(`✅ Claimed: +${data.rewards.xp} XP, +${data.rewards.currency} coins!`);
       setTimeout(() => setNotification(null), 5000);
       setClaimingQuestId(null);
     };
@@ -160,7 +153,12 @@ export function DailyQuestsPanel({
       {/* Notification */}
       {notification && (
         <div className="mb-4">
-          <UICard variant="gradient" gradient="success" size="sm" className="text-center animate-pulse">
+          <UICard
+            variant="gradient"
+            gradient="success"
+            size="sm"
+            className="text-center animate-pulse"
+          >
             <p className="text-green-900 dark:text-white">{notification}</p>
           </UICard>
         </div>
@@ -168,106 +166,106 @@ export function DailyQuestsPanel({
 
       {/* Content */}
       <div>
-          {loading ? (
-            <LoadingState message="Loading quests..." size="lg" />
-          ) : quests.length === 0 ? (
-            <EmptyState
-              icon="📋"
-              title="No quests available"
-              description="Check back tomorrow for new quests!"
-            />
-          ) : (
-            <div className="space-y-4">
-              {quests.map((quest) => {
-                if (!quest.template) return null;
+        {loading ? (
+          <LoadingState message="Loading quests..." size="lg" />
+        ) : quests.length === 0 ? (
+          <EmptyState
+            icon="📋"
+            title="No quests available"
+            description="Check back tomorrow for new quests!"
+          />
+        ) : (
+          <div className="space-y-4">
+            {quests.map((quest) => {
+              if (!quest.template) return null;
 
-                return (
-                  <UICard
-                    key={quest.id}
-                    variant="bordered"
-                    size="md"
-                    className="hover:border-gray-500 transition-colors"
-                  >
-                    {/* Quest Header */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-3xl">{quest.template.icon}</span>
-                        <div>
-                          <h3 className="text-gray-900 dark:text-white font-semibold text-lg">
-                            {quest.template.name}
-                          </h3>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm">
-                            {quest.template.description}
-                          </p>
-                        </div>
+              return (
+                <UICard
+                  key={quest.id}
+                  variant="bordered"
+                  size="md"
+                  className="hover:border-gray-500 transition-colors"
+                >
+                  {/* Quest Header */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl">{quest.template.icon}</span>
+                      <div>
+                        <h3 className="text-gray-900 dark:text-white font-semibold text-lg">
+                          {quest.template.name}
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-sm">
+                          {quest.template.description}
+                        </p>
                       </div>
+                    </div>
 
-                      {/* Difficulty Badge */}
-                      <UIBadge
-                        variant="subtle"
-                        color={
-                          quest.template.quest_type === 'easy'
-                            ? 'success'
-                            : quest.template.quest_type === 'medium'
+                    {/* Difficulty Badge */}
+                    <UIBadge
+                      variant="subtle"
+                      color={
+                        quest.template.quest_type === 'easy'
+                          ? 'success'
+                          : quest.template.quest_type === 'medium'
                             ? 'warning'
                             : 'error'
-                        }
-                        size="sm"
-                      >
-                        {getDifficultyLabel(quest.template.quest_type)}
-                      </UIBadge>
-                    </div>
+                      }
+                      size="sm"
+                    >
+                      {getDifficultyLabel(quest.template.quest_type)}
+                    </UIBadge>
+                  </div>
 
-                    {/* Progress Bar */}
-                    <div className="mb-3">
-                      <ProgressBar
-                        value={quest.progress}
-                        max={quest.template.target_value}
-                        label={`Progress: ${quest.progress}/${quest.template.target_value}`}
-                        showValue
-                        variant="gradient"
-                        color={quest.completed ? 'success' : 'primary'}
-                        size="md"
-                      />
-                    </div>
+                  {/* Progress Bar */}
+                  <div className="mb-3">
+                    <ProgressBar
+                      value={quest.progress}
+                      max={quest.template.target_value}
+                      label={`Progress: ${quest.progress}/${quest.template.target_value}`}
+                      showValue
+                      variant="gradient"
+                      color={quest.completed ? 'success' : 'primary'}
+                      size="md"
+                    />
+                  </div>
 
-                    {/* Rewards and Action */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex gap-4 text-sm">
-                        <div className="flex items-center gap-1">
-                          <span className="text-blue-500 dark:text-blue-400">⭐</span>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {quest.template.reward_xp} XP
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-yellow-500 dark:text-yellow-400">💰</span>
-                          <span className="text-gray-700 dark:text-gray-300">
-                            {quest.template.reward_currency} coins
-                          </span>
-                        </div>
+                  {/* Rewards and Action */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex gap-4 text-sm">
+                      <div className="flex items-center gap-1">
+                        <span className="text-blue-500 dark:text-blue-400">⭐</span>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {quest.template.reward_xp} XP
+                        </span>
                       </div>
-
-                      {/* Claim Button */}
-                      {quest.completed && !quest.reward_claimed ? (
-                        <Button
-                          onClick={() => handleClaimReward(quest.id)}
-                          disabled={claimingQuestId === quest.id}
-                          variant="success"
-                        >
-                          {claimingQuestId === quest.id ? 'Claiming...' : 'Claim Reward'}
-                        </Button>
-                      ) : quest.reward_claimed ? (
-                        <span className="text-green-400 font-semibold">✓ Claimed</span>
-                      ) : (
-                        <span className="text-gray-500 text-sm">In Progress</span>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <span className="text-yellow-500 dark:text-yellow-400">💰</span>
+                        <span className="text-gray-700 dark:text-gray-300">
+                          {quest.template.reward_currency} coins
+                        </span>
+                      </div>
                     </div>
-                  </UICard>
-                );
-              })}
-            </div>
-          )}
+
+                    {/* Claim Button */}
+                    {quest.completed && !quest.reward_claimed ? (
+                      <Button
+                        onClick={() => handleClaimReward(quest.id)}
+                        disabled={claimingQuestId === quest.id}
+                        variant="success"
+                      >
+                        {claimingQuestId === quest.id ? 'Claiming...' : 'Claim Reward'}
+                      </Button>
+                    ) : quest.reward_claimed ? (
+                      <span className="text-green-400 font-semibold">✓ Claimed</span>
+                    ) : (
+                      <span className="text-gray-500 text-sm">In Progress</span>
+                    )}
+                  </div>
+                </UICard>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Footer note */}

@@ -24,7 +24,13 @@ export function parseMessage(message: string): ParsedMessageSegment[] {
   const mentionPattern = /@[\w-]+/g;
 
   let lastIndex = 0;
-  const allMatches: Array<{ index: number; length: number; type: 'url' | 'mention'; content: string; href?: string }> = [];
+  const allMatches: Array<{
+    index: number;
+    length: number;
+    type: 'url' | 'mention';
+    content: string;
+    href?: string;
+  }> = [];
 
   // Find all URLs
   let urlMatch;
@@ -34,7 +40,7 @@ export function parseMessage(message: string): ParsedMessageSegment[] {
       length: urlMatch[0].length,
       type: 'url',
       content: urlMatch[0],
-      href: urlMatch[0]
+      href: urlMatch[0],
     });
   }
 
@@ -45,7 +51,7 @@ export function parseMessage(message: string): ParsedMessageSegment[] {
       index: mentionMatch.index,
       length: mentionMatch[0].length,
       type: 'mention',
-      content: mentionMatch[0]
+      content: mentionMatch[0],
     });
   }
 
@@ -58,7 +64,7 @@ export function parseMessage(message: string): ParsedMessageSegment[] {
     if (match.index > lastIndex) {
       segments.push({
         type: 'text',
-        content: message.substring(lastIndex, match.index)
+        content: message.substring(lastIndex, match.index),
       });
     }
 
@@ -66,7 +72,7 @@ export function parseMessage(message: string): ParsedMessageSegment[] {
     segments.push({
       type: match.type,
       content: match.content,
-      href: match.href
+      href: match.href,
     });
 
     lastIndex = match.index + match.length;
@@ -76,7 +82,7 @@ export function parseMessage(message: string): ParsedMessageSegment[] {
   if (lastIndex < message.length) {
     segments.push({
       type: 'text',
-      content: message.substring(lastIndex)
+      content: message.substring(lastIndex),
     });
   }
 
@@ -101,7 +107,8 @@ export function renderParsedMessage(
       case 'mention':
         // Check if this mention is for the current player
         const mentionedName = segment.content.substring(1); // Remove @
-        const isMentioningCurrentPlayer = mentionedName.toLowerCase() === currentPlayerName.toLowerCase();
+        const isMentioningCurrentPlayer =
+          mentionedName.toLowerCase() === currentPlayerName.toLowerCase();
 
         return (
           <span
@@ -110,8 +117,8 @@ export function renderParsedMessage(
               isMentioningCurrentPlayer
                 ? 'bg-yellow-300 dark:bg-yellow-600 px-1 rounded'
                 : isOwnMessage
-                ? 'text-blue-200'
-                : 'text-blue-600 dark:text-blue-400'
+                  ? 'text-blue-200'
+                  : 'text-blue-600 dark:text-blue-400'
             }`}
           >
             {segment.content}
@@ -163,5 +170,5 @@ export function extractMentions(message: string): string[] {
  */
 export function messageHasMention(message: string, playerName: string): boolean {
   const mentions = extractMentions(message);
-  return mentions.some(mention => mention.toLowerCase() === playerName.toLowerCase());
+  return mentions.some((mention) => mention.toLowerCase() === playerName.toLowerCase());
 }

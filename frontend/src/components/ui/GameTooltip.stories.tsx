@@ -90,17 +90,15 @@ export const MoveSuggestion: Story = {
       <div className="space-y-3">
         <div className="text-lg font-bold">Play: 7 🔴</div>
         <p className="text-sm">
-          This is the highest card you can play that still follows suit.
-          It gives you a good chance of winning this trick.
+          This is the highest card you can play that still follows suit. It gives you a good chance
+          of winning this trick.
         </p>
         <div className="pt-2 border-t border-white/20">
           <div className="text-xs font-semibold mb-1 flex items-center gap-1">
             <span>💭</span>
             <span>Alternative:</span>
           </div>
-          <p className="text-xs">
-            You could also play 3 🔴 to save your high card for later.
-          </p>
+          <p className="text-xs">You could also play 3 🔴 to save your high card for later.</p>
         </div>
       </div>
     </InteractiveWrapper>
@@ -115,9 +113,7 @@ export const BotThinking: Story = {
     <InteractiveWrapper variant="bot" title="Bot Thinking" icon="🤖">
       <div className="space-y-2">
         <div className="text-sm font-medium">Claude (Hard)</div>
-        <p className="text-base font-bold">
-          Analyzing opponent's remaining cards...
-        </p>
+        <p className="text-base font-bold">Analyzing opponent's remaining cards...</p>
         <p className="text-sm text-white/80">
           Considering trump conservation strategy for endgame.
         </p>
@@ -133,8 +129,8 @@ export const InfoVariant: Story = {
   render: () => (
     <InteractiveWrapper variant="info" title="Game Info" icon="ℹ️">
       <p className="text-sm">
-        This is an informational tooltip with the default blue theme.
-        Great for general game information and tips.
+        This is an informational tooltip with the default blue theme. Great for general game
+        information and tips.
       </p>
     </InteractiveWrapper>
   ),
@@ -147,8 +143,8 @@ export const WarningVariant: Story = {
   render: () => (
     <InteractiveWrapper variant="warning" title="Warning" icon="⚠️">
       <p className="text-sm">
-        You must follow suit! You have red cards in your hand
-        but are trying to play a different color.
+        You must follow suit! You have red cards in your hand but are trying to play a different
+        color.
       </p>
     </InteractiveWrapper>
   ),
@@ -230,8 +226,8 @@ export const AlwaysOpen: Story = {
         variant="success"
       >
         <p className="text-sm">
-          This tooltip is always visible for visual testing purposes.
-          In production, it would be controlled by user interaction.
+          This tooltip is always visible for visual testing purposes. In production, it would be
+          controlled by user interaction.
         </p>
       </GameTooltip>
     </div>

@@ -17,7 +17,8 @@ const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 
 if (SENTRY_DSN) {
   const sentryEnvironment = import.meta.env.VITE_SENTRY_ENVIRONMENT || 'production';
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'https://anthropicjoffre-production.up.railway.app';
+  const BACKEND_URL =
+    import.meta.env.VITE_BACKEND_URL || 'https://anthropicjoffre-production.up.railway.app';
   const tunnelUrl = `${BACKEND_URL}/api/sentry-tunnel`;
 
   logger.info('Initializing Sentry', { environment: sentryEnvironment, tunnel: tunnelUrl });
@@ -66,5 +67,5 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </AuthProvider>
       </SkinProvider>
     </ErrorBoundary>
-  </React.StrictMode>,
+  </React.StrictMode>
 );

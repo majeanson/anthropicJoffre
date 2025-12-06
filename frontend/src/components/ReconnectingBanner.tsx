@@ -6,7 +6,10 @@ interface ReconnectingBannerProps {
   maxAttempts: number;
 }
 
-export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, maxAttempts }: ReconnectingBannerProps) {
+export const ReconnectingBanner = memo(function ReconnectingBanner({
+  attempt,
+  maxAttempts,
+}: ReconnectingBannerProps) {
   const isFirstAttempt = attempt <= 2;
 
   return (
@@ -34,7 +37,8 @@ export const ReconnectingBanner = memo(function ReconnectingBanner({ attempt, ma
           color="info"
           className="[&_*]:text-white/80 [&>div:first-child]:text-white/80"
           style={{
-            ['--progress-track' as string]: 'color-mix(in srgb, var(--color-info) 30%, transparent)',
+            ['--progress-track' as string]:
+              'color-mix(in srgb, var(--color-info) 30%, transparent)',
             ['--progress-fill' as string]: 'white',
           }}
         />

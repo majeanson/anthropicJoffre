@@ -19,7 +19,16 @@
 import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { FriendWithStatus, FriendRequest, FriendRequestNotification } from '../types/friends';
-import { Modal, Button, SocialListItem, UIBadge, Tabs, Input, EmptyState, LoadingState } from './ui';
+import {
+  Modal,
+  Button,
+  SocialListItem,
+  UIBadge,
+  Tabs,
+  Input,
+  EmptyState,
+  LoadingState,
+} from './ui';
 import type { PlayerStatus } from './ui/OnlineStatusBadge';
 import type { Tab } from './ui/Tabs';
 
@@ -31,7 +40,13 @@ interface FriendsPanelProps {
   onStartConversation?: (username: string) => void;
 }
 
-export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, onStartConversation }: FriendsPanelProps) {
+export default function FriendsPanel({
+  socket,
+  currentPlayer,
+  isOpen,
+  onClose,
+  onStartConversation,
+}: FriendsPanelProps) {
   // Early returns BEFORE hooks
   if (!isOpen) return null;
   if (!socket || !currentPlayer) return null;
@@ -41,7 +56,9 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
   const [pendingRequests, setPendingRequests] = useState<FriendRequest[]>([]);
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{ player_name: string; games_played: number; games_won: number }>>([]);
+  const [searchResults, setSearchResults] = useState<
+    Array<{ player_name: string; games_played: number; games_won: number }>
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch friends list on mount
@@ -73,7 +90,11 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
       setIsLoading(false);
     };
 
-    const handleFriendsListUpdated = ({ friends: friendsList }: { friends: FriendWithStatus[] }) => {
+    const handleFriendsListUpdated = ({
+      friends: friendsList,
+    }: {
+      friends: FriendWithStatus[];
+    }) => {
       setFriends(friendsList);
       // Refresh requests when friends list updates
       socket.emit('get_friend_requests');
@@ -92,7 +113,11 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
       socket.emit('get_sent_friend_requests');
     };
 
-    const handlePlayerSearchResults = ({ players }: { players: Array<{ player_name: string; games_played: number; games_won: number }> }) => {
+    const handlePlayerSearchResults = ({
+      players,
+    }: {
+      players: Array<{ player_name: string; games_played: number; games_won: number }>;
+    }) => {
       setSearchResults(players);
       setIsLoading(false);
     };
@@ -170,7 +195,6 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
 
       {/* Content */}
       <div className="space-y-4">
-
         {/* Friends Tab */}
         {activeTab === 'friends' && (
           <div className="space-y-3">
@@ -202,7 +226,12 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
                         <Button
                           variant="primary"
                           size="sm"
-                          onClick={() => socket?.emit('spectate_game', { gameId: friend.game_id, spectatorName: currentPlayer })}
+                          onClick={() =>
+                            socket?.emit('spectate_game', {
+                              gameId: friend.game_id,
+                              spectatorName: currentPlayer,
+                            })
+                          }
                         >
                           Watch
                         </Button>
@@ -227,7 +256,9 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
           <div className="space-y-6">
             {/* Received Requests */}
             <div>
-              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-3">Received Requests</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-3">
+                Received Requests
+              </h3>
               <div className="space-y-3">
                 {pendingRequests.length === 0 ? (
                   <EmptyState icon="📬" title="No pending requests" compact />
@@ -264,7 +295,9 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
 
             {/* Sent Requests */}
             <div>
-              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-3">Sent Requests</h3>
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-3">
+                Sent Requests
+              </h3>
               <div className="space-y-3">
                 {sentRequests.length === 0 ? (
                   <EmptyState icon="📤" title="No sent requests" compact />
@@ -311,9 +344,7 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
               </Button>
             </div>
 
-            {isLoading && (
-              <LoadingState message="Searching..." size="sm" />
-            )}
+            {isLoading && <LoadingState message="Searching..." size="sm" />}
 
             {!isLoading && searchResults.length === 0 && searchQuery.length >= 2 && (
               <EmptyState icon="🔍" title="No players found" compact />
@@ -321,8 +352,8 @@ export default function FriendsPanel({ socket, currentPlayer, isOpen, onClose, o
 
             <div className="space-y-3">
               {searchResults.map((player) => {
-                const alreadyFriend = friends.some(f => f.player_name === player.player_name);
-                const alreadySent = sentRequests.some(r => r.to_player === player.player_name);
+                const alreadyFriend = friends.some((f) => f.player_name === player.player_name);
+                const alreadySent = sentRequests.some((r) => r.to_player === player.player_name);
 
                 return (
                   <SocialListItem

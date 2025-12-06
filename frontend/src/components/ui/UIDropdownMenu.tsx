@@ -102,7 +102,8 @@ export function UIDropdownMenu({
   useEffect(() => {
     if (isOpen && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      const dropdownWidth = width === 'sm' ? 160 : width === 'md' ? 224 : width === 'lg' ? 288 : 150;
+      const dropdownWidth =
+        width === 'sm' ? 160 : width === 'md' ? 224 : width === 'lg' ? 288 : 150;
 
       let top = 0;
       let left = 0;
@@ -138,8 +139,10 @@ export function UIDropdownMenu({
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
       if (
-        triggerRef.current && !triggerRef.current.contains(target) &&
-        dropdownRef.current && !dropdownRef.current.contains(target)
+        triggerRef.current &&
+        !triggerRef.current.contains(target) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(target)
       ) {
         setIsOpen(false);
       }
@@ -183,50 +186,53 @@ export function UIDropdownMenu({
       </div>
 
       {/* Dropdown Menu - Rendered via portal to escape overflow:hidden */}
-      {isOpen && createPortal(
-        <div
-          ref={dropdownRef}
-          className="fixed z-[9999]"
-          style={{
-            top: dropdownPosition.top,
-            left: dropdownPosition.left,
-          }}
-        >
-          <UICard
-            variant="elevated"
-            size="sm"
-            className={`${widthClasses[width]} animate-fade-in !p-0`}
-            data-testid={`${testId}-content`}
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[9999]"
+            style={{
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+            }}
           >
-            <div className="py-1" role="menu" aria-orientation="vertical">
-              {items.map((item, index) => {
-                if (item.type === 'divider') {
-                  return <UIDivider key={index} className="my-1" />;
-                }
+            <UICard
+              variant="elevated"
+              size="sm"
+              className={`${widthClasses[width]} animate-fade-in !p-0`}
+              data-testid={`${testId}-content`}
+            >
+              <div className="py-1" role="menu" aria-orientation="vertical">
+                {items.map((item, index) => {
+                  if (item.type === 'divider') {
+                    return <UIDivider key={index} className="my-1" />;
+                  }
 
-                return (
-                  <Button
-                    key={index}
-                    onClick={() => handleItemClick(item)}
-                    variant={item.danger ? 'danger' : 'ghost'}
-                    size="sm"
-                    disabled={item.disabled}
-                    className={`w-full justify-start px-4 py-2 rounded-none ${
-                      item.danger ? '!bg-transparent hover:!bg-red-50 dark:hover:!bg-red-900/20' : ''
-                    }`}
-                    role="menuitem"
-                    data-testid={item['data-testid']}
-                  >
-                    {item.icon && <span aria-hidden="true">{item.icon}</span>}
-                    <span>{item.label}</span>
-                  </Button>
-                );
-              })}
-            </div>
-          </UICard>
-        </div>,
-        document.body
-      )}
+                  return (
+                    <Button
+                      key={index}
+                      onClick={() => handleItemClick(item)}
+                      variant={item.danger ? 'danger' : 'ghost'}
+                      size="sm"
+                      disabled={item.disabled}
+                      className={`w-full justify-start px-4 py-2 rounded-none ${
+                        item.danger
+                          ? '!bg-transparent hover:!bg-red-50 dark:hover:!bg-red-900/20'
+                          : ''
+                      }`}
+                      role="menuitem"
+                      data-testid={item['data-testid']}
+                    >
+                      {item.icon && <span aria-hidden="true">{item.icon}</span>}
+                      <span>{item.label}</span>
+                    </Button>
+                  );
+                })}
+              </div>
+            </UICard>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

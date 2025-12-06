@@ -7,12 +7,22 @@ const MockAudioContext = vi.fn().mockImplementation(() => ({
     connect: vi.fn(),
     start: vi.fn(),
     stop: vi.fn(),
-    frequency: { value: 0, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
+    frequency: {
+      value: 0,
+      setValueAtTime: vi.fn(),
+      exponentialRampToValueAtTime: vi.fn(),
+      linearRampToValueAtTime: vi.fn(),
+    },
     type: 'sine',
   })),
   createGain: vi.fn(() => ({
     connect: vi.fn(),
-    gain: { value: 0, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn(), linearRampToValueAtTime: vi.fn() },
+    gain: {
+      value: 0,
+      setValueAtTime: vi.fn(),
+      exponentialRampToValueAtTime: vi.fn(),
+      linearRampToValueAtTime: vi.fn(),
+    },
   })),
   destination: {},
   currentTime: 0,
@@ -20,7 +30,8 @@ const MockAudioContext = vi.fn().mockImplementation(() => ({
   resume: vi.fn(),
 }));
 
-(globalThis as typeof globalThis & { AudioContext: typeof MockAudioContext }).AudioContext = MockAudioContext;
+(globalThis as typeof globalThis & { AudioContext: typeof MockAudioContext }).AudioContext =
+  MockAudioContext;
 
 // Mock sounds module
 vi.mock('../utils/sounds', () => ({

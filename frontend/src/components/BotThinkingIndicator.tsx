@@ -77,21 +77,45 @@ export function BotThinkingIndicator({
       case 'top':
         return {
           bottom: window.innerHeight - rect.top + padding,
-          left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
+          left: Math.max(
+            padding,
+            Math.min(
+              rect.left + rect.width / 2 - tooltipWidth / 2,
+              window.innerWidth - tooltipWidth - padding
+            )
+          ),
         };
       case 'bottom':
         return {
           top: rect.bottom + padding,
-          left: Math.max(padding, Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - padding)),
+          left: Math.max(
+            padding,
+            Math.min(
+              rect.left + rect.width / 2 - tooltipWidth / 2,
+              window.innerWidth - tooltipWidth - padding
+            )
+          ),
         };
       case 'left':
         return {
-          top: Math.max(padding, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - padding)),
+          top: Math.max(
+            padding,
+            Math.min(
+              rect.top + rect.height / 2 - tooltipHeight / 2,
+              window.innerHeight - tooltipHeight - padding
+            )
+          ),
           right: window.innerWidth - rect.left + padding,
         };
       case 'right':
         return {
-          top: Math.max(padding, Math.min(rect.top + rect.height / 2 - tooltipHeight / 2, window.innerHeight - tooltipHeight - padding)),
+          top: Math.max(
+            padding,
+            Math.min(
+              rect.top + rect.height / 2 - tooltipHeight / 2,
+              window.innerHeight - tooltipHeight - padding
+            )
+          ),
           left: rect.right + padding,
         };
       default:
@@ -116,7 +140,10 @@ export function BotThinkingIndicator({
           aria-expanded={isOpen}
           title="Click to toggle bot thinking"
         >
-          <span className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`} aria-hidden="true">
+          <span
+            className={`text-base md:text-lg ${isOpen ? 'animate-pulse' : ''}`}
+            aria-hidden="true"
+          >
             🤖
           </span>
         </Button>

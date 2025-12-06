@@ -5,28 +5,55 @@ import GlobalUI from './components/GlobalUI';
 
 // Lazy load heavy components for better initial load performance
 // Game phase components (only loaded when needed)
-const TeamSelection = lazy(() => import('./components/TeamSelection').then(m => ({ default: m.TeamSelection })));
-const BettingPhase = lazy(() => import('./components/BettingPhase').then(m => ({ default: m.BettingPhase })));
-const PlayingPhase = lazy(() => import('./components/PlayingPhase').then(m => ({ default: m.PlayingPhase })));
+const TeamSelection = lazy(() =>
+  import('./components/TeamSelection').then((m) => ({ default: m.TeamSelection }))
+);
+const BettingPhase = lazy(() =>
+  import('./components/BettingPhase').then((m) => ({ default: m.BettingPhase }))
+);
+const PlayingPhase = lazy(() =>
+  import('./components/PlayingPhase').then((m) => ({ default: m.PlayingPhase }))
+);
 const RoundSummary = lazy(() => import('./components/RoundSummary'));
-const RematchVoting = lazy(() => import('./components/RematchVoting').then(m => ({ default: m.RematchVoting })));
+const RematchVoting = lazy(() =>
+  import('./components/RematchVoting').then((m) => ({ default: m.RematchVoting }))
+);
 
 // Modals and overlays (only loaded when opened)
-const GameReplay = lazy(() => import('./components/GameReplay').then(m => ({ default: m.GameReplay })));
-const BotTakeoverModal = lazy(() => import('./components/BotTakeoverModal').then(m => ({ default: m.BotTakeoverModal })));
-const SwapConfirmationModal = lazy(() => import('./components/SwapConfirmationModal').then(m => ({ default: m.SwapConfirmationModal })));
+const GameReplay = lazy(() =>
+  import('./components/GameReplay').then((m) => ({ default: m.GameReplay }))
+);
+const BotTakeoverModal = lazy(() =>
+  import('./components/BotTakeoverModal').then((m) => ({ default: m.BotTakeoverModal }))
+);
+const SwapConfirmationModal = lazy(() =>
+  import('./components/SwapConfirmationModal').then((m) => ({ default: m.SwapConfirmationModal }))
+);
+const VictoryConfetti = lazy(() =>
+  import('./components/VictoryConfetti').then((m) => ({ default: m.VictoryConfetti }))
+);
 
 // Debug components (only loaded in debug mode)
 const DebugControls = lazy(() => import('./components/DebugControls'));
-const DebugPanel = lazy(() => import('./components/DebugPanel').then(m => ({ default: m.DebugPanel })));
+const DebugPanel = lazy(() =>
+  import('./components/DebugPanel').then((m) => ({ default: m.DebugPanel }))
+);
 // Task 10 Phase 2: Keyboard navigation help
-const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcutsModal').then(m => ({ default: m.KeyboardShortcutsModal })));
+const KeyboardShortcutsModal = lazy(() =>
+  import('./components/KeyboardShortcutsModal').then((m) => ({ default: m.KeyboardShortcutsModal }))
+);
 // Player profile modal (lazy loaded)
-const PlayerProfileModal = lazy(() => import('./components/PlayerProfileModal').then(m => ({ default: m.PlayerProfileModal })));
+const PlayerProfileModal = lazy(() =>
+  import('./components/PlayerProfileModal').then((m) => ({ default: m.PlayerProfileModal }))
+);
 // Beginner mode components
-const BeginnerTutorial = lazy(() => import('./components/BeginnerTutorial').then(m => ({ default: m.BeginnerTutorial })));
+const BeginnerTutorial = lazy(() =>
+  import('./components/BeginnerTutorial').then((m) => ({ default: m.BeginnerTutorial }))
+);
 // How to Play modal (for "Why Register" prompt)
-const HowToPlay = lazy(() => import('./components/HowToPlay').then(m => ({ default: m.HowToPlay })));
+const HowToPlay = lazy(() =>
+  import('./components/HowToPlay').then((m) => ({ default: m.HowToPlay }))
+);
 // Sprint 19: Quest system components (integrated via Stats tab → ProfileProgressModal)
 import { Achievement } from './types/achievements'; // Sprint 2 Phase 1
 import { FriendRequestNotification } from './types/friends'; // Sprint 2 Phase 2
@@ -35,7 +62,12 @@ import { ModalProvider, useModals } from './contexts/ModalContext'; // Modal sta
 import { useNotifications } from './hooks/useNotifications'; // Sprint 3 Phase 5
 import { useSettings } from './contexts/SettingsContext'; // Settings including beginner mode
 import { preloadCardImages } from './utils/imagePreloader';
-import { calculateGameXp, calculateGameCoins, XP_REWARDS, CURRENCY_REWARDS } from './utils/xpSystem';
+import {
+  calculateGameXp,
+  calculateGameCoins,
+  XP_REWARDS,
+  CURRENCY_REWARDS,
+} from './utils/xpSystem';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ReplayErrorFallback } from './components/fallbacks/ReplayErrorFallback';
 // Sprint 5 Phase 2: Custom hooks for state management
@@ -109,12 +141,8 @@ function AppContent() {
   const { checkTutorialAchievement } = useTutorialAchievement({ socket });
 
   // Sprint 20: Skin context for level-based skin unlocks
-  const {
-    setPlayerLevel,
-    setUnlockedSkinIds,
-    setSkinRequirements,
-    loadPreferencesFromBackend,
-  } = useSkin();
+  const { setPlayerLevel, setUnlockedSkinIds, setSkinRequirements, loadPreferencesFromBackend } =
+    useSkin();
 
   // Sprint 3 Refactoring: Audio management hook
   const { soundEnabled, toggleSound, playErrorSound } = useAudioManager({ gameState });
@@ -187,17 +215,29 @@ function AppContent() {
   });
 
   // Sprint 2 Phase 1: Achievement state
-  const [achievementNotification, setAchievementNotification] = useState<{ achievement: Achievement; playerName: string } | null>(null);
+  const [achievementNotification, setAchievementNotification] = useState<{
+    achievement: Achievement;
+    playerName: string;
+  } | null>(null);
 
   // Sprint 2 Phase 2: Friends state
-  const [friendRequestNotification, setFriendRequestNotification] = useState<FriendRequestNotification | null>(null);
+  const [friendRequestNotification, setFriendRequestNotification] =
+    useState<FriendRequestNotification | null>(null);
   const [pendingFriendRequestsCount, setPendingFriendRequestsCount] = useState<number>(0);
 
   // Sprint 16: Swap request state
-  const [swapRequest, setSwapRequest] = useState<{ fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean } | null>(null);
+  const [swapRequest, setSwapRequest] = useState<{
+    fromPlayerId: string;
+    fromPlayerName: string;
+    willChangeTeams: boolean;
+  } | null>(null);
 
   // Sprint 20: Level up celebration state
-  const [levelUpData, setLevelUpData] = useState<{ oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null>(null);
+  const [levelUpData, setLevelUpData] = useState<{
+    oldLevel: number;
+    newLevel: number;
+    newlyUnlockedSkins: string[];
+  } | null>(null);
 
   // Sprint 21: Session XP/Coins tracking
   const [sessionXp, setSessionXp] = useState(0);
@@ -270,20 +310,22 @@ function AppContent() {
   }, []);
 
   // Online players tracking
-  const [onlinePlayers, setOnlinePlayers] = useState<Array<{
-    socketId: string;
-    playerName: string;
-    status: 'in_lobby' | 'in_game' | 'in_team_selection';
-    gameId?: string;
-    lastActivity: number;
-  }>>([]);
+  const [onlinePlayers, setOnlinePlayers] = useState<
+    Array<{
+      socketId: string;
+      playerName: string;
+      status: 'in_lobby' | 'in_game' | 'in_team_selection';
+      gameId?: string;
+      lastActivity: number;
+    }>
+  >([]);
 
   useEffect(() => {
     preloadCardImages();
 
     // Clean up any old bot sessions from localStorage
     // Bot sessions should not persist and can interfere with human player reconnection
-    Object.keys(localStorage).forEach(key => {
+    Object.keys(localStorage).forEach((key) => {
       if (key.startsWith('botSession_')) {
         localStorage.removeItem(key);
       }
@@ -296,7 +338,13 @@ function AppContent() {
   useEffect(() => {
     if (!socket) return;
 
-    const handleAchievementUnlocked = ({ playerName, achievement }: { playerName: string; achievement: Achievement }) => {
+    const handleAchievementUnlocked = ({
+      playerName,
+      achievement,
+    }: {
+      playerName: string;
+      achievement: Achievement;
+    }) => {
       // Show notification popup
       setAchievementNotification({ playerName, achievement });
     };
@@ -316,7 +364,9 @@ function AppContent() {
     socket.emit('get_skin_requirements');
     socket.emit('get_player_progression', { playerName: currentPlayerName });
 
-    const handleSkinRequirements = (data: { requirements: Array<{ skinId: string; requiredLevel: number; unlockDescription: string }> }) => {
+    const handleSkinRequirements = (data: {
+      requirements: Array<{ skinId: string; requiredLevel: number; unlockDescription: string }>;
+    }) => {
       setSkinRequirements(data.requirements);
     };
 
@@ -371,7 +421,7 @@ function AppContent() {
       // Show toast notification
       setFriendRequestNotification(notification);
       // Increment count
-      setPendingFriendRequestsCount(prev => prev + 1);
+      setPendingFriendRequestsCount((prev) => prev + 1);
     };
 
     const handleFriendRequests = ({ requests }: { requests: unknown[] }) => {
@@ -380,12 +430,12 @@ function AppContent() {
 
     const handleFriendRequestAccepted = () => {
       // Decrement count when a request is accepted
-      setPendingFriendRequestsCount(prev => Math.max(0, prev - 1));
+      setPendingFriendRequestsCount((prev) => Math.max(0, prev - 1));
     };
 
     const handleFriendRequestRejected = () => {
       // Decrement count when a request is rejected
-      setPendingFriendRequestsCount(prev => Math.max(0, prev - 1));
+      setPendingFriendRequestsCount((prev) => Math.max(0, prev - 1));
     };
 
     socket.on('friend_request_received', handleFriendRequestReceived);
@@ -399,7 +449,7 @@ function AppContent() {
       socket.off('friend_request_accepted_confirm', handleFriendRequestAccepted);
       socket.off('friend_request_rejected', handleFriendRequestRejected);
     };
-  }, [socket, auth.isAuthenticated])
+  }, [socket, auth.isAuthenticated]);
 
   // Sprint 22A: Game invite listener with Join action
   useEffect(() => {
@@ -407,7 +457,7 @@ function AppContent() {
 
     const handleGameInviteReceived = ({
       gameId: inviteGameId,
-      fromPlayer
+      fromPlayer,
     }: {
       gameId: string;
       fromPlayer: string;
@@ -429,7 +479,7 @@ function AppContent() {
               socket.emit('join_game', { gameId: inviteGameId, playerName, beginnerMode });
               setGameId(inviteGameId);
             }
-          }
+          },
         }
       );
       console.log(`[Social] Game invite received from ${fromPlayer} for game ${inviteGameId}`);
@@ -467,7 +517,11 @@ function AppContent() {
   useEffect(() => {
     if (!socket || !gameId) return;
 
-    const handleSwapRequestReceived = (data: { fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean }) => {
+    const handleSwapRequestReceived = (data: {
+      fromPlayerId: string;
+      fromPlayerName: string;
+      willChangeTeams: boolean;
+    }) => {
       setSwapRequest(data);
     };
 
@@ -539,18 +593,14 @@ function AppContent() {
     const handleGlobalKeyboard = (e: KeyboardEvent) => {
       // Don't intercept if user is typing in an input
       const target = e.target as HTMLElement;
-      if (
-        target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.isContentEditable
-      ) {
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
         return;
       }
 
       // ? - Show keyboard shortcuts help
       if (e.key === '?' && !e.ctrlKey && !e.altKey) {
         e.preventDefault();
-        setShowKeyboardShortcuts(prev => !prev);
+        setShowKeyboardShortcuts((prev) => !prev);
       }
     };
 
@@ -561,7 +611,7 @@ function AppContent() {
   // Sprint 5 Phase 2: Handle bot spawning on reconnection
   // This ensures bots continue playing after human player reconnects
   useEffect(() => {
-    if (gameState && socket && gameState.players.some(p => p.isBot)) {
+    if (gameState && socket && gameState.players.some((p) => p.isBot)) {
       // Check if we just reconnected by looking for showCatchUpModal
       if (showCatchUpModal) {
         spawnBotsForGame(gameState);
@@ -619,29 +669,35 @@ function AppContent() {
       // Explicitly include optional fields for .strict() validation
       socket.emit('spectate_game', {
         gameId,
-        spectatorName: spectatorName || undefined
+        spectatorName: spectatorName || undefined,
       });
       setGameId(gameId);
     }
   };
 
-  const handlePlaceBet = useCallback((amount: number, withoutTrump: boolean, skipped?: boolean) => {
-    if (socket && gameId) {
-      // Explicitly include all fields for .strict() validation
-      socket.emit('place_bet', {
-        gameId,
-        amount,
-        withoutTrump,
-        skipped: skipped ?? false
-      });
-    }
-  }, [socket, gameId]);
+  const handlePlaceBet = useCallback(
+    (amount: number, withoutTrump: boolean, skipped?: boolean) => {
+      if (socket && gameId) {
+        // Explicitly include all fields for .strict() validation
+        socket.emit('place_bet', {
+          gameId,
+          amount,
+          withoutTrump,
+          skipped: skipped ?? false,
+        });
+      }
+    },
+    [socket, gameId]
+  );
 
-  const handlePlayCard = useCallback((card: Card) => {
-    if (socket && gameId) {
-      socket.emit('play_card', { gameId, card });
-    }
-  }, [socket, gameId]);
+  const handlePlayCard = useCallback(
+    (card: Card) => {
+      if (socket && gameId) {
+        socket.emit('play_card', { gameId, card });
+      }
+    },
+    [socket, gameId]
+  );
 
   // Sprint 3 Refactoring: Autoplay management hook (must be after handlePlaceBet and handlePlayCard)
   const { autoplayEnabled, toggleAutoplay } = useAutoplay({
@@ -660,7 +716,7 @@ function AppContent() {
   const handleSwapPosition = (targetPlayerId: string) => {
     if (!socket || !gameId || !gameState) return;
 
-    const targetPlayer = gameState.players.find(p => p.id === targetPlayerId);
+    const targetPlayer = gameState.players.find((p) => p.id === targetPlayerId);
     if (!targetPlayer) return;
 
     // If target is a bot, swap immediately
@@ -678,7 +734,7 @@ function AppContent() {
     socket.emit('respond_to_swap', {
       gameId,
       requesterId: swapRequest.fromPlayerId,
-      accepted: true
+      accepted: true,
     });
 
     setSwapRequest(null);
@@ -690,7 +746,7 @@ function AppContent() {
     socket.emit('respond_to_swap', {
       gameId,
       requesterId: swapRequest.fromPlayerId,
-      accepted: false
+      accepted: false,
     });
 
     setSwapRequest(null);
@@ -705,7 +761,7 @@ function AppContent() {
   const handleLeaveGame = () => {
     if (!socket || !gameId || !gameState) return;
 
-    const currentPlayer = gameState.players.find(p => p.id === socket.id);
+    const currentPlayer = gameState.players.find((p) => p.id === socket.id);
 
     // If spectator or player not found, just leave normally
     if (isSpectator || !currentPlayer || currentPlayer.isBot) {
@@ -729,7 +785,7 @@ function AppContent() {
     }
 
     // Count current bots
-    const botCount = gameState.players.filter(p => p.isBot).length;
+    const botCount = gameState.players.filter((p) => p.isBot).length;
 
     // If already 3 bots, just leave without replacement (max bots would be exceeded)
     if (botCount >= 3) {
@@ -764,7 +820,7 @@ function AppContent() {
     // Replace player with bot
     socket.emit('replace_me_with_bot', {
       gameId,
-      playerName: currentPlayer.name
+      playerName: currentPlayer.name,
     });
 
     // Note: cleanup happens when 'replaced_by_bot' event is received
@@ -784,7 +840,7 @@ function AppContent() {
   // Sound toggle handler - now provided by useAudioManager hook
 
   const handleNewChatMessage = (message: ChatMessage) => {
-    setChatMessages(prev => [...prev, message]);
+    setChatMessages((prev) => [...prev, message]);
   };
 
   const handleRejoinGame = () => {
@@ -859,7 +915,10 @@ function AppContent() {
     achievementNotification: achievementNotification ? achievementNotification.achievement : null,
     setAchievementNotification: (achievement: Achievement | null) => {
       if (achievement) {
-        setAchievementNotification({ achievement, playerName: gameState?.players.find(p => p.id === socket?.id)?.name || '' });
+        setAchievementNotification({
+          achievement,
+          playerName: gameState?.players.find((p) => p.id === socket?.id)?.name || '',
+        });
       } else {
         setAchievementNotification(null);
       }
@@ -928,7 +987,13 @@ function AppContent() {
         {/* Bot Takeover Modal - for joining games that are full with bots */}
         {botTakeoverModal && (
           <ErrorBoundary componentName="BotTakeoverModal">
-            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+            <Suspense
+              fallback={
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="text-white">Loading...</div>
+                </div>
+              }
+            >
               <BotTakeoverModal
                 isOpen={!!botTakeoverModal}
                 availableBots={botTakeoverModal.availableBots}
@@ -941,7 +1006,6 @@ function AppContent() {
       </>
     );
   }
-
 
   // If debug mode is enabled, use the multi-player view
   if (debugMode && gameState.players.length === 4) {
@@ -998,7 +1062,13 @@ function AppContent() {
           </Suspense>
         </ErrorBoundary>
         <ErrorBoundary componentName="TeamSelection">
-          <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
+          <Suspense
+            fallback={
+              <div className="min-h-screen bg-gradient-to-br from-amber-900 via-orange-800 to-red-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+                <div className="text-white text-2xl">Loading...</div>
+              </div>
+            }
+          >
             <TeamSelection
               players={gameState.players}
               gameId={gameId}
@@ -1089,37 +1159,43 @@ function AppContent() {
           </Suspense>
         </ErrorBoundary>
         <ErrorBoundary>
-          <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
+          <Suspense
+            fallback={
+              <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+                <div className="text-white text-2xl">Loading...</div>
+              </div>
+            }
+          >
             <BettingPhase
-            players={gameState.players}
-            currentBets={gameState.currentBets}
-            currentPlayerId={currentPlayerName}
-            currentPlayerIndex={gameState.currentPlayerIndex}
-            dealerIndex={gameState.dealerIndex}
-            onPlaceBet={handlePlaceBet}
-            onLeaveGame={handleLeaveGame}
-            gameState={gameState}
-            autoplayEnabled={autoplayEnabled}
-            onAutoplayToggle={toggleAutoplay}
-            soundEnabled={soundEnabled}
-            onSoundToggle={toggleSound}
-            connectionStats={connectionStats}
-            onOpenBotManagement={() => setShowBotManagement(true)}
-            onOpenAchievements={handleOpenAchievements}
-            onOpenFriends={handleOpenFriends}
-            pendingFriendRequestsCount={pendingFriendRequestsCount}
-            onClickPlayer={handleClickPlayer}
-            socket={socket}
-            gameId={gameId}
-            chatMessages={chatMessages}
-            onNewChatMessage={handleNewChatMessage}
-            isVoiceEnabled={isVoiceEnabled}
-            isVoiceMuted={isVoiceMuted}
-            voiceParticipants={voiceParticipants}
-            voiceError={voiceError}
-            onVoiceToggle={handleVoiceToggle}
-            onVoiceMuteToggle={toggleVoiceMute}
-          />
+              players={gameState.players}
+              currentBets={gameState.currentBets}
+              currentPlayerId={currentPlayerName}
+              currentPlayerIndex={gameState.currentPlayerIndex}
+              dealerIndex={gameState.dealerIndex}
+              onPlaceBet={handlePlaceBet}
+              onLeaveGame={handleLeaveGame}
+              gameState={gameState}
+              autoplayEnabled={autoplayEnabled}
+              onAutoplayToggle={toggleAutoplay}
+              soundEnabled={soundEnabled}
+              onSoundToggle={toggleSound}
+              connectionStats={connectionStats}
+              onOpenBotManagement={() => setShowBotManagement(true)}
+              onOpenAchievements={handleOpenAchievements}
+              onOpenFriends={handleOpenFriends}
+              pendingFriendRequestsCount={pendingFriendRequestsCount}
+              onClickPlayer={handleClickPlayer}
+              socket={socket}
+              gameId={gameId}
+              chatMessages={chatMessages}
+              onNewChatMessage={handleNewChatMessage}
+              isVoiceEnabled={isVoiceEnabled}
+              isVoiceMuted={isVoiceMuted}
+              voiceParticipants={voiceParticipants}
+              voiceError={voiceError}
+              onVoiceToggle={handleVoiceToggle}
+              onVoiceMuteToggle={toggleVoiceMute}
+            />
           </Suspense>
         </ErrorBoundary>
 
@@ -1188,35 +1264,41 @@ function AppContent() {
           </Suspense>
         </ErrorBoundary>
         <ErrorBoundary>
-          <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-green-900 via-teal-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
+          <Suspense
+            fallback={
+              <div className="min-h-screen bg-gradient-to-br from-green-900 via-teal-900 to-blue-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+                <div className="text-white text-2xl">Loading...</div>
+              </div>
+            }
+          >
             <PlayingPhase
-          gameState={gameState}
-          currentPlayerId={currentPlayerName}
-          onPlayCard={handlePlayCard}
-          isSpectator={isSpectator}
-          currentTrickWinnerId={currentTrickWinnerId}
-          onLeaveGame={handleLeaveGame}
-          autoplayEnabled={autoplayEnabled}
-          onAutoplayToggle={toggleAutoplay}
-          soundEnabled={soundEnabled}
-          onSoundToggle={toggleSound}
-          onOpenBotManagement={() => setShowBotManagement(true)}
-          onOpenAchievements={handleOpenAchievements}
-          onOpenFriends={handleOpenFriends}
-          pendingFriendRequestsCount={pendingFriendRequestsCount}
-          onClickPlayer={handleClickPlayer}
-          socket={socket}
-          gameId={gameId}
-          chatMessages={chatMessages}
-          onNewChatMessage={handleNewChatMessage}
-          connectionStats={connectionStats}
-          isVoiceEnabled={isVoiceEnabled}
-          isVoiceMuted={isVoiceMuted}
-          voiceParticipants={voiceParticipants}
-          voiceError={voiceError}
-          onVoiceToggle={handleVoiceToggle}
-          onVoiceMuteToggle={toggleVoiceMute}
-        />
+              gameState={gameState}
+              currentPlayerId={currentPlayerName}
+              onPlayCard={handlePlayCard}
+              isSpectator={isSpectator}
+              currentTrickWinnerId={currentTrickWinnerId}
+              onLeaveGame={handleLeaveGame}
+              autoplayEnabled={autoplayEnabled}
+              onAutoplayToggle={toggleAutoplay}
+              soundEnabled={soundEnabled}
+              onSoundToggle={toggleSound}
+              onOpenBotManagement={() => setShowBotManagement(true)}
+              onOpenAchievements={handleOpenAchievements}
+              onOpenFriends={handleOpenFriends}
+              pendingFriendRequestsCount={pendingFriendRequestsCount}
+              onClickPlayer={handleClickPlayer}
+              socket={socket}
+              gameId={gameId}
+              chatMessages={chatMessages}
+              onNewChatMessage={handleNewChatMessage}
+              connectionStats={connectionStats}
+              isVoiceEnabled={isVoiceEnabled}
+              isVoiceMuted={isVoiceMuted}
+              voiceParticipants={voiceParticipants}
+              voiceError={voiceError}
+              onVoiceToggle={handleVoiceToggle}
+              onVoiceMuteToggle={toggleVoiceMute}
+            />
           </Suspense>
         </ErrorBoundary>
 
@@ -1290,7 +1372,13 @@ function AppContent() {
           </Suspense>
         </ErrorBoundary>
         <ErrorBoundary>
-          <Suspense fallback={<div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center"><div className="text-white text-2xl">Loading...</div></div>}>
+          <Suspense
+            fallback={
+              <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+                <div className="text-white text-2xl">Loading...</div>
+              </div>
+            }
+          >
             <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-6">
               <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-5xl w-full">
                 <RoundSummary
@@ -1339,12 +1427,15 @@ function AppContent() {
 
   if (gameState.phase === 'game_over') {
     const winningTeam = gameState.teamScores.team1 >= 41 ? 1 : 2;
-    const team1Players = gameState.players.filter(p => p.teamId === 1);
-    const team2Players = gameState.players.filter(p => p.teamId === 2);
+    const team1Players = gameState.players.filter((p) => p.teamId === 1);
+    const team2Players = gameState.players.filter((p) => p.teamId === 2);
 
     return (
       <>
         <GlobalUI {...globalUIProps} />
+        <Suspense fallback={null}>
+          <VictoryConfetti teamColor={winningTeam === 1 ? 'orange' : 'purple'} duration={5000} />
+        </Suspense>
         <DebugControls
           gameState={gameState}
           gameId={gameId}
@@ -1376,7 +1467,9 @@ function AppContent() {
               <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-orange-600 to-red-600 mb-4 animate-pulse">
                 🏆 Game Over! 🏆
               </h2>
-              <div className={`text-6xl font-black mb-2 ${winningTeam === 1 ? 'text-orange-600' : 'text-purple-600'}`}>
+              <div
+                className={`text-6xl font-black mb-2 ${winningTeam === 1 ? 'text-orange-600' : 'text-purple-600'}`}
+              >
                 Team {winningTeam} Wins!
               </div>
               <p className="text-umber-600 font-semibold">Round {gameState.roundNumber}</p>
@@ -1384,20 +1477,28 @@ function AppContent() {
 
             {/* Final Scores */}
             <div className="grid grid-cols-2 gap-6 mb-8">
-              <div className={`text-center p-6 rounded-xl border-4 ${winningTeam === 1 ? 'bg-orange-100 border-orange-400 ring-4 ring-yellow-400' : 'bg-orange-50 border-orange-200'}`}>
+              <div
+                className={`text-center p-6 rounded-xl border-4 ${winningTeam === 1 ? 'bg-orange-100 border-orange-400 ring-4 ring-yellow-400' : 'bg-orange-50 border-orange-200'}`}
+              >
                 <div className="flex items-center justify-center gap-2 mb-2">
                   {winningTeam === 1 && <span className="text-3xl">👑</span>}
                   <h3 className="text-2xl font-bold text-orange-800">Team 1</h3>
                 </div>
-                <p data-testid="team1-final-score" className="text-6xl font-black text-orange-600">{gameState.teamScores.team1}</p>
+                <p data-testid="team1-final-score" className="text-6xl font-black text-orange-600">
+                  {gameState.teamScores.team1}
+                </p>
                 <p className="text-sm text-orange-700 mt-2">Final Score</p>
               </div>
-              <div className={`text-center p-6 rounded-xl border-4 ${winningTeam === 2 ? 'bg-purple-100 border-purple-400 ring-4 ring-yellow-400' : 'bg-purple-50 border-purple-200'}`}>
+              <div
+                className={`text-center p-6 rounded-xl border-4 ${winningTeam === 2 ? 'bg-purple-100 border-purple-400 ring-4 ring-yellow-400' : 'bg-purple-50 border-purple-200'}`}
+              >
                 <div className="flex items-center justify-center gap-2 mb-2">
                   {winningTeam === 2 && <span className="text-3xl">👑</span>}
                   <h3 className="text-2xl font-bold text-purple-800">Team 2</h3>
                 </div>
-                <p data-testid="team2-final-score" className="text-6xl font-black text-purple-600">{gameState.teamScores.team2}</p>
+                <p data-testid="team2-final-score" className="text-6xl font-black text-purple-600">
+                  {gameState.teamScores.team2}
+                </p>
                 <p className="text-sm text-purple-700 mt-2">Final Score</p>
               </div>
             </div>
@@ -1409,7 +1510,7 @@ function AppContent() {
 
               // Calculate rewards for current player
               const currentPlayer = gameState.players.find(
-                p => p.name === currentPlayerName || p.id === currentPlayerName
+                (p) => p.name === currentPlayerName || p.id === currentPlayerName
               );
               if (!currentPlayer || currentPlayer.isBot) return null;
 
@@ -1431,16 +1532,17 @@ function AppContent() {
                     betsSuccessful++;
                   }
                   // Count rounds won/lost based on round score (positive = team scored points)
-                  const playerTeamScore = currentPlayer.teamId === 1
-                    ? round.roundScore.team1
-                    : round.roundScore.team2;
+                  const playerTeamScore =
+                    currentPlayer.teamId === 1 ? round.roundScore.team1 : round.roundScore.team2;
                   if (playerTeamScore > 0) {
                     roundsWon++;
                   } else {
                     roundsLost++;
                   }
                   // Count special cards from player stats
-                  const playerStats = round.playerStats?.find(ps => ps.playerName === currentPlayer.name);
+                  const playerStats = round.playerStats?.find(
+                    (ps) => ps.playerName === currentPlayer.name
+                  );
                   if (playerStats?.redZerosCollected) {
                     redZerosCollected += playerStats.redZerosCollected;
                   }
@@ -1470,34 +1572,73 @@ function AppContent() {
                 >
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     {/* XP Section */}
-                    <div className="flex items-center gap-3 md:gap-4" role="group" aria-label="Experience points earned">
-                      <span className="text-4xl md:text-5xl" aria-hidden="true">✨</span>
+                    <div
+                      className="flex items-center gap-3 md:gap-4"
+                      role="group"
+                      aria-label="Experience points earned"
+                    >
+                      <span className="text-4xl md:text-5xl" aria-hidden="true">
+                        ✨
+                      </span>
                       <div>
-                        <h3 className="text-base md:text-lg font-bold text-emerald-800 dark:text-emerald-300" id="game-xp-label">Total XP</h3>
-                        <div className="text-3xl md:text-4xl font-black text-emerald-600 dark:text-emerald-400" aria-labelledby="game-xp-label">
+                        <h3
+                          className="text-base md:text-lg font-bold text-emerald-800 dark:text-emerald-300"
+                          id="game-xp-label"
+                        >
+                          Total XP
+                        </h3>
+                        <div
+                          className="text-3xl md:text-4xl font-black text-emerald-600 dark:text-emerald-400"
+                          aria-labelledby="game-xp-label"
+                        >
                           +{xp} XP
                         </div>
                       </div>
                     </div>
 
                     {/* Coins Section */}
-                    <div className="flex items-center gap-3 md:gap-4 md:border-l md:border-emerald-300 dark:md:border-emerald-700 md:pl-6" role="group" aria-label="Coins earned">
-                      <span className="text-4xl md:text-5xl" aria-hidden="true">🪙</span>
+                    <div
+                      className="flex items-center gap-3 md:gap-4 md:border-l md:border-emerald-300 dark:md:border-emerald-700 md:pl-6"
+                      role="group"
+                      aria-label="Coins earned"
+                    >
+                      <span className="text-4xl md:text-5xl" aria-hidden="true">
+                        🪙
+                      </span>
                       <div>
-                        <h3 className="text-base md:text-lg font-bold text-amber-700 dark:text-amber-400" id="game-coins-label">Total Coins</h3>
-                        <div className="text-3xl md:text-4xl font-black text-amber-600 dark:text-amber-400" aria-labelledby="game-coins-label">
+                        <h3
+                          className="text-base md:text-lg font-bold text-amber-700 dark:text-amber-400"
+                          id="game-coins-label"
+                        >
+                          Total Coins
+                        </h3>
+                        <div
+                          className="text-3xl md:text-4xl font-black text-amber-600 dark:text-amber-400"
+                          aria-labelledby="game-coins-label"
+                        >
                           +{coins}
                         </div>
                       </div>
                     </div>
 
                     {/* Breakdown */}
-                    <div className="text-xs md:text-sm space-y-1 border-t md:border-t-0 md:border-l border-emerald-300 dark:border-emerald-700 pt-3 md:pt-0 md:pl-6" aria-label="Reward breakdown">
+                    <div
+                      className="text-xs md:text-sm space-y-1 border-t md:border-t-0 md:border-l border-emerald-300 dark:border-emerald-700 pt-3 md:pt-0 md:pl-6"
+                      aria-label="Reward breakdown"
+                    >
                       <div className="text-emerald-700 dark:text-emerald-400">
                         <div>Game = +{XP_REWARDS.GAME_COMPLETION} XP</div>
                         {won && <div>Victory = +{XP_REWARDS.GAME_WIN} XP</div>}
-                        {tricksWon > 0 && <div>{tricksWon} tricks = +{tricksWon * XP_REWARDS.TRICK_WON} XP</div>}
-                        {betsSuccessful > 0 && <div>{betsSuccessful} bets = +{betsSuccessful * XP_REWARDS.SUCCESSFUL_BET} XP</div>}
+                        {tricksWon > 0 && (
+                          <div>
+                            {tricksWon} tricks = +{tricksWon * XP_REWARDS.TRICK_WON} XP
+                          </div>
+                        )}
+                        {betsSuccessful > 0 && (
+                          <div>
+                            {betsSuccessful} bets = +{betsSuccessful * XP_REWARDS.SUCCESSFUL_BET} XP
+                          </div>
+                        )}
                       </div>
                       <div className="text-amber-600 dark:text-amber-400">
                         {won ? (
@@ -1505,8 +1646,19 @@ function AppContent() {
                         ) : (
                           <div>Participation = +{CURRENCY_REWARDS.GAME_LOST} coins</div>
                         )}
-                        {roundsWon > 0 && <div>{roundsWon} rounds won = +{roundsWon * (CURRENCY_REWARDS.ROUND_WON + CURRENCY_REWARDS.BET_MADE)} coins</div>}
-                        {redZerosCollected > 0 && <div>{redZerosCollected} red 0s = +{redZerosCollected * CURRENCY_REWARDS.RED_ZERO_COLLECTED} coins</div>}
+                        {roundsWon > 0 && (
+                          <div>
+                            {roundsWon} rounds won = +
+                            {roundsWon * (CURRENCY_REWARDS.ROUND_WON + CURRENCY_REWARDS.BET_MADE)}{' '}
+                            coins
+                          </div>
+                        )}
+                        {redZerosCollected > 0 && (
+                          <div>
+                            {redZerosCollected} red 0s = +
+                            {redZerosCollected * CURRENCY_REWARDS.RED_ZERO_COLLECTED} coins
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1523,17 +1675,29 @@ function AppContent() {
               >
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center">
                   <div className="flex items-center gap-2">
-                    <span className="text-xl" aria-hidden="true">📊</span>
-                    <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">This Session:</span>
+                    <span className="text-xl" aria-hidden="true">
+                      📊
+                    </span>
+                    <span className="text-sm font-semibold text-indigo-700 dark:text-indigo-300">
+                      This Session:
+                    </span>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
-                      <span className="text-lg" aria-hidden="true">✨</span>
-                      <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{sessionXp} XP</span>
+                      <span className="text-lg" aria-hidden="true">
+                        ✨
+                      </span>
+                      <span className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                        {sessionXp} XP
+                      </span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <span className="text-lg" aria-hidden="true">🪙</span>
-                      <span className="text-lg font-bold text-amber-600 dark:text-amber-400">{sessionCoins} coins</span>
+                      <span className="text-lg" aria-hidden="true">
+                        🪙
+                      </span>
+                      <span className="text-lg font-bold text-amber-600 dark:text-amber-400">
+                        {sessionCoins} coins
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -1544,11 +1708,18 @@ function AppContent() {
             <div className="grid grid-cols-2 gap-6 mb-8">
               {/* Team 1 Players */}
               <div className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 border-2 border-orange-200 dark:border-orange-700">
-                <h4 className="text-lg font-bold text-orange-800 dark:text-orange-300 mb-3 text-center">Team 1 Players</h4>
+                <h4 className="text-lg font-bold text-orange-800 dark:text-orange-300 mb-3 text-center">
+                  Team 1 Players
+                </h4>
                 <div className="space-y-2">
-                  {team1Players.map(player => (
-                    <div key={player.id} className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-orange-200 dark:border-orange-700">
-                      <div className="font-semibold text-umber-900 dark:text-gray-100">{player.name}</div>
+                  {team1Players.map((player) => (
+                    <div
+                      key={player.id}
+                      className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-orange-200 dark:border-orange-700"
+                    >
+                      <div className="font-semibold text-umber-900 dark:text-gray-100">
+                        {player.name}
+                      </div>
                       <div className="text-sm text-umber-700 dark:text-gray-300">
                         {player.tricksWon} tricks • {player.pointsWon} pts
                       </div>
@@ -1559,11 +1730,18 @@ function AppContent() {
 
               {/* Team 2 Players */}
               <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 border-2 border-purple-200 dark:border-purple-700">
-                <h4 className="text-lg font-bold text-purple-800 dark:text-purple-300 mb-3 text-center">Team 2 Players</h4>
+                <h4 className="text-lg font-bold text-purple-800 dark:text-purple-300 mb-3 text-center">
+                  Team 2 Players
+                </h4>
                 <div className="space-y-2">
-                  {team2Players.map(player => (
-                    <div key={player.id} className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-purple-200 dark:border-purple-700">
-                      <div className="font-semibold text-umber-900 dark:text-gray-100">{player.name}</div>
+                  {team2Players.map((player) => (
+                    <div
+                      key={player.id}
+                      className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-purple-200 dark:border-purple-700"
+                    >
+                      <div className="font-semibold text-umber-900 dark:text-gray-100">
+                        {player.name}
+                      </div>
                       <div className="text-sm text-umber-700 dark:text-gray-300">
                         {player.tricksWon} tricks • {player.pointsWon} pts
                       </div>
@@ -1580,64 +1758,91 @@ function AppContent() {
                   📜 Game History
                 </h3>
                 <div className="max-h-96 overflow-y-auto space-y-3 pr-2">
-                  {gameState.roundHistory.slice().reverse().map((round) => {
-                    const betPlayer = gameState.players.find(p => p.id === round.highestBet.playerId);
+                  {gameState.roundHistory
+                    .slice()
+                    .reverse()
+                    .map((round) => {
+                      const betPlayer = gameState.players.find(
+                        (p) => p.id === round.highestBet.playerId
+                      );
 
-                    return (
-                      <div
-                        key={round.roundNumber}
-                        className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 hover:bg-parchment-200 dark:hover:bg-gray-600 transition-colors"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="text-lg font-bold text-umber-900 dark:text-gray-100">
-                            Round {round.roundNumber}
-                          </h4>
-                          <span className={`px-3 py-1 rounded-full text-sm font-semibold border-2 ${
-                            round.betMade
-                              ? 'bg-green-100 text-green-800 border-green-400'
-                              : 'bg-red-100 text-red-800 border-red-400'
-                          }`}>
-                            {round.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
-                          </span>
-                        </div>
+                      return (
+                        <div
+                          key={round.roundNumber}
+                          className="bg-parchment-100 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 hover:bg-parchment-200 dark:hover:bg-gray-600 transition-colors"
+                        >
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-lg font-bold text-umber-900 dark:text-gray-100">
+                              Round {round.roundNumber}
+                            </h4>
+                            <span
+                              className={`px-3 py-1 rounded-full text-sm font-semibold border-2 ${
+                                round.betMade
+                                  ? 'bg-green-100 text-green-800 border-green-400'
+                                  : 'bg-red-100 text-red-800 border-red-400'
+                              }`}
+                            >
+                              {round.betMade ? '✓ Bet Made' : '✗ Bet Failed'}
+                            </span>
+                          </div>
 
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                          <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                            <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">Bidder</p>
-                            <p className="font-bold text-umber-900 dark:text-gray-100">{betPlayer?.name || 'Unknown'}</p>
-                            <p className="text-xs text-umber-600 dark:text-gray-400">Team {round.offensiveTeam}</p>
-                          </div>
-                          <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                            <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">Bet</p>
-                            <p className="font-bold text-umber-900 dark:text-gray-100">{round.betAmount} points</p>
-                            <p className="text-xs text-umber-600 dark:text-gray-400">
-                              {round.withoutTrump ? 'No Trump (2x)' : 'With Trump'}
-                            </p>
-                          </div>
-                          <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                            <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">Points Earned</p>
-                            <p className="font-bold text-umber-900 dark:text-gray-100">
-                              {round.offensivePoints} / {round.betAmount}
-                            </p>
-                            <p className="text-xs text-umber-600 dark:text-gray-400">
-                              Defensive: {round.defensivePoints}
-                            </p>
-                          </div>
-                          <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
-                            <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">Round Score</p>
-                            <p className="font-bold">
-                              <span className="text-orange-600">{round.roundScore.team1 >= 0 ? '+' : ''}{round.roundScore.team1}</span>
-                              {' / '}
-                              <span className="text-purple-600">{round.roundScore.team2 >= 0 ? '+' : ''}{round.roundScore.team2}</span>
-                            </p>
-                            <p className="text-xs text-umber-600">
-                              Total: {round.cumulativeScore.team1} - {round.cumulativeScore.team2}
-                            </p>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
+                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                                Bidder
+                              </p>
+                              <p className="font-bold text-umber-900 dark:text-gray-100">
+                                {betPlayer?.name || 'Unknown'}
+                              </p>
+                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                                Team {round.offensiveTeam}
+                              </p>
+                            </div>
+                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
+                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                                Bet
+                              </p>
+                              <p className="font-bold text-umber-900 dark:text-gray-100">
+                                {round.betAmount} points
+                              </p>
+                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                                {round.withoutTrump ? 'No Trump (2x)' : 'With Trump'}
+                              </p>
+                            </div>
+                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
+                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                                Points Earned
+                              </p>
+                              <p className="font-bold text-umber-900 dark:text-gray-100">
+                                {round.offensivePoints} / {round.betAmount}
+                              </p>
+                              <p className="text-xs text-umber-600 dark:text-gray-400">
+                                Defensive: {round.defensivePoints}
+                              </p>
+                            </div>
+                            <div className="bg-parchment-50 dark:bg-gray-600 rounded p-2">
+                              <p className="text-umber-600 dark:text-gray-300 font-semibold text-xs">
+                                Round Score
+                              </p>
+                              <p className="font-bold">
+                                <span className="text-orange-600">
+                                  {round.roundScore.team1 >= 0 ? '+' : ''}
+                                  {round.roundScore.team1}
+                                </span>
+                                {' / '}
+                                <span className="text-purple-600">
+                                  {round.roundScore.team2 >= 0 ? '+' : ''}
+                                  {round.roundScore.team2}
+                                </span>
+                              </p>
+                              <p className="text-xs text-umber-600">
+                                Total: {round.cumulativeScore.team1} - {round.cumulativeScore.team2}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
                 </div>
               </div>
             )}
@@ -1681,8 +1886,16 @@ function AppContent() {
 
         {/* Game Replay Modal */}
         {showReplayModal && socket && (
-          <ErrorBoundary fallback={<ReplayErrorFallback onClose={() => setShowReplayModal(false)} />}>
-            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading replay...</div></div>}>
+          <ErrorBoundary
+            fallback={<ReplayErrorFallback onClose={() => setShowReplayModal(false)} />}
+          >
+            <Suspense
+              fallback={
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="text-white">Loading replay...</div>
+                </div>
+              }
+            >
               <GameReplay
                 gameId={gameId}
                 socket={socket}
@@ -1695,13 +1908,19 @@ function AppContent() {
         {/* Bot Takeover Modal */}
         {botTakeoverModal && (
           <ErrorBoundary componentName="BotTakeoverModal">
-            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+            <Suspense
+              fallback={
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="text-white">Loading...</div>
+                </div>
+              }
+            >
               <BotTakeoverModal
-              isOpen={!!botTakeoverModal}
-              availableBots={botTakeoverModal.availableBots}
-              onTakeOver={handleTakeOverBot}
-              onCancel={() => setBotTakeoverModal(null)}
-            />
+                isOpen={!!botTakeoverModal}
+                availableBots={botTakeoverModal.availableBots}
+                onTakeOver={handleTakeOverBot}
+                onCancel={() => setBotTakeoverModal(null)}
+              />
             </Suspense>
           </ErrorBoundary>
         )}
@@ -1709,7 +1928,13 @@ function AppContent() {
         {/* Swap Confirmation Modal */}
         {swapRequest && (
           <ErrorBoundary componentName="SwapConfirmationModal">
-            <Suspense fallback={<div className="fixed inset-0 bg-black/50 flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+            <Suspense
+              fallback={
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                  <div className="text-white">Loading...</div>
+                </div>
+              }
+            >
               <SwapConfirmationModal
                 isOpen={!!swapRequest}
                 fromPlayerName={swapRequest.fromPlayerName}
@@ -1728,10 +1953,13 @@ function AppContent() {
               // Cast to string to avoid TypeScript control flow narrowing issues
               const phase = gameState?.phase as string | undefined;
               const currentPhase: 'lobby' | 'team_selection' | 'betting' | 'playing' =
-                phase === 'team_selection' ? 'team_selection'
-                : phase === 'betting' ? 'betting'
-                : phase === 'playing' ? 'playing'
-                : 'lobby';
+                phase === 'team_selection'
+                  ? 'team_selection'
+                  : phase === 'betting'
+                    ? 'betting'
+                    : phase === 'playing'
+                      ? 'playing'
+                      : 'lobby';
 
               return (
                 <KeyboardShortcutsModal

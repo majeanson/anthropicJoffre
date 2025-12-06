@@ -47,7 +47,7 @@ export function SocialHub({
   currentUsername,
   initialTab = 'friends',
   onPlayerClick,
-  onSendMessage
+  onSendMessage,
 }: SocialHubProps) {
   // Early return BEFORE hooks
   if (!isOpen) return null;
@@ -82,14 +82,16 @@ export function SocialHub({
                 playerName: name,
                 lastPlayed: game.finished_at?.toString() || new Date().toISOString(),
                 gamesPlayed: 1,
-                isFriend: false
+                isFriend: false,
               });
             }
           }
         });
       });
 
-      setRecentPlayers(Array.from(playersMap.values()).sort((a, b) => b.gamesPlayed - a.gamesPlayed));
+      setRecentPlayers(
+        Array.from(playersMap.values()).sort((a, b) => b.gamesPlayed - a.gamesPlayed)
+      );
       setLoading(false);
     };
 
@@ -105,12 +107,12 @@ export function SocialHub({
     if (!socket || !isAuthenticated || activeTab !== 'suggestions') return;
 
     const playerSuggestions: FriendSuggestion[] = recentPlayers
-      .filter(p => !p.isFriend)
+      .filter((p) => !p.isFriend)
       .slice(0, 10)
-      .map(p => ({
+      .map((p) => ({
         playerName: p.playerName,
         reason: `Played together ${p.gamesPlayed} time${p.gamesPlayed > 1 ? 's' : ''}`,
-        gamesPlayed: p.gamesPlayed
+        gamesPlayed: p.gamesPlayed,
       }));
 
     setSuggestions(playerSuggestions);
@@ -131,43 +133,26 @@ export function SocialHub({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-50 p-4"
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/70"
       onClick={onClose}
       onKeyDown={(e) => e.stopPropagation()}
     >
       <div
-        className="rounded-[var(--radius-xl)] border-2 w-full max-w-4xl h-[700px] shadow-2xl flex flex-col"
-        style={{
-          background: 'linear-gradient(to bottom right, var(--color-bg-secondary), var(--color-bg-primary))',
-          borderColor: 'var(--color-border-accent)',
-          boxShadow: 'var(--shadow-glow)',
-        }}
+        className="rounded-[var(--radius-xl)] border-2 border-skin-accent w-full max-w-4xl h-[700px] shadow-2xl flex flex-col shadow-[var(--shadow-glow)] bg-gradient-to-br from-skin-secondary to-skin-primary"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div
-          className="flex items-center justify-between p-4 border-b"
-          style={{ borderColor: 'var(--color-border-default)' }}
-        >
-          <h2
-            className="text-2xl font-display uppercase tracking-wider"
-            style={{ color: 'var(--color-text-accent)' }}
-          >
+        <div className="flex items-center justify-between p-4 border-b border-skin-default">
+          <h2 className="text-2xl font-display uppercase tracking-wider text-skin-accent">
             Social Hub
           </h2>
-          <Button
-            onClick={onClose}
-            variant="ghost"
-            size="sm"
-            aria-label="Close"
-          >
+          <Button onClick={onClose} variant="ghost" size="sm" aria-label="Close">
             ×
           </Button>
         </div>
 
         {/* Tabs */}
-        <div style={{ borderBottom: '1px solid var(--color-border-default)' }}>
+        <div className="border-b border-skin-default">
           <Tabs
             tabs={socialTabs}
             activeTab={activeTab}
@@ -181,13 +166,11 @@ export function SocialHub({
         {/* Content */}
         <div className="flex-1 overflow-y-auto">
           {activeTab === 'friends' && (
-            <Suspense fallback={
-              <div className="p-8 text-center" style={{ color: 'var(--color-text-muted)' }}>
-                Loading friends...
-              </div>
-            }>
+            <Suspense
+              fallback={<div className="p-8 text-center text-skin-muted">Loading friends...</div>}
+            >
               <div className="p-6">
-                <p style={{ color: 'var(--color-text-muted)' }} className="mb-4">
+                <p className="mb-4 text-skin-muted">
                   Friends panel content will appear here. Use existing FriendsPanel component.
                 </p>
               </div>
@@ -195,14 +178,15 @@ export function SocialHub({
           )}
 
           {activeTab === 'achievements' && (
-            <Suspense fallback={
-              <div className="p-8 text-center" style={{ color: 'var(--color-text-muted)' }}>
-                Loading achievements...
-              </div>
-            }>
+            <Suspense
+              fallback={
+                <div className="p-8 text-center text-skin-muted">Loading achievements...</div>
+              }
+            >
               <div className="p-6">
-                <p style={{ color: 'var(--color-text-muted)' }} className="mb-4">
-                  Achievements panel content will appear here. Use existing AchievementsPanel component.
+                <p className="mb-4 text-skin-muted">
+                  Achievements panel content will appear here. Use existing AchievementsPanel
+                  component.
                 </p>
               </div>
             </Suspense>
@@ -213,8 +197,8 @@ export function SocialHub({
               {loading && <CardSkeleton count={5} hasAvatar={true} />}
               {!loading && recentPlayers.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="mb-2" style={{ color: 'var(--color-text-muted)' }}>No recent players</p>
-                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  <p className="mb-2 text-skin-muted">No recent players</p>
+                  <p className="text-sm text-skin-muted">
                     Play some games to see players you've played with!
                   </p>
                 </div>
@@ -223,11 +207,7 @@ export function SocialHub({
                 {recentPlayers.map((player) => (
                   <div
                     key={player.playerName}
-                    className="rounded-[var(--radius-lg)] p-4 flex items-center justify-between border transition-colors hover:border-[var(--color-border-accent)]"
-                    style={{
-                      backgroundColor: 'var(--color-bg-tertiary)',
-                      borderColor: 'var(--color-border-default)',
-                    }}
+                    className="rounded-[var(--radius-lg)] p-4 flex items-center justify-between border transition-colors hover:border-skin-accent bg-skin-tertiary border-skin-default"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar username={player.playerName} size="md" />
@@ -240,15 +220,13 @@ export function SocialHub({
                             className="text-lg font-semibold"
                           />
                         ) : (
-                          <p
-                            className="text-lg font-semibold"
-                            style={{ color: 'var(--color-text-primary)' }}
-                          >
+                          <p className="text-lg font-semibold text-skin-primary">
                             {player.playerName}
                           </p>
                         )}
-                        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                          Played together {player.gamesPlayed} time{player.gamesPlayed > 1 ? 's' : ''}
+                        <p className="text-sm text-skin-muted">
+                          Played together {player.gamesPlayed} time
+                          {player.gamesPlayed > 1 ? 's' : ''}
                         </p>
                       </div>
                     </div>
@@ -282,10 +260,8 @@ export function SocialHub({
             <div className="p-6">
               {suggestions.length === 0 && (
                 <div className="text-center py-8">
-                  <p className="mb-2" style={{ color: 'var(--color-text-muted)' }}>
-                    No friend suggestions yet
-                  </p>
-                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                  <p className="mb-2 text-skin-muted">No friend suggestions yet</p>
+                  <p className="text-sm text-skin-muted">
                     Play more games to get friend suggestions!
                   </p>
                 </div>
@@ -294,11 +270,7 @@ export function SocialHub({
                 {suggestions.map((suggestion) => (
                   <div
                     key={suggestion.playerName}
-                    className="rounded-[var(--radius-lg)] p-4 flex items-center justify-between border transition-colors hover:border-[var(--color-success)]"
-                    style={{
-                      backgroundColor: 'var(--color-bg-tertiary)',
-                      borderColor: 'var(--color-border-default)',
-                    }}
+                    className="rounded-[var(--radius-lg)] p-4 flex items-center justify-between border transition-colors hover:border-skin-success bg-skin-tertiary border-skin-default"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar username={suggestion.playerName} size="md" />
@@ -311,16 +283,11 @@ export function SocialHub({
                             className="text-lg font-semibold"
                           />
                         ) : (
-                          <p
-                            className="text-lg font-semibold"
-                            style={{ color: 'var(--color-text-primary)' }}
-                          >
+                          <p className="text-lg font-semibold text-skin-primary">
                             {suggestion.playerName}
                           </p>
                         )}
-                        <p className="text-sm" style={{ color: 'var(--color-success)' }}>
-                          {suggestion.reason}
-                        </p>
+                        <p className="text-sm text-skin-success">{suggestion.reason}</p>
                       </div>
                     </div>
                     <Button

@@ -14,9 +14,8 @@ export function InlineBetStatus({
   currentBets,
   skippedPlayers,
   currentPlayerIndex,
-  onClickPlayer
+  onClickPlayer,
 }: InlineBetStatusProps) {
-
   const getBetDisplay = (player: Player): { icon: string; text: string; color: string } => {
     const bet = currentBets.get(player.name);
     const isCurrentPlayer = players[currentPlayerIndex]?.id === player.id;
@@ -25,9 +24,10 @@ export function InlineBetStatus({
       return {
         icon: '✓',
         text: `${bet.amount}${bet.withoutTrump ? '*' : ''}`,
-        color: player.teamId === 1
-          ? 'bg-orange-500/80 dark:bg-orange-600/80 text-white'
-          : 'bg-purple-500/80 dark:bg-purple-600/80 text-white'
+        color:
+          player.teamId === 1
+            ? 'bg-orange-500/80 dark:bg-orange-600/80 text-white'
+            : 'bg-purple-500/80 dark:bg-purple-600/80 text-white',
       };
     }
 
@@ -35,7 +35,7 @@ export function InlineBetStatus({
       return {
         icon: '⊗',
         text: 'skip',
-        color: 'bg-gray-400 dark:bg-gray-600 text-gray-700 dark:text-gray-300'
+        color: 'bg-gray-400 dark:bg-gray-600 text-gray-700 dark:text-gray-300',
       };
     }
 
@@ -43,16 +43,17 @@ export function InlineBetStatus({
       return {
         icon: '⏳',
         text: '?',
-        color: player.teamId === 1
-          ? 'bg-orange-300 dark:bg-orange-400 text-orange-900'
-          : 'bg-purple-300 dark:bg-purple-400 text-purple-900'
+        color:
+          player.teamId === 1
+            ? 'bg-orange-300 dark:bg-orange-400 text-orange-900'
+            : 'bg-purple-300 dark:bg-purple-400 text-purple-900',
       };
     }
 
     return {
       icon: '○',
       text: '?',
-      color: 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+      color: 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
     };
   };
 
@@ -93,7 +94,9 @@ export function InlineBetStatus({
                     {player.name}
                   </Button>
                 ) : (
-                  <span className="font-bold" data-testid={`player-name-${player.name}`}>{player.name}</span>
+                  <span className="font-bold" data-testid={`player-name-${player.name}`}>
+                    {player.name}
+                  </span>
                 )}
               </div>
               <span className="font-black text-lg">{display.text}</span>

@@ -94,9 +94,7 @@ export function ConversationItem({
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
           <span className="font-semibold text-white truncate">{username}</span>
-          <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
-            {formatTime(timestamp)}
-          </span>
+          <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{formatTime(timestamp)}</span>
         </div>
         <p className="text-sm text-gray-400 truncate">{lastMessage}</p>
         {unreadCount > 0 && (

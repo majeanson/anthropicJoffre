@@ -337,7 +337,9 @@ export const Interactive: Story = {
       setTimeout(() => {
         setQuests((prev) =>
           prev.map((q) =>
-            q.id === questId ? { ...q, reward_claimed: true, claimed_at: new Date().toISOString() } : q
+            q.id === questId
+              ? { ...q, reward_claimed: true, claimed_at: new Date().toISOString() }
+              : q
           )
         );
 

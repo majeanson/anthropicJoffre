@@ -147,7 +147,8 @@ export const LongMessage: Story = {
   args: {
     variant: 'info',
     title: 'Update Available',
-    message: 'A new version of the game is available with bug fixes, performance improvements, and new features. Please refresh the page to update.',
+    message:
+      'A new version of the game is available with bug fixes, performance improvements, and new features. Please refresh the page to update.',
     onClose: () => console.log('Toast closed'),
   },
 };
@@ -173,7 +174,7 @@ export const AllVariants: Story = {
             key={toast.id}
             variant={toast.variant}
             message={toast.message}
-            onClose={() => setToasts(toasts.filter(t => t.id !== toast.id))}
+            onClose={() => setToasts(toasts.filter((t) => t.id !== toast.id))}
           />
         ))}
       </div>
@@ -235,9 +236,27 @@ export const QuestToasts: Story = {
   },
   render: () => {
     const [toasts, setToasts] = useState([
-      { id: 1, variant: 'success' as const, title: 'Quest Complete!', message: 'Play 5 Games - Reward: 100 points', icon: '📋' },
-      { id: 2, variant: 'info' as const, title: 'Daily Bonus', message: 'Login streak: 7 days - Multiplier: 1.5x', icon: '🔥' },
-      { id: 3, variant: 'success' as const, title: 'Reward Claimed!', message: 'Day 7 reward: 150 points', icon: '🎁' },
+      {
+        id: 1,
+        variant: 'success' as const,
+        title: 'Quest Complete!',
+        message: 'Play 5 Games - Reward: 100 points',
+        icon: '📋',
+      },
+      {
+        id: 2,
+        variant: 'info' as const,
+        title: 'Daily Bonus',
+        message: 'Login streak: 7 days - Multiplier: 1.5x',
+        icon: '🔥',
+      },
+      {
+        id: 3,
+        variant: 'success' as const,
+        title: 'Reward Claimed!',
+        message: 'Day 7 reward: 150 points',
+        icon: '🎁',
+      },
     ]);
 
     return (
@@ -249,7 +268,7 @@ export const QuestToasts: Story = {
             title={toast.title}
             message={toast.message}
             icon={<span>{toast.icon}</span>}
-            onClose={() => setToasts(toasts.filter(t => t.id !== toast.id))}
+            onClose={() => setToasts(toasts.filter((t) => t.id !== toast.id))}
           />
         ))}
       </div>

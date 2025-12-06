@@ -60,7 +60,13 @@ interface MockPlayer {
 const createMockPlayers = (votes: string[]): MockPlayer[] => [
   { id: 'p1', name: 'You', teamId: 1, isCurrentPlayer: true, hasVoted: votes.includes('You') },
   { id: 'p2', name: 'Bob', teamId: 2, isCurrentPlayer: false, hasVoted: votes.includes('Bob') },
-  { id: 'p3', name: 'Charlie', teamId: 1, isCurrentPlayer: false, hasVoted: votes.includes('Charlie') },
+  {
+    id: 'p3',
+    name: 'Charlie',
+    teamId: 1,
+    isCurrentPlayer: false,
+    hasVoted: votes.includes('Charlie'),
+  },
   { id: 'p4', name: 'Diana', teamId: 2, isCurrentPlayer: false, hasVoted: votes.includes('Diana') },
 ];
 
@@ -79,9 +85,7 @@ export const NoVotesYet: Story = {
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
         <UICard variant="elevated" size="lg">
           <div className="text-center space-y-6">
-            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">
-              Play Again?
-            </h2>
+            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">Play Again?</h2>
 
             <UICard variant="bordered" size="md">
               <div className="text-6xl mb-4">🔄</div>
@@ -110,9 +114,7 @@ export const NoVotesYet: Story = {
                     <div className="text-xs font-bold text-[var(--color-text-primary)] max-w-[60px] truncate">
                       {player.isCurrentPlayer ? 'You' : player.name}
                     </div>
-                    <div className="text-2xl mt-1">
-                      {player.hasVoted ? '✓' : '○'}
-                    </div>
+                    <div className="text-2xl mt-1">{player.hasVoted ? '✓' : '○'}</div>
                   </div>
                 ))}
               </div>
@@ -139,9 +141,7 @@ export const SomeVotes: Story = {
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
         <UICard variant="elevated" size="lg">
           <div className="text-center space-y-6">
-            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">
-              Play Again?
-            </h2>
+            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">Play Again?</h2>
 
             <UICard variant="bordered" size="md">
               <div className="text-6xl mb-4">🔄</div>
@@ -169,9 +169,7 @@ export const SomeVotes: Story = {
                     <div className="text-xs font-bold text-[var(--color-text-primary)] max-w-[60px] truncate">
                       {player.isCurrentPlayer ? 'You' : player.name}
                     </div>
-                    <div className="text-2xl mt-1">
-                      {player.hasVoted ? '✓' : '○'}
-                    </div>
+                    <div className="text-2xl mt-1">{player.hasVoted ? '✓' : '○'}</div>
                   </div>
                 ))}
               </div>
@@ -199,9 +197,7 @@ export const AlmostThere: Story = {
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
         <UICard variant="elevated" size="lg">
           <div className="text-center space-y-6">
-            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">
-              Play Again?
-            </h2>
+            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">Play Again?</h2>
 
             <UICard variant="bordered" size="md">
               <div className="text-6xl mb-4">🔄</div>
@@ -229,9 +225,7 @@ export const AlmostThere: Story = {
                     <div className="text-xs font-bold text-[var(--color-text-primary)] max-w-[60px] truncate">
                       {player.isCurrentPlayer ? 'You' : player.name}
                     </div>
-                    <div className="text-2xl mt-1">
-                      {player.hasVoted ? '✓' : '○'}
-                    </div>
+                    <div className="text-2xl mt-1">{player.hasVoted ? '✓' : '○'}</div>
                   </div>
                 ))}
               </div>
@@ -259,9 +253,7 @@ export const AllVoted: Story = {
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
         <UICard variant="elevated" size="lg">
           <div className="text-center space-y-6">
-            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">
-              Play Again?
-            </h2>
+            <h2 className="text-3xl font-black text-[var(--color-text-primary)]">Play Again?</h2>
 
             <UICard variant="bordered" size="md">
               <div className="text-6xl mb-4">🎉</div>
@@ -313,9 +305,7 @@ export const VoteIndicators: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Not Voted</p>
           <div className="flex flex-col items-center p-3 rounded-lg border-2 bg-gray-200 dark:bg-gray-600 border-gray-400 dark:border-gray-500 opacity-60">
             <TeamIndicator teamId={1} size="md" className="mb-2" />
-            <div className="text-xs font-bold text-[var(--color-text-primary)]">
-              Alice
-            </div>
+            <div className="text-xs font-bold text-[var(--color-text-primary)]">Alice</div>
             <div className="text-2xl mt-1">○</div>
           </div>
         </div>
@@ -325,9 +315,7 @@ export const VoteIndicators: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Voted</p>
           <div className="flex flex-col items-center p-3 rounded-lg border-2 bg-green-100 dark:bg-green-900/40 border-green-400">
             <TeamIndicator teamId={2} size="md" className="mb-2" />
-            <div className="text-xs font-bold text-[var(--color-text-primary)]">
-              Bob
-            </div>
+            <div className="text-xs font-bold text-[var(--color-text-primary)]">Bob</div>
             <div className="text-2xl mt-1">✓</div>
           </div>
         </div>
@@ -337,9 +325,7 @@ export const VoteIndicators: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">You (Not Voted)</p>
           <div className="flex flex-col items-center p-3 rounded-lg border-2 bg-gray-200 dark:bg-gray-600 border-gray-400 dark:border-gray-500 opacity-60">
             <TeamIndicator teamId={1} size="md" className="mb-2" />
-            <div className="text-xs font-bold text-[var(--color-text-primary)]">
-              You
-            </div>
+            <div className="text-xs font-bold text-[var(--color-text-primary)]">You</div>
             <div className="text-2xl mt-1">○</div>
           </div>
         </div>
@@ -349,9 +335,7 @@ export const VoteIndicators: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">You (Voted)</p>
           <div className="flex flex-col items-center p-3 rounded-lg border-2 bg-green-100 dark:bg-green-900/40 border-green-400">
             <TeamIndicator teamId={1} size="md" className="mb-2" />
-            <div className="text-xs font-bold text-[var(--color-text-primary)]">
-              You
-            </div>
+            <div className="text-xs font-bold text-[var(--color-text-primary)]">You</div>
             <div className="text-2xl mt-1">✓</div>
           </div>
         </div>
@@ -417,14 +401,11 @@ export const ProgressDisplay: Story = {
                 {count === 4
                   ? 'Starting rematch...'
                   : count === 3
-                  ? '1 more vote needed!'
-                  : `${4 - count} more votes needed`
-                }
+                    ? '1 more vote needed!'
+                    : `${4 - count} more votes needed`}
               </p>
             </div>
-            <span className="text-4xl">
-              {count === 4 ? '🎉' : '🔄'}
-            </span>
+            <span className="text-4xl">{count === 4 ? '🎉' : '🔄'}</span>
           </div>
         ))}
       </div>

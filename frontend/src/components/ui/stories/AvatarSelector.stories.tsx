@@ -65,10 +65,7 @@ function InteractiveAvatarSelector({ initialAvatarId }: { initialAvatarId?: stri
   return (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
       <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Choose Your Avatar</h3>
-      <AvatarSelector
-        selectedAvatarId={selectedId}
-        onSelect={setSelectedId}
-      />
+      <AvatarSelector selectedAvatarId={selectedId} onSelect={setSelectedId} />
     </div>
   );
 }
@@ -101,15 +98,14 @@ export const InProfileEditor: Story = {
           <Avatar username={username} avatarUrl={avatarId} size="xl" />
           <div>
             <p className="text-[var(--color-text-primary)] font-medium">{username}</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">Click an avatar below to change</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Click an avatar below to change
+            </p>
           </div>
         </div>
 
         {/* Avatar Selector */}
-        <AvatarSelector
-          selectedAvatarId={avatarId}
-          onSelect={setAvatarId}
-        />
+        <AvatarSelector selectedAvatarId={avatarId} onSelect={setAvatarId} />
       </div>
     );
   },
@@ -131,10 +127,7 @@ export const CompactView: Story = {
             </div>
           )}
         </div>
-        <AvatarSelector
-          selectedAvatarId={avatarId}
-          onSelect={setAvatarId}
-        />
+        <AvatarSelector selectedAvatarId={avatarId} onSelect={setAvatarId} />
       </div>
     );
   },
@@ -150,10 +143,7 @@ export const CategoryShowcase: Story = {
       <p className="text-[var(--color-text-secondary)] text-sm mb-4">
         Use the category buttons to filter avatars by type
       </p>
-      <AvatarSelector
-        selectedAvatarId="crown"
-        onSelect={() => {}}
-      />
+      <AvatarSelector selectedAvatarId="crown" onSelect={() => {}} />
     </div>
   ),
 };
@@ -183,7 +173,9 @@ export const RegistrationFlow: Story = {
 
         {step === 1 && (
           <>
-            <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Choose Your Avatar</h3>
+            <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+              Choose Your Avatar
+            </h3>
             <AvatarSelector
               selectedAvatarId={avatarId}
               onSelect={(id) => {

@@ -55,8 +55,10 @@ export const API_ENDPOINTS = {
     const queryString = query.toString();
     return `${CONFIG.API_BASE_URL}/api/leaderboard${queryString ? `?${queryString}` : ''}`;
   },
-  playerStats: (playerName: string) => `${CONFIG.API_BASE_URL}/api/stats/${encodeURIComponent(playerName)}`,
-  playerHistory: (playerName: string) => `${CONFIG.API_BASE_URL}/api/player-history/${encodeURIComponent(playerName)}`,
+  playerStats: (playerName: string) =>
+    `${CONFIG.API_BASE_URL}/api/stats/${encodeURIComponent(playerName)}`,
+  playerHistory: (playerName: string) =>
+    `${CONFIG.API_BASE_URL}/api/player-history/${encodeURIComponent(playerName)}`,
 
   // Auth
   authRegister: () => `${CONFIG.API_BASE_URL}/api/auth/register`,
@@ -64,7 +66,8 @@ export const API_ENDPOINTS = {
   authLogout: () => `${CONFIG.API_BASE_URL}/api/auth/logout`,
   authVerifyEmail: (token: string) => `${CONFIG.API_BASE_URL}/api/auth/verify-email?token=${token}`,
   authForgotPassword: () => `${CONFIG.API_BASE_URL}/api/auth/forgot-password`,
-  authResetPassword: (token: string) => `${CONFIG.API_BASE_URL}/api/auth/reset-password?token=${token}`,
+  authResetPassword: (token: string) =>
+    `${CONFIG.API_BASE_URL}/api/auth/reset-password?token=${token}`,
   authRefresh: () => `${CONFIG.API_BASE_URL}/api/auth/refresh`,
   authProfile: () => `${CONFIG.API_BASE_URL}/api/auth/me`,
   userProfile: () => `${CONFIG.API_BASE_URL}/api/profiles/me`,

@@ -27,7 +27,12 @@ interface Sparkle {
   type: 'star' | 'circle' | 'diamond';
 }
 
-export function ConfettiEffect({ teamColor, duration = 1500, position = 'bottom', points = 1 }: ConfettiEffectProps) {
+export function ConfettiEffect({
+  teamColor,
+  duration = 1500,
+  position = 'bottom',
+  points = 1,
+}: ConfettiEffectProps) {
   const { animationsEnabled } = useSettings();
 
   // Don't render if animations are disabled
@@ -122,18 +127,10 @@ export function ConfettiEffect({ teamColor, duration = 1500, position = 'bottom'
   // Special icon for red/brown 0
   const renderSpecialIcon = () => {
     if (isRedZero) {
-      return (
-        <div className="text-2xl animate-bounce">
-          💎
-        </div>
-      );
+      return <div className="text-2xl animate-bounce">💎</div>;
     }
     if (isBrownZero) {
-      return (
-        <div className="text-2xl">
-          💩
-        </div>
-      );
+      return <div className="text-2xl">💩</div>;
     }
     return null;
   };
@@ -142,8 +139,7 @@ export function ConfettiEffect({ teamColor, duration = 1500, position = 'bottom'
 
   return (
     <div
-      className={`absolute ${positionClasses[position]} pointer-events-none z-[60]`}
-      style={{ width: 140, height: 140 }}
+      className={`absolute ${positionClasses[position]} pointer-events-none z-[60] w-[140px] h-[140px]`}
     >
       {/* Special card icon */}
       {isSpecialCard && (
@@ -166,8 +162,8 @@ export function ConfettiEffect({ teamColor, duration = 1500, position = 'bottom'
           background: isRedZero
             ? `radial-gradient(circle, ${accentGold}80 0%, ${suitRed}40 50%, transparent 70%)`
             : isBrownZero
-            ? `radial-gradient(circle, ${suitBrown}60 0%, ${suitBrown}40 50%, transparent 70%)`
-            : `radial-gradient(circle, ${primaryColor}80 0%, transparent 70%)`,
+              ? `radial-gradient(circle, ${suitBrown}60 0%, ${suitBrown}40 50%, transparent 70%)`
+              : `radial-gradient(circle, ${primaryColor}80 0%, transparent 70%)`,
           animation: `pulse-glow ${effectDuration}ms ease-out forwards`,
         }}
       />

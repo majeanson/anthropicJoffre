@@ -91,7 +91,11 @@ export function LoginStreakBadgeDisplay({
               </div>
             </div>
             {streak.streakFreezeAvailable && (
-              <span className="text-blue-200 text-sm ml-1" title="Freeze Available" aria-label="Freeze available">
+              <span
+                className="text-blue-200 text-sm ml-1"
+                title="Freeze Available"
+                aria-label="Freeze available"
+              >
                 🛡️
               </span>
             )}
@@ -107,16 +111,12 @@ export function LoginStreakBadgeDisplay({
             <div className="space-y-2">
               <div className="flex justify-between items-center border-b border-gray-600 pb-2">
                 <span className="text-gray-300 text-sm">Current Streak</span>
-                <span className="text-white font-bold">
-                  {streak.currentStreak} days
-                </span>
+                <span className="text-white font-bold">{streak.currentStreak} days</span>
               </div>
 
               <div className="flex justify-between items-center border-b border-gray-600 pb-2">
                 <span className="text-gray-300 text-sm">Longest Streak</span>
-                <span className="text-yellow-400 font-bold">
-                  {streak.longestStreak} days 🏆
-                </span>
+                <span className="text-yellow-400 font-bold">{streak.longestStreak} days 🏆</span>
               </div>
 
               <div className="flex justify-between items-center border-b border-gray-600 pb-2">

@@ -31,12 +31,12 @@ export function useChatMessages({ socket }: UseChatMessagesProps) {
 
     // Team Selection Chat Event
     const handleTeamSelectionChat = (message: ChatMessage) => {
-      setChatMessages(prev => [...prev, message]);
+      setChatMessages((prev) => [...prev, message]);
     };
 
     // In-Game Chat Event
     const handleGameChat = (message: ChatMessage) => {
-      setChatMessages(prev => [...prev, message]);
+      setChatMessages((prev) => [...prev, message]);
     };
 
     // Register event listeners

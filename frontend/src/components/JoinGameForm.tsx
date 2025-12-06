@@ -15,8 +15,12 @@ import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 
 // Lazy load modals
-const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
-const GlobalLeaderboard = lazy(() => import('./GlobalLeaderboard').then(m => ({ default: m.GlobalLeaderboard })));
+const PlayerStatsModal = lazy(() =>
+  import('./PlayerStatsModal').then((m) => ({ default: m.PlayerStatsModal }))
+);
+const GlobalLeaderboard = lazy(() =>
+  import('./GlobalLeaderboard').then((m) => ({ default: m.GlobalLeaderboard }))
+);
 
 interface JoinGameFormProps {
   gameId: string;
@@ -78,23 +82,26 @@ export function JoinGameForm({
   const joinButtonRef = useRef<HTMLButtonElement>(null);
 
   // Get focusable element for current position
-  const getFocusableElement = useCallback((row: number, col: number): HTMLElement | null => {
-    // Adjust row if user is authenticated (skip name input)
-    const effectiveRow = user && row >= 2 ? row + 1 : row;
+  const getFocusableElement = useCallback(
+    (row: number, col: number): HTMLElement | null => {
+      // Adjust row if user is authenticated (skip name input)
+      const effectiveRow = user && row >= 2 ? row + 1 : row;
 
-    switch (effectiveRow) {
-      case 0: // Join type radios
-        return col === 0 ? playerRadioRef.current : spectatorRadioRef.current;
-      case 1: // Game ID input
-        return gameIdInputRef.current;
-      case 2: // Player name input
-        return playerNameInputRef.current;
-      case 3: // Back/Join buttons
-        return col === 0 ? backButtonRef.current : joinButtonRef.current;
-      default:
-        return null;
-    }
-  }, [user]);
+      switch (effectiveRow) {
+        case 0: // Join type radios
+          return col === 0 ? playerRadioRef.current : spectatorRadioRef.current;
+        case 1: // Game ID input
+          return gameIdInputRef.current;
+        case 2: // Player name input
+          return playerNameInputRef.current;
+        case 3: // Back/Join buttons
+          return col === 0 ? backButtonRef.current : joinButtonRef.current;
+        default:
+          return null;
+      }
+    },
+    [user]
+  );
 
   // Focus current element
   const focusCurrentElement = useCallback(() => {
@@ -103,16 +110,24 @@ export function JoinGameForm({
   }, [navRow, navCol, getFocusableElement]);
 
   // Get max columns for a row
-  const getMaxCols = useCallback((row: number): number => {
-    const effectiveRow = user && row >= 2 ? row + 1 : row;
-    switch (effectiveRow) {
-      case 0: return 2; // Player/Spectator
-      case 1: return 1; // Game ID
-      case 2: return 1; // Player name
-      case 3: return 2; // Back/Join
-      default: return 1;
-    }
-  }, [user]);
+  const getMaxCols = useCallback(
+    (row: number): number => {
+      const effectiveRow = user && row >= 2 ? row + 1 : row;
+      switch (effectiveRow) {
+        case 0:
+          return 2; // Player/Spectator
+        case 1:
+          return 1; // Game ID
+        case 2:
+          return 1; // Player name
+        case 3:
+          return 2; // Back/Join
+        default:
+          return 1;
+      }
+    },
+    [user]
+  );
 
   // Get max rows
   const getMaxRows = useCallback((): number => {
@@ -123,8 +138,9 @@ export function JoinGameForm({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't intercept when typing in inputs (except for navigation keys)
-      const isInInput = document.activeElement === gameIdInputRef.current ||
-                        document.activeElement === playerNameInputRef.current;
+      const isInInput =
+        document.activeElement === gameIdInputRef.current ||
+        document.activeElement === playerNameInputRef.current;
       if (isInInput && !['ArrowUp', 'ArrowDown', 'Escape'].includes(e.key)) {
         return;
       }
@@ -142,9 +158,9 @@ export function JoinGameForm({
 
         case 'ArrowUp':
           e.preventDefault();
-          setNavRow(prev => {
+          setNavRow((prev) => {
             const newRow = prev > 0 ? prev - 1 : getMaxRows() - 1;
-            setNavCol(c => Math.min(c, getMaxCols(newRow) - 1));
+            setNavCol((c) => Math.min(c, getMaxCols(newRow) - 1));
             return newRow;
           });
           sounds.buttonClick();
@@ -152,9 +168,9 @@ export function JoinGameForm({
 
         case 'ArrowDown':
           e.preventDefault();
-          setNavRow(prev => {
+          setNavRow((prev) => {
             const newRow = prev < getMaxRows() - 1 ? prev + 1 : 0;
-            setNavCol(c => Math.min(c, getMaxCols(newRow) - 1));
+            setNavCol((c) => Math.min(c, getMaxCols(newRow) - 1));
             return newRow;
           });
           sounds.buttonClick();
@@ -162,7 +178,7 @@ export function JoinGameForm({
 
         case 'ArrowLeft':
           e.preventDefault();
-          setNavCol(prev => {
+          setNavCol((prev) => {
             const maxCols = getMaxCols(navRow);
             const newCol = prev > 0 ? prev - 1 : maxCols - 1;
             // Handle radio button toggle
@@ -177,7 +193,7 @@ export function JoinGameForm({
 
         case 'ArrowRight':
           e.preventDefault();
-          setNavCol(prev => {
+          setNavCol((prev) => {
             const maxCols = getMaxCols(navRow);
             const newCol = prev < maxCols - 1 ? prev + 1 : 0;
             // Handle radio button toggle
@@ -231,15 +247,27 @@ export function JoinGameForm({
 
   return (
     <>
-      <div
-        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-amber-400 via-orange-500 to-red-500"
-      >
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-amber-400 via-orange-500 to-red-500">
         {/* Animated background cards */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }} aria-hidden="true">🃏</div>
-          <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} aria-hidden="true">🎴</div>
-          <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }} aria-hidden="true">🂡</div>
-          <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }} aria-hidden="true">🂱</div>
+          <div className="absolute top-10 left-10 text-6xl animate-bounce-3s" aria-hidden="true">
+            🃏
+          </div>
+          <div className="absolute top-20 right-20 text-6xl animate-bounce-4s" aria-hidden="true">
+            🎴
+          </div>
+          <div
+            className="absolute bottom-20 left-20 text-6xl animate-bounce-3s-half"
+            aria-hidden="true"
+          >
+            🂡
+          </div>
+          <div
+            className="absolute bottom-10 right-10 text-6xl animate-bounce-4s-half"
+            aria-hidden="true"
+          >
+            🂱
+          </div>
         </div>
 
         <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
@@ -249,7 +277,9 @@ export function JoinGameForm({
           <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
 
-          <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Join Game</h2>
+          <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">
+            Join Game
+          </h2>
 
           {/* Show message when joining from URL */}
           {autoJoinGameId && (
@@ -260,9 +290,14 @@ export function JoinGameForm({
               className="mb-6 animate-pulse shadow-lg"
             >
               <div className="flex items-center justify-center gap-2 mb-2">
-                <span className="text-2xl" aria-hidden="true">🎮</span>
+                <span className="text-2xl" aria-hidden="true">
+                  🎮
+                </span>
                 <p className="text-white font-bold text-lg text-center">
-                  Joining game: <span className="font-mono bg-white/20 px-2 py-1 rounded border border-white/30">{gameId}</span>
+                  Joining game:{' '}
+                  <span className="font-mono bg-white/20 px-2 py-1 rounded border border-white/30">
+                    {gameId}
+                  </span>
                 </p>
               </div>
               <p className="text-white/90 font-medium text-center">
@@ -300,7 +335,9 @@ export function JoinGameForm({
                     onChange={(e) => setJoinType(e.target.value as 'player' | 'spectator')}
                     className="w-4 h-4 text-umber-600 focus:ring-umber-500 focus:ring-2 focus:ring-offset-2"
                   />
-                  <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">Spectator</span>
+                  <span className="ml-3 text-umber-800 dark:text-gray-200 font-medium">
+                    Spectator
+                  </span>
                 </label>
               </div>
             </div>
@@ -321,7 +358,7 @@ export function JoinGameForm({
               value={playerName}
               onChange={(e) => setPlayerName(e.target.value)}
               disabled={!!user}
-              placeholder={user ? "Using authenticated username" : "Enter your name"}
+              placeholder={user ? 'Using authenticated username' : 'Enter your name'}
               required={joinType === 'player'}
               className={autoJoinGameId ? 'ring-2 ring-blue-300 dark:ring-blue-700' : ''}
             />
@@ -330,7 +367,8 @@ export function JoinGameForm({
             {joinType === 'spectator' && (
               <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-400 dark:border-gray-600 rounded-lg p-3">
                 <p className="text-sm text-umber-900 dark:text-gray-300">
-                  As a spectator, you can watch the game but cannot play cards. Player hands will be hidden.
+                  As a spectator, you can watch the game but cannot play cards. Player hands will be
+                  hidden.
                 </p>
               </div>
             )}
@@ -356,7 +394,10 @@ export function JoinGameForm({
                   type="button"
                   variant="secondary"
                   size="lg"
-                  onClick={() => { sounds.buttonClick(); onBack(); }}
+                  onClick={() => {
+                    sounds.buttonClick();
+                    onBack();
+                  }}
                   className="flex-1"
                 >
                   Back

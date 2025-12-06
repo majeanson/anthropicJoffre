@@ -13,7 +13,13 @@ export interface ToastProps {
   action?: ToastAction;
 }
 
-export const Toast = memo(function Toast({ message, type, duration = 3000, onClose, action }: ToastProps) {
+export const Toast = memo(function Toast({
+  message,
+  type,
+  duration = 3000,
+  onClose,
+  action,
+}: ToastProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -38,7 +44,9 @@ export const Toast = memo(function Toast({ message, type, duration = 3000, onClo
 
   return (
     <div className="fixed top-[68px] left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
-      <div className={`${bgColor} text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]`}>
+      <div
+        className={`${bgColor} text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]`}
+      >
         <div className="text-2xl font-bold">{icon}</div>
         <div className="flex-1 font-semibold">{message}</div>
         {action && (

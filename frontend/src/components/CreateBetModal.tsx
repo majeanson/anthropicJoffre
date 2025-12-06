@@ -112,7 +112,7 @@ export default function CreateBetModal({
   // Filter preset bets based on game state
   // - "Without Trump" bet only available when the round is played without trump
   // - "First Trump" bet only available when there IS a trump suit
-  const availablePresetBets = PRESET_BETS.filter(bet => {
+  const availablePresetBets = PRESET_BETS.filter((bet) => {
     if (bet.type === 'without_trump_success') return isWithoutTrump;
     if (bet.type === 'first_trump_played') return !isWithoutTrump;
     return true;
@@ -121,20 +121,26 @@ export default function CreateBetModal({
   const [selectedPreset, setSelectedPreset] = useState<PresetBetType | null>(null);
   const [prediction, setPrediction] = useState<string>('');
   const [customDescription, setCustomDescription] = useState('');
-  const [resolutionTiming, setResolutionTiming] = useState<'trick' | 'round' | 'game' | 'manual'>('manual');
+  const [resolutionTiming, setResolutionTiming] = useState<'trick' | 'round' | 'game' | 'manual'>(
+    'manual'
+  );
   const [amount, setAmount] = useState(Math.min(10, balance));
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Resolution timing options for custom bets
   const RESOLUTION_TIMING_OPTIONS = [
-    { value: 'trick' as const, label: 'After This Trick', description: 'Resolve when current trick ends' },
+    {
+      value: 'trick' as const,
+      label: 'After This Trick',
+      description: 'Resolve when current trick ends',
+    },
     { value: 'round' as const, label: 'End of Round', description: 'Resolve when this round ends' },
     { value: 'game' as const, label: 'End of Game', description: 'Resolve when the game ends' },
     { value: 'manual' as const, label: 'Manual', description: 'Participants decide the winner' },
   ];
 
-  const selectedPresetConfig = availablePresetBets.find(p => p.type === selectedPreset);
+  const selectedPresetConfig = availablePresetBets.find((p) => p.type === selectedPreset);
   const maxAmount = balance;
   const minAmount = 1;
 
@@ -203,15 +209,12 @@ export default function CreateBetModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/70"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
       {/* Modal */}
       <div
         className="relative w-full max-w-md bg-[var(--color-bg-secondary)] rounded-xl shadow-2xl border border-[var(--color-border-default)] overflow-hidden"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-[var(--color-border-default)] bg-gradient-to-r from-yellow-500/10 to-amber-500/10">
@@ -232,9 +235,7 @@ export default function CreateBetModal({
         <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
           {/* Balance display */}
           <div className="flex items-center justify-between p-3 bg-[var(--color-bg-tertiary)] rounded-lg">
-            <span className="text-sm text-[var(--color-text-secondary)]">
-              Your Balance
-            </span>
+            <span className="text-sm text-[var(--color-text-secondary)]">Your Balance</span>
             <span className="text-yellow-500 font-bold flex items-center gap-1">
               <span>🪙</span>
               {balance}
@@ -274,11 +275,9 @@ export default function CreateBetModal({
           {/* Preset bet selection */}
           {betType === 'preset' && (
             <div className="space-y-3">
-              <label className="text-sm text-[var(--color-text-secondary)]">
-                Select Bet Type
-              </label>
+              <label className="text-sm text-[var(--color-text-secondary)]">Select Bet Type</label>
               <div className="grid gap-2">
-                {availablePresetBets.map(preset => (
+                {availablePresetBets.map((preset) => (
                   <button
                     key={preset.type}
                     onClick={() => {
@@ -308,7 +307,7 @@ export default function CreateBetModal({
                     Your Prediction
                   </label>
                   <div className="flex gap-2">
-                    {selectedPresetConfig.predictions.map(pred => (
+                    {selectedPresetConfig.predictions.map((pred) => (
                       <button
                         key={pred.value}
                         onClick={() => setPrediction(pred.value)}
@@ -336,7 +335,7 @@ export default function CreateBetModal({
                 </label>
                 <textarea
                   value={customDescription}
-                  onChange={e => setCustomDescription(e.target.value)}
+                  onChange={(e) => setCustomDescription(e.target.value)}
                   placeholder="e.g., Marc will play a trump on the first trick"
                   maxLength={200}
                   className="w-full p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)] rounded-lg text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-yellow-500 resize-none"
@@ -353,7 +352,7 @@ export default function CreateBetModal({
                   When to Resolve
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {RESOLUTION_TIMING_OPTIONS.map(option => (
+                  {RESOLUTION_TIMING_OPTIONS.map((option) => (
                     <button
                       key={option.value}
                       onClick={() => setResolutionTiming(option.value)}
@@ -381,8 +380,8 @@ export default function CreateBetModal({
                       resolutionTiming === 'trick'
                         ? 'when the current trick ends'
                         : resolutionTiming === 'round'
-                        ? 'at the end of this round'
-                        : 'when the game ends'
+                          ? 'at the end of this round'
+                          : 'when the game ends'
                     }.`}
               </p>
             </div>
@@ -391,9 +390,7 @@ export default function CreateBetModal({
           {/* Amount slider */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <label className="text-sm text-[var(--color-text-secondary)]">
-                Bet Amount
-              </label>
+              <label className="text-sm text-[var(--color-text-secondary)]">Bet Amount</label>
               <span className="text-yellow-500 font-bold flex items-center gap-1">
                 <span>🪙</span>
                 {amount}
@@ -404,7 +401,7 @@ export default function CreateBetModal({
               min={minAmount}
               max={maxAmount}
               value={amount}
-              onChange={e => setAmount(parseInt(e.target.value))}
+              onChange={(e) => setAmount(parseInt(e.target.value))}
               className="w-full h-2 bg-[var(--color-bg-tertiary)] rounded-lg appearance-none cursor-pointer accent-yellow-500"
             />
             <div className="flex justify-between text-xs text-[var(--color-text-secondary)]">
@@ -414,19 +411,21 @@ export default function CreateBetModal({
 
             {/* Quick amount buttons */}
             <div className="flex gap-2">
-              {[10, 25, 50, 100].filter(v => v <= maxAmount).map(quickAmount => (
-                <button
-                  key={quickAmount}
-                  onClick={() => setAmount(quickAmount)}
-                  className={`flex-1 py-1 text-xs rounded transition-colors ${
-                    amount === quickAmount
-                      ? 'bg-yellow-500 text-white'
-                      : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
-                  }`}
-                >
-                  {quickAmount}
-                </button>
-              ))}
+              {[10, 25, 50, 100]
+                .filter((v) => v <= maxAmount)
+                .map((quickAmount) => (
+                  <button
+                    key={quickAmount}
+                    onClick={() => setAmount(quickAmount)}
+                    className={`flex-1 py-1 text-xs rounded transition-colors ${
+                      amount === quickAmount
+                        ? 'bg-yellow-500 text-white'
+                        : 'bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-primary)]'
+                    }`}
+                  >
+                    {quickAmount}
+                  </button>
+                ))}
               <button
                 onClick={() => setAmount(maxAmount)}
                 className={`flex-1 py-1 text-xs rounded transition-colors ${

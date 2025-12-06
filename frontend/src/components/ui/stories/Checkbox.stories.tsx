@@ -77,7 +77,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: 'Accept the Alchemist\'s Oath',
+    label: "Accept the Alchemist's Oath",
     variant: 'checkbox',
   },
 };
@@ -321,10 +321,7 @@ export const LaboratorySettings: Story = {
         checked
       />
 
-      <div
-        className="pt-4 mt-4"
-        style={{ borderTop: '1px solid #2D3548' }}
-      >
+      <div className="pt-4 mt-4" style={{ borderTop: '1px solid #2D3548' }}>
         <h4
           className="text-sm font-semibold mb-3"
           style={{
@@ -374,10 +371,7 @@ export const AlchemistRegistration: Story = {
           description="Required for guild membership"
         />
 
-        <Checkbox
-          label="Subscribe to the Chronicle"
-          description="Receive wisdom and discoveries"
-        />
+        <Checkbox label="Subscribe to the Chronicle" description="Receive wisdom and discoveries" />
 
         <Checkbox
           label={
@@ -428,10 +422,7 @@ export const ExperimentOptions: Story = {
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-3">
-          <h4
-            className="text-sm font-semibold"
-            style={{ color: '#9CA3AF' }}
-          >
+          <h4 className="text-sm font-semibold" style={{ color: '#9CA3AF' }}>
             Elements
           </h4>
           <Checkbox label="△ Fire" checked />
@@ -441,10 +432,7 @@ export const ExperimentOptions: Story = {
         </div>
 
         <div className="space-y-3">
-          <h4
-            className="text-sm font-semibold"
-            style={{ color: '#9CA3AF' }}
-          >
+          <h4 className="text-sm font-semibold" style={{ color: '#9CA3AF' }}>
             Catalysts
           </h4>
           <Checkbox label="☿ Mercury" checked />
@@ -458,11 +446,7 @@ export const ExperimentOptions: Story = {
         className="mt-4 pt-4 flex items-center justify-between"
         style={{ borderTop: '1px solid #2D3548' }}
       >
-        <Checkbox
-          variant="toggle"
-          label="Lock configuration"
-          size="sm"
-        />
+        <Checkbox variant="toggle" label="Lock configuration" size="sm" />
         <button
           className="px-4 py-2 rounded-lg text-sm font-semibold"
           style={{

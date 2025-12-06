@@ -42,20 +42,23 @@ export function GameCreationForm({
   const createButtonRef = useRef<HTMLButtonElement>(null);
 
   // Get focusable element for current position
-  const getFocusableElement = useCallback((row: number, col: number): HTMLElement | null => {
-    const effectiveRow = user ? row + 1 : row; // Skip name input row if authenticated
+  const getFocusableElement = useCallback(
+    (row: number, col: number): HTMLElement | null => {
+      const effectiveRow = user ? row + 1 : row; // Skip name input row if authenticated
 
-    switch (effectiveRow) {
-      case 0: // Name input
-        return nameInputRef.current;
-      case 1: // Ranked checkbox
-        return rankedCheckboxRef.current;
-      case 2: // Back/Create buttons
-        return col === 0 ? backButtonRef.current : createButtonRef.current;
-      default:
-        return null;
-    }
-  }, [user]);
+      switch (effectiveRow) {
+        case 0: // Name input
+          return nameInputRef.current;
+        case 1: // Ranked checkbox
+          return rankedCheckboxRef.current;
+        case 2: // Back/Create buttons
+          return col === 0 ? backButtonRef.current : createButtonRef.current;
+        default:
+          return null;
+      }
+    },
+    [user]
+  );
 
   // Focus current element
   const focusCurrentElement = useCallback(() => {
@@ -64,15 +67,22 @@ export function GameCreationForm({
   }, [navRow, navCol, getFocusableElement]);
 
   // Get max columns for a row
-  const getMaxCols = useCallback((row: number): number => {
-    const effectiveRow = user ? row + 1 : row;
-    switch (effectiveRow) {
-      case 0: return 1; // Name input
-      case 1: return 1; // Ranked checkbox
-      case 2: return 2; // Back/Create
-      default: return 1;
-    }
-  }, [user]);
+  const getMaxCols = useCallback(
+    (row: number): number => {
+      const effectiveRow = user ? row + 1 : row;
+      switch (effectiveRow) {
+        case 0:
+          return 1; // Name input
+        case 1:
+          return 1; // Ranked checkbox
+        case 2:
+          return 2; // Back/Create
+        default:
+          return 1;
+      }
+    },
+    [user]
+  );
 
   // Get max rows
   const getMaxRows = useCallback((): number => {
@@ -83,8 +93,10 @@ export function GameCreationForm({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't intercept when typing in input
-      if (document.activeElement === nameInputRef.current &&
-          !['ArrowUp', 'ArrowDown', 'Escape'].includes(e.key)) {
+      if (
+        document.activeElement === nameInputRef.current &&
+        !['ArrowUp', 'ArrowDown', 'Escape'].includes(e.key)
+      ) {
         return;
       }
 
@@ -97,9 +109,9 @@ export function GameCreationForm({
 
         case 'ArrowUp':
           e.preventDefault();
-          setNavRow(prev => {
+          setNavRow((prev) => {
             const newRow = prev > 0 ? prev - 1 : getMaxRows() - 1;
-            setNavCol(c => Math.min(c, getMaxCols(newRow) - 1));
+            setNavCol((c) => Math.min(c, getMaxCols(newRow) - 1));
             return newRow;
           });
           sounds.buttonClick();
@@ -107,9 +119,9 @@ export function GameCreationForm({
 
         case 'ArrowDown':
           e.preventDefault();
-          setNavRow(prev => {
+          setNavRow((prev) => {
             const newRow = prev < getMaxRows() - 1 ? prev + 1 : 0;
-            setNavCol(c => Math.min(c, getMaxCols(newRow) - 1));
+            setNavCol((c) => Math.min(c, getMaxCols(newRow) - 1));
             return newRow;
           });
           sounds.buttonClick();
@@ -117,7 +129,7 @@ export function GameCreationForm({
 
         case 'ArrowLeft':
           e.preventDefault();
-          setNavCol(prev => {
+          setNavCol((prev) => {
             const maxCols = getMaxCols(navRow);
             return prev > 0 ? prev - 1 : maxCols - 1;
           });
@@ -126,7 +138,7 @@ export function GameCreationForm({
 
         case 'ArrowRight':
           e.preventDefault();
-          setNavCol(prev => {
+          setNavCol((prev) => {
             const maxCols = getMaxCols(navRow);
             return prev < maxCols - 1 ? prev + 1 : 0;
           });
@@ -169,15 +181,27 @@ export function GameCreationForm({
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-amber-400 via-orange-500 to-red-500"
-    >
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden bg-gradient-to-br from-amber-400 via-orange-500 to-red-500">
       {/* Animated background cards */}
       <div className="absolute inset-0 opacity-10 pointer-events-none">
-        <div className="absolute top-10 left-10 text-6xl animate-bounce" style={{ animationDuration: '3s', animationDelay: '0s' }} aria-hidden="true">🃏</div>
-        <div className="absolute top-20 right-20 text-6xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }} aria-hidden="true">🎴</div>
-        <div className="absolute bottom-20 left-20 text-6xl animate-bounce" style={{ animationDuration: '3.5s', animationDelay: '0.5s' }} aria-hidden="true">🂡</div>
-        <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDuration: '4.5s', animationDelay: '1.5s' }} aria-hidden="true">🂱</div>
+        <div className="absolute top-10 left-10 text-6xl animate-bounce-3s" aria-hidden="true">
+          🃏
+        </div>
+        <div className="absolute top-20 right-20 text-6xl animate-bounce-4s" aria-hidden="true">
+          🎴
+        </div>
+        <div
+          className="absolute bottom-20 left-20 text-6xl animate-bounce-3s-half"
+          aria-hidden="true"
+        >
+          🂡
+        </div>
+        <div
+          className="absolute bottom-10 right-10 text-6xl animate-bounce-4s-half"
+          aria-hidden="true"
+        >
+          🂱
+        </div>
       </div>
 
       <div className="bg-gradient-to-br from-parchment-50 to-parchment-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-2xl max-w-md w-full border-4 border-amber-700 dark:border-gray-600 relative">
@@ -187,7 +211,9 @@ export function GameCreationForm({
         <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-amber-600 dark:border-gray-500 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-amber-600 dark:border-gray-500 rounded-br-xl"></div>
 
-        <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">Create Game</h2>
+        <h2 className="text-4xl font-bold mb-6 text-umber-900 dark:text-gray-100 font-serif text-center">
+          Create Game
+        </h2>
         <form onSubmit={handleCreate} className="space-y-4">
           <Input
             ref={nameInputRef}
@@ -197,7 +223,7 @@ export function GameCreationForm({
             type="text"
             value={playerName}
             onChange={(e) => setPlayerName(e.target.value)}
-            placeholder={user ? "Using authenticated username" : "Enter your name"}
+            placeholder={user ? 'Using authenticated username' : 'Enter your name'}
             disabled={!!user}
             required
             variant="default"
@@ -205,7 +231,9 @@ export function GameCreationForm({
           />
 
           {/* Persistence Mode Selector */}
-          <div className={`bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3 ${!user ? 'opacity-60' : ''}`}>
+          <div
+            className={`bg-parchment-100 dark:bg-gray-800 border-2 border-umber-300 dark:border-gray-600 rounded-lg p-3 ${!user ? 'opacity-60' : ''}`}
+          >
             <div className="flex items-center justify-between gap-3">
               <Checkbox
                 ref={rankedCheckboxRef}
@@ -222,15 +250,21 @@ export function GameCreationForm({
                 color={createGamePersistence === 'elo' ? 'warning' : 'gray'}
                 size="sm"
               >
-                <span aria-hidden="true">{createGamePersistence === 'elo' ? '🏆' : '🎮'}</span> {createGamePersistence === 'elo' ? 'Ranked' : 'Casual'}
+                <span aria-hidden="true">{createGamePersistence === 'elo' ? '🏆' : '🎮'}</span>{' '}
+                {createGamePersistence === 'elo' ? 'Ranked' : 'Casual'}
               </UIBadge>
             </div>
             <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
-              {!user
-                ? <><span aria-hidden="true">🔒</span> Available when registered - Register to enable ranked mode</>
-                : createGamePersistence === 'elo'
-                ? 'Game will be saved to your profile and affect your ranking'
-                : 'No stats saved - play without affecting your ELO rating'}
+              {!user ? (
+                <>
+                  <span aria-hidden="true">🔒</span> Available when registered - Register to enable
+                  ranked mode
+                </>
+              ) : createGamePersistence === 'elo' ? (
+                'Game will be saved to your profile and affect your ranking'
+              ) : (
+                'No stats saved - play without affecting your ELO rating'
+              )}
             </p>
           </div>
 
@@ -241,7 +275,10 @@ export function GameCreationForm({
               type="button"
               variant="secondary"
               size="lg"
-              onClick={() => { sounds.buttonClick(); onBack(); }}
+              onClick={() => {
+                sounds.buttonClick();
+                onBack();
+              }}
               className="flex-1"
             >
               Back

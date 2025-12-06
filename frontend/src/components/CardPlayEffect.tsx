@@ -85,11 +85,13 @@ export function CardPlayEffect({ card, position, onComplete }: CardPlayEffectPro
         <div
           key={particle.id}
           className="absolute w-3 h-3 rounded-full motion-safe:animate-particle-burst motion-reduce:opacity-0"
-          style={{
-            backgroundColor: particle.color,
-            '--particle-x': `${particle.x}px`,
-            '--particle-y': `${particle.y}px`,
-          } as React.CSSProperties}
+          style={
+            {
+              backgroundColor: particle.color,
+              '--particle-x': `${particle.x}px`,
+              '--particle-y': `${particle.y}px`,
+            } as React.CSSProperties
+          }
         />
       ))}
     </div>

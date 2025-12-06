@@ -29,10 +29,26 @@ import { sizes } from '../../config/layout';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 export type ModalTheme =
-  | 'arcane' | 'midnight' | 'ember' | 'void' | 'parchment' | 'teal' | 'minimal'
+  | 'arcane'
+  | 'midnight'
+  | 'ember'
+  | 'void'
+  | 'parchment'
+  | 'teal'
+  | 'minimal'
   // Legacy themes for backward compatibility
-  | 'elegant' | 'velvet' | 'neon' | 'arcade' | 'hologram' | 'classic' | 'terminal'
-  | 'blue' | 'purple' | 'green' | 'orange' | 'red';
+  | 'elegant'
+  | 'velvet'
+  | 'neon'
+  | 'arcade'
+  | 'hologram'
+  | 'classic'
+  | 'terminal'
+  | 'blue'
+  | 'purple'
+  | 'green'
+  | 'orange'
+  | 'red';
 
 export interface ModalProps {
   /** Whether modal is open */
@@ -96,16 +112,19 @@ export interface ModalProps {
 }
 
 // Theme configurations - Midnight Alchemy aesthetic
-const themeConfigs: Record<ModalTheme, {
-  backdrop: string;
-  container: string;
-  header: string;
-  border: string;
-  title: string;
-  closeButton: string;
-  footer: string;
-  glow: string;
-}> = {
+const themeConfigs: Record<
+  ModalTheme,
+  {
+    backdrop: string;
+    container: string;
+    header: string;
+    border: string;
+    title: string;
+    closeButton: string;
+    footer: string;
+    glow: string;
+  }
+> = {
   arcane: {
     backdrop: 'bg-[rgba(11,14,20,0.94)]',
     container: 'bg-gradient-to-b from-[#131824] via-[#1A1F2E] to-[#0B0E14]',
@@ -445,7 +464,8 @@ export function Modal({
           <div
             className="absolute inset-0 pointer-events-none z-50"
             style={{
-              background: 'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 3px)',
+              background:
+                'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 3px)',
             }}
           />
         )}
@@ -523,10 +543,7 @@ export function Modal({
         )}
 
         {/* Body */}
-        <div
-          className={contentClassName || 'flex-1 overflow-y-auto p-6'}
-          style={{ color: 'var(--color-text-primary)' }}
-        >
+        <div className={contentClassName || 'flex-1 overflow-y-auto p-6 text-skin-primary'}>
           {children}
         </div>
 
@@ -578,9 +595,7 @@ export const TealModal = (props: PresetModalProps) => (
 );
 
 /** Classic parchment styled modal */
-export const ClassicModal = (props: PresetModalProps) => (
-  <Modal theme="parchment" {...props} />
-);
+export const ClassicModal = (props: PresetModalProps) => <Modal theme="parchment" {...props} />;
 
 /** Terminal/hacker styled modal */
 export const TerminalModal = (props: PresetModalProps) => (
@@ -588,9 +603,7 @@ export const TerminalModal = (props: PresetModalProps) => (
 );
 
 /** Minimal theme modal - uses CSS variables for skin compatibility */
-export const MinimalModal = (props: PresetModalProps) => (
-  <Modal theme="minimal" {...props} />
-);
+export const MinimalModal = (props: PresetModalProps) => <Modal theme="minimal" {...props} />;
 
 // Legacy exports for backward compatibility
 export const ElegantModal = ArcaneModal;

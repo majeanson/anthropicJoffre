@@ -42,44 +42,47 @@ export function useFocusTrap(options: UseFocusTrapOptions) {
     if (!containerRef.current) return [];
     return Array.from(
       containerRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTORS)
-    ).filter(el => el.offsetParent !== null); // Filter out hidden elements
+    ).filter((el) => el.offsetParent !== null); // Filter out hidden elements
   }, []);
 
   // Handle Tab key to trap focus
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!isActive || !containerRef.current) return;
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!isActive || !containerRef.current) return;
 
-    // Handle Escape
-    if (e.key === 'Escape' && onEscape) {
-      e.preventDefault();
-      e.stopPropagation();
-      onEscape();
-      return;
-    }
+      // Handle Escape
+      if (e.key === 'Escape' && onEscape) {
+        e.preventDefault();
+        e.stopPropagation();
+        onEscape();
+        return;
+      }
 
-    // Handle Tab
-    if (e.key === 'Tab') {
-      const focusableElements = getFocusableElements();
-      if (focusableElements.length === 0) return;
+      // Handle Tab
+      if (e.key === 'Tab') {
+        const focusableElements = getFocusableElements();
+        if (focusableElements.length === 0) return;
 
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
 
-      if (e.shiftKey) {
-        // Shift+Tab: if on first element, go to last
-        if (document.activeElement === firstElement) {
-          e.preventDefault();
-          lastElement.focus();
-        }
-      } else {
-        // Tab: if on last element, go to first
-        if (document.activeElement === lastElement) {
-          e.preventDefault();
-          firstElement.focus();
+        if (e.shiftKey) {
+          // Shift+Tab: if on first element, go to last
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else {
+          // Tab: if on last element, go to first
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
         }
       }
-    }
-  }, [isActive, onEscape, getFocusableElements]);
+    },
+    [isActive, onEscape, getFocusableElements]
+  );
 
   // Store previous focus and auto-focus first element
   useEffect(() => {
@@ -150,63 +153,70 @@ export function useListNavigation(options: UseListNavigationOptions) {
   const { itemCount, enabled = true, onSelect, onEscape, wrap = true } = options;
 
   const selectedIndexRef = useRef(0);
-  const [, forceUpdate] = useReducer(x => x + 1, 0);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   const setSelectedIndex = useCallback((index: number) => {
     selectedIndexRef.current = index;
     forceUpdate();
   }, []);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (!enabled || itemCount === 0) return;
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (!enabled || itemCount === 0) return;
 
-    // Don't handle if in input field
-    const target = e.target as HTMLElement;
-    if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
-      return;
-    }
+      // Don't handle if in input field
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT'
+      ) {
+        return;
+      }
 
-    switch (e.key) {
-      case 'ArrowUp':
-        e.preventDefault();
-        if (wrap) {
-          setSelectedIndex((selectedIndexRef.current - 1 + itemCount) % itemCount);
-        } else {
-          setSelectedIndex(Math.max(0, selectedIndexRef.current - 1));
-        }
-        break;
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          if (wrap) {
+            setSelectedIndex((selectedIndexRef.current - 1 + itemCount) % itemCount);
+          } else {
+            setSelectedIndex(Math.max(0, selectedIndexRef.current - 1));
+          }
+          break;
 
-      case 'ArrowDown':
-        e.preventDefault();
-        if (wrap) {
-          setSelectedIndex((selectedIndexRef.current + 1) % itemCount);
-        } else {
-          setSelectedIndex(Math.min(itemCount - 1, selectedIndexRef.current + 1));
-        }
-        break;
+        case 'ArrowDown':
+          e.preventDefault();
+          if (wrap) {
+            setSelectedIndex((selectedIndexRef.current + 1) % itemCount);
+          } else {
+            setSelectedIndex(Math.min(itemCount - 1, selectedIndexRef.current + 1));
+          }
+          break;
 
-      case 'Home':
-        e.preventDefault();
-        setSelectedIndex(0);
-        break;
+        case 'Home':
+          e.preventDefault();
+          setSelectedIndex(0);
+          break;
 
-      case 'End':
-        e.preventDefault();
-        setSelectedIndex(itemCount - 1);
-        break;
+        case 'End':
+          e.preventDefault();
+          setSelectedIndex(itemCount - 1);
+          break;
 
-      case 'Enter':
-      case ' ':
-        e.preventDefault();
-        onSelect?.(selectedIndexRef.current);
-        break;
+        case 'Enter':
+        case ' ':
+          e.preventDefault();
+          onSelect?.(selectedIndexRef.current);
+          break;
 
-      case 'Escape':
-        e.preventDefault();
-        onEscape?.();
-        break;
-    }
-  }, [enabled, itemCount, wrap, onSelect, onEscape, setSelectedIndex]);
+        case 'Escape':
+          e.preventDefault();
+          onEscape?.();
+          break;
+      }
+    },
+    [enabled, itemCount, wrap, onSelect, onEscape, setSelectedIndex]
+  );
 
   useEffect(() => {
     if (enabled) {
@@ -227,4 +237,3 @@ export function useListNavigation(options: UseListNavigationOptions) {
     setSelectedIndex,
   };
 }
-

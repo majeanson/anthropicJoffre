@@ -5,12 +5,18 @@ export type RankingTier = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Diamond';
  */
 export function getTierIcon(tier: string): string {
   switch (tier) {
-    case 'Diamond': return '💎';
-    case 'Platinum': return '🏆';
-    case 'Gold': return '🥇';
-    case 'Silver': return '🥈';
-    case 'Bronze': return '🥉';
-    default: return '📊';
+    case 'Diamond':
+      return '💎';
+    case 'Platinum':
+      return '🏆';
+    case 'Gold':
+      return '🥇';
+    case 'Silver':
+      return '🥈';
+    case 'Bronze':
+      return '🥉';
+    default:
+      return '📊';
   }
 }
 
@@ -21,19 +27,19 @@ export function getTierIcon(tier: string): string {
  */
 export function getTierColor(tier: string, fullClass: boolean = false): string {
   const colors = {
-    'Diamond': 'from-cyan-400 to-blue-600',
-    'Platinum': 'from-gray-300 to-gray-500',
-    'Gold': 'from-yellow-400 to-yellow-600',
-    'Silver': 'from-gray-400 to-gray-600',
-    'Bronze': 'from-orange-700 to-orange-900',
+    Diamond: 'from-cyan-400 to-blue-600',
+    Platinum: 'from-gray-300 to-gray-500',
+    Gold: 'from-yellow-400 to-yellow-600',
+    Silver: 'from-gray-400 to-gray-600',
+    Bronze: 'from-orange-700 to-orange-900',
   };
 
   const textColors = {
-    'Diamond': 'text-white',
-    'Platinum': 'text-gray-900',
-    'Gold': 'text-gray-900',
-    'Silver': 'text-white',
-    'Bronze': 'text-white',
+    Diamond: 'text-white',
+    Platinum: 'text-gray-900',
+    Gold: 'text-gray-900',
+    Silver: 'text-white',
+    Bronze: 'text-white',
   };
 
   const gradient = colors[tier as keyof typeof colors] || 'from-gray-500 to-gray-700';

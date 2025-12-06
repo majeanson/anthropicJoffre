@@ -83,7 +83,9 @@ describe('GameCreationForm', () => {
     const mockUser = { id: 1, username: 'TestUser', email: 'test@example.com' };
     renderWithProviders(<GameCreationForm {...defaultProps} user={mockUser as any} />);
 
-    expect(screen.getByText('Game will be saved to your profile and affect your ranking')).toBeInTheDocument();
+    expect(
+      screen.getByText('Game will be saved to your profile and affect your ranking')
+    ).toBeInTheDocument();
   });
 
   it('shows appropriate info message for casual mode', async () => {
@@ -94,7 +96,9 @@ describe('GameCreationForm', () => {
     const checkbox = screen.getByTestId('persistence-mode-checkbox');
     await user.click(checkbox);
 
-    expect(screen.getByText('No stats saved - play without affecting your ELO rating')).toBeInTheDocument();
+    expect(
+      screen.getByText('No stats saved - play without affecting your ELO rating')
+    ).toBeInTheDocument();
   });
 
   it('calls onCreateGame with player name and ranked mode on submit', async () => {

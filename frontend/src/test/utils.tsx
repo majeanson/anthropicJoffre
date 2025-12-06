@@ -15,17 +15,12 @@ import { ModalProvider } from '../contexts/ModalContext';
 /**
  * Custom render function that wraps components with required providers
  */
-export function renderWithProviders(
-  ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
-) {
+export function renderWithProviders(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
       <SettingsProvider>
         <AuthProvider>
-          <ModalProvider>
-            {children}
-          </ModalProvider>
+          <ModalProvider>{children}</ModalProvider>
         </AuthProvider>
       </SettingsProvider>
     );
@@ -53,7 +48,7 @@ export function createMockSocket(): any {
     }),
     off: vi.fn((event: string, callback?: Function) => {
       if (callback && listeners[event]) {
-        listeners[event] = listeners[event].filter(cb => cb !== callback);
+        listeners[event] = listeners[event].filter((cb) => cb !== callback);
       } else {
         delete listeners[event];
       }
@@ -62,7 +57,7 @@ export function createMockSocket(): any {
     emit: vi.fn((event: string, ...args: unknown[]) => {
       // Optionally trigger listeners for testing
       if (listeners[event]) {
-        listeners[event].forEach(cb => cb(...args));
+        listeners[event].forEach((cb) => cb(...args));
       }
       return mockSocket;
     }),
@@ -75,7 +70,7 @@ export function createMockSocket(): any {
     // Helper to trigger events from tests
     __triggerEvent: (event: string, ...args: unknown[]) => {
       if (listeners[event]) {
-        listeners[event].forEach(cb => cb(...args));
+        listeners[event].forEach((cb) => cb(...args));
       }
     },
   };

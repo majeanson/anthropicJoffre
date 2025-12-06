@@ -103,9 +103,7 @@ export const TeamScoresSection: Story = {
 
           <div className="mb-3">
             <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
-            <div className="text-6xl font-black text-orange-700 dark:text-orange-300">
-              +9
-            </div>
+            <div className="text-6xl font-black text-orange-700 dark:text-orange-300">+9</div>
           </div>
 
           <div className="text-base font-semibold text-green-600 dark:text-green-400 mb-2">
@@ -127,9 +125,7 @@ export const TeamScoresSection: Story = {
 
           <div className="mb-3">
             <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">This Round</div>
-            <div className="text-6xl font-black text-purple-700 dark:text-purple-300">
-              -7
-            </div>
+            <div className="text-6xl font-black text-purple-700 dark:text-purple-300">-7</div>
           </div>
 
           <div className="text-lg text-gray-700 dark:text-gray-300 pt-3 mt-8 border-t-2 border-purple-200 dark:border-gray-600">
@@ -156,24 +152,16 @@ export const BetResults: Story = {
         <UICard variant="bordered" gradient="team1" className="border-4 border-orange-400">
           <h4 className="font-bold text-lg text-orange-600 mb-2">Team 1</h4>
           <div className="text-5xl font-black text-orange-700 mb-3">+10</div>
-          <div className="text-base font-semibold text-green-600">
-            ✓ Made bet!
-          </div>
-          <p className="text-sm text-gray-600 mt-2">
-            Bet 8, earned 10 points
-          </p>
+          <div className="text-base font-semibold text-green-600">✓ Made bet!</div>
+          <p className="text-sm text-gray-600 mt-2">Bet 8, earned 10 points</p>
         </UICard>
 
         {/* Missed Bet */}
         <UICard variant="bordered" gradient="team2" className="border-4 border-purple-400">
           <h4 className="font-bold text-lg text-purple-600 mb-2">Team 2</h4>
           <div className="text-5xl font-black text-purple-700 mb-3">-8</div>
-          <div className="text-base font-semibold text-red-600">
-            ✗ Missed bet
-          </div>
-          <p className="text-sm text-gray-600 mt-2">
-            Bet 9, only earned 6 points
-          </p>
+          <div className="text-base font-semibold text-red-600">✗ Missed bet</div>
+          <p className="text-sm text-gray-600 mt-2">Bet 9, only earned 6 points</p>
         </UICard>
       </div>
     </div>
@@ -212,9 +200,7 @@ export const RoundHighlights: Story = {
                 <div className="font-bold text-base text-gray-900 dark:text-white truncate">
                   {h.player}
                 </div>
-                <div className="text-sm text-gray-700 dark:text-gray-300">
-                  {h.description}
-                </div>
+                <div className="text-sm text-gray-700 dark:text-gray-300">{h.description}</div>
               </div>
             </UICard>
           ))}
@@ -255,11 +241,18 @@ export const AllStatTypes: Story = {
         <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Performance Stats</h3>
         <div className="grid grid-cols-3 gap-2 mb-6">
           {performanceStats.map((s, i) => (
-            <div key={i} className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center gap-2">
+            <div
+              key={i}
+              className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center gap-2"
+            >
               <span className="text-2xl">{s.icon}</span>
               <div>
-                <div className="text-xs font-medium text-[var(--color-text-secondary)]">{s.title}</div>
-                <div className="text-sm font-bold text-[var(--color-text-primary)]">{s.description}</div>
+                <div className="text-xs font-medium text-[var(--color-text-secondary)]">
+                  {s.title}
+                </div>
+                <div className="text-sm font-bold text-[var(--color-text-primary)]">
+                  {s.description}
+                </div>
               </div>
             </div>
           ))}
@@ -268,11 +261,18 @@ export const AllStatTypes: Story = {
         <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Hand-Based Stats</h3>
         <div className="grid grid-cols-3 gap-2">
           {handStats.map((s, i) => (
-            <div key={i} className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center gap-2">
+            <div
+              key={i}
+              className="p-3 rounded-lg bg-[var(--color-bg-secondary)] flex items-center gap-2"
+            >
               <span className="text-2xl">{s.icon}</span>
               <div>
-                <div className="text-xs font-medium text-[var(--color-text-secondary)]">{s.title}</div>
-                <div className="text-sm font-bold text-[var(--color-text-primary)]">{s.description}</div>
+                <div className="text-xs font-medium text-[var(--color-text-secondary)]">
+                  {s.title}
+                </div>
+                <div className="text-sm font-bold text-[var(--color-text-primary)]">
+                  {s.description}
+                </div>
               </div>
             </div>
           ))}
@@ -298,15 +298,23 @@ export const PlayerPerformanceTable: Story = {
 
     return (
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[600px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">📊 Player Performance</h3>
+        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+          📊 Player Performance
+        </h3>
 
         <UICard variant="bordered" className="overflow-hidden">
           <table className="w-full">
             <thead className="bg-amber-100 dark:bg-gray-700">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">Player</th>
-                <th className="px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">Tricks</th>
-                <th className="px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">Points</th>
+                <th className="px-4 py-3 text-left text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">
+                  Player
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">
+                  Tricks
+                </th>
+                <th className="px-4 py-3 text-center text-xs font-bold text-amber-900 dark:text-amber-300 uppercase">
+                  Points
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-amber-100 dark:divide-gray-700">
@@ -317,21 +325,31 @@ export const PlayerPerformanceTable: Story = {
                       <TeamIndicator teamId={p.teamId as 1 | 2} size="sm" />
                       <span>{p.name}</span>
                       {p.redZeros > 0 && (
-                        <span className="inline-flex items-center gap-1 text-xs" title="Red 0 collected">
+                        <span
+                          className="inline-flex items-center gap-1 text-xs"
+                          title="Red 0 collected"
+                        >
                           <span className="w-2 h-2 rounded-full bg-red-500"></span>
                           <span className="font-bold text-green-600">×{p.redZeros}</span>
                         </span>
                       )}
                       {p.brownZeros > 0 && (
-                        <span className="inline-flex items-center gap-1 text-xs" title="Brown 0 received">
+                        <span
+                          className="inline-flex items-center gap-1 text-xs"
+                          title="Brown 0 received"
+                        >
                           <span className="w-2 h-2 rounded-full bg-amber-800"></span>
                           <span className="font-bold text-red-600">×{p.brownZeros}</span>
                         </span>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-center font-medium text-gray-800 dark:text-gray-200">{p.tricks}</td>
-                  <td className="px-4 py-3 text-sm text-center font-bold text-gray-900 dark:text-gray-100">{p.points}</td>
+                  <td className="px-4 py-3 text-sm text-center font-medium text-gray-800 dark:text-gray-200">
+                    {p.tricks}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-center font-bold text-gray-900 dark:text-gray-100">
+                    {p.points}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -358,7 +376,9 @@ export const ReadyStatus: Story = {
 
     return (
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4 text-center">👥 Ready Status</h3>
+        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4 text-center">
+          👥 Ready Status
+        </h3>
 
         <div className="grid grid-cols-4 gap-2 mb-6">
           {players.map((p) => (
@@ -387,11 +407,7 @@ export const ReadyStatus: Story = {
           ))}
         </div>
 
-        <Button
-          variant="primary"
-          size="lg"
-          className="w-full text-lg"
-        >
+        <Button variant="primary" size="lg" className="w-full text-lg">
           Ready for Next Round
         </Button>
       </div>
@@ -409,10 +425,22 @@ export const LoadingState: Story = {
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
       <div className="flex flex-col items-center justify-center py-16">
         <div className="flex gap-2 mb-4">
-          <div className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-red-500 to-red-700" style={{animationDelay: '0s'}}></div>
-          <div className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-yellow-500 to-yellow-700" style={{animationDelay: '0.1s'}}></div>
-          <div className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-green-500 to-green-700" style={{animationDelay: '0.2s'}}></div>
-          <div className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-purple-500 to-purple-700" style={{animationDelay: '0.3s'}}></div>
+          <div
+            className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-red-500 to-red-700"
+            style={{ animationDelay: '0s' }}
+          ></div>
+          <div
+            className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-yellow-500 to-yellow-700"
+            style={{ animationDelay: '0.1s' }}
+          ></div>
+          <div
+            className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-green-500 to-green-700"
+            style={{ animationDelay: '0.2s' }}
+          ></div>
+          <div
+            className="w-12 h-16 rounded-lg animate-bounce bg-gradient-to-br from-purple-500 to-purple-700"
+            style={{ animationDelay: '0.3s' }}
+          ></div>
         </div>
         <p className="text-center text-lg font-semibold text-gray-700 dark:text-gray-300 animate-pulse">
           Calculating round results...
@@ -458,7 +486,11 @@ export const FullLayout: Story = {
           { icon: '⭐', title: 'Team MVP', player: 'Bob', desc: '70% of team' },
           { icon: '🍀', title: 'Lucky Player', player: 'Charlie', desc: '2 red 0s' },
         ].map((h, i) => (
-          <UICard key={i} variant="bordered" className="flex items-center gap-3 bg-amber-50 dark:bg-gray-700 border-amber-200">
+          <UICard
+            key={i}
+            variant="bordered"
+            className="flex items-center gap-3 bg-amber-50 dark:bg-gray-700 border-amber-200"
+          >
             <span className="text-3xl">{h.icon}</span>
             <div>
               <div className="text-xs font-medium text-amber-700">{h.title}</div>

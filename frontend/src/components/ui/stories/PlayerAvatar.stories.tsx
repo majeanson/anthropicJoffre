@@ -44,7 +44,7 @@ A comprehensive player display component for game interfaces, combining avatar w
     teamId: { control: 'select', options: [null, 1, 2], description: 'Team assignment' },
     isBot: { control: 'boolean', description: 'Is this a bot player?' },
     isOnline: { control: 'boolean', description: 'Is player connected?' },
-    isCurrentTurn: { control: 'boolean', description: 'Is it this player\'s turn?' },
+    isCurrentTurn: { control: 'boolean', description: "Is it this player's turn?" },
     isDealer: { control: 'boolean', description: 'Is this player the dealer?' },
     variant: { control: 'select', options: ['compact', 'full'], description: 'Display variant' },
     size: { control: 'select', options: ['sm', 'md', 'lg'], description: 'Avatar size' },
@@ -67,18 +67,8 @@ export const AllVariants: Story = {
       <div>
         <h3 className="text-white font-semibold mb-4">Full Variant</h3>
         <div className="flex flex-wrap gap-6">
-          <PlayerAvatar
-            playerName="Alice"
-            avatarUrl="fox"
-            teamId={1}
-            variant="full"
-          />
-          <PlayerAvatar
-            playerName="Bob"
-            avatarUrl="ninja"
-            teamId={2}
-            variant="full"
-          />
+          <PlayerAvatar playerName="Alice" avatarUrl="fox" teamId={1} variant="full" />
+          <PlayerAvatar playerName="Bob" avatarUrl="ninja" teamId={2} variant="full" />
           <PlayerAvatar
             playerName="Bot_Easy"
             avatarUrl="robot"
@@ -93,18 +83,8 @@ export const AllVariants: Story = {
       <div>
         <h3 className="text-white font-semibold mb-4">Compact Variant</h3>
         <div className="flex flex-wrap gap-4">
-          <PlayerAvatar
-            playerName="Alice"
-            avatarUrl="fox"
-            teamId={1}
-            variant="compact"
-          />
-          <PlayerAvatar
-            playerName="Bob"
-            avatarUrl="ninja"
-            teamId={2}
-            variant="compact"
-          />
+          <PlayerAvatar playerName="Alice" avatarUrl="fox" teamId={1} variant="compact" />
+          <PlayerAvatar playerName="Bob" avatarUrl="ninja" teamId={2} variant="compact" />
           <PlayerAvatar
             playerName="Bot_Easy"
             avatarUrl="robot"
@@ -240,18 +220,8 @@ export const TeamColors: Story = {
         <div className="p-4 rounded-lg bg-orange-900/20 border border-orange-500/30">
           <h4 className="text-orange-400 text-sm mb-3">Team 1 (Orange)</h4>
           <div className="space-y-3">
-            <PlayerAvatar
-              playerName="Alice"
-              avatarUrl="fox"
-              teamId={1}
-              variant="full"
-            />
-            <PlayerAvatar
-              playerName="Charlie"
-              avatarUrl="lion"
-              teamId={1}
-              variant="full"
-            />
+            <PlayerAvatar playerName="Alice" avatarUrl="fox" teamId={1} variant="full" />
+            <PlayerAvatar playerName="Charlie" avatarUrl="lion" teamId={1} variant="full" />
           </div>
         </div>
 
@@ -259,18 +229,8 @@ export const TeamColors: Story = {
         <div className="p-4 rounded-lg bg-purple-900/20 border border-purple-500/30">
           <h4 className="text-purple-400 text-sm mb-3">Team 2 (Purple)</h4>
           <div className="space-y-3">
-            <PlayerAvatar
-              playerName="Bob"
-              avatarUrl="ninja"
-              teamId={2}
-              variant="full"
-            />
-            <PlayerAvatar
-              playerName="Diana"
-              avatarUrl="mage"
-              teamId={2}
-              variant="full"
-            />
+            <PlayerAvatar playerName="Bob" avatarUrl="ninja" teamId={2} variant="full" />
+            <PlayerAvatar playerName="Diana" avatarUrl="mage" teamId={2} variant="full" />
           </div>
         </div>
 
@@ -278,16 +238,8 @@ export const TeamColors: Story = {
         <div className="p-4 rounded-lg bg-gray-800 border border-gray-700">
           <h4 className="text-gray-400 text-sm mb-3">No Team</h4>
           <div className="space-y-3">
-            <PlayerAvatar
-              playerName="Spectator"
-              avatarUrl="ghost"
-              variant="full"
-            />
-            <PlayerAvatar
-              playerName="Waiting"
-              avatarUrl="alien"
-              variant="full"
-            />
+            <PlayerAvatar playerName="Spectator" avatarUrl="ghost" variant="full" />
+            <PlayerAvatar playerName="Waiting" avatarUrl="alien" variant="full" />
           </div>
         </div>
       </div>
@@ -307,13 +259,7 @@ export const AllSizes: Story = {
 
       <div className="flex items-end gap-8">
         <div className="flex flex-col items-center gap-2">
-          <PlayerAvatar
-            playerName="Small"
-            avatarUrl="fox"
-            teamId={1}
-            size="sm"
-            variant="compact"
-          />
+          <PlayerAvatar playerName="Small" avatarUrl="fox" teamId={1} size="sm" variant="compact" />
           <span className="text-xs text-gray-400">Small</span>
         </div>
         <div className="flex flex-col items-center gap-2">
@@ -377,12 +323,7 @@ export const GameBoardLayout: Story = {
 
         {/* Bottom player */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2">
-          <PlayerAvatar
-            playerName="Charlie"
-            avatarUrl="lion"
-            teamId={1}
-            variant="full"
-          />
+          <PlayerAvatar playerName="Charlie" avatarUrl="lion" teamId={1} variant="full" />
         </div>
 
         {/* Left player */}

@@ -44,7 +44,11 @@ An interactive, clickable player name component for opening player profiles.
   tags: ['autodocs'],
   argTypes: {
     playerName: { control: 'text', description: 'Player name to display' },
-    variant: { control: 'select', options: ['inline', 'badge', 'plain'], description: 'Display variant' },
+    variant: {
+      control: 'select',
+      options: ['inline', 'badge', 'plain'],
+      description: 'Display variant',
+    },
     onClick: { action: 'clicked', description: 'Click handler (opens profile)' },
     className: { control: 'text', description: 'Additional CSS classes' },
   },
@@ -114,16 +118,10 @@ export const InChatMessage: Story = {
           <Avatar username="Alice" avatarUrl="fox" size="sm" />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <PlayerNameButton
-                playerName="Alice"
-                onClick={() => {}}
-                variant="inline"
-              />
+              <PlayerNameButton playerName="Alice" onClick={() => {}} variant="inline" />
               <span className="text-[var(--color-text-tertiary)] text-xs">2:34 PM</span>
             </div>
-            <p className="text-[var(--color-text-primary)] text-sm">
-              Great game everyone!
-            </p>
+            <p className="text-[var(--color-text-primary)] text-sm">Great game everyone!</p>
           </div>
         </div>
 
@@ -132,11 +130,7 @@ export const InChatMessage: Story = {
           <Avatar username="Bob" avatarUrl="ninja" size="sm" />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <PlayerNameButton
-                playerName="Bob"
-                onClick={() => {}}
-                variant="inline"
-              />
+              <PlayerNameButton playerName="Bob" onClick={() => {}} variant="inline" />
               <span className="text-[var(--color-text-tertiary)] text-xs">2:35 PM</span>
             </div>
             <p className="text-[var(--color-text-primary)] text-sm">
@@ -150,21 +144,12 @@ export const InChatMessage: Story = {
           <Avatar username="Charlie" avatarUrl="dragon" size="sm" />
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <PlayerNameButton
-                playerName="Charlie"
-                onClick={() => {}}
-                variant="inline"
-              />
+              <PlayerNameButton playerName="Charlie" onClick={() => {}} variant="inline" />
               <span className="text-[var(--color-text-tertiary)] text-xs">2:36 PM</span>
             </div>
             <p className="text-[var(--color-text-primary)] text-sm">
-              Nice play{' '}
-              <PlayerNameButton
-                playerName="Alice"
-                onClick={() => {}}
-                variant="inline"
-              />
-              ! Rematch?
+              Nice play <PlayerNameButton playerName="Alice" onClick={() => {}} variant="inline" />!
+              Rematch?
             </p>
           </div>
         </div>
@@ -187,14 +172,15 @@ export const InLeaderboard: Story = {
           { rank: 4, name: 'LuckyDice', wins: 98, color: 'text-[var(--color-text-secondary)]' },
           { rank: 5, name: 'StarPlayer', wins: 87, color: 'text-[var(--color-text-secondary)]' },
         ].map((player) => (
-          <div key={player.rank} className="flex items-center gap-3 p-2 rounded-lg bg-[var(--color-bg-secondary)]">
+          <div
+            key={player.rank}
+            className="flex items-center gap-3 p-2 rounded-lg bg-[var(--color-bg-secondary)]"
+          >
             <span className={`w-8 text-center font-bold ${player.color}`}>#{player.rank}</span>
-            <PlayerNameButton
-              playerName={player.name}
-              onClick={() => {}}
-              variant="plain"
-            />
-            <span className="text-[var(--color-text-tertiary)] text-sm ml-auto">{player.wins} W</span>
+            <PlayerNameButton playerName={player.name} onClick={() => {}} variant="plain" />
+            <span className="text-[var(--color-text-tertiary)] text-sm ml-auto">
+              {player.wins} W
+            </span>
           </div>
         ))}
       </div>
@@ -210,9 +196,27 @@ export const InGameHistory: Story = {
 
       <div className="space-y-3">
         {[
-          { id: 1, team1: ['Alice', 'Charlie'], team2: ['Bob', 'Diana'], winner: 1, score: '41-32' },
-          { id: 2, team1: ['Alice', 'Bob'], team2: ['Charlie', 'Diana'], winner: 2, score: '38-41' },
-          { id: 3, team1: ['Alice', 'Diana'], team2: ['Bob', 'Charlie'], winner: 1, score: '41-28' },
+          {
+            id: 1,
+            team1: ['Alice', 'Charlie'],
+            team2: ['Bob', 'Diana'],
+            winner: 1,
+            score: '41-32',
+          },
+          {
+            id: 2,
+            team1: ['Alice', 'Bob'],
+            team2: ['Charlie', 'Diana'],
+            winner: 2,
+            score: '38-41',
+          },
+          {
+            id: 3,
+            team1: ['Alice', 'Diana'],
+            team2: ['Bob', 'Charlie'],
+            winner: 1,
+            score: '41-28',
+          },
         ].map((game) => (
           <div key={game.id} className="p-3 rounded-lg bg-[var(--color-bg-secondary)]">
             <div className="flex items-center justify-between">
@@ -255,11 +259,7 @@ export const BadgeVariantShowcase: Story = {
             <Avatar username="NewFriend" avatarUrl="unicorn" size="md" />
             <div>
               <p className="text-[var(--color-text-secondary)] text-sm">Friend request from</p>
-              <PlayerNameButton
-                playerName="NewFriend123"
-                onClick={() => {}}
-                variant="badge"
-              />
+              <PlayerNameButton playerName="NewFriend123" onClick={() => {}} variant="badge" />
             </div>
           </div>
           <button className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded text-sm">
@@ -272,11 +272,7 @@ export const BadgeVariantShowcase: Story = {
           <div className="flex items-center gap-3">
             <Avatar username="Inviter" avatarUrl="crown" size="md" />
             <div>
-              <PlayerNameButton
-                playerName="GameMaster99"
-                onClick={() => {}}
-                variant="badge"
-              />
+              <PlayerNameButton playerName="GameMaster99" onClick={() => {}} variant="badge" />
               <p className="text-[var(--color-text-secondary)] text-sm">invited you to play</p>
             </div>
           </div>
@@ -299,11 +295,7 @@ export const WithCustomContent: Story = {
         {/* With Avatar */}
         <div className="p-3 rounded-lg bg-[var(--color-bg-secondary)]">
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Name with Avatar:</p>
-          <PlayerNameButton
-            playerName="DragonSlayer99"
-            onClick={() => {}}
-            variant="badge"
-          >
+          <PlayerNameButton playerName="DragonSlayer99" onClick={() => {}} variant="badge">
             <span className="flex items-center gap-2">
               <Avatar username="DragonSlayer99" avatarUrl="dragon" size="sm" />
               DragonSlayer99
@@ -314,11 +306,7 @@ export const WithCustomContent: Story = {
         {/* With Emoji */}
         <div className="p-3 rounded-lg bg-[var(--color-bg-secondary)]">
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Name with Emoji:</p>
-          <PlayerNameButton
-            playerName="VIPPlayer"
-            onClick={() => {}}
-            variant="badge"
-          >
+          <PlayerNameButton playerName="VIPPlayer" onClick={() => {}} variant="badge">
             👑 VIPPlayer
           </PlayerNameButton>
         </div>
@@ -326,11 +314,7 @@ export const WithCustomContent: Story = {
         {/* With Status */}
         <div className="p-3 rounded-lg bg-[var(--color-bg-secondary)]">
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Name with Status:</p>
-          <PlayerNameButton
-            playerName="OnlinePlayer"
-            onClick={() => {}}
-            variant="badge"
-          >
+          <PlayerNameButton playerName="OnlinePlayer" onClick={() => {}} variant="badge">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-green-500" />
               OnlinePlayer
@@ -354,7 +338,9 @@ export const Default: Story = {
   decorators: [
     (Story) => (
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)]">
-        <p className="text-[var(--color-text-secondary)] mb-4">Click the name to trigger onClick:</p>
+        <p className="text-[var(--color-text-secondary)] mb-4">
+          Click the name to trigger onClick:
+        </p>
         <Story />
       </div>
     ),

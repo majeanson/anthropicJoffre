@@ -9,10 +9,10 @@
 export const breakpoints = {
   // Breakpoint values (matches Tailwind defaults)
   values: {
-    sm: '640px',   // Small devices (phones, 640px and up)
-    md: '768px',   // Medium devices (tablets, 768px and up)
-    lg: '1024px',  // Large devices (desktops, 1024px and up)
-    xl: '1280px',  // Extra large devices (large desktops, 1280px and up)
+    sm: '640px', // Small devices (phones, 640px and up)
+    md: '768px', // Medium devices (tablets, 768px and up)
+    lg: '1024px', // Large devices (desktops, 1024px and up)
+    xl: '1280px', // Extra large devices (large desktops, 1280px and up)
     '2xl': '1536px', // 2X Extra large devices (larger desktops, 1536px and up)
   },
 
@@ -35,15 +35,15 @@ export const breakpoints = {
 
   // Common responsive classes
   hide: {
-    mobile: 'hidden sm:block',     // Hide on mobile, show on sm+
-    tablet: 'hidden md:block',     // Hide on tablet, show on md+
-    desktop: 'block lg:hidden',    // Hide on desktop, show on mobile/tablet
+    mobile: 'hidden sm:block', // Hide on mobile, show on sm+
+    tablet: 'hidden md:block', // Hide on tablet, show on md+
+    desktop: 'block lg:hidden', // Hide on desktop, show on mobile/tablet
   },
 
   show: {
-    mobile: 'block sm:hidden',     // Show on mobile only
+    mobile: 'block sm:hidden', // Show on mobile only
     tablet: 'hidden sm:block md:hidden', // Show on tablet only
-    desktop: 'hidden lg:block',    // Show on desktop only
+    desktop: 'hidden lg:block', // Show on desktop only
   },
 } as const;
 

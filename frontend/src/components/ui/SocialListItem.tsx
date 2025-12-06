@@ -77,7 +77,9 @@ export function SocialListItem({
             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{metadata}</p>
           )}
           {status && !avatar && (
-            <p className={`text-sm ${status === 'offline' ? 'text-gray-500' : 'text-green-600 dark:text-green-400'}`}>
+            <p
+              className={`text-sm ${status === 'offline' ? 'text-gray-500' : 'text-green-600 dark:text-green-400'}`}
+            >
               {status === 'in_game' && 'In Game'}
               {status === 'in_lobby' && 'In Lobby'}
               {status === 'in_team_selection' && 'Team Selection'}
@@ -89,11 +91,7 @@ export function SocialListItem({
       </div>
 
       {/* Right: Actions */}
-      {actions && (
-        <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-          {actions}
-        </div>
-      )}
+      {actions && <div className="flex items-center gap-2 flex-shrink-0 ml-4">{actions}</div>}
     </div>
   );
 }

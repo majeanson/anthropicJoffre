@@ -60,7 +60,8 @@ export function applyStateDelta(currentState: GameState, delta: GameStateDelta):
 
   // Apply primitive field changes
   if (delta.phase !== undefined) newState.phase = delta.phase;
-  if (delta.currentPlayerIndex !== undefined) newState.currentPlayerIndex = delta.currentPlayerIndex;
+  if (delta.currentPlayerIndex !== undefined)
+    newState.currentPlayerIndex = delta.currentPlayerIndex;
   if (delta.dealerIndex !== undefined) newState.dealerIndex = delta.dealerIndex;
   if (delta.trump !== undefined) newState.trump = delta.trump;
   if (delta.roundNumber !== undefined) newState.roundNumber = delta.roundNumber;
@@ -101,7 +102,10 @@ export function applyStateDelta(currentState: GameState, delta: GameStateDelta):
 
   // Apply current round tricks additions
   if (delta.newCurrentRoundTricks && delta.newCurrentRoundTricks.length > 0) {
-    newState.currentRoundTricks = [...currentState.currentRoundTricks, ...delta.newCurrentRoundTricks];
+    newState.currentRoundTricks = [
+      ...currentState.currentRoundTricks,
+      ...delta.newCurrentRoundTricks,
+    ];
   }
 
   return newState;

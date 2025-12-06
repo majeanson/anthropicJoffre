@@ -216,7 +216,9 @@ export const ScoreVariations: Story = {
   name: 'Score Variations',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-4">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Different Score Scenarios</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Different Score Scenarios
+      </h3>
 
       <div className="space-y-4 max-w-[350px]">
         {/* Close game */}
@@ -284,7 +286,9 @@ export const Clickable: Story = {
   name: 'Clickable Card',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] max-w-[350px]">
-      <p className="text-[var(--color-text-secondary)] text-sm mb-3">Click the card to view details:</p>
+      <p className="text-[var(--color-text-secondary)] text-sm mb-3">
+        Click the card to view details:
+      </p>
       <MatchCard
         game={createMockGame()}
         onViewDetails={(gameId) => alert(`Viewing details for game: ${gameId}`)}
@@ -297,7 +301,9 @@ export const FullInteractive: Story = {
   name: 'Full Interactive (Card + Replay)',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] max-w-[350px]">
-      <p className="text-[var(--color-text-secondary)] text-sm mb-3">Card is clickable, replay button is separate:</p>
+      <p className="text-[var(--color-text-secondary)] text-sm mb-3">
+        Card is clickable, replay button is separate:
+      </p>
       <MatchCard
         game={createMockGame()}
         onViewDetails={(gameId) => alert(`Viewing details for game: ${gameId}`)}

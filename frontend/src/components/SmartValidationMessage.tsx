@@ -13,12 +13,15 @@ export function SmartValidationMessage({ messages }: SmartValidationMessageProps
   // Priority: error > warning > info > success
   const priority = { error: 4, warning: 3, info: 2, success: 1 };
 
-  const topMessage = messages.reduce((top, msg) => {
-    if (!top || priority[msg.type] > priority[top.type]) {
-      return msg;
-    }
-    return top;
-  }, null as ValidationMessage | null);
+  const topMessage = messages.reduce(
+    (top, msg) => {
+      if (!top || priority[msg.type] > priority[top.type]) {
+        return msg;
+      }
+      return top;
+    },
+    null as ValidationMessage | null
+  );
 
   if (!topMessage) return null;
 
@@ -26,14 +29,14 @@ export function SmartValidationMessage({ messages }: SmartValidationMessageProps
     error: '❌',
     warning: '⚠️',
     info: 'ℹ️',
-    success: '✅'
+    success: '✅',
   };
 
   const gradientMap: Record<string, UICardGradient> = {
     error: 'error',
     warning: 'warning',
     info: 'info',
-    success: 'success'
+    success: 'success',
   };
 
   return (

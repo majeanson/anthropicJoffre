@@ -53,11 +53,18 @@ const VISIBILITY_OPTIONS: SelectOption[] = [
   { value: 'private', label: 'Private - Only you' },
 ];
 
-export function ProfileEditor({ initialData, playerLevel = 1, onSave, onCancel }: ProfileEditorProps) {
+export function ProfileEditor({
+  initialData,
+  playerLevel = 1,
+  onSave,
+  onCancel,
+}: ProfileEditorProps) {
   const [avatarId, setAvatarId] = useState(initialData?.avatar_id || 'dog');
   const [bio, setBio] = useState(initialData?.bio || '');
   const [country, setCountry] = useState(initialData?.country || '');
-  const [favoriteTeam, setFavoriteTeam] = useState<1 | 2 | null>(initialData?.favorite_team || null);
+  const [favoriteTeam, setFavoriteTeam] = useState<1 | 2 | null>(
+    initialData?.favorite_team || null
+  );
   const [visibility, setVisibility] = useState<'public' | 'friends_only' | 'private'>(
     initialData?.visibility || 'public'
   );
@@ -79,8 +86,12 @@ export function ProfileEditor({ initialData, playerLevel = 1, onSave, onCancel }
       setCountry(initialData.country || '');
       setFavoriteTeam(initialData.favorite_team || null);
       setVisibility(initialData.visibility || 'public');
-      setShowOnlineStatus(initialData.show_online_status !== undefined ? initialData.show_online_status : true);
-      setAllowFriendRequests(initialData.allow_friend_requests !== undefined ? initialData.allow_friend_requests : true);
+      setShowOnlineStatus(
+        initialData.show_online_status !== undefined ? initialData.show_online_status : true
+      );
+      setAllowFriendRequests(
+        initialData.allow_friend_requests !== undefined ? initialData.allow_friend_requests : true
+      );
     }
   }, [initialData]);
 
@@ -117,10 +128,7 @@ export function ProfileEditor({ initialData, playerLevel = 1, onSave, onCancel }
           <div className="w-20 h-20 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center text-6xl">
             {selectedAvatar?.emoji || '👤'}
           </div>
-          <Button
-            onClick={() => setShowAvatarSelector(!showAvatarSelector)}
-            variant="primary"
-          >
+          <Button onClick={() => setShowAvatarSelector(!showAvatarSelector)} variant="primary">
             {showAvatarSelector ? 'Hide Avatars' : 'Change Avatar'}
           </Button>
         </div>
@@ -141,7 +149,10 @@ export function ProfileEditor({ initialData, playerLevel = 1, onSave, onCancel }
 
       {/* Bio */}
       <div>
-        <label htmlFor="bio" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        <label
+          htmlFor="bio"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
+        >
           Bio
         </label>
         <textarea
@@ -231,19 +242,10 @@ export function ProfileEditor({ initialData, playerLevel = 1, onSave, onCancel }
 
       {/* Action Buttons */}
       <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <Button
-          onClick={handleSave}
-          disabled={isSaving}
-          variant="primary"
-          className="flex-1"
-        >
+        <Button onClick={handleSave} disabled={isSaving} variant="primary" className="flex-1">
           {isSaving ? 'Saving...' : 'Save Profile'}
         </Button>
-        <Button
-          onClick={onCancel}
-          disabled={isSaving}
-          variant="secondary"
-        >
+        <Button onClick={onCancel} disabled={isSaving} variant="secondary">
           Cancel
         </Button>
       </div>

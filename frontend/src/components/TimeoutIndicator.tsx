@@ -8,7 +8,12 @@ interface TimeoutIndicatorProps {
   onTimeout?: () => void; // Optional callback when timer reaches 0
 }
 
-export function TimeoutIndicator({ duration, isActive, resetKey, onTimeout }: TimeoutIndicatorProps) {
+export function TimeoutIndicator({
+  duration,
+  isActive,
+  resetKey,
+  onTimeout,
+}: TimeoutIndicatorProps) {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [hasShown, setHasShown] = useState(false);
@@ -59,7 +64,12 @@ export function TimeoutIndicator({ duration, isActive, resetKey, onTimeout }: Ti
   };
 
   return (
-    <UIBadge variant="solid" color={getBadgeColor()} size="sm" className="transition-colors duration-500">
+    <UIBadge
+      variant="solid"
+      color={getBadgeColor()}
+      size="sm"
+      className="transition-colors duration-500"
+    >
       ⏱️ {seconds}s
     </UIBadge>
   );

@@ -54,7 +54,12 @@ vi.mock('./InlineBetStatus', () => ({
         const skipped = skippedPlayers.has(p.id);
         return (
           <div key={p.id} data-testid={`bet-status-${p.name}`}>
-            {p.name}: {bet ? `${bet.amount} pts ${bet.withoutTrump ? 'without trump' : ''}` : skipped ? 'Skipped' : 'No bet'}
+            {p.name}:{' '}
+            {bet
+              ? `${bet.amount} pts ${bet.withoutTrump ? 'without trump' : ''}`
+              : skipped
+                ? 'Skipped'
+                : 'No bet'}
           </div>
         );
       })}
@@ -158,14 +163,9 @@ describe('BettingPhase', () => {
     });
 
     it('should show player hand', () => {
-      const hand = [
-        createTestCard('red', 5),
-        createTestCard('blue', 3),
-      ];
+      const hand = [createTestCard('red', 5), createTestCard('blue', 3)];
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand })],
       });
 
       renderWithSettings(
@@ -299,9 +299,7 @@ describe('BettingPhase', () => {
 
     it('should display Skipped badge for skipped bets', () => {
       const game = createTestGame({
-        currentBets: [
-          createTestBet({ playerId: 'player-2', skipped: true }),
-        ],
+        currentBets: [createTestBet({ playerId: 'player-2', skipped: true })],
       });
 
       renderWithSettings(
@@ -351,9 +349,7 @@ describe('BettingPhase', () => {
 
     it('should display without-trump indicator', () => {
       const game = createTestGame({
-        currentBets: [
-          createTestBet({ playerId: 'player-2', amount: 8, withoutTrump: true }),
-        ],
+        currentBets: [createTestBet({ playerId: 'player-2', amount: 8, withoutTrump: true })],
       });
 
       renderWithSettings(

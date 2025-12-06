@@ -58,14 +58,8 @@ export function ConnectionQualityIndicator({ stats, showToast }: ConnectionQuali
       >
         <span className="text-base">{display.icon}</span>
         <div className="flex flex-col items-start">
-          <span className="text-xs font-medium">
-            {display.label}
-          </span>
-          {ping !== null && (
-            <span className="text-xs font-mono">
-              {ping}ms
-            </span>
-          )}
+          <span className="text-xs font-medium">{display.label}</span>
+          {ping !== null && <span className="text-xs font-mono">{ping}ms</span>}
         </div>
       </div>
     </UICard>
@@ -80,11 +74,16 @@ export function ConnectionQualityBadge({ stats }: { stats: ConnectionStats }) {
 
   const getIcon = () => {
     switch (quality) {
-      case 'excellent': return '🟢';
-      case 'good': return '🔵';
-      case 'fair': return '🟡';
-      case 'poor': return '🔴';
-      case 'offline': return '⚫';
+      case 'excellent':
+        return '🟢';
+      case 'good':
+        return '🔵';
+      case 'fair':
+        return '🟡';
+      case 'poor':
+        return '🔴';
+      case 'offline':
+        return '⚫';
     }
   };
 

@@ -38,7 +38,7 @@ export const Basic: Story = {
 export const WithUnread: Story = {
   args: {
     username: 'JaneSmith',
-    lastMessage: 'Sure! I\'m ready when you are.',
+    lastMessage: "Sure! I'm ready when you are.",
     timestamp: new Date(Date.now() - 300000).toISOString(), // 5 min ago
     unreadCount: 3,
     onClick: () => console.log('Clicked'),
@@ -58,7 +58,7 @@ export const Selected: Story = {
 export const SelectedWithUnread: Story = {
   args: {
     username: 'AliceWilliams',
-    lastMessage: 'I\'ll be online later tonight',
+    lastMessage: "I'll be online later tonight",
     timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
     unreadCount: 5,
     isSelected: true,
@@ -78,7 +78,8 @@ export const OldMessage: Story = {
 export const LongMessage: Story = {
   args: {
     username: 'DianaRoss',
-    lastMessage: 'This is a really long message that should get truncated with an ellipsis to prevent it from breaking the layout of the conversation list.',
+    lastMessage:
+      'This is a really long message that should get truncated with an ellipsis to prevent it from breaking the layout of the conversation list.',
     timestamp: new Date().toISOString(),
     onClick: () => console.log('Clicked'),
   },

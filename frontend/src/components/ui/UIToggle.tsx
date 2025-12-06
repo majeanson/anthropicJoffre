@@ -144,17 +144,17 @@ export function UIToggleField({
           {togglePosition === 'right' && icon && (
             <span className="text-xl flex-shrink-0">{icon}</span>
           )}
-          <span className="text-umber-900 dark:text-gray-100 font-semibold">
-            {fieldLabel}
-          </span>
+          <span className="text-umber-900 dark:text-gray-100 font-semibold">{fieldLabel}</span>
           {togglePosition === 'left' && icon && (
             <span className="text-xl flex-shrink-0">{icon}</span>
           )}
         </div>
         {description && (
-          <p className={`text-xs text-umber-600 dark:text-gray-400 mt-0.5 ${
-            togglePosition === 'right' && icon ? 'ml-7' : ''
-          }`}>
+          <p
+            className={`text-xs text-umber-600 dark:text-gray-400 mt-0.5 ${
+              togglePosition === 'right' && icon ? 'ml-7' : ''
+            }`}
+          >
             {description}
           </p>
         )}

@@ -38,7 +38,7 @@ export function useAutoplay({
   const autoplayTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const toggleAutoplay = useCallback(() => {
-    setAutoplayEnabled(prev => !prev);
+    setAutoplayEnabled((prev) => !prev);
   }, []);
 
   // Extract specific values from gameState to prevent infinite re-renders
@@ -55,7 +55,7 @@ export function useAutoplay({
 
     // CRITICAL: Use player name as stable identifier (socket.id changes on reconnect)
     const myPlayerName = localStorage.getItem('playerName') || '';
-    const me = gameState.players.find(p => p.name === myPlayerName);
+    const me = gameState.players.find((p) => p.name === myPlayerName);
     if (!me) return; // Player not found in game
 
     const myPlayerId = me.id; // Get socket ID from player object
@@ -109,7 +109,17 @@ export function useAutoplay({
         autoplayTimeoutRef.current = null;
       }
     };
-  }, [autoplayEnabled, phase, currentPlayerId, playersReadyList, socket, gameState, gameId, onPlaceBet, onPlayCard]);
+  }, [
+    autoplayEnabled,
+    phase,
+    currentPlayerId,
+    playersReadyList,
+    socket,
+    gameState,
+    gameId,
+    onPlaceBet,
+    onPlayCard,
+  ]);
 
   return {
     autoplayEnabled,

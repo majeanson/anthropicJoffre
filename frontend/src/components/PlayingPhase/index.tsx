@@ -21,8 +21,10 @@ import { sounds } from '../../utils/sounds';
 import { ConnectionStats } from '../../hooks/useConnectionQuality';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
+import { useAchievementCache } from '../../hooks/useAchievementCache';
 import { suggestMove } from '../../utils/moveSuggestion';
 import { Button } from '../ui/Button';
+import type { AchievementProgress } from '../../types/achievements';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';
@@ -90,33 +92,17 @@ function PlayingPhaseComponent({
   // CRITICAL: Check player existence BEFORE any hooks
   const playerLookup = isSpectator
     ? gameState.players[0]
-    : gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
+    : gameState.players.find((p) => p.name === currentPlayerId || p.id === currentPlayerId);
 
   // Safety check: If player not found and not spectator, show error BEFORE calling any hooks
   if (!playerLookup && !isSpectator) {
     return (
-      <div
-        className="flex items-center justify-center min-h-screen"
-        style={{ background: 'var(--color-bg-primary)' }}
-      >
-        <div
-          className="p-8 rounded-[var(--radius-xl)] text-center border-2"
-          style={{
-            backgroundColor: 'var(--color-bg-secondary)',
-            borderColor: 'var(--color-border-accent)',
-            boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
-          }}
-        >
-          <h2
-            className="text-2xl font-display uppercase tracking-wider mb-4"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
+      <div className="flex items-center justify-center min-h-screen bg-skin-primary">
+        <div className="p-8 rounded-[var(--radius-xl)] text-center border-2 bg-skin-secondary border-skin-accent shadow-[var(--shadow-glow),var(--shadow-lg)]">
+          <h2 className="text-2xl font-display uppercase tracking-wider mb-4 text-skin-primary">
             Player Not Found
           </h2>
-          <p
-            className="font-body mb-6"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
+          <p className="font-body mb-6 text-skin-muted">
             Your player data could not be found in this game.
           </p>
           <Button
@@ -147,7 +133,7 @@ function PlayingPhaseComponent({
     socket,
     currentPlayerId,
     chatOpen,
-    onNewChatMessage
+    onNewChatMessage,
   });
 
   // Card play effect state
@@ -174,6 +160,12 @@ function PlayingPhaseComponent({
   const [openThinkingButtons, setOpenThinkingButtons] = useState<Set<string>>(new Set());
   const [suggestionOpen, setSuggestionOpen] = useState(false);
 
+  // Achievement badge cache for player cards
+  const { getCachedBadges, fetchAchievements } = useAchievementCache(socket ?? null);
+  const [playerAchievements, setPlayerAchievements] = useState<Map<string, AchievementProgress[]>>(
+    new Map()
+  );
+
   // Track autoplayEnabled with ref
   const autoplayEnabledRef = useRef(autoplayEnabled);
   useEffect(() => {
@@ -185,15 +177,13 @@ function PlayingPhaseComponent({
 
   // Get current player
   const currentPlayer = useMemo(() => playerLookup, [playerLookup]);
-  const isCurrentTurn = useMemo(
-    () => {
-      const turnPlayer = gameState.players[gameState.currentPlayerIndex];
-      return turnPlayer?.name === currentPlayerId || turnPlayer?.id === currentPlayerId;
-    },
-    [gameState.players, gameState.currentPlayerIndex, currentPlayerId]
-  );
+  const isCurrentTurn = useMemo(() => {
+    const turnPlayer = gameState.players[gameState.currentPlayerIndex];
+    return turnPlayer?.name === currentPlayerId || turnPlayer?.id === currentPlayerId;
+  }, [gameState.players, gameState.currentPlayerIndex, currentPlayerId]);
   const currentPlayerIndex = useMemo(
-    () => gameState.players.findIndex(p => p.name === currentPlayerId || p.id === currentPlayerId),
+    () =>
+      gameState.players.findIndex((p) => p.name === currentPlayerId || p.id === currentPlayerId),
     [gameState.players, currentPlayerId]
   );
 
@@ -206,7 +196,7 @@ function PlayingPhaseComponent({
 
   // Toggle handlers
   const toggleBotThinking = useCallback((botName: string) => {
-    setOpenThinkingButtons(prev => {
+    setOpenThinkingButtons((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(botName)) {
         newSet.delete(botName);
@@ -218,8 +208,38 @@ function PlayingPhaseComponent({
   }, []);
 
   const toggleSuggestion = useCallback(() => {
-    setSuggestionOpen(prev => !prev);
+    setSuggestionOpen((prev) => !prev);
   }, []);
+
+  // Fetch achievement badges for human players
+  useEffect(() => {
+    if (!socket) return;
+
+    const humanPlayers = gameState.players.filter((p) => !p.isBot && !p.isEmpty);
+
+    // Fetch achievements for each human player
+    humanPlayers.forEach(async (player) => {
+      // Check cache first
+      const cached = getCachedBadges(player.name);
+      if (cached.length > 0) {
+        setPlayerAchievements((prev) => {
+          const next = new Map(prev);
+          next.set(player.name, cached);
+          return next;
+        });
+      } else {
+        // Fetch from server
+        const result = await fetchAchievements(player.name);
+        if (result?.topBadges) {
+          setPlayerAchievements((prev) => {
+            const next = new Map(prev);
+            next.set(player.name, result.topBadges);
+            return next;
+          });
+        }
+      }
+    });
+  }, [socket, gameState.players, getCachedBadges, fetchAchievements]);
 
   // Trick winner listener
   useEffect(() => {
@@ -230,10 +250,10 @@ function PlayingPhaseComponent({
       points: number;
       gameState: GameState;
     }) => {
-      const winner = data.gameState.players.find(p => p.id === data.winnerId);
+      const winner = data.gameState.players.find((p) => p.id === data.winnerId);
       if (!winner) return;
 
-      const winnerIndex = data.gameState.players.findIndex(p => p.id === data.winnerId);
+      const winnerIndex = data.gameState.players.findIndex((p) => p.id === data.winnerId);
       const relativePosition = (winnerIndex - currentPlayerIndex + 4) % 4;
       const positions: ('bottom' | 'left' | 'top' | 'right')[] = ['bottom', 'left', 'top', 'right'];
 
@@ -248,7 +268,9 @@ function PlayingPhaseComponent({
     };
 
     socket.on('trick_resolved', handleTrickResolved);
-    return () => { socket.off('trick_resolved', handleTrickResolved); };
+    return () => {
+      socket.off('trick_resolved', handleTrickResolved);
+    };
   }, [socket, currentPlayerIndex]);
 
   // Win/loss sound effects
@@ -259,7 +281,7 @@ function PlayingPhaseComponent({
     if (lastSoundedTrickWinnerRef.current === winnerId) return;
     lastSoundedTrickWinnerRef.current = winnerId;
 
-    const winnerTeamId = gameState.players.find(p => p.id === winnerId)?.teamId;
+    const winnerTeamId = gameState.players.find((p) => p.id === winnerId)?.teamId;
     const currentPlayerTeamId = currentPlayer?.teamId;
 
     if (winnerTeamId === currentPlayerTeamId) {
@@ -274,7 +296,7 @@ function PlayingPhaseComponent({
     const newMap = new Map<string, string>();
 
     gameState.currentTrick.forEach((play, index) => {
-      const player = gameState.players.find(p => p.name === play.playerName);
+      const player = gameState.players.find((p) => p.name === play.playerName);
       if (!player?.isBot) return;
 
       const card = play.card;
@@ -322,7 +344,7 @@ function PlayingPhaseComponent({
     if (!isCurrentTurn || !queuedCard || !currentPlayer) return;
 
     const cardInHand = currentPlayer.hand.some(
-      c => c.color === queuedCard.color && c.value === queuedCard.value
+      (c) => c.color === queuedCard.color && c.value === queuedCard.value
     );
     if (!cardInHand) {
       setQueuedCard(null);
@@ -334,7 +356,8 @@ function PlayingPhaseComponent({
     // 1. Player just won the trick and is now leading AND
     // 2. The card was queued while waiting (not during own turn)
     // This allows continuous play flow when winning tricks (queue 7, play, queue 6, auto-play, etc.)
-    const justWonTrick = gameState.currentTrick.length === 0 &&
+    const justWonTrick =
+      gameState.currentTrick.length === 0 &&
       gameState.previousTrick?.winnerName === currentPlayer.name;
     if (justWonTrick && !queuedDuringOwnTurn) {
       // Keep the card queued but don't auto-play - player queued while waiting, now they're leading
@@ -348,7 +371,7 @@ function PlayingPhaseComponent({
     // When currentTrick.length === 0, we're also leading (no suit-following required)
     if (gameState.currentTrick.length > 0 && gameState.currentTrick.length < 4) {
       const ledSuit = gameState.currentTrick[0].card.color;
-      const hasLedSuit = currentPlayer.hand.some(c => c.color === ledSuit);
+      const hasLedSuit = currentPlayer.hand.some((c) => c.color === ledSuit);
       if (hasLedSuit && queuedCard.color !== ledSuit) {
         isValidToPlay = false;
       }
@@ -368,7 +391,15 @@ function PlayingPhaseComponent({
     }, 150);
 
     return () => clearTimeout(timeoutId);
-  }, [isCurrentTurn, queuedCard, queuedDuringOwnTurn, currentPlayer, gameState.currentTrick, gameState.previousTrick, onPlayCard]);
+  }, [
+    isCurrentTurn,
+    queuedCard,
+    queuedDuringOwnTurn,
+    currentPlayer,
+    gameState.currentTrick,
+    gameState.previousTrick,
+    onPlayCard,
+  ]);
 
   // Clear queue on new round
   useEffect(() => {
@@ -377,23 +408,26 @@ function PlayingPhaseComponent({
   }, [gameState.roundNumber]);
 
   // Handler to queue/unqueue a card
-  const handleQueueCard = useCallback((card: CardType | null) => {
-    if (!card) {
-      setQueuedCard(null);
-      setQueuedDuringOwnTurn(false);
-      return;
-    }
-    if (queuedCard && queuedCard.color === card.color && queuedCard.value === card.value) {
-      // Unqueue - clicking same card
-      setQueuedCard(null);
-      setQueuedDuringOwnTurn(false);
-    } else {
-      // Queue new card - track if it was queued during own turn for continuous play flow
-      setQueuedCard(card);
-      setQueuedDuringOwnTurn(isCurrentTurn);
-      sounds.cardDeal();
-    }
-  }, [queuedCard, isCurrentTurn]);
+  const handleQueueCard = useCallback(
+    (card: CardType | null) => {
+      if (!card) {
+        setQueuedCard(null);
+        setQueuedDuringOwnTurn(false);
+        return;
+      }
+      if (queuedCard && queuedCard.color === card.color && queuedCard.value === card.value) {
+        // Unqueue - clicking same card
+        setQueuedCard(null);
+        setQueuedDuringOwnTurn(false);
+      } else {
+        // Queue new card - track if it was queued during own turn for continuous play flow
+        setQueuedCard(card);
+        setQueuedDuringOwnTurn(isCurrentTurn);
+        sounds.cardDeal();
+      }
+    },
+    [queuedCard, isCurrentTurn]
+  );
 
   // Empty state message when no trick
   const EmptyTrickMessage = () => {
@@ -405,12 +439,9 @@ function PlayingPhaseComponent({
           className={`
             relative rounded-[var(--radius-xl)] px-6 py-4 lg:px-8 lg:py-6
             border-2 transition-all duration-[var(--duration-fast)]
+            bg-skin-tertiary
+            ${isCurrentTurn ? 'border-skin-text-accent shadow-[var(--shadow-glow)]' : 'border-skin-border-default shadow-[var(--shadow-lg)]'}
           `}
-          style={{
-            backgroundColor: 'var(--color-bg-tertiary)',
-            borderColor: isCurrentTurn ? 'var(--color-text-accent)' : 'var(--color-border-default)',
-            boxShadow: isCurrentTurn ? 'var(--shadow-glow)' : 'var(--shadow-lg)',
-          }}
           data-testid="turn-indicator"
         >
           {isCurrentTurn && (
@@ -419,8 +450,7 @@ function PlayingPhaseComponent({
             </div>
           )}
           <p
-            className="text-lg md:text-2xl lg:text-3xl font-display uppercase tracking-wider"
-            style={{ color: 'var(--color-text-primary)' }}
+            className="text-lg md:text-2xl lg:text-3xl font-display uppercase tracking-wider text-skin-primary"
             data-testid="current-turn-player"
           >
             {isCurrentTurn
@@ -431,9 +461,8 @@ function PlayingPhaseComponent({
             {[0, 1, 2].map((i) => (
               <div
                 key={i}
-                className="w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce"
+                className="w-2 h-2 lg:w-3 lg:h-3 rounded-full animate-bounce bg-skin-text-accent"
                 style={{
-                  backgroundColor: 'var(--color-text-accent)',
                   animationDelay: `${i * 0.1}s`,
                 }}
               />
@@ -451,10 +480,7 @@ function PlayingPhaseComponent({
   }, [isCurrentTurn, isSpectator, gameState, currentPlayerId]);
 
   return (
-    <div
-      className="h-screen-safe md:min-h-screen-safe flex flex-col overflow-y-auto overflow-x-hidden md:overflow-visible"
-      style={{ background: 'var(--color-bg-primary)' }}
-    >
+    <div className="h-screen-safe md:min-h-screen-safe flex flex-col overflow-y-auto overflow-x-hidden md:overflow-visible game-container bg-skin-primary">
       <GameHeader
         gameId={gameId || ''}
         roundNumber={gameState.roundNumber}
@@ -476,9 +502,21 @@ function PlayingPhaseComponent({
         onOpenSideBets={() => setSideBetsOpen(!sideBetsOpen)}
         openSideBetsCount={openSideBetsCount}
         connectionStats={connectionStats}
-        highestBet={gameState.highestBet ? { amount: gameState.highestBet.amount, withoutTrump: gameState.highestBet.withoutTrump, playerId: gameState.highestBet.playerId } : undefined}
+        highestBet={
+          gameState.highestBet
+            ? {
+                amount: gameState.highestBet.amount,
+                withoutTrump: gameState.highestBet.withoutTrump,
+                playerId: gameState.highestBet.playerId,
+              }
+            : undefined
+        }
         trump={gameState.trump}
-        bettingTeamId={gameState.highestBet?.playerId ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId : null}
+        bettingTeamId={
+          gameState.highestBet?.playerId
+            ? gameState.players.find((p) => p.id === gameState.highestBet?.playerId)?.teamId
+            : null
+        }
         isVoiceEnabled={isVoiceEnabled}
         isVoiceMuted={isVoiceMuted}
         voiceParticipants={voiceParticipants}
@@ -500,12 +538,8 @@ function PlayingPhaseComponent({
               rounded-[var(--radius-xl)] p-3 md:p-6 lg:p-8
               md:min-h-[400px] lg:min-h-[450px]
               relative border-2 h-full flex flex-col
+              bg-skin-secondary border-skin-accent shadow-[var(--shadow-glow)]
             "
-            style={{
-              backgroundColor: 'var(--color-bg-secondary)',
-              borderColor: 'var(--color-border-accent)',
-              boxShadow: 'var(--shadow-glow)',
-            }}
           >
             <EmptyTrickMessage />
 
@@ -524,6 +558,7 @@ function PlayingPhaseComponent({
               onToggleSuggestion={toggleSuggestion}
               beginnerMode={beginnerMode}
               isCurrentTurn={isCurrentTurn}
+              playerAchievements={playerAchievements}
             />
           </div>
         </div>
@@ -552,11 +587,7 @@ function PlayingPhaseComponent({
       />
 
       {/* How to Play Modal */}
-      <HowToPlay
-        isModal={true}
-        isOpen={showHowToPlay}
-        onClose={() => setShowHowToPlay(false)}
-      />
+      <HowToPlay isModal={true} isOpen={showHowToPlay} onClose={() => setShowHowToPlay(false)} />
 
       {/* Chat Panel */}
       <UnifiedChat
@@ -611,11 +642,7 @@ function PlayingPhaseComponent({
 
       {/* Side Bet Toast Notifications - visible when panel is closed */}
       {socket && (
-        <SideBetToast
-          socket={socket}
-          playerName={currentPlayerId}
-          enabled={!sideBetsOpen}
-        />
+        <SideBetToast socket={socket} playerName={currentPlayerId} enabled={!sideBetsOpen} />
       )}
     </div>
   );

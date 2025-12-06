@@ -59,7 +59,13 @@ type Story = StoryObj<typeof meta>;
 
 interface MockNotification {
   id: number;
-  type: 'achievement_unlocked' | 'friend_request' | 'friend_accepted' | 'game_invite' | 'mention' | 'system';
+  type:
+    | 'achievement_unlocked'
+    | 'friend_request'
+    | 'friend_accepted'
+    | 'game_invite'
+    | 'mention'
+    | 'system';
   title: string;
   message: string;
   timestamp: string;
@@ -119,13 +125,20 @@ const mockNotifications: MockNotification[] = [
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
-    case 'achievement_unlocked': return '🏆';
-    case 'friend_request': return '👥';
-    case 'friend_accepted': return '✅';
-    case 'game_invite': return '🎮';
-    case 'mention': return '💬';
-    case 'system': return '📢';
-    default: return '🔔';
+    case 'achievement_unlocked':
+      return '🏆';
+    case 'friend_request':
+      return '👥';
+    case 'friend_accepted':
+      return '✅';
+    case 'game_invite':
+      return '🎮';
+    case 'mention':
+      return '💬';
+    case 'system':
+      return '📢';
+    default:
+      return '🔔';
   }
 };
 
@@ -183,9 +196,7 @@ export const DropdownOpen: Story = {
       <UICard variant="elevated" size="md" className="w-full max-h-[500px] flex flex-col border-2">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b-2 border-gray-200 dark:border-gray-600">
-          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">
-            Notifications
-          </h3>
+          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">Notifications</h3>
           <div className="flex gap-2">
             <Button variant="primary" size="sm">
               Mark all read
@@ -242,10 +253,18 @@ export const NotificationTypes: Story = {
   name: 'All Notification Types',
   render: () => {
     const notificationTypes = [
-      { type: 'achievement_unlocked', title: 'Achievement Unlocked!', message: 'You earned a new badge' },
-      { type: 'friend_request', title: 'Friend Request', message: 'Someone wants to be your friend' },
+      {
+        type: 'achievement_unlocked',
+        title: 'Achievement Unlocked!',
+        message: 'You earned a new badge',
+      },
+      {
+        type: 'friend_request',
+        title: 'Friend Request',
+        message: 'Someone wants to be your friend',
+      },
       { type: 'friend_accepted', title: 'Friend Accepted', message: 'Your request was accepted' },
-      { type: 'game_invite', title: 'Game Invite', message: 'You\'ve been invited to a game' },
+      { type: 'game_invite', title: 'Game Invite', message: "You've been invited to a game" },
       { type: 'mention', title: 'Mentioned', message: 'Someone mentioned you' },
       { type: 'system', title: 'System Message', message: 'Important system update' },
     ];
@@ -339,9 +358,7 @@ export const EmptyNotifications: Story = {
 
       <UICard variant="elevated" size="md" className="w-full">
         <div className="flex items-center justify-between pb-4 border-b-2 border-gray-200 dark:border-gray-600">
-          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">
-            Notifications
-          </h3>
+          <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">Notifications</h3>
         </div>
 
         <div className="py-8">
@@ -396,18 +413,14 @@ function InteractiveDemo() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const handleMarkAsRead = (id: number) => {
-    setNotifications(prev =>
-      prev.map(n => n.id === id ? { ...n, isRead: true } : n)
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
   };
 
   const handleMarkAllRead = () => {
-    setNotifications(prev =>
-      prev.map(n => ({ ...n, isRead: true }))
-    );
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
   const handleClearAll = () => {
@@ -439,7 +452,11 @@ function InteractiveDemo() {
 
         {/* Dropdown */}
         {isOpen && (
-          <UICard variant="elevated" size="md" className="absolute right-0 bottom-full mb-2 w-96 max-h-[400px] flex flex-col border-2">
+          <UICard
+            variant="elevated"
+            size="md"
+            className="absolute right-0 bottom-full mb-2 w-96 max-h-[400px] flex flex-col border-2"
+          >
             <div className="flex items-center justify-between pb-4 border-b border-gray-600">
               <h3 className="font-bold text-gray-100">Notifications</h3>
               <div className="flex gap-2">

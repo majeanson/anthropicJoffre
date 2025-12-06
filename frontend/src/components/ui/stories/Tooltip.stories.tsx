@@ -157,9 +157,7 @@ export const OnIcon: Story = {
   args: {
     content: 'Copy game link',
     children: (
-      <button className="p-2 text-xl hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
-        📋
-      </button>
+      <button className="p-2 text-xl hover:bg-gray-100 dark:hover:bg-gray-700 rounded">📋</button>
     ),
   },
 };
@@ -168,18 +166,15 @@ export const OnIcon: Story = {
 export const OnText: Story = {
   args: {
     content: 'Click to copy',
-    children: (
-      <span className="text-blue-500 underline cursor-pointer">
-        Game ID: ABC123
-      </span>
-    ),
+    children: <span className="text-blue-500 underline cursor-pointer">Game ID: ABC123</span>,
   },
 };
 
 // Long Content
 export const LongContent: Story = {
   args: {
-    content: 'This is a longer tooltip that contains more detailed information about the feature or action.',
+    content:
+      'This is a longer tooltip that contains more detailed information about the feature or action.',
     children: <Button>Long tooltip</Button>,
   },
 };
@@ -222,27 +217,39 @@ export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4 justify-center">
       <Tooltip content="Dark tooltip" variant="dark">
-        <Button variant="secondary" size="sm">Dark</Button>
+        <Button variant="secondary" size="sm">
+          Dark
+        </Button>
       </Tooltip>
 
       <Tooltip content="Light tooltip" variant="light">
-        <Button variant="secondary" size="sm">Light</Button>
+        <Button variant="secondary" size="sm">
+          Light
+        </Button>
       </Tooltip>
 
       <Tooltip content="Info tooltip" variant="info">
-        <Button variant="secondary" size="sm">Info</Button>
+        <Button variant="secondary" size="sm">
+          Info
+        </Button>
       </Tooltip>
 
       <Tooltip content="Success tooltip" variant="success">
-        <Button variant="secondary" size="sm">Success</Button>
+        <Button variant="secondary" size="sm">
+          Success
+        </Button>
       </Tooltip>
 
       <Tooltip content="Warning tooltip" variant="warning">
-        <Button variant="secondary" size="sm">Warning</Button>
+        <Button variant="secondary" size="sm">
+          Warning
+        </Button>
       </Tooltip>
 
       <Tooltip content="Error tooltip" variant="error">
-        <Button variant="secondary" size="sm">Error</Button>
+        <Button variant="secondary" size="sm">
+          Error
+        </Button>
       </Tooltip>
     </div>
   ),
@@ -257,21 +264,15 @@ export const ActionBarExample: Story = {
   render: () => (
     <div className="flex items-center gap-2 p-4 bg-parchment-100 dark:bg-gray-800 rounded-lg">
       <Tooltip content="Copy game link">
-        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">
-          📋
-        </button>
+        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">📋</button>
       </Tooltip>
 
       <Tooltip content="Invite friends">
-        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">
-          👥
-        </button>
+        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">👥</button>
       </Tooltip>
 
       <Tooltip content="Game settings">
-        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">
-          ⚙️
-        </button>
+        <button className="p-2 hover:bg-parchment-200 dark:hover:bg-gray-700 rounded">⚙️</button>
       </Tooltip>
 
       <div className="h-6 w-px bg-parchment-300 dark:bg-gray-600 mx-2" />

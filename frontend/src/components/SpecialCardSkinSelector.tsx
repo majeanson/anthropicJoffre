@@ -47,7 +47,8 @@ function SpecialSkinCard({
   const [isHovered, setIsHovered] = useState(false);
 
   const canAfford = cosmeticCurrency >= skin.price;
-  const isLevelLocked = skin.unlockType === 'level' &&
+  const isLevelLocked =
+    skin.unlockType === 'level' &&
     !skin.isUnlocked &&
     playerLevel < parseInt(skin.unlockRequirement || '0', 10);
   const isAchievementLocked = skin.unlockType === 'achievement' && !skin.isUnlocked;
@@ -65,11 +66,12 @@ function SpecialSkinCard({
         border-2
         p-4
         transition-all duration-300
-        ${isEquipped
-          ? 'border-[var(--color-text-accent)] shadow-lg'
-          : skin.isUnlocked
-            ? 'border-[var(--color-border-default)] hover:border-[var(--color-border-accent)]'
-            : 'border-[var(--color-border-subtle)] opacity-80'
+        ${
+          isEquipped
+            ? 'border-[var(--color-text-accent)] shadow-lg'
+            : skin.isUnlocked
+              ? 'border-[var(--color-border-default)] hover:border-[var(--color-border-accent)]'
+              : 'border-[var(--color-border-subtle)] opacity-80'
         }
         bg-[var(--color-bg-secondary)]
       `}
@@ -109,7 +111,10 @@ function SpecialSkinCard({
               <p className="text-sm text-white font-bold">{skin.price} coins</p>
               {canAfford ? (
                 <button
-                  onClick={(e) => { e.stopPropagation(); onPurchase(skin.skinId); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPurchase(skin.skinId);
+                  }}
                   className="mt-2 px-4 py-1.5 bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-sm font-bold rounded-lg hover:from-yellow-400 hover:to-orange-400 transition-all"
                 >
                   Purchase
@@ -162,9 +167,10 @@ function SpecialSkinCard({
         style={{
           backgroundColor: skin.cardType === 'red_zero' ? '#fee2e2' : '#fef3c7',
           border: `3px solid ${skin.borderColor || '#888'}`,
-          boxShadow: isHovered || isEquipped
-            ? `0 0 20px ${skin.glowColor || 'rgba(0,0,0,0.3)'}`
-            : '0 4px 12px rgba(0,0,0,0.2)',
+          boxShadow:
+            isHovered || isEquipped
+              ? `0 0 20px ${skin.glowColor || 'rgba(0,0,0,0.3)'}`
+              : '0 4px 12px rgba(0,0,0,0.2)',
         }}
       >
         {/* Icon */}
@@ -186,9 +192,7 @@ function SpecialSkinCard({
 
       {/* Skin info */}
       <div className="text-center">
-        <h4 className="font-bold text-[var(--color-text-primary)] text-sm">
-          {skin.skinName}
-        </h4>
+        <h4 className="font-bold text-[var(--color-text-primary)] text-sm">{skin.skinName}</h4>
         <p className="text-xs text-[var(--color-text-muted)] mt-1 line-clamp-2">
           {skin.description}
         </p>
@@ -342,8 +346,18 @@ export function SpecialCardSkinSelector({ socket, onClose }: SpecialCardSkinSele
               onClick={onClose}
               className="p-2 hover:bg-[var(--color-bg-tertiary)] rounded-lg transition-colors"
             >
-              <svg className="w-5 h-5 text-[var(--color-text-secondary)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5 text-[var(--color-text-secondary)]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           )}
@@ -368,15 +382,13 @@ export function SpecialCardSkinSelector({ socket, onClose }: SpecialCardSkinSele
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl">🔥</span>
-          <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
-            Red Zero Skins
-          </h3>
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Red Zero Skins</h3>
           <span className="px-2 py-0.5 bg-green-600/20 text-green-400 text-xs rounded-full font-bold">
             +5 Points
           </span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {redZeroSkins.map(skin => (
+          {redZeroSkins.map((skin) => (
             <SpecialSkinCard
               key={skin.skinId}
               skin={skin}
@@ -394,15 +406,13 @@ export function SpecialCardSkinSelector({ socket, onClose }: SpecialCardSkinSele
       <div>
         <div className="flex items-center gap-2 mb-4">
           <span className="text-2xl">🌍</span>
-          <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
-            Brown Zero Skins
-          </h3>
+          <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Brown Zero Skins</h3>
           <span className="px-2 py-0.5 bg-red-600/20 text-red-400 text-xs rounded-full font-bold">
             -2 Points
           </span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {brownZeroSkins.map(skin => (
+          {brownZeroSkins.map((skin) => (
             <SpecialSkinCard
               key={skin.skinId}
               skin={skin}
@@ -430,26 +440,21 @@ interface SpecialCardSkinDropdownProps {
 }
 
 export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownProps) {
-  const {
-    specialCardSkins,
-    equippedSpecialSkins,
-    setEquippedSpecialSkins,
-  } = useSpecialCardSkins();
+  const { specialCardSkins, equippedSpecialSkins, setEquippedSpecialSkins } = useSpecialCardSkins();
 
   const [isOpen, setIsOpen] = useState(false);
 
   // Filter skins by card type
-  const skins = specialCardSkins.filter(s => s.cardType === cardType);
+  const skins = specialCardSkins.filter((s) => s.cardType === cardType);
 
   // Get currently equipped skin
-  const equippedSkinId = cardType === 'red_zero'
-    ? equippedSpecialSkins.redZeroSkin
-    : equippedSpecialSkins.brownZeroSkin;
+  const equippedSkinId =
+    cardType === 'red_zero' ? equippedSpecialSkins.redZeroSkin : equippedSpecialSkins.brownZeroSkin;
 
-  const equippedSkin = skins.find(s => s.skinId === equippedSkinId) || skins[0];
+  const equippedSkin = skins.find((s) => s.skinId === equippedSkinId) || skins[0];
 
   const handleSelect = (skinId: string) => {
-    const skin = skins.find(s => s.skinId === skinId);
+    const skin = skins.find((s) => s.skinId === skinId);
     if (!skin?.isUnlocked) return;
 
     // Update equipped skins
@@ -511,7 +516,7 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
             max-h-64 overflow-y-auto
           "
         >
-          {skins.map(skin => {
+          {skins.map((skin) => {
             const isEquipped = skin.skinId === equippedSkinId;
             const isLocked = !skin.isUnlocked;
             const rarity = rarityStyles[skin.rarity];
@@ -527,11 +532,12 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
                   px-4 py-3
                   text-left
                   transition-colors
-                  ${isEquipped
-                    ? 'bg-[var(--color-text-accent)]/20 border-l-4 border-[var(--color-text-accent)]'
-                    : isLocked
-                      ? 'opacity-50 cursor-not-allowed'
-                      : 'hover:bg-[var(--color-bg-secondary)]'
+                  ${
+                    isEquipped
+                      ? 'bg-[var(--color-text-accent)]/20 border-l-4 border-[var(--color-text-accent)]'
+                      : isLocked
+                        ? 'opacity-50 cursor-not-allowed'
+                        : 'hover:bg-[var(--color-bg-secondary)]'
                   }
                   border-b border-[var(--color-border-subtle)] last:border-b-0
                 `}
@@ -555,7 +561,9 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
                     )}
                   </div>
                   <div className="flex items-center gap-2 text-xs text-[var(--color-text-muted)]">
-                    <span className={`capitalize ${rarity.badgeColor.replace('bg-', 'text-').replace('-500', '-400')}`}>
+                    <span
+                      className={`capitalize ${rarity.badgeColor.replace('bg-', 'text-').replace('-500', '-400')}`}
+                    >
                       {skin.rarity}
                     </span>
                     {isLocked && (
@@ -573,12 +581,7 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
       )}
 
       {/* Click outside to close */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
     </div>
   );
 }

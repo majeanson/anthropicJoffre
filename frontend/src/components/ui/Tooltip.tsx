@@ -69,12 +69,15 @@ const positionClasses: Record<TooltipPosition, { container: string; arrow: strin
 };
 
 // Variant styles using CSS variables for skin compatibility
-const variantStyles: Record<TooltipVariant, {
-  bg: string;
-  text: string;
-  border: string;
-  shadow: string;
-}> = {
+const variantStyles: Record<
+  TooltipVariant,
+  {
+    bg: string;
+    text: string;
+    border: string;
+    shadow: string;
+  }
+> = {
   dark: {
     bg: 'var(--color-bg-primary)',
     text: 'var(--color-text-primary)',
@@ -205,9 +208,7 @@ export function Tooltip({
       onBlur={handleHide}
     >
       {/* Trigger Element */}
-      <div aria-describedby={shouldRender ? tooltipId.current : undefined}>
-        {children}
-      </div>
+      <div aria-describedby={shouldRender ? tooltipId.current : undefined}>{children}</div>
 
       {/* Tooltip */}
       {shouldRender && (
@@ -223,36 +224,44 @@ export function Tooltip({
             whitespace-nowrap
             pointer-events-none
             transition-all duration-200
+            border border-solid
+            font-serif
             ${isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-1 scale-95'}
             ${className}
           `}
           style={{
             background: variantStyle.bg,
             color: variantStyle.text,
-            borderWidth: '1px',
-            borderStyle: 'solid',
             borderColor: variantStyle.border,
             boxShadow: variantStyle.shadow,
-            fontFamily: '"Cormorant Garamond", Georgia, serif',
           }}
         >
           {/* Arcane corner accents */}
           {variant === 'arcane' && (
             <>
-              <div className="absolute top-0 left-0 w-2 h-2 border-l border-t opacity-60 rounded-tl-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
-              <div className="absolute top-0 right-0 w-2 h-2 border-r border-t opacity-60 rounded-tr-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
-              <div className="absolute bottom-0 left-0 w-2 h-2 border-l border-b opacity-60 rounded-bl-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
-              <div className="absolute bottom-0 right-0 w-2 h-2 border-r border-b opacity-60 rounded-br-sm" style={{ borderColor: 'var(--color-border-accent)' }} />
+              <div
+                className="absolute top-0 left-0 w-2 h-2 border-l border-t opacity-60 rounded-tl-sm"
+                style={{ borderColor: 'var(--color-border-accent)' }}
+              />
+              <div
+                className="absolute top-0 right-0 w-2 h-2 border-r border-t opacity-60 rounded-tr-sm"
+                style={{ borderColor: 'var(--color-border-accent)' }}
+              />
+              <div
+                className="absolute bottom-0 left-0 w-2 h-2 border-l border-b opacity-60 rounded-bl-sm"
+                style={{ borderColor: 'var(--color-border-accent)' }}
+              />
+              <div
+                className="absolute bottom-0 right-0 w-2 h-2 border-r border-b opacity-60 rounded-br-sm"
+                style={{ borderColor: 'var(--color-border-accent)' }}
+              />
             </>
           )}
 
           {content}
 
           {/* Arrow */}
-          <div
-            className={`absolute ${positionStyle.arrow}`}
-            style={getArrowStyle()}
-          />
+          <div className={`absolute ${positionStyle.arrow}`} style={getArrowStyle()} />
         </div>
       )}
     </div>
@@ -266,9 +275,7 @@ export function Tooltip({
 export interface PresetTooltipProps extends Omit<TooltipProps, 'variant'> {}
 
 /** Arcane tooltip with copper glow */
-export const ArcaneTooltip = (props: PresetTooltipProps) => (
-  <Tooltip variant="arcane" {...props} />
-);
+export const ArcaneTooltip = (props: PresetTooltipProps) => <Tooltip variant="arcane" {...props} />;
 
 /** Success tooltip for positive feedback */
 export const SuccessTooltip = (props: PresetTooltipProps) => (
@@ -281,8 +288,6 @@ export const WarningTooltip = (props: PresetTooltipProps) => (
 );
 
 /** Error tooltip for critical information */
-export const ErrorTooltip = (props: PresetTooltipProps) => (
-  <Tooltip variant="error" {...props} />
-);
+export const ErrorTooltip = (props: PresetTooltipProps) => <Tooltip variant="error" {...props} />;
 
 export default Tooltip;

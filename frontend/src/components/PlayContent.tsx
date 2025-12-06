@@ -29,7 +29,11 @@ interface PlayContentProps {
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
   quickPlayPersistence: 'elo' | 'casual';
   setQuickPlayPersistence: (mode: 'elo' | 'casual') => void;
-  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual', playerName?: string) => void;
+  onQuickPlay: (
+    difficulty: BotDifficulty,
+    persistenceMode: 'elo' | 'casual',
+    playerName?: string
+  ) => void;
   user: User | null;
   onShowLogin?: () => void;
   onShowRegister?: () => void;
@@ -78,7 +82,10 @@ export function PlayContent({
               <Button
                 variant="warning"
                 size="sm"
-                onClick={() => { sounds.buttonClick(); onShowLogin(); }}
+                onClick={() => {
+                  sounds.buttonClick();
+                  onShowLogin();
+                }}
               >
                 Login
               </Button>
@@ -87,7 +94,10 @@ export function PlayContent({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => { sounds.buttonClick(); onShowRegister(); }}
+                onClick={() => {
+                  sounds.buttonClick();
+                  onShowRegister();
+                }}
               >
                 Register
               </Button>
@@ -124,11 +134,7 @@ export function PlayContent({
       )}
 
       {/* Active Games (Resumable) */}
-      <ActiveGames
-        playerName={playerName}
-        socket={socket}
-        onResumeGame={onResumeGame}
-      />
+      <ActiveGames playerName={playerName} socket={socket} onResumeGame={onResumeGame} />
 
       {/* Multiplayer Section */}
       <div
@@ -148,7 +154,10 @@ export function PlayContent({
             data-keyboard-nav="create-game"
             variant="warning"
             size="md"
-            onClick={() => { sounds.buttonClick(); onCreateGame(); }}
+            onClick={() => {
+              sounds.buttonClick();
+              onCreateGame();
+            }}
             disabled={!tierInfo.canCreateGame}
             fullWidth
             leftIcon={<span>{tierInfo.canCreateGame ? '➕' : '🔒'}</span>}
@@ -160,7 +169,10 @@ export function PlayContent({
             data-testid="join-game-button"
             data-keyboard-nav="browse-games"
             size="md"
-            onClick={() => { sounds.buttonClick(); onBrowseGames(); }}
+            onClick={() => {
+              sounds.buttonClick();
+              onBrowseGames();
+            }}
             fullWidth
             leftIcon={<span>🔍</span>}
           >

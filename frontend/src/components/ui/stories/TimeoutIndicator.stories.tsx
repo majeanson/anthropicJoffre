@@ -55,13 +55,7 @@ type Story = StoryObj<typeof meta>;
 // URGENCY STATES
 // =============================================================================
 
-function TimeoutBadgeDisplay({
-  seconds,
-  percentage,
-}: {
-  seconds: number;
-  percentage: number;
-}) {
+function TimeoutBadgeDisplay({ seconds, percentage }: { seconds: number; percentage: number }) {
   const getBadgeColor = (): 'success' | 'warning' | 'error' => {
     if (percentage > 50) return 'success';
     if (percentage > 25) return 'warning';
@@ -69,7 +63,12 @@ function TimeoutBadgeDisplay({
   };
 
   return (
-    <UIBadge variant="solid" color={getBadgeColor()} size="sm" className="transition-colors duration-500">
+    <UIBadge
+      variant="solid"
+      color={getBadgeColor()}
+      size="sm"
+      className="transition-colors duration-500"
+    >
       ⏱️ {seconds}s
     </UIBadge>
   );
@@ -79,7 +78,9 @@ export const UrgencyStates: Story = {
   name: 'Urgency States',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-6 w-[350px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Timeout Urgency Levels</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Timeout Urgency Levels
+      </h3>
 
       <div className="space-y-4">
         {/* Green - Plenty of Time (> 50%) */}
@@ -301,19 +302,10 @@ function LiveCountdownDemo() {
       </div>
 
       <div className="flex gap-2 justify-center">
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleStart}
-          disabled={isActive}
-        >
+        <Button variant="primary" size="sm" onClick={handleStart} disabled={isActive}>
           Start Timer
         </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={handleReset}
-        >
+        <Button variant="secondary" size="sm" onClick={handleReset}>
           Reset
         </Button>
       </div>

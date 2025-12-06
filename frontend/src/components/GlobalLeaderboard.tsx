@@ -66,8 +66,7 @@ const LeaderboardRow = memo(function LeaderboardRow({
         <p className="text-xs text-umber-600 dark:text-gray-400">
           {showRoundStats
             ? `${player.rounds_won || 0}W - ${(player.total_rounds_played || 0) - (player.rounds_won || 0)}L`
-            : `${player.games_won}W - ${player.games_lost}L`
-          }
+            : `${player.games_won}W - ${player.games_lost}L`}
         </p>
       </div>
 
@@ -76,25 +75,35 @@ const LeaderboardRow = memo(function LeaderboardRow({
           {/* ELO Rating */}
           <div className="col-span-1 flex flex-col items-center justify-center">
             <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">ELO</p>
-            <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{player.elo_rating}</p>
-            <p className="text-xs text-gray-500 dark:text-gray-500">Peak: {player.highest_rating}</p>
+            <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+              {player.elo_rating}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-500">
+              Peak: {player.highest_rating}
+            </p>
           </div>
 
           {/* Games Played */}
           <div className="col-span-1 flex flex-col items-center justify-center">
             <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Games</p>
-            <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games_played}</p>
+            <p className="text-xl font-bold text-gray-700 dark:text-gray-300">
+              {player.games_played}
+            </p>
           </div>
 
           {/* Win Percentage */}
           <div className="col-span-1 flex flex-col items-center justify-center">
             <p className="text-sm text-gray-600 dark:text-gray-400 md:hidden">Win Rate</p>
-            <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.win_percentage}%</p>
+            <p className="text-xl font-bold text-green-600 dark:text-green-400">
+              {player.win_percentage}%
+            </p>
           </div>
 
           {/* Tier Badge */}
           <div className="col-span-1 flex items-center justify-center">
-            <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.ranking_tier, true)}`}>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.ranking_tier, true)}`}
+            >
               {getTierIcon(player.ranking_tier)} {player.ranking_tier}
             </span>
           </div>
@@ -104,25 +113,33 @@ const LeaderboardRow = memo(function LeaderboardRow({
           {/* Total Rounds Played */}
           <div className="col-span-1 flex flex-col items-center justify-center">
             <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Rounds</p>
-            <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{player.total_rounds_played || 0}</p>
+            <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+              {player.total_rounds_played || 0}
+            </p>
           </div>
 
           {/* Round Win Percentage */}
           <div className="col-span-1 flex flex-col items-center justify-center">
             <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Round Win%</p>
-            <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.rounds_win_percentage || 0}%</p>
+            <p className="text-xl font-bold text-green-600 dark:text-green-400">
+              {player.rounds_win_percentage || 0}%
+            </p>
           </div>
 
           {/* Average Tricks Per Round */}
           <div className="col-span-1 flex flex-col items-center justify-center">
             <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Avg Tricks</p>
-            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{player.avg_tricks_per_round || 0}</p>
+            <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+              {player.avg_tricks_per_round || 0}
+            </p>
           </div>
 
           {/* Bet Success Rate */}
           <div className="col-span-1 flex flex-col items-center justify-center">
             <p className="text-sm text-blue-600 dark:text-blue-400 md:hidden">Bet Success</p>
-            <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{player.bet_success_rate || 0}%</p>
+            <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+              {player.bet_success_rate || 0}%
+            </p>
           </div>
         </>
       )}
@@ -130,7 +147,12 @@ const LeaderboardRow = memo(function LeaderboardRow({
   );
 });
 
-export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }: GlobalLeaderboardProps) {
+export function GlobalLeaderboard({
+  socket,
+  isOpen,
+  onClose,
+  onViewPlayerStats,
+}: GlobalLeaderboardProps) {
   // ✅ CRITICAL: Check isOpen BEFORE any hooks to prevent "Rendered more hooks than during the previous render" error
   // Rules of Hooks: All early returns must happen BEFORE calling any hooks
   if (!isOpen) return null;
@@ -146,7 +168,11 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
     setLoading(true);
     socket.emit('get_leaderboard', { limit: 100, excludeBots: true });
 
-    const handleLeaderboardResponse = ({ players: receivedPlayers }: { players: LeaderboardPlayer[] }) => {
+    const handleLeaderboardResponse = ({
+      players: receivedPlayers,
+    }: {
+      players: LeaderboardPlayer[];
+    }) => {
       setPlayers(receivedPlayers);
       setLoading(false);
     };
@@ -169,103 +195,110 @@ export function GlobalLeaderboard({ socket, isOpen, onClose, onViewPlayerStats }
       size="xl"
     >
       <div className="space-y-4">
-          {loading && (
-            <div className="space-y-4">
-              <TableSkeleton rows={10} columns={7} showHeader={true} />
+        {loading && (
+          <div className="space-y-4">
+            <TableSkeleton rows={10} columns={7} showHeader={true} />
+          </div>
+        )}
+
+        {!loading && players.length === 0 && (
+          <EmptyState
+            icon="🎮"
+            title="No players yet!"
+            description="Be the first to play and claim the top spot!"
+            card
+          />
+        )}
+
+        {!loading && players.length > 0 && (
+          <div className="space-y-4">
+            {/* Toggle Stats View Button */}
+            <div className="flex justify-center">
+              <Button variant="primary" onClick={() => setShowRoundStats(!showRoundStats)}>
+                {showRoundStats ? '🏆 Show Game Stats' : '📊 Show Round Stats'}
+              </Button>
             </div>
-          )}
 
-          {!loading && players.length === 0 && (
-            <EmptyState
-              icon="🎮"
-              title="No players yet!"
-              description="Be the first to play and claim the top spot!"
-              card
-            />
-          )}
-
-          {!loading && players.length > 0 && (
-            <div className="space-y-4">
-              {/* Toggle Stats View Button */}
-              <div className="flex justify-center">
-                <Button
-                  variant="primary"
-                  onClick={() => setShowRoundStats(!showRoundStats)}
-                >
-                  {showRoundStats ? '🏆 Show Game Stats' : '📊 Show Round Stats'}
-                </Button>
+            {/* Table Header - Game Stats */}
+            {!showRoundStats && (
+              <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold text-sm text-gray-700 dark:text-gray-300">
+                <div className="col-span-1">Rank</div>
+                <div className="col-span-2">Player</div>
+                <div className="col-span-1 text-center">ELO</div>
+                <div className="col-span-1 text-center">Games</div>
+                <div className="col-span-1 text-center">Win Rate</div>
+                <div className="col-span-1 text-center">Tier</div>
               </div>
+            )}
 
-              {/* Table Header - Game Stats */}
-              {!showRoundStats && (
-                <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-gray-200 dark:bg-gray-700 rounded-lg font-bold text-sm text-gray-700 dark:text-gray-300">
-                  <div className="col-span-1">Rank</div>
-                  <div className="col-span-2">Player</div>
-                  <div className="col-span-1 text-center">ELO</div>
-                  <div className="col-span-1 text-center">Games</div>
-                  <div className="col-span-1 text-center">Win Rate</div>
-                  <div className="col-span-1 text-center">Tier</div>
-                </div>
-              )}
+            {/* Table Header - Round Stats */}
+            {showRoundStats && (
+              <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-blue-200 dark:bg-blue-900/60 rounded-lg font-bold text-sm text-blue-900 dark:text-blue-200">
+                <div className="col-span-1">Rank</div>
+                <div className="col-span-2">Player</div>
+                <div className="col-span-1 text-center">Rounds</div>
+                <div className="col-span-1 text-center">Round Win%</div>
+                <div className="col-span-1 text-center">Avg Tricks</div>
+                <div className="col-span-1 text-center">Bet Success</div>
+              </div>
+            )}
 
-              {/* Table Header - Round Stats */}
-              {showRoundStats && (
-                <div className="hidden md:grid md:grid-cols-7 gap-4 px-4 py-3 bg-blue-200 dark:bg-blue-900/60 rounded-lg font-bold text-sm text-blue-900 dark:text-blue-200">
-                  <div className="col-span-1">Rank</div>
-                  <div className="col-span-2">Player</div>
-                  <div className="col-span-1 text-center">Rounds</div>
-                  <div className="col-span-1 text-center">Round Win%</div>
-                  <div className="col-span-1 text-center">Avg Tricks</div>
-                  <div className="col-span-1 text-center">Bet Success</div>
-                </div>
-              )}
+            {/* Player Rows */}
+            {players.map((player, index) => (
+              <LeaderboardRow
+                key={player.player_name}
+                player={player}
+                index={index}
+                showRoundStats={showRoundStats}
+                onViewPlayerStats={onViewPlayerStats}
+              />
+            ))}
+          </div>
+        )}
 
-              {/* Player Rows */}
-              {players.map((player, index) => (
-                <LeaderboardRow
-                  key={player.player_name}
-                  player={player}
-                  index={index}
-                  showRoundStats={showRoundStats}
-                  onViewPlayerStats={onViewPlayerStats}
-                />
-              ))}
+        {/* Footer */}
+        {!loading && players.length > 0 && (
+          <UICard variant="bordered" size="md" className="mt-4">
+            <div className="flex flex-wrap gap-4 justify-center text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-2">
+                <span>💎 Diamond:</span>
+                <span className="font-bold">
+                  {players.filter((p) => p.ranking_tier === 'Diamond').length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>🏆 Platinum:</span>
+                <span className="font-bold">
+                  {players.filter((p) => p.ranking_tier === 'Platinum').length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>🥇 Gold:</span>
+                <span className="font-bold">
+                  {players.filter((p) => p.ranking_tier === 'Gold').length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>🥈 Silver:</span>
+                <span className="font-bold">
+                  {players.filter((p) => p.ranking_tier === 'Silver').length}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>🥉 Bronze:</span>
+                <span className="font-bold">
+                  {players.filter((p) => p.ranking_tier === 'Bronze').length}
+                </span>
+              </div>
             </div>
-          )}
-
-          {/* Footer */}
-          {!loading && players.length > 0 && (
-            <UICard variant="bordered" size="md" className="mt-4">
-              <div className="flex flex-wrap gap-4 justify-center text-sm text-gray-600 dark:text-gray-400">
-                <div className="flex items-center gap-2">
-                  <span>💎 Diamond:</span>
-                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Diamond').length}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>🏆 Platinum:</span>
-                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Platinum').length}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>🥇 Gold:</span>
-                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Gold').length}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>🥈 Silver:</span>
-                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Silver').length}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>🥉 Bronze:</span>
-                  <span className="font-bold">{players.filter(p => p.ranking_tier === 'Bronze').length}</span>
-                </div>
-              </div>
-              {onViewPlayerStats && (
-                <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  Click on a player to view detailed statistics
-                </p>
-              )}
-            </UICard>
-          )}
-        </div>
+            {onViewPlayerStats && (
+              <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2">
+                Click on a player to view detailed statistics
+              </p>
+            )}
+          </UICard>
+        )}
+      </div>
     </Modal>
   );
 }

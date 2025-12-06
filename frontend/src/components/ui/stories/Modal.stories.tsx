@@ -7,14 +7,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import {
-  Modal,
-  ArcaneModal,
-  MidnightModal,
-  EmberModal,
-  TealModal,
-  MinimalModal,
-} from '../Modal';
+import { Modal, ArcaneModal, MidnightModal, EmberModal, TealModal, MinimalModal } from '../Modal';
 import { Button, ArcaneButton, DangerButton, SuccessButton } from '../Button';
 
 const meta = {
@@ -99,11 +92,7 @@ const ModalWrapper = (args: any) => {
       <ArcaneButton onClick={() => setIsOpen(true)} glow>
         Open Modal
       </ArcaneButton>
-      <Modal
-        {...args}
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      >
+      <Modal {...args} isOpen={isOpen} onClose={() => setIsOpen(false)}>
         {args.children}
       </Modal>
     </div>
@@ -126,8 +115,8 @@ export const ArcaneTheme: Story = {
     children: (
       <div className="space-y-4">
         <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-          This is the default arcane theme with copper and rose gold ethereal glow effects.
-          Perfect for that mystical alchemist's study aesthetic.
+          This is the default arcane theme with copper and rose gold ethereal glow effects. Perfect
+          for that mystical alchemist's study aesthetic.
         </p>
         <div className="flex gap-2">
           <span
@@ -157,7 +146,8 @@ export const ArcaneTheme: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Default arcane theme with copper/rose gold ethereal glow - the signature mystical style.',
+        story:
+          'Default arcane theme with copper/rose gold ethereal glow - the signature mystical style.',
       },
     },
   },
@@ -174,8 +164,8 @@ export const MidnightTheme: Story = {
     theme: 'midnight',
     children: (
       <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The midnight theme evokes the depths of the alchemist's laboratory,
-        with deep blue accents and subtle silver highlights.
+        The midnight theme evokes the depths of the alchemist's laboratory, with deep blue accents
+        and subtle silver highlights.
       </p>
     ),
   },
@@ -192,8 +182,8 @@ export const EmberTheme: Story = {
     theme: 'ember',
     children: (
       <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The ember theme brings the warmth of the alchemist's furnace,
-        with fiery orange and gold accents.
+        The ember theme brings the warmth of the alchemist's furnace, with fiery orange and gold
+        accents.
       </p>
     ),
   },
@@ -210,8 +200,8 @@ export const VoidTheme: Story = {
     theme: 'void',
     children: (
       <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The void theme represents the cosmic mysteries,
-        with deep purple gradients and otherworldly energy.
+        The void theme represents the cosmic mysteries, with deep purple gradients and otherworldly
+        energy.
       </p>
     ),
   },
@@ -228,8 +218,8 @@ export const ParchmentTheme: Story = {
     theme: 'parchment',
     children: (
       <p style={{ color: '#6B7280', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The parchment theme channels ancient manuscripts,
-        with warm cream tones and weathered aesthetics.
+        The parchment theme channels ancient manuscripts, with warm cream tones and weathered
+        aesthetics.
       </p>
     ),
   },
@@ -246,8 +236,8 @@ export const TealTheme: Story = {
     theme: 'teal',
     children: (
       <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        The teal theme represents the water element,
-        with ethereal cyan glow and transformative energy.
+        The teal theme represents the water element, with ethereal cyan glow and transformative
+        energy.
       </p>
     ),
   },
@@ -264,8 +254,8 @@ export const MinimalTheme: Story = {
     theme: 'minimal',
     children: (
       <p style={{ color: 'var(--color-text-secondary)' }}>
-        The minimal theme uses CSS variables, making it automatically compatible
-        with all skin themes including light and dark Modern Minimal.
+        The minimal theme uses CSS variables, making it automatically compatible with all skin
+        themes including light and dark Modern Minimal.
       </p>
     ),
   },
@@ -332,12 +322,12 @@ export const AllThemes: RenderOnlyStory = {
             onClose={() => setActiveTheme(null)}
             title={`${activeTheme.charAt(0).toUpperCase() + activeTheme.slice(1)} Theme`}
             subtitle="Click X or backdrop to close"
-            icon={themes.find(t => t.id === activeTheme)?.icon}
+            icon={themes.find((t) => t.id === activeTheme)?.icon}
             theme={activeTheme as any}
           >
             <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-              This is the {activeTheme} theme modal. Each theme has its own
-              unique color palette and ethereal glow effect.
+              This is the {activeTheme} theme modal. Each theme has its own unique color palette and
+              ethereal glow effect.
             </p>
           </Modal>
         )}
@@ -385,14 +375,11 @@ export const LargeSize: Story = {
     children: (
       <div className="space-y-4">
         <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-          Large modals provide ample space for complex content,
-          detailed formulae, or comprehensive displays.
+          Large modals provide ample space for complex content, detailed formulae, or comprehensive
+          displays.
         </p>
         <div className="grid grid-cols-2 gap-4 mt-4">
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: '#1A1F2E' }}
-          >
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
             <div
               className="text-2xl"
               style={{ color: '#D4A574', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
@@ -401,10 +388,7 @@ export const LargeSize: Story = {
             </div>
             <div style={{ color: '#6B7280', fontSize: '0.875rem' }}>Transmutations</div>
           </div>
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: '#1A1F2E' }}
-          >
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#1A1F2E' }}>
             <div
               className="text-2xl"
               style={{ color: '#4A9C6D', fontFamily: '"Cinzel Decorative", Georgia, serif' }}
@@ -433,8 +417,8 @@ export const WithFooter: Story = {
     theme: 'arcane',
     children: (
       <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-        Are you sure you want to begin this transmutation?
-        The process cannot be reversed once started.
+        Are you sure you want to begin this transmutation? The process cannot be reversed once
+        started.
       </p>
     ),
     footer: (
@@ -465,7 +449,9 @@ export const ConfirmationDialog: Story = {
     ),
     footer: (
       <>
-        <Button variant="secondary" fullWidth>Retreat</Button>
+        <Button variant="secondary" fullWidth>
+          Retreat
+        </Button>
         <SuccessButton fullWidth>Begin</SuccessButton>
       </>
     ),
@@ -518,8 +504,8 @@ export const PresetModals: RenderOnlyStory = {
             icon="⚗"
           >
             <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-              This is a pre-configured {preset.label.toLowerCase()} with optimal
-              settings for the {preset.id} theme.
+              This is a pre-configured {preset.label.toLowerCase()} with optimal settings for the{' '}
+              {preset.id} theme.
             </p>
           </preset.Component>
         ))}
@@ -563,10 +549,7 @@ export const VictoryModal: Story = {
           >
             41 - 28
           </div>
-          <div
-            className="text-sm uppercase tracking-wider"
-            style={{ color: '#6B7280' }}
-          >
+          <div className="text-sm uppercase tracking-wider" style={{ color: '#6B7280' }}>
             Final Score
           </div>
         </div>
@@ -620,8 +603,8 @@ export const DefeatModal: Story = {
           28 - 41
         </div>
         <p style={{ color: '#9CA3AF', fontFamily: '"Cormorant Garamond", Georgia, serif' }}>
-          Even the greatest alchemists face setbacks. Study your failures,
-          for they contain the seeds of future success.
+          Even the greatest alchemists face setbacks. Study your failures, for they contain the
+          seeds of future success.
         </p>
       </div>
     ),
@@ -725,7 +708,9 @@ export const AlchemistProfile: Story = {
       </div>
     ),
     footer: (
-      <Button variant="secondary" fullWidth>Close Tome</Button>
+      <Button variant="secondary" fullWidth>
+        Close Tome
+      </Button>
     ),
   },
   parameters: {
@@ -775,19 +760,51 @@ export const AlchemistStudy: RenderOnlyStory = {
             <div className="flex justify-center gap-8">
               <div className="text-center">
                 <div className="text-4xl mb-2">△</div>
-                <div style={{ color: '#A63D3D', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Fire</div>
+                <div
+                  style={{
+                    color: '#A63D3D',
+                    fontFamily: '"Cinzel", Georgia, serif',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  Fire
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl mb-2">▽</div>
-                <div style={{ color: '#4682B4', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Water</div>
+                <div
+                  style={{
+                    color: '#4682B4',
+                    fontFamily: '"Cinzel", Georgia, serif',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  Water
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl mb-2">◇</div>
-                <div style={{ color: '#4A9C6D', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Earth</div>
+                <div
+                  style={{
+                    color: '#4A9C6D',
+                    fontFamily: '"Cinzel", Georgia, serif',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  Earth
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-4xl mb-2">○</div>
-                <div style={{ color: '#E8E4DC', fontFamily: '"Cinzel", Georgia, serif', fontSize: '0.75rem' }}>Air</div>
+                <div
+                  style={{
+                    color: '#E8E4DC',
+                    fontFamily: '"Cinzel", Georgia, serif',
+                    fontSize: '0.75rem',
+                  }}
+                >
+                  Air
+                </div>
               </div>
             </div>
 

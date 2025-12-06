@@ -23,11 +23,7 @@ interface LoginStreakBadgeProps {
   onClick?: () => void;
 }
 
-export function LoginStreakBadge({
-  socket,
-  playerName,
-  onClick,
-}: LoginStreakBadgeProps) {
+export function LoginStreakBadge({ socket, playerName, onClick }: LoginStreakBadgeProps) {
   const [streak, setStreak] = useState<LoginStreak | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
   const [freezeUsedNotification, setFreezeUsedNotification] = useState(false);
@@ -103,7 +99,9 @@ export function LoginStreakBadge({
         <div className="fixed top-4 right-4 z-50 animate-bounce">
           <UICard variant="gradient" gradient="info" size="sm">
             <div className="flex items-center gap-3">
-              <span className="text-3xl" aria-hidden="true">🛡️</span>
+              <span className="text-3xl" aria-hidden="true">
+                🛡️
+              </span>
               <div>
                 <p className="text-white font-bold">Streak Freeze Used!</p>
                 <p className="text-blue-200 text-sm">Your streak continues</p>
@@ -123,12 +121,12 @@ export function LoginStreakBadge({
           onClick={onClick}
           variant="primary"
           size="md"
-          className={`bg-gradient-to-r ${getStreakColor(
-            streak.currentStreak
-          )} hover:scale-105`}
+          className={`bg-gradient-to-r ${getStreakColor(streak.currentStreak)} hover:scale-105`}
         >
           <div className="flex items-center gap-2">
-            <span className="text-xl" aria-hidden="true">{getStreakEmoji(streak.currentStreak)}</span>
+            <span className="text-xl" aria-hidden="true">
+              {getStreakEmoji(streak.currentStreak)}
+            </span>
             <div className="text-left">
               <div className="text-xs opacity-80">Login Streak</div>
               <div className="text-lg leading-none">
@@ -136,7 +134,11 @@ export function LoginStreakBadge({
               </div>
             </div>
             {streak.streakFreezeAvailable && (
-              <span className="text-blue-200 text-sm ml-1" title="Freeze Available" aria-hidden="true">
+              <span
+                className="text-blue-200 text-sm ml-1"
+                title="Freeze Available"
+                aria-hidden="true"
+              >
                 🛡️
               </span>
             )}
@@ -148,41 +150,39 @@ export function LoginStreakBadge({
           <div className="absolute top-full mt-2 left-0 z-[10500] min-w-[280px]">
             <UICard variant="elevated" size="sm">
               <div className="space-y-2">
-              <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                <span className="text-gray-300 text-sm">Current Streak</span>
-                <span className="text-white font-bold">
-                  {streak.currentStreak} days
-                </span>
-              </div>
+                <div className="flex justify-between items-center border-b border-gray-600 pb-2">
+                  <span className="text-gray-300 text-sm">Current Streak</span>
+                  <span className="text-white font-bold">{streak.currentStreak} days</span>
+                </div>
 
-              <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                <span className="text-gray-300 text-sm">Longest Streak</span>
-                <span className="text-yellow-400 font-bold">
-                  {streak.longestStreak} days <span aria-hidden="true">🏆</span>
-                </span>
-              </div>
+                <div className="flex justify-between items-center border-b border-gray-600 pb-2">
+                  <span className="text-gray-300 text-sm">Longest Streak</span>
+                  <span className="text-yellow-400 font-bold">
+                    {streak.longestStreak} days <span aria-hidden="true">🏆</span>
+                  </span>
+                </div>
 
-              <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                <span className="text-gray-300 text-sm">Total Logins</span>
-                <span className="text-white font-bold">{streak.totalLogins}</span>
-              </div>
+                <div className="flex justify-between items-center border-b border-gray-600 pb-2">
+                  <span className="text-gray-300 text-sm">Total Logins</span>
+                  <span className="text-white font-bold">{streak.totalLogins}</span>
+                </div>
 
-              <div className="flex justify-between items-center">
-                <span className="text-gray-300 text-sm">Streak Freeze</span>
-                <span
-                  className={`font-bold ${
-                    streak.streakFreezeAvailable ? 'text-blue-400' : 'text-gray-500'
-                  }`}
-                >
-                  {streak.streakFreezeAvailable ? '✓ Available' : '✗ Used'}
-                </span>
-              </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 text-sm">Streak Freeze</span>
+                  <span
+                    className={`font-bold ${
+                      streak.streakFreezeAvailable ? 'text-blue-400' : 'text-gray-500'
+                    }`}
+                  >
+                    {streak.streakFreezeAvailable ? '✓ Available' : '✗ Used'}
+                  </span>
+                </div>
 
-              {streak.streakFreezeAvailable && (
-                <Alert variant="info" icon="💡" className="mt-3">
-                  Miss a day? Your streak freeze will protect you once per week!
-                </Alert>
-              )}
+                {streak.streakFreezeAvailable && (
+                  <Alert variant="info" icon="💡" className="mt-3">
+                    Miss a day? Your streak freeze will protect you once per week!
+                  </Alert>
+                )}
               </div>
             </UICard>
           </div>

@@ -82,9 +82,7 @@ export function DailyQuestsPanelDisplay({
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-bold text-white">Daily Quests</h2>
-              <p className="text-purple-100 mt-1">
-                Complete quests to earn XP and coins
-              </p>
+              <p className="text-purple-100 mt-1">Complete quests to earn XP and coins</p>
             </div>
             <button
               onClick={onClose}
@@ -113,9 +111,7 @@ export function DailyQuestsPanelDisplay({
           ) : quests.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-400 text-lg">No quests available</p>
-              <p className="text-gray-500 text-sm mt-2">
-                Check back tomorrow for new quests!
-              </p>
+              <p className="text-gray-500 text-sm mt-2">Check back tomorrow for new quests!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -142,9 +138,7 @@ export function DailyQuestsPanelDisplay({
                           <h3 className="text-white font-semibold text-lg">
                             {quest.template.name}
                           </h3>
-                          <p className="text-gray-400 text-sm">
-                            {quest.template.description}
-                          </p>
+                          <p className="text-gray-400 text-sm">{quest.template.description}</p>
                         </div>
                       </div>
 
@@ -189,9 +183,7 @@ export function DailyQuestsPanelDisplay({
                           <span className="text-blue-400" aria-hidden="true">
                             ⭐
                           </span>
-                          <span className="text-gray-300">
-                            {quest.template.reward_xp} XP
-                          </span>
+                          <span className="text-gray-300">{quest.template.reward_xp} XP</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <span className="text-yellow-400" aria-hidden="true">

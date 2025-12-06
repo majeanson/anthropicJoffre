@@ -6,7 +6,11 @@ interface TimeoutCountdownProps {
   isYourTurn: boolean;
 }
 
-export function TimeoutCountdown({ playerName, secondsRemaining, isYourTurn }: TimeoutCountdownProps) {
+export function TimeoutCountdown({
+  playerName,
+  secondsRemaining,
+  isYourTurn,
+}: TimeoutCountdownProps) {
   if (secondsRemaining === 0 || secondsRemaining > 60) {
     return null;
   }
@@ -27,12 +31,7 @@ export function TimeoutCountdown({ playerName, secondsRemaining, isYourTurn }: T
       >
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -51,9 +50,7 @@ export function TimeoutCountdown({ playerName, secondsRemaining, isYourTurn }: T
         </div>
         {isYourTurn && secondsRemaining <= 15 && (
           <div className="text-xs text-center mt-1 opacity-90">
-            {secondsRemaining === 0
-              ? 'Auto-playing...'
-              : 'Hurry! Auto-play will activate soon'}
+            {secondsRemaining === 0 ? 'Auto-playing...' : 'Hurry! Auto-play will activate soon'}
           </div>
         )}
       </UICard>

@@ -36,10 +36,14 @@ export const ALL_TUTORIAL_PHASES: TutorialPhase[] = [
  */
 export function getTutorialProgress(): TutorialProgress {
   const saved = localStorage.getItem(COMPLETION_STORAGE_KEY);
-  const completedPhases = saved ? new Set<TutorialPhase>(JSON.parse(saved)) : new Set<TutorialPhase>();
+  const completedPhases = saved
+    ? new Set<TutorialPhase>(JSON.parse(saved))
+    : new Set<TutorialPhase>();
 
   const totalPhasesCompleted = completedPhases.size;
-  const completionPercentage = Math.round((totalPhasesCompleted / ALL_TUTORIAL_PHASES.length) * 100);
+  const completionPercentage = Math.round(
+    (totalPhasesCompleted / ALL_TUTORIAL_PHASES.length) * 100
+  );
 
   return {
     completedPhases,
@@ -56,10 +60,13 @@ export function markTutorialCompleted(phase: TutorialPhase): void {
   progress.completedPhases.add(phase);
 
   localStorage.setItem(COMPLETION_STORAGE_KEY, JSON.stringify([...progress.completedPhases]));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({
-    lastCompletedDate: new Date().toISOString(),
-    totalPhasesCompleted: progress.completedPhases.size,
-  }));
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify({
+      lastCompletedDate: new Date().toISOString(),
+      totalPhasesCompleted: progress.completedPhases.size,
+    })
+  );
 }
 
 /**
@@ -93,7 +100,7 @@ export function resetTutorialProgress(): void {
  */
 export function getRemainingTutorials(): TutorialPhase[] {
   const progress = getTutorialProgress();
-  return ALL_TUTORIAL_PHASES.filter(phase => !progress.completedPhases.has(phase));
+  return ALL_TUTORIAL_PHASES.filter((phase) => !progress.completedPhases.has(phase));
 }
 
 /**

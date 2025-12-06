@@ -13,7 +13,7 @@ export function Skeleton({
   width,
   height,
   className = '',
-  count = 1
+  count = 1,
 }: SkeletonProps) {
   const baseClasses = `animate-pulse bg-gradient-to-r ${colors.gradients.neutral} bg-[length:200%_100%] motion-safe:animate-[shimmer_2s_ease-in-out_infinite]`;
 
@@ -22,7 +22,7 @@ export function Skeleton({
     circular: 'rounded-full',
     rectangular: 'rounded',
     card: 'h-32 rounded-lg',
-    button: 'h-10 rounded-lg'
+    button: 'h-10 rounded-lg',
   };
 
   const getStyle = () => {
@@ -59,7 +59,10 @@ export function Skeleton({
 // Compound components for common patterns
 export function SkeletonCard() {
   return (
-    <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-300 dark:border-gray-700 rounded-lg p-4 space-y-3" data-testid="skeleton-card">
+    <div
+      className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-300 dark:border-gray-700 rounded-lg p-4 space-y-3"
+      data-testid="skeleton-card"
+    >
       <Skeleton variant="text" width="60%" height={24} />
       <Skeleton variant="text" count={3} />
       <div className="flex gap-2 mt-4">
@@ -74,7 +77,10 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
   return (
     <div className="space-y-3" data-testid="skeleton-list">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="flex items-center gap-3 p-3 bg-parchment-100 dark:bg-gray-800 rounded-lg border border-parchment-300 dark:border-gray-700">
+        <div
+          key={index}
+          className="flex items-center gap-3 p-3 bg-parchment-100 dark:bg-gray-800 rounded-lg border border-parchment-300 dark:border-gray-700"
+        >
           <Skeleton variant="circular" width={40} height={40} />
           <div className="flex-1 space-y-2">
             <Skeleton variant="text" width="40%" />
@@ -88,7 +94,10 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
 
 export function SkeletonGameCard() {
   return (
-    <div className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-300 dark:border-gray-700 rounded-lg p-4" data-testid="skeleton-game-card">
+    <div
+      className="bg-parchment-100 dark:bg-gray-800 border-2 border-parchment-300 dark:border-gray-700 rounded-lg p-4"
+      data-testid="skeleton-game-card"
+    >
       <div className="flex items-center justify-between mb-3">
         <Skeleton variant="text" width={100} height={20} />
         <Skeleton variant="rectangular" width={60} height={24} />

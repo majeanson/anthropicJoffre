@@ -41,9 +41,13 @@ A compact badge for displaying player identity with team colors and status indic
     name: { control: 'text', description: 'Player name' },
     teamId: { control: 'select', options: [1, 2], description: 'Team assignment' },
     isBot: { control: 'boolean', description: 'Is this a bot player?' },
-    botDifficulty: { control: 'select', options: ['easy', 'medium', 'hard'], description: 'Bot difficulty level' },
+    botDifficulty: {
+      control: 'select',
+      options: ['easy', 'medium', 'hard'],
+      description: 'Bot difficulty level',
+    },
     isThinking: { control: 'boolean', description: 'Is the bot currently thinking?' },
-    isCurrentTurn: { control: 'boolean', description: 'Is it this player\'s turn?' },
+    isCurrentTurn: { control: 'boolean', description: "Is it this player's turn?" },
     compact: { control: 'boolean', description: 'Use compact (stacked) layout?' },
   },
 } satisfies Meta<typeof PlayerBadge>;
@@ -90,36 +94,23 @@ export const BotDifficulties: Story = {
   name: 'Bot Difficulty Levels',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-6">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Bot Difficulty Indicators</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Bot Difficulty Indicators
+      </h3>
 
       <div className="flex gap-6">
         <div className="p-4 rounded-lg bg-[var(--color-bg-secondary)] text-center">
-          <PlayerBadge
-            name="Bot_Easy"
-            teamId={1}
-            isBot={true}
-            botDifficulty="easy"
-          />
+          <PlayerBadge name="Bot_Easy" teamId={1} isBot={true} botDifficulty="easy" />
           <p className="text-green-400 text-xs mt-2">Easy 🟢</p>
         </div>
 
         <div className="p-4 rounded-lg bg-[var(--color-bg-secondary)] text-center">
-          <PlayerBadge
-            name="Bot_Med"
-            teamId={2}
-            isBot={true}
-            botDifficulty="medium"
-          />
+          <PlayerBadge name="Bot_Med" teamId={2} isBot={true} botDifficulty="medium" />
           <p className="text-yellow-400 text-xs mt-2">Medium 🟡</p>
         </div>
 
         <div className="p-4 rounded-lg bg-[var(--color-bg-secondary)] text-center">
-          <PlayerBadge
-            name="Bot_Hard"
-            teamId={1}
-            isBot={true}
-            botDifficulty="hard"
-          />
+          <PlayerBadge name="Bot_Hard" teamId={1} isBot={true} botDifficulty="hard" />
           <p className="text-red-400 text-xs mt-2">Hard 🔴</p>
         </div>
       </div>
@@ -189,12 +180,27 @@ export const LayoutModes: Story = {
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-8">
       {/* Compact Layout */}
       <div>
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Compact Layout (Default)</h3>
+        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+          Compact Layout (Default)
+        </h3>
         <div className="flex gap-6 p-4 rounded-lg bg-[var(--color-bg-secondary)]">
           <PlayerBadge name="Alice" teamId={1} compact={true} />
-          <PlayerBadge name="Bot_Easy" teamId={2} isBot={true} botDifficulty="easy" compact={true} />
+          <PlayerBadge
+            name="Bot_Easy"
+            teamId={2}
+            isBot={true}
+            botDifficulty="easy"
+            compact={true}
+          />
           <PlayerBadge name="Bob" teamId={1} isCurrentTurn={true} compact={true} />
-          <PlayerBadge name="Bot_Hard" teamId={2} isBot={true} botDifficulty="hard" isThinking={true} compact={true} />
+          <PlayerBadge
+            name="Bot_Hard"
+            teamId={2}
+            isBot={true}
+            botDifficulty="hard"
+            isThinking={true}
+            compact={true}
+          />
         </div>
       </div>
 
@@ -203,9 +209,22 @@ export const LayoutModes: Story = {
         <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Expanded Layout</h3>
         <div className="space-y-2 p-4 rounded-lg bg-[var(--color-bg-secondary)]">
           <PlayerBadge name="Alice" teamId={1} compact={false} />
-          <PlayerBadge name="Bot_Easy" teamId={2} isBot={true} botDifficulty="easy" compact={false} />
+          <PlayerBadge
+            name="Bot_Easy"
+            teamId={2}
+            isBot={true}
+            botDifficulty="easy"
+            compact={false}
+          />
           <PlayerBadge name="Bob" teamId={1} isCurrentTurn={true} compact={false} />
-          <PlayerBadge name="Bot_Hard" teamId={2} isBot={true} botDifficulty="hard" isThinking={true} compact={false} />
+          <PlayerBadge
+            name="Bot_Hard"
+            teamId={2}
+            isBot={true}
+            botDifficulty="hard"
+            isThinking={true}
+            compact={false}
+          />
         </div>
       </div>
     </div>
@@ -220,7 +239,9 @@ export const BettingPhaseLayout: Story = {
   name: 'Betting Phase Example',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Betting Phase - Player Order</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Betting Phase - Player Order
+      </h3>
 
       <div className="flex justify-between items-center p-4 rounded-lg bg-[var(--color-bg-secondary)]">
         <PlayerBadge name="Alice" teamId={1} />
@@ -249,10 +270,20 @@ export const ScoreDisplay: Story = {
         {[
           { name: 'Alice', team: 1 as const, tricks: 3, points: 4 },
           { name: 'Bob', team: 2 as const, tricks: 2, points: 2 },
-          { name: 'Bot_Med', team: 1 as const, tricks: 1, points: 1, isBot: true, difficulty: 'medium' as const },
+          {
+            name: 'Bot_Med',
+            team: 1 as const,
+            tricks: 1,
+            points: 1,
+            isBot: true,
+            difficulty: 'medium' as const,
+          },
           { name: 'Diana', team: 2 as const, tricks: 2, points: 2 },
         ].map((player) => (
-          <div key={player.name} className="flex items-center justify-between p-2 rounded-lg bg-[var(--color-bg-secondary)]">
+          <div
+            key={player.name}
+            className="flex items-center justify-between p-2 rounded-lg bg-[var(--color-bg-secondary)]"
+          >
             <PlayerBadge
               name={player.name}
               teamId={player.team}
@@ -274,7 +305,9 @@ export const TurnOrderCircle: Story = {
   name: 'Turn Order Circle',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4 text-center">Turn Order</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4 text-center">
+        Turn Order
+      </h3>
 
       <div className="relative w-[300px] h-[300px]">
         {/* Top */}

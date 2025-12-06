@@ -7,24 +7,38 @@ interface UseGameEventListenersProps {
   socket: Socket | null;
   gameState: GameState | null;
   autoJoinGameId: string;
-  showToast: (message: string, type: 'success' | 'error' | 'info' | 'warning', duration?: number) => void;
-  setToast: (toast: { message: string; type: 'success' | 'error' | 'info' | 'warning'; duration?: number } | null) => void;
+  showToast: (
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning',
+    duration?: number
+  ) => void;
+  setToast: (
+    toast: {
+      message: string;
+      type: 'success' | 'error' | 'info' | 'warning';
+      duration?: number;
+    } | null
+  ) => void;
   setError: Dispatch<SetStateAction<string>>;
   setGameState: (gameState: GameState | null) => void;
   setGameId: (gameId: string) => void;
   setIsSpectator: (isSpectator: boolean) => void;
-  setOnlinePlayers: (players: Array<{
-    socketId: string;
-    playerName: string;
-    status: 'in_lobby' | 'in_game' | 'in_team_selection';
-    gameId?: string;
-    lastActivity: number;
-  }>) => void;
-  setBotTakeoverModal: (modal: {
-    gameId: string;
-    availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
-    playerName: string;
-  } | null) => void;
+  setOnlinePlayers: (
+    players: Array<{
+      socketId: string;
+      playerName: string;
+      status: 'in_lobby' | 'in_game' | 'in_team_selection';
+      gameId?: string;
+      lastActivity: number;
+    }>
+  ) => void;
+  setBotTakeoverModal: (
+    modal: {
+      gameId: string;
+      availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
+      playerName: string;
+    } | null
+  ) => void;
   spawnBotsForGame: (gameState: GameState) => void;
   cleanupBotSocket: (botName: string) => void;
   playErrorSound: () => void;
@@ -62,9 +76,15 @@ export function useGameEventListeners({
     if (!socket) return;
 
     // Player disconnection with toast notification
-    const handlePlayerDisconnected = ({ playerId, waitingForReconnection }: { playerId: string; waitingForReconnection: boolean }) => {
+    const handlePlayerDisconnected = ({
+      playerId,
+      waitingForReconnection,
+    }: {
+      playerId: string;
+      waitingForReconnection: boolean;
+    }) => {
       if (waitingForReconnection && gameState) {
-        const player = gameState.players.find(p => p.id === playerId);
+        const player = gameState.players.find((p) => p.id === playerId);
         if (player) {
           showToast(`${player.name} disconnected`, 'warning');
         }
@@ -72,31 +92,47 @@ export function useGameEventListeners({
     };
 
     // Online players list updates
-    const handleOnlinePlayersUpdate = (players: Array<{
-      socketId: string;
-      playerName: string;
-      status: 'in_lobby' | 'in_game' | 'in_team_selection';
-      gameId?: string;
-      lastActivity: number;
-    }>) => {
+    const handleOnlinePlayersUpdate = (
+      players: Array<{
+        socketId: string;
+        playerName: string;
+        status: 'in_lobby' | 'in_game' | 'in_team_selection';
+        gameId?: string;
+        lastActivity: number;
+      }>
+    ) => {
       setOnlinePlayers(players);
     };
 
     // Timeout warnings
-    const handleTimeoutWarning = ({ playerName, secondsRemaining }: { playerName: string; secondsRemaining: number }) => {
-      const message = `⏰ ${playerName === (gameState?.players.find(p => p.id === socket.id)?.name) ? 'You have' : `${playerName} has`} ${secondsRemaining} seconds!`;
+    const handleTimeoutWarning = ({
+      playerName,
+      secondsRemaining,
+    }: {
+      playerName: string;
+      secondsRemaining: number;
+    }) => {
+      const message = `⏰ ${playerName === gameState?.players.find((p) => p.id === socket.id)?.name ? 'You have' : `${playerName} has`} ${secondsRemaining} seconds!`;
       showToast(message, 'warning');
     };
 
     // Auto-action notifications with deduplication to prevent flickering
-    const handleAutoActionTaken = ({ playerName, phase }: { playerName: string; phase: 'betting' | 'playing' }) => {
+    const handleAutoActionTaken = ({
+      playerName,
+      phase,
+    }: {
+      playerName: string;
+      phase: 'betting' | 'playing';
+    }) => {
       const message = `🤖 Auto-${phase === 'betting' ? 'bet' : 'play'} for ${playerName}`;
       const now = Date.now();
 
       // Only show toast if it's a different message OR more than 2 seconds have passed
-      if (!lastAutoActionRef.current ||
-          lastAutoActionRef.current.message !== message ||
-          now - lastAutoActionRef.current.timestamp > 2000) {
+      if (
+        !lastAutoActionRef.current ||
+        lastAutoActionRef.current.message !== message ||
+        now - lastAutoActionRef.current.timestamp > 2000
+      ) {
         showToast(message, 'info', 1500); // Shorter duration for auto-actions
         lastAutoActionRef.current = { message, timestamp: now };
       }
@@ -146,7 +182,11 @@ export function useGameEventListeners({
     };
 
     // Bot management events
-    const handleBotReplaced = ({ gameState: newGameState, replacedPlayerName, botName }: {
+    const handleBotReplaced = ({
+      gameState: newGameState,
+      replacedPlayerName,
+      botName,
+    }: {
       gameState: GameState;
       replacedPlayerName: string;
       botName: string;
@@ -157,7 +197,11 @@ export function useGameEventListeners({
     };
 
     // Sprint 6: Handle player self-replacement
-    const handlePlayerReplacedSelf = ({ gameState: newGameState, replacedPlayerName, botName }: {
+    const handlePlayerReplacedSelf = ({
+      gameState: newGameState,
+      replacedPlayerName,
+      botName,
+    }: {
       gameState: GameState;
       replacedPlayerName: string;
       botName: string;
@@ -167,7 +211,12 @@ export function useGameEventListeners({
       spawnBotsForGame(newGameState);
     };
 
-    const handleBotTakenOver = ({ gameState: newGameState, botName, newPlayerName, session }: {
+    const handleBotTakenOver = ({
+      gameState: newGameState,
+      botName,
+      newPlayerName,
+      session,
+    }: {
       gameState: GameState;
       botName: string;
       newPlayerName: string;
@@ -193,7 +242,10 @@ export function useGameEventListeners({
       setIsSpectator(false);
     };
 
-    const handleGameFullWithBots = ({ gameId, availableBots }: {
+    const handleGameFullWithBots = ({
+      gameId,
+      availableBots,
+    }: {
       gameId: string;
       availableBots: Array<{ name: string; teamId: 1 | 2; difficulty: BotDifficulty }>;
     }) => {
@@ -206,7 +258,7 @@ export function useGameEventListeners({
           socket.emit('take_over_bot', {
             gameId,
             newPlayerName: storedPlayerName,
-            botNameToReplace: availableBots[0].name
+            botNameToReplace: availableBots[0].name,
           });
         }
         return;
@@ -216,12 +268,15 @@ export function useGameEventListeners({
       setBotTakeoverModal({
         gameId,
         availableBots,
-        playerName: storedPlayerName
+        playerName: storedPlayerName,
       });
     };
 
     // Session XP/coins tracking
-    const handleRewardsEarned = ({ xp, coins }: {
+    const handleRewardsEarned = ({
+      xp,
+      coins,
+    }: {
       xp: number;
       coins: number;
       source: 'round' | 'game_end';
@@ -229,10 +284,10 @@ export function useGameEventListeners({
       won?: boolean;
     }) => {
       if (setSessionXp) {
-        setSessionXp(prev => prev + xp);
+        setSessionXp((prev) => prev + xp);
       }
       if (setSessionCoins) {
-        setSessionCoins(prev => prev + coins);
+        setSessionCoins((prev) => prev + coins);
       }
       // Trigger XP popup for visual feedback
       if (xp > 0 && onXpGained) {
@@ -247,7 +302,12 @@ export function useGameEventListeners({
     };
 
     // Connection status update - updates player's reconnection countdown timer
-    const handleConnectionStatusUpdate = ({ playerId, playerName, status, reconnectTimeLeft }: {
+    const handleConnectionStatusUpdate = ({
+      playerId,
+      playerName,
+      status,
+      reconnectTimeLeft,
+    }: {
       playerId: string;
       playerName: string;
       status: 'disconnected' | 'connected';
@@ -256,7 +316,9 @@ export function useGameEventListeners({
       if (!gameState) return;
 
       // Find and update the player's reconnectTimeLeft
-      const playerIndex = gameState.players.findIndex(p => p.id === playerId || p.name === playerName);
+      const playerIndex = gameState.players.findIndex(
+        (p) => p.id === playerId || p.name === playerName
+      );
       if (playerIndex === -1) return;
 
       // Only update if the value actually changed to avoid unnecessary re-renders
@@ -280,14 +342,17 @@ export function useGameEventListeners({
     };
 
     // Player reconnected - update their connection status
-    const handlePlayerReconnected = ({ playerId, playerName }: {
+    const handlePlayerReconnected = ({
+      playerId,
+      playerName,
+    }: {
       playerId: string;
       playerName: string;
       oldSocketId: string;
     }) => {
       if (!gameState) return;
 
-      const playerIndex = gameState.players.findIndex(p => p.name === playerName);
+      const playerIndex = gameState.players.findIndex((p) => p.name === playerName);
       if (playerIndex === -1) return;
 
       const player = gameState.players[playerIndex];
@@ -351,5 +416,23 @@ export function useGameEventListeners({
       socket.off('connection_status_update', handleConnectionStatusUpdate);
       socket.off('player_reconnected', handlePlayerReconnected);
     };
-  }, [socket, gameState, showToast, setToast, setError, setGameState, setGameId, setIsSpectator, setOnlinePlayers, setBotTakeoverModal, spawnBotsForGame, cleanupBotSocket, autoJoinGameId, playErrorSound, setSessionXp, setSessionCoins, onXpGained]);
+  }, [
+    socket,
+    gameState,
+    showToast,
+    setToast,
+    setError,
+    setGameState,
+    setGameId,
+    setIsSpectator,
+    setOnlinePlayers,
+    setBotTakeoverModal,
+    spawnBotsForGame,
+    cleanupBotSocket,
+    autoJoinGameId,
+    playErrorSound,
+    setSessionXp,
+    setSessionCoins,
+    onXpGained,
+  ]);
 }

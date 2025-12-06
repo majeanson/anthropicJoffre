@@ -35,9 +35,11 @@ export function useLobbyChat({ socket, playerName }: UseLobbyChatProps) {
     if (!socket) return;
 
     // Handle chat history response
-    const handleChatHistory = (data: { messages: Array<{ playerName: string; message: string; createdAt: string }> }) => {
+    const handleChatHistory = (data: {
+      messages: Array<{ playerName: string; message: string; createdAt: string }>;
+    }) => {
       // Convert database messages to ChatMessage format
-      const historicalMessages: ChatMessage[] = data.messages.map(msg => ({
+      const historicalMessages: ChatMessage[] = data.messages.map((msg) => ({
         playerId: msg.playerName, // Use playerName as ID for lobby
         playerName: msg.playerName,
         message: msg.message,
@@ -48,7 +50,11 @@ export function useLobbyChat({ socket, playerName }: UseLobbyChatProps) {
     };
 
     // Handle incoming lobby chat messages
-    const handleLobbyChatMessage = (data: { playerName: string; message: string; timestamp: number }) => {
+    const handleLobbyChatMessage = (data: {
+      playerName: string;
+      message: string;
+      timestamp: number;
+    }) => {
       const newMessage: ChatMessage = {
         playerId: data.playerName, // Use playerName as ID for lobby
         playerName: data.playerName,
@@ -56,7 +62,7 @@ export function useLobbyChat({ socket, playerName }: UseLobbyChatProps) {
         timestamp: data.timestamp,
         teamId: null, // No teams in lobby
       };
-      setMessages(prev => [...prev, newMessage]);
+      setMessages((prev) => [...prev, newMessage]);
     };
 
     // Register event listeners

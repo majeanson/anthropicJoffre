@@ -161,7 +161,9 @@ export function RewardsCalendarDisplay({
                       aria-label={`Day ${reward.dayNumber}: ${reward.description}`}
                     >
                       {/* Day Number */}
-                      <div className="text-xs text-gray-300 font-bold mb-1">Day {reward.dayNumber}</div>
+                      <div className="text-xs text-gray-300 font-bold mb-1">
+                        Day {reward.dayNumber}
+                      </div>
 
                       {/* Icon */}
                       <div className="text-2xl mb-1" aria-hidden="true">
@@ -186,7 +188,10 @@ export function RewardsCalendarDisplay({
                         ></div>
                       )}
                       {reward.isSpecial && (
-                        <div className="absolute -top-1 -left-1 text-yellow-400" aria-label="Special milestone">
+                        <div
+                          className="absolute -top-1 -left-1 text-yellow-400"
+                          aria-label="Special milestone"
+                        >
                           ⭐
                         </div>
                       )}

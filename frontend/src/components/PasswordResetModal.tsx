@@ -17,8 +17,11 @@ interface PasswordResetModalProps {
   onSwitchToLogin: () => void;
 }
 
-
-export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }: PasswordResetModalProps) {
+export default function PasswordResetModal({
+  isOpen,
+  onClose,
+  onSwitchToLogin,
+}: PasswordResetModalProps) {
   // All hooks MUST be called before any conditional returns (Rules of Hooks)
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,9 +42,9 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
       const response = await fetch(API_ENDPOINTS.authForgotPassword(), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
 
       const result = await response.json();
@@ -85,14 +88,10 @@ export default function PasswordResetModal({ isOpen, onClose, onSwitchToLogin }:
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Success Message */}
-        {successMessage && (
-          <Alert variant="success">{successMessage}</Alert>
-        )}
+        {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
         {/* Error Message */}
-        {errorMessage && (
-          <Alert variant="error">{errorMessage}</Alert>
-        )}
+        {errorMessage && <Alert variant="error">{errorMessage}</Alert>}
 
         {!successMessage && (
           <>

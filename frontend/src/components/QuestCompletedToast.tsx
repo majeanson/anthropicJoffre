@@ -41,15 +41,17 @@ const ConfettiParticle = memo(function ConfettiParticle({
   return (
     <div
       className="absolute w-2 h-2 rounded-full"
-      style={{
-        backgroundColor: color,
-        left: '50%',
-        top: '50%',
-        transform: 'translate(-50%, -50%)',
-        animation: `confettiBurst ${duration}s ease-out ${delay}s forwards`,
-        '--angle': `${angle}deg`,
-        '--distance': `${distance}px`,
-      } as React.CSSProperties}
+      style={
+        {
+          backgroundColor: color,
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          animation: `confettiBurst ${duration}s ease-out ${delay}s forwards`,
+          '--angle': `${angle}deg`,
+          '--distance': `${distance}px`,
+        } as React.CSSProperties
+      }
     />
   );
 });
@@ -189,9 +191,7 @@ export const QuestCompletedToast = memo(function QuestCompletedToast({
                 </span>
               </div>
 
-              <div className="font-bold text-lg mb-2 truncate">
-                {quest.questName}
-              </div>
+              <div className="font-bold text-lg mb-2 truncate">{quest.questName}</div>
 
               {/* Rewards */}
               <div className="flex items-center gap-4 text-sm">
@@ -231,20 +231,23 @@ export function useQuestCompletedToast() {
   const [completedQuest, setCompletedQuest] = useState<QuestCompletion | null>(null);
   const [, setQueue] = useState<QuestCompletion[]>([]);
 
-  const showQuestCompleted = useCallback((quest: QuestCompletion) => {
-    if (completedQuest) {
-      // Queue if one is already showing
-      setQueue(prev => [...prev, quest]);
-    } else {
-      setCompletedQuest(quest);
-    }
-  }, [completedQuest]);
+  const showQuestCompleted = useCallback(
+    (quest: QuestCompletion) => {
+      if (completedQuest) {
+        // Queue if one is already showing
+        setQueue((prev) => [...prev, quest]);
+      } else {
+        setCompletedQuest(quest);
+      }
+    },
+    [completedQuest]
+  );
 
   const dismissQuest = useCallback(() => {
     setCompletedQuest(null);
     // Show next in queue after small delay
     setTimeout(() => {
-      setQueue(prev => {
+      setQueue((prev) => {
         if (prev.length > 0) {
           const [next, ...rest] = prev;
           setCompletedQuest(next);

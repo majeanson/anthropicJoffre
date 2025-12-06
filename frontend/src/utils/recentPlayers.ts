@@ -38,7 +38,7 @@ export function addRecentPlayer(playerName: string): void {
   if (!playerName || playerName.trim() === '') return;
 
   const players = getRecentPlayers();
-  const existing = players.find(p => p.name === playerName);
+  const existing = players.find((p) => p.name === playerName);
 
   if (existing) {
     // Update existing player
@@ -49,14 +49,12 @@ export function addRecentPlayer(playerName: string): void {
     players.push({
       name: playerName,
       lastPlayed: Date.now(),
-      gamesPlayed: 1
+      gamesPlayed: 1,
     });
   }
 
   // Keep only the most recent MAX_RECENT_PLAYERS
-  const trimmed = players
-    .sort((a, b) => b.lastPlayed - a.lastPlayed)
-    .slice(0, MAX_RECENT_PLAYERS);
+  const trimmed = players.sort((a, b) => b.lastPlayed - a.lastPlayed).slice(0, MAX_RECENT_PLAYERS);
 
   try {
     localStorage.setItem(RECENT_PLAYERS_KEY, JSON.stringify(trimmed));
@@ -70,7 +68,7 @@ export function addRecentPlayer(playerName: string): void {
  * Excludes your own name
  */
 export function addRecentPlayers(playerNames: string[], yourName: string): void {
-  playerNames.forEach(name => {
+  playerNames.forEach((name) => {
     if (name !== yourName) {
       addRecentPlayer(name);
     }

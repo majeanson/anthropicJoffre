@@ -34,20 +34,10 @@ export { Select } from './Select';
 export type { SelectProps, SelectVariant, SelectSize, SelectOption } from './Select';
 
 export { UIToggle, UIToggleField } from './UIToggle';
-export type {
-  UIToggleProps,
-  UIToggleFieldProps,
-  ToggleSize,
-  ToggleColor,
-} from './UIToggle';
+export type { UIToggleProps, UIToggleFieldProps, ToggleSize, ToggleColor } from './UIToggle';
 
 export { UISlider, UISliderField } from './UISlider';
-export type {
-  UISliderProps,
-  UISliderFieldProps,
-  SliderSize,
-  SliderColor,
-} from './UISlider';
+export type { UISliderProps, UISliderFieldProps, SliderSize, SliderColor } from './UISlider';
 
 // Navigation Components
 export { Tabs, TabPanel } from './Tabs';
@@ -139,11 +129,7 @@ export type {
 } from './UIDivider';
 
 export { UIDropdownMenu } from './UIDropdownMenu';
-export type {
-  UIDropdownMenuProps,
-  DropdownMenuItem,
-  DropdownPosition,
-} from './UIDropdownMenu';
+export type { UIDropdownMenuProps, DropdownMenuItem, DropdownPosition } from './UIDropdownMenu';
 
 // Social components
 export { SocialListItem } from './SocialListItem';

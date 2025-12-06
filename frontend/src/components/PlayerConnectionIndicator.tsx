@@ -69,9 +69,7 @@ export const PlayerConnectionIndicator: React.FC<PlayerConnectionIndicatorProps>
     return (
       <div className="relative inline-block">
         <div
-          className={`${sizeClass} ${bg} rounded-full ${
-            pulse ? 'animate-pulse' : ''
-          }`}
+          className={`${sizeClass} ${bg} rounded-full ${pulse ? 'animate-pulse' : ''}`}
           title={`${playerName ? playerName + ' - ' : ''}${label}${
             reconnectTimeLeft !== undefined ? ` (${formatTime(reconnectTimeLeft)})` : ''
           }`}
@@ -84,16 +82,8 @@ export const PlayerConnectionIndicator: React.FC<PlayerConnectionIndicatorProps>
   return (
     <div className="flex items-center gap-2">
       <div className="relative">
-        <div
-          className={`${sizeClass} ${bg} rounded-full ${
-            pulse ? 'animate-pulse' : ''
-          }`}
-        />
-        {pulse && (
-          <div
-            className={`absolute inset-0 ${bg} rounded-full animate-ping opacity-75`}
-          />
-        )}
+        <div className={`${sizeClass} ${bg} rounded-full ${pulse ? 'animate-pulse' : ''}`} />
+        {pulse && <div className={`absolute inset-0 ${bg} rounded-full animate-ping opacity-75`} />}
       </div>
       <div className="flex flex-col">
         <span className={`text-sm font-medium ${text}`}>
@@ -150,21 +140,22 @@ export const PlayerCardWithStatus: React.FC<PlayerCardWithStatusProps> = ({
 
       {/* Player name */}
       <div className="flex items-center gap-2">
-        <span className={`font-medium ${isDisconnected ? 'line-through' : ''}`}>
-          {playerName}
-        </span>
+        <span className={`font-medium ${isDisconnected ? 'line-through' : ''}`}>{playerName}</span>
         {isCurrentPlayer && (
           <span className="text-xs text-green-600 dark:text-green-400">(You)</span>
         )}
         {isBot && (
-          <UIBadge variant="solid" color="info" size="xs">BOT</UIBadge>
+          <UIBadge variant="solid" color="info" size="xs">
+            BOT
+          </UIBadge>
         )}
       </div>
 
       {/* Disconnection message */}
       {isDisconnected && reconnectTimeLeft !== undefined && (
         <div className="mt-1 text-xs text-red-600 dark:text-red-400">
-          Reconnecting... {Math.floor(reconnectTimeLeft / 60)}:{(reconnectTimeLeft % 60).toString().padStart(2, '0')}
+          Reconnecting... {Math.floor(reconnectTimeLeft / 60)}:
+          {(reconnectTimeLeft % 60).toString().padStart(2, '0')}
         </div>
       )}
     </TeamCard>

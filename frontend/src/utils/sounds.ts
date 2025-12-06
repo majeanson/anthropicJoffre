@@ -1,6 +1,8 @@
 // Sound utility for game audio effects using Web Audio API
 // Generates simple synthesized sounds without requiring audio files
 
+import { haptics } from './haptics';
+
 class SoundManager {
   private audioContext: AudioContext | null = null;
   private enabled: boolean = true;
@@ -9,7 +11,8 @@ class SoundManager {
   constructor() {
     // Initialize AudioContext on first user interaction
     if (typeof window !== 'undefined') {
-      const AudioContextClass = window.AudioContext ||
+      const AudioContextClass =
+        window.AudioContext ||
         (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         this.audioContext = new AudioContextClass();
@@ -19,7 +22,8 @@ class SoundManager {
 
   private ensureContext() {
     if (!this.audioContext) {
-      const AudioContextClass = window.AudioContext ||
+      const AudioContextClass =
+        window.AudioContext ||
         (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         this.audioContext = new AudioContextClass();
@@ -53,7 +57,7 @@ class SoundManager {
     const gain = ctx.createGain();
 
     // Pitch varies slightly for each card
-    const basePitch = 200 + (index * 10);
+    const basePitch = 200 + index * 10;
     osc.frequency.setValueAtTime(basePitch, now);
     osc.frequency.exponentialRampToValueAtTime(basePitch * 0.5, now + 0.1);
 
@@ -72,6 +76,9 @@ class SoundManager {
 
   // Card play sound - satisfying click/snap
   playCardPlay() {
+    // Haptic feedback for card play
+    haptics.play();
+
     if (!this.enabled) return;
     this.ensureContext();
     if (!this.audioContext) return;
@@ -108,7 +115,7 @@ class SoundManager {
 
     // Base frequency varies by card value (0-7)
     // Higher cards = higher pitch
-    const basePitch = 400 + (cardValue * 80); // 400-960 Hz range
+    const basePitch = 400 + cardValue * 80; // 400-960 Hz range
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
@@ -130,6 +137,9 @@ class SoundManager {
 
   // Trick won sound - triumphant chime
   playTrickWon() {
+    // Haptic feedback for winning a trick
+    haptics.success();
+
     if (!this.enabled) return;
     this.ensureContext();
     if (!this.audioContext) return;
@@ -225,6 +235,9 @@ class SoundManager {
 
   // Button click sound - subtle click
   playButtonClick() {
+    // Light haptic feedback for button clicks
+    haptics.tap();
+
     if (!this.enabled) return;
     this.ensureContext();
     if (!this.audioContext) return;
@@ -403,7 +416,7 @@ class SoundManager {
     const now = ctx.currentTime;
 
     // Ascending fanfare: C4, E4, G4, C5
-    const notes = [261.63, 329.63, 392.00, 523.25];
+    const notes = [261.63, 329.63, 392.0, 523.25];
     notes.forEach((freq, index) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -426,6 +439,9 @@ class SoundManager {
 
   // Game over - celebratory chord
   playGameOver() {
+    // Haptic celebration for game end
+    haptics.win();
+
     if (!this.enabled) return;
     this.ensureContext();
     if (!this.audioContext) return;
@@ -434,7 +450,7 @@ class SoundManager {
     const now = ctx.currentTime;
 
     // Major chord: C4, E4, G4
-    const chord = [261.63, 329.63, 392.00];
+    const chord = [261.63, 329.63, 392.0];
     chord.forEach((freq) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -484,6 +500,9 @@ class SoundManager {
 
   // Error - descending error tone
   playError() {
+    // Haptic feedback for errors
+    haptics.error();
+
     if (!this.enabled) return;
     this.ensureContext();
     if (!this.audioContext) return;
@@ -608,9 +627,9 @@ class SoundManager {
 
     // Descending minor notes with wobble
     const notes = [
-      { freq: 440, delay: 0 },      // A4
-      { freq: 349, delay: 0.15 },   // F4
-      { freq: 294, delay: 0.3 },    // D4
+      { freq: 440, delay: 0 }, // A4
+      { freq: 349, delay: 0.15 }, // F4
+      { freq: 294, delay: 0.3 }, // D4
     ];
 
     notes.forEach(({ freq, delay }) => {
@@ -644,11 +663,11 @@ class SoundManager {
 
     // Magical ascending arpeggio (C5 → E5 → G5 → C6 → E6)
     const notes = [
-      { freq: 523, delay: 0 },      // C5
-      { freq: 659, delay: 0.08 },   // E5
-      { freq: 784, delay: 0.16 },   // G5
-      { freq: 1047, delay: 0.24 },  // C6
-      { freq: 1319, delay: 0.32 },  // E6
+      { freq: 523, delay: 0 }, // C5
+      { freq: 659, delay: 0.08 }, // E5
+      { freq: 784, delay: 0.16 }, // G5
+      { freq: 1047, delay: 0.24 }, // C6
+      { freq: 1319, delay: 0.32 }, // E6
     ];
 
     notes.forEach(({ freq, delay }) => {
@@ -708,7 +727,7 @@ class SoundManager {
 
     // Two-note celebratory fanfare
     const notes = [
-      { freq: 784, delay: 0 },    // G5
+      { freq: 784, delay: 0 }, // G5
       { freq: 1047, delay: 0.1 }, // C6
     ];
 
@@ -768,10 +787,10 @@ class SoundManager {
 
     // Triumphant ascending notes
     const notes = [
-      { freq: 523, delay: 0 },      // C5
-      { freq: 659, delay: 0.12 },   // E5
-      { freq: 784, delay: 0.24 },   // G5
-      { freq: 1047, delay: 0.36 },  // C6
+      { freq: 523, delay: 0 }, // C5
+      { freq: 659, delay: 0.12 }, // E5
+      { freq: 784, delay: 0.24 }, // G5
+      { freq: 1047, delay: 0.36 }, // C6
     ];
 
     notes.forEach(({ freq, delay }) => {

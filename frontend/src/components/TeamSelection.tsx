@@ -90,27 +90,21 @@ export function TeamSelection({
   const team2SwapRefs = useRef<(HTMLButtonElement | null)[]>([null, null]);
 
   // Memoize expensive computations
-  const currentPlayer = useMemo(() =>
-    players.find(p => p.name === currentPlayerId || p.id === currentPlayerId),
+  const currentPlayer = useMemo(
+    () => players.find((p) => p.name === currentPlayerId || p.id === currentPlayerId),
     [players, currentPlayerId]
   );
 
-  const team1Players = useMemo(() =>
-    players.filter(p => p.teamId === 1),
-    [players]
-  );
+  const team1Players = useMemo(() => players.filter((p) => p.teamId === 1), [players]);
 
-  const team2Players = useMemo(() =>
-    players.filter(p => p.teamId === 2),
-    [players]
-  );
+  const team2Players = useMemo(() => players.filter((p) => p.teamId === 2), [players]);
 
   // Listen for chat messages
   useEffect(() => {
     if (!socket) return;
 
     const handleChatMessage = (msg: ChatMessage) => {
-      setMessages(prev => [...prev, msg]);
+      setMessages((prev) => [...prev, msg]);
     };
 
     socket.on('team_selection_chat_message', handleChatMessage);
@@ -132,8 +126,9 @@ export function TeamSelection({
   }, [gameId]);
 
   // Check if difficulty section is visible
-  const showDifficulty = players.filter(p => !p.isEmpty).length < 4 && onAddBot && onBotDifficultyChange;
-  const showAddBot = players.filter(p => !p.isEmpty).length < 4 && onAddBot;
+  const showDifficulty =
+    players.filter((p) => !p.isEmpty).length < 4 && onAddBot && onBotDifficultyChange;
+  const showAddBot = players.filter((p) => !p.isEmpty).length < 4 && onAddBot;
 
   // Get sections in order
   const getSections = useCallback((): NavSection[] => {
@@ -144,16 +139,25 @@ export function TeamSelection({
   }, [showDifficulty]);
 
   // Get max columns for a section
-  const getMaxCols = useCallback((section: NavSection): number => {
-    switch (section) {
-      case 'header': return onLeaveGame ? 2 : 1;
-      case 'teams': return 2;
-      case 'difficulty': return 3;
-      case 'actions': return showAddBot ? 2 : 1;
-      case 'rules': return 1;
-      default: return 1;
-    }
-  }, [onLeaveGame, showAddBot]);
+  const getMaxCols = useCallback(
+    (section: NavSection): number => {
+      switch (section) {
+        case 'header':
+          return onLeaveGame ? 2 : 1;
+        case 'teams':
+          return 2;
+        case 'difficulty':
+          return 3;
+        case 'actions':
+          return showAddBot ? 2 : 1;
+        case 'rules':
+          return 1;
+        default:
+          return 1;
+      }
+    },
+    [onLeaveGame, showAddBot]
+  );
 
   // Focus current element based on section and column
   const focusCurrentElement = useCallback(() => {
@@ -201,7 +205,7 @@ export function TeamSelection({
         case 'ArrowUp':
           e.preventDefault();
           if (navSection === 'teams') {
-            setTeamNavRow(prev => prev > 0 ? prev - 1 : 1);
+            setTeamNavRow((prev) => (prev > 0 ? prev - 1 : 1));
           } else {
             const newIndex = currentIndex > 0 ? currentIndex - 1 : sections.length - 1;
             setNavSection(sections[newIndex]);
@@ -213,7 +217,7 @@ export function TeamSelection({
         case 'ArrowDown':
           e.preventDefault();
           if (navSection === 'teams') {
-            setTeamNavRow(prev => prev < 1 ? prev + 1 : 0);
+            setTeamNavRow((prev) => (prev < 1 ? prev + 1 : 0));
           } else {
             const newIndex = currentIndex < sections.length - 1 ? currentIndex + 1 : 0;
             setNavSection(sections[newIndex]);
@@ -225,10 +229,10 @@ export function TeamSelection({
         case 'ArrowLeft':
           e.preventDefault();
           if (navSection === 'teams') {
-            setTeamNavTeam(prev => prev === 1 ? 2 : 1);
+            setTeamNavTeam((prev) => (prev === 1 ? 2 : 1));
           } else {
             const maxCols = getMaxCols(navSection);
-            setNavCol(prev => prev > 0 ? prev - 1 : maxCols - 1);
+            setNavCol((prev) => (prev > 0 ? prev - 1 : maxCols - 1));
           }
           sounds.buttonClick();
           break;
@@ -236,10 +240,10 @@ export function TeamSelection({
         case 'ArrowRight':
           e.preventDefault();
           if (navSection === 'teams') {
-            setTeamNavTeam(prev => prev === 1 ? 2 : 1);
+            setTeamNavTeam((prev) => (prev === 1 ? 2 : 1));
           } else {
             const maxCols = getMaxCols(navSection);
-            setNavCol(prev => prev < maxCols - 1 ? prev + 1 : 0);
+            setNavCol((prev) => (prev < maxCols - 1 ? prev + 1 : 0));
           }
           sounds.buttonClick();
           break;
@@ -248,7 +252,16 @@ export function TeamSelection({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [navSection, navCol, teamNavRow, teamNavTeam, showRules, onLeaveGame, getSections, getMaxCols]);
+  }, [
+    navSection,
+    navCol,
+    teamNavRow,
+    teamNavTeam,
+    showRules,
+    onLeaveGame,
+    getSections,
+    getMaxCols,
+  ]);
 
   // Focus element when navigation changes
   useEffect(() => {
@@ -259,19 +272,19 @@ export function TeamSelection({
 
   // Validation for starting game
   const canStartGame = useMemo(() => {
-    const realPlayers = players.filter(p => !p.isEmpty);
+    const realPlayers = players.filter((p) => !p.isEmpty);
     if (realPlayers.length !== 4) return false;
 
-    const team1RealPlayers = team1Players.filter(p => !p.isEmpty);
-    const team2RealPlayers = team2Players.filter(p => !p.isEmpty);
+    const team1RealPlayers = team1Players.filter((p) => !p.isEmpty);
+    const team2RealPlayers = team2Players.filter((p) => !p.isEmpty);
     if (team1RealPlayers.length !== 2) return false;
     if (team2RealPlayers.length !== 2) return false;
     return true;
   }, [players, team1Players, team2Players]);
 
   const startGameMessage = useMemo(() => {
-    const realPlayers = players.filter(p => !p.isEmpty);
-    const emptySeats = players.filter(p => p.isEmpty).length;
+    const realPlayers = players.filter((p) => !p.isEmpty);
+    const emptySeats = players.filter((p) => p.isEmpty).length;
 
     if (emptySeats > 0) {
       return `${emptySeats} empty seat(s) - fill them to start`;
@@ -280,8 +293,8 @@ export function TeamSelection({
       return `Waiting for ${4 - realPlayers.length} more player(s) to join`;
     }
 
-    const team1RealPlayers = team1Players.filter(p => !p.isEmpty);
-    const team2RealPlayers = team2Players.filter(p => !p.isEmpty);
+    const team1RealPlayers = team1Players.filter((p) => !p.isEmpty);
+    const team2RealPlayers = team2Players.filter((p) => !p.isEmpty);
     if (team1RealPlayers.length !== 2 || team2RealPlayers.length !== 2) {
       return 'Teams must have 2 players each (no empty seats)';
     }
@@ -292,11 +305,8 @@ export function TeamSelection({
   const renderPlayerSlot = (
     playerAtPosition: Player | undefined,
     position: number,
-    teamId: 1 | 2,
-    teamColor: string,
-    _teamColorSecondary: string // Reserved for future use
+    teamId: 1 | 2
   ) => {
-    void _teamColorSecondary;
     const isCurrentPlayer = playerAtPosition?.id === currentPlayerId;
     const isEmptySeat = playerAtPosition?.isEmpty;
 
@@ -306,31 +316,34 @@ export function TeamSelection({
         className={`
           p-4 rounded-[var(--radius-md)]
           border-2 transition-all duration-[var(--duration-fast)]
-          ${isCurrentPlayer
-            ? ''
-            : playerAtPosition && !isEmptySeat
-            ? 'bg-[var(--color-bg-secondary)] border-[var(--color-border-default)]'
-            : 'bg-[var(--color-bg-tertiary)] border-dashed border-[var(--color-border-subtle)]'
+          ${
+            isCurrentPlayer
+              ? teamId === 1
+                ? 'bg-team1-20 border-team1 shadow-team1'
+                : 'bg-team2-20 border-team2 shadow-team2'
+              : playerAtPosition && !isEmptySeat
+                ? 'bg-skin-secondary border-skin-default'
+                : 'bg-skin-tertiary border-dashed border-skin-subtle'
           }
         `}
-        style={isCurrentPlayer ? {
-          backgroundColor: `${teamColor}20`,
-          borderColor: teamColor,
-          boxShadow: `0 0 10px ${teamColor}40`,
-        } : {}}
       >
         {playerAtPosition && !isEmptySeat ? (
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
             <div className="flex items-center gap-2">
               <span
-                className="font-display text-sm uppercase tracking-wider"
-                style={{ color: isCurrentPlayer ? teamColor : 'var(--color-text-primary)' }}
+                className={`font-display text-sm uppercase tracking-wider ${
+                  isCurrentPlayer
+                    ? teamId === 1
+                      ? 'text-team1'
+                      : 'text-team2'
+                    : 'text-skin-primary'
+                }`}
               >
                 {playerAtPosition.name}
                 {isCurrentPlayer && ' (You)'}
               </span>
               {playerAtPosition.isBot && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg-tertiary)] text-[var(--color-text-muted)]">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-skin-tertiary text-skin-muted">
                   🤖 Bot
                 </span>
               )}
@@ -349,17 +362,27 @@ export function TeamSelection({
                     if (teamId === 1) team1SwapRefs.current[position] = el;
                     else team2SwapRefs.current[position] = el;
                   }}
-                  onClick={() => { sounds.buttonClick(); onSwapPosition(playerAtPosition.id); }}
+                  onClick={() => {
+                    sounds.buttonClick();
+                    onSwapPosition(playerAtPosition.id);
+                  }}
                   variant={teamId === 1 ? 'warning' : 'secondary'}
                   size="xs"
-                  title={currentPlayer.teamId !== teamId ? 'Swap with this player (changes teams!)' : 'Swap positions'}
+                  title={
+                    currentPlayer.teamId !== teamId
+                      ? 'Swap with this player (changes teams!)'
+                      : 'Swap positions'
+                  }
                 >
                   ↔ Swap
                 </Button>
               )}
               {!isCurrentPlayer && currentPlayerId === creatorId && onKickPlayer && (
                 <Button
-                  onClick={() => { sounds.buttonClick(); onKickPlayer(playerAtPosition.id); }}
+                  onClick={() => {
+                    sounds.buttonClick();
+                    onKickPlayer(playerAtPosition.id);
+                  }}
                   variant="danger"
                   size="xs"
                   title="Remove player from game"
@@ -373,14 +396,14 @@ export function TeamSelection({
           <div className="text-center">
             {isEmptySeat ? (
               <div className="space-y-2">
-                <div className="text-[var(--color-text-muted)] text-sm font-body italic">
+                <div className="text-skin-muted text-sm font-body italic">
                   💺 {playerAtPosition?.emptySlotName || 'Empty Seat'}
                 </div>
                 {!currentPlayer && socket && (
                   <Button
                     onClick={() => {
                       const allPlayers = players;
-                      const seatIndex = allPlayers.findIndex(p => p.id === playerAtPosition?.id);
+                      const seatIndex = allPlayers.findIndex((p) => p.id === playerAtPosition?.id);
                       if (seatIndex !== -1) {
                         const playerName = prompt('Enter your name to fill this seat:');
                         if (playerName && playerName.trim()) {
@@ -405,20 +428,17 @@ export function TeamSelection({
                   sounds.teamSwitch();
                   onSelectTeam(teamId);
                 }}
-                className="
+                className={`
                   font-display text-sm uppercase tracking-wider
                   transition-all duration-[var(--duration-fast)]
                   hover:scale-105
-                "
-                style={{
-                  color: teamColor,
-                  textShadow: `0 0 10px ${teamColor}60`,
-                }}
+                  ${teamId === 1 ? 'text-team1 text-shadow-team1' : 'text-team2 text-shadow-team2'}
+                `}
               >
                 Join Team {teamId}
               </button>
             ) : (
-              <span className="text-[var(--color-text-muted)] font-body">Empty Seat</span>
+              <span className="text-skin-muted font-body">Empty Seat</span>
             )}
           </div>
         )}
@@ -427,45 +447,33 @@ export function TeamSelection({
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative"
-      style={{ background: 'var(--color-bg-primary)' }}
-    >
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 relative game-container bg-skin-primary">
       {/* Animated background grid */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `
-              linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
-              linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
-          }}
-        />
+        <div className="absolute inset-0 bg-grid-pattern" />
       </div>
 
       {/* Main container - full width */}
       <div
         className="
-          bg-[var(--color-bg-secondary)]
+          bg-skin-secondary
           rounded-[var(--radius-xl)]
           p-6 sm:p-8
-          w-full
+          w-full max-w-[1200px]
           relative
-          border-2 border-[var(--color-border-accent)]
+          border-2 border-skin-accent
+          shadow-main-glow
         "
-        style={{
-          boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
-          maxWidth: '1200px',
-        }}
       >
         {/* Top-left buttons */}
         <div className="absolute top-4 left-4 flex gap-2 z-10">
           {onLeaveGame && (
             <Button
               ref={leaveButtonRef}
-              onClick={() => { sounds.buttonClick(); onLeaveGame(); }}
+              onClick={() => {
+                sounds.buttonClick();
+                onLeaveGame();
+              }}
               variant="danger"
               size="sm"
               title="Leave Game"
@@ -474,7 +482,10 @@ export function TeamSelection({
             </Button>
           )}
           <Button
-            onClick={() => { sounds.buttonClick(); setShowSocialSidebar(!showSocialSidebar); }}
+            onClick={() => {
+              sounds.buttonClick();
+              setShowSocialSidebar(!showSocialSidebar);
+            }}
             variant="success"
             size="sm"
             title="Find players to invite"
@@ -484,35 +495,39 @@ export function TeamSelection({
           {/* Voice Chat Buttons */}
           {onVoiceToggle && (
             <Button
-              onClick={() => { sounds.buttonClick(); onVoiceToggle(); }}
-              variant={isVoiceEnabled ? "success" : "secondary"}
+              onClick={() => {
+                sounds.buttonClick();
+                onVoiceToggle();
+              }}
+              variant={isVoiceEnabled ? 'success' : 'secondary'}
               size="sm"
-              title={isVoiceEnabled ? `Voice Chat (${voiceParticipants.length} in call)` : "Join Voice Chat"}
+              title={
+                isVoiceEnabled
+                  ? `Voice Chat (${voiceParticipants.length} in call)`
+                  : 'Join Voice Chat'
+              }
             >
-              {isVoiceEnabled ? (isVoiceMuted ? "🔇" : "🎙️") : "🎤"} Voice{isVoiceEnabled && ` (${voiceParticipants.length})`}
+              {isVoiceEnabled ? (isVoiceMuted ? '🔇' : '🎙️') : '🎤'} Voice
+              {isVoiceEnabled && ` (${voiceParticipants.length})`}
             </Button>
           )}
           {isVoiceEnabled && onVoiceMuteToggle && (
             <Button
-              onClick={() => { sounds.buttonClick(); onVoiceMuteToggle(); }}
-              variant={isVoiceMuted ? "warning" : "secondary"}
+              onClick={() => {
+                sounds.buttonClick();
+                onVoiceMuteToggle();
+              }}
+              variant={isVoiceMuted ? 'warning' : 'secondary'}
               size="sm"
-              title={isVoiceMuted ? "Unmute microphone" : "Mute microphone"}
+              title={isVoiceMuted ? 'Unmute microphone' : 'Mute microphone'}
             >
-              {isVoiceMuted ? "🔇 Unmute" : "🔊 Mute"}
+              {isVoiceMuted ? '🔇 Unmute' : '🔊 Mute'}
             </Button>
           )}
         </div>
 
-
         {/* Title */}
-        <h2
-          className="text-2xl sm:text-3xl font-display uppercase tracking-wider mb-6 text-center mt-12"
-          style={{
-            color: 'var(--color-text-primary)',
-            textShadow: '0 0 20px var(--color-glow)',
-          }}
-        >
+        <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider mb-6 text-center mt-12 text-skin-primary drop-shadow-[0_0_20px_var(--color-glow)]">
           Team Selection
         </h2>
 
@@ -527,11 +542,7 @@ export function TeamSelection({
               bg-[var(--color-bg-tertiary)]
             "
           >
-            <div
-              data-testid="game-id"
-              className="font-mono text-lg text-center"
-              style={{ color: 'var(--color-text-accent)' }}
-            >
+            <div data-testid="game-id" className="font-mono text-lg text-center text-skin-accent">
               {gameId}
             </div>
           </div>
@@ -557,13 +568,9 @@ export function TeamSelection({
               border-2 animate-bounce z-50
               flex items-center gap-2
               font-display uppercase tracking-wider text-sm
+              bg-skin-status-success border-skin-status-success text-skin-inverse
+              shadow-[0_0_20px_var(--color-success)]
             "
-            style={{
-              backgroundColor: 'var(--color-success)',
-              borderColor: 'var(--color-success)',
-              color: 'var(--color-text-inverse)',
-              boxShadow: '0 0 20px var(--color-success)',
-            }}
           >
             <span>✅</span>
             <span>Game link copied!</span>
@@ -573,7 +580,9 @@ export function TeamSelection({
         {/* Player count */}
         <div className="mb-6">
           <p className="text-center text-[var(--color-text-secondary)] font-body">
-            Players (<span data-testid="player-count">{players.filter(p => !p.isEmpty).length}</span>/4) - Choose your team and position
+            Players (
+            <span data-testid="player-count">{players.filter((p) => !p.isEmpty).length}</span>/4) -
+            Choose your team and position
           </p>
         </div>
 
@@ -584,33 +593,15 @@ export function TeamSelection({
             className="
               p-4 sm:p-6
               rounded-[var(--radius-lg)]
-              border-2
+              border-2 border-team1 bg-team1-10
             "
-            style={{
-              borderColor: 'var(--color-team1-primary)',
-              backgroundColor: 'var(--color-team1-primary)10',
-            }}
             data-testid="team-1-container"
           >
-            <h3
-              className="text-xl font-display uppercase tracking-wider mb-4 text-center"
-              style={{
-                color: 'var(--color-team1-primary)',
-                textShadow: '0 0 10px var(--color-team1-primary)',
-              }}
-            >
+            <h3 className="text-xl font-display uppercase tracking-wider mb-4 text-center text-team1 text-shadow-team1">
               Team 1
             </h3>
             <div className="space-y-3">
-              {[0, 1].map((position) =>
-                renderPlayerSlot(
-                  team1Players[position],
-                  position,
-                  1,
-                  'var(--color-team1-primary)',
-                  'var(--color-team1-secondary)'
-                )
-              )}
+              {[0, 1].map((position) => renderPlayerSlot(team1Players[position], position, 1))}
             </div>
           </div>
 
@@ -619,33 +610,15 @@ export function TeamSelection({
             className="
               p-4 sm:p-6
               rounded-[var(--radius-lg)]
-              border-2
+              border-2 border-team2 bg-team2-10
             "
-            style={{
-              borderColor: 'var(--color-team2-primary)',
-              backgroundColor: 'var(--color-team2-primary)10',
-            }}
             data-testid="team-2-container"
           >
-            <h3
-              className="text-xl font-display uppercase tracking-wider mb-4 text-center"
-              style={{
-                color: 'var(--color-team2-primary)',
-                textShadow: '0 0 10px var(--color-team2-primary)',
-              }}
-            >
+            <h3 className="text-xl font-display uppercase tracking-wider mb-4 text-center text-team2 text-shadow-team2">
               Team 2
             </h3>
             <div className="space-y-3">
-              {[0, 1].map((position) =>
-                renderPlayerSlot(
-                  team2Players[position],
-                  position,
-                  2,
-                  'var(--color-team2-primary)',
-                  'var(--color-team2-secondary)'
-                )
-              )}
+              {[0, 1].map((position) => renderPlayerSlot(team2Players[position], position, 2))}
             </div>
           </div>
         </div>
@@ -670,21 +643,27 @@ export function TeamSelection({
                 {(['easy', 'medium', 'hard'] as BotDifficulty[]).map((difficulty, index) => (
                   <button
                     key={difficulty}
-                    ref={index === 0 ? easyButtonRef : index === 1 ? mediumButtonRef : hardButtonRef}
-                    onClick={() => { sounds.buttonClick(); onBotDifficultyChange(difficulty); }}
+                    ref={
+                      index === 0 ? easyButtonRef : index === 1 ? mediumButtonRef : hardButtonRef
+                    }
+                    onClick={() => {
+                      sounds.buttonClick();
+                      onBotDifficultyChange(difficulty);
+                    }}
                     className={`
                       px-3 py-2
                       rounded-[var(--radius-md)]
                       font-display text-xs uppercase tracking-wider
                       border-2 transition-all duration-[var(--duration-fast)]
-                      ${botDifficulty === difficulty
-                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/20 text-[var(--color-text-accent)]'
-                        : 'border-[var(--color-border-default)] bg-transparent text-[var(--color-text-muted)] hover:border-[var(--color-border-accent)]'
+                      ${
+                        botDifficulty === difficulty
+                          ? 'border-skin-accent bg-skin-accent/20 text-skin-accent shadow-skin-glow'
+                          : 'border-skin-default bg-transparent text-skin-muted hover:border-skin-accent'
                       }
                     `}
-                    style={botDifficulty === difficulty ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
                   >
-                    {difficulty === 'easy' && '😊'} {difficulty === 'medium' && '🤔'} {difficulty === 'hard' && '😈'} {difficulty}
+                    {difficulty === 'easy' && '😊'} {difficulty === 'medium' && '🤔'}{' '}
+                    {difficulty === 'hard' && '😈'} {difficulty}
                   </button>
                 ))}
               </div>
@@ -696,7 +675,10 @@ export function TeamSelection({
             {showAddBot && onAddBot && (
               <Button
                 ref={addBotButtonRef}
-                onClick={() => { sounds.buttonClick(); onAddBot(); }}
+                onClick={() => {
+                  sounds.buttonClick();
+                  onAddBot();
+                }}
                 variant="warning"
                 size="md"
               >
@@ -706,11 +688,15 @@ export function TeamSelection({
 
             <Button
               ref={startGameButtonRef}
-              data-testid={canStartGame ? "start-game-button" : "start-game-button-disabled"}
-              onClick={canStartGame ? () => {
-                sounds.gameStart();
-                onStartGame();
-              } : undefined}
+              data-testid={canStartGame ? 'start-game-button' : 'start-game-button-disabled'}
+              onClick={
+                canStartGame
+                  ? () => {
+                      sounds.gameStart();
+                      onStartGame();
+                    }
+                  : undefined
+              }
               disabled={!canStartGame}
               variant="success"
               size="lg"
@@ -730,11 +716,7 @@ export function TeamSelection({
                 max-w-md mx-auto
               "
             >
-              <p
-                data-testid="start-game-message"
-                className="text-sm font-body"
-                style={{ color: 'var(--color-warning)' }}
-              >
+              <p data-testid="start-game-message" className="text-sm font-body text-skin-warning">
                 {startGameMessage}
               </p>
             </div>
@@ -745,7 +727,10 @@ export function TeamSelection({
         <div className="mt-6">
           <NeonButton
             ref={rulesButtonRef}
-            onClick={() => { sounds.buttonClick(); setShowRules(true); }}
+            onClick={() => {
+              sounds.buttonClick();
+              setShowRules(true);
+            }}
             size="lg"
             fullWidth
             glow
@@ -781,7 +766,7 @@ export function TeamSelection({
           onSendMessage={(message) => {
             socket.emit('send_team_selection_chat', {
               gameId,
-              message: message.trim()
+              message: message.trim(),
             });
           }}
           title="💬 Team Selection Chat"

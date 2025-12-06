@@ -107,13 +107,7 @@ describe('SocialPanel', () => {
   });
 
   it('displays message when no online players', () => {
-    renderWithProviders(
-      <SocialPanel
-        {...defaultProps}
-        onlinePlayers={[]}
-        socialTab="online"
-      />
-    );
+    renderWithProviders(<SocialPanel {...defaultProps} onlinePlayers={[]} socialTab="online" />);
 
     expect(screen.getByText('No players online')).toBeInTheDocument();
   });
@@ -138,13 +132,7 @@ describe('SocialPanel', () => {
   });
 
   it('displays message when no recent players', () => {
-    renderWithProviders(
-      <SocialPanel
-        {...defaultProps}
-        recentPlayers={[]}
-        socialTab="recent"
-      />
-    );
+    renderWithProviders(<SocialPanel {...defaultProps} recentPlayers={[]} socialTab="recent" />);
 
     expect(screen.getByText('No recent players yet')).toBeInTheDocument();
   });

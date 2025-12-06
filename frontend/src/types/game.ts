@@ -35,12 +35,7 @@ export interface Bet {
   skipped?: boolean; // True if player skipped their bet
 }
 
-export type GamePhase =
-  | 'team_selection'
-  | 'betting'
-  | 'playing'
-  | 'scoring'
-  | 'game_over';
+export type GamePhase = 'team_selection' | 'betting' | 'playing' | 'scoring' | 'game_over';
 
 export interface TrickCard {
   playerId: string; // Socket ID - volatile, changes on reconnect. DO NOT use for comparisons/lookups
@@ -268,7 +263,7 @@ export interface OnlinePlayer {
   status: 'in_lobby' | 'in_game' | 'in_team_selection';
   gameId?: string;
   lastActivity: number;
-  lookingForGame?: boolean;  // True if player is actively looking for teammates
+  lookingForGame?: boolean; // True if player is actively looking for teammates
 }
 
 /**
@@ -276,10 +271,10 @@ export interface OnlinePlayer {
  * Sync with backend/src/types/game.ts
  */
 export interface VoiceParticipant {
-  odId: string;        // Socket ID of the participant
-  name: string;        // Display name
+  odId: string; // Socket ID of the participant
+  name: string; // Display name
   isSpectator: boolean; // True if spectator, false if player
-  isMuted: boolean;    // Mute state
+  isMuted: boolean; // Mute state
   isSpeaking: boolean; // Voice activity indicator
 }
 
@@ -295,18 +290,25 @@ export type SideBetType = 'preset' | 'custom';
  * Preset bet types that can be auto-resolved by the game
  */
 export type PresetBetType =
-  | 'red_zero_winner'      // Which team wins the trick containing red 0
-  | 'brown_zero_victim'    // Which team takes the brown 0 (loses points)
-  | 'tricks_over_under'    // Target player wins >= X tricks
+  | 'red_zero_winner' // Which team wins the trick containing red 0
+  | 'brown_zero_victim' // Which team takes the brown 0 (loses points)
+  | 'tricks_over_under' // Target player wins >= X tricks
   | 'team_score_over_under' // Team scores >= X points in round
-  | 'bet_made'             // Betting team makes their bet
+  | 'bet_made' // Betting team makes their bet
   | 'without_trump_success' // "Without trump" bet succeeds
-  | 'first_trump_played';  // Who plays the first trump card
+  | 'first_trump_played'; // Who plays the first trump card
 
 /**
  * Status of a side bet
  */
-export type SideBetStatus = 'open' | 'active' | 'pending_resolution' | 'resolved' | 'cancelled' | 'expired' | 'disputed';
+export type SideBetStatus =
+  | 'open'
+  | 'active'
+  | 'pending_resolution'
+  | 'resolved'
+  | 'cancelled'
+  | 'expired'
+  | 'disputed';
 
 /**
  * How a bet was resolved
@@ -325,20 +327,20 @@ export interface SideBet {
   id: number;
   gameId: string;
   betType: SideBetType;
-  presetType?: PresetBetType;        // For preset bets
-  customDescription?: string;         // For custom bets (free text)
+  presetType?: PresetBetType; // For preset bets
+  customDescription?: string; // For custom bets (free text)
   resolutionTiming?: ResolutionTiming; // When to resolve custom bet (trick/round/game/manual)
-  creatorName: string;                // Who created the bet
-  acceptorName?: string;              // Who accepted (null if open)
-  amount: number;                     // Coins wagered (1 to creator's balance)
-  prediction?: string;                // The bet prediction (e.g., 'team1', '>=5', 'true')
-  targetPlayer?: string;              // Who the bet is about (if applicable)
+  creatorName: string; // Who created the bet
+  acceptorName?: string; // Who accepted (null if open)
+  amount: number; // Coins wagered (1 to creator's balance)
+  prediction?: string; // The bet prediction (e.g., 'team1', '>=5', 'true')
+  targetPlayer?: string; // Who the bet is about (if applicable)
   status: SideBetStatus;
-  result?: boolean;                   // null until resolved, true if creator won
-  resolvedBy?: SideBetResolution;     // How it was resolved
-  roundNumber?: number;               // Which round the bet applies to (null = whole game)
-  trickNumber?: number;               // Which trick the bet was created on (for trick-timed resolution)
-  claimedWinner?: string;             // For pending_resolution: who claimed they won
+  result?: boolean; // null until resolved, true if creator won
+  resolvedBy?: SideBetResolution; // How it was resolved
+  roundNumber?: number; // Which round the bet applies to (null = whole game)
+  trickNumber?: number; // Which trick the bet was created on (for trick-timed resolution)
+  claimedWinner?: string; // For pending_resolution: who claimed they won
   createdAt: Date;
   acceptedAt?: Date;
   resolvedAt?: Date;
@@ -373,13 +375,13 @@ export interface SideBetAcceptedEvent {
 
 export interface SideBetResolvedEvent {
   betId: number;
-  result: boolean;       // true = creator won
+  result: boolean; // true = creator won
   winnerName: string;
   loserName: string;
   coinsAwarded: number;
-  streakBonus?: number;       // Bonus coins from streak multiplier
-  winnerStreak?: number;      // Winner's new streak count
-  streakMultiplier?: number;  // Applied multiplier (1.0, 1.25, 1.5, 2.0)
+  streakBonus?: number; // Bonus coins from streak multiplier
+  winnerStreak?: number; // Winner's new streak count
+  streakMultiplier?: number; // Applied multiplier (1.0, 1.25, 1.5, 2.0)
 }
 
 export interface SideBetCancelledEvent {
@@ -396,7 +398,7 @@ export interface SideBetDisputedEvent {
 export interface SideBetWinClaimedEvent {
   betId: number;
   claimedBy: string;
-  otherParty: string;  // The person who needs to confirm
+  otherParty: string; // The person who needs to confirm
   bet: SideBet;
 }
 

@@ -4,7 +4,7 @@ import { Theme, themes, defaultTheme } from '../config/theme';
 interface ThemeContextType {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  themeConfig: typeof themes[Theme];
+  themeConfig: (typeof themes)[Theme];
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);

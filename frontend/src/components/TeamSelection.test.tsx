@@ -134,9 +134,7 @@ describe('TeamSelection', () => {
     });
 
     it('should show both team containers', () => {
-      const players = [
-        createTestPlayer({ id: 'player-1', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-1', teamId: 1 })];
 
       renderWithSettings(
         <TeamSelection
@@ -335,9 +333,7 @@ describe('TeamSelection', () => {
 
   describe('Game Link Copying', () => {
     it('should copy game link to clipboard', async () => {
-      const players = [
-        createTestPlayer({ id: 'player-1', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-1', teamId: 1 })];
 
       renderWithSettings(
         <TeamSelection
@@ -362,9 +358,7 @@ describe('TeamSelection', () => {
     });
 
     it('should show success toast after copying', async () => {
-      const players = [
-        createTestPlayer({ id: 'player-1', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-1', teamId: 1 })];
 
       renderWithSettings(
         <TeamSelection
@@ -389,9 +383,7 @@ describe('TeamSelection', () => {
 
   describe('Leave Game Functionality', () => {
     it('should call onLeaveGame when Leave button clicked', () => {
-      const players = [
-        createTestPlayer({ id: 'player-1', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-1', teamId: 1 })];
 
       renderWithSettings(
         <TeamSelection
@@ -413,9 +405,7 @@ describe('TeamSelection', () => {
     });
 
     it('should not show Leave button when onLeaveGame not provided', () => {
-      const players = [
-        createTestPlayer({ id: 'player-1', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-1', teamId: 1 })];
 
       renderWithSettings(
         <TeamSelection
@@ -435,9 +425,7 @@ describe('TeamSelection', () => {
 
   describe('Chat Integration', () => {
     it('should render chat component', () => {
-      const players = [
-        createTestPlayer({ id: 'player-1', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-1', teamId: 1 })];
 
       renderWithSettings(
         <TeamSelection
@@ -456,9 +444,7 @@ describe('TeamSelection', () => {
     });
 
     it('should listen for chat messages when socket provided', () => {
-      const players = [
-        createTestPlayer({ id: 'player-1', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-1', teamId: 1 })];
 
       renderWithSettings(
         <TeamSelection
@@ -499,9 +485,7 @@ describe('TeamSelection', () => {
     });
 
     it('should handle missing current player gracefully', () => {
-      const players = [
-        createTestPlayer({ id: 'player-2', teamId: 1 }),
-      ];
+      const players = [createTestPlayer({ id: 'player-2', teamId: 1 })];
 
       const { container } = renderWithSettings(
         <TeamSelection

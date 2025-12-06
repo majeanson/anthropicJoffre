@@ -54,7 +54,11 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
     if (!socket) return;
 
     // Game Created Event
-    const handleGameCreated = ({ gameId: newGameId, gameState: newGameState, session }: {
+    const handleGameCreated = ({
+      gameId: newGameId,
+      gameState: newGameState,
+      session,
+    }: {
       gameId: string;
       gameState: GameState;
       session: PlayerSession;
@@ -69,7 +73,10 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
     };
 
     // Player Joined Event
-    const handlePlayerJoined = ({ gameState: newGameState, session }: {
+    const handlePlayerJoined = ({
+      gameState: newGameState,
+      session,
+    }: {
       gameState: GameState;
       session?: PlayerSession;
     }) => {
@@ -82,7 +89,10 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
     };
 
     // Reconnection Successful Event
-    const handleReconnectionSuccessful = ({ gameState: newGameState, session }: {
+    const handleReconnectionSuccessful = ({
+      gameState: newGameState,
+      session,
+    }: {
       gameState: GameState;
       session: PlayerSession;
     }) => {
@@ -133,7 +143,7 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
 
     // Game Updated Delta Event (Bandwidth Optimization)
     const handleGameUpdatedDelta = (delta: GameStateDelta) => {
-      setGameState(prevState => {
+      setGameState((prevState) => {
         if (!prevState) return prevState; // Can't apply delta without previous state
         const newState = applyStateDelta(prevState, delta);
 
@@ -151,7 +161,10 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
     };
 
     // Trick Resolved Event
-    const handleTrickResolved = ({ winnerId, gameState: newGameState }: {
+    const handleTrickResolved = ({
+      winnerId,
+      gameState: newGameState,
+    }: {
       winnerId: string;
       gameState: GameState;
     }) => {
@@ -171,11 +184,11 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
       setGameState(newGameState);
 
       // Save recent players (excluding yourself)
-      const currentPlayer = newGameState.players.find(p => p.id === socket.id);
+      const currentPlayer = newGameState.players.find((p) => p.id === socket.id);
       if (currentPlayer) {
         const otherPlayers = newGameState.players
-          .map(p => p.name)
-          .filter(name => name !== currentPlayer.name);
+          .map((p) => p.name)
+          .filter((name) => name !== currentPlayer.name);
         addRecentPlayers(otherPlayers, currentPlayer.name);
       }
 
@@ -184,12 +197,18 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
     };
 
     // Rematch Vote Update Event
-    const handleRematchVoteUpdate = ({ voters }: { votes: number; totalPlayers: number; voters: string[] }) => {
-      setGameState(prevState => {
+    const handleRematchVoteUpdate = ({
+      voters,
+    }: {
+      votes: number;
+      totalPlayers: number;
+      voters: string[];
+    }) => {
+      setGameState((prevState) => {
         if (!prevState) return prevState;
         return {
           ...prevState,
-          rematchVotes: voters
+          rematchVotes: voters,
         };
       });
     };
@@ -199,14 +218,14 @@ export function useGameState({ socket, onSpawnBots }: UseGameStateProps): UseGam
       setGameState(newGameState);
 
       // Save session for the new game
-      const currentPlayer = newGameState.players.find(p => p.id === socket.id);
+      const currentPlayer = newGameState.players.find((p) => p.id === socket.id);
       if (currentPlayer) {
         const session: PlayerSession = {
           gameId: newGameState.id,
           playerId: currentPlayer.id,
           playerName: currentPlayer.name,
           token: `${newGameState.id}_${currentPlayer.id}_${Date.now()}`,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         };
         sessionStorage.setItem('gameSession', JSON.stringify(session));
       }

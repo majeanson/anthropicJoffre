@@ -49,12 +49,15 @@ export interface PlayerEquippedSpecialSkins {
 // RARITY STYLING
 // ============================================================================
 
-export const rarityStyles: Record<SpecialCardRarity, {
-  gradient: string;
-  borderGradient: string;
-  badgeColor: string;
-  glowIntensity: number;
-}> = {
+export const rarityStyles: Record<
+  SpecialCardRarity,
+  {
+    gradient: string;
+    borderGradient: string;
+    badgeColor: string;
+    glowIntensity: number;
+  }
+> = {
   common: {
     gradient: 'from-gray-400 to-gray-500',
     borderGradient: 'from-gray-400 via-gray-500 to-gray-400',
@@ -240,14 +243,14 @@ export const defaultSpecialCardSkins: SpecialCardSkin[] = [
  * Get a special card skin by ID from the local definitions
  */
 export function getSpecialCardSkin(skinId: string): SpecialCardSkin | undefined {
-  return defaultSpecialCardSkins.find(skin => skin.skinId === skinId);
+  return defaultSpecialCardSkins.find((skin) => skin.skinId === skinId);
 }
 
 /**
  * Get skins by card type
  */
 export function getSpecialCardSkinsByType(cardType: SpecialCardType): SpecialCardSkin[] {
-  return defaultSpecialCardSkins.filter(skin => skin.cardType === cardType);
+  return defaultSpecialCardSkins.filter((skin) => skin.cardType === cardType);
 }
 
 /**
@@ -273,12 +276,12 @@ export function getUnlockRequirementText(skin: SpecialCardSkin): string {
  */
 function formatAchievementName(key: string): string {
   const nameMap: Record<string, string> = {
-    'red_zero_hunter': 'Red Zero Hunter',
-    'games_won_100': 'Win 100 Games',
-    'no_brown_10': 'Curse Dodger',
-    'perfect_game': 'Perfect Game',
+    red_zero_hunter: 'Red Zero Hunter',
+    games_won_100: 'Win 100 Games',
+    no_brown_10: 'Curse Dodger',
+    perfect_game: 'Perfect Game',
   };
-  return nameMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  return nameMap[key] || key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 /**

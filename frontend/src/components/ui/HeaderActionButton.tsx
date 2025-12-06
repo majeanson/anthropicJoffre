@@ -28,7 +28,8 @@ import { UIBadge } from './UIBadge';
 
 export type HeaderActionButtonSize = 'sm' | 'md';
 
-export interface HeaderActionButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
+export interface HeaderActionButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   /** Icon element (emoji or React node) */
   icon: ReactNode;
   /** Optional label text (hidden on mobile, shown on desktop) */
@@ -43,18 +44,19 @@ export interface HeaderActionButtonProps extends Omit<ButtonHTMLAttributes<HTMLB
   className?: string;
 }
 
-const sizeClasses: Record<HeaderActionButtonSize, { button: string; icon: string; label: string }> = {
-  sm: {
-    button: 'p-1',
-    icon: 'text-sm',
-    label: 'text-xs',
-  },
-  md: {
-    button: 'p-1.5 md:px-3 md:py-1.5',
-    icon: 'text-base md:text-lg',
-    label: 'text-sm',
-  },
-};
+const sizeClasses: Record<HeaderActionButtonSize, { button: string; icon: string; label: string }> =
+  {
+    sm: {
+      button: 'p-1',
+      icon: 'text-sm',
+      label: 'text-xs',
+    },
+    md: {
+      button: 'p-1.5 md:px-3 md:py-1.5',
+      icon: 'text-base md:text-lg',
+      label: 'text-sm',
+    },
+  };
 
 export function HeaderActionButton({
   icon,
@@ -90,7 +92,9 @@ export function HeaderActionButton({
     >
       <span className={classes.icon}>{icon}</span>
       {label && (
-        <span className={`hidden md:inline text-white dark:text-gray-100 font-semibold ${classes.label}`}>
+        <span
+          className={`hidden md:inline text-white dark:text-gray-100 font-semibold ${classes.label}`}
+        >
           {label}
         </span>
       )}

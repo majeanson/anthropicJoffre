@@ -16,7 +16,8 @@ import { InputHTMLAttributes, forwardRef, ReactNode } from 'react';
 export type CheckboxVariant = 'checkbox' | 'toggle';
 export type CheckboxSize = 'sm' | 'md' | 'lg';
 
-export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type'> {
+export interface CheckboxProps
+  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size' | 'type'> {
   /** Checkbox variant */
   variant?: CheckboxVariant;
   /** Checkbox size */
@@ -37,7 +38,10 @@ const checkboxSizeClasses: Record<CheckboxSize, string> = {
   lg: 'w-6 h-6',
 };
 
-const toggleSizeClasses: Record<CheckboxSize, { container: string; knob: string; translate: string }> = {
+const toggleSizeClasses: Record<
+  CheckboxSize,
+  { container: string; knob: string; translate: string }
+> = {
   sm: {
     container: 'w-8 h-4',
     knob: 'w-3 h-3',
@@ -61,19 +65,22 @@ const labelSizeClasses: Record<CheckboxSize, string> = {
   lg: 'text-lg',
 };
 
-export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox({
-  variant = 'checkbox',
-  size = 'md',
-  label,
-  description,
-  indeterminate = false,
-  containerClassName = '',
-  className = '',
-  disabled,
-  checked,
-  id,
-  ...props
-}, ref) {
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
+  {
+    variant = 'checkbox',
+    size = 'md',
+    label,
+    description,
+    indeterminate = false,
+    containerClassName = '',
+    className = '',
+    disabled,
+    checked,
+    id,
+    ...props
+  },
+  ref
+) {
   // Generate unique ID if not provided
   const inputId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -117,9 +124,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
               rounded-full
               transition-all duration-[var(--duration-normal)]
               border-2
-              ${checked
-                ? 'bg-[var(--color-success)] border-[var(--color-success)]'
-                : 'bg-[var(--color-bg-tertiary)] border-[var(--color-border-default)]'
+              ${
+                checked
+                  ? 'bg-skin-status-success border-skin-status-success'
+                  : 'bg-skin-tertiary border-skin-default'
               }
             `}
             style={{
@@ -134,15 +142,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
                 absolute top-0.5 left-0.5
                 rounded-full
                 transition-all duration-[var(--duration-normal)]
+                shadow-sm
                 ${checked ? toggleSize.translate : 'translate-x-0'}
-                ${checked
-                  ? 'bg-[var(--color-text-primary)]'
-                  : 'bg-[var(--color-text-muted)]'
-                }
+                ${checked ? 'bg-skin-text-primary' : 'bg-skin-text-muted'}
               `}
-              style={{
-                boxShadow: 'var(--shadow-sm)',
-              }}
             />
           </div>
         </div>
@@ -152,15 +155,13 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           <div className="flex flex-col">
             {label && (
               <span
-                className={`font-body font-medium tracking-wide text-[var(--color-text-primary)] ${labelSizeClasses[size]}`}
+                className={`font-body font-medium tracking-wide text-skin-text-primary ${labelSizeClasses[size]}`}
               >
                 {label}
               </span>
             )}
             {description && (
-              <span className="text-sm mt-0.5 font-body text-[var(--color-text-muted)]">
-                {description}
-              </span>
+              <span className="text-sm mt-0.5 font-body text-skin-text-muted">{description}</span>
             )}
           </div>
         )}
@@ -192,13 +193,14 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             transition-all duration-[var(--duration-fast)]
             flex items-center justify-center
             peer-focus-visible:ring-2
-            peer-focus-visible:ring-[var(--color-text-accent)]
+            peer-focus-visible:ring-skin-accent
             peer-focus-visible:ring-offset-2
-            peer-focus-visible:ring-offset-[var(--color-bg-primary)]
+            peer-focus-visible:ring-offset-skin-primary
             border-2
-            ${checked
-              ? 'bg-[var(--color-text-accent)] border-[var(--color-text-accent)]'
-              : 'bg-[var(--color-bg-primary)] border-[var(--color-border-default)]'
+            ${
+              checked
+                ? 'bg-skin-text-accent border-skin-text-accent'
+                : 'bg-skin-primary border-skin-default'
             }
             ${className}
           `}
@@ -211,23 +213,19 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
           {/* Checkmark */}
           {checked && (
             <svg
-              className="w-3 h-3 text-[var(--color-text-inverse)]"
+              className="w-3 h-3 text-skin-text-inverse"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
               strokeWidth={3}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           )}
           {/* Indeterminate dash */}
           {!checked && indeterminate && (
             <div
-              className="w-2.5 h-0.5 rounded-full bg-[var(--color-text-accent)]"
+              className="w-2.5 h-0.5 rounded-full bg-skin-text-accent"
               style={{
                 boxShadow: '0 0 4px var(--color-glow)',
               }}
@@ -241,15 +239,13 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
         <div className="flex flex-col">
           {label && (
             <span
-              className={`font-body font-medium text-[var(--color-text-primary)] ${labelSizeClasses[size]}`}
+              className={`font-body font-medium text-skin-text-primary ${labelSizeClasses[size]}`}
             >
               {label}
             </span>
           )}
           {description && (
-            <span className="text-sm mt-0.5 font-body text-[var(--color-text-muted)]">
-              {description}
-            </span>
+            <span className="text-sm mt-0.5 font-body text-skin-text-muted">{description}</span>
           )}
         </div>
       )}
@@ -264,8 +260,8 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 export interface PresetCheckboxProps extends Omit<CheckboxProps, 'variant'> {}
 
 /** Toggle switch for on/off states */
-export const Toggle = forwardRef<HTMLInputElement, PresetCheckboxProps>(
-  (props, ref) => <Checkbox ref={ref} variant="toggle" {...props} />
-);
+export const Toggle = forwardRef<HTMLInputElement, PresetCheckboxProps>((props, ref) => (
+  <Checkbox ref={ref} variant="toggle" {...props} />
+));
 
 export default Checkbox;

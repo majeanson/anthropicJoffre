@@ -14,7 +14,13 @@ import { useState, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import { Modal, UICard, Button, Spinner } from './ui';
 import { LoginStreakBadge } from './LoginStreakBadge';
-import { getLevelProgress, getLevelTitle, getLevelColor, getLevelGradient, formatXp } from '../utils/xpSystem';
+import {
+  getLevelProgress,
+  getLevelTitle,
+  getLevelColor,
+  getLevelGradient,
+  formatXp,
+} from '../utils/xpSystem';
 
 interface QuestSummary {
   total: number;
@@ -73,10 +79,12 @@ export function PersonalHub({
     socket.emit('get_player_calendar_progress', { playerName });
     socket.emit('get_player_stats', { playerName });
 
-    const handleDailyQuests = (data: { quests: Array<{ completed: boolean; reward_claimed: boolean }> }) => {
+    const handleDailyQuests = (data: {
+      quests: Array<{ completed: boolean; reward_claimed: boolean }>;
+    }) => {
       const total = data.quests.length;
-      const completed = data.quests.filter(q => q.completed).length;
-      const claimable = data.quests.filter(q => q.completed && !q.reward_claimed).length;
+      const completed = data.quests.filter((q) => q.completed).length;
+      const claimable = data.quests.filter((q) => q.completed && !q.reward_claimed).length;
       setQuestSummary({ total, completed, claimable });
       setLoading(false);
     };
@@ -138,7 +146,7 @@ export function PersonalHub({
       ) : (
         <div className="space-y-4">
           {/* XP and Level Display */}
-          {playerStats && (
+          {playerStats &&
             (() => {
               const progress = getLevelProgress(playerStats.total_xp);
               const levelTitle = getLevelTitle(progress.level);
@@ -149,11 +157,13 @@ export function PersonalHub({
                 <UICard variant="bordered" size="md">
                   <div className="flex items-center gap-4">
                     {/* Level Badge */}
-                    <div className={`
+                    <div
+                      className={`
                       w-16 h-16 rounded-xl flex flex-col items-center justify-center
                       bg-gradient-to-br ${levelGradient}
                       shadow-lg
-                    `}>
+                    `}
+                    >
                       <span className="text-white font-bold text-2xl">{progress.level}</span>
                       <span className="text-white/80 text-[10px] uppercase">Level</span>
                     </div>
@@ -172,7 +182,9 @@ export function PersonalHub({
                         />
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        <span>{progress.progressPercent}% to Level {progress.level + 1}</span>
+                        <span>
+                          {progress.progressPercent}% to Level {progress.level + 1}
+                        </span>
                         <span>{formatXp(progress.xpToNextLevel)} XP needed</span>
                       </div>
                     </div>
@@ -180,31 +192,49 @@ export function PersonalHub({
                   {/* Quick Stats Row */}
                   <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 grid grid-cols-3 gap-2 text-center">
                     <div>
-                      <div className="text-lg font-bold text-blue-500">{playerStats.games_played}</div>
-                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Games</div>
+                      <div className="text-lg font-bold text-blue-500">
+                        {playerStats.games_played}
+                      </div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">
+                        Games
+                      </div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-green-500">{playerStats.win_percentage.toFixed(0)}%</div>
-                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">Win Rate</div>
+                      <div className="text-lg font-bold text-green-500">
+                        {playerStats.win_percentage.toFixed(0)}%
+                      </div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">
+                        Win Rate
+                      </div>
                     </div>
                     <div>
-                      <div className="text-lg font-bold text-yellow-500">{playerStats.elo_rating}</div>
-                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">ELO</div>
+                      <div className="text-lg font-bold text-yellow-500">
+                        {playerStats.elo_rating}
+                      </div>
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">
+                        ELO
+                      </div>
                     </div>
                   </div>
                 </UICard>
               );
-            })()
-          )}
+            })()}
 
           {/* Login Streak */}
-          <UICard variant="gradient" gradient="warning" size="md" className="cursor-pointer hover:scale-[1.02] transition-transform">
+          <UICard
+            variant="gradient"
+            gradient="warning"
+            size="md"
+            className="cursor-pointer hover:scale-[1.02] transition-transform"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="text-3xl">🔥</span>
                 <div>
                   <h3 className="text-gray-900 dark:text-white font-bold text-lg">Login Streak</h3>
-                  <p className="text-gray-700 dark:text-gray-300 text-sm">Keep your streak alive!</p>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
+                    Keep your streak alive!
+                  </p>
                 </div>
               </div>
               <LoginStreakBadge socket={socket} playerName={playerName} />
@@ -228,12 +258,15 @@ export function PersonalHub({
                       {questSummary.completed}/{questSummary.total} completed
                       {questSummary.claimable > 0 && (
                         <span className="text-green-600 dark:text-green-400 ml-2">
-                          ({questSummary.claimable} reward{questSummary.claimable > 1 ? 's' : ''} available!)
+                          ({questSummary.claimable} reward{questSummary.claimable > 1 ? 's' : ''}{' '}
+                          available!)
                         </span>
                       )}
                     </p>
                   ) : (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Complete quests for XP & coins</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      Complete quests for XP & coins
+                    </p>
                   )}
                 </div>
               </div>
@@ -259,7 +292,9 @@ export function PersonalHub({
               <div className="flex items-center gap-3">
                 <span className="text-3xl">📅</span>
                 <div>
-                  <h3 className="text-gray-900 dark:text-white font-bold text-lg">30-Day Rewards</h3>
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg">
+                    30-Day Rewards
+                  </h3>
                   {calendarSummary ? (
                     <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Day {calendarSummary.currentDay} of 30
@@ -270,7 +305,9 @@ export function PersonalHub({
                       )}
                     </p>
                   ) : (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">Login daily for rewards</p>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                      Login daily for rewards
+                    </p>
                   )}
                 </div>
               </div>
@@ -297,7 +334,9 @@ export function PersonalHub({
                 <span className="text-3xl">🏆</span>
                 <div>
                   <h3 className="text-gray-900 dark:text-white font-bold text-lg">Achievements</h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">Track your accomplishments</p>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
+                    Track your accomplishments
+                  </p>
                 </div>
               </div>
               <Button variant="ghost" size="sm">

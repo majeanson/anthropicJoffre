@@ -17,14 +17,14 @@
 // ============================================================================
 
 export type CardSkinId =
-  | 'classic'           // Free: Default numeric style
-  | 'roman'             // Free: Roman numerals with laurel theme
-  | 'elemental'         // Level 5: Fire, earth, water, nature elements
-  | 'nordic'            // Level 10: Viking/Norse theme with runes decorations
-  | 'alchemical'        // Level 15: Alchemical elements theme
-  | 'celestial'         // Level 20: Stars and cosmos theme
-  | 'royal'             // Level 25: Playing card style (hearts, diamonds, etc.)
-  | 'neon';             // Level 30: Cyberpunk neon style
+  | 'classic' // Free: Default numeric style
+  | 'roman' // Free: Roman numerals with laurel theme
+  | 'elemental' // Level 5: Fire, earth, water, nature elements
+  | 'nordic' // Level 10: Viking/Norse theme with runes decorations
+  | 'alchemical' // Level 15: Alchemical elements theme
+  | 'celestial' // Level 20: Stars and cosmos theme
+  | 'royal' // Level 25: Playing card style (hearts, diamonds, etc.)
+  | 'neon'; // Level 30: Cyberpunk neon style
 
 export interface CardSkinSuitStyle {
   /** Color for this suit (CSS color value) */
@@ -133,10 +133,10 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
       return romanNumerals[value] || value.toString();
     },
     suits: {
-      red: { color: '#b91c1c', centerIcon: '🦅', glowColor: 'rgba(185, 28, 28, 0.5)' },   // Eagle
-      brown: { color: '#78350f', centerIcon: '🏛️', glowColor: 'rgba(120, 53, 15, 0.5)' },  // Temple
-      green: { color: '#166534', centerIcon: '🌿', glowColor: 'rgba(22, 101, 52, 0.5)' },  // Laurel
-      blue: { color: '#1e40af', centerIcon: '⚔️', glowColor: 'rgba(30, 64, 175, 0.5)' },   // Swords
+      red: { color: '#b91c1c', centerIcon: '🦅', glowColor: 'rgba(185, 28, 28, 0.5)' }, // Eagle
+      brown: { color: '#78350f', centerIcon: '🏛️', glowColor: 'rgba(120, 53, 15, 0.5)' }, // Temple
+      green: { color: '#166534', centerIcon: '🌿', glowColor: 'rgba(22, 101, 52, 0.5)' }, // Laurel
+      blue: { color: '#1e40af', centerIcon: '⚔️', glowColor: 'rgba(30, 64, 175, 0.5)' }, // Swords
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+V' },
@@ -159,10 +159,10 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
     useCenterIcons: true,
     formatValue: (value) => value.toString(),
     suits: {
-      red: { color: '#ef4444', centerIcon: '🔥', glowColor: 'rgba(239, 68, 68, 0.6)' },    // Fire
-      brown: { color: '#a16207', centerIcon: '🌍', glowColor: 'rgba(161, 98, 7, 0.6)' },   // Earth
-      green: { color: '#22c55e', centerIcon: '🌿', glowColor: 'rgba(34, 197, 94, 0.6)' },  // Nature
-      blue: { color: '#3b82f6', centerIcon: '💧', glowColor: 'rgba(59, 130, 246, 0.6)' },  // Water
+      red: { color: '#ef4444', centerIcon: '🔥', glowColor: 'rgba(239, 68, 68, 0.6)' }, // Fire
+      brown: { color: '#a16207', centerIcon: '🌍', glowColor: 'rgba(161, 98, 7, 0.6)' }, // Earth
+      green: { color: '#22c55e', centerIcon: '🌿', glowColor: 'rgba(34, 197, 94, 0.6)' }, // Nature
+      blue: { color: '#3b82f6', centerIcon: '💧', glowColor: 'rgba(59, 130, 246, 0.6)' }, // Water
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+5' },
@@ -180,10 +180,10 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
     useCenterIcons: true,
     formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#f87171', centerIcon: '⚡', glowColor: 'rgba(248, 113, 113, 0.6)' },  // Thor's lightning
-      brown: { color: '#d97706', centerIcon: '🪓', glowColor: 'rgba(217, 119, 6, 0.6)' },  // Axe
+      red: { color: '#f87171', centerIcon: '⚡', glowColor: 'rgba(248, 113, 113, 0.6)' }, // Thor's lightning
+      brown: { color: '#d97706', centerIcon: '🪓', glowColor: 'rgba(217, 119, 6, 0.6)' }, // Axe
       green: { color: '#4ade80', centerIcon: '🌲', glowColor: 'rgba(74, 222, 128, 0.6)' }, // Yggdrasil
-      blue: { color: '#60a5fa', centerIcon: '❄️', glowColor: 'rgba(96, 165, 250, 0.6)' },  // Ice
+      blue: { color: '#60a5fa', centerIcon: '❄️', glowColor: 'rgba(96, 165, 250, 0.6)' }, // Ice
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+5' },
@@ -193,7 +193,7 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
 
   alchemical: {
     id: 'alchemical',
-    name: 'Alchemist\'s Lab',
+    name: "Alchemist's Lab",
     description: 'Ancient alchemical elements and transmutation',
     requiredLevel: 15,
     preview: 'linear-gradient(135deg, #fbbf24 0%, #78350f 50%, #1e1b4b 100%)',
@@ -201,10 +201,10 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
     useCenterIcons: true,
     formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#f59e0b', centerIcon: '🔥', glowColor: 'rgba(245, 158, 11, 0.6)' },   // Fire element
-      brown: { color: '#92400e', centerIcon: '⚗️', glowColor: 'rgba(146, 64, 14, 0.6)' },  // Flask
+      red: { color: '#f59e0b', centerIcon: '🔥', glowColor: 'rgba(245, 158, 11, 0.6)' }, // Fire element
+      brown: { color: '#92400e', centerIcon: '⚗️', glowColor: 'rgba(146, 64, 14, 0.6)' }, // Flask
       green: { color: '#84cc16', centerIcon: '🧪', glowColor: 'rgba(132, 204, 22, 0.6)' }, // Potion
-      blue: { color: '#0ea5e9', centerIcon: '💎', glowColor: 'rgba(14, 165, 233, 0.6)' },  // Crystal
+      blue: { color: '#0ea5e9', centerIcon: '💎', glowColor: 'rgba(14, 165, 233, 0.6)' }, // Crystal
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+5' },
@@ -222,10 +222,10 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
     useCenterIcons: true,
     formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#fb7185', centerIcon: '☄️', glowColor: 'rgba(251, 113, 133, 0.6)' },  // Comet
+      red: { color: '#fb7185', centerIcon: '☄️', glowColor: 'rgba(251, 113, 133, 0.6)' }, // Comet
       brown: { color: '#d4a574', centerIcon: '🌙', glowColor: 'rgba(212, 165, 116, 0.6)' }, // Moon
       green: { color: '#86efac', centerIcon: '🌟', glowColor: 'rgba(134, 239, 172, 0.6)' }, // Star
-      blue: { color: '#93c5fd', centerIcon: '🌌', glowColor: 'rgba(147, 197, 253, 0.6)' },  // Galaxy
+      blue: { color: '#93c5fd', centerIcon: '🌌', glowColor: 'rgba(147, 197, 253, 0.6)' }, // Galaxy
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+5' },
@@ -248,10 +248,10 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
       return royalValues[value] || value.toString();
     },
     suits: {
-      red: { color: '#dc2626', centerIcon: '♥️', glowColor: 'rgba(220, 38, 38, 0.6)' },    // Heart
-      brown: { color: '#b45309', centerIcon: '♦️', glowColor: 'rgba(180, 83, 9, 0.6)' },   // Diamond
-      green: { color: '#059669', centerIcon: '♣️', glowColor: 'rgba(5, 150, 105, 0.6)' },  // Club
-      blue: { color: '#2563eb', centerIcon: '♠️', glowColor: 'rgba(37, 99, 235, 0.6)' },   // Spade
+      red: { color: '#dc2626', centerIcon: '♥️', glowColor: 'rgba(220, 38, 38, 0.6)' }, // Heart
+      brown: { color: '#b45309', centerIcon: '♦️', glowColor: 'rgba(180, 83, 9, 0.6)' }, // Diamond
+      green: { color: '#059669', centerIcon: '♣️', glowColor: 'rgba(5, 150, 105, 0.6)' }, // Club
+      blue: { color: '#2563eb', centerIcon: '♠️', glowColor: 'rgba(37, 99, 235, 0.6)' }, // Spade
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+5' },
@@ -270,10 +270,10 @@ const cardSkins: Record<CardSkinId, CardSkin> = {
     useCenterIcons: true,
     formatValue: (value) => value.toString(), // Keep numbers readable
     suits: {
-      red: { color: '#f43f5e', centerIcon: '🎮', glowColor: 'rgba(244, 63, 94, 0.7)' },    // Gaming
+      red: { color: '#f43f5e', centerIcon: '🎮', glowColor: 'rgba(244, 63, 94, 0.7)' }, // Gaming
       brown: { color: '#f97316', centerIcon: '⚡', glowColor: 'rgba(249, 115, 22, 0.7)' }, // Electric
       green: { color: '#10b981', centerIcon: '🔋', glowColor: 'rgba(16, 185, 129, 0.7)' }, // Battery
-      blue: { color: '#06b6d4', centerIcon: '💠', glowColor: 'rgba(6, 182, 212, 0.7)' },   // Gem
+      blue: { color: '#06b6d4', centerIcon: '💠', glowColor: 'rgba(6, 182, 212, 0.7)' }, // Gem
     },
     specialCards: {
       redBonus: { symbol: '0', label: '+5' },
@@ -307,7 +307,7 @@ export interface CardSkinRequirement {
 
 /** Get card skin requirements for sync with backend */
 export function getCardSkinRequirements(): CardSkinRequirement[] {
-  return cardSkinList.map(skin => ({
+  return cardSkinList.map((skin) => ({
     cardSkinId: skin.id,
     requiredLevel: skin.requiredLevel,
     description: skin.description,
@@ -334,14 +334,14 @@ export interface CardSkinPricingInfo {
  * - Premium skins: purchasable with cosmetic currency
  */
 export const cardSkinPricing: Record<CardSkinId, CardSkinPricingInfo> = {
-  'classic': { price: 0, suggestedLevel: 0 },       // Free
-  'roman': { price: 0, suggestedLevel: 0 },         // Free
-  'elemental': { price: 100, suggestedLevel: 5 },   // Cheap (-35%)
-  'nordic': { price: 195, suggestedLevel: 10 },     // Medium (-35%)
-  'alchemical': { price: 325, suggestedLevel: 15 }, // Medium (-35%)
-  'celestial': { price: 490, suggestedLevel: 20 },  // Premium (-35%)
-  'royal': { price: 650, suggestedLevel: 25 },      // Premium (-35%)
-  'neon': { price: 975, suggestedLevel: 30 },       // Most expensive (-35%)
+  classic: { price: 0, suggestedLevel: 0 }, // Free
+  roman: { price: 0, suggestedLevel: 0 }, // Free
+  elemental: { price: 100, suggestedLevel: 5 }, // Cheap (-35%)
+  nordic: { price: 195, suggestedLevel: 10 }, // Medium (-35%)
+  alchemical: { price: 325, suggestedLevel: 15 }, // Medium (-35%)
+  celestial: { price: 490, suggestedLevel: 20 }, // Premium (-35%)
+  royal: { price: 650, suggestedLevel: 25 }, // Premium (-35%)
+  neon: { price: 975, suggestedLevel: 30 }, // Most expensive (-35%)
 };
 
 /**

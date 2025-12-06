@@ -36,7 +36,7 @@ export const SentMessage: Story = {
 
 export const ReceivedMessage: Story = {
   args: {
-    text: 'I\'m doing great, thanks! How about you?',
+    text: "I'm doing great, thanks! How about you?",
     isSent: false,
     timestamp: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
   },
@@ -44,7 +44,7 @@ export const ReceivedMessage: Story = {
 
 export const SentMessageRead: Story = {
   args: {
-    text: 'That\'s awesome to hear!',
+    text: "That's awesome to hear!",
     isSent: true,
     timestamp: new Date().toISOString(),
     isRead: true,

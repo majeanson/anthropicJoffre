@@ -54,7 +54,7 @@ export function ProfileButton({
   onShowPersonalHub,
   onShowWhyRegister,
   className = '',
-  compact = false
+  compact = false,
 }: ProfileButtonProps) {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const { logout } = useAuth();
@@ -128,7 +128,7 @@ export function ProfileButton({
       <Avatar
         username={user?.username || playerName || 'Guest'}
         avatarUrl={user?.avatar_url}
-        size={compact ? "sm" : "md"}
+        size={compact ? 'sm' : 'md'}
       />
       {!compact && (
         <div className="flex flex-col items-start">
@@ -145,8 +145,18 @@ export function ProfileButton({
               </span>
             )}
             {user && (
-              <svg className="w-4 h-4 text-umber-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <svg
+                className="w-4 h-4 text-umber-600 dark:text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             )}
           </div>
@@ -157,11 +167,7 @@ export function ProfileButton({
 
   // For non-authenticated users, just render the button without dropdown
   if (!user) {
-    return (
-      <div className="relative">
-        {triggerButton}
-      </div>
-    );
+    return <div className="relative">{triggerButton}</div>;
   }
 
   return (

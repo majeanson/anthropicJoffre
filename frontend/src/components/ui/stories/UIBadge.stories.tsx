@@ -43,7 +43,18 @@ how the component looks across all available themes.
     },
     color: {
       control: 'select',
-      options: ['team1', 'team2', 'success', 'warning', 'error', 'info', 'muted', 'accent', 'gray', 'primary'],
+      options: [
+        'team1',
+        'team2',
+        'success',
+        'warning',
+        'error',
+        'info',
+        'muted',
+        'accent',
+        'gray',
+        'primary',
+      ],
       description: 'Color scheme',
     },
     size: {
@@ -466,32 +477,28 @@ export const StatusExamples: Story = {
           <div className="relative">
             <button
               className="px-4 py-2 rounded-lg"
-              style={{ backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)' }}
+              style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                color: 'var(--color-text-primary)',
+              }}
             >
               Messages
             </button>
-            <UIBadge
-              color="error"
-              size="xs"
-              shape="pill"
-              className="absolute -top-2 -right-2"
-            >
+            <UIBadge color="error" size="xs" shape="pill" className="absolute -top-2 -right-2">
               3
             </UIBadge>
           </div>
           <div className="relative">
             <button
               className="px-4 py-2 rounded-lg"
-              style={{ backgroundColor: 'var(--color-bg-tertiary)', color: 'var(--color-text-primary)' }}
+              style={{
+                backgroundColor: 'var(--color-bg-tertiary)',
+                color: 'var(--color-text-primary)',
+              }}
             >
               Notifications
             </button>
-            <UIBadge
-              color="primary"
-              size="xs"
-              shape="pill"
-              className="absolute -top-2 -right-2"
-            >
+            <UIBadge color="primary" size="xs" shape="pill" className="absolute -top-2 -right-2">
               12
             </UIBadge>
           </div>
@@ -516,7 +523,10 @@ export const SkinShowcase: Story = {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+          <h4
+            className="text-sm font-semibold mb-2"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             Solid
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -535,7 +545,10 @@ export const SkinShowcase: Story = {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+          <h4
+            className="text-sm font-semibold mb-2"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             Outline
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -554,7 +567,10 @@ export const SkinShowcase: Story = {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+          <h4
+            className="text-sm font-semibold mb-2"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             Subtle
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -573,7 +589,10 @@ export const SkinShowcase: Story = {
           </div>
         </div>
         <div>
-          <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+          <h4
+            className="text-sm font-semibold mb-2"
+            style={{ color: 'var(--color-text-secondary)' }}
+          >
             Translucent
           </h4>
           <div className="flex flex-wrap gap-2">
@@ -623,7 +642,10 @@ export const RealWorldExamples: Story = {
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-full"
-              style={{ background: 'linear-gradient(135deg, var(--color-team2-primary), var(--color-team1-primary))' }}
+              style={{
+                background:
+                  'linear-gradient(135deg, var(--color-team2-primary), var(--color-team1-primary))',
+              }}
             />
             <div>
               <h4 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
@@ -712,8 +734,7 @@ export const RealWorldExamples: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          'Real-world examples: player cards, game lobbies, and stats dashboards',
+        story: 'Real-world examples: player cards, game lobbies, and stats dashboards',
       },
     },
   },

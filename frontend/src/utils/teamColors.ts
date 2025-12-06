@@ -9,9 +9,7 @@ export type TeamColorVariant = 'light' | 'dark' | 'gradient' | 'text' | 'border'
  * Get team gradient colors (from-to pattern)
  */
 export function getTeamGradient(teamId: TeamId): string {
-  return teamId === 1
-    ? 'from-orange-600 to-orange-700'
-    : 'from-purple-600 to-purple-700';
+  return teamId === 1 ? 'from-orange-600 to-orange-700' : 'from-purple-600 to-purple-700';
 }
 
 /**
@@ -44,9 +42,10 @@ export function getTeamBg(teamId: TeamId, variant: 'light' | 'dark' = 'light'): 
  * Get team border color
  */
 export function getTeamBorder(teamId: TeamId, width: '1' | '2' | '4' = '2'): string {
-  const color = teamId === 1
-    ? 'border-orange-400 dark:border-orange-600'
-    : 'border-purple-400 dark:border-purple-600';
+  const color =
+    teamId === 1
+      ? 'border-orange-400 dark:border-orange-600'
+      : 'border-purple-400 dark:border-purple-600';
   return `border-${width} ${color}`;
 }
 

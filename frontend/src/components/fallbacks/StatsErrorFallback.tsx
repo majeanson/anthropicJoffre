@@ -27,18 +27,10 @@ export function StatsErrorFallback({ onClose }: StatsErrorFallbackProps) {
           Failed to load player statistics. The data may be temporarily unavailable.
         </p>
         <div className="space-y-3">
-          <Button
-            onClick={onClose || (() => window.location.reload())}
-            variant="primary"
-            fullWidth
-          >
+          <Button onClick={onClose || (() => window.location.reload())} variant="primary" fullWidth>
             Close Stats
           </Button>
-          <Button
-            onClick={() => window.location.reload()}
-            variant="secondary"
-            fullWidth
-          >
+          <Button onClick={() => window.location.reload()} variant="secondary" fullWidth>
             Reload Page
           </Button>
         </div>

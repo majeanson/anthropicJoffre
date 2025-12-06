@@ -118,7 +118,7 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
         {stats.allCompleted && (
           <div className="mb-4 bg-green-100 dark:bg-green-900/30 border-2 border-green-500 rounded-lg p-4">
             <p className="text-green-800 dark:text-green-200 font-bold text-center">
-                🎉 Congratulations! You've completed all tutorials!
+              🎉 Congratulations! You've completed all tutorials!
             </p>
           </div>
         )}
@@ -173,13 +173,16 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
                       {TUTORIAL_TITLES[phase]}
                     </h3>
                     <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
-                      {isCompleted ? 'Completed' : 'Not yet seen'} • Tap to {isExpanded ? 'hide' : 'view'}
+                      {isCompleted ? 'Completed' : 'Not yet seen'} • Tap to{' '}
+                      {isExpanded ? 'hide' : 'view'}
                     </p>
                   </div>
 
                   {/* Expand/Collapse Indicator */}
                   <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-500 dark:text-gray-400">
-                    <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
+                    <span
+                      className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                    >
                       ▼
                     </span>
                   </div>
@@ -218,18 +221,10 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
 
         {/* Action Buttons */}
         <div className="flex gap-3">
-          <Button
-            variant="secondary"
-            fullWidth
-            onClick={() => setShowHowToPlay(true)}
-          >
+          <Button variant="secondary" fullWidth onClick={() => setShowHowToPlay(true)}>
             📖 How to Play
           </Button>
-          <Button
-            variant="primary"
-            fullWidth
-            onClick={onClose}
-          >
+          <Button variant="primary" fullWidth onClick={onClose}>
             Close
           </Button>
         </div>

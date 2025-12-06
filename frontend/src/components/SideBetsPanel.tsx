@@ -53,7 +53,11 @@ const RESOLUTION_TIMING_LABELS: Record<string, { label: string; icon: string; co
 };
 
 // Helper to format team prediction relative to viewer
-const formatTeamPrediction = (prediction: string | undefined, viewerTeamId: 1 | 2, isSpectator: boolean = false): string => {
+const formatTeamPrediction = (
+  prediction: string | undefined,
+  viewerTeamId: 1 | 2,
+  isSpectator: boolean = false
+): string => {
   if (!prediction) return '';
   if (prediction === 'true') return 'Yes';
   if (prediction === 'false') return 'No';
@@ -107,7 +111,7 @@ export default function SideBetsPanel({
     if (!socket) return;
 
     const handleBetsList = ({ bets: newBets }: SideBetsListEvent) => {
-      const mappedBets = newBets.map(b => ({
+      const mappedBets = newBets.map((b) => ({
         ...b,
         createdAt: new Date(b.createdAt),
         acceptedAt: b.acceptedAt ? new Date(b.acceptedAt) : undefined,
@@ -115,18 +119,25 @@ export default function SideBetsPanel({
       }));
       setBets(mappedBets);
       // Notify parent of open bets count (bets from others)
-      const openCount = mappedBets.filter(b => b.status === 'open' && b.creatorName !== playerName).length;
+      const openCount = mappedBets.filter(
+        (b) => b.status === 'open' && b.creatorName !== playerName
+      ).length;
       onOpenBetsCountChange?.(openCount);
     };
 
     const handleBetCreated = ({ bet }: SideBetCreatedEvent) => {
-      setBets(prev => {
-        const newBets = [{
-          ...bet,
-          createdAt: new Date(bet.createdAt),
-        }, ...prev];
+      setBets((prev) => {
+        const newBets = [
+          {
+            ...bet,
+            createdAt: new Date(bet.createdAt),
+          },
+          ...prev,
+        ];
         // Update open bets count
-        const openCount = newBets.filter(b => b.status === 'open' && b.creatorName !== playerName).length;
+        const openCount = newBets.filter(
+          (b) => b.status === 'open' && b.creatorName !== playerName
+        ).length;
         onOpenBetsCountChange?.(openCount);
         return newBets;
       });
@@ -136,14 +147,16 @@ export default function SideBetsPanel({
     };
 
     const handleBetAccepted = ({ betId, acceptorName }: SideBetAcceptedEvent) => {
-      setBets(prev => {
-        const newBets = prev.map(b =>
+      setBets((prev) => {
+        const newBets = prev.map((b) =>
           b.id === betId
             ? { ...b, acceptorName, status: 'active' as const, acceptedAt: new Date() }
             : b
         );
         // Update open bets count
-        const openCount = newBets.filter(b => b.status === 'open' && b.creatorName !== playerName).length;
+        const openCount = newBets.filter(
+          (b) => b.status === 'open' && b.creatorName !== playerName
+        ).length;
         onOpenBetsCountChange?.(openCount);
         return newBets;
       });
@@ -159,11 +172,9 @@ export default function SideBetsPanel({
       winnerStreak,
       streakMultiplier,
     }: SideBetResolvedEvent) => {
-      setBets(prev =>
-        prev.map(b =>
-          b.id === betId
-            ? { ...b, status: 'resolved' as const, resolvedAt: new Date() }
-            : b
+      setBets((prev) =>
+        prev.map((b) =>
+          b.id === betId ? { ...b, status: 'resolved' as const, resolvedAt: new Date() } : b
         )
       );
       const isWinner = winnerName === playerName;
@@ -199,35 +210,39 @@ export default function SideBetsPanel({
     };
 
     const handleBetCancelled = ({ betId }: SideBetCancelledEvent) => {
-      setBets(prev => {
-        const newBets = prev.map(b =>
+      setBets((prev) => {
+        const newBets = prev.map((b) =>
           b.id === betId ? { ...b, status: 'cancelled' as const } : b
         );
         // Update open bets count
-        const openCount = newBets.filter(b => b.status === 'open' && b.creatorName !== playerName).length;
+        const openCount = newBets.filter(
+          (b) => b.status === 'open' && b.creatorName !== playerName
+        ).length;
         onOpenBetsCountChange?.(openCount);
         return newBets;
       });
     };
 
     const handleBetDisputed = ({ betId, refundAmount }: SideBetDisputedEvent) => {
-      setBets(prev =>
-        prev.map(b =>
-          b.id === betId ? { ...b, status: 'disputed' as const } : b
-        )
+      setBets((prev) =>
+        prev.map((b) => (b.id === betId ? { ...b, status: 'disputed' as const } : b))
       );
       showNotification(`Bet disputed - ${refundAmount} coins refunded to both`, 'info');
     };
 
     const handleWinClaimed = ({ betId, claimedBy, bet }: SideBetWinClaimedEvent) => {
       // Update the bet status
-      setBets(prev =>
-        prev.map(b =>
-          b.id === betId ? { ...b, status: 'pending_resolution' as const, claimedWinner: claimedBy } : b
+      setBets((prev) =>
+        prev.map((b) =>
+          b.id === betId
+            ? { ...b, status: 'pending_resolution' as const, claimedWinner: claimedBy }
+            : b
         )
       );
       // Notify the other party
-      const isOtherParty = (bet.creatorName === playerName || bet.acceptorName === playerName) && claimedBy !== playerName;
+      const isOtherParty =
+        (bet.creatorName === playerName || bet.acceptorName === playerName) &&
+        claimedBy !== playerName;
       if (isOtherParty) {
         showNotification(`${claimedBy} claims they won! Please confirm or dispute.`, 'info');
         sounds.chatNotification();
@@ -275,36 +290,53 @@ export default function SideBetsPanel({
     setTimeout(() => setNotification(null), 3000);
   }, []);
 
-  const handleAcceptBet = useCallback((betId: number) => {
-    if (!socket) return;
-    socket.emit('accept_side_bet', { gameId, betId });
-  }, [socket, gameId]);
+  const handleAcceptBet = useCallback(
+    (betId: number) => {
+      if (!socket) return;
+      socket.emit('accept_side_bet', { gameId, betId });
+    },
+    [socket, gameId]
+  );
 
-  const handleCancelBet = useCallback((betId: number) => {
-    if (!socket) return;
-    socket.emit('cancel_side_bet', { gameId, betId });
-  }, [socket, gameId]);
+  const handleCancelBet = useCallback(
+    (betId: number) => {
+      if (!socket) return;
+      socket.emit('cancel_side_bet', { gameId, betId });
+    },
+    [socket, gameId]
+  );
 
-  const handleClaimWin = useCallback((betId: number) => {
-    if (!socket) return;
-    socket.emit('claim_bet_win', { gameId, betId });
-  }, [socket, gameId]);
+  const handleClaimWin = useCallback(
+    (betId: number) => {
+      if (!socket) return;
+      socket.emit('claim_bet_win', { gameId, betId });
+    },
+    [socket, gameId]
+  );
 
-  const handleConfirmResolution = useCallback((betId: number, confirmed: boolean) => {
-    if (!socket) return;
-    socket.emit('confirm_bet_resolution', { gameId, betId, confirmed });
-  }, [socket, gameId]);
+  const handleConfirmResolution = useCallback(
+    (betId: number, confirmed: boolean) => {
+      if (!socket) return;
+      socket.emit('confirm_bet_resolution', { gameId, betId, confirmed });
+    },
+    [socket, gameId]
+  );
 
-  const handleDisputeBet = useCallback((betId: number) => {
-    if (!socket) return;
-    socket.emit('dispute_bet', { gameId, betId });
-  }, [socket, gameId]);
+  const handleDisputeBet = useCallback(
+    (betId: number) => {
+      if (!socket) return;
+      socket.emit('dispute_bet', { gameId, betId });
+    },
+    [socket, gameId]
+  );
 
   // Filter bets by status
-  const openBets = bets.filter(b => b.status === 'open' && b.creatorName !== playerName);
-  const myOpenBets = bets.filter(b => b.status === 'open' && b.creatorName === playerName);
-  const activeBets = bets.filter(b => b.status === 'active' || b.status === 'pending_resolution');
-  const resolvedBets = bets.filter(b => b.status === 'resolved' || b.status === 'disputed' || b.status === 'cancelled');
+  const openBets = bets.filter((b) => b.status === 'open' && b.creatorName !== playerName);
+  const myOpenBets = bets.filter((b) => b.status === 'open' && b.creatorName === playerName);
+  const activeBets = bets.filter((b) => b.status === 'active' || b.status === 'pending_resolution');
+  const resolvedBets = bets.filter(
+    (b) => b.status === 'resolved' || b.status === 'disputed' || b.status === 'cancelled'
+  );
 
   // Get bet description with context
   const getBetDescription = (bet: SideBet): string => {
@@ -345,7 +377,6 @@ export default function SideBetsPanel({
     handleDisputeBet(resolutionPrompt.bet.id);
     setResolutionPrompt(null);
   }, [resolutionPrompt, handleDisputeBet]);
-
 
   return (
     <>
@@ -409,8 +440,8 @@ export default function SideBetsPanel({
                 notification.type === 'success'
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                   : notification.type === 'error'
-                  ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                  : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    : 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
               }`}
             >
               {notification.message}
@@ -420,200 +451,214 @@ export default function SideBetsPanel({
           {/* Active Tab Content */}
           {activeTab === 'active' && (
             <>
-          {/* Open bets to accept */}
-          {openBets.length > 0 && (
-            <section>
-              <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-                Open Bets ({openBets.length})
-              </h3>
-              <div className="space-y-2">
-                {openBets.map(bet => (
-                  <div
-                    key={bet.id}
-                    className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border-default)]"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs text-[var(--color-text-secondary)]">
-                        {bet.creatorName}
-                      </span>
-                      <span className="text-yellow-500 font-medium">
-                        🪙 {bet.amount}
-                      </span>
-                    </div>
-                    <p className="text-sm text-[var(--color-text-primary)] mb-1">
-                      {getBetDescription(bet)}
-                    </p>
-                    {bet.prediction && (
-                      <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-                        {bet.creatorName} bets: <span className="text-[var(--color-text-primary)] font-medium">{formatTeamPrediction(bet.prediction, playerTeamId, isSpectator)}</span>
-                      </p>
-                    )}
-                    <button
-                      onClick={() => handleAcceptBet(bet.id)}
-                      disabled={balance < bet.amount}
-                      className="w-full py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
-                    >
-                      {balance < bet.amount ? 'Not enough coins' : 'Accept Bet (opposite side)'}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* My open bets */}
-          {myOpenBets.length > 0 && (
-            <section>
-              <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-                Your Open Bets ({myOpenBets.length})
-              </h3>
-              <div className="space-y-2">
-                {myOpenBets.map(bet => (
-                  <div
-                    key={bet.id}
-                    className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-yellow-500/30"
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <span className="text-xs text-yellow-500">
-                        Waiting for opponent...
-                      </span>
-                      <span className="text-yellow-500 font-medium">
-                        🪙 {bet.amount}
-                      </span>
-                    </div>
-                    <p className="text-sm text-[var(--color-text-primary)] mb-1">
-                      {getBetDescription(bet)}
-                    </p>
-                    {bet.prediction && (
-                      <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-                        Your bet: <span className="text-yellow-400 font-medium">{formatTeamPrediction(bet.prediction, playerTeamId, isSpectator)}</span>
-                      </p>
-                    )}
-                    <button
-                      onClick={() => handleCancelBet(bet.id)}
-                      className="w-full py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 text-sm rounded border border-red-500/30 transition-colors"
-                    >
-                      Cancel Bet
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Active bets */}
-          {activeBets.length > 0 && (
-            <section>
-              <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
-                Active Bets ({activeBets.length})
-              </h3>
-              <div className="space-y-2">
-                {activeBets.map(bet => {
-                  const isParticipant =
-                    bet.creatorName === playerName || bet.acceptorName === playerName;
-                  const isCustom = bet.betType === 'custom';
-                  const isCreator = bet.creatorName === playerName;
-                  const creatorPrediction = formatTeamPrediction(bet.prediction, playerTeamId, isSpectator);
-
-                  return (
-                    <div
-                      key={bet.id}
-                      className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-green-500/30"
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <span className="text-xs text-green-400">
-                          {bet.creatorName} vs {bet.acceptorName}
-                        </span>
-                        <span className="text-yellow-500 font-medium">
-                          🪙 {bet.amount * 2}
-                        </span>
-                      </div>
-                      <p className="text-sm text-[var(--color-text-primary)] mb-1">
-                        {getBetDescription(bet)}
-                      </p>
-                      {/* Resolution timing badge for custom bets */}
-                      {getResolutionTimingBadge(bet) && (
-                        <div className="mb-2">
-                          {getResolutionTimingBadge(bet)}
+              {/* Open bets to accept */}
+              {openBets.length > 0 && (
+                <section>
+                  <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+                    Open Bets ({openBets.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {openBets.map((bet) => (
+                      <div
+                        key={bet.id}
+                        className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-[var(--color-border-default)]"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-xs text-[var(--color-text-secondary)]">
+                            {bet.creatorName}
+                          </span>
+                          <span className="text-yellow-500 font-medium">🪙 {bet.amount}</span>
                         </div>
-                      )}
-                      {bet.prediction && isParticipant && (
-                        <p className="text-xs text-[var(--color-text-secondary)] mb-2">
-                          {isCreator ? (
-                            <>You bet: <span className="text-green-400 font-medium">{creatorPrediction}</span></>
-                          ) : (
-                            <>You bet against: <span className="text-purple-400 font-medium">{creatorPrediction}</span></>
-                          )}
+                        <p className="text-sm text-[var(--color-text-primary)] mb-1">
+                          {getBetDescription(bet)}
                         </p>
-                      )}
+                        {bet.prediction && (
+                          <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                            {bet.creatorName} bets:{' '}
+                            <span className="text-[var(--color-text-primary)] font-medium">
+                              {formatTeamPrediction(bet.prediction, playerTeamId, isSpectator)}
+                            </span>
+                          </p>
+                        )}
+                        <button
+                          onClick={() => handleAcceptBet(bet.id)}
+                          disabled={balance < bet.amount}
+                          className="w-full py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
+                        >
+                          {balance < bet.amount ? 'Not enough coins' : 'Accept Bet (opposite side)'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
-                      {/* Manual resolution for custom bets */}
-                      {isCustom && isParticipant && bet.status === 'active' && (
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            onClick={() => handleClaimWin(bet.id)}
-                            className="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white text-xs rounded transition-colors"
-                          >
-                            Claim Win
-                          </button>
-                          <button
-                            onClick={() => handleDisputeBet(bet.id)}
-                            className="flex-1 py-2 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition-colors"
-                          >
-                            Dispute
-                          </button>
+              {/* My open bets */}
+              {myOpenBets.length > 0 && (
+                <section>
+                  <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+                    Your Open Bets ({myOpenBets.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {myOpenBets.map((bet) => (
+                      <div
+                        key={bet.id}
+                        className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-yellow-500/30"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="text-xs text-yellow-500">Waiting for opponent...</span>
+                          <span className="text-yellow-500 font-medium">🪙 {bet.amount}</span>
                         </div>
-                      )}
+                        <p className="text-sm text-[var(--color-text-primary)] mb-1">
+                          {getBetDescription(bet)}
+                        </p>
+                        {bet.prediction && (
+                          <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                            Your bet:{' '}
+                            <span className="text-yellow-400 font-medium">
+                              {formatTeamPrediction(bet.prediction, playerTeamId, isSpectator)}
+                            </span>
+                          </p>
+                        )}
+                        <button
+                          onClick={() => handleCancelBet(bet.id)}
+                          className="w-full py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 text-sm rounded border border-red-500/30 transition-colors"
+                        >
+                          Cancel Bet
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
-                      {/* Pending resolution - waiting for confirmation */}
-                      {isCustom && bet.status === 'pending_resolution' && (
-                        <div className="mt-2">
-                          {bet.claimedWinner === playerName ? (
-                            <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
-                              Waiting for {bet.claimedWinner === bet.creatorName ? bet.acceptorName : bet.creatorName} to confirm...
+              {/* Active bets */}
+              {activeBets.length > 0 && (
+                <section>
+                  <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
+                    Active Bets ({activeBets.length})
+                  </h3>
+                  <div className="space-y-2">
+                    {activeBets.map((bet) => {
+                      const isParticipant =
+                        bet.creatorName === playerName || bet.acceptorName === playerName;
+                      const isCustom = bet.betType === 'custom';
+                      const isCreator = bet.creatorName === playerName;
+                      const creatorPrediction = formatTeamPrediction(
+                        bet.prediction,
+                        playerTeamId,
+                        isSpectator
+                      );
+
+                      return (
+                        <div
+                          key={bet.id}
+                          className="p-3 bg-[var(--color-bg-tertiary)] rounded-lg border border-green-500/30"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <span className="text-xs text-green-400">
+                              {bet.creatorName} vs {bet.acceptorName}
+                            </span>
+                            <span className="text-yellow-500 font-medium">🪙 {bet.amount * 2}</span>
+                          </div>
+                          <p className="text-sm text-[var(--color-text-primary)] mb-1">
+                            {getBetDescription(bet)}
+                          </p>
+                          {/* Resolution timing badge for custom bets */}
+                          {getResolutionTimingBadge(bet) && (
+                            <div className="mb-2">{getResolutionTimingBadge(bet)}</div>
+                          )}
+                          {bet.prediction && isParticipant && (
+                            <p className="text-xs text-[var(--color-text-secondary)] mb-2">
+                              {isCreator ? (
+                                <>
+                                  You bet:{' '}
+                                  <span className="text-green-400 font-medium">
+                                    {creatorPrediction}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  You bet against:{' '}
+                                  <span className="text-purple-400 font-medium">
+                                    {creatorPrediction}
+                                  </span>
+                                </>
+                              )}
+                            </p>
+                          )}
+
+                          {/* Manual resolution for custom bets */}
+                          {isCustom && isParticipant && bet.status === 'active' && (
+                            <div className="flex gap-2 mt-2">
+                              <button
+                                onClick={() => handleClaimWin(bet.id)}
+                                className="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white text-xs rounded transition-colors"
+                              >
+                                Claim Win
+                              </button>
+                              <button
+                                onClick={() => handleDisputeBet(bet.id)}
+                                className="flex-1 py-2 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition-colors"
+                              >
+                                Dispute
+                              </button>
                             </div>
-                          ) : isParticipant ? (
-                            <div className="space-y-2">
-                              <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
-                                {bet.claimedWinner} claims they won!
-                              </div>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleConfirmResolution(bet.id, true)}
-                                  className="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white text-xs rounded transition-colors"
-                                >
-                                  Confirm
-                                </button>
-                                <button
-                                  onClick={() => handleConfirmResolution(bet.id, false)}
-                                  className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs rounded transition-colors"
-                                >
-                                  Dispute
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
-                              {bet.claimedWinner} claims win - awaiting confirmation
+                          )}
+
+                          {/* Pending resolution - waiting for confirmation */}
+                          {isCustom && bet.status === 'pending_resolution' && (
+                            <div className="mt-2">
+                              {bet.claimedWinner === playerName ? (
+                                <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
+                                  Waiting for{' '}
+                                  {bet.claimedWinner === bet.creatorName
+                                    ? bet.acceptorName
+                                    : bet.creatorName}{' '}
+                                  to confirm...
+                                </div>
+                              ) : isParticipant ? (
+                                <div className="space-y-2">
+                                  <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
+                                    {bet.claimedWinner} claims they won!
+                                  </div>
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleConfirmResolution(bet.id, true)}
+                                      className="flex-1 py-2 bg-green-600 hover:bg-green-500 text-white text-xs rounded transition-colors"
+                                    >
+                                      Confirm
+                                    </button>
+                                    <button
+                                      onClick={() => handleConfirmResolution(bet.id, false)}
+                                      className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white text-xs rounded transition-colors"
+                                    >
+                                      Dispute
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="text-xs text-yellow-400 bg-yellow-500/10 px-2 py-1 rounded">
+                                  {bet.claimedWinner} claims win - awaiting confirmation
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          )}
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
 
-          {/* Empty state for active tab */}
-          {openBets.length === 0 && myOpenBets.length === 0 && activeBets.length === 0 && (
-            <div className="text-center py-8 text-[var(--color-text-secondary)]">
-              <span className="text-4xl mb-2 block">🎲</span>
-              <p className="text-sm">No active bets</p>
-              <p className="text-xs mt-1">Create a bet to get started!</p>
-            </div>
-          )}
+              {/* Empty state for active tab */}
+              {openBets.length === 0 && myOpenBets.length === 0 && activeBets.length === 0 && (
+                <div className="text-center py-8 text-[var(--color-text-secondary)]">
+                  <span className="text-4xl mb-2 block">🎲</span>
+                  <p className="text-sm">No active bets</p>
+                  <p className="text-xs mt-1">Create a bet to get started!</p>
+                </div>
+              )}
             </>
           )}
 
@@ -622,14 +667,17 @@ export default function SideBetsPanel({
             <>
               {resolvedBets.length > 0 ? (
                 <div className="space-y-2">
-                  {resolvedBets.map(bet => {
-                    const isWinner = bet.status === 'resolved' &&
+                  {resolvedBets.map((bet) => {
+                    const isWinner =
+                      bet.status === 'resolved' &&
                       ((bet.result === true && bet.creatorName === playerName) ||
-                       (bet.result === false && bet.acceptorName === playerName));
-                    const isLoser = bet.status === 'resolved' &&
+                        (bet.result === false && bet.acceptorName === playerName));
+                    const isLoser =
+                      bet.status === 'resolved' &&
                       ((bet.result === true && bet.acceptorName === playerName) ||
-                       (bet.result === false && bet.creatorName === playerName));
-                    const wasParticipant = bet.creatorName === playerName || bet.acceptorName === playerName;
+                        (bet.result === false && bet.creatorName === playerName));
+                    const wasParticipant =
+                      bet.creatorName === playerName || bet.acceptorName === playerName;
 
                     return (
                       <div
@@ -638,12 +686,12 @@ export default function SideBetsPanel({
                           isWinner
                             ? 'border-green-500/50'
                             : isLoser
-                            ? 'border-red-500/50'
-                            : bet.status === 'disputed'
-                            ? 'border-gray-500/50'
-                            : bet.status === 'cancelled'
-                            ? 'border-yellow-500/30'
-                            : 'border-[var(--color-border-default)]'
+                              ? 'border-red-500/50'
+                              : bet.status === 'disputed'
+                                ? 'border-gray-500/50'
+                                : bet.status === 'cancelled'
+                                  ? 'border-yellow-500/30'
+                                  : 'border-[var(--color-border-default)]'
                         }`}
                       >
                         <div className="flex justify-between items-start mb-1">
@@ -663,23 +711,23 @@ export default function SideBetsPanel({
                               bet.status === 'disputed'
                                 ? 'text-gray-400'
                                 : bet.status === 'cancelled'
-                                ? 'text-yellow-400'
-                                : isWinner
-                                ? 'text-green-400'
-                                : isLoser
-                                ? 'text-red-400'
-                                : 'text-blue-400'
+                                  ? 'text-yellow-400'
+                                  : isWinner
+                                    ? 'text-green-400'
+                                    : isLoser
+                                      ? 'text-red-400'
+                                      : 'text-blue-400'
                             }`}
                           >
                             {bet.status === 'disputed'
                               ? 'Disputed (Refunded)'
                               : bet.status === 'cancelled'
-                              ? 'Cancelled'
-                              : wasParticipant
-                              ? isWinner
-                                ? `+${bet.amount * 2} (Won)`
-                                : `-${bet.amount} (Lost)`
-                              : 'Resolved'}
+                                ? 'Cancelled'
+                                : wasParticipant
+                                  ? isWinner
+                                    ? `+${bet.amount * 2} (Won)`
+                                    : `-${bet.amount} (Lost)`
+                                  : 'Resolved'}
                           </span>
                         </div>
                         {bet.resolvedAt && (
@@ -730,10 +778,7 @@ export default function SideBetsPanel({
       {/* Resolution Prompt Modal - appears when timing triggers */}
       {resolutionPrompt && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/60"
-            onClick={() => setResolutionPrompt(null)}
-          />
+          <div className="absolute inset-0 bg-black/60" onClick={() => setResolutionPrompt(null)} />
           <div
             className="relative bg-[var(--color-bg-secondary)] rounded-xl border-2 border-yellow-500/50 shadow-2xl max-w-md w-full p-6 animate-pulse-once"
             onClick={(e) => e.stopPropagation()}
@@ -743,9 +788,7 @@ export default function SideBetsPanel({
               <h3 className="text-lg font-bold text-[var(--color-text-primary)] mt-2">
                 Time to Resolve Your Bet!
               </h3>
-              <p className="text-sm text-yellow-500 mt-1">
-                {resolutionPrompt.message}
-              </p>
+              <p className="text-sm text-yellow-500 mt-1">{resolutionPrompt.message}</p>
             </div>
 
             <div className="bg-[var(--color-bg-tertiary)] rounded-lg p-4 mb-4">
@@ -795,12 +838,7 @@ export default function SideBetsPanel({
       )}
 
       {/* Overlay when panel is open - reduced opacity */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40"
-          onClick={onClose}
-        />
-      )}
+      {isOpen && <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />}
     </>
   );
 }

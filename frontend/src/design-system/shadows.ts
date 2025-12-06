@@ -37,13 +37,22 @@ export const shadows = {
 } as const;
 
 // Shadow sizes that return string values
-type ShadowSize = 'none' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'inner' | 'card' | 'modal' | 'button' | 'dropdown' | 'tooltip';
+type ShadowSize =
+  | 'none'
+  | 'sm'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | '2xl'
+  | 'inner'
+  | 'card'
+  | 'modal'
+  | 'button'
+  | 'dropdown'
+  | 'tooltip';
 
 // Helper function to get shadow class
-export function getShadow(
-  size: ShadowSize,
-  hover = false
-): string {
+export function getShadow(size: ShadowSize, hover = false): string {
   const baseShadow = shadows[size] as string;
 
   if (hover) {

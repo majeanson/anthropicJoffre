@@ -62,29 +62,38 @@ const labelSizeClasses: Record<SelectSize, string> = {
   lg: 'text-base mb-2',
 };
 
-export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select({
-  variant = 'default',
-  size = 'md',
-  label,
-  helperText,
-  error,
-  options,
-  placeholder,
-  leftIcon,
-  fullWidth = false,
-  className = '',
-  containerClassName = '',
-  disabled,
-  id,
-  ...props
-}, ref) {
+export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
+  {
+    variant = 'default',
+    size = 'md',
+    label,
+    helperText,
+    error,
+    options,
+    placeholder,
+    leftIcon,
+    fullWidth = false,
+    className = '',
+    containerClassName = '',
+    disabled,
+    id,
+    ...props
+  },
+  ref
+) {
   const [isFocused, setIsFocused] = useState(false);
 
   // Generate unique ID if not provided
   const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
   // Icon padding
-  const leftPaddingClass = leftIcon ? (size === 'sm' ? 'pl-8' : size === 'lg' ? 'pl-12' : 'pl-10') : '';
+  const leftPaddingClass = leftIcon
+    ? size === 'sm'
+      ? 'pl-8'
+      : size === 'lg'
+        ? 'pl-12'
+        : 'pl-10'
+    : '';
 
   // Variant-specific classes
   const getVariantClasses = () => {
@@ -100,41 +109,41 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
         return `
           ${baseClasses}
           bg-[var(--color-bg-tertiary)]
-          ${error
-            ? 'border-[var(--color-error)]'
-            : 'border-transparent'
-          }
+          ${error ? 'border-[var(--color-error)]' : 'border-transparent'}
         `;
       case 'arcane':
         return `
           ${baseClasses}
           bg-[var(--color-bg-primary)]
-          ${error
-            ? 'border-[var(--color-error)]'
-            : isFocused
-              ? 'border-[var(--color-text-accent)]'
-              : 'border-[var(--color-border-default)]'
+          ${
+            error
+              ? 'border-[var(--color-error)]'
+              : isFocused
+                ? 'border-[var(--color-text-accent)]'
+                : 'border-[var(--color-border-default)]'
           }
         `;
       case 'outlined':
         return `
           ${baseClasses}
           bg-transparent
-          ${error
-            ? 'border-[var(--color-error)]'
-            : isFocused
-              ? 'border-[var(--color-text-accent)]'
-              : 'border-[var(--color-border-default)]'
+          ${
+            error
+              ? 'border-[var(--color-error)]'
+              : isFocused
+                ? 'border-[var(--color-text-accent)]'
+                : 'border-[var(--color-border-default)]'
           }
         `;
       default:
         return `
           ${baseClasses}
-          ${error
-            ? 'border-[var(--color-error)]'
-            : isFocused
-              ? 'border-[var(--color-text-accent)]'
-              : 'border-[var(--color-border-default)]'
+          ${
+            error
+              ? 'border-[var(--color-error)]'
+              : isFocused
+                ? 'border-[var(--color-text-accent)]'
+                : 'border-[var(--color-border-default)]'
           }
         `;
     }
@@ -232,9 +241,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
             ${className}
           `}
           style={{
-            boxShadow: isFocused && variant === 'arcane'
-              ? '0 0 20px color-mix(in srgb, var(--color-text-accent) 20%, transparent)'
-              : 'var(--shadow-sm)',
+            boxShadow:
+              isFocused && variant === 'arcane'
+                ? '0 0 20px color-mix(in srgb, var(--color-text-accent) 20%, transparent)'
+                : 'var(--shadow-sm)',
           }}
           {...props}
         >
@@ -298,13 +308,13 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
 export interface PresetSelectProps extends Omit<SelectProps, 'variant'> {}
 
 /** Arcane select with corner accents */
-export const ArcaneSelect = forwardRef<HTMLSelectElement, PresetSelectProps>(
-  (props, ref) => <Select ref={ref} variant="arcane" {...props} />
-);
+export const ArcaneSelect = forwardRef<HTMLSelectElement, PresetSelectProps>((props, ref) => (
+  <Select ref={ref} variant="arcane" {...props} />
+));
 
 /** Filled select with subtle background */
-export const FilledSelect = forwardRef<HTMLSelectElement, PresetSelectProps>(
-  (props, ref) => <Select ref={ref} variant="filled" {...props} />
-);
+export const FilledSelect = forwardRef<HTMLSelectElement, PresetSelectProps>((props, ref) => (
+  <Select ref={ref} variant="filled" {...props} />
+));
 
 export default Select;

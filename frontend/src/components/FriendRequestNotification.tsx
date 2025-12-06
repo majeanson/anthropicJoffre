@@ -19,7 +19,7 @@ interface FriendRequestNotificationProps {
 export default function FriendRequestNotificationComponent({
   notification,
   onClose,
-  onView
+  onView,
 }: FriendRequestNotificationProps) {
   // Early return BEFORE hooks
   if (!notification) return null;
@@ -37,11 +37,14 @@ export default function FriendRequestNotificationComponent({
     <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
       <UICard variant="gradient" gradient="team2" size="md" className="w-80 border-2">
         <div className="flex items-start gap-3">
-          <span className="text-3xl" aria-hidden="true">👥</span>
+          <span className="text-3xl" aria-hidden="true">
+            👥
+          </span>
           <div className="flex-1">
             <h3 className="text-purple-900 dark:text-white font-bold text-lg">Friend Request</h3>
             <p className="text-purple-800 dark:text-white/90 text-sm mt-1">
-              <span className="font-semibold">{notification.from_player}</span> sent you a friend request
+              <span className="font-semibold">{notification.from_player}</span> sent you a friend
+              request
             </p>
             <div className="flex gap-2 mt-3">
               <Button

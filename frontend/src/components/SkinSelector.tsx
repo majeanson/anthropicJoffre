@@ -38,19 +38,20 @@ function SkinCard({ skin, isSelected, isLocked, requiredLevel, onSelect }: SkinC
         w-full
         p-4
         rounded-[var(--radius-lg)]
-        border-[var(--button-border-width)]
-        transition-all duration-[var(--duration-normal)]
+        border-2
+        transition-all
         text-left
-        ${isLocked
-          ? 'opacity-60 cursor-not-allowed border-[var(--color-border-default)]'
-          : isSelected
-            ? 'border-[var(--color-text-accent)] shadow-[0_0_20px_var(--color-glow)]'
-            : 'border-[var(--color-border-default)] hover:border-[var(--color-border-accent)] hover:scale-[1.02]'
+        ${
+          isLocked
+            ? 'opacity-60 cursor-not-allowed border-skin-default'
+            : isSelected
+              ? 'border-skin-text-accent shadow-[0_0_20px_var(--color-glow)]'
+              : 'border-skin-default hover:border-skin-accent hover:scale-[1.02]'
         }
-        bg-[var(--color-bg-secondary)]
+        bg-skin-secondary
         focus-visible:outline-none
-        focus-visible:ring-[var(--input-focus-ring-width)]
-        focus-visible:ring-[var(--color-text-accent)]
+        focus-visible:ring-3
+        focus-visible:ring-skin-text-accent
       `}
     >
       {/* Lock overlay */}
@@ -72,27 +73,25 @@ function SkinCard({ skin, isSelected, isLocked, requiredLevel, onSelect }: SkinC
       {/* Skin info */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm">
+          <h3 className="font-display text-skin-primary uppercase tracking-wider text-sm">
             {skin.name}
           </h3>
           {skin.isDark ? (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-skin-tertiary text-skin-text-secondary">
               Dark
             </span>
           ) : (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-[var(--color-text-secondary)]">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-skin-text-secondary">
               Light
             </span>
           )}
         </div>
-        <p className="text-xs text-[var(--color-text-muted)] font-body line-clamp-2">
-          {skin.description}
-        </p>
+        <p className="text-xs text-skin-text-muted font-body line-clamp-2">{skin.description}</p>
       </div>
 
       {/* Selected indicator */}
       {isSelected && !isLocked && (
-        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-success)] flex items-center justify-center">
+        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-skin-status-success flex items-center justify-center">
           <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
@@ -125,7 +124,7 @@ export function SkinSelectorGrid({
 
   const handleSelect = (id: SkinId) => {
     setSkin(id);
-    const selectedSkin = availableSkins.find(s => s.id === id);
+    const selectedSkin = availableSkins.find((s) => s.id === id);
     if (selectedSkin && onSkinChange) {
       onSkinChange(selectedSkin);
     }
@@ -170,7 +169,7 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
     if (!isSkinUnlocked(id)) return; // Don't allow locked skins
     setSkin(id);
     setIsOpen(false);
-    const selectedSkin = availableSkins.find(s => s.id === id);
+    const selectedSkin = availableSkins.find((s) => s.id === id);
     if (selectedSkin && onSkinChange) {
       onSkinChange(selectedSkin);
     }
@@ -185,11 +184,11 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
           flex items-center gap-3
           px-4 py-3
           rounded-[var(--radius-lg)]
-          border-[var(--input-border-width)]
-          border-[var(--color-border-default)]
-          bg-[var(--color-bg-secondary)]
-          hover:border-[var(--color-border-accent)]
-          transition-all duration-[var(--duration-fast)]
+          border-2
+          border-skin-default
+          bg-skin-secondary
+          hover:border-skin-accent
+          transition-all
           w-full
           text-left
         `}
@@ -200,12 +199,12 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
           style={{ background: skin.preview }}
         />
         <div className="flex-1 min-w-0">
-          <div className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm">
+          <div className="font-display text-skin-primary uppercase tracking-wider text-sm">
             {skin.name}
           </div>
         </div>
         <svg
-          className={`w-5 h-5 text-[var(--color-text-muted)] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-skin-text-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -218,24 +217,23 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
           {/* Menu */}
-          <div className={`
+          <div
+            className={`
             absolute top-full left-0 right-0
             mt-2
             rounded-[var(--radius-lg)]
-            border-[var(--input-border-width)]
-            border-[var(--color-border-accent)]
-            bg-[var(--color-bg-secondary)]
-            shadow-[var(--shadow-lg)]
+            border-2
+            border-skin-accent
+            bg-skin-secondary
+            shadow-lg
             z-50
             overflow-hidden
             animate-slideUp
-          `}>
+          `}
+          >
             {availableSkins.map((s) => {
               const isLocked = !isSkinUnlocked(s.id);
               const requiredLevel = getRequiredLevel(s.id);
@@ -250,12 +248,13 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
                     w-full
                     px-4 py-3
                     text-left
-                    transition-colors duration-[var(--duration-fast)]
-                    ${isLocked
-                      ? 'opacity-50 cursor-not-allowed'
-                      : s.id === skinId
-                        ? 'bg-[var(--color-bg-tertiary)]'
-                        : 'hover:bg-[var(--color-bg-tertiary)]'
+                    transition-colors
+                    ${
+                      isLocked
+                        ? 'opacity-50 cursor-not-allowed'
+                        : s.id === skinId
+                          ? 'bg-skin-tertiary'
+                          : 'hover:bg-skin-tertiary'
                     }
                   `}
                 >
@@ -271,20 +270,34 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
                     )}
                   </div>
                   <div className="flex-1">
-                    <div className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm">
+                    <div className="font-display text-skin-primary uppercase tracking-wider text-sm">
                       {s.name}
                     </div>
-                    <div className="text-xs text-[var(--color-text-muted)] font-body">
-                      {isLocked ? `Level ${requiredLevel} required` : s.isDark ? 'Dark theme' : 'Light theme'}
+                    <div className="text-xs text-skin-text-muted font-body">
+                      {isLocked
+                        ? `Level ${requiredLevel} required`
+                        : s.isDark
+                          ? 'Dark theme'
+                          : 'Light theme'}
                     </div>
                   </div>
                   {s.id === skinId && !isLocked && (
-                    <svg className="w-5 h-5 text-[var(--color-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-skin-status-success"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   )}
                   {isLocked && (
-                    <span className="text-xs text-[var(--color-text-muted)]">Lvl {requiredLevel}</span>
+                    <span className="text-xs text-skin-text-muted">Lvl {requiredLevel}</span>
                   )}
                 </button>
               );
@@ -325,8 +338,9 @@ export function SkinSelectorModal({ isOpen, onClose, onSkinChange }: SkinSelecto
       }
     >
       <div className="space-y-4">
-        <p className="text-[var(--color-text-secondary)] font-body">
-          Customize the look and feel of your game experience. Each skin offers a unique visual style with its own colors, effects, and atmosphere.
+        <p className="text-skin-text-secondary font-body">
+          Customize the look and feel of your game experience. Each skin offers a unique visual
+          style with its own colors, effects, and atmosphere.
         </p>
 
         <SkinSelectorGrid
@@ -337,19 +351,17 @@ export function SkinSelectorModal({ isOpen, onClose, onSkinChange }: SkinSelecto
         />
 
         {/* Current skin info */}
-        <div className="mt-6 p-4 rounded-[var(--radius-lg)] bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)]">
+        <div className="mt-6 p-4 rounded-[var(--radius-lg)] bg-skin-tertiary border border-skin-border-subtle">
           <div className="flex items-center gap-3">
             <div
               className="w-12 h-12 rounded-[var(--radius-md)]"
               style={{ background: skin.preview }}
             />
             <div>
-              <div className="font-display text-[var(--color-text-primary)] uppercase tracking-wider">
+              <div className="font-display text-skin-primary uppercase tracking-wider">
                 Currently Active: {skin.name}
               </div>
-              <div className="text-sm text-[var(--color-text-muted)] font-body">
-                {skin.description}
-              </div>
+              <div className="text-sm text-skin-text-muted font-body">{skin.description}</div>
             </div>
           </div>
         </div>
@@ -379,30 +391,24 @@ export function QuickSkinToggle({ showLabel = false }: QuickSkinToggleProps) {
           flex items-center gap-2
           px-3 py-2
           rounded-[var(--radius-md)]
-          border-[var(--input-border-width)]
-          border-[var(--color-border-default)]
-          bg-[var(--color-bg-secondary)]
-          hover:border-[var(--color-border-accent)]
+          border-2
+          border-skin-default
+          bg-skin-secondary
+          hover:border-skin-accent
           hover:shadow-[0_0_10px_var(--color-glow)]
-          transition-all duration-[var(--duration-fast)]
+          transition-all
         `}
         aria-label="Change skin"
       >
-        <div
-          className="w-5 h-5 rounded-[var(--radius-sm)]"
-          style={{ background: skin.preview }}
-        />
+        <div className="w-5 h-5 rounded-[var(--radius-sm)]" style={{ background: skin.preview }} />
         {showLabel && (
-          <span className="font-display text-xs text-[var(--color-text-secondary)] uppercase tracking-wider">
+          <span className="font-display text-xs text-skin-text-secondary uppercase tracking-wider">
             {skin.name}
           </span>
         )}
       </button>
 
-      <SkinSelectorModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-      />
+      <SkinSelectorModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }

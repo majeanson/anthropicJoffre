@@ -78,7 +78,13 @@ interface HealthData {
   };
 }
 
-export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }: UnifiedDebugPanelProps) {
+export function UnifiedDebugPanel({
+  isOpen,
+  onClose,
+  gameState,
+  gameId,
+  socket,
+}: UnifiedDebugPanelProps) {
   const [activeTab, setActiveTab] = useState<TabType>('build');
   const [detailedHealth, setDetailedHealth] = useState<HealthData | null>(null);
   const [healthError, setHealthError] = useState<string | null>(null);
@@ -125,7 +131,11 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
 
   // Cleanup obsolete games
   const runCleanup = async () => {
-    if (!confirm('⚠️ This will DELETE all obsolete 6-character game IDs from the database.\n\nAre you sure you want to continue?')) {
+    if (
+      !confirm(
+        '⚠️ This will DELETE all obsolete 6-character game IDs from the database.\n\nAre you sure you want to continue?'
+      )
+    ) {
       return;
     }
 
@@ -133,7 +143,9 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
     setCleanupError(null);
     setCleanupResult(null);
     try {
-      const response = await fetch(`${CONFIG.API_BASE_URL}/api/admin/cleanup-obsolete-games`, { method: 'POST' });
+      const response = await fetch(`${CONFIG.API_BASE_URL}/api/admin/cleanup-obsolete-games`, {
+        method: 'POST',
+      });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       setCleanupResult(data);
@@ -148,7 +160,11 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
   useEffect(() => {
     if (!socket) return;
 
-    const handleAllGamesCleared = (data: { gamesCleared: number; sessionsCleared: number; message: string }) => {
+    const handleAllGamesCleared = (data: {
+      gamesCleared: number;
+      sessionsCleared: number;
+      message: string;
+    }) => {
       setClearMessage(`✅ ${data.message}`);
       setIsClearing(false);
       setTimeout(() => setClearMessage(null), 5000);
@@ -181,7 +197,11 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
       setClearMessage('❌ No socket connection');
       return;
     }
-    if (!window.confirm('⚠️ Clear ALL games from memory?\n\nThis will disconnect all active players and remove all game data.\n\nAre you sure?')) {
+    if (
+      !window.confirm(
+        '⚠️ Clear ALL games from memory?\n\nThis will disconnect all active players and remove all game data.\n\nAre you sure?'
+      )
+    ) {
       return;
     }
     setIsClearing(true);
@@ -229,7 +249,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      timeZoneName: 'short'
+      timeZoneName: 'short',
     });
   };
 
@@ -238,7 +258,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
   };
 
   const highestBidder = gameState?.highestBet
-    ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)
+    ? gameState.players.find((p) => p.id === gameState.highestBet?.playerId)
     : null;
 
   // Tab definitions for the Tabs component
@@ -262,7 +282,7 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
     >
       {/* Tabs */}
       <Tabs
-        tabs={tabs.map(t => ({ id: t.id, label: t.label }))}
+        tabs={tabs.map((t) => ({ id: t.id, label: t.label }))}
         activeTab={activeTab}
         onChange={(id) => setActiveTab(id as TabType)}
         variant="pills"
@@ -272,206 +292,713 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
 
       {/* Content */}
       <div className="space-y-4">
-          {/* Tab 1: Build Info */}
-          {activeTab === 'build' && (
-            <div className="space-y-4 animate-slide-in">
-              {/* Version */}
-              <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">🏷️</span>
-                  <h3 className="font-bold text-purple-300 text-lg">Version</h3>
-                </div>
-                <p className="text-white font-mono text-2xl font-bold">v{buildInfo.version}</p>
-                <p className="text-gray-400 text-sm mt-1">{buildInfo.buildStatus}</p>
+        {/* Tab 1: Build Info */}
+        {activeTab === 'build' && (
+          <div className="space-y-4 animate-slide-in">
+            {/* Version */}
+            <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">🏷️</span>
+                <h3 className="font-bold text-purple-300 text-lg">Version</h3>
               </div>
+              <p className="text-white font-mono text-2xl font-bold">v{buildInfo.version}</p>
+              <p className="text-gray-400 text-sm mt-1">{buildInfo.buildStatus}</p>
+            </div>
 
-              {/* Build Date */}
-              <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-2xl">📅</span>
-                  <h3 className="font-bold text-blue-300 text-lg">Build Date</h3>
-                </div>
-                <p className="text-white">{formatDate(buildInfo.buildDate)}</p>
+            {/* Build Date */}
+            <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-2xl">📅</span>
+                <h3 className="font-bold text-blue-300 text-lg">Build Date</h3>
               </div>
+              <p className="text-white">{formatDate(buildInfo.buildDate)}</p>
+            </div>
 
-              {/* Git Info */}
-              {buildInfo.git && (
-                <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-2xl">💾</span>
-                    <h3 className="font-bold text-green-300 text-lg">Latest Commit</h3>
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-mono text-xs text-green-400 font-bold bg-green-950 px-2 py-1 rounded">
-                      {buildInfo.git.commitHash}
-                    </span>
-                    <span className="text-xs text-gray-400">on {buildInfo.git.branch}</span>
-                  </div>
-                  <p className="text-white text-sm">{getCommitTitle(buildInfo.git.commitMessage)}</p>
+            {/* Git Info */}
+            {buildInfo.git && (
+              <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-2xl">💾</span>
+                  <h3 className="font-bold text-green-300 text-lg">Latest Commit</h3>
                 </div>
-              )}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-mono text-xs text-green-400 font-bold bg-green-950 px-2 py-1 rounded">
+                    {buildInfo.git.commitHash}
+                  </span>
+                  <span className="text-xs text-gray-400">on {buildInfo.git.branch}</span>
+                </div>
+                <p className="text-white text-sm">{getCommitTitle(buildInfo.git.commitMessage)}</p>
+              </div>
+            )}
 
-              {/* Test Status */}
-              {buildInfo.testsStatus && (
-                <div className="bg-gradient-to-r from-amber-900/50 to-orange-900/50 border border-amber-500/30 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-2xl">✅</span>
-                    <h3 className="font-bold text-amber-300 text-lg">Test Status</h3>
+            {/* Test Status */}
+            {buildInfo.testsStatus && (
+              <div className="bg-gradient-to-r from-amber-900/50 to-orange-900/50 border border-amber-500/30 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">✅</span>
+                  <h3 className="font-bold text-amber-300 text-lg">Test Status</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                  <div className="bg-gray-800/50 rounded p-2">
+                    <div className="text-gray-400 text-xs">Backend</div>
+                    <div className="text-white font-bold">{buildInfo.testsStatus.backend}</div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                    <div className="bg-gray-800/50 rounded p-2">
-                      <div className="text-gray-400 text-xs">Backend</div>
-                      <div className="text-white font-bold">{buildInfo.testsStatus.backend}</div>
-                    </div>
-                    <div className="bg-gray-800/50 rounded p-2">
-                      <div className="text-gray-400 text-xs">E2E</div>
-                      <div className="text-white font-bold">{buildInfo.testsStatus.e2e}</div>
-                    </div>
-                    <div className="bg-gray-800/50 rounded p-2">
-                      <div className="text-gray-400 text-xs">Overall</div>
-                      <div className="text-white font-bold">{buildInfo.testsStatus.overall}</div>
-                    </div>
+                  <div className="bg-gray-800/50 rounded p-2">
+                    <div className="text-gray-400 text-xs">E2E</div>
+                    <div className="text-white font-bold">{buildInfo.testsStatus.e2e}</div>
+                  </div>
+                  <div className="bg-gray-800/50 rounded p-2">
+                    <div className="text-gray-400 text-xs">Overall</div>
+                    <div className="text-white font-bold">{buildInfo.testsStatus.overall}</div>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Latest Features */}
-              {buildInfo.latestDoneFeatures && buildInfo.latestDoneFeatures.length > 0 && (
-                <div className="bg-gradient-to-r from-pink-900/50 to-rose-900/50 border border-pink-500/30 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">✨</span>
-                      <h3 className="font-bold text-pink-300 text-lg">Latest Features</h3>
-                    </div>
-                    <Button
-                      onClick={() => setShowLatestFeatures(!showLatestFeatures)}
-                      variant="primary"
-                      size="sm"
-                    >
-                      {showLatestFeatures ? 'Hide' : 'Show'}
-                    </Button>
+            {/* Latest Features */}
+            {buildInfo.latestDoneFeatures && buildInfo.latestDoneFeatures.length > 0 && (
+              <div className="bg-gradient-to-r from-pink-900/50 to-rose-900/50 border border-pink-500/30 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">✨</span>
+                    <h3 className="font-bold text-pink-300 text-lg">Latest Features</h3>
                   </div>
-
-                  {showLatestFeatures && (
-                    <div className="space-y-3 animate-slide-in">
-                      {buildInfo.latestDoneFeatures.map((featureGroup, index) => (
-                        <div key={index} className="bg-gray-800/50 rounded-lg p-3 border border-pink-500/20">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-semibold text-pink-300">{featureGroup.title}</span>
-                            <span className="text-xs text-gray-400">{featureGroup.date}</span>
-                          </div>
-                          <ul className="space-y-1 ml-4">
-                            {featureGroup.features.map((feature, fIndex) => (
-                              <li key={fIndex} className="flex items-start gap-2 text-sm text-gray-300">
-                                <span className="text-green-400 flex-shrink-0">✓</span>
-                                <span>{feature}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Future Features */}
-              {buildInfo.futureTodos && buildInfo.futureTodos.length > 0 && (
-                <div className="bg-gradient-to-r from-violet-900/50 to-purple-900/50 border border-violet-500/30 rounded-lg p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🚀</span>
-                      <h3 className="font-bold text-violet-300 text-lg">Future Features</h3>
-                    </div>
-                    <Button
-                      onClick={() => setShowFutureFeatures(!showFutureFeatures)}
-                      variant="primary"
-                      size="sm"
-                    >
-                      {showFutureFeatures ? 'Hide' : 'Show'}
-                    </Button>
-                  </div>
-
-                  {showFutureFeatures && (
-                    <ul className="space-y-2 animate-slide-in">
-                      {buildInfo.futureTodos.map((todo, index) => (
-                        <li key={index} className="flex items-start gap-2 text-sm text-gray-300 bg-gray-800/50 px-3 py-2 rounded border border-violet-500/20">
-                          <span className="text-violet-400 flex-shrink-0">▸</span>
-                          <span>{todo}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )}
-
-              {/* Database Cleanup */}
-              {SHOW_CLEANUP_BUTTON && (
-                <div className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border border-red-500/30 rounded-lg p-4">
-                  <div className="flex items-center gap-3 mb-3">
-                    <span className="text-2xl">🗑️</span>
-                    <h3 className="font-bold text-red-300 text-lg">Database Cleanup</h3>
-                  </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    Remove obsolete 6-character game IDs from production database
-                  </p>
                   <Button
-                    onClick={runCleanup}
-                    disabled={cleanupLoading}
-                    variant="danger"
-                    size="md"
-                    className="w-full"
+                    onClick={() => setShowLatestFeatures(!showLatestFeatures)}
+                    variant="primary"
+                    size="sm"
                   >
-                    {cleanupLoading ? '⏳ Cleaning...' : '🗑️ Run Cleanup'}
+                    {showLatestFeatures ? 'Hide' : 'Show'}
                   </Button>
+                </div>
 
-                  {cleanupError && (
-                    <div className="mt-2 bg-red-900/30 px-3 py-2 rounded border border-red-500">
-                      <p className="text-sm text-red-300">❌ {cleanupError}</p>
+                {showLatestFeatures && (
+                  <div className="space-y-3 animate-slide-in">
+                    {buildInfo.latestDoneFeatures.map((featureGroup, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-800/50 rounded-lg p-3 border border-pink-500/20"
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="font-semibold text-pink-300">{featureGroup.title}</span>
+                          <span className="text-xs text-gray-400">{featureGroup.date}</span>
+                        </div>
+                        <ul className="space-y-1 ml-4">
+                          {featureGroup.features.map((feature, fIndex) => (
+                            <li
+                              key={fIndex}
+                              className="flex items-start gap-2 text-sm text-gray-300"
+                            >
+                              <span className="text-green-400 flex-shrink-0">✓</span>
+                              <span>{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Future Features */}
+            {buildInfo.futureTodos && buildInfo.futureTodos.length > 0 && (
+              <div className="bg-gradient-to-r from-violet-900/50 to-purple-900/50 border border-violet-500/30 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">🚀</span>
+                    <h3 className="font-bold text-violet-300 text-lg">Future Features</h3>
+                  </div>
+                  <Button
+                    onClick={() => setShowFutureFeatures(!showFutureFeatures)}
+                    variant="primary"
+                    size="sm"
+                  >
+                    {showFutureFeatures ? 'Hide' : 'Show'}
+                  </Button>
+                </div>
+
+                {showFutureFeatures && (
+                  <ul className="space-y-2 animate-slide-in">
+                    {buildInfo.futureTodos.map((todo, index) => (
+                      <li
+                        key={index}
+                        className="flex items-start gap-2 text-sm text-gray-300 bg-gray-800/50 px-3 py-2 rounded border border-violet-500/20"
+                      >
+                        <span className="text-violet-400 flex-shrink-0">▸</span>
+                        <span>{todo}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
+
+            {/* Database Cleanup */}
+            {SHOW_CLEANUP_BUTTON && (
+              <div className="bg-gradient-to-r from-red-900/50 to-orange-900/50 border border-red-500/30 rounded-lg p-4">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">🗑️</span>
+                  <h3 className="font-bold text-red-300 text-lg">Database Cleanup</h3>
+                </div>
+                <p className="text-sm text-gray-300 mb-3">
+                  Remove obsolete 6-character game IDs from production database
+                </p>
+                <Button
+                  onClick={runCleanup}
+                  disabled={cleanupLoading}
+                  variant="danger"
+                  size="md"
+                  className="w-full"
+                >
+                  {cleanupLoading ? '⏳ Cleaning...' : '🗑️ Run Cleanup'}
+                </Button>
+
+                {cleanupError && (
+                  <div className="mt-2 bg-red-900/30 px-3 py-2 rounded border border-red-500">
+                    <p className="text-sm text-red-300">❌ {cleanupError}</p>
+                  </div>
+                )}
+
+                {cleanupResult && (
+                  <div className="mt-2 bg-green-900/30 px-3 py-3 rounded border border-green-500">
+                    <p className="text-sm font-bold text-green-300 mb-2">
+                      ✅ {cleanupResult.message}
+                    </p>
+                    <div className="text-xs text-gray-300 space-y-1">
+                      <p>• In-memory games deleted: {cleanupResult.deletedCount?.inMemory || 0}</p>
+                      <p>
+                        • Active games (DB) deleted: {cleanupResult.deletedCount?.activeGames || 0}
+                      </p>
+                      <p>
+                        • Finished games (DB) deleted:{' '}
+                        {cleanupResult.deletedCount?.finishedGames || 0}
+                      </p>
+                      <p>• Sessions deleted: {cleanupResult.deletedCount?.sessions || 0}</p>
                     </div>
-                  )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
-                  {cleanupResult && (
-                    <div className="mt-2 bg-green-900/30 px-3 py-3 rounded border border-green-500">
-                      <p className="text-sm font-bold text-green-300 mb-2">✅ {cleanupResult.message}</p>
-                      <div className="text-xs text-gray-300 space-y-1">
-                        <p>• In-memory games deleted: {cleanupResult.deletedCount?.inMemory || 0}</p>
-                        <p>• Active games (DB) deleted: {cleanupResult.deletedCount?.activeGames || 0}</p>
-                        <p>• Finished games (DB) deleted: {cleanupResult.deletedCount?.finishedGames || 0}</p>
-                        <p>• Sessions deleted: {cleanupResult.deletedCount?.sessions || 0}</p>
+        {/* Tab 2: Game State */}
+        {activeTab === 'gameState' && gameState && (
+          <div className="space-y-4 animate-slide-in">
+            {/* Game Info */}
+            <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 rounded-lg p-4">
+              <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
+                <span>📋</span> Game Information
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-gray-800/50 rounded p-3">
+                  <span className="text-xs text-gray-400">Game ID</span>
+                  <p className="font-mono text-sm text-purple-400 font-bold">{gameId}</p>
+                </div>
+                <div className="bg-gray-800/50 rounded p-3">
+                  <span className="text-xs text-gray-400">Phase</span>
+                  <p className="text-sm">
+                    <span
+                      className={`px-2 py-1 rounded-full font-semibold text-xs ${
+                        gameState.phase === 'team_selection'
+                          ? 'bg-purple-500/30 text-purple-300'
+                          : gameState.phase === 'betting'
+                            ? 'bg-orange-500/30 text-orange-300'
+                            : gameState.phase === 'playing'
+                              ? 'bg-blue-500/30 text-blue-300'
+                              : gameState.phase === 'scoring'
+                                ? 'bg-green-500/30 text-green-300'
+                                : 'bg-gray-500/30 text-gray-300'
+                      }`}
+                    >
+                      {gameState.phase.replace('_', ' ').toUpperCase()}
+                    </span>
+                  </p>
+                </div>
+                <div className="bg-gray-800/50 rounded p-3">
+                  <span className="text-xs text-gray-400">Round</span>
+                  <p className="text-sm font-bold text-white">{gameState.roundNumber}</p>
+                </div>
+                <div className="bg-gray-800/50 rounded p-3">
+                  <span className="text-xs text-gray-400">Trump Suit</span>
+                  <p className="text-sm font-bold text-white">{gameState.trump || 'Not set'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Team Scores */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gradient-to-br from-orange-900/50 to-red-900/50 border-2 border-orange-500/50 rounded-lg p-4 text-center">
+                <h4 className="text-sm font-semibold text-orange-300 mb-1">Team 1</h4>
+                <p className="text-4xl font-bold text-orange-400">{gameState.teamScores.team1}</p>
+                <p className="text-xs text-orange-300 mt-1">
+                  {gameState.teamScores.team1 >= 41
+                    ? '✓ Winner!'
+                    : `${41 - gameState.teamScores.team1} to win`}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-900/50 to-violet-900/50 border-2 border-purple-500/50 rounded-lg p-4 text-center">
+                <h4 className="text-sm font-semibold text-purple-300 mb-1">Team 2</h4>
+                <p className="text-4xl font-bold text-purple-400">{gameState.teamScores.team2}</p>
+                <p className="text-xs text-purple-300 mt-1">
+                  {gameState.teamScores.team2 >= 41
+                    ? '✓ Winner!'
+                    : `${41 - gameState.teamScores.team2} to win`}
+                </p>
+              </div>
+            </div>
+
+            {/* Players */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+                <span>👥</span> Players
+              </h3>
+              {gameState.players.map((player, index) => {
+                const isCurrentTurn = index === gameState.currentPlayerIndex;
+                const isDealer = index === gameState.dealerIndex;
+                const bet = gameState.currentBets.find((b) => b.playerName === player.name);
+
+                return (
+                  <div
+                    key={player.id}
+                    className={`p-3 rounded-lg border ${
+                      isCurrentTurn
+                        ? 'bg-green-900/30 border-green-500 shadow-lg'
+                        : 'bg-gray-800/30 border-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`w-3 h-3 rounded-full ${
+                            player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
+                          }`}
+                        ></span>
+                        <span className="font-bold text-white text-sm">{player.name}</span>
+                        {isDealer && (
+                          <span className="px-2 py-0.5 bg-purple-500/30 text-purple-300 text-xs font-semibold rounded-full">
+                            DEALER
+                          </span>
+                        )}
+                        {isCurrentTurn && (
+                          <span className="px-2 py-0.5 bg-green-500/30 text-green-300 text-xs font-semibold rounded-full animate-pulse">
+                            TURN
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500 font-mono">Pos {index + 1}</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div className="bg-gray-900/50 rounded px-2 py-1">
+                        <span className="text-gray-400">Cards:</span>
+                        <span className="ml-1 font-semibold text-white">{player.hand.length}</span>
+                      </div>
+                      <div className="bg-gray-900/50 rounded px-2 py-1">
+                        <span className="text-gray-400">Tricks:</span>
+                        <span className="ml-1 font-semibold text-white">{player.tricksWon}</span>
+                      </div>
+                      <div className="bg-gray-900/50 rounded px-2 py-1">
+                        <span className="text-gray-400">Points:</span>
+                        <span className="ml-1 font-semibold text-white">{player.pointsWon}</span>
+                      </div>
+                      {bet && (
+                        <div className="bg-gray-900/50 rounded px-2 py-1">
+                          <span className="text-gray-400">Bet:</span>
+                          <span className="ml-1 font-semibold text-white">
+                            {bet.skipped ? 'Skip' : `${bet.amount}${bet.withoutTrump ? ' 🚫' : ''}`}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Current Trick */}
+            {gameState.currentTrick.length > 0 && (
+              <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
+                <h3 className="text-lg font-bold text-blue-300 mb-3">
+                  🎴 Current Trick ({gameState.currentTrick.length}/4 cards)
+                </h3>
+                <div className="grid grid-cols-4 gap-2">
+                  {gameState.currentTrick.map((trickCard, index) => {
+                    const player = gameState.players.find((p) => p.id === trickCard.playerId);
+                    return (
+                      <div
+                        key={index}
+                        className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700"
+                      >
+                        <p className="text-xs text-gray-400 mb-1">{player?.name}</p>
+                        <div
+                          className={`inline-block px-2 py-1 rounded font-bold text-white text-sm ${
+                            trickCard.card.color === 'blue'
+                              ? 'bg-orange-600'
+                              : trickCard.card.color === 'green'
+                                ? 'bg-green-600'
+                                : 'bg-amber-800'
+                          }`}
+                        >
+                          {trickCard.card.value}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Betting Info */}
+            {gameState.currentBets.length > 0 && (
+              <div className="bg-gradient-to-r from-amber-900/50 to-yellow-900/50 border border-amber-500/30 rounded-lg p-4">
+                <h3 className="text-lg font-bold text-amber-300 mb-3">💰 Betting Information</h3>
+                {highestBidder && gameState.highestBet && (
+                  <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 mb-3">
+                    <p className="font-semibold text-yellow-300 text-sm">
+                      🏅 Highest Bet: {highestBidder.name} - {gameState.highestBet.amount} points
+                      {gameState.highestBet.withoutTrump && ' (Without Trump - 2x)'}
+                    </p>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-2">
+                  {gameState.currentBets.map((bet) => {
+                    const player = gameState.players.find((p) => p.id === bet.playerId);
+                    return (
+                      <div
+                        key={bet.playerId}
+                        className="flex items-center justify-between bg-gray-800/50 rounded p-2 border border-gray-700 text-sm"
+                      >
+                        <span className="font-medium text-gray-300">{player?.name}</span>
+                        <span
+                          className={`font-semibold ${bet.skipped ? 'text-gray-500' : 'text-purple-400'}`}
+                        >
+                          {bet.skipped
+                            ? 'Skipped'
+                            : `${bet.amount}${bet.withoutTrump ? ' 🚫' : ''}`}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'gameState' && !gameState && (
+          <div className="text-center py-12 text-gray-400">
+            <p className="text-lg mb-2">No active game</p>
+            <p className="text-sm">Join or create a game to see game state information</p>
+          </div>
+        )}
+
+        {/* Tab 3: Automation */}
+        {activeTab === 'automation' && (
+          <div className="space-y-4 animate-slide-in">
+            {gameState && gameState.phase === 'playing' && (
+              <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border-2 border-green-500/50 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">🎮</span>
+                  <span className="font-semibold text-green-300">Playing Phase Controls</span>
+                  <span className="px-2 py-0.5 bg-green-500/30 text-green-300 text-xs font-semibold rounded-full">
+                    ACTIVE
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <Button
+                    onClick={() => socket?.emit('debug_auto_play_card', { gameId })}
+                    disabled={!socket}
+                    variant="primary"
+                    size="md"
+                  >
+                    🤖 Auto-Play Card
+                  </Button>
+                  <Button
+                    onClick={() => socket?.emit('debug_skip_trick', { gameId })}
+                    disabled={!socket || gameState.currentTrick.length === 0}
+                    variant="warning"
+                    size="md"
+                  >
+                    ⏭️ Skip Trick
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (window.confirm('Skip entire round? Auto-play all remaining cards.')) {
+                        socket?.emit('debug_skip_round', { gameId });
+                      }
+                    }}
+                    disabled={!socket}
+                    variant="secondary"
+                    size="md"
+                  >
+                    ⏭️⏭️ Skip Round
+                  </Button>
+                </div>
+                <p className="text-xs text-green-300 mt-3">
+                  Auto-play cards for current player. Use for testing game flow.
+                </p>
+              </div>
+            )}
+
+            {gameState && gameState.phase === 'betting' && (
+              <div className="bg-gradient-to-r from-orange-900/50 to-red-900/50 border-2 border-orange-500/50 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">💰</span>
+                  <span className="font-semibold text-orange-300">Betting Phase Controls</span>
+                  <span className="px-2 py-0.5 bg-orange-500/30 text-orange-300 text-xs font-semibold rounded-full">
+                    ACTIVE
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+                  <Button
+                    onClick={() => socket?.emit('debug_auto_bet', { gameId })}
+                    disabled={!socket}
+                    variant="primary"
+                    size="md"
+                  >
+                    💰 Auto-Bet
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (window.confirm('Skip betting phase? Auto-bet for all players.')) {
+                        socket?.emit('debug_skip_betting', { gameId });
+                      }
+                    }}
+                    disabled={!socket}
+                    variant="secondary"
+                    size="md"
+                  >
+                    ⏭️ Skip Betting
+                  </Button>
+                </div>
+
+                <div className="border-t-2 border-orange-500/30 pt-4">
+                  <p className="text-sm font-semibold text-orange-300 mb-2">Force Bet Override</p>
+                  <div className="grid grid-cols-12 gap-2">
+                    {[7, 8, 9, 10, 11, 12].map((amount) => (
+                      <div key={amount} className="col-span-6 md:col-span-2 flex flex-col gap-1">
+                        <Button
+                          onClick={() =>
+                            socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: false })
+                          }
+                          disabled={!socket}
+                          variant="warning"
+                          size="sm"
+                        >
+                          {amount}
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: true })
+                          }
+                          disabled={!socket}
+                          variant="danger"
+                          size="sm"
+                        >
+                          {amount} 🚫
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-orange-300 mt-2">
+                    Force bet for current player. 🚫 = Without Trump (2x multiplier)
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {(!gameState || (gameState.phase !== 'playing' && gameState.phase !== 'betting')) && (
+              <div className="bg-gray-800/50 border-2 border-gray-700 rounded-lg p-8 text-center">
+                <p className="text-gray-400 text-lg">
+                  No automation controls available for{' '}
+                  <span className="font-semibold text-white">
+                    {gameState ? gameState.phase.replace('_', ' ') : 'current'}
+                  </span>{' '}
+                  phase
+                </p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Automation is available during betting and playing phases
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 4: Server Health */}
+        {activeTab === 'serverHealth' && (
+          <div className="space-y-4 animate-slide-in">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <span>🖥️</span> Server Health Monitoring
+              </h3>
+              <div className="flex gap-2">
+                <Button onClick={fetchDetailedHealth} variant="primary" size="sm">
+                  🔄 Refresh
+                </Button>
+                <Button
+                  onClick={handleClearAllGames}
+                  disabled={isClearing || !socket}
+                  variant="danger"
+                  size="sm"
+                >
+                  {isClearing ? '🔄 Clearing...' : '🗑️ Clear All Games'}
+                </Button>
+              </div>
+            </div>
+
+            {clearMessage && (
+              <div
+                className={`p-3 rounded-lg border-2 ${
+                  clearMessage.startsWith('✅')
+                    ? 'bg-green-900/30 border-green-500 text-green-300'
+                    : clearMessage.startsWith('❌')
+                      ? 'bg-red-900/30 border-red-500 text-red-300'
+                      : 'bg-blue-900/30 border-blue-500 text-blue-300'
+                }`}
+              >
+                <p className="font-semibold">{clearMessage}</p>
+              </div>
+            )}
+
+            {healthLoading && (
+              <UICard variant="elevated" size="lg" className="text-center py-8">
+                <Spinner size="lg" color="primary" />
+                <p className="text-sm text-gray-400 mt-3">Loading health data...</p>
+              </UICard>
+            )}
+
+            {healthError && (
+              <div className="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-center">
+                <p className="text-red-300 font-semibold">⚠️ Unable to fetch server health</p>
+                <p className="text-sm text-red-400 mt-1">{healthError}</p>
+              </div>
+            )}
+
+            {detailedHealth && !healthLoading && (
+              <div className="space-y-4">
+                {/* Status & Uptime */}
+                <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="inline-block px-3 py-1 bg-green-500/30 text-green-300 text-sm font-semibold rounded-full">
+                        {detailedHealth.status.toUpperCase()}
+                      </span>
+                      <p className="text-xs text-gray-400 mt-2">
+                        Uptime: {detailedHealth.uptime.formatted}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Game State */}
+                <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
+                  <h4 className="text-sm font-bold text-blue-300 mb-3 flex items-center gap-2">
+                    <span>🎮</span> Game State
+                  </h4>
+                  <div className="grid grid-cols-3 gap-3 text-sm">
+                    <div className="bg-gray-800/50 px-3 py-2 rounded">
+                      <div className="text-gray-400 text-xs">Games</div>
+                      <div className="font-bold text-white text-lg">
+                        {detailedHealth.game.activeGames}
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Tab 2: Game State */}
-          {activeTab === 'gameState' && gameState && (
-            <div className="space-y-4 animate-slide-in">
-              {/* Game Info */}
-              <div className="bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-500/30 rounded-lg p-4">
-                <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
-                  <span>📋</span> Game Information
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gray-800/50 rounded p-3">
-                    <span className="text-xs text-gray-400">Game ID</span>
-                    <p className="font-mono text-sm text-purple-400 font-bold">{gameId}</p>
+                    <div className="bg-gray-800/50 px-3 py-2 rounded">
+                      <div className="text-gray-400 text-xs">Sockets</div>
+                      <div className="font-bold text-white text-lg">
+                        {detailedHealth.game.connectedSockets}
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/50 px-3 py-2 rounded">
+                      <div className="text-gray-400 text-xs">Players</div>
+                      <div className="font-bold text-white text-lg">
+                        {detailedHealth.game.onlinePlayers}
+                      </div>
+                    </div>
                   </div>
+                </div>
+
+                {/* Database & Cache */}
+                <div className="bg-gradient-to-r from-purple-900/50 to-violet-900/50 border border-purple-500/30 rounded-lg p-4">
+                  <h4 className="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
+                    <span>💾</span> Database & Cache
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-gray-800/50 px-3 py-2 rounded">
+                      <div className="text-gray-400 text-xs">Pool Utilization</div>
+                      <div className="font-bold text-white">
+                        {detailedHealth.database.pool.utilization}
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/50 px-3 py-2 rounded">
+                      <div className="text-gray-400 text-xs">Cache Keys</div>
+                      <div className="font-bold text-white">{detailedHealth.cache.keys}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Memory */}
+                <div className="bg-gradient-to-r from-amber-900/50 to-orange-900/50 border border-amber-500/30 rounded-lg p-4">
+                  <h4 className="text-sm font-bold text-amber-300 mb-3 flex items-center gap-2">
+                    <span>🧠</span> Memory Usage
+                  </h4>
+                  <div className="bg-gray-800/50 px-3 py-3 rounded text-sm">
+                    <div className="flex justify-between mb-2">
+                      <span className="text-gray-400">Heap Used / Total</span>
+                      <span className="font-bold text-white">
+                        {detailedHealth.memory.heapUsedMB} / {detailedHealth.memory.heapTotalMB} MB
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-700 rounded-full h-3">
+                      <div
+                        className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all"
+                        style={{ width: detailedHealth.memory.heapUtilization }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Error Handling */}
+                <div className="bg-gradient-to-r from-red-900/50 to-pink-900/50 border border-red-500/30 rounded-lg p-4">
+                  <h4 className="text-sm font-bold text-red-300 mb-3 flex items-center gap-2">
+                    <span>🛡️</span> Error Handling
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="bg-gray-800/50 px-3 py-2 rounded">
+                      <div className="text-gray-400 text-xs">Success Rate</div>
+                      <div className="font-bold text-green-400 text-lg">
+                        {detailedHealth.errorHandling.successRate}
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/50 px-3 py-2 rounded">
+                      <div className="text-gray-400 text-xs">Total Calls</div>
+                      <div className="font-bold text-white text-lg">
+                        {detailedHealth.errorHandling.totalCalls.toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 5: Test Controls */}
+        {activeTab === 'testControls' && (
+          <div className="space-y-4 animate-slide-in">
+            {/* Current State */}
+            {gameState && (
+              <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
+                <h3 className="text-lg font-bold text-blue-300 mb-3 flex items-center gap-2">
+                  <span>📊</span> Current State
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className="bg-gray-800/50 rounded p-3">
                     <span className="text-xs text-gray-400">Phase</span>
-                    <p className="text-sm">
-                      <span className={`px-2 py-1 rounded-full font-semibold text-xs ${
-                        gameState.phase === 'team_selection' ? 'bg-purple-500/30 text-purple-300' :
-                        gameState.phase === 'betting' ? 'bg-orange-500/30 text-orange-300' :
-                        gameState.phase === 'playing' ? 'bg-blue-500/30 text-blue-300' :
-                        gameState.phase === 'scoring' ? 'bg-green-500/30 text-green-300' :
-                        'bg-gray-500/30 text-gray-300'
-                      }`}>
-                        {gameState.phase.replace('_', ' ').toUpperCase()}
-                      </span>
+                    <p className="text-sm font-bold capitalize text-white">
+                      {gameState.phase.replace('_', ' ')}
                     </p>
                   </div>
                   <div className="bg-gray-800/50 rounded p-3">
@@ -479,625 +1006,201 @@ export function UnifiedDebugPanel({ isOpen, onClose, gameState, gameId, socket }
                     <p className="text-sm font-bold text-white">{gameState.roundNumber}</p>
                   </div>
                   <div className="bg-gray-800/50 rounded p-3">
-                    <span className="text-xs text-gray-400">Trump Suit</span>
-                    <p className="text-sm font-bold text-white">{gameState.trump || 'Not set'}</p>
+                    <span className="text-xs text-gray-400">Team 1 Score</span>
+                    <p className="text-sm font-bold text-orange-400">
+                      {gameState.teamScores.team1}
+                    </p>
                   </div>
-                </div>
-              </div>
-
-              {/* Team Scores */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gradient-to-br from-orange-900/50 to-red-900/50 border-2 border-orange-500/50 rounded-lg p-4 text-center">
-                  <h4 className="text-sm font-semibold text-orange-300 mb-1">Team 1</h4>
-                  <p className="text-4xl font-bold text-orange-400">{gameState.teamScores.team1}</p>
-                  <p className="text-xs text-orange-300 mt-1">
-                    {gameState.teamScores.team1 >= 41 ? '✓ Winner!' : `${41 - gameState.teamScores.team1} to win`}
-                  </p>
-                </div>
-                <div className="bg-gradient-to-br from-purple-900/50 to-violet-900/50 border-2 border-purple-500/50 rounded-lg p-4 text-center">
-                  <h4 className="text-sm font-semibold text-purple-300 mb-1">Team 2</h4>
-                  <p className="text-4xl font-bold text-purple-400">{gameState.teamScores.team2}</p>
-                  <p className="text-xs text-purple-300 mt-1">
-                    {gameState.teamScores.team2 >= 41 ? '✓ Winner!' : `${41 - gameState.teamScores.team2} to win`}
-                  </p>
-                </div>
-              </div>
-
-              {/* Players */}
-              <div className="space-y-2">
-                <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
-                  <span>👥</span> Players
-                </h3>
-                {gameState.players.map((player, index) => {
-                  const isCurrentTurn = index === gameState.currentPlayerIndex;
-                  const isDealer = index === gameState.dealerIndex;
-                  const bet = gameState.currentBets.find(b => b.playerName === player.name);
-
-                  return (
-                    <div
-                      key={player.id}
-                      className={`p-3 rounded-lg border ${
-                        isCurrentTurn
-                          ? 'bg-green-900/30 border-green-500 shadow-lg'
-                          : 'bg-gray-800/30 border-gray-700'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className={`w-3 h-3 rounded-full ${
-                            player.teamId === 1 ? 'bg-orange-500' : 'bg-purple-500'
-                          }`}></span>
-                          <span className="font-bold text-white text-sm">{player.name}</span>
-                          {isDealer && (
-                            <span className="px-2 py-0.5 bg-purple-500/30 text-purple-300 text-xs font-semibold rounded-full">
-                              DEALER
-                            </span>
-                          )}
-                          {isCurrentTurn && (
-                            <span className="px-2 py-0.5 bg-green-500/30 text-green-300 text-xs font-semibold rounded-full animate-pulse">
-                              TURN
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-xs text-gray-500 font-mono">Pos {index + 1}</span>
-                      </div>
-
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                        <div className="bg-gray-900/50 rounded px-2 py-1">
-                          <span className="text-gray-400">Cards:</span>
-                          <span className="ml-1 font-semibold text-white">{player.hand.length}</span>
-                        </div>
-                        <div className="bg-gray-900/50 rounded px-2 py-1">
-                          <span className="text-gray-400">Tricks:</span>
-                          <span className="ml-1 font-semibold text-white">{player.tricksWon}</span>
-                        </div>
-                        <div className="bg-gray-900/50 rounded px-2 py-1">
-                          <span className="text-gray-400">Points:</span>
-                          <span className="ml-1 font-semibold text-white">{player.pointsWon}</span>
-                        </div>
-                        {bet && (
-                          <div className="bg-gray-900/50 rounded px-2 py-1">
-                            <span className="text-gray-400">Bet:</span>
-                            <span className="ml-1 font-semibold text-white">
-                              {bet.skipped ? 'Skip' : `${bet.amount}${bet.withoutTrump ? ' 🚫' : ''}`}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Current Trick */}
-              {gameState.currentTrick.length > 0 && (
-                <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
-                  <h3 className="text-lg font-bold text-blue-300 mb-3">
-                    🎴 Current Trick ({gameState.currentTrick.length}/4 cards)
-                  </h3>
-                  <div className="grid grid-cols-4 gap-2">
-                    {gameState.currentTrick.map((trickCard, index) => {
-                      const player = gameState.players.find(p => p.id === trickCard.playerId);
-                      return (
-                        <div key={index} className="bg-gray-800/50 rounded-lg p-2 text-center border border-gray-700">
-                          <p className="text-xs text-gray-400 mb-1">{player?.name}</p>
-                          <div className={`inline-block px-2 py-1 rounded font-bold text-white text-sm ${
-                            trickCard.card.color === 'blue' ? 'bg-orange-600' :
-                            trickCard.card.color === 'green' ? 'bg-green-600' :
-                            'bg-amber-800'
-                          }`}>
-                            {trickCard.card.value}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Betting Info */}
-              {gameState.currentBets.length > 0 && (
-                <div className="bg-gradient-to-r from-amber-900/50 to-yellow-900/50 border border-amber-500/30 rounded-lg p-4">
-                  <h3 className="text-lg font-bold text-amber-300 mb-3">💰 Betting Information</h3>
-                  {highestBidder && gameState.highestBet && (
-                    <div className="bg-yellow-900/30 border border-yellow-500 rounded-lg p-3 mb-3">
-                      <p className="font-semibold text-yellow-300 text-sm">
-                        🏅 Highest Bet: {highestBidder.name} - {gameState.highestBet.amount} points
-                        {gameState.highestBet.withoutTrump && ' (Without Trump - 2x)'}
-                      </p>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 gap-2">
-                    {gameState.currentBets.map((bet) => {
-                      const player = gameState.players.find(p => p.id === bet.playerId);
-                      return (
-                        <div key={bet.playerId} className="flex items-center justify-between bg-gray-800/50 rounded p-2 border border-gray-700 text-sm">
-                          <span className="font-medium text-gray-300">{player?.name}</span>
-                          <span className={`font-semibold ${bet.skipped ? 'text-gray-500' : 'text-purple-400'}`}>
-                            {bet.skipped ? 'Skipped' : `${bet.amount}${bet.withoutTrump ? ' 🚫' : ''}`}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'gameState' && !gameState && (
-            <div className="text-center py-12 text-gray-400">
-              <p className="text-lg mb-2">No active game</p>
-              <p className="text-sm">Join or create a game to see game state information</p>
-            </div>
-          )}
-
-          {/* Tab 3: Automation */}
-          {activeTab === 'automation' && (
-            <div className="space-y-4 animate-slide-in">
-              {gameState && gameState.phase === 'playing' && (
-                <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border-2 border-green-500/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xl">🎮</span>
-                    <span className="font-semibold text-green-300">Playing Phase Controls</span>
-                    <span className="px-2 py-0.5 bg-green-500/30 text-green-300 text-xs font-semibold rounded-full">
-                      ACTIVE
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <Button
-                      onClick={() => socket?.emit('debug_auto_play_card', { gameId })}
-                      disabled={!socket}
-                      variant="primary"
-                      size="md"
-                    >
-                      🤖 Auto-Play Card
-                    </Button>
-                    <Button
-                      onClick={() => socket?.emit('debug_skip_trick', { gameId })}
-                      disabled={!socket || gameState.currentTrick.length === 0}
-                      variant="warning"
-                      size="md"
-                    >
-                      ⏭️ Skip Trick
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        if (window.confirm('Skip entire round? Auto-play all remaining cards.')) {
-                          socket?.emit('debug_skip_round', { gameId });
-                        }
-                      }}
-                      disabled={!socket}
-                      variant="secondary"
-                      size="md"
-                    >
-                      ⏭️⏭️ Skip Round
-                    </Button>
-                  </div>
-                  <p className="text-xs text-green-300 mt-3">
-                    Auto-play cards for current player. Use for testing game flow.
-                  </p>
-                </div>
-              )}
-
-              {gameState && gameState.phase === 'betting' && (
-                <div className="bg-gradient-to-r from-orange-900/50 to-red-900/50 border-2 border-orange-500/50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-xl">💰</span>
-                    <span className="font-semibold text-orange-300">Betting Phase Controls</span>
-                    <span className="px-2 py-0.5 bg-orange-500/30 text-orange-300 text-xs font-semibold rounded-full">
-                      ACTIVE
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                    <Button
-                      onClick={() => socket?.emit('debug_auto_bet', { gameId })}
-                      disabled={!socket}
-                      variant="primary"
-                      size="md"
-                    >
-                      💰 Auto-Bet
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        if (window.confirm('Skip betting phase? Auto-bet for all players.')) {
-                          socket?.emit('debug_skip_betting', { gameId });
-                        }
-                      }}
-                      disabled={!socket}
-                      variant="secondary"
-                      size="md"
-                    >
-                      ⏭️ Skip Betting
-                    </Button>
-                  </div>
-
-                  <div className="border-t-2 border-orange-500/30 pt-4">
-                    <p className="text-sm font-semibold text-orange-300 mb-2">Force Bet Override</p>
-                    <div className="grid grid-cols-12 gap-2">
-                      {[7, 8, 9, 10, 11, 12].map(amount => (
-                        <div key={amount} className="col-span-6 md:col-span-2 flex flex-col gap-1">
-                          <Button
-                            onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: false })}
-                            disabled={!socket}
-                            variant="warning"
-                            size="sm"
-                          >
-                            {amount}
-                          </Button>
-                          <Button
-                            onClick={() => socket?.emit('debug_force_bet', { gameId, amount, withoutTrump: true })}
-                            disabled={!socket}
-                            variant="danger"
-                            size="sm"
-                          >
-                            {amount} 🚫
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                    <p className="text-xs text-orange-300 mt-2">
-                      Force bet for current player. 🚫 = Without Trump (2x multiplier)
+                  <div className="bg-gray-800/50 rounded p-3">
+                    <span className="text-xs text-gray-400">Team 2 Score</span>
+                    <p className="text-sm font-bold text-purple-400">
+                      {gameState.teamScores.team2}
                     </p>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {(!gameState || (gameState.phase !== 'playing' && gameState.phase !== 'betting')) && (
-                <div className="bg-gray-800/50 border-2 border-gray-700 rounded-lg p-8 text-center">
-                  <p className="text-gray-400 text-lg">
-                    No automation controls available for{' '}
-                    <span className="font-semibold text-white">
-                      {gameState ? gameState.phase.replace('_', ' ') : 'current'}
-                    </span>{' '}
-                    phase
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Automation is available during betting and playing phases
-                  </p>
+            {/* Score Manipulation */}
+            <UICard variant="gradient" gradient="success" size="md">
+              <h3 className="text-lg font-bold text-green-300 mb-3 flex items-center gap-2">
+                <span>🎯</span> Set Team Scores
+              </h3>
+              <div className="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-2">
+                    Team 1 Score
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={team1Score}
+                    onChange={(e) => setTeam1Score(parseInt(e.target.value) || 0)}
+                    variant="filled"
+                    size="md"
+                  />
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* Tab 4: Server Health */}
-          {activeTab === 'serverHealth' && (
-            <div className="space-y-4 animate-slide-in">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <span>🖥️</span> Server Health Monitoring
-                </h3>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={fetchDetailedHealth}
-                    variant="primary"
-                    size="sm"
-                  >
-                    🔄 Refresh
-                  </Button>
-                  <Button
-                    onClick={handleClearAllGames}
-                    disabled={isClearing || !socket}
-                    variant="danger"
-                    size="sm"
-                  >
-                    {isClearing ? '🔄 Clearing...' : '🗑️ Clear All Games'}
-                  </Button>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-300 mb-2">
+                    Team 2 Score
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    value={team2Score}
+                    onChange={(e) => setTeam2Score(parseInt(e.target.value) || 0)}
+                    variant="filled"
+                    size="md"
+                  />
                 </div>
               </div>
+              <Button onClick={handleSetScores} variant="success" size="md" className="w-full">
+                Apply Scores
+              </Button>
+            </UICard>
 
-              {clearMessage && (
-                <div className={`p-3 rounded-lg border-2 ${
-                  clearMessage.startsWith('✅')
-                    ? 'bg-green-900/30 border-green-500 text-green-300'
-                    : clearMessage.startsWith('❌')
-                    ? 'bg-red-900/30 border-red-500 text-red-300'
-                    : 'bg-blue-900/30 border-blue-500 text-blue-300'
-                }`}>
-                  <p className="font-semibold">{clearMessage}</p>
-                </div>
-              )}
-
-              {healthLoading && (
-                <UICard variant="elevated" size="lg" className="text-center py-8">
-                  <Spinner size="lg" color="primary" />
-                  <p className="text-sm text-gray-400 mt-3">Loading health data...</p>
-                </UICard>
-              )}
-
-              {healthError && (
-                <div className="bg-red-900/30 border-2 border-red-500 rounded-lg p-4 text-center">
-                  <p className="text-red-300 font-semibold">⚠️ Unable to fetch server health</p>
-                  <p className="text-sm text-red-400 mt-1">{healthError}</p>
-                </div>
-              )}
-
-              {detailedHealth && !healthLoading && (
-                <div className="space-y-4">
-                  {/* Status & Uptime */}
-                  <div className="bg-gradient-to-r from-green-900/50 to-emerald-900/50 border border-green-500/30 rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="inline-block px-3 py-1 bg-green-500/30 text-green-300 text-sm font-semibold rounded-full">
-                          {detailedHealth.status.toUpperCase()}
-                        </span>
-                        <p className="text-xs text-gray-400 mt-2">
-                          Uptime: {detailedHealth.uptime.formatted}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Game State */}
-                  <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
-                    <h4 className="text-sm font-bold text-blue-300 mb-3 flex items-center gap-2">
-                      <span>🎮</span> Game State
-                    </h4>
-                    <div className="grid grid-cols-3 gap-3 text-sm">
-                      <div className="bg-gray-800/50 px-3 py-2 rounded">
-                        <div className="text-gray-400 text-xs">Games</div>
-                        <div className="font-bold text-white text-lg">{detailedHealth.game.activeGames}</div>
-                      </div>
-                      <div className="bg-gray-800/50 px-3 py-2 rounded">
-                        <div className="text-gray-400 text-xs">Sockets</div>
-                        <div className="font-bold text-white text-lg">{detailedHealth.game.connectedSockets}</div>
-                      </div>
-                      <div className="bg-gray-800/50 px-3 py-2 rounded">
-                        <div className="text-gray-400 text-xs">Players</div>
-                        <div className="font-bold text-white text-lg">{detailedHealth.game.onlinePlayers}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Database & Cache */}
-                  <div className="bg-gradient-to-r from-purple-900/50 to-violet-900/50 border border-purple-500/30 rounded-lg p-4">
-                    <h4 className="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
-                      <span>💾</span> Database & Cache
-                    </h4>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-gray-800/50 px-3 py-2 rounded">
-                        <div className="text-gray-400 text-xs">Pool Utilization</div>
-                        <div className="font-bold text-white">{detailedHealth.database.pool.utilization}</div>
-                      </div>
-                      <div className="bg-gray-800/50 px-3 py-2 rounded">
-                        <div className="text-gray-400 text-xs">Cache Keys</div>
-                        <div className="font-bold text-white">{detailedHealth.cache.keys}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Memory */}
-                  <div className="bg-gradient-to-r from-amber-900/50 to-orange-900/50 border border-amber-500/30 rounded-lg p-4">
-                    <h4 className="text-sm font-bold text-amber-300 mb-3 flex items-center gap-2">
-                      <span>🧠</span> Memory Usage
-                    </h4>
-                    <div className="bg-gray-800/50 px-3 py-3 rounded text-sm">
-                      <div className="flex justify-between mb-2">
-                        <span className="text-gray-400">Heap Used / Total</span>
-                        <span className="font-bold text-white">
-                          {detailedHealth.memory.heapUsedMB} / {detailedHealth.memory.heapTotalMB} MB
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-700 rounded-full h-3">
-                        <div
-                          className="bg-gradient-to-r from-blue-500 to-cyan-500 h-3 rounded-full transition-all"
-                          style={{ width: detailedHealth.memory.heapUtilization }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Error Handling */}
-                  <div className="bg-gradient-to-r from-red-900/50 to-pink-900/50 border border-red-500/30 rounded-lg p-4">
-                    <h4 className="text-sm font-bold text-red-300 mb-3 flex items-center gap-2">
-                      <span>🛡️</span> Error Handling
-                    </h4>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="bg-gray-800/50 px-3 py-2 rounded">
-                        <div className="text-gray-400 text-xs">Success Rate</div>
-                        <div className="font-bold text-green-400 text-lg">{detailedHealth.errorHandling.successRate}</div>
-                      </div>
-                      <div className="bg-gray-800/50 px-3 py-2 rounded">
-                        <div className="text-gray-400 text-xs">Total Calls</div>
-                        <div className="font-bold text-white text-lg">{detailedHealth.errorHandling.totalCalls.toLocaleString()}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Tab 5: Test Controls */}
-          {activeTab === 'testControls' && (
-            <div className="space-y-4 animate-slide-in">
-              {/* Current State */}
-              {gameState && (
-                <div className="bg-gradient-to-r from-blue-900/50 to-cyan-900/50 border border-blue-500/30 rounded-lg p-4">
-                  <h3 className="text-lg font-bold text-blue-300 mb-3 flex items-center gap-2">
-                    <span>📊</span> Current State
-                  </h3>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="bg-gray-800/50 rounded p-3">
-                      <span className="text-xs text-gray-400">Phase</span>
-                      <p className="text-sm font-bold capitalize text-white">{gameState.phase.replace('_', ' ')}</p>
-                    </div>
-                    <div className="bg-gray-800/50 rounded p-3">
-                      <span className="text-xs text-gray-400">Round</span>
-                      <p className="text-sm font-bold text-white">{gameState.roundNumber}</p>
-                    </div>
-                    <div className="bg-gray-800/50 rounded p-3">
-                      <span className="text-xs text-gray-400">Team 1 Score</span>
-                      <p className="text-sm font-bold text-orange-400">{gameState.teamScores.team1}</p>
-                    </div>
-                    <div className="bg-gray-800/50 rounded p-3">
-                      <span className="text-xs text-gray-400">Team 2 Score</span>
-                      <p className="text-sm font-bold text-purple-400">{gameState.teamScores.team2}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Score Manipulation */}
-              <UICard variant="gradient" gradient="success" size="md">
-                <h3 className="text-lg font-bold text-green-300 mb-3 flex items-center gap-2">
-                  <span>🎯</span> Set Team Scores
-                </h3>
-                <div className="grid grid-cols-2 gap-3 mb-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-300 mb-2">Team 1 Score</label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={team1Score}
-                      onChange={(e) => setTeam1Score(parseInt(e.target.value) || 0)}
-                      variant="filled"
-                      size="md"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-gray-300 mb-2">Team 2 Score</label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={100}
-                      value={team2Score}
-                      onChange={(e) => setTeam2Score(parseInt(e.target.value) || 0)}
-                      variant="filled"
-                      size="md"
-                    />
-                  </div>
-                </div>
+            {/* Quick Actions */}
+            <UICard variant="gradient" gradient="primary" size="md">
+              <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
+                <span>⚡</span> Quick Actions
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
                 <Button
-                  onClick={handleSetScores}
-                  variant="success"
-                  size="md"
-                  className="w-full"
+                  onClick={() => {
+                    setTeam1Score(40);
+                    setTeam2Score(0);
+                  }}
+                  variant="warning"
+                  size="sm"
                 >
-                  Apply Scores
+                  Team 1 Near Win (40-0)
                 </Button>
-              </UICard>
+                <Button
+                  onClick={() => {
+                    setTeam1Score(0);
+                    setTeam2Score(40);
+                  }}
+                  variant="secondary"
+                  size="sm"
+                >
+                  Team 2 Near Win (0-40)
+                </Button>
+                <Button
+                  onClick={() => {
+                    setTeam1Score(35);
+                    setTeam2Score(35);
+                  }}
+                  variant="primary"
+                  size="sm"
+                >
+                  Close Game (35-35)
+                </Button>
+                <Button
+                  onClick={() => {
+                    setTeam1Score(0);
+                    setTeam2Score(0);
+                  }}
+                  variant="ghost"
+                  size="sm"
+                >
+                  Reset Scores (0-0)
+                </Button>
+              </div>
+            </UICard>
 
-              {/* Quick Actions */}
-              <UICard variant="gradient" gradient="primary" size="md">
-                <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
-                  <span>⚡</span> Quick Actions
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={() => { setTeam1Score(40); setTeam2Score(0); }}
-                    variant="warning"
-                    size="sm"
-                  >
-                    Team 1 Near Win (40-0)
-                  </Button>
-                  <Button
-                    onClick={() => { setTeam1Score(0); setTeam2Score(40); }}
-                    variant="secondary"
-                    size="sm"
-                  >
-                    Team 2 Near Win (0-40)
-                  </Button>
-                  <Button
-                    onClick={() => { setTeam1Score(35); setTeam2Score(35); }}
-                    variant="primary"
-                    size="sm"
-                  >
-                    Close Game (35-35)
-                  </Button>
-                  <Button
-                    onClick={() => { setTeam1Score(0); setTeam2Score(0); }}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    Reset Scores (0-0)
-                  </Button>
-                </div>
-              </UICard>
+            {/* Developer Resources */}
+            <UICard variant="gradient" gradient="primary" size="md">
+              <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
+                <span>🔧</span> Developer Resources
+              </h3>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() =>
+                    window.open(
+                      'https://69291bd0d238365e7e12f66c-nqeyaruzoe.chromatic.com/',
+                      '_blank'
+                    )
+                  }
+                  variant="secondary"
+                  size="md"
+                >
+                  📖 Open Storybook
+                </Button>
+                <Button
+                  onClick={() =>
+                    window.open(
+                      'https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568',
+                      '_blank'
+                    )
+                  }
+                  variant="warning"
+                  size="md"
+                >
+                  🐛 Open Sentry
+                </Button>
+              </div>
+            </UICard>
 
-              {/* Developer Resources */}
-              <UICard variant="gradient" gradient="primary" size="md">
-                <h3 className="text-lg font-bold text-purple-300 mb-3 flex items-center gap-2">
-                  <span>🔧</span> Developer Resources
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={() => window.open('https://69291bd0d238365e7e12f66c-nqeyaruzoe.chromatic.com/', '_blank')}
-                    variant="secondary"
-                    size="md"
+            {/* Sentry Testing */}
+            <UICard variant="gradient" gradient="error" size="md">
+              <h3 className="text-lg font-bold text-red-300 mb-3 flex items-center gap-2">
+                <span>🚨</span> Sentry Error Tracking Tests
+              </h3>
+              <p className="text-sm text-gray-300 mb-3">
+                Test Sentry error tracking integration for both frontend and backend.
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Button onClick={handleTestFrontendSentry} variant="danger" size="md">
+                  📱 Test Frontend Sentry
+                </Button>
+                <Button
+                  onClick={handleTestBackendSentry}
+                  disabled={!socket}
+                  variant="warning"
+                  size="md"
+                >
+                  🖥️ Test Backend Sentry
+                </Button>
+              </div>
+              <UICard
+                variant="elevated"
+                size="sm"
+                className="mt-3 !bg-blue-900/30 !border-blue-500"
+              >
+                <p className="text-xs text-blue-300">
+                  <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
+                  <a
+                    href="https://sentry.io"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline hover:text-blue-200"
                   >
-                    📖 Open Storybook
-                  </Button>
-                  <Button
-                    onClick={() => window.open('https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568', '_blank')}
-                    variant="warning"
-                    size="md"
-                  >
-                    🐛 Open Sentry
-                  </Button>
-                </div>
-              </UICard>
-
-              {/* Sentry Testing */}
-              <UICard variant="gradient" gradient="error" size="md">
-                <h3 className="text-lg font-bold text-red-300 mb-3 flex items-center gap-2">
-                  <span>🚨</span> Sentry Error Tracking Tests
-                </h3>
-                <p className="text-sm text-gray-300 mb-3">
-                  Test Sentry error tracking integration for both frontend and backend.
-                </p>
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    onClick={handleTestFrontendSentry}
-                    variant="danger"
-                    size="md"
-                  >
-                    📱 Test Frontend Sentry
-                  </Button>
-                  <Button
-                    onClick={handleTestBackendSentry}
-                    disabled={!socket}
-                    variant="warning"
-                    size="md"
-                  >
-                    🖥️ Test Backend Sentry
-                  </Button>
-                </div>
-                <UICard variant="elevated" size="sm" className="mt-3 !bg-blue-900/30 !border-blue-500">
-                  <p className="text-xs text-blue-300">
-                    <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
-                    <a
-                      href="https://sentry.io"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-blue-200"
-                    >
-                      sentry.io
-                    </a>
-                    {' '}to verify errors appear and configure alerts.
-                  </p>
-                </UICard>
-              </UICard>
-
-              {/* Warning */}
-              <UICard variant="gradient" gradient="warning" size="md">
-                <p className="text-sm text-yellow-300">
-                  <strong>⚠️ Warning:</strong> These actions directly modify the game state.
-                  Use for testing purposes only. Changes affect all connected players.
+                    sentry.io
+                  </a>{' '}
+                  to verify errors appear and configure alerts.
                 </p>
               </UICard>
-            </div>
-          )}
-        </div>
+            </UICard>
 
-        {/* Footer */}
-        <div className="mt-4 pt-4 border-t border-gray-700">
-          <p className="text-center text-xs sm:text-sm text-gray-400">
-            Made with ❤️ and lots of ☕ • v{buildInfo.version} • {buildInfo.buildStatus}
-          </p>
-        </div>
+            {/* Warning */}
+            <UICard variant="gradient" gradient="warning" size="md">
+              <p className="text-sm text-yellow-300">
+                <strong>⚠️ Warning:</strong> These actions directly modify the game state. Use for
+                testing purposes only. Changes affect all connected players.
+              </p>
+            </UICard>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-4 pt-4 border-t border-gray-700">
+        <p className="text-center text-xs sm:text-sm text-gray-400">
+          Made with ❤️ and lots of ☕ • v{buildInfo.version} • {buildInfo.buildStatus}
+        </p>
+      </div>
     </Modal>
   );
 }

@@ -134,7 +134,7 @@ export function GameHeader({
       red: 'var(--color-suit-red)',
       brown: 'var(--color-suit-brown)',
       green: 'var(--color-suit-green)',
-      blue: 'var(--color-suit-blue)'
+      blue: 'var(--color-suit-blue)',
     };
     return { backgroundColor: colorMap[color] };
   };
@@ -156,13 +156,7 @@ export function GameHeader({
   };
 
   return (
-    <div
-      className="border-b-2 shadow-lg z-40 relative overflow-visible"
-      style={{
-        background: 'linear-gradient(to right, var(--color-bg-secondary), var(--color-bg-tertiary))',
-        borderColor: 'var(--color-border-accent)',
-      }}
-    >
+    <div className="border-b-2 shadow-lg z-40 relative overflow-visible border-skin-accent bg-gradient-to-r from-skin-secondary to-skin-tertiary">
       <div className="max-w-7xl mx-auto px-2 sm:px-4 py-1 sm:py-1.5">
         {/* Desktop: Single row */}
         <div className="hidden md:flex items-center gap-3">
@@ -173,46 +167,35 @@ export function GameHeader({
             size="xs"
             title="Click to copy game link"
           >
-            <p
-              className="text-xs font-mono font-bold"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
+            <p className="text-xs font-mono font-bold text-skin-secondary">
               {linkCopied ? '✓ Copied!' : gameId}
             </p>
           </Button>
 
-          <div
-            className="px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
-            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-          >
-            <p
-              className="text-xs font-bold"
-              style={{ color: 'var(--color-text-primary)' }}
-              data-testid="round-number"
-            >
+          <div className="px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary">
+            <p className="text-xs font-bold text-skin-primary" data-testid="round-number">
               R{roundNumber}
             </p>
           </div>
 
           {/* Bet and Trump Display */}
           {(highestBet || trump) && (
-            <div
-              className="flex items-center gap-1 px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
-              style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-            >
+            <div className="flex items-center gap-1 px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary">
               {highestBet && (
                 <div className="flex items-center gap-1">
-                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Bet:</span>
-                  <span className="text-xs font-bold" style={{ color: 'var(--color-text-primary)' }}>{highestBet.amount}</span>
+                  <span className="text-xs text-skin-muted">Bet:</span>
+                  <span className="text-xs font-bold text-skin-primary">{highestBet.amount}</span>
                   {highestBet.withoutTrump && (
-                    <span className="text-xs font-bold" style={{ color: 'var(--color-warning)' }} title="Without Trump">!</span>
+                    <span className="text-xs font-bold text-skin-warning" title="Without Trump">
+                      !
+                    </span>
                   )}
                 </div>
               )}
-              {highestBet && trump && <span style={{ color: 'var(--color-text-muted)' }}>|</span>}
+              {highestBet && trump && <span className="text-skin-muted">|</span>}
               {trump && (
                 <div className="flex items-center gap-1">
-                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Trump:</span>
+                  <span className="text-xs text-skin-muted">Trump:</span>
                   <div
                     className="w-3 h-3 rounded-sm"
                     style={getTrumpColorStyle(trump)}
@@ -225,47 +208,55 @@ export function GameHeader({
 
           {/* Team Scores */}
           <div className="flex items-center gap-1" data-testid="team-scores">
-            <span className="sr-only">Team 1: {team1Score} Team 2: {team2Score}</span>
+            <span className="sr-only">
+              Team 1: {team1Score} Team 2: {team2Score}
+            </span>
 
             {/* Team 1 Score */}
             <div
-              className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+              className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all bg-skin-team1-primary ${
                 team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
               } ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
               style={{
-                backgroundColor: 'var(--color-team1-primary)',
-                boxShadow: bettingTeamId === 1 ? '0 0 0 2px var(--color-warning), 0 0 10px var(--color-warning)' : undefined,
+                boxShadow:
+                  bettingTeamId === 1
+                    ? '0 0 0 2px var(--color-warning), 0 0 10px var(--color-warning)'
+                    : undefined,
               }}
             >
-              <p className="text-xs font-semibold" style={{ color: 'var(--color-team1-text)', opacity: 0.9 }}>T1</p>
-              <p className="text-base font-black" style={{ color: 'var(--color-team1-text)' }}>{animatedTeam1Score}</p>
+              <p className="text-xs font-semibold text-skin-team1-text opacity-90">T1</p>
+              <p className="text-base font-black text-skin-team1-text">{animatedTeam1Score}</p>
               {team1ScoreChange !== null && (
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                  <span style={{ color: team1ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                    {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
+                  <span className={team1ScoreChange > 0 ? 'text-skin-success' : 'text-skin-error'}>
+                    {team1ScoreChange > 0 ? '+' : ''}
+                    {team1ScoreChange}
                   </span>
                 </div>
               )}
             </div>
 
-            <div className="font-bold text-sm flex-shrink-0" style={{ color: 'var(--color-text-primary)' }}>:</div>
+            <div className="font-bold text-sm flex-shrink-0 text-skin-primary">:</div>
 
             {/* Team 2 Score */}
             <div
-              className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+              className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all bg-skin-team2-primary ${
                 team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
               } ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
               style={{
-                backgroundColor: 'var(--color-team2-primary)',
-                boxShadow: bettingTeamId === 2 ? '0 0 0 2px var(--color-warning), 0 0 10px var(--color-warning)' : undefined,
+                boxShadow:
+                  bettingTeamId === 2
+                    ? '0 0 0 2px var(--color-warning), 0 0 10px var(--color-warning)'
+                    : undefined,
               }}
             >
-              <p className="text-xs font-semibold" style={{ color: 'var(--color-team2-text)', opacity: 0.9 }}>T2</p>
-              <p className="text-base font-black" style={{ color: 'var(--color-team2-text)' }}>{animatedTeam2Score}</p>
+              <p className="text-xs font-semibold text-skin-team2-text opacity-90">T2</p>
+              <p className="text-base font-black text-skin-team2-text">{animatedTeam2Score}</p>
               {team2ScoreChange !== null && (
                 <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-lg font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                  <span style={{ color: team2ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                    {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
+                  <span className={team2ScoreChange > 0 ? 'text-skin-success' : 'text-skin-error'}>
+                    {team2ScoreChange > 0 ? '+' : ''}
+                    {team2ScoreChange}
                   </span>
                 </div>
               )}
@@ -292,12 +283,13 @@ export function GameHeader({
             {onVoiceToggle && (
               <HeaderActionButton
                 onClick={onVoiceToggle}
-                icon={isVoiceEnabled ? (isVoiceMuted ? "🔇" : "🎙️") : "🎤"}
-                label={isVoiceEnabled ? (isVoiceMuted ? "Muted" : "Voice") : "Voice"}
+                icon={isVoiceEnabled ? (isVoiceMuted ? '🔇' : '🎙️') : '🎤'}
+                label={isVoiceEnabled ? (isVoiceMuted ? 'Muted' : 'Voice') : 'Voice'}
                 badgeCount={isVoiceEnabled ? voiceParticipants.length : undefined}
-                title={isVoiceEnabled
-                  ? `Voice Chat (${voiceParticipants.length} in call)${voiceError ? ` - ${voiceError}` : ''}`
-                  : "Join Voice Chat"
+                title={
+                  isVoiceEnabled
+                    ? `Voice Chat (${voiceParticipants.length} in call)${voiceError ? ` - ${voiceError}` : ''}`
+                    : 'Join Voice Chat'
                 }
                 testId="header-voice-button"
               />
@@ -307,9 +299,9 @@ export function GameHeader({
             {isVoiceEnabled && onVoiceMuteToggle && (
               <HeaderActionButton
                 onClick={onVoiceMuteToggle}
-                icon={isVoiceMuted ? "🔇" : "🔊"}
-                label={isVoiceMuted ? "Unmute" : "Mute"}
-                title={isVoiceMuted ? "Unmute microphone" : "Mute microphone"}
+                icon={isVoiceMuted ? '🔇' : '🔊'}
+                label={isVoiceMuted ? 'Unmute' : 'Mute'}
+                title={isVoiceMuted ? 'Unmute microphone' : 'Mute microphone'}
                 testId="header-mute-button"
               />
             )}
@@ -397,27 +389,22 @@ export function GameHeader({
               size="xs"
               title="Click to copy game link"
             >
-              <p className="text-xs font-mono font-bold" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="text-xs font-mono font-bold text-skin-secondary">
                 {linkCopied ? '✓' : gameId}
               </p>
             </Button>
 
-            <div
-              className="px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
-              style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-            >
-              <p className="text-xs font-bold" style={{ color: 'var(--color-text-primary)' }}>R{roundNumber}</p>
+            <div className="px-2 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary">
+              <p className="text-xs font-bold text-skin-primary">R{roundNumber}</p>
             </div>
 
             {/* Mobile Bet and Trump Display */}
             {(highestBet || trump) && (
-              <div
-                className="flex items-center gap-0.5 px-1.5 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0"
-                style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-              >
+              <div className="flex items-center gap-0.5 px-1.5 py-1 rounded-[var(--radius-md)] backdrop-blur-sm flex-shrink-0 bg-skin-tertiary">
                 {highestBet && (
-                  <span className="text-[10px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                    {highestBet.amount}{highestBet.withoutTrump ? '!' : ''}
+                  <span className="text-[10px] font-bold text-skin-primary">
+                    {highestBet.amount}
+                    {highestBet.withoutTrump ? '!' : ''}
                   </span>
                 )}
                 {trump && (
@@ -431,43 +418,47 @@ export function GameHeader({
             <div className="flex items-center gap-1">
               {/* Team 1 Score Mobile */}
               <div
-                className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+                className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all bg-skin-team1-primary ${
                   team1Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
                 } ${team1Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
                 style={{
-                  backgroundColor: 'var(--color-team1-primary)',
                   boxShadow: bettingTeamId === 1 ? '0 0 0 2px var(--color-warning)' : undefined,
                 }}
               >
-                <p className="text-xs font-semibold" style={{ color: 'var(--color-team1-text)', opacity: 0.9 }}>T1</p>
-                <p className="text-base font-black" style={{ color: 'var(--color-team1-text)' }}>{animatedTeam1Score}</p>
+                <p className="text-xs font-semibold text-skin-team1-text opacity-90">T1</p>
+                <p className="text-base font-black text-skin-team1-text">{animatedTeam1Score}</p>
                 {team1ScoreChange !== null && (
                   <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                    <span style={{ color: team1ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                      {team1ScoreChange > 0 ? '+' : ''}{team1ScoreChange}
+                    <span
+                      className={team1ScoreChange > 0 ? 'text-skin-success' : 'text-skin-error'}
+                    >
+                      {team1ScoreChange > 0 ? '+' : ''}
+                      {team1ScoreChange}
                     </span>
                   </div>
                 )}
               </div>
 
-              <div className="font-bold text-sm flex-shrink-0" style={{ color: 'var(--color-text-primary)' }}>:</div>
+              <div className="font-bold text-sm flex-shrink-0 text-skin-primary">:</div>
 
               {/* Team 2 Score Mobile */}
               <div
-                className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all ${
+                className={`relative px-2 py-1 rounded-[var(--radius-md)] shadow-md flex items-center gap-1 flex-shrink-0 transition-all bg-skin-team2-primary ${
                   team2Flash === 'green' ? 'motion-safe:animate-score-flash-green' : ''
                 } ${team2Flash === 'red' ? 'motion-safe:animate-score-flash-red' : ''}`}
                 style={{
-                  backgroundColor: 'var(--color-team2-primary)',
                   boxShadow: bettingTeamId === 2 ? '0 0 0 2px var(--color-warning)' : undefined,
                 }}
               >
-                <p className="text-xs font-semibold" style={{ color: 'var(--color-team2-text)', opacity: 0.9 }}>T2</p>
-                <p className="text-base font-black" style={{ color: 'var(--color-team2-text)' }}>{animatedTeam2Score}</p>
+                <p className="text-xs font-semibold text-skin-team2-text opacity-90">T2</p>
+                <p className="text-base font-black text-skin-team2-text">{animatedTeam2Score}</p>
                 {team2ScoreChange !== null && (
                   <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-black motion-safe:animate-plus-minus-float motion-reduce:opacity-100 pointer-events-none whitespace-nowrap z-[9999]">
-                    <span style={{ color: team2ScoreChange > 0 ? 'var(--color-success)' : 'var(--color-error)' }}>
-                      {team2ScoreChange > 0 ? '+' : ''}{team2ScoreChange}
+                    <span
+                      className={team2ScoreChange > 0 ? 'text-skin-success' : 'text-skin-error'}
+                    >
+                      {team2ScoreChange > 0 ? '+' : ''}
+                      {team2ScoreChange}
                     </span>
                   </div>
                 )}
@@ -492,9 +483,9 @@ export function GameHeader({
             {onVoiceToggle && (
               <HeaderActionButton
                 onClick={onVoiceToggle}
-                icon={isVoiceEnabled ? (isVoiceMuted ? "🔇" : "🎙️") : "🎤"}
+                icon={isVoiceEnabled ? (isVoiceMuted ? '🔇' : '🎙️') : '🎤'}
                 badgeCount={isVoiceEnabled ? voiceParticipants.length : undefined}
-                title={isVoiceEnabled ? `Voice (${voiceParticipants.length})` : "Voice"}
+                title={isVoiceEnabled ? `Voice (${voiceParticipants.length})` : 'Voice'}
                 size="sm"
                 className="p-1.5"
               />
@@ -504,8 +495,8 @@ export function GameHeader({
             {isVoiceEnabled && onVoiceMuteToggle && (
               <HeaderActionButton
                 onClick={onVoiceMuteToggle}
-                icon={isVoiceMuted ? "🔇" : "🔊"}
-                title={isVoiceMuted ? "Unmute" : "Mute"}
+                icon={isVoiceMuted ? '🔇' : '🔊'}
+                title={isVoiceMuted ? 'Unmute' : 'Mute'}
                 size="sm"
                 className="p-1.5"
               />

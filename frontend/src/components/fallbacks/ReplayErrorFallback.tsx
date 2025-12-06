@@ -27,18 +27,10 @@ export function ReplayErrorFallback({ onClose }: ReplayErrorFallbackProps) {
           Failed to load or play the game replay. The replay data may be corrupted or unavailable.
         </p>
         <div className="space-y-3">
-          <Button
-            onClick={onClose || (() => window.location.reload())}
-            variant="primary"
-            fullWidth
-          >
+          <Button onClick={onClose || (() => window.location.reload())} variant="primary" fullWidth>
             Close Replay
           </Button>
-          <Button
-            onClick={() => window.location.reload()}
-            variant="secondary"
-            fullWidth
-          >
+          <Button onClick={() => window.location.reload()} variant="secondary" fullWidth>
             Reload Page
           </Button>
         </div>

@@ -42,7 +42,7 @@ export function useAudioManager({ gameState }: UseAudioManagerProps): UseAudioMa
   }, [soundEnabled]);
 
   const toggleSound = useCallback(() => {
-    setSoundEnabled(prev => {
+    setSoundEnabled((prev) => {
       const newState = !prev;
       sounds.setEnabled(newState);
       if (newState) {

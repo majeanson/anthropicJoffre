@@ -122,19 +122,19 @@ export const WithScoreAnimation: Story = {
           />
           <div className="p-4 flex gap-4 justify-center">
             <button
-              onClick={() => setTeam1Score(s => s + 5)}
+              onClick={() => setTeam1Score((s) => s + 5)}
               className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
             >
               +5 Team 1
             </button>
             <button
-              onClick={() => setTeam2Score(s => s + 3)}
+              onClick={() => setTeam2Score((s) => s + 3)}
               className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
             >
               +3 Team 2
             </button>
             <button
-              onClick={() => setTeam1Score(s => s - 2)}
+              onClick={() => setTeam1Score((s) => s - 2)}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
               -2 Team 1
@@ -216,9 +216,7 @@ export const DarkMode: Story = {
         <div className="dark min-h-[200px] bg-gray-900">
           <Story />
           <div className="p-4 mt-4 bg-gray-800 rounded m-4">
-            <p className="text-sm text-gray-400">
-              Dark mode content below header
-            </p>
+            <p className="text-sm text-gray-400">Dark mode content below header</p>
           </div>
         </div>
       </SettingsProvider>

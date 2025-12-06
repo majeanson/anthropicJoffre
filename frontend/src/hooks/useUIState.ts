@@ -58,35 +58,35 @@ export function useUIState(): UseUIStateReturn {
   const [dmRecipient, setDmRecipient] = useState<string | null>(null);
 
   const toggleBotManagement = useCallback(() => {
-    setShowBotManagement(prev => !prev);
+    setShowBotManagement((prev) => !prev);
   }, []);
 
   const toggleFriendsPanel = useCallback(() => {
-    setShowFriendsPanel(prev => !prev);
+    setShowFriendsPanel((prev) => !prev);
   }, []);
 
   const toggleReplayModal = useCallback(() => {
-    setShowReplayModal(prev => !prev);
+    setShowReplayModal((prev) => !prev);
   }, []);
 
   const toggleAchievementsPanel = useCallback(() => {
-    setShowAchievementsPanel(prev => !prev);
+    setShowAchievementsPanel((prev) => !prev);
   }, []);
 
   const toggleQuestsPanel = useCallback(() => {
-    setShowQuestsPanel(prev => !prev);
+    setShowQuestsPanel((prev) => !prev);
   }, []);
 
   const toggleRewardsCalendar = useCallback(() => {
-    setShowRewardsCalendar(prev => !prev);
+    setShowRewardsCalendar((prev) => !prev);
   }, []);
 
   const togglePersonalHub = useCallback(() => {
-    setShowPersonalHub(prev => !prev);
+    setShowPersonalHub((prev) => !prev);
   }, []);
 
   const toggleDirectMessages = useCallback(() => {
-    setShowDirectMessages(prev => !prev);
+    setShowDirectMessages((prev) => !prev);
   }, []);
 
   const closeAllPanels = useCallback(() => {

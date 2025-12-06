@@ -85,18 +85,8 @@ export function WeeklyCalendar({
     <div className="w-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3
-          className="font-bold text-lg"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
-          Weekly Rewards
-        </h3>
-        <span
-          className="text-sm"
-          style={{ color: 'var(--color-text-muted)' }}
-        >
-          {daysClaimed.length}/7 claimed
-        </span>
+        <h3 className="font-bold text-lg text-skin-primary">Weekly Rewards</h3>
+        <span className="text-sm text-skin-muted">{daysClaimed.length}/7 claimed</span>
       </div>
 
       {/* Calendar grid */}
@@ -120,8 +110,7 @@ export function WeeklyCalendar({
             >
               {/* Day name */}
               <span
-                className={`font-medium ${compact ? 'text-[10px]' : 'text-xs'}`}
-                style={{ color: 'var(--color-text-secondary)' }}
+                className={`font-medium text-skin-secondary ${compact ? 'text-[10px]' : 'text-xs'}`}
               >
                 {compact ? day.dayName.slice(0, 1) : day.dayName.slice(0, 3)}
               </span>
@@ -135,16 +124,13 @@ export function WeeklyCalendar({
                 ) : isClaiming ? (
                   <span className="animate-spin">⌛</span>
                 ) : (
-                  <span className={isClaimable ? 'animate-bounce' : ''}>
-                    {day.icon}
-                  </span>
+                  <span className={isClaimable ? 'animate-bounce' : ''}>{day.icon}</span>
                 )}
               </div>
 
               {/* Rewards */}
               <div
-                className={`flex flex-col items-center ${compact ? 'text-[9px]' : 'text-[10px] sm:text-xs'}`}
-                style={{ color: 'var(--color-text-muted)' }}
+                className={`flex flex-col items-center text-skin-muted ${compact ? 'text-[9px]' : 'text-[10px] sm:text-xs'}`}
               >
                 <span>+{day.rewardXp} XP</span>
                 {!compact && <span>+{day.rewardCurrency} 💰</span>}
@@ -167,26 +153,19 @@ export function WeeklyCalendar({
       </div>
 
       {/* Today indicator */}
-      <div
-        className="mt-3 text-center text-sm"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
+      <div className="mt-3 text-center text-sm text-skin-muted">
         {getDayStatus(currentDayOfWeek) === 'available' ? (
           <span className="text-blue-400">
-            Claim today's reward! ({calendar.find(d => d.dayNumber === currentDayOfWeek)?.dayName})
+            Claim today's reward! ({calendar.find((d) => d.dayNumber === currentDayOfWeek)?.dayName}
+            )
           </span>
         ) : getDayStatus(currentDayOfWeek) === 'claimed' ? (
-          <span className="text-green-400">
-            Today's reward claimed!
-          </span>
+          <span className="text-green-400">Today's reward claimed!</span>
         ) : null}
       </div>
 
       {/* Info text */}
-      <p
-        className="mt-2 text-xs text-center"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
+      <p className="mt-2 text-xs text-center text-skin-muted">
         Log in each day to claim rewards. Missed days cannot be recovered.
       </p>
     </div>
@@ -212,18 +191,16 @@ export function WeeklyCalendarCompact({
       onClick={onOpenFull}
       className={`
         relative flex items-center gap-2 px-3 py-1.5 rounded-full
-        transition-all hover:scale-105
-        ${hasUnclaimedToday
-          ? 'bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-400'
-          : 'bg-gray-500/10 border border-gray-500/30'
+        transition-all hover:scale-105 text-skin-primary
+        ${
+          hasUnclaimedToday
+            ? 'bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-400'
+            : 'bg-gray-500/10 border border-gray-500/30'
         }
       `}
-      style={{ color: 'var(--color-text-primary)' }}
     >
       <span className="text-sm">📅</span>
-      <span className="text-xs font-medium">
-        {daysClaimed.length}/7
-      </span>
+      <span className="text-xs font-medium">{daysClaimed.length}/7</span>
       {hasUnclaimedToday && (
         <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full animate-ping" />
       )}

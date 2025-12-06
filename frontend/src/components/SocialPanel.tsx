@@ -70,7 +70,9 @@ export function SocialPanel({
 
   // Friend search state
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{ player_name: string; games_played: number; games_won: number }>>([]);
+  const [searchResults, setSearchResults] = useState<
+    Array<{ player_name: string; games_played: number; games_won: number }>
+  >([]);
   const [isSearching, setIsSearching] = useState(false);
 
   // Profile editing state
@@ -119,10 +121,10 @@ export function SocialPanel({
     if (socialTab === 'friends' && user) {
       // Get recent players who are not friends
       const suggestions = recentPlayers
-        .filter(rp => !friends.some(f => f.player_name === rp.name))
-        .filter(rp => !rp.name.startsWith('Bot ')) // Exclude bots
+        .filter((rp) => !friends.some((f) => f.player_name === rp.name))
+        .filter((rp) => !rp.name.startsWith('Bot ')) // Exclude bots
         .slice(0, 5)
-        .map(rp => rp.name);
+        .map((rp) => rp.name);
       setFriendSuggestions(suggestions);
     }
   }, [socialTab, recentPlayers, friends, user]);
@@ -245,10 +247,14 @@ export function SocialPanel({
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'in_lobby': return 'In Lobby';
-      case 'in_game': return 'Playing';
-      case 'in_team_selection': return 'Setting up';
-      default: return status;
+      case 'in_lobby':
+        return 'In Lobby';
+      case 'in_game':
+        return 'Playing';
+      case 'in_team_selection':
+        return 'Setting up';
+      default:
+        return status;
     }
   };
 
@@ -269,9 +275,13 @@ export function SocialPanel({
   useEffect(() => {
     if (!socket) return;
 
-    const handleSearchResults = ({ players }: { players: Array<{ player_name: string; games_played: number; games_won: number }> }) => {
+    const handleSearchResults = ({
+      players,
+    }: {
+      players: Array<{ player_name: string; games_played: number; games_won: number }>;
+    }) => {
       // Filter out bots from search results
-      const humanPlayers = players.filter(p => !p.player_name.startsWith('Bot '));
+      const humanPlayers = players.filter((p) => !p.player_name.startsWith('Bot '));
       setSearchResults(humanPlayers);
       setIsSearching(false);
     };
@@ -311,7 +321,7 @@ export function SocialPanel({
     const updates = {
       bio: profileBio.trim() || null,
       country: profileCountry || null,
-      favorite_team: profileFavoriteTeam
+      favorite_team: profileFavoriteTeam,
     };
 
     socket.emit('update_user_profile', updates);
@@ -381,7 +391,10 @@ export function SocialPanel({
         <Button
           data-keyboard-nav="social-online"
           data-nav-subtab="online"
-          onClick={() => { sounds.buttonClick(); setSocialTab('online'); }}
+          onClick={() => {
+            sounds.buttonClick();
+            setSocialTab('online');
+          }}
           variant={socialTab === 'online' ? 'primary' : 'ghost'}
           size="sm"
         >
@@ -406,7 +419,10 @@ export function SocialPanel({
         <Button
           data-keyboard-nav="social-chat"
           data-nav-subtab="chat"
-          onClick={() => { sounds.buttonClick(); setSocialTab('chat'); }}
+          onClick={() => {
+            sounds.buttonClick();
+            setSocialTab('chat');
+          }}
           variant={socialTab === 'chat' ? 'primary' : 'ghost'}
           size="sm"
         >
@@ -457,9 +473,7 @@ export function SocialPanel({
             <div className="bg-gradient-to-r from-purple-500/20 to-blue-500/20 rounded-lg p-3 border-2 border-purple-500/30">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-[var(--color-text-primary)]">
-                    Looking for Game
-                  </p>
+                  <p className="font-semibold text-[var(--color-text-primary)]">Looking for Game</p>
                   <p className="text-xs text-[var(--color-text-secondary)]">
                     Let others know you're looking for teammates
                   </p>
@@ -481,10 +495,10 @@ export function SocialPanel({
                 <p className="text-sm mt-2">Online players will appear here</p>
               </div>
             ) : (
-              onlinePlayers.map(player => {
+              onlinePlayers.map((player) => {
                 const isBot = player.playerName?.startsWith('Bot ');
                 const isSelf = player.playerName === playerName;
-                const isFriend = friends.some(f => f.player_name === player.playerName);
+                const isFriend = friends.some((f) => f.player_name === player.playerName);
                 const showFriendButton = user && !isBot && !isSelf && !isFriend;
                 const isLfg = player.lookingForGame === true;
 
@@ -504,7 +518,9 @@ export function SocialPanel({
                           <div className="flex items-center gap-1.5">
                             <PlayerNameButton
                               playerName={player.playerName || player.socketId || 'Unknown'}
-                              onClick={() => setSelectedPlayerProfile(player.playerName || 'Unknown')}
+                              onClick={() =>
+                                setSelectedPlayerProfile(player.playerName || 'Unknown')
+                              }
                               variant="plain"
                               className="font-bold truncate text-left"
                             />
@@ -517,7 +533,9 @@ export function SocialPanel({
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-[var(--color-text-secondary)]">{getStatusLabel(player.status)}</p>
+                          <p className="text-xs text-[var(--color-text-secondary)]">
+                            {getStatusLabel(player.status)}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -539,7 +557,8 @@ export function SocialPanel({
                             data-keyboard-nav={`join-player-${player.socketId}`}
                             onClick={() => {
                               sounds.buttonClick();
-                              const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
+                              const nameToUse =
+                                playerName.trim() || window.prompt('Enter your name to join:');
                               if (nameToUse && nameToUse.trim()) {
                                 if (!playerName.trim()) {
                                   setPlayerName(nameToUse.trim());
@@ -567,7 +586,7 @@ export function SocialPanel({
           <div className="space-y-2">
             {(() => {
               // Filter out bots (names starting with "Bot ")
-              const humanPlayers = recentPlayers.filter(p => !p.name.startsWith('Bot '));
+              const humanPlayers = recentPlayers.filter((p) => !p.name.startsWith('Bot '));
 
               if (humanPlayers.length === 0) {
                 return (
@@ -579,7 +598,7 @@ export function SocialPanel({
                 );
               }
 
-              return humanPlayers.map(player => (
+              return humanPlayers.map((player) => (
                 <div
                   key={player.name}
                   className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
@@ -593,7 +612,8 @@ export function SocialPanel({
                         className="font-bold"
                       />
                       <p className="text-xs text-[var(--color-text-secondary)]">
-                        {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} • {new Date(player.lastPlayed).toLocaleDateString()}
+                        {player.gamesPlayed} game{player.gamesPlayed !== 1 ? 's' : ''} •{' '}
+                        {new Date(player.lastPlayed).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -645,9 +665,13 @@ export function SocialPanel({
                   {/* Search Results */}
                   {searchResults.length > 0 && (
                     <div className="mt-2 space-y-2">
-                      {searchResults.slice(0, 5).map(player => {
-                        const isAlreadyFriend = friends.some(f => f.player_name === player.player_name);
-                        const isPending = sentRequests.some(r => r.to_player === player.player_name);
+                      {searchResults.slice(0, 5).map((player) => {
+                        const isAlreadyFriend = friends.some(
+                          (f) => f.player_name === player.player_name
+                        );
+                        const isPending = sentRequests.some(
+                          (r) => r.to_player === player.player_name
+                        );
                         const isSelf = player.player_name === user?.username;
 
                         if (isSelf) return null;
@@ -682,7 +706,9 @@ export function SocialPanel({
                                   onClick={() => {
                                     handleSendFriendRequest(player.player_name);
                                     // Clear this result from the list
-                                    setSearchResults(prev => prev.filter(p => p.player_name !== player.player_name));
+                                    setSearchResults((prev) =>
+                                      prev.filter((p) => p.player_name !== player.player_name)
+                                    );
                                   }}
                                   variant="success"
                                   size="sm"
@@ -711,7 +737,7 @@ export function SocialPanel({
                       Friend Requests ({pendingRequests.length})
                     </h4>
                     <div className="space-y-2">
-                      {pendingRequests.map(request => (
+                      {pendingRequests.map((request) => (
                         <div
                           key={request.id}
                           className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-3 border-2 border-blue-300 dark:border-blue-600"
@@ -755,7 +781,7 @@ export function SocialPanel({
                       Sent Requests ({sentRequests.length})
                     </h4>
                     <div className="space-y-2">
-                      {sentRequests.map(request => (
+                      {sentRequests.map((request) => (
                         <div
                           key={request.id}
                           className="bg-yellow-100 dark:bg-yellow-900/40 rounded-lg p-3 border-2 border-yellow-300 dark:border-yellow-600"
@@ -786,9 +812,11 @@ export function SocialPanel({
                       Your Friends ({friends.length})
                     </h4>
                     <div className="space-y-2">
-                      {friends.map(friend => {
+                      {friends.map((friend) => {
                         const isOnline = friend.is_online;
-                        const onlinePlayer = isOnline ? onlinePlayers.find(p => p.playerName === friend.player_name) : null;
+                        const onlinePlayer = isOnline
+                          ? onlinePlayers.find((p) => p.playerName === friend.player_name)
+                          : null;
 
                         return (
                           <div
@@ -797,7 +825,9 @@ export function SocialPanel({
                           >
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2 flex-1 min-w-0">
-                                <span className={`text-sm flex-shrink-0 ${isOnline ? 'text-green-500' : 'text-gray-400'}`}>
+                                <span
+                                  className={`text-sm flex-shrink-0 ${isOnline ? 'text-green-500' : 'text-gray-400'}`}
+                                >
                                   {isOnline ? '🟢' : '⚫'}
                                 </span>
                                 <div className="min-w-0 flex-1">
@@ -808,35 +838,39 @@ export function SocialPanel({
                                     className="font-semibold text-sm truncate text-left"
                                   />
                                   <p className="text-xs text-[var(--color-text-secondary)]">
-                                    {isOnline ? (
-                                      onlinePlayer?.status ? getStatusLabel(onlinePlayer.status) : 'Online'
-                                    ) : (
-                                      'Offline'
-                                    )}
+                                    {isOnline
+                                      ? onlinePlayer?.status
+                                        ? getStatusLabel(onlinePlayer.status)
+                                        : 'Online'
+                                      : 'Offline'}
                                   </p>
                                 </div>
                               </div>
                               <div className="flex gap-1 flex-shrink-0">
-                                {isOnline && onlinePlayer?.gameId && onlinePlayer.status !== 'in_lobby' && (
-                                  <Button
-                                    data-keyboard-nav={`join-friend-${friend.player_name}`}
-                                    onClick={() => {
-                                      sounds.buttonClick();
-                                      const nameToUse = playerName.trim() || window.prompt('Enter your name to join:');
-                                      if (nameToUse && nameToUse.trim()) {
-                                        if (!playerName.trim()) {
-                                          setPlayerName(nameToUse.trim());
+                                {isOnline &&
+                                  onlinePlayer?.gameId &&
+                                  onlinePlayer.status !== 'in_lobby' && (
+                                    <Button
+                                      data-keyboard-nav={`join-friend-${friend.player_name}`}
+                                      onClick={() => {
+                                        sounds.buttonClick();
+                                        const nameToUse =
+                                          playerName.trim() ||
+                                          window.prompt('Enter your name to join:');
+                                        if (nameToUse && nameToUse.trim()) {
+                                          if (!playerName.trim()) {
+                                            setPlayerName(nameToUse.trim());
+                                          }
+                                          onJoinGame(onlinePlayer.gameId!, nameToUse.trim());
                                         }
-                                        onJoinGame(onlinePlayer.gameId!, nameToUse.trim());
-                                      }
-                                    }}
-                                    variant="secondary"
-                                    size="sm"
-                                    title="Join their game"
-                                  >
-                                    🎮
-                                  </Button>
-                                )}
+                                      }}
+                                      variant="secondary"
+                                      size="sm"
+                                      title="Join their game"
+                                    >
+                                      🎮
+                                    </Button>
+                                  )}
                                 <Button
                                   onClick={() => handleRemoveFriend(friend.player_name)}
                                   variant="danger"
@@ -861,7 +895,7 @@ export function SocialPanel({
                       ✨ Suggested Friends
                     </h4>
                     <div className="space-y-2">
-                      {friendSuggestions.slice(0, 3).map(suggestion => (
+                      {friendSuggestions.slice(0, 3).map((suggestion) => (
                         <div
                           key={suggestion}
                           className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-2 border border-parchment-400 dark:border-gray-500 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors"
@@ -927,7 +961,7 @@ export function SocialPanel({
                   sendLobbyMessage(message);
                 }
               }}
-              placeholder={playerName.trim() ? "Type a message..." : "Click to enter your name..."}
+              placeholder={playerName.trim() ? 'Type a message...' : 'Click to enter your name...'}
               className="h-[328px]"
             />
           </div>
@@ -1000,7 +1034,9 @@ export function SocialPanel({
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-[var(--color-text-secondary)]">Email:</span>
-                      <span className="text-[var(--color-text-primary)] font-medium">{user.email}</span>
+                      <span className="text-[var(--color-text-primary)] font-medium">
+                        {user.email}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-[var(--color-text-secondary)]">Member Since:</span>
@@ -1060,7 +1096,9 @@ export function SocialPanel({
                     // View Mode
                     <div className="space-y-2 text-sm">
                       <div>
-                        <span className="text-[var(--color-text-secondary)] block text-xs mb-1">Bio:</span>
+                        <span className="text-[var(--color-text-secondary)] block text-xs mb-1">
+                          Bio:
+                        </span>
                         <p className="text-[var(--color-text-primary)]">
                           {profileBio || <span className="text-gray-400 italic">Not set</span>}
                         </p>
@@ -1073,8 +1111,14 @@ export function SocialPanel({
                       </div>
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-secondary)]">Favorite Team:</span>
-                        <span className={`font-medium ${profileFavoriteTeam === 1 ? 'text-orange-600' : profileFavoriteTeam === 2 ? 'text-purple-600' : 'text-gray-400'}`}>
-                          {profileFavoriteTeam ? `Team ${profileFavoriteTeam}` : <span className="text-gray-400 italic">Not set</span>}
+                        <span
+                          className={`font-medium ${profileFavoriteTeam === 1 ? 'text-orange-600' : profileFavoriteTeam === 2 ? 'text-purple-600' : 'text-gray-400'}`}
+                        >
+                          {profileFavoriteTeam ? (
+                            `Team ${profileFavoriteTeam}`
+                          ) : (
+                            <span className="text-gray-400 italic">Not set</span>
+                          )}
                         </span>
                       </div>
                     </div>

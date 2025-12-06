@@ -45,11 +45,16 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
     if (achievement.rarity) return achievement.rarity;
     // Map tier to rarity
     switch (achievement.tier) {
-      case 'bronze': return 'common';
-      case 'silver': return 'rare';
-      case 'gold': return 'epic';
-      case 'platinum': return 'legendary';
-      default: return 'common';
+      case 'bronze':
+        return 'common';
+      case 'silver':
+        return 'rare';
+      case 'gold':
+        return 'epic';
+      case 'platinum':
+        return 'legendary';
+      default:
+        return 'common';
     }
   };
 
@@ -57,20 +62,29 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
   const getRarityGradient = (): UICardGradient => {
     switch (rarity) {
-      case 'common': return 'success';
-      case 'rare': return 'info';
-      case 'epic': return 'team2';
-      case 'legendary': return 'warning';
-      default: return 'success';
+      case 'common':
+        return 'success';
+      case 'rare':
+        return 'info';
+      case 'epic':
+        return 'team2';
+      case 'legendary':
+        return 'warning';
+      default:
+        return 'success';
     }
   };
 
   const getRarityGlow = () => {
     switch (rarity) {
-      case 'legendary': return 'shadow-[0_0_30px_rgba(251,191,36,0.5)]';
-      case 'epic': return 'shadow-[0_0_25px_rgba(147,51,234,0.4)]';
-      case 'rare': return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
-      default: return 'shadow-2xl';
+      case 'legendary':
+        return 'shadow-[0_0_30px_rgba(251,191,36,0.5)]';
+      case 'epic':
+        return 'shadow-[0_0_25px_rgba(147,51,234,0.4)]';
+      case 'rare':
+        return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
+      default:
+        return 'shadow-2xl';
     }
   };
 
@@ -78,9 +92,11 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
   const name = achievement.name || achievement.achievement_name;
 
   return (
-    <div className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[10000] transition-all duration-500 ${
-      isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
-    }`}>
+    <div
+      className={`fixed top-20 left-1/2 transform -translate-x-1/2 z-[10000] transition-all duration-500 ${
+        isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+      }`}
+    >
       <UICard
         variant="gradient"
         gradient={getRarityGradient()}
@@ -109,9 +125,7 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
             <div className="text-xs uppercase tracking-wider mb-1 text-gray-700 dark:text-white/90">
               {achievement.is_secret ? '🔓 Secret Achievement Unlocked!' : 'Achievement Unlocked!'}
             </div>
-            <div className="font-bold text-xl mb-1">
-              {name}
-            </div>
+            <div className="font-bold text-xl mb-1">{name}</div>
             <div className="text-sm text-gray-700 dark:text-white/80">
               {achievement.description}
             </div>

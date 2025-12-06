@@ -15,7 +15,10 @@ interface ProfileEditorModalProps {
   user: User;
   onClose: () => void;
   updateProfile: (data: ProfileUpdateData) => Promise<void>;
-  getUserProfile: () => Promise<{ profile: UserProfile | null; preferences: UserPreferences | null } | null>;
+  getUserProfile: () => Promise<{
+    profile: UserProfile | null;
+    preferences: UserPreferences | null;
+  } | null>;
   socket?: Socket | null;
 }
 
@@ -24,7 +27,7 @@ export function ProfileEditorModal({
   onClose,
   updateProfile,
   getUserProfile,
-  socket
+  socket,
 }: ProfileEditorModalProps) {
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);

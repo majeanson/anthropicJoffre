@@ -96,7 +96,9 @@ export const AllBettingStates: Story = {
   name: 'All Betting States',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-6">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Betting Progress States</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Betting Progress States
+      </h3>
 
       <div className="grid grid-cols-2 gap-6">
         {/* Start of betting */}
@@ -115,10 +117,7 @@ export const AllBettingStates: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Mid-Betting (2 bets)</p>
           <BettingHistory
             players={mockPlayers}
-            currentBets={[
-              createBet('Bob', 8),
-              createBet('Charlie', 9),
-            ]}
+            currentBets={[createBet('Bob', 8), createBet('Charlie', 9)]}
             dealerIndex={0}
             onClickPlayer={() => {}}
           />
@@ -129,10 +128,7 @@ export const AllBettingStates: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">With Skip</p>
           <BettingHistory
             players={mockPlayers}
-            currentBets={[
-              createBet('Bob', 0, false, true),
-              createBet('Charlie', 8),
-            ]}
+            currentBets={[createBet('Bob', 0, false, true), createBet('Charlie', 8)]}
             dealerIndex={0}
             onClickPlayer={() => {}}
           />
@@ -166,7 +162,9 @@ export const WithoutTrumpBets: Story = {
   name: 'Without Trump (x2) Bets',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[320px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Without Trump Hierarchy</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Without Trump Hierarchy
+      </h3>
       <p className="text-[var(--color-text-secondary)] text-sm mb-4">
         8 with x2 beats 8 without x2, but loses to 9
       </p>
@@ -174,10 +172,10 @@ export const WithoutTrumpBets: Story = {
       <BettingHistory
         players={mockPlayers}
         currentBets={[
-          createBet('Bob', 8, false),       // Regular 8
-          createBet('Charlie', 8, true),    // 8 with x2 = higher
-          createBet('Diana', 9, false),     // 9 = highest
-          createBet('Alice', 9, true),      // 9 with x2 = actual highest
+          createBet('Bob', 8, false), // Regular 8
+          createBet('Charlie', 8, true), // 8 with x2 = higher
+          createBet('Diana', 9, false), // 9 = highest
+          createBet('Alice', 9, true), // 9 with x2 = actual highest
         ]}
         dealerIndex={0}
         onClickPlayer={() => {}}
@@ -207,10 +205,7 @@ export const DealerScenarios: Story = {
           </p>
           <BettingHistory
             players={mockPlayers}
-            currentBets={[
-              createBet('Bob', 7),
-              createBet('Charlie', 8),
-            ]}
+            currentBets={[createBet('Bob', 7), createBet('Charlie', 8)]}
             dealerIndex={0}
             onClickPlayer={() => {}}
           />
@@ -226,10 +221,7 @@ export const DealerScenarios: Story = {
           </p>
           <BettingHistory
             players={mockPlayers}
-            currentBets={[
-              createBet('Diana', 7),
-              createBet('Alice', 8),
-            ]}
+            currentBets={[createBet('Diana', 7), createBet('Alice', 8)]}
             dealerIndex={2}
             onClickPlayer={() => {}}
           />
@@ -246,7 +238,7 @@ export const DealerScenarios: Story = {
               createBet('Bob', 0, false, true),
               createBet('Charlie', 0, false, true),
               createBet('Diana', 0, false, true),
-              createBet('Alice', 7),  // Dealer forced to bet
+              createBet('Alice', 7), // Dealer forced to bet
             ]}
             dealerIndex={0}
             onClickPlayer={() => {}}
@@ -255,16 +247,14 @@ export const DealerScenarios: Story = {
 
         {/* Dealer equalizes */}
         <div className="w-[280px]">
-          <p className="text-[var(--color-text-secondary)] text-sm mb-2">
-            Dealer Equalizes
-          </p>
+          <p className="text-[var(--color-text-secondary)] text-sm mb-2">Dealer Equalizes</p>
           <BettingHistory
             players={mockPlayers}
             currentBets={[
               createBet('Bob', 0, false, true),
               createBet('Charlie', 8),
               createBet('Diana', 0, false, true),
-              createBet('Alice', 8),  // Dealer matches (wins ties)
+              createBet('Alice', 8), // Dealer matches (wins ties)
             ]}
             dealerIndex={0}
             onClickPlayer={() => {}}
@@ -291,10 +281,10 @@ export const TeamColors: Story = {
       <BettingHistory
         players={mockPlayers}
         currentBets={[
-          createBet('Bob', 7),      // Team 2
-          createBet('Charlie', 8),  // Team 1
-          createBet('Diana', 9),    // Team 2
-          createBet('Alice', 10),   // Team 1
+          createBet('Bob', 7), // Team 2
+          createBet('Charlie', 8), // Team 1
+          createBet('Diana', 9), // Team 2
+          createBet('Alice', 10), // Team 1
         ]}
         dealerIndex={0}
         onClickPlayer={() => {}}
@@ -356,10 +346,7 @@ export const BetAmounts: Story = {
           <p className="text-[var(--color-text-secondary)] text-sm mb-2">Low Bets (7-8)</p>
           <BettingHistory
             players={mockPlayers}
-            currentBets={[
-              createBet('Bob', 7),
-              createBet('Charlie', 8),
-            ]}
+            currentBets={[createBet('Bob', 7), createBet('Charlie', 8)]}
             dealerIndex={0}
             onClickPlayer={() => {}}
           />
@@ -429,7 +416,9 @@ export const SkipPatterns: Story = {
 
         {/* All skip except dealer */}
         <div className="w-[260px]">
-          <p className="text-[var(--color-text-secondary)] text-xs mb-2">All Skip (Dealer Forced)</p>
+          <p className="text-[var(--color-text-secondary)] text-xs mb-2">
+            All Skip (Dealer Forced)
+          </p>
           <BettingHistory
             players={mockPlayers}
             currentBets={[
@@ -460,10 +449,10 @@ export const LegendShowcase: Story = {
       <BettingHistory
         players={mockPlayers}
         currentBets={[
-          createBet('Bob', 0, false, true),  // Skipped
-          createBet('Charlie', 8, false),     // Normal bet
-          createBet('Diana', 8, true),        // Without trump
-          createBet('Alice', 9, false),       // Highest bet
+          createBet('Bob', 0, false, true), // Skipped
+          createBet('Charlie', 8, false), // Normal bet
+          createBet('Diana', 8, true), // Without trump
+          createBet('Alice', 9, false), // Highest bet
         ]}
         dealerIndex={0}
         onClickPlayer={() => {}}
@@ -488,18 +477,12 @@ export const LegendShowcase: Story = {
 export const Default: Story = {
   args: {
     players: mockPlayers,
-    currentBets: [
-      createBet('Bob', 8),
-      createBet('Charlie', 9),
-    ],
+    currentBets: [createBet('Bob', 8), createBet('Charlie', 9)],
     dealerIndex: 0,
   },
   render: (args) => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[320px]">
-      <BettingHistory
-        {...args}
-        onClickPlayer={(name) => alert(`Opening profile: ${name}`)}
-      />
+      <BettingHistory {...args} onClickPlayer={(name) => alert(`Opening profile: ${name}`)} />
     </div>
   ),
 };
@@ -517,10 +500,7 @@ export const CompletedBetting: Story = {
   },
   render: (args) => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[320px]">
-      <BettingHistory
-        {...args}
-        onClickPlayer={(name) => alert(`Opening profile: ${name}`)}
-      />
+      <BettingHistory {...args} onClickPlayer={(name) => alert(`Opening profile: ${name}`)} />
     </div>
   ),
 };

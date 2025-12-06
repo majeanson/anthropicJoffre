@@ -15,6 +15,10 @@
  * - Full keyboard navigation support
  * - Clear visual feedback for all states
  * - ARIA labels for screen readers
+ *
+ * Styling:
+ * - Uses CSS classes from index.css (card-*, border-suit-*, etc.)
+ * - No inline styles - all styling via Tailwind or CSS classes
  */
 
 import { memo, useMemo } from 'react';
@@ -32,97 +36,83 @@ interface CardProps {
   faceDown?: boolean;
 }
 
-// Suit-specific styles that work across all themes
-// Uses CSS variables for colors but keeps simple shadows that work on any background
-// Red and Brown now have distinct visual markers beyond color for mobile accessibility
-const suitStyles: Record<CardColor, {
-  border: string;
-  text: string;
-  shadow: string;
-  shadowHover: string;
-  innerGlow: string;
-  elementName: string;
-  borderStyle: string;      // Solid for red, double for brown - visual differentiation
-}> = {
+// Suit-specific CSS class mappings
+const suitClasses: Record<
+  CardColor,
+  {
+    border: string;
+    innerGlow: string;
+    badge: string;
+    borderStyle: string;
+  }
+> = {
   red: {
-    border: 'var(--color-suit-red)',
-    text: 'var(--color-suit-red)',
-    shadow: 'var(--shadow-md)',
-    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
-    innerGlow: 'color-mix(in srgb, var(--color-suit-red) 12%, transparent)',
-    elementName: 'Fire',
-    borderStyle: 'solid',
+    border: 'border-suit-red',
+    innerGlow: 'card-inner-glow-red',
+    badge: 'card-badge-red',
+    borderStyle: 'border-solid',
   },
   brown: {
-    border: 'var(--color-suit-brown)',
-    text: 'var(--color-suit-brown)',
-    shadow: 'var(--shadow-md)',
-    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
-    innerGlow: 'color-mix(in srgb, var(--color-suit-brown) 12%, transparent)',
-    elementName: 'Earth',
-    borderStyle: 'double',   // Double border for brown - distinct from red
+    border: 'border-suit-brown',
+    innerGlow: 'card-inner-glow-brown',
+    badge: 'card-badge-brown',
+    borderStyle: 'border-double',
   },
   green: {
-    border: 'var(--color-suit-green)',
-    text: 'var(--color-suit-green)',
-    shadow: 'var(--shadow-md)',
-    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
-    innerGlow: 'color-mix(in srgb, var(--color-suit-green) 12%, transparent)',
-    elementName: 'Nature',
-    borderStyle: 'solid',
+    border: 'border-suit-green',
+    innerGlow: 'card-inner-glow-green',
+    badge: 'card-badge-green',
+    borderStyle: 'border-solid',
   },
   blue: {
-    border: 'var(--color-suit-blue)',
-    text: 'var(--color-suit-blue)',
-    shadow: 'var(--shadow-md)',
-    shadowHover: 'var(--shadow-lg), var(--shadow-glow)',
-    innerGlow: 'color-mix(in srgb, var(--color-suit-blue) 12%, transparent)',
-    elementName: 'Water',
-    borderStyle: 'solid',
+    border: 'border-suit-blue',
+    innerGlow: 'card-inner-glow-blue',
+    badge: 'card-badge-blue',
+    borderStyle: 'border-solid',
   },
 };
 
-// Size configurations with improved readability
+// Size configurations - all Tailwind classes, no inline styles
 const sizeStyles = {
   tiny: {
-    container: 'w-14 h-20 sm:w-12 sm:h-20',
+    container: 'w-[2.75rem] h-[4rem] sm:w-12 sm:h-20 border-2',
     text: 'text-base',
-    cornerText: 'text-sm font-black',      // Increased from text-[10px]
-    emblem: 'w-7 h-7 sm:w-6 sm:h-6',
-    badge: 'text-[9px] px-1 py-0.5',       // Slightly larger
-    borderWidth: '2px',
-    cornerOffset: 'top-0.5 left-1',
-    cornerOffsetBottom: 'bottom-0.5 right-1',
+    cornerText: 'text-sm font-black',
+    emblem: 'w-6 h-6 sm:w-6 sm:h-6',
+    badge: 'text-[9px] px-1 py-0.5',
+    badgeSize: 'min-w-[18px] h-[18px]',
+    cornerOffset: 'top-0.5 left-0.5',
+    cornerOffsetBottom: 'bottom-0.5 right-0.5',
   },
   small: {
-    container: 'w-20 h-32 md:w-16 md:h-28',
-    text: 'text-lg',
-    cornerText: 'text-base font-black',    // Increased from text-xs
-    emblem: 'w-12 h-12 md:w-10 md:h-10',
-    badge: 'text-[10px] px-1 py-0.5',
-    borderWidth: '2px',
-    cornerOffset: 'top-1 left-1.5',
-    cornerOffsetBottom: 'bottom-1 right-1.5',
+    container: 'w-[3.25rem] h-[5rem] sm:w-16 sm:h-24 md:w-16 md:h-28 border-2',
+    text: 'text-base sm:text-lg',
+    cornerText: 'text-sm sm:text-base font-black',
+    emblem: 'w-8 h-8 sm:w-10 sm:h-10 md:w-10 md:h-10',
+    badge: 'text-[9px] sm:text-[10px] px-1 py-0.5',
+    badgeSize: 'min-w-[22px] h-[22px]',
+    cornerOffset: 'top-0.5 left-1 sm:top-1 sm:left-1.5',
+    cornerOffsetBottom: 'bottom-0.5 right-1 sm:bottom-1 sm:right-1.5',
   },
   medium: {
-    container: 'w-24 h-36 md:w-20 md:h-32',
-    text: 'text-2xl',
-    cornerText: 'text-lg font-black',      // Increased from text-sm
-    emblem: 'w-14 h-14 md:w-12 md:h-12',
-    badge: 'text-xs px-1.5 py-0.5',
-    borderWidth: '2px',
-    cornerOffset: 'top-1 left-1.5',
-    cornerOffsetBottom: 'bottom-1 right-1.5',
+    container: 'w-[4rem] h-[6rem] sm:w-20 sm:h-32 md:w-20 md:h-32 border-2',
+    text: 'text-lg sm:text-2xl',
+    cornerText: 'text-base sm:text-lg font-black',
+    emblem: 'w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12',
+    badge: 'text-[10px] sm:text-xs px-1 sm:px-1.5 py-0.5',
+    badgeSize: 'min-w-[26px] h-[26px]',
+    cornerOffset: 'top-0.5 left-1 sm:top-1 sm:left-1.5',
+    cornerOffsetBottom: 'bottom-0.5 right-1 sm:bottom-1 sm:right-1.5',
   },
   large: {
-    container: 'w-28 h-40 md:w-24 md:h-36',
-    text: 'text-3xl',
-    cornerText: 'text-xl font-black',      // Increased from text-base
-    emblem: 'w-18 h-18 md:w-16 md:h-16',
-    badge: 'text-sm px-2 py-0.5',
-    borderWidth: '3px',
-    cornerOffset: 'top-1.5 left-2',
-    cornerOffsetBottom: 'bottom-1.5 right-2',
+    container: 'w-[5rem] h-[7.5rem] sm:w-24 sm:h-36 md:w-24 md:h-36 border-[3px]',
+    text: 'text-xl sm:text-3xl',
+    cornerText: 'text-lg sm:text-xl font-black',
+    emblem: 'w-12 h-12 sm:w-16 sm:h-16 md:w-16 md:h-16',
+    badge: 'text-xs sm:text-sm px-1.5 sm:px-2 py-0.5',
+    badgeSize: 'min-w-[26px] h-[26px]',
+    cornerOffset: 'top-1 left-1.5 sm:top-1.5 sm:left-2',
+    cornerOffsetBottom: 'bottom-1 right-1.5 sm:bottom-1.5 sm:right-2',
   },
 };
 
@@ -154,7 +144,7 @@ function CardComponent({
     return getEquippedSpecialSkin(cardType);
   }, [isSpecial, card.color, getEquippedSpecialSkin]);
 
-  const suitStyle = suitStyles[card.color];
+  const suitClass = suitClasses[card.color];
   const sizeConfig = sizeStyles[size];
 
   // Get formatted value from card skin
@@ -201,55 +191,27 @@ function CardComponent({
           rounded-[var(--radius-lg)]
           flex items-center justify-center
           relative overflow-hidden
+          border-solid border-skin-accent
+          card-back-bg
         `}
-        style={{
-          backgroundColor: 'var(--color-bg-tertiary)',
-          borderWidth: sizeConfig.borderWidth,
-          borderStyle: 'solid',
-          borderColor: 'var(--color-border-accent)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
-          background: `
-            linear-gradient(135deg,
-              var(--color-bg-tertiary) 0%,
-              var(--color-bg-secondary) 50%,
-              var(--color-bg-tertiary) 100%
-            )
-          `,
-        }}
       >
         {/* Alchemical circle pattern */}
-        <div
-          className="absolute inset-3 rounded-full border opacity-20"
-          style={{
-            borderColor: 'var(--color-border-accent)',
-          }}
-        />
-        <div
-          className="absolute inset-5 rounded-full border opacity-15"
-          style={{
-            borderColor: 'var(--color-border-accent)',
-          }}
-        />
+        <div className="absolute inset-3 rounded-full border border-skin-accent opacity-20" />
+        <div className="absolute inset-5 rounded-full border border-skin-accent opacity-15" />
 
         {/* Sacred geometry corners */}
-        <div className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 border-[var(--color-border-accent)] opacity-50" />
-        <div className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 border-[var(--color-border-accent)] opacity-50" />
-        <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-[var(--color-border-accent)] opacity-50" />
-        <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-[var(--color-border-accent)] opacity-50" />
+        <div className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 border-skin-accent opacity-50" />
+        <div className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 border-skin-accent opacity-50" />
+        <div className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 border-skin-accent opacity-50" />
+        <div className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 border-skin-accent opacity-50" />
 
         {/* Center symbol */}
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center relative"
-          style={{
-            background: `linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 80%, black))`,
-            boxShadow: 'var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-          }}
-        >
+        <div className="w-10 h-10 rounded-full flex items-center justify-center relative card-center-symbol">
           {/* Triangle inside circle */}
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
             <path
               d="M12 4L21 20H3L12 4Z"
-              stroke="var(--color-text-inverse)"
+              className="stroke-skin-inverse"
               strokeWidth="2"
               strokeLinejoin="round"
             />
@@ -258,6 +220,20 @@ function CardComponent({
       </div>
     );
   }
+
+  // Compute state-based classes
+  const stateClasses = useMemo(() => {
+    const classes: string[] = ['card-base'];
+    if (isPlayable && !disabled) {
+      classes.push('card-playable');
+    } else if (disabled) {
+      classes.push('card-disabled');
+    }
+    return classes.join(' ');
+  }, [isPlayable, disabled]);
+
+  // Brown cards get thicker border
+  const borderThicknessClass = card.color === 'brown' ? 'border-4' : '';
 
   return (
     <button
@@ -269,66 +245,37 @@ function CardComponent({
       data-card-color={card.color}
       className={`
         ${sizeConfig.container}
+        ${borderThicknessClass}
+        ${suitClass.border}
+        ${suitClass.borderStyle}
+        ${stateClasses}
         rounded-[var(--radius-lg)]
         font-display
         flex flex-col items-center justify-center gap-1
-        transition-all duration-[var(--duration-normal)] ease-[var(--easing)]
         relative overflow-hidden
-        ${!disabled && onClick ? 'cursor-pointer' : 'cursor-default'}
+        touch-manipulation
+        select-none
+        ${!disabled && onClick ? 'cursor-pointer active:scale-95 hover:card-playable' : 'cursor-default'}
         ${disabled ? 'opacity-50' : ''}
-        ${isKeyboardSelected ? 'ring-[var(--input-focus-ring-width)] ring-[var(--color-text-accent)] ring-offset-2 ring-offset-[var(--color-bg-primary)]' : ''}
+        ${isKeyboardSelected ? 'ring-[3px] ring-skin-accent ring-offset-2 ring-offset-skin-primary' : ''}
         focus-visible:outline-none
-        focus-visible:ring-[var(--input-focus-ring-width)]
-        focus-visible:ring-[var(--color-text-accent)]
+        focus-visible:ring-[3px]
+        focus-visible:ring-skin-accent
         focus-visible:ring-offset-2
-        focus-visible:ring-offset-[var(--color-bg-primary)]
+        focus-visible:ring-offset-skin-primary
       `}
-      style={{
-        backgroundColor: 'var(--card-bg-color)',
-        borderWidth: card.color === 'brown' ? '4px' : sizeConfig.borderWidth, // Thicker border for brown
-        borderStyle: suitStyle.borderStyle,
-        // Use special skin border color if available
-        borderColor: isSpecial && equippedSpecialSkin?.borderColor
-          ? equippedSpecialSkin.borderColor
-          : suitStyle.border,
-        boxShadow: isPlayable && !disabled
-          ? (isSpecial && equippedSpecialSkin?.glowColor
-            ? `${suitStyle.shadowHover}, 0 0 25px ${equippedSpecialSkin.glowColor}`
-            : suitStyle.shadowHover)
-          : disabled
-            ? '0 2px 4px rgba(0, 0, 0, 0.2)'
-            : suitStyle.shadow,
-        transform: isPlayable && !disabled ? 'translateY(-6px)' : undefined,
-      }}
-      onMouseEnter={(e) => {
-        if (!disabled && onClick) {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = suitStyle.shadowHover;
-          (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-8px) scale(1.03)';
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!disabled) {
-          (e.currentTarget as HTMLButtonElement).style.boxShadow = isPlayable ? suitStyle.shadowHover : suitStyle.shadow;
-          (e.currentTarget as HTMLButtonElement).style.transform = isPlayable ? 'translateY(-6px)' : '';
-        }
-      }}
     >
       {/* Parchment texture overlay */}
-      <div
-        className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none opacity-40"
-        style={{
-          background: 'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.08) 100%)',
-        }}
-      />
+      <div className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none opacity-40 card-parchment-overlay" />
 
       {/* Ethereal glow for playable cards */}
       {isPlayable && !disabled && (
         <div
-          className="absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none"
-          style={{
-            background: `radial-gradient(ellipse at center, ${suitStyle.innerGlow} 0%, transparent 65%)`,
-            animation: 'ethereal-pulse 2.5s ease-in-out infinite',
-          }}
+          className={`
+            absolute inset-0 rounded-[var(--radius-lg)] pointer-events-none
+            ${suitClass.innerGlow}
+            animate-[ethereal-pulse_2.5s_ease-in-out_infinite]
+          `}
         />
       )}
 
@@ -340,23 +287,14 @@ function CardComponent({
             flex items-center justify-center
             rounded-md
             select-none
+            px-1
+            card-badge
+            ${suitClass.badge}
+            ${sizeConfig.badgeSize}
           `}
-          style={{
-            backgroundColor: cardSkinSuitStyle.color,
-            minWidth: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
-            height: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
-            padding: '0 4px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
-            fontFamily: cardSkin.fontFamily,
-          }}
         >
           <span
-            className={`font-display ${sizeConfig.cornerText}`}
-            style={{
-              color: '#fff',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
-              fontFamily: cardSkin.fontFamily,
-            }}
+            className={`font-display ${sizeConfig.cornerText} text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]`}
           >
             {formattedValue}
           </span>
@@ -372,13 +310,8 @@ function CardComponent({
             flex items-center justify-center
             text-3xl md:text-4xl
             ${equippedSpecialSkin.animationClass || ''}
+            ${isPlayable ? 'card-emblem-playable' : ''}
           `}
-          style={{
-            filter: isPlayable ? 'brightness(1.1)' : undefined,
-            textShadow: equippedSpecialSkin.glowColor
-              ? `0 0 15px ${equippedSpecialSkin.glowColor}`
-              : undefined,
-          }}
         >
           {equippedSpecialSkin.centerIcon}
         </div>
@@ -388,10 +321,8 @@ function CardComponent({
             ${sizeConfig.emblem}
             flex items-center justify-center
             text-3xl md:text-4xl
+            ${isPlayable ? 'card-emblem-playable' : ''}
           `}
-          style={{
-            filter: isPlayable ? 'brightness(1.1)' : undefined,
-          }}
         >
           {centerIcon}
         </div>
@@ -405,10 +336,8 @@ function CardComponent({
             ${sizeConfig.emblem}
             object-contain
             ${isSpecial ? '' : 'opacity-85'}
+            ${isPlayable ? 'card-emblem-playable-drop-shadow' : 'card-emblem-drop-shadow'}
           `}
-          style={{
-            filter: `drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)) ${isPlayable ? 'brightness(1.05)' : ''}`,
-          }}
         />
       )}
 
@@ -421,23 +350,14 @@ function CardComponent({
             rounded-md
             rotate-180
             select-none
+            px-1
+            card-badge
+            ${suitClass.badge}
+            ${sizeConfig.badgeSize}
           `}
-          style={{
-            backgroundColor: cardSkinSuitStyle.color,
-            minWidth: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
-            height: size === 'tiny' ? '18px' : size === 'small' ? '22px' : '26px',
-            padding: '0 4px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.4)',
-            fontFamily: cardSkin.fontFamily,
-          }}
         >
           <span
-            className={`font-display ${sizeConfig.cornerText}`}
-            style={{
-              color: '#fff',
-              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
-              fontFamily: cardSkin.fontFamily,
-            }}
+            className={`font-display ${sizeConfig.cornerText} text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]`}
           >
             {formattedValue}
           </span>
@@ -452,17 +372,9 @@ function CardComponent({
             ${sizeConfig.badge}
             font-display font-bold
             rounded-[var(--radius-sm)]
+            text-skin-inverse
+            ${card.color === 'red' ? 'card-special-badge-success' : 'card-special-badge-error'}
           `}
-          style={{
-            backgroundColor: card.color === 'red'
-              ? 'var(--color-success)'
-              : 'var(--color-error)',
-            color: 'var(--color-text-inverse)',
-            boxShadow: card.color === 'red'
-              ? '0 2px 10px var(--color-success)'
-              : '0 2px 10px var(--color-error)',
-            fontFamily: cardSkin.fontFamily,
-          }}
         >
           {specialDisplay.label}
         </span>
@@ -470,27 +382,9 @@ function CardComponent({
 
       {/* Disabled overlay with seal */}
       {disabled && onClick && (
-        <div
-          className="absolute inset-0 flex items-center justify-center rounded-[var(--radius-lg)]"
-          style={{
-            backgroundColor: 'color-mix(in srgb, var(--color-bg-primary) 60%, transparent)',
-            backdropFilter: 'grayscale(90%) brightness(0.7)',
-          }}
-        >
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{
-              background: `linear-gradient(135deg, var(--color-error), color-mix(in srgb, var(--color-error) 70%, black))`,
-              boxShadow: 'var(--shadow-md)',
-            }}
-          >
-            <span
-              className="font-display text-xl font-bold"
-              style={{
-                color: 'white',
-                textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-              }}
-            >
+        <div className="absolute inset-0 flex items-center justify-center rounded-[var(--radius-lg)] card-disabled-overlay">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center card-disabled-seal">
+            <span className="font-display text-xl font-bold text-white drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
               ✕
             </span>
           </div>
@@ -530,15 +424,21 @@ interface CardBackProps {
 export function CardBack({ size = 'medium', teamColor }: CardBackProps) {
   const sizeConfig = sizeStyles[size];
 
-  const teamColors = {
-    1: 'var(--color-team1-primary)',
-    2: 'var(--color-team2-primary)',
-  };
-
-  const teamGlows = {
-    1: 'rgba(180, 83, 9, 0.3)',
-    2: 'rgba(124, 58, 237, 0.3)',
-  };
+  // Determine team-specific classes
+  const teamBorderClass =
+    teamColor === 1
+      ? 'border-skin-team1-primary'
+      : teamColor === 2
+        ? 'border-skin-team2-primary'
+        : 'border-skin-accent';
+  const teamBackClass =
+    teamColor === 1 ? 'card-back-team1' : teamColor === 2 ? 'card-back-team2' : 'card-back-bg';
+  const teamSymbolClass =
+    teamColor === 1
+      ? 'card-center-symbol-team1'
+      : teamColor === 2
+        ? 'card-center-symbol-team2'
+        : 'card-center-symbol';
 
   return (
     <div
@@ -547,64 +447,34 @@ export function CardBack({ size = 'medium', teamColor }: CardBackProps) {
         rounded-[var(--radius-lg)]
         flex items-center justify-center
         relative overflow-hidden
+        border-solid
+        ${teamBorderClass}
+        ${teamBackClass}
       `}
-      style={{
-        backgroundColor: 'var(--color-bg-tertiary)',
-        borderWidth: sizeConfig.borderWidth,
-        borderStyle: 'solid',
-        borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)',
-        boxShadow: teamColor
-          ? `0 4px 20px rgba(0, 0, 0, 0.5), 0 0 25px ${teamGlows[teamColor]}`
-          : '0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03)',
-        background: `
-          linear-gradient(135deg,
-            var(--color-bg-tertiary) 0%,
-            var(--color-bg-secondary) 50%,
-            var(--color-bg-tertiary) 100%
-          )
-        `,
-      }}
     >
       {/* Alchemical circle pattern */}
-      <div
-        className="absolute inset-3 rounded-full border opacity-20"
-        style={{
-          borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)',
-        }}
-      />
+      <div className={`absolute inset-3 rounded-full border ${teamBorderClass} opacity-20`} />
 
       {/* Sacred geometry corners */}
       <div
-        className="absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 opacity-50"
-        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+        className={`absolute top-1 left-1 w-3 h-3 border-l-2 border-t-2 ${teamBorderClass} opacity-50`}
       />
       <div
-        className="absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 opacity-50"
-        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+        className={`absolute top-1 right-1 w-3 h-3 border-r-2 border-t-2 ${teamBorderClass} opacity-50`}
       />
       <div
-        className="absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 opacity-50"
-        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+        className={`absolute bottom-1 left-1 w-3 h-3 border-l-2 border-b-2 ${teamBorderClass} opacity-50`}
       />
       <div
-        className="absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 opacity-50"
-        style={{ borderColor: teamColor ? teamColors[teamColor] : 'var(--color-border-accent)' }}
+        className={`absolute bottom-1 right-1 w-3 h-3 border-r-2 border-b-2 ${teamBorderClass} opacity-50`}
       />
 
       {/* Center symbol */}
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center"
-        style={{
-          background: teamColor
-            ? `linear-gradient(135deg, ${teamColors[teamColor]}, color-mix(in srgb, ${teamColors[teamColor]} 80%, black))`
-            : `linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 80%, black))`,
-          boxShadow: 'var(--shadow-glow)',
-        }}
-      >
+      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${teamSymbolClass}`}>
         <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
           <path
             d="M12 4L21 20H3L12 4Z"
-            stroke="var(--color-text-inverse)"
+            className="stroke-skin-inverse"
             strokeWidth="2"
             strokeLinejoin="round"
           />
@@ -632,12 +502,8 @@ export function CardStack({ count, size = 'medium', maxVisible = 5 }: CardStackP
       {Array.from({ length: visibleCards }).map((_, index) => (
         <div
           key={index}
-          className="absolute"
-          style={{
-            top: index * -2,
-            left: index * 1,
-            zIndex: index,
-          }}
+          className="absolute card-stack-offset"
+          style={{ '--stack-index': index } as React.CSSProperties}
         >
           <CardBack size={size} />
         </div>
@@ -645,14 +511,7 @@ export function CardStack({ count, size = 'medium', maxVisible = 5 }: CardStackP
 
       {/* Card count badge */}
       {count > 0 && (
-        <div
-          className="absolute -top-2 -right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center font-display text-xs font-bold"
-          style={{
-            background: `linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 90%, black))`,
-            color: 'var(--color-text-inverse)',
-            boxShadow: 'var(--shadow-glow)',
-          }}
-        >
+        <div className="absolute -top-2 -right-2 z-10 w-7 h-7 rounded-full flex items-center justify-center font-display text-xs font-bold card-count-badge">
           {count}
         </div>
       )}
@@ -671,19 +530,16 @@ interface ElegantCardDisplayProps {
   spotlight?: boolean;
 }
 
-export function ElegantCardDisplay({ card, size = 'medium', spotlight = false }: ElegantCardDisplayProps) {
+export function ElegantCardDisplay({
+  card,
+  size = 'medium',
+  spotlight = false,
+}: ElegantCardDisplayProps) {
   return (
     <div className="relative inline-block">
       {/* Spotlight effect */}
       {spotlight && (
-        <div
-          className="absolute -inset-10 rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--color-glow) 15%, transparent) 0%, color-mix(in srgb, var(--color-highlight) 8%, transparent) 30%, transparent 60%)',
-            filter: 'blur(12px)',
-            animation: 'ethereal-pulse 3s ease-in-out infinite',
-          }}
-        />
+        <div className="absolute -inset-10 rounded-full pointer-events-none card-spotlight" />
       )}
       <Card card={card} size={size} />
     </div>

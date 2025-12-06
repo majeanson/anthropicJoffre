@@ -34,7 +34,7 @@ function findBestTrump(hand: Card[]): CardColor {
 
   // Initialize all colors
   const colors: CardColor[] = ['red', 'brown', 'green', 'blue'];
-  colors.forEach(color => {
+  colors.forEach((color) => {
     colorDistribution.set(color, 0);
     colorHighCards.set(color, 0);
   });
@@ -54,7 +54,7 @@ function findBestTrump(hand: Card[]): CardColor {
   colorDistribution.forEach((count, color) => {
     const highCards = colorHighCards.get(color) || 0;
     // Score = number of cards + 2x high cards (value quality matters more)
-    const score = count + (highCards * 2);
+    const score = count + highCards * 2;
     if (score > bestScore) {
       bestScore = score;
       bestTrump = color;
@@ -74,7 +74,10 @@ function findBestTrump(hand: Card[]): CardColor {
  * - Long trump suits get bonus (trump control)
  * - Red 0 in hand = +1 point potential
  */
-function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
+function evaluateHandStrength(
+  hand: Card[],
+  trump: CardColor | null
+): {
   trumpCount: number;
   highCards: number;
   estimatedTricks: number;
@@ -171,7 +174,7 @@ function evaluateHandStrength(hand: Card[], trump: CardColor | null): {
 
   // Non-trump high card value depends on trump count
   // More trump = less likely opponents can cut your high cards
-  hand.forEach(card => {
+  hand.forEach((card) => {
     if (card.color !== optimalTrump) {
       if (card.value === 7) {
         // 7 non-trump: high chance to win if we have trump control
@@ -299,12 +302,13 @@ export function suggestBet(gameState: GameState, playerName: string): BetSuggest
 
   // Find highest bet
   const validBets = gameState.currentBets.filter((b) => !b.skipped);
-  const highestBet = validBets.length > 0
-    ? validBets.reduce((max, b) => (b.amount > max.amount ? b : max))
-    : null;
+  const highestBet =
+    validBets.length > 0 ? validBets.reduce((max, b) => (b.amount > max.amount ? b : max)) : null;
 
   // Check if dominant color makes "without trump" viable
-  const dominantColorCount = strength.dominantColor ? strength.colorDistribution.get(strength.dominantColor) || 0 : 0;
+  const dominantColorCount = strength.dominantColor
+    ? strength.colorDistribution.get(strength.dominantColor) || 0
+    : 0;
   const isWithoutTrumpViable = dominantColorCount >= 5 && strength.hasSevenInColor;
 
   // Round estimated tricks for display
@@ -456,7 +460,10 @@ function getPlayableCards(hand: Card[], currentTrick: { card: Card; playerId: st
 /**
  * Determine who is currently winning the trick
  */
-function getTrickWinner(currentTrick: { card: Card; playerName: string }[], trump: CardColor | null): { card: Card; playerName: string } {
+function getTrickWinner(
+  currentTrick: { card: Card; playerName: string }[],
+  trump: CardColor | null
+): { card: Card; playerName: string } {
   return currentTrick.reduce((winning, play) => {
     const winningCard = winning.card;
     const playCard = play.card;
@@ -477,7 +484,12 @@ function getTrickWinner(currentTrick: { card: Card; playerName: string }[], trum
 /**
  * Check if a card can beat the current winning card
  */
-function canBeatCard(myCard: Card, winningCard: Card, _ledSuit: CardColor, trump: CardColor | null): boolean {
+function canBeatCard(
+  myCard: Card,
+  winningCard: Card,
+  _ledSuit: CardColor,
+  trump: CardColor | null
+): boolean {
   // My card is trump, winning card is not
   if (myCard.color === trump && winningCard.color !== trump) return true;
 
@@ -497,15 +509,19 @@ function canBeatCard(myCard: Card, winningCard: Card, _ledSuit: CardColor, trump
  * Check if this card is GUARANTEED to win (no unplayed cards can beat it)
  * This accounts for cards already played in the trick and ensures we play high enough to win
  */
-function isGuaranteedWin(myCard: Card, currentTrick: { card: Card }[], trump: CardColor | null): boolean {
+function isGuaranteedWin(
+  myCard: Card,
+  currentTrick: { card: Card }[],
+  trump: CardColor | null
+): boolean {
   const ledSuit = currentTrick.length > 0 ? currentTrick[0].card.color : myCard.color;
-  const playedCards = currentTrick.map(t => t.card);
+  const playedCards = currentTrick.map((t) => t.card);
 
   // If my card is trump
   if (myCard.color === trump) {
     // Check if any higher trump values could still be unplayed
     for (let val = myCard.value + 1; val <= 7; val++) {
-      const alreadyPlayed = playedCards.some(c => c.color === trump && c.value === val);
+      const alreadyPlayed = playedCards.some((c) => c.color === trump && c.value === val);
       if (!alreadyPlayed) {
         // A higher trump could still beat us
         return false;
@@ -518,7 +534,7 @@ function isGuaranteedWin(myCard: Card, currentTrick: { card: Card }[], trump: Ca
   if (myCard.color === ledSuit) {
     // Check if any higher cards in led suit could beat us
     for (let val = myCard.value + 1; val <= 7; val++) {
-      const alreadyPlayed = playedCards.some(c => c.color === ledSuit && c.value === val);
+      const alreadyPlayed = playedCards.some((c) => c.color === ledSuit && c.value === val);
       if (!alreadyPlayed) {
         return false; // A higher led suit card could beat us
       }
@@ -526,7 +542,7 @@ function isGuaranteedWin(myCard: Card, currentTrick: { card: Card }[], trump: Ca
 
     // Check if trump could still beat us
     if (trump && trump !== ledSuit) {
-      const trumpPlayed = playedCards.some(c => c.color === trump);
+      const trumpPlayed = playedCards.some((c) => c.color === trump);
       if (!trumpPlayed) {
         return false; // Trump could still beat us
       }
@@ -587,8 +603,8 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
   const myTeamId = player.teamId;
 
   // Find teammate
-  const teammate = gameState.players.find(p => p.teamId === myTeamId && p.name !== playerName);
-  const teammateInTrick = currentTrick.find(t => t.playerName === teammate?.name);
+  const teammate = gameState.players.find((p) => p.teamId === myTeamId && p.name !== playerName);
+  const teammateInTrick = currentTrick.find((t) => t.playerName === teammate?.name);
 
   // Determine current winner and if it's teammate
   let currentWinner: { card: Card; playerName: string } | null = null;
@@ -606,22 +622,25 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
 
     // Priority: Lead with high trump to win
     if (trumpCards.length > 0) {
-      const highestTrump = trumpCards.reduce((max, card) => card.value > max.value ? card : max);
+      const highestTrump = trumpCards.reduce((max, card) => (card.value > max.value ? card : max));
 
       return {
         card: highestTrump,
         priority: 'high',
         reason: 'Lead with high trump to control',
         explanation: `Leading with ${highestTrump.value} ${highestTrump.color} (trump) gives you the best chance to win this trick!`,
-        alternatives: nonTrumpCards.length > 0
-          ? `You could save trump by leading non-trump, but you'd risk losing the trick.`
-          : undefined,
+        alternatives:
+          nonTrumpCards.length > 0
+            ? `You could save trump by leading non-trump, but you'd risk losing the trick.`
+            : undefined,
       };
     }
 
     // Play highest non-trump to try winning
     if (nonTrumpCards.length > 0) {
-      const highestNonTrump = nonTrumpCards.reduce((max, card) => card.value > max.value ? card : max);
+      const highestNonTrump = nonTrumpCards.reduce((max, card) =>
+        card.value > max.value ? card : max
+      );
 
       return {
         card: highestNonTrump,
@@ -634,13 +653,13 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
 
   // CASE 2: Teammate is winning - ADD RED 0 IF SAFE
   if (teammateWinning && currentWinner) {
-    const redZero = playableCards.find(c => c.value === 0 && c.color === 'red');
+    const redZero = playableCards.find((c) => c.value === 0 && c.color === 'red');
     const ledSuit = currentTrick[0].card.color;
 
     // Check if red 0 can be beaten
     if (redZero) {
-      const canBeBeaten = playableCards.some(c =>
-        c !== redZero && canBeatCard(c, currentWinner.card, ledSuit, trump)
+      const canBeBeaten = playableCards.some(
+        (c) => c !== redZero && canBeatCard(c, currentWinner.card, ledSuit, trump)
       );
 
       // If red 0 won't risk the trick, ALWAYS play it for bonus points!
@@ -659,7 +678,8 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
       // Never waste red 0 if we have it
       if (card.value === 0 && card.color === 'red') return min;
       // Avoid brown 0 if possible
-      if (card.value === 0 && card.color === 'brown') return min.value === 0 && min.color === 'brown' ? min : card;
+      if (card.value === 0 && card.color === 'brown')
+        return min.value === 0 && min.color === 'brown' ? min : card;
       return card.value < min.value ? card : min;
     });
 
@@ -668,7 +688,9 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
       priority: 'low',
       reason: 'Teammate winning - save high cards',
       explanation: `Your teammate is winning with ${currentWinner.card.value} ${currentWinner.card.color}. Play your lowest card (${lowestCard.value} ${lowestCard.color}) to save powerful cards for later tricks.`,
-      alternatives: redZero ? `Red 0 would add bonus points but might risk the trick if beaten.` : undefined,
+      alternatives: redZero
+        ? `Red 0 would add bonus points but might risk the trick if beaten.`
+        : undefined,
     };
   }
 
@@ -677,24 +699,30 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
   const winningCard = currentWinner ? currentWinner.card : currentTrick[0].card;
 
   // Find cards that can win CURRENTLY
-  const potentialWinningCards = playableCards.filter(c => canBeatCard(c, winningCard, ledSuit, trump));
+  const potentialWinningCards = playableCards.filter((c) =>
+    canBeatCard(c, winningCard, ledSuit, trump)
+  );
 
   if (potentialWinningCards.length > 0) {
     // Find cards that are GUARANTEED to win (accounting for unplayed cards)
-    const guaranteedWinningCards = potentialWinningCards.filter(c => isGuaranteedWin(c, currentTrick, trump));
+    const guaranteedWinningCards = potentialWinningCards.filter((c) =>
+      isGuaranteedWin(c, currentTrick, trump)
+    );
 
     // Prefer guaranteed wins
-    const cardsToConsider = guaranteedWinningCards.length > 0 ? guaranteedWinningCards : potentialWinningCards;
+    const cardsToConsider =
+      guaranteedWinningCards.length > 0 ? guaranteedWinningCards : potentialWinningCards;
 
     // Check if trick has red 0 (high value)
-    const trickHasRedZero = currentTrick.some(t => t.card.value === 0 && t.card.color === 'red');
-    const redZeroInHand = cardsToConsider.find(c => c.value === 0 && c.color === 'red');
+    const trickHasRedZero = currentTrick.some((t) => t.card.value === 0 && t.card.color === 'red');
+    const redZeroInHand = cardsToConsider.find((c) => c.value === 0 && c.color === 'red');
 
     // If trick has red 0, try to win it with GUARANTEED win!
     if (trickHasRedZero) {
-      const bestCard = guaranteedWinningCards.length > 0
-        ? guaranteedWinningCards.reduce((min, card) => card.value < min.value ? card : min)
-        : potentialWinningCards.reduce((max, card) => card.value > max.value ? card : max); // Play highest if no guaranteed win
+      const bestCard =
+        guaranteedWinningCards.length > 0
+          ? guaranteedWinningCards.reduce((min, card) => (card.value < min.value ? card : min))
+          : potentialWinningCards.reduce((max, card) => (card.value > max.value ? card : max)); // Play highest if no guaranteed win
 
       return {
         card: bestCard,
@@ -715,9 +743,10 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
     }
 
     // Otherwise play lowest GUARANTEED winning card (or highest if no guarantee)
-    const bestCard = guaranteedWinningCards.length > 0
-      ? guaranteedWinningCards.reduce((min, card) => card.value < min.value ? card : min)
-      : potentialWinningCards.reduce((max, card) => card.value > max.value ? card : max);
+    const bestCard =
+      guaranteedWinningCards.length > 0
+        ? guaranteedWinningCards.reduce((min, card) => (card.value < min.value ? card : min))
+        : potentialWinningCards.reduce((max, card) => (card.value > max.value ? card : max));
 
     const isGuaranteed = guaranteedWinningCards.includes(bestCard);
 
@@ -725,36 +754,44 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
       card: bestCard,
       priority: 'high',
       reason: isGuaranteed ? 'GUARANTEE the win' : 'Try to win',
-      explanation: `${teammateInTrick ? 'Your teammate couldn\'t win' : 'You can win this trick'}. Play ${bestCard.value} ${bestCard.color} to ${isGuaranteed ? 'GUARANTEE the win (higher cards already played)' : 'try to take it (but watch out for higher cards)'}!`,
+      explanation: `${teammateInTrick ? "Your teammate couldn't win" : 'You can win this trick'}. Play ${bestCard.value} ${bestCard.color} to ${isGuaranteed ? 'GUARANTEE the win (higher cards already played)' : 'try to take it (but watch out for higher cards)'}!`,
     };
   }
 
   // CASE 4: Can't win - DEFENSIVE PLAY based on who's winning
-  const brownZero = playableCards.find(c => c.value === 0 && c.color === 'brown');
-  const opponentWinning = currentWinner && currentWinner.playerName !== teammate?.name && currentWinner.playerName !== playerName;
+  const brownZero = playableCards.find((c) => c.value === 0 && c.color === 'brown');
+  const opponentWinning =
+    currentWinner &&
+    currentWinner.playerName !== teammate?.name &&
+    currentWinner.playerName !== playerName;
 
   // If OPPONENT is winning and we have brown 0, POISON their trick!
   if (opponentWinning && brownZero) {
     return {
       card: brownZero,
       priority: 'high',
-      reason: '💀 POISON opponent\'s trick!',
+      reason: "💀 POISON opponent's trick!",
       explanation: `Opponent is winning. Play Brown 0 to give them -2 points! This turns their winning trick into a penalty. Defensive play at its best!`,
     };
   }
 
   // If TEAMMATE is winning, avoid brown 0
-  const nonBrownCards = playableCards.filter(c => !(c.value === 0 && c.color === 'brown'));
+  const nonBrownCards = playableCards.filter((c) => !(c.value === 0 && c.color === 'brown'));
 
   if (nonBrownCards.length > 0) {
-    const lowestNonBrown = nonBrownCards.reduce((min, card) => card.value < min.value ? card : min);
+    const lowestNonBrown = nonBrownCards.reduce((min, card) =>
+      card.value < min.value ? card : min
+    );
 
     return {
       card: lowestNonBrown,
       priority: 'low',
-      reason: teammateWinning ? 'Teammate winning - save cards' : 'Can\'t win - throw lowest',
+      reason: teammateWinning ? 'Teammate winning - save cards' : "Can't win - throw lowest",
       explanation: `You can't win this trick. Play ${lowestNonBrown.value} ${lowestNonBrown.color} (your lowest non-brown-0) to ${teammateWinning ? 'help your teammate' : 'save better cards'}.`,
-      alternatives: brownZero && !teammateWinning ? `Brown 0 would poison the trick if opponent wins, but save it if uncertain.` : undefined,
+      alternatives:
+        brownZero && !teammateWinning
+          ? `Brown 0 would poison the trick if opponent wins, but save it if uncertain.`
+          : undefined,
     };
   }
 
@@ -763,7 +800,7 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
     return {
       card: brownZero,
       priority: 'low',
-      reason: opponentWinning ? '💀 POISON opponent\'s trick!' : 'Only option left',
+      reason: opponentWinning ? "💀 POISON opponent's trick!" : 'Only option left',
       explanation: opponentWinning
         ? `Opponent is winning. Brown 0 will give them -2 points! Turn their win into a penalty.`
         : `You can't win and only have Brown 0 left. This will give -2 points to whoever wins the trick, but you have no choice.`,
@@ -771,7 +808,7 @@ export function suggestMove(gameState: GameState, playerName: string): MoveSugge
   }
 
   // Fallback: play lowest card
-  const lowestCard = playableCards.reduce((min, card) => card.value < min.value ? card : min);
+  const lowestCard = playableCards.reduce((min, card) => (card.value < min.value ? card : min));
   return {
     card: lowestCard,
     priority: 'low',

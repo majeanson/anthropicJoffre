@@ -53,7 +53,17 @@ Uses **Cinzel Decorative** for that mystical manuscript feel with wide letter-sp
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'success', 'warning', 'danger', 'ghost', 'link', 'elegant', 'arcane'],
+      options: [
+        'primary',
+        'secondary',
+        'success',
+        'warning',
+        'danger',
+        'ghost',
+        'link',
+        'elegant',
+        'arcane',
+      ],
       description: 'Visual style variant',
     },
     size: {
@@ -170,7 +180,9 @@ export const AllVariants: Story = {
       <Button variant="ghost">Ghost</Button>
       <Button variant="link">Link</Button>
       <Button variant="elegant">Elegant</Button>
-      <Button variant="arcane" glow>Arcane</Button>
+      <Button variant="arcane" glow>
+        Arcane
+      </Button>
     </div>
   ),
   parameters: {
@@ -212,7 +224,8 @@ export const MechanicalPress: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Mechanical press mode adds a steampunk-inspired depth effect with satisfying tactile feedback.',
+        story:
+          'Mechanical press mode adds a steampunk-inspired depth effect with satisfying tactile feedback.',
       },
     },
   },
@@ -290,10 +303,18 @@ export const Disabled: Story = {
 export const DisabledVariants: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4 items-center p-6 bg-[#0B0E14] rounded-xl">
-      <Button variant="primary" disabled>Primary</Button>
-      <Button variant="secondary" disabled>Secondary</Button>
-      <Button variant="arcane" disabled>Arcane</Button>
-      <Button variant="success" disabled>Success</Button>
+      <Button variant="primary" disabled>
+        Primary
+      </Button>
+      <Button variant="secondary" disabled>
+        Secondary
+      </Button>
+      <Button variant="arcane" disabled>
+        Arcane
+      </Button>
+      <Button variant="success" disabled>
+        Success
+      </Button>
     </div>
   ),
 };
@@ -392,9 +413,15 @@ export const AlchemistLaboratory: Story = {
         className="flex gap-3 justify-center pt-6 mt-6"
         style={{ borderTop: '1px solid #2D3548' }}
       >
-        <Button variant="ghost" size="sm">Ancient Texts</Button>
-        <Button variant="ghost" size="sm">Ingredients</Button>
-        <Button variant="link" size="sm">Philosopher's Notes</Button>
+        <Button variant="ghost" size="sm">
+          Ancient Texts
+        </Button>
+        <Button variant="ghost" size="sm">
+          Ingredients
+        </Button>
+        <Button variant="link" size="sm">
+          Philosopher's Notes
+        </Button>
       </div>
 
       {/* Bottom corners */}
@@ -407,7 +434,8 @@ export const AlchemistLaboratory: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Example of buttons used in a game menu context with the Midnight Alchemy aesthetic.',
+        story:
+          'Example of buttons used in a game menu context with the Midnight Alchemy aesthetic.',
       },
     },
   },
@@ -435,9 +463,15 @@ export const CardGameActions: Story = {
         </Button>
       </div>
       <div className="flex gap-2 justify-center">
-        <Button variant="ghost" size="sm">View Rules</Button>
-        <Button variant="ghost" size="sm">Chat</Button>
-        <Button variant="danger" size="sm">Leave Game</Button>
+        <Button variant="ghost" size="sm">
+          View Rules
+        </Button>
+        <Button variant="ghost" size="sm">
+          Chat
+        </Button>
+        <Button variant="danger" size="sm">
+          Leave Game
+        </Button>
       </div>
     </div>
   ),
@@ -457,12 +491,7 @@ export const CardGameActions: Story = {
 export const ElementalQuartet: Story = {
   render: () => (
     <div className="grid grid-cols-2 gap-4 p-6 bg-[#0B0E14] rounded-xl max-w-md">
-      <Button
-        variant="danger"
-        size="lg"
-        fullWidth
-        leftIcon={<span className="text-xl">🔥</span>}
-      >
+      <Button variant="danger" size="lg" fullWidth leftIcon={<span className="text-xl">🔥</span>}>
         Fire
       </Button>
       <Button
@@ -474,12 +503,7 @@ export const ElementalQuartet: Story = {
       >
         Water
       </Button>
-      <Button
-        variant="success"
-        size="lg"
-        fullWidth
-        leftIcon={<span className="text-xl">🌿</span>}
-      >
+      <Button variant="success" size="lg" fullWidth leftIcon={<span className="text-xl">🌿</span>}>
         Earth
       </Button>
       <Button

@@ -55,12 +55,10 @@ type Story = StoryObj<typeof meta>;
 // Sample content component for consistent examples
 const SampleContent = () => (
   <div>
-    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-      Card Title
-    </h3>
+    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Card Title</h3>
     <p className="text-gray-600 dark:text-gray-300">
-      This is sample card content. Cards can contain any React elements including text,
-      images, buttons, and more.
+      This is sample card content. Cards can contain any React elements including text, images,
+      buttons, and more.
     </p>
   </div>
 );
@@ -118,9 +116,7 @@ export const Team1Gradient: Story = {
     size: 'md',
     children: (
       <div>
-        <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-200 mb-2">
-          Team 1
-        </h3>
+        <h3 className="text-lg font-semibold text-orange-900 dark:text-orange-200 mb-2">Team 1</h3>
         <p className="text-orange-700 dark:text-orange-300">
           Orange gradient card for Team 1 content
         </p>
@@ -143,9 +139,7 @@ export const Team2Gradient: Story = {
     size: 'md',
     children: (
       <div>
-        <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-200 mb-2">
-          Team 2
-        </h3>
+        <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-200 mb-2">Team 2</h3>
         <p className="text-purple-700 dark:text-purple-300">
           Purple gradient card for Team 2 content
         </p>
@@ -252,36 +246,20 @@ export const DarkModeShowcase: Story = {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <UICard variant="default">
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
-            Default
-          </h4>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            White → Gray-800
-          </p>
+          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Default</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-300">White → Gray-800</p>
         </UICard>
         <UICard variant="elevated">
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
-            Elevated
-          </h4>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Higher shadow
-          </p>
+          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Elevated</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Higher shadow</p>
         </UICard>
         <UICard variant="bordered">
-          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
-            Bordered
-          </h4>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Gray-200 → Gray-600
-          </p>
+          <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">Bordered</h4>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Gray-200 → Gray-600</p>
         </UICard>
         <UICard variant="gradient" gradient="primary">
-          <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1">
-            Gradient
-          </h4>
-          <p className="text-sm text-indigo-700 dark:text-indigo-300">
-            Semi-transparent
-          </p>
+          <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1">Gradient</h4>
+          <p className="text-sm text-indigo-700 dark:text-indigo-300">Semi-transparent</p>
         </UICard>
       </div>
       <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
@@ -304,27 +282,19 @@ export const AllGradients: Story = {
   render: () => (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <UICard variant="gradient" gradient="team1">
-        <h4 className="font-semibold text-orange-900 dark:text-orange-200 mb-1">
-          Team 1
-        </h4>
+        <h4 className="font-semibold text-orange-900 dark:text-orange-200 mb-1">Team 1</h4>
         <p className="text-sm text-orange-700 dark:text-orange-300">Orange gradient</p>
       </UICard>
       <UICard variant="gradient" gradient="team2">
-        <h4 className="font-semibold text-purple-900 dark:text-purple-200 mb-1">
-          Team 2
-        </h4>
+        <h4 className="font-semibold text-purple-900 dark:text-purple-200 mb-1">Team 2</h4>
         <p className="text-sm text-purple-700 dark:text-purple-300">Purple gradient</p>
       </UICard>
       <UICard variant="gradient" gradient="success">
-        <h4 className="font-semibold text-green-900 dark:text-green-200 mb-1">
-          Success
-        </h4>
+        <h4 className="font-semibold text-green-900 dark:text-green-200 mb-1">Success</h4>
         <p className="text-sm text-green-700 dark:text-green-300">Green gradient</p>
       </UICard>
       <UICard variant="gradient" gradient="warning">
-        <h4 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-1">
-          Warning
-        </h4>
+        <h4 className="font-semibold text-yellow-900 dark:text-yellow-200 mb-1">Warning</h4>
         <p className="text-sm text-yellow-700 dark:text-yellow-300">Yellow gradient</p>
       </UICard>
       <UICard variant="gradient" gradient="error">
@@ -336,12 +306,8 @@ export const AllGradients: Story = {
         <p className="text-sm text-blue-700 dark:text-blue-300">Blue gradient</p>
       </UICard>
       <UICard variant="gradient" gradient="primary">
-        <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1">
-          Primary
-        </h4>
-        <p className="text-sm text-indigo-700 dark:text-indigo-300">
-          Indigo gradient
-        </p>
+        <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1">Primary</h4>
+        <p className="text-sm text-indigo-700 dark:text-indigo-300">Indigo gradient</p>
       </UICard>
     </div>
   ),
@@ -364,9 +330,7 @@ export const RealWorldExamples: Story = {
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full" />
           <div className="flex-1">
-            <h4 className="font-semibold text-gray-900 dark:text-gray-100">
-              John Doe
-            </h4>
+            <h4 className="font-semibold text-gray-900 dark:text-gray-100">John Doe</h4>
             <p className="text-sm text-gray-600 dark:text-gray-300">john@example.com</p>
           </div>
         </div>
@@ -375,12 +339,8 @@ export const RealWorldExamples: Story = {
       {/* Stats Card */}
       <UICard variant="gradient" gradient="success">
         <div className="text-center">
-          <div className="text-3xl font-bold text-green-900 dark:text-green-100">
-            +24%
-          </div>
-          <p className="text-sm text-green-700 dark:text-green-300 mt-1">
-            Growth this month
-          </p>
+          <div className="text-3xl font-bold text-green-900 dark:text-green-100">+24%</div>
+          <p className="text-sm text-green-700 dark:text-green-300 mt-1">Growth this month</p>
         </div>
       </UICard>
 
@@ -389,12 +349,8 @@ export const RealWorldExamples: Story = {
         <div className="flex items-start gap-3">
           <div className="text-2xl">🔔</div>
           <div className="flex-1">
-            <h5 className="font-medium text-gray-900 dark:text-gray-100">
-              New message
-            </h5>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              You have 3 unread messages
-            </p>
+            <h5 className="font-medium text-gray-900 dark:text-gray-100">New message</h5>
+            <p className="text-sm text-gray-600 dark:text-gray-300">You have 3 unread messages</p>
           </div>
         </div>
       </UICard>
@@ -403,14 +359,10 @@ export const RealWorldExamples: Story = {
       <UICard variant="gradient" gradient="team1" onClick={() => {}}>
         <div className="flex justify-between items-center">
           <div>
-            <h4 className="font-semibold text-orange-900 dark:text-orange-200">
-              Team 1
-            </h4>
+            <h4 className="font-semibold text-orange-900 dark:text-orange-200">Team 1</h4>
             <p className="text-sm text-orange-700 dark:text-orange-300">Orange Team</p>
           </div>
-          <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">
-            28
-          </div>
+          <div className="text-3xl font-bold text-orange-900 dark:text-orange-100">28</div>
         </div>
       </UICard>
     </div>

@@ -89,17 +89,17 @@ function BettingPhaseComponent({
 
   // Memoize expensive computations
   const currentPlayer = useMemo(
-    () => players.find(p => p.name === currentPlayerId),
+    () => players.find((p) => p.name === currentPlayerId),
     [players, currentPlayerId]
   );
 
   const hasPlacedBet = useMemo(
-    () => currentPlayer ? currentBets.some(b => b.playerName === currentPlayer.name) : false,
+    () => (currentPlayer ? currentBets.some((b) => b.playerName === currentPlayer.name) : false),
     [currentBets, currentPlayer]
   );
 
   const isMyTurn = useMemo(
-    () => currentPlayer ? players[currentPlayerIndex]?.id === currentPlayer.id : false,
+    () => (currentPlayer ? players[currentPlayerIndex]?.id === currentPlayer.id : false),
     [players, currentPlayerIndex, currentPlayer]
   );
 
@@ -108,10 +108,7 @@ function BettingPhaseComponent({
     [currentPlayerIndex, dealerIndex]
   );
 
-  const playerHand = useMemo(
-    () => currentPlayer?.hand || [],
-    [currentPlayer]
-  );
+  const playerHand = useMemo(() => currentPlayer?.hand || [], [currentPlayer]);
 
   // State for bet selection
   const [selectedAmount, setSelectedAmount] = useState<number>(7);
@@ -128,23 +125,24 @@ function BettingPhaseComponent({
     socket,
     currentPlayerId,
     chatOpen,
-    onNewChatMessage
+    onNewChatMessage,
   });
 
   // Get highest valid bet
   const highestBet = useMemo((): Bet | null => {
-    const validBets = currentBets.filter(b => !b.skipped);
+    const validBets = currentBets.filter((b) => !b.skipped);
     if (validBets.length === 0) return null;
     return validBets.reduce((highest, current) => {
       if (current.amount > highest.amount) return current;
-      if (current.amount === highest.amount && current.withoutTrump && !highest.withoutTrump) return current;
+      if (current.amount === highest.amount && current.withoutTrump && !highest.withoutTrump)
+        return current;
       return highest;
     });
   }, [currentBets]);
 
   const canSkip = (): boolean => {
     if (!isDealer) return true;
-    const hasValidBets = currentBets.some(b => !b.skipped);
+    const hasValidBets = currentBets.some((b) => !b.skipped);
     return hasValidBets;
   };
 
@@ -187,16 +185,16 @@ function BettingPhaseComponent({
         e.preventDefault();
         if (navLevel === 0) {
           if (e.key === 'ArrowRight') {
-            setSelectedAmount(prev => Math.min(12, prev + 1));
+            setSelectedAmount((prev) => Math.min(12, prev + 1));
           } else {
-            setSelectedAmount(prev => Math.max(7, prev - 1));
+            setSelectedAmount((prev) => Math.max(7, prev - 1));
           }
         } else if (navLevel === 1) {
-          setWithoutTrump(prev => !prev);
+          setWithoutTrump((prev) => !prev);
         } else if (navLevel === 2) {
           const hasSkip = canSkip();
           if (hasSkip) {
-            setActionIndex(prev => prev === 0 ? 1 : 0);
+            setActionIndex((prev) => (prev === 0 ? 1 : 0));
           }
         }
         sounds.buttonClick();
@@ -217,7 +215,7 @@ function BettingPhaseComponent({
       } else if (e.key === 'Escape') {
         e.preventDefault();
         if (navLevel > 0) {
-          setNavLevel(prev => prev - 1);
+          setNavLevel((prev) => prev - 1);
         } else if (canSkip()) {
           handleSkip();
         }
@@ -238,18 +236,17 @@ function BettingPhaseComponent({
   const isCurrentBetValid = (): boolean => {
     if (!highestBet) return true;
     if (isDealer) return selectedAmount >= highestBet.amount;
-    return selectedAmount > highestBet.amount ||
-           (selectedAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump);
+    return (
+      selectedAmount > highestBet.amount ||
+      (selectedAmount === highestBet.amount && withoutTrump && !highestBet.withoutTrump)
+    );
   };
 
   // Get current player's team color
   const currentTurnTeamId = players[currentPlayerIndex]?.teamId;
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ background: 'var(--color-bg-primary)' }}
-    >
+    <div className="min-h-screen flex flex-col game-container bg-skin-primary">
       <GameHeader
         gameId={gameState.id}
         roundNumber={gameState.roundNumber}
@@ -262,16 +259,28 @@ function BettingPhaseComponent({
         onOpenAchievements={onOpenAchievements}
         onOpenFriends={onOpenFriends}
         pendingFriendRequestsCount={pendingFriendRequestsCount}
-        botCount={gameState.players.filter(p => p.isBot).length}
+        botCount={gameState.players.filter((p) => p.isBot).length}
         autoplayEnabled={autoplayEnabled}
         onAutoplayToggle={onAutoplayToggle}
         unreadChatCount={unreadChatCount}
         soundEnabled={soundEnabled}
         onSoundToggle={onSoundToggle}
         connectionStats={connectionStats}
-        highestBet={highestBet ? { amount: highestBet.amount, withoutTrump: highestBet.withoutTrump, playerId: highestBet.playerId } : undefined}
+        highestBet={
+          highestBet
+            ? {
+                amount: highestBet.amount,
+                withoutTrump: highestBet.withoutTrump,
+                playerId: highestBet.playerId,
+              }
+            : undefined
+        }
         trump={gameState.trump}
-        bettingTeamId={gameState.highestBet?.playerId ? gameState.players.find(p => p.id === gameState.highestBet?.playerId)?.teamId : null}
+        bettingTeamId={
+          gameState.highestBet?.playerId
+            ? gameState.players.find((p) => p.id === gameState.highestBet?.playerId)?.teamId
+            : null
+        }
         isVoiceEnabled={isVoiceEnabled}
         isVoiceMuted={isVoiceMuted}
         voiceParticipants={voiceParticipants}
@@ -283,22 +292,14 @@ function BettingPhaseComponent({
       <div className="flex-1 flex items-center justify-center p-4">
         <div
           className="
-            bg-[var(--color-bg-secondary)]
+            bg-skin-secondary
             rounded-[var(--radius-xl)]
             p-6 max-w-2xl w-full
-            border-2 border-[var(--color-border-accent)]
+            border-2 border-skin-accent
+            shadow-main-glow
           "
-          style={{
-            boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
-          }}
         >
-          <h2
-            className="text-2xl font-display uppercase tracking-wider mb-4 text-center"
-            style={{
-              color: 'var(--color-text-primary)',
-              textShadow: '0 0 10px var(--color-glow)',
-            }}
-          >
+          <h2 className="text-2xl font-display uppercase tracking-wider mb-4 text-center text-skin-primary drop-shadow-[0_0_10px_var(--color-glow)]">
             Betting Phase
           </h2>
 
@@ -311,22 +312,16 @@ function BettingPhaseComponent({
                   font-display uppercase tracking-wider text-sm
                   flex items-center justify-center gap-2 flex-wrap
                   border-2 transition-all duration-[var(--duration-fast)]
+                  ${currentTurnTeamId === 1 ? 'bg-team1 text-skin-team1-text' : 'bg-team2 text-skin-team2-text'}
+                  ${isMyTurn ? 'border-skin-accent shadow-turn-active' : 'border-transparent'}
+                  ${!isMyTurn && (currentTurnTeamId === 1 ? 'shadow-turn-team1' : 'shadow-turn-team2')}
                 `}
-                style={{
-                  backgroundColor: currentTurnTeamId === 1
-                    ? 'var(--color-team1-primary)'
-                    : 'var(--color-team2-primary)',
-                  borderColor: isMyTurn ? 'var(--color-text-accent)' : 'transparent',
-                  color: currentTurnTeamId === 1
-                    ? 'var(--color-team1-text)'
-                    : 'var(--color-team2-text)',
-                  boxShadow: isMyTurn
-                    ? '0 0 20px var(--color-glow), 0 0 40px var(--color-glow)'
-                    : `0 0 15px ${currentTurnTeamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)'}`,
-                }}
               >
                 {isMyTurn && <span className="animate-bounce">👇</span>}
-                <span>Waiting for: {players[currentPlayerIndex]?.name}{isMyTurn ? ' (Your Turn)' : ''}</span>
+                <span>
+                  Waiting for: {players[currentPlayerIndex]?.name}
+                  {isMyTurn ? ' (Your Turn)' : ''}
+                </span>
                 <TimeoutIndicator
                   duration={60000}
                   isActive={!hasPlacedBet && isMyTurn}
@@ -354,10 +349,7 @@ function BettingPhaseComponent({
           {/* Player's Hand Display */}
           {playerHand.length > 0 && (
             <div className="mb-6">
-              <h3
-                className="text-sm font-display uppercase tracking-wider mb-3"
-                style={{ color: 'var(--color-text-secondary)' }}
-              >
+              <h3 className="text-sm font-display uppercase tracking-wider mb-3 text-skin-secondary">
                 Your Hand
               </h3>
               <div className="grid grid-cols-4 gap-2 md:gap-3 max-w-md mx-auto">
@@ -383,10 +375,7 @@ function BettingPhaseComponent({
 
           {/* Betting Controls */}
           {!hasPlacedBet && (
-            <div
-              className="space-y-4 mt-6 pt-6"
-              style={{ borderTop: '2px solid var(--color-border-default)' }}
-            >
+            <div className="space-y-4 mt-6 pt-6 border-t-2 border-skin-default">
               {isMyTurn ? (
                 <>
                   {/* Level 0: Bet Amount */}
@@ -395,43 +384,45 @@ function BettingPhaseComponent({
                     className={`
                       p-4 rounded-[var(--radius-lg)]
                       border-2 transition-all duration-[var(--duration-fast)]
-                      ${navLevel === 0
-                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
-                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)]'
+                      ${
+                        navLevel === 0
+                          ? 'border-skin-accent bg-skin-accent/10 shadow-nav-active'
+                          : 'border-skin-default bg-skin-tertiary'
                       }
                     `}
-                    style={navLevel === 0 ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
                   >
-                    <label
-                      className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      {navLevel === 0 && <span style={{ color: 'var(--color-text-accent)' }}>▶</span>}
+                    <label className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2 text-skin-muted">
+                      {navLevel === 0 && <span className="text-skin-accent">▶</span>}
                       Select Bet Amount
                       <span className="hidden sm:inline text-[10px]">(← → to adjust)</span>
                     </label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
                       {[7, 8, 9, 10, 11, 12].map((amount) => {
                         const isValid = isBetAmountValid(amount);
                         const isSelected = selectedAmount === amount;
                         return (
                           <button
                             key={amount}
-                            onClick={() => { sounds.buttonClick(); setSelectedAmount(amount); }}
+                            onClick={() => {
+                              sounds.buttonClick();
+                              setSelectedAmount(amount);
+                            }}
                             disabled={!isValid}
                             className={`
-                              py-3 px-4
+                              min-h-[48px] py-3 sm:py-4 px-3 sm:px-4
                               rounded-[var(--radius-md)]
-                              font-display text-lg
+                              font-display text-lg sm:text-xl
                               border-2 transition-all duration-[var(--duration-fast)]
-                              ${!isValid
-                                ? 'opacity-40 cursor-not-allowed border-[var(--color-border-subtle)] text-[var(--color-text-muted)]'
-                                : isSelected
-                                ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/20 text-[var(--color-text-accent)]'
-                                : 'border-[var(--color-border-default)] bg-transparent text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
+                              touch-manipulation select-none
+                              active:scale-95
+                              ${
+                                !isValid
+                                  ? 'opacity-40 cursor-not-allowed border-skin-subtle text-skin-muted'
+                                  : isSelected
+                                    ? 'border-skin-accent bg-skin-accent/20 text-skin-accent shadow-btn-selected'
+                                    : 'border-skin-default bg-transparent text-skin-secondary hover:border-skin-accent'
                               }
                             `}
-                            style={isSelected && isValid ? { boxShadow: '0 0 10px var(--color-glow)' } : {}}
                           >
                             {amount}
                           </button>
@@ -446,52 +437,54 @@ function BettingPhaseComponent({
                     className={`
                       p-4 rounded-[var(--radius-lg)]
                       border-2 transition-all duration-[var(--duration-fast)]
-                      ${navLevel === 1
-                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
-                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)]'
+                      ${
+                        navLevel === 1
+                          ? 'border-skin-accent bg-skin-accent/10 shadow-nav-active'
+                          : 'border-skin-default bg-skin-tertiary'
                       }
                     `}
-                    style={navLevel === 1 ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
                   >
-                    <label
-                      className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      {navLevel === 1 && <span style={{ color: 'var(--color-text-accent)' }}>▶</span>}
+                    <label className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2 text-skin-muted">
+                      {navLevel === 1 && <span className="text-skin-accent">▶</span>}
                       Trump Option
                       <span className="hidden sm:inline text-[10px]">(← → to toggle)</span>
                     </label>
                     <div className="space-y-2">
                       {[
                         { value: false, label: 'With Trump (1x)', icon: '🃏' },
-                        { value: true, label: 'Without Trump (2x)', icon: '✨' }
+                        { value: true, label: 'Without Trump (2x)', icon: '✨' },
                       ].map((option) => (
                         <button
                           key={option.label}
-                          onClick={() => { sounds.buttonClick(); setWithoutTrump(option.value); }}
+                          onClick={() => {
+                            sounds.buttonClick();
+                            setWithoutTrump(option.value);
+                          }}
                           className={`
-                            w-full flex items-center p-3
+                            w-full flex items-center min-h-[48px] p-3 sm:p-4
                             rounded-[var(--radius-md)]
                             border-2 transition-all duration-[var(--duration-fast)]
-                            ${withoutTrump === option.value
-                              ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/20'
-                              : 'border-[var(--color-border-default)] bg-[var(--color-bg-secondary)] hover:border-[var(--color-border-accent)]'
+                            touch-manipulation select-none
+                            active:scale-[0.98]
+                            ${
+                              withoutTrump === option.value
+                                ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/20'
+                                : 'border-[var(--color-border-default)] bg-[var(--color-bg-secondary)] hover:border-[var(--color-border-accent)]'
                             }
                           `}
                         >
-                          <span className="mr-3 text-lg">{option.icon}</span>
+                          <span className="mr-3 text-lg sm:text-xl">{option.icon}</span>
                           <span
-                            className="font-body text-sm"
-                            style={{
-                              color: withoutTrump === option.value
-                                ? 'var(--color-text-accent)'
-                                : 'var(--color-text-secondary)'
-                            }}
+                            className={`font-body text-sm sm:text-base ${
+                              withoutTrump === option.value
+                                ? 'text-skin-accent'
+                                : 'text-skin-secondary'
+                            }`}
                           >
                             {option.label}
                           </span>
                           {withoutTrump === option.value && (
-                            <span className="ml-auto" style={{ color: 'var(--color-text-accent)' }}>✓</span>
+                            <span className="ml-auto text-lg text-skin-accent">✓</span>
                           )}
                         </button>
                       ))}
@@ -504,20 +497,19 @@ function BettingPhaseComponent({
                     className={`
                       p-4 rounded-[var(--radius-lg)]
                       border-2 transition-all duration-[var(--duration-fast)]
-                      ${navLevel === 2
-                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
-                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)]'
+                      ${
+                        navLevel === 2
+                          ? 'border-skin-accent bg-skin-accent/10 shadow-nav-active'
+                          : 'border-skin-default bg-skin-tertiary'
                       }
                     `}
-                    style={navLevel === 2 ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
                   >
-                    <label
-                      className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      {navLevel === 2 && <span style={{ color: 'var(--color-text-accent)' }}>▶</span>}
+                    <label className="block text-xs font-display uppercase tracking-wider mb-3 flex items-center gap-2 text-skin-muted">
+                      {navLevel === 2 && <span className="text-skin-accent">▶</span>}
                       Action
-                      <span className="hidden sm:inline text-[10px]">(← → select, Enter confirm)</span>
+                      <span className="hidden sm:inline text-[10px]">
+                        (← → select, Enter confirm)
+                      </span>
                     </label>
                     <div className="flex gap-3">
                       {canSkip() && (
@@ -546,30 +538,43 @@ function BettingPhaseComponent({
                   {/* Validation Messages */}
                   <SmartValidationMessage
                     messages={[
-                      ...(!isCurrentBetValid() && highestBet ? [{
-                        type: 'warning' as const,
-                        text: `Too low: Current highest is ${highestBet.amount} points${highestBet.withoutTrump ? ' (No Trump)' : ''}. ${isDealer ? 'You can match or raise.' : 'You must raise.'}`
-                      }] : []),
-                      ...(isDealer && currentBets.length > 0 && currentBets.some(b => !b.skipped) ? [{
-                        type: 'info' as const,
-                        text: 'Dealer Privilege: You can match or raise the current bet'
-                      }] : []),
-                      ...(isDealer && !currentBets.some(b => !b.skipped) ? [{
-                        type: 'info' as const,
-                        text: 'Dealer: You must bet at least 7 points'
-                      }] : []),
-                      ...(isCurrentBetValid() ? [{
-                        type: 'success' as const,
-                        text: `Ready to place bet: ${selectedAmount} ${withoutTrump ? '(No Trump)' : ''}`
-                      }] : [])
+                      ...(!isCurrentBetValid() && highestBet
+                        ? [
+                            {
+                              type: 'warning' as const,
+                              text: `Too low: Current highest is ${highestBet.amount} points${highestBet.withoutTrump ? ' (No Trump)' : ''}. ${isDealer ? 'You can match or raise.' : 'You must raise.'}`,
+                            },
+                          ]
+                        : []),
+                      ...(isDealer && currentBets.length > 0 && currentBets.some((b) => !b.skipped)
+                        ? [
+                            {
+                              type: 'info' as const,
+                              text: 'Dealer Privilege: You can match or raise the current bet',
+                            },
+                          ]
+                        : []),
+                      ...(isDealer && !currentBets.some((b) => !b.skipped)
+                        ? [
+                            {
+                              type: 'info' as const,
+                              text: 'Dealer: You must bet at least 7 points',
+                            },
+                          ]
+                        : []),
+                      ...(isCurrentBetValid()
+                        ? [
+                            {
+                              type: 'success' as const,
+                              text: `Ready to place bet: ${selectedAmount} ${withoutTrump ? '(No Trump)' : ''}`,
+                            },
+                          ]
+                        : []),
                     ]}
                   />
                 </>
               ) : (
-                <div
-                  className="text-center font-body py-3"
-                  style={{ color: 'var(--color-text-muted)' }}
-                >
+                <div className="text-center font-body py-3 text-skin-muted">
                   It's {players[currentPlayerIndex]?.name}'s turn to bet
                 </div>
               )}
@@ -577,13 +582,7 @@ function BettingPhaseComponent({
           )}
 
           {hasPlacedBet && (
-            <div
-              className="text-center font-body mt-6 pt-6"
-              style={{
-                borderTop: '2px solid var(--color-border-default)',
-                color: 'var(--color-success)',
-              }}
-            >
+            <div className="text-center font-body mt-6 pt-6 border-t-2 border-skin-default text-skin-success">
               ✓ Waiting for other players to bet...
             </div>
           )}
@@ -609,14 +608,14 @@ function BettingPhaseComponent({
           onSendMessage={(message) => {
             socket.emit('send_game_chat', {
               gameId,
-              message: message.trim()
+              message: message.trim(),
             });
             onNewChatMessage({
               playerId: currentPlayerId,
               playerName: currentPlayer?.name || 'Unknown',
               message: message.trim(),
               timestamp: Date.now(),
-              teamId: currentPlayer?.teamId || null
+              teamId: currentPlayer?.teamId || null,
             });
           }}
           title="💬 Game Chat"

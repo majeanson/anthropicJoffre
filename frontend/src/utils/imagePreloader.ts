@@ -46,8 +46,11 @@ export function preloadCardImages(): Promise<void[]> {
     // Use requestIdleCallback to load images during browser idle time
     // This prevents blocking the initial page render
     if ('requestIdleCallback' in window) {
-      (window as Window & { requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void })
-        .requestIdleCallback(doPreload, { timeout: 3000 });
+      (
+        window as Window & {
+          requestIdleCallback: (cb: () => void, opts?: { timeout: number }) => void;
+        }
+      ).requestIdleCallback(doPreload, { timeout: 3000 });
     } else {
       // Fallback: defer by 1 second for older browsers
       setTimeout(doPreload, 1000);

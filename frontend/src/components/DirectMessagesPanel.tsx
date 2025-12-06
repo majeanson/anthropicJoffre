@@ -75,14 +75,16 @@ export function DirectMessagesPanel({
   onClose,
   socket,
   currentUsername,
-  initialRecipient
+  initialRecipient,
 }: DirectMessagesPanelProps) {
   // ✅ Early return BEFORE hooks
   if (!isOpen) return null;
 
   // ✅ NOW safe to call hooks
   const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [selectedConversation, setSelectedConversation] = useState<string | null>(initialRecipient || null);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(
+    initialRecipient || null
+  );
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -97,7 +99,11 @@ export function DirectMessagesPanel({
     setLoading(true);
     socket.emit('get_conversations');
 
-    const handleConversationsList = ({ conversations: convos }: { conversations: Conversation[] }) => {
+    const handleConversationsList = ({
+      conversations: convos,
+    }: {
+      conversations: Conversation[];
+    }) => {
       setConversations(convos);
       setLoading(false);
     };
@@ -118,7 +124,7 @@ export function DirectMessagesPanel({
 
     const handleConversationMessages = ({
       otherUsername,
-      messages: msgs
+      messages: msgs,
     }: {
       otherUsername: string;
       messages: DirectMessage[];
@@ -144,8 +150,8 @@ export function DirectMessagesPanel({
     const handleMessagesMarkedRead = ({ senderUsername }: { senderUsername: string }) => {
       if (senderUsername === selectedConversation) {
         // Update conversation unread count
-        setConversations(prev =>
-          prev.map(conv => {
+        setConversations((prev) =>
+          prev.map((conv) => {
             const otherUser =
               conv.user1_username === currentUsername ? conv.user2_username : conv.user1_username;
             return otherUser === senderUsername ? { ...conv, unread_count: 0 } : conv;
@@ -167,14 +173,14 @@ export function DirectMessagesPanel({
 
     const handleMessageReceived = ({
       message,
-      senderUsername
+      senderUsername,
     }: {
       message: DirectMessage;
       senderUsername: string;
     }) => {
       // If conversation is open, append message
       if (senderUsername === selectedConversation) {
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
         socket.emit('mark_messages_read', { senderUsername });
       } else {
         // Otherwise, update conversation list
@@ -185,7 +191,7 @@ export function DirectMessagesPanel({
     const handleMessageSent = ({ message }: { message: DirectMessage }) => {
       // Append sent message to conversation
       if (selectedConversation && message.recipient_username === selectedConversation) {
-        setMessages(prev => [...prev, message]);
+        setMessages((prev) => [...prev, message]);
       }
     };
 
@@ -218,7 +224,7 @@ export function DirectMessagesPanel({
     setSendingMessage(true);
     socket.emit('send_direct_message', {
       recipientUsername: selectedConversation,
-      messageText: inputMessage.trim()
+      messageText: inputMessage.trim(),
     });
 
     setInputMessage('');
@@ -231,11 +237,11 @@ export function DirectMessagesPanel({
     return conv.user1_username === currentUsername
       ? {
           username: conv.user2_username,
-          avatar_url: conv.user2_avatar_url
+          avatar_url: conv.user2_avatar_url,
         }
       : {
           username: conv.user1_username,
-          avatar_url: conv.user1_avatar_url
+          avatar_url: conv.user1_avatar_url,
         };
   };
 

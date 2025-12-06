@@ -27,10 +27,7 @@ function createMockAchievement(overrides: Partial<Achievement>): Achievement {
 /**
  * Wrapper component to handle state for interactive stories
  */
-function InteractiveAchievement(props: {
-  achievement: Achievement | null;
-  autoShow?: boolean;
-}) {
+function InteractiveAchievement(props: { achievement: Achievement | null; autoShow?: boolean }) {
   const [showAchievement, setShowAchievement] = useState(props.autoShow ?? true);
 
   return (

@@ -219,7 +219,7 @@ describe('Hand Evaluation - Void Suit Recognition', () => {
       card('brown', 4),
     ];
 
-    const { gameState, playerName} = createTestGameState(hand, null);
+    const { gameState, playerName } = createTestGameState(hand, null);
     const suggestion = suggestBet(gameState, playerName);
 
     // During betting, should choose suit with most cards (green), not void (red)

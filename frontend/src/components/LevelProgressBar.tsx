@@ -46,13 +46,47 @@ export function LevelProgressBar({
   // Get level tier styling based on level - using inline CSS colors for proper rendering
   // Dynamic Tailwind classes don't work at runtime, so we use inline styles
   const levelTier = useMemo(() => {
-    if (level >= 50) return { gradient: 'linear-gradient(to bottom right, #a855f7, #ec4899)', glowColor: 'rgba(168, 85, 247, 0.5)', name: 'Legendary' };
-    if (level >= 40) return { gradient: 'linear-gradient(to bottom right, #facc15, #f97316)', glowColor: 'rgba(234, 179, 8, 0.5)', name: 'Master' };
-    if (level >= 30) return { gradient: 'linear-gradient(to bottom right, #22d3ee, #3b82f6)', glowColor: 'rgba(34, 211, 238, 0.5)', name: 'Expert' };
-    if (level >= 20) return { gradient: 'linear-gradient(to bottom right, #34d399, #22c55e)', glowColor: 'rgba(52, 211, 153, 0.5)', name: 'Veteran' };
-    if (level >= 10) return { gradient: 'linear-gradient(to bottom right, #60a5fa, #6366f1)', glowColor: 'rgba(96, 165, 250, 0.5)', name: 'Skilled' };
-    if (level >= 5) return { gradient: 'linear-gradient(to bottom right, #94a3b8, #64748b)', glowColor: 'rgba(148, 163, 184, 0.5)', name: 'Apprentice' };
-    return { gradient: 'linear-gradient(to bottom right, #d97706, #b45309)', glowColor: 'rgba(217, 119, 6, 0.5)', name: 'Beginner' };
+    if (level >= 50)
+      return {
+        gradient: 'linear-gradient(to bottom right, #a855f7, #ec4899)',
+        glowColor: 'rgba(168, 85, 247, 0.5)',
+        name: 'Legendary',
+      };
+    if (level >= 40)
+      return {
+        gradient: 'linear-gradient(to bottom right, #facc15, #f97316)',
+        glowColor: 'rgba(234, 179, 8, 0.5)',
+        name: 'Master',
+      };
+    if (level >= 30)
+      return {
+        gradient: 'linear-gradient(to bottom right, #22d3ee, #3b82f6)',
+        glowColor: 'rgba(34, 211, 238, 0.5)',
+        name: 'Expert',
+      };
+    if (level >= 20)
+      return {
+        gradient: 'linear-gradient(to bottom right, #34d399, #22c55e)',
+        glowColor: 'rgba(52, 211, 153, 0.5)',
+        name: 'Veteran',
+      };
+    if (level >= 10)
+      return {
+        gradient: 'linear-gradient(to bottom right, #60a5fa, #6366f1)',
+        glowColor: 'rgba(96, 165, 250, 0.5)',
+        name: 'Skilled',
+      };
+    if (level >= 5)
+      return {
+        gradient: 'linear-gradient(to bottom right, #94a3b8, #64748b)',
+        glowColor: 'rgba(148, 163, 184, 0.5)',
+        name: 'Apprentice',
+      };
+    return {
+      gradient: 'linear-gradient(to bottom right, #d97706, #b45309)',
+      glowColor: 'rgba(217, 119, 6, 0.5)',
+      name: 'Beginner',
+    };
   }, [level]);
 
   // Level badge component
@@ -100,25 +134,16 @@ export function LevelProgressBar({
         <div className="flex items-center justify-between mb-1">
           <span
             className={`
-              font-semibold
+              font-semibold text-skin-primary
               ${compact ? 'text-xs' : 'text-sm'}
             `}
-            style={{ color: 'var(--color-text-primary)' }}
           >
             Level {level}
             {!compact && (
-              <span
-                className="ml-2 text-xs font-normal"
-                style={{ color: 'var(--color-text-muted)' }}
-              >
-                {levelTier.name}
-              </span>
+              <span className="ml-2 text-xs font-normal text-skin-muted">{levelTier.name}</span>
             )}
           </span>
-          <span
-            className={`font-medium ${compact ? 'text-xs' : 'text-sm'}`}
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
+          <span className={`font-medium text-skin-secondary ${compact ? 'text-xs' : 'text-sm'}`}>
             {currentLevelXP.toLocaleString()} / {nextLevelXP.toLocaleString()} XP
           </span>
         </div>
@@ -126,10 +151,9 @@ export function LevelProgressBar({
         {/* Progress bar */}
         <div
           className={`
-            relative overflow-hidden rounded-full
+            relative overflow-hidden rounded-full bg-skin-tertiary
             ${compact ? 'h-2' : 'h-3'}
           `}
-          style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
         >
           <div
             className={`
@@ -156,12 +180,7 @@ export function LevelProgressBar({
 
         {/* Total XP (optional) */}
         {totalXP !== undefined && !compact && (
-          <div
-            className="mt-1 text-xs"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            Total: {totalXP.toLocaleString()} XP
-          </div>
+          <div className="mt-1 text-xs text-skin-muted">Total: {totalXP.toLocaleString()} XP</div>
         )}
       </div>
     </div>

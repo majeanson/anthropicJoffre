@@ -71,37 +71,32 @@ function CardSkinCard({
         relative
         w-full
         p-4
-        rounded-[var(--radius-lg)]
+        rounded-lg
         border-2
-        transition-all duration-[var(--duration-normal)]
+        transition-all duration-350
         text-left
-        ${isLocked
-          ? 'opacity-70 cursor-not-allowed border-[var(--color-border-default)]'
-          : isSelected
-            ? 'border-[var(--color-text-accent)] shadow-[0_0_20px_var(--color-glow)] scale-[1.02]'
-            : 'border-[var(--color-border-default)] hover:border-[var(--color-border-accent)] hover:scale-[1.01]'
+        ${
+          isLocked
+            ? 'opacity-70 cursor-not-allowed border-skin-border-default'
+            : isSelected
+              ? 'border-skin-text-accent shadow-[0_0_20px_var(--color-glow)] scale-[1.02]'
+              : 'border-skin-border-default hover:border-skin-border-accent hover:scale-[1.01]'
         }
-        bg-[var(--color-bg-secondary)]
+        bg-skin-secondary
         focus-visible:outline-none
-        focus-visible:ring-[var(--input-focus-ring-width)]
-        focus-visible:ring-[var(--color-text-accent)]
+        focus-visible:ring-3
+        focus-visible:ring-skin-text-accent
         overflow-hidden
       `}
     >
       {/* Selection flash overlay */}
       {showSelectFlash && (
-        <div
-          className="absolute inset-0 z-20 pointer-events-none rounded-[var(--radius-lg)]"
-          style={{
-            background: 'radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%)',
-            animation: 'skinSelectFlash 0.6s ease-out forwards',
-          }}
-        />
+        <div className="absolute inset-0 z-20 pointer-events-none rounded-lg bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.8)_0%,rgba(255,255,255,0)_70%)] animate-[skinSelectFlash_0.6s_ease-out_forwards]" />
       )}
 
       {/* Lock overlay */}
       {isLocked && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[var(--radius-lg)] bg-black/50 z-10">
+        <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-black/50 z-10">
           <span className="text-4xl mb-2">🔒</span>
           <p className="text-sm text-white font-bold">Level {requiredLevel}</p>
           <p className="text-xs text-gray-300 mt-1">
@@ -121,66 +116,66 @@ function CardSkinCard({
 
       {/* Selected indicator */}
       {isSelected && !isLocked && (
-        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-[var(--color-success)] flex items-center justify-center z-10">
+        <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-skin-status-success flex items-center justify-center z-10">
           <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
           </svg>
         </div>
       )}
 
-      {/* Preview area */}
+      {/* Preview area - uses CSS custom property for dynamic background */}
       <div
-        className="rounded-[var(--radius-md)] p-3 mb-3 flex justify-center gap-1"
-        style={{ background: cardSkin.preview }}
+        className="rounded-md p-3 mb-3 flex justify-center gap-1"
+        style={{ '--skin-preview-bg': cardSkin.preview } as React.CSSProperties}
       >
-        {/* Show sample cards with this skin's formatting */}
-        {sampleCards.map((card, index) => (
-          <div
-            key={index}
-            className="transform scale-75 origin-center"
-            style={{
-              opacity: isHovered || isSelected ? 1 : 0.9,
-              transition: 'all 0.2s ease',
-              animation: showSelectFlash
-                ? `skinCardBounce 0.5s ease-out ${index * 0.08}s both`
-                : 'none',
-            }}
-          >
-            {/* Mini card preview showing the value format */}
+        <div className="flex gap-1" style={{ background: 'var(--skin-preview-bg)' }}>
+          {/* Show sample cards with this skin's formatting */}
+          {sampleCards.map((card, index) => (
             <div
-              className="w-10 h-14 rounded-md flex items-center justify-center text-white font-bold text-sm transition-shadow duration-200"
-              style={{
-                backgroundColor: cardSkin.suits[card.color].color,
-                fontFamily: cardSkin.fontFamily,
-                boxShadow: isHovered || showSelectFlash
-                  ? `0 0 15px ${cardSkin.suits[card.color].glowColor}`
-                  : 'none',
-              }}
+              key={index}
+              className={`skin-preview-card ${isHovered || isSelected ? 'skin-preview-card-active' : 'skin-preview-card-inactive'}`}
+              style={
+                {
+                  '--anim-delay': `${index * 0.08}s`,
+                  animation: showSelectFlash
+                    ? `skinCardBounce 0.5s ease-out var(--anim-delay) both`
+                    : 'none',
+                } as React.CSSProperties
+              }
             >
-              {cardSkin.formatValue(card.value, false)}
+              {/* Mini card preview showing the value format - dynamic colors require style */}
+              <div
+                className="skin-mini-card"
+                style={
+                  {
+                    '--card-color': cardSkin.suits[card.color].color,
+                    '--card-glow': cardSkin.suits[card.color].glowColor,
+                    backgroundColor: 'var(--card-color)',
+                    fontFamily: cardSkin.fontFamily,
+                    boxShadow: isHovered || showSelectFlash ? '0 0 15px var(--card-glow)' : 'none',
+                  } as React.CSSProperties
+                }
+              >
+                {cardSkin.formatValue(card.value, false)}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Skin info */}
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <h3
-            className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm"
-            style={{ fontFamily: cardSkin.fontFamily }}
-          >
+          <h3 className="font-display text-skin-primary uppercase tracking-wider text-sm">
             {cardSkin.name}
           </h3>
           {cardSkin.requiredLevel > 0 && !isLocked && (
-            <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">
+            <span className="text-xs px-2 py-0.5 rounded-full bg-skin-tertiary text-skin-secondary">
               Lvl {cardSkin.requiredLevel}+
             </span>
           )}
         </div>
-        <p className="text-xs text-[var(--color-text-muted)] font-body line-clamp-2">
-          {cardSkin.description}
-        </p>
+        <p className="text-xs text-skin-muted font-body line-clamp-2">{cardSkin.description}</p>
       </div>
     </button>
   );
@@ -238,7 +233,7 @@ export function CardSkinSelector({
       setPreviewBounce(false);
     }, 700);
 
-    const selectedSkin = availableCardSkins.find(s => s.id === id);
+    const selectedSkin = availableCardSkins.find((s) => s.id === id);
     if (selectedSkin && onSkinChange) {
       onSkinChange(selectedSkin);
     }
@@ -260,26 +255,31 @@ export function CardSkinSelector({
     <div className="space-y-4">
       {/* Live Preview with actual Card component */}
       {showPreview && (
-        <div className="p-4 rounded-[var(--radius-lg)] bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)] overflow-hidden">
-          <p className="text-xs text-[var(--color-text-muted)] mb-3 text-center uppercase tracking-wider">
+        <div className="p-4 rounded-lg bg-skin-tertiary border border-skin-subtle overflow-hidden">
+          <p className="text-xs text-skin-muted mb-3 text-center uppercase tracking-wider">
             Live Preview
           </p>
           <div className="flex justify-center gap-2 flex-wrap">
-            {([
-              { color: 'red', value: 5 },
-              { color: 'blue', value: 6 },
-              { color: 'green', value: 1 },
-              { color: 'brown', value: 7 },
-              { color: 'red', value: 0 },  // Special card
-              { color: 'brown', value: 0 }, // Special card
-            ] as CardType[]).map((card, index) => (
+            {(
+              [
+                { color: 'red', value: 5 },
+                { color: 'blue', value: 6 },
+                { color: 'green', value: 1 },
+                { color: 'brown', value: 7 },
+                { color: 'red', value: 0 }, // Special card
+                { color: 'brown', value: 0 }, // Special card
+              ] as CardType[]
+            ).map((card, index) => (
               <div
                 key={`${card.color}-${card.value}`}
-                style={{
-                  animation: previewBounce
-                    ? `skinCardBounce 0.5s ease-out ${index * 0.06}s both`
-                    : 'none',
-                }}
+                style={
+                  {
+                    '--anim-delay': `${index * 0.06}s`,
+                    animation: previewBounce
+                      ? `skinCardBounce 0.5s ease-out var(--anim-delay) both`
+                      : 'none',
+                  } as React.CSSProperties
+                }
               >
                 <Card card={card} size="small" />
               </div>
@@ -305,16 +305,11 @@ export function CardSkinSelector({
       </div>
 
       {/* Current Selection Info */}
-      <div className="p-3 rounded-[var(--radius-md)] bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)]">
+      <div className="p-3 rounded-md bg-skin-tertiary border border-skin-subtle">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs text-[var(--color-text-muted)] uppercase tracking-wider">
-              Active Card Skin
-            </p>
-            <p
-              className="font-display text-[var(--color-text-primary)] uppercase tracking-wider"
-              style={{ fontFamily: cardSkin.fontFamily }}
-            >
+            <p className="text-xs text-skin-muted uppercase tracking-wider">Active Card Skin</p>
+            <p className="font-display text-skin-primary uppercase tracking-wider">
               {cardSkin.name}
             </p>
           </div>
@@ -360,7 +355,7 @@ export function CardSkinDropdown({ onSkinChange }: CardSkinDropdownProps) {
 
     setCardSkin(id);
     setIsOpen(false);
-    const selectedSkin = availableCardSkins.find(s => s.id === id);
+    const selectedSkin = availableCardSkins.find((s) => s.id === id);
     if (selectedSkin && onSkinChange) {
       onSkinChange(selectedSkin);
     }
@@ -378,39 +373,27 @@ export function CardSkinDropdown({ onSkinChange }: CardSkinDropdownProps) {
       {/* Trigger button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`
-          flex items-center gap-3
-          px-4 py-3
-          rounded-[var(--radius-lg)]
-          border-[var(--input-border-width)]
-          border-[var(--color-border-default)]
-          bg-[var(--color-bg-secondary)]
-          hover:border-[var(--color-border-accent)]
-          transition-all duration-[var(--duration-fast)]
-          w-full
-          text-left
-        `}
+        className="flex items-center gap-3 px-4 py-3 rounded-lg border-2 border-skin-border-default bg-skin-secondary hover:border-skin-border-accent transition-all duration-180 w-full text-left"
       >
-        {/* Preview swatch */}
+        {/* Preview swatch - requires dynamic background from skin config */}
         <div
-          className="w-8 h-8 rounded-[var(--radius-sm)] flex items-center justify-center text-white font-bold text-xs"
-          style={{
-            background: cardSkin.preview,
-            fontFamily: cardSkin.fontFamily,
-          }}
+          className="skin-swatch"
+          style={
+            {
+              '--swatch-bg': cardSkin.preview,
+              background: 'var(--swatch-bg)',
+            } as React.CSSProperties
+          }
         >
           {cardSkin.formatValue(7, false)}
         </div>
         <div className="flex-1 min-w-0">
-          <div
-            className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm"
-            style={{ fontFamily: cardSkin.fontFamily }}
-          >
+          <div className="font-display text-skin-primary uppercase tracking-wider text-sm">
             {cardSkin.name}
           </div>
         </div>
         <svg
-          className={`w-5 h-5 text-[var(--color-text-muted)] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-skin-muted transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -423,25 +406,10 @@ export function CardSkinDropdown({ onSkinChange }: CardSkinDropdownProps) {
       {isOpen && (
         <>
           {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setIsOpen(false)}
-          />
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
 
           {/* Menu */}
-          <div className={`
-            absolute top-full left-0 right-0
-            mt-2
-            rounded-[var(--radius-lg)]
-            border-[var(--input-border-width)]
-            border-[var(--color-border-accent)]
-            bg-[var(--color-bg-secondary)]
-            shadow-[var(--shadow-lg)]
-            z-50
-            overflow-hidden
-            max-h-80 overflow-y-auto
-            animate-slideUp
-          `}>
+          <div className="absolute top-full left-0 right-0 mt-2 rounded-lg border-2 border-skin-border-accent bg-skin-secondary shadow-lg z-50 overflow-hidden max-h-80 overflow-y-auto animate-slideUp">
             {sortedSkins.map((s) => {
               const isLocked = !isCardSkinUnlocked(s.id);
               const requiredLevel = getCardSkinRequiredLevel(s.id);
@@ -451,55 +419,57 @@ export function CardSkinDropdown({ onSkinChange }: CardSkinDropdownProps) {
                   key={s.id}
                   onClick={() => handleSelect(s.id)}
                   disabled={isLocked}
-                  className={`
-                    flex items-center gap-3
-                    w-full
-                    px-4 py-3
-                    text-left
-                    transition-colors duration-[var(--duration-fast)]
-                    ${isLocked
+                  className={`flex items-center gap-3 w-full px-4 py-3 text-left transition-colors duration-180 ${
+                    isLocked
                       ? 'opacity-50 cursor-not-allowed'
                       : s.id === cardSkinId
-                        ? 'bg-[var(--color-bg-tertiary)]'
-                        : 'hover:bg-[var(--color-bg-tertiary)]'
-                    }
-                  `}
+                        ? 'bg-skin-tertiary'
+                        : 'hover:bg-skin-tertiary'
+                  }`}
                 >
                   <div className="relative">
+                    {/* Swatch - requires dynamic background from skin config */}
                     <div
-                      className="w-8 h-8 rounded-[var(--radius-sm)] flex items-center justify-center text-white font-bold text-xs"
-                      style={{
-                        background: s.preview,
-                        fontFamily: s.fontFamily,
-                      }}
+                      className="skin-swatch"
+                      style={
+                        {
+                          '--swatch-bg': s.preview,
+                          background: 'var(--swatch-bg)',
+                        } as React.CSSProperties
+                      }
                     >
                       {s.formatValue(5, false)}
                     </div>
                     {isLocked && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-[var(--radius-sm)]">
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-sm">
                         <span className="text-sm">🔒</span>
                       </div>
                     )}
                   </div>
                   <div className="flex-1">
-                    <div
-                      className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm"
-                      style={{ fontFamily: s.fontFamily }}
-                    >
+                    <div className="font-display text-skin-primary uppercase tracking-wider text-sm">
                       {s.name}
                     </div>
-                    <div className="text-xs text-[var(--color-text-muted)] font-body">
+                    <div className="text-xs text-skin-muted font-body">
                       {isLocked ? `Level ${requiredLevel} required` : s.description}
                     </div>
                   </div>
                   {s.id === cardSkinId && !isLocked && (
-                    <svg className="w-5 h-5 text-[var(--color-success)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-5 h-5 text-success"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   )}
-                  {isLocked && (
-                    <span className="text-xs text-[var(--color-text-muted)]">Lvl {requiredLevel}</span>
-                  )}
+                  {isLocked && <span className="text-xs text-skin-muted">Lvl {requiredLevel}</span>}
                 </button>
               );
             })}

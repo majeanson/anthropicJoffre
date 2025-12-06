@@ -89,10 +89,7 @@ export const WhiteOnDark: LoadingStory = {
 
 export const EmptyDefault: LoadingStory = {
   render: () => (
-    <EmptyState
-      title="No items found"
-      description="Try adjusting your search or filters"
-    />
+    <EmptyState title="No items found" description="Try adjusting your search or filters" />
   ),
 };
 
@@ -112,13 +109,7 @@ export const EmptyWithAction: LoadingStory = {
 };
 
 export const EmptyCompact: LoadingStory = {
-  render: () => (
-    <EmptyState
-      icon="📭"
-      title="No messages"
-      compact
-    />
-  ),
+  render: () => <EmptyState icon="📭" title="No messages" compact />,
 };
 
 export const EmptyInCard: LoadingStory = {
@@ -151,9 +142,7 @@ export const EmptyCustomIcon: LoadingStory = {
 export const ErrorDefault: LoadingStory = {
   render: () => (
     <div className="w-96">
-      <ErrorState
-        message="Failed to load data. Please try again."
-      />
+      <ErrorState message="Failed to load data. Please try again." />
     </div>
   ),
 };
@@ -161,10 +150,7 @@ export const ErrorDefault: LoadingStory = {
 export const ErrorWithRetry: LoadingStory = {
   render: () => (
     <div className="w-96">
-      <ErrorState
-        message="Failed to load game history"
-        onRetry={() => alert('Retrying...')}
-      />
+      <ErrorState message="Failed to load game history" onRetry={() => alert('Retrying...')} />
     </div>
   ),
 };
@@ -184,11 +170,7 @@ export const ErrorWithCorrelationId: LoadingStory = {
 export const ErrorRetrying: LoadingStory = {
   render: () => (
     <div className="w-96">
-      <ErrorState
-        message="Connection failed"
-        onRetry={() => {}}
-        isRetrying={true}
-      />
+      <ErrorState message="Connection failed" onRetry={() => {}} isRetrying={true} />
     </div>
   ),
 };
@@ -322,7 +304,10 @@ export const InteractiveDemo: LoadingStory = {
           >
             <div className="space-y-2">
               {mockData.map((item, i) => (
-                <div key={i} className="p-3 bg-green-100 dark:bg-green-900/30 rounded border border-green-300 dark:border-green-700">
+                <div
+                  key={i}
+                  className="p-3 bg-green-100 dark:bg-green-900/30 rounded border border-green-300 dark:border-green-700"
+                >
                   ✅ {item}
                 </div>
               ))}
@@ -381,10 +366,7 @@ export const AllStatesShowcase: LoadingStory = {
         <h3 className="text-lg font-bold text-gray-700 dark:text-gray-300 mb-3">Error States</h3>
         <div className="space-y-3">
           <ErrorState message="Simple error message" />
-          <ErrorState
-            message="Error with retry option"
-            onRetry={() => {}}
-          />
+          <ErrorState message="Error with retry option" onRetry={() => {}} />
           <ErrorState
             message="Error with correlation ID"
             correlationId="err-12345"

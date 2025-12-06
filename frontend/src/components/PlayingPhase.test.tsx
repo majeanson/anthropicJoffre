@@ -143,17 +143,11 @@ describe('PlayingPhase', () => {
         createTestCard('green', 7),
       ];
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand })],
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       expect(screen.getByTestId('card-red-5')).toBeInTheDocument();
@@ -200,9 +194,7 @@ describe('PlayingPhase', () => {
         createTestCard('blue', 3), // Not playable if red is led suit
       ];
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand })],
         currentTrick: [
           { card: createTestCard('red', 7), playerId: 'player-2', playerName: 'Player 2' },
         ],
@@ -210,11 +202,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       const redCard = screen.getByTestId('card-red-5');
@@ -231,18 +219,12 @@ describe('PlayingPhase', () => {
         createTestCard('green', 7),
       ];
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand })],
         currentTrick: [], // Empty trick = leading
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       expect(screen.getByTestId('card-red-5')).not.toBeDisabled();
@@ -254,18 +236,12 @@ describe('PlayingPhase', () => {
       const card = createTestCard('red', 5);
       const hand = [card];
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand })],
         currentTrick: [],
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       fireEvent.click(screen.getByTestId('card-red-5'));
@@ -277,18 +253,12 @@ describe('PlayingPhase', () => {
       const card = createTestCard('red', 5);
       const hand = [card];
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand })],
         currentTrick: [],
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       const cardButton = screen.getByTestId('card-red-5');
@@ -310,11 +280,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Trick cards should be visible (mocked components)
@@ -327,11 +293,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Should show waiting message since it's not player-1's turn
@@ -344,11 +306,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Should render without errors even with empty trick
@@ -371,11 +329,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Led suit info should be visible (implementation-specific)
@@ -389,11 +343,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // No led suit indicator when trick is empty
@@ -408,11 +358,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Scores should be visible in game header
@@ -425,11 +371,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Trump color should be visible in game header
@@ -442,11 +384,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Round number should be visible
@@ -460,11 +398,7 @@ describe('PlayingPhase', () => {
 
       // Should render error message instead of crashing
       const { container } = renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="invalid-id"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="invalid-id" onPlayCard={mockOnPlayCard} />
       );
 
       expect(container).toBeInTheDocument();
@@ -473,17 +407,11 @@ describe('PlayingPhase', () => {
 
     it('should handle empty hand gracefully', () => {
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand: [] }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand: [] })],
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Should render without crashing
@@ -497,11 +425,7 @@ describe('PlayingPhase', () => {
       });
 
       renderWithSettings(
-        <PlayingPhase
-          gameState={game}
-          currentPlayerId="player-1"
-          onPlayCard={mockOnPlayCard}
-        />
+        <PlayingPhase gameState={game} currentPlayerId="player-1" onPlayCard={mockOnPlayCard} />
       );
 
       // Should render without crashing even with null trump
@@ -532,9 +456,7 @@ describe('PlayingPhase', () => {
     it('should not allow card play in spectator mode', () => {
       const hand = [createTestCard('red', 5)];
       const game = createTestGame({
-        players: [
-          createTestPlayer({ id: 'player-1', hand }),
-        ],
+        players: [createTestPlayer({ id: 'player-1', hand })],
       });
 
       renderWithSettings(

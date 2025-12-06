@@ -34,17 +34,14 @@ interface RewardsCalendarProps {
   onClose: () => void;
 }
 
-export function RewardsCalendar({
-  socket,
-  playerName,
-  isOpen,
-  onClose,
-}: RewardsCalendarProps) {
+export function RewardsCalendar({ socket, playerName, isOpen, onClose }: RewardsCalendarProps) {
   const [calendar, setCalendar] = useState<CalendarReward[]>([]);
   const [progress, setProgress] = useState<CalendarProgress | null>(null);
   const [loading, setLoading] = useState(true);
   const [claimingDay, setClaimingDay] = useState<number | null>(null);
-  const [notification, setNotification] = useState<{ message: string; isError: boolean } | null>(null);
+  const [notification, setNotification] = useState<{ message: string; isError: boolean } | null>(
+    null
+  );
 
   useEffect(() => {
     if (!socket || !playerName) return;
@@ -85,7 +82,10 @@ export function RewardsCalendar({
       if (data.rewards.xp) rewardText.push(`+${data.rewards.xp} XP`);
       if (data.rewards.currency) rewardText.push(`+${data.rewards.currency} coins`);
 
-      setNotification({ message: `Day ${data.dayNumber} claimed: ${rewardText.join(', ')}!`, isError: false });
+      setNotification({
+        message: `Day ${data.dayNumber} claimed: ${rewardText.join(', ')}!`,
+        isError: false,
+      });
       setTimeout(() => setNotification(null), 5000);
       setClaimingDay(null);
     };
@@ -125,7 +125,10 @@ export function RewardsCalendar({
       if (dayNumber > progress.currentDay) {
         setNotification({ message: 'Cannot claim future rewards!', isError: true });
       } else {
-        setNotification({ message: 'This reward has expired. You can only claim today\'s reward.', isError: true });
+        setNotification({
+          message: "This reward has expired. You can only claim today's reward.",
+          isError: true,
+        });
       }
       setTimeout(() => setNotification(null), 3000);
       return;
@@ -194,7 +197,12 @@ export function RewardsCalendar({
       {/* Notification */}
       {notification && (
         <div className="mb-4">
-          <UICard variant="gradient" gradient={notification.isError ? 'error' : 'success'} size="sm" className="text-center">
+          <UICard
+            variant="gradient"
+            gradient={notification.isError ? 'error' : 'success'}
+            size="sm"
+            className="text-center"
+          >
             <p className="text-white">{notification.message}</p>
           </UICard>
         </div>
@@ -238,18 +246,14 @@ export function RewardsCalendar({
               return (
                 <Button
                   key={reward.dayNumber}
-                  onClick={() =>
-                    status === 'available' && handleClaimReward(reward.dayNumber)
-                  }
+                  onClick={() => status === 'available' && handleClaimReward(reward.dayNumber)}
                   disabled={status !== 'available' || claimingDay !== null}
                   variant="ghost"
                   size="md"
                   className={getDayClasses(reward)}
                 >
                   {/* Day Number */}
-                  <div className="text-xs text-gray-300 font-bold mb-1">
-                    Day {reward.dayNumber}
-                  </div>
+                  <div className="text-xs text-gray-300 font-bold mb-1">Day {reward.dayNumber}</div>
 
                   {/* Icon */}
                   <div className="text-2xl mb-1">{reward.icon}</div>
@@ -291,8 +295,7 @@ export function RewardsCalendar({
                 <span className="font-semibold">Day 21:</span> 150 coins + badge
               </div>
               <div className="text-purple-200">
-                <span className="font-semibold">Day 30:</span> 500 coins + exclusive
-                rewards!
+                <span className="font-semibold">Day 30:</span> 500 coins + exclusive rewards!
               </div>
             </div>
           </UICard>

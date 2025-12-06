@@ -196,7 +196,8 @@ export const LongContent: Story = {
   args: {
     variant: 'info',
     title: 'The Laws of Transmutation',
-    children: 'In this sacred art, practitioners must follow the cardinal rule: equivalent exchange. Points are scored based on successful reactions and special catalysts discovered. The red catalyst grants +5 points while the brown catalyst deducts -2 points.',
+    children:
+      'In this sacred art, practitioners must follow the cardinal rule: equivalent exchange. Points are scored based on successful reactions and special catalysts discovered. The red catalyst grants +5 points while the brown catalyst deducts -2 points.',
   },
 };
 
@@ -210,21 +211,11 @@ export const AllVariants: Story = {
   },
   render: () => (
     <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <Alert variant="info">
-        ☿ Mercury: Knowledge flows like quicksilver.
-      </Alert>
-      <Alert variant="success">
-        ☉ Gold: The transmutation is complete!
-      </Alert>
-      <Alert variant="warning">
-        △ Fire: Proceed with extreme caution.
-      </Alert>
-      <Alert variant="error">
-        ☠ Void: The mixture has destabilized.
-      </Alert>
-      <Alert variant="neutral">
-        ◇ Salt: An observation recorded.
-      </Alert>
+      <Alert variant="info">☿ Mercury: Knowledge flows like quicksilver.</Alert>
+      <Alert variant="success">☉ Gold: The transmutation is complete!</Alert>
+      <Alert variant="warning">△ Fire: Proceed with extreme caution.</Alert>
+      <Alert variant="error">☠ Void: The mixture has destabilized.</Alert>
+      <Alert variant="neutral">◇ Salt: An observation recorded.</Alert>
     </div>
   ),
 };
@@ -256,35 +247,19 @@ export const LaboratoryNotifications: Story = {
         Laboratory Scrolls
       </h3>
 
-      <Alert
-        variant="info"
-        icon={<span>⚗</span>}
-        title="Your Turn"
-      >
+      <Alert variant="info" icon={<span>⚗</span>} title="Your Turn">
         The Great Work awaits your contribution. Select a catalyst.
       </Alert>
 
-      <Alert
-        variant="success"
-        icon={<span>☉</span>}
-        title="Reaction Won!"
-      >
+      <Alert variant="success" icon={<span>☉</span>} title="Reaction Won!">
         Your formula prevailed. +6 points of pure essence collected!
       </Alert>
 
-      <Alert
-        variant="warning"
-        icon={<span>⏳</span>}
-        title="Time Flows"
-      >
+      <Alert variant="warning" icon={<span>⏳</span>} title="Time Flows">
         10 seconds remain before the mixture settles.
       </Alert>
 
-      <Alert
-        variant="error"
-        icon={<span>✕</span>}
-        title="Invalid Catalyst"
-      >
+      <Alert variant="error" icon={<span>✕</span>} title="Invalid Catalyst">
         You must use the same element if you possess one.
       </Alert>
     </div>
@@ -301,30 +276,15 @@ export const SystemMessages: Story = {
   },
   render: () => (
     <div className="space-y-4 p-6 bg-[#0B0E14] rounded-xl">
-      <Alert
-        variant="warning"
-        icon={<span>🔮</span>}
-        title="Ethereal Link Severed"
-        dismissible
-      >
+      <Alert variant="warning" icon={<span>🔮</span>} title="Ethereal Link Severed" dismissible>
         Attempting to restore connection... Please wait.
       </Alert>
 
-      <Alert
-        variant="success"
-        icon={<span>✓</span>}
-        title="Bond Restored"
-        dismissible
-      >
+      <Alert variant="success" icon={<span>✓</span>} title="Bond Restored" dismissible>
         The ethereal link has been reestablished. Continue your work!
       </Alert>
 
-      <Alert
-        variant="info"
-        icon={<span>👤</span>}
-        title="Alchemist Arrived"
-        dismissible
-      >
+      <Alert variant="info" icon={<span>👤</span>} title="Alchemist Arrived" dismissible>
         Aurelia has entered the laboratory.
       </Alert>
     </div>
@@ -359,10 +319,7 @@ export const FormValidation: Story = {
 
       <div className="space-y-3">
         <div>
-          <label
-            className="block text-sm font-medium mb-1"
-            style={{ color: '#9CA3AF' }}
-          >
+          <label className="block text-sm font-medium mb-1" style={{ color: '#9CA3AF' }}>
             Alchemist Name
           </label>
           <input
@@ -377,15 +334,10 @@ export const FormValidation: Story = {
           />
         </div>
 
-        <Alert variant="error">
-          Name must contain at least 3 runes.
-        </Alert>
+        <Alert variant="error">Name must contain at least 3 runes.</Alert>
 
         <div>
-          <label
-            className="block text-sm font-medium mb-1"
-            style={{ color: '#9CA3AF' }}
-          >
+          <label className="block text-sm font-medium mb-1" style={{ color: '#9CA3AF' }}>
             Sigil of Contact
           </label>
           <input
@@ -454,9 +406,7 @@ export const BettingPhaseAlerts: Story = {
         ))}
       </div>
 
-      <Alert variant="warning">
-        You must raise the wager. Current highest is 8.
-      </Alert>
+      <Alert variant="warning">You must raise the wager. Current highest is 8.</Alert>
     </div>
   ),
 };

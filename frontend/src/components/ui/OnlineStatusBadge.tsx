@@ -50,7 +50,11 @@ const statusConfig: Record<PlayerStatus, { icon: string; text: string; color: st
   },
 };
 
-export function OnlineStatusBadge({ status, showText = true, className = '' }: OnlineStatusBadgeProps) {
+export function OnlineStatusBadge({
+  status,
+  showText = true,
+  className = '',
+}: OnlineStatusBadgeProps) {
   const config = statusConfig[status] || statusConfig.online;
 
   if (!showText) {

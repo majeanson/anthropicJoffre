@@ -72,16 +72,45 @@ interface MockMessage {
 const mockConversations: MockConversation[] = [
   { username: 'Alice', lastMessage: 'Great game! GG', timestamp: '2 min ago', unreadCount: 2 },
   { username: 'Bob', lastMessage: 'Rematch tomorrow?', timestamp: '1 hour ago', unreadCount: 0 },
-  { username: 'Charlie', lastMessage: 'Thanks for the tips!', timestamp: '3 hours ago', unreadCount: 0 },
+  {
+    username: 'Charlie',
+    lastMessage: 'Thanks for the tips!',
+    timestamp: '3 hours ago',
+    unreadCount: 0,
+  },
   { username: 'Diana', lastMessage: 'See you next time', timestamp: 'Yesterday', unreadCount: 0 },
 ];
 
 const mockMessages: MockMessage[] = [
   { id: 1, text: 'Hey! Good game today!', isSent: false, timestamp: '10:30 AM', isRead: true },
-  { id: 2, text: 'Thanks! You played really well', isSent: true, timestamp: '10:31 AM', isRead: true },
-  { id: 3, text: 'That last round was intense!', isSent: false, timestamp: '10:32 AM', isRead: true },
-  { id: 4, text: 'Yeah, I thought we were going to lose when you got that 12 bet', isSent: true, timestamp: '10:33 AM', isRead: true },
-  { id: 5, text: 'The red zero saved me though', isSent: false, timestamp: '10:34 AM', isRead: true },
+  {
+    id: 2,
+    text: 'Thanks! You played really well',
+    isSent: true,
+    timestamp: '10:31 AM',
+    isRead: true,
+  },
+  {
+    id: 3,
+    text: 'That last round was intense!',
+    isSent: false,
+    timestamp: '10:32 AM',
+    isRead: true,
+  },
+  {
+    id: 4,
+    text: 'Yeah, I thought we were going to lose when you got that 12 bet',
+    isSent: true,
+    timestamp: '10:33 AM',
+    isRead: true,
+  },
+  {
+    id: 5,
+    text: 'The red zero saved me though',
+    isSent: false,
+    timestamp: '10:34 AM',
+    isRead: true,
+  },
   { id: 6, text: 'Great game! GG', isSent: false, timestamp: '10:35 AM', isRead: false },
 ];
 
@@ -227,12 +256,7 @@ export const NoMessagesYet: Story = {
           {/* Messages Area - Empty */}
           <div className="flex-1 flex flex-col">
             <div className="flex-1 flex items-center justify-center">
-              <EmptyState
-                icon="👋"
-                title="No messages yet"
-                description="Say hi!"
-                compact
-              />
+              <EmptyState icon="👋" title="No messages yet" description="Say hi!" compact />
             </div>
 
             {/* Input */}
@@ -301,13 +325,20 @@ export const WithUnreadMessages: Story = {
     const unreadConversations: MockConversation[] = [
       { username: 'Alice', lastMessage: 'Are you online?', timestamp: 'Just now', unreadCount: 5 },
       { username: 'Bob', lastMessage: 'Check this out!', timestamp: '5 min ago', unreadCount: 3 },
-      { username: 'Charlie', lastMessage: 'Game starting...', timestamp: '10 min ago', unreadCount: 1 },
+      {
+        username: 'Charlie',
+        lastMessage: 'Game starting...',
+        timestamp: '10 min ago',
+        unreadCount: 1,
+      },
       { username: 'Diana', lastMessage: 'Old message', timestamp: '2 days ago', unreadCount: 0 },
     ];
 
     return (
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)]">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Conversation List with Unread</h3>
+        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+          Conversation List with Unread
+        </h3>
         <div className="w-80 bg-[var(--color-bg-secondary)] rounded-lg overflow-hidden">
           {unreadConversations.map((conv) => (
             <ConversationItem
@@ -342,22 +373,46 @@ export const MessageBubbleVariants: Story = {
         <div>
           <p className="text-[var(--color-text-secondary)] text-xs mb-2">Received Messages</p>
           <MessageBubble text="Hello! How are you?" isSent={false} timestamp="10:30 AM" />
-          <MessageBubble text="This is a longer message to show how text wraps in the bubble component." isSent={false} timestamp="10:31 AM" />
+          <MessageBubble
+            text="This is a longer message to show how text wraps in the bubble component."
+            isSent={false}
+            timestamp="10:31 AM"
+          />
         </div>
 
         {/* Sent messages */}
         <div>
           <p className="text-[var(--color-text-secondary)] text-xs mb-2">Sent Messages</p>
-          <MessageBubble text="I'm doing great, thanks!" isSent={true} timestamp="10:32 AM" isRead={false} />
-          <MessageBubble text="Just finished a game" isSent={true} timestamp="10:33 AM" isRead={true} />
+          <MessageBubble
+            text="I'm doing great, thanks!"
+            isSent={true}
+            timestamp="10:32 AM"
+            isRead={false}
+          />
+          <MessageBubble
+            text="Just finished a game"
+            isSent={true}
+            timestamp="10:33 AM"
+            isRead={true}
+          />
         </div>
 
         {/* Read status */}
         <div>
           <p className="text-[var(--color-text-secondary)] text-xs mb-2">Read Status Indicator</p>
           <div className="flex flex-col gap-2">
-            <MessageBubble text="Message not yet read" isSent={true} timestamp="10:34 AM" isRead={false} />
-            <MessageBubble text="Message has been read" isSent={true} timestamp="10:35 AM" isRead={true} />
+            <MessageBubble
+              text="Message not yet read"
+              isSent={true}
+              timestamp="10:34 AM"
+              isRead={false}
+            />
+            <MessageBubble
+              text="Message has been read"
+              isSent={true}
+              timestamp="10:35 AM"
+              isRead={true}
+            />
           </div>
         </div>
       </div>
@@ -377,7 +432,9 @@ export const ConversationItemStates: Story = {
 
       <div className="bg-[var(--color-bg-secondary)] rounded-lg overflow-hidden space-y-1">
         <div>
-          <p className="text-[var(--color-text-tertiary)] text-xs p-2 bg-[var(--color-bg-tertiary)]">Selected</p>
+          <p className="text-[var(--color-text-tertiary)] text-xs p-2 bg-[var(--color-bg-tertiary)]">
+            Selected
+          </p>
           <ConversationItem
             username="Alice"
             avatar={<Avatar username="Alice" size="md" />}
@@ -390,7 +447,9 @@ export const ConversationItemStates: Story = {
         </div>
 
         <div>
-          <p className="text-[var(--color-text-tertiary)] text-xs p-2 bg-[var(--color-bg-tertiary)]">With Unread</p>
+          <p className="text-[var(--color-text-tertiary)] text-xs p-2 bg-[var(--color-bg-tertiary)]">
+            With Unread
+          </p>
           <ConversationItem
             username="Bob"
             avatar={<Avatar username="Bob" size="md" />}
@@ -403,7 +462,9 @@ export const ConversationItemStates: Story = {
         </div>
 
         <div>
-          <p className="text-[var(--color-text-tertiary)] text-xs p-2 bg-[var(--color-bg-tertiary)]">Normal</p>
+          <p className="text-[var(--color-text-tertiary)] text-xs p-2 bg-[var(--color-bg-tertiary)]">
+            Normal
+          </p>
           <ConversationItem
             username="Charlie"
             avatar={<Avatar username="Charlie" size="md" />}
@@ -436,7 +497,12 @@ export const LongConversation: Story = {
       { id: 7, text: 'Perfect, Ill be there', isSent: false, timestamp: '9:06 AM' },
       { id: 8, text: 'Cool! See you then', isSent: true, timestamp: '9:07 AM' },
       { id: 9, text: 'BTW, any strategy tips?', isSent: false, timestamp: '9:10 AM' },
-      { id: 10, text: 'Always bid conservatively in early rounds', isSent: true, timestamp: '9:11 AM' },
+      {
+        id: 10,
+        text: 'Always bid conservatively in early rounds',
+        isSent: true,
+        timestamp: '9:11 AM',
+      },
       { id: 11, text: 'And save your trump cards!', isSent: true, timestamp: '9:11 AM' },
       { id: 12, text: 'Good advice, thanks!', isSent: false, timestamp: '9:12 AM' },
     ];

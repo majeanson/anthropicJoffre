@@ -21,13 +21,13 @@ Multiplayer Trick Card Game - Real-time 4-player, 2-team card game with WebSocke
 
 ---
 
-## 🎯 Core Development Principles
+## 🎯 Core Development Principle
 
 ### Architecture Patterns
 - **Small atomic components** - Favor new files over agglomeration
 - **Event-driven architecture** - Use WebSocket events, NEVER setTimeout for game logic resolution
 - **Player Identification** - **CRITICAL**: ALWAYS use player names as identifiers, NEVER socket.ids (socket IDs are volatile and change on reconnection)
-- **Type safety** - All WebSocket actions must be well-defined, typed, and reusable
+- **Type safety** - All WebSocket actions must be well-definedsorry i, typed, and reusable
 - **TDD workflow** - Write tests proactively, follow TDD_WORKFLOW.md
 - **Shared types** - Keep backend/src/types/game.ts and frontend/src/types/game.ts in sync
 
@@ -205,21 +205,6 @@ function PlayingPhase({ gameState, currentPlayerId }) {
 'leaderboard': { players: LeaderboardEntry[] }
 'player_history': { playerName: string; games: GameHistoryEntry[] }
 'online_players': { players: OnlinePlayer[] }
-
-// Sprint 16: Direct Messages (Server → Client)
-'direct_message_sent': { message: DirectMessage }
-'conversation_messages': { otherUsername: string; messages: DirectMessage[] }
-'conversations_list': { conversations: Conversation[] }
-'messages_marked_read': { senderUsername: string; count: number }
-'unread_count': { count: number }
-'message_deleted': { messageId: number }
-'conversation_deleted': { otherUsername: string; count: number }
-'message_search_results': { results: DirectMessage[] }
-
-// Sprint 16: Social Features (Server → Client)
-'recent_players': { players: RecentPlayer[] }
-'friend_suggestions': { suggestions: FriendSuggestion[] }
-'mutual_friends': { otherUsername: string; mutualFriends: string[] }
 ```
 
 ### Adding New Events
@@ -296,71 +281,35 @@ GET /api/player-history/:playerName // Player game history
 **Important for Testing**: First round betting order is Player 3, 4, 1, 2 (not 1, 2, 3, 4)
 
 ### Position Swapping
-Players can swap positions with any other player in any phase (team selection, betting, playing phase):
+Players can swap positions with teammates or bots depending in any phase (team selection, betting, playing phase):
 
 **Team Selection Phase:**
-- Players can swap positions with any teammate
-- Swap button appears next to all teammates in team panels
+- Players can swap positions with any users
+- Swap button appears next to all users
 - Allows strategic positioning before game starts
 - Enforces alternating team pattern (1-2-1-2) after any swap
 
 **Active Gameplay (Betting, Playing, Scoring):**
-- Players can swap positions with **ANY PLAYER** (same team OR opposite team, bot or human)
-- Swap buttons (↔) appear next to all players in the circular player layout
-- **Bot swaps**: Immediate execution (no confirmation needed)
-- **Human swaps**: Requires confirmation from target player
-  - Initiator sends swap request via `request_swap` socket event
-  - Target receives `swap_request_received` event and sees confirmation modal
-  - Target has 30 seconds to accept or reject
-  - Auto-rejects after timeout
-  - Limit: 1 pending request per player
-- **Cross-team swapping**: Swapping with a player on the opposite team changes YOUR team
-  - Example: 1 human (Team 1) + 1 bot (Team 1) + 1 human (Team 2) + 1 bot (Team 2)
-  - Human from Team 1 swaps with player from Team 2
-  - Result: Both players switch teams based on new positions
-- Tooltip indicates when swapping will change teams: "Swap with this player (changes teams!)"
+- Players can swap positions with **ANY PLAYER** (same team OR opposite team)
+- Swap buttons (↔) appear next to all users in the circular player layout
+- Swapping with a bot is automatic, Swapping with a human prompts a confirmation from the other human user
+- Tooltip indicates when swapping will change teams: "Swap positions with BotName (changes teams!)"
 - Useful for adjusting turn order mid-game, changing visual layout, or switching teams
-- All game data (hand, tricks won, points) is preserved and swapped correctly
+- All game data (hand, tricks won, points) is preserved and swapped correctly. This means all cards, played cards, cards in hand, cards in play, previous tricks, scores, tricks, everything should be swapped, just like if they were already like that forever and ever before the swap .
 
 **Implementation:**
-- `backend/src/game/validation.ts:256-263` - Validation logic (allows any player swaps)
+- `backend/src/game/validation.ts:255-261` - Dual-phase validation logic (any bot allowed during gameplay)
 - `backend/src/game/state.ts:224-296` - Position swap with data preservation
-- `backend/src/socketHandlers/lobby.ts:530-686` - Swap handlers (immediate and confirmation flows)
-- `frontend/src/components/TeamSelection.tsx:214-222, 321-329` - Team selection swap UI
-- `frontend/src/components/PlayingPhase.tsx:583-596, 918-1010` - Gameplay swap UI
-- `frontend/src/components/SwapConfirmationModal.tsx` - Confirmation modal for human swaps
-- `frontend/src/App.tsx:347-384` - Swap logic and socket listeners
-
-**Socket Events:**
-- `'swap_position'` (Client → Server) - Immediate swap (for bots)
-  ```typescript
-  { gameId: string; targetPlayerId: string }
-  ```
-- `'request_swap'` (Client → Server) - Request swap (for humans)
-  ```typescript
-  { gameId: string; targetPlayerId: string }
-  ```
-- `'swap_request_received'` (Server → Client) - Notify target of swap request
-  ```typescript
-  { fromPlayerId: string; fromPlayerName: string; willChangeTeams: boolean }
-  ```
-- `'respond_to_swap'` (Client → Server) - Accept/reject swap
-  ```typescript
-  { gameId: string; requesterId: string; accepted: boolean }
-  ```
-- `'swap_accepted'` / `'swap_rejected'` (Server → Client) - Notify initiator
-  ```typescript
-  { message: string }
-  ```
+- `frontend/src/components/TeamSelection.tsx:214-220, 313-319` - Team selection swap UI
+- `frontend/src/components/PlayingPhase.tsx:583-596, 918-1010` - Gameplay swap UI with cross-team support
+- Socket event: `'swap_position': { gameId: string; targetPlayerId: string }`
 
 **Critical Details:**
-- Swapping updates player positions in the array (affects turn order)
-- Preserves all player data: hand, tricksWon, pointsWon
-- Updates references in currentTrick, currentBets, and highestBet
+- Swapping updates player's identity in the positions in the array (affects turn order, i.e I could "swap" infinitely with the next player and play every round for example)
+- Player data is correctly swapped (this should be tested)
+- Updates references in currentTrick, currentBets, and highestBet and all other pertinent places (this should be checked)
 - Team IDs are recalculated based on position (alternating 1-2-1-2 pattern)
 - **Position determines team**: After swap, teams are reassigned by position (not by original team)
-- Swap requests expire after 30 seconds (auto-reject)
-- Limit of 1 pending request per player (new request cancels old)
 
 ---
 

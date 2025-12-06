@@ -21,19 +21,31 @@ import { useBotManagement } from '../hooks/useBotManagement';
 // Lazy load heavy modals for better initial load performance
 // Sprint 8 Task 3: Added NotificationCenter to lazy loading
 // Note: AchievementsPanel removed - now integrated into ProfileProgressModal as "Achievements" tab
-const BotManagementPanel = lazy(() => import('./BotManagementPanel').then(m => ({ default: m.BotManagementPanel })));
+const BotManagementPanel = lazy(() =>
+  import('./BotManagementPanel').then((m) => ({ default: m.BotManagementPanel }))
+);
 const FriendsPanel = lazy(() => import('./FriendsPanel'));
-const CatchUpModal = lazy(() => import('./CatchUpModal').then(m => ({ default: m.CatchUpModal })));
+const CatchUpModal = lazy(() =>
+  import('./CatchUpModal').then((m) => ({ default: m.CatchUpModal }))
+);
 const LoginModal = lazy(() => import('./LoginModal'));
 const RegisterModal = lazy(() => import('./RegisterModal'));
 const PasswordResetModal = lazy(() => import('./PasswordResetModal'));
-const NotificationCenter = lazy(() => import('./NotificationCenter').then(m => ({ default: m.NotificationCenter })));
+const NotificationCenter = lazy(() =>
+  import('./NotificationCenter').then((m) => ({ default: m.NotificationCenter }))
+);
 // Note: Old DailyQuestsPanel and 30-day RewardsCalendar removed - use ProfileProgressModal tabs instead
 // Sprint 20: Replaced PersonalHub with unified ProfileProgressModal
-const ProfileProgressModal = lazy(() => import('./ProfileProgressModal').then(m => ({ default: m.ProfileProgressModal })));
+const ProfileProgressModal = lazy(() =>
+  import('./ProfileProgressModal').then((m) => ({ default: m.ProfileProgressModal }))
+);
 import type { TabId } from './ProfileProgressModal';
-const LevelUpModal = lazy(() => import('./LevelUpModal').then(m => ({ default: m.LevelUpModal })));
-const DirectMessagesPanel = lazy(() => import('./DirectMessagesPanel').then(m => ({ default: m.DirectMessagesPanel })));
+const LevelUpModal = lazy(() =>
+  import('./LevelUpModal').then((m) => ({ default: m.LevelUpModal }))
+);
+const DirectMessagesPanel = lazy(() =>
+  import('./DirectMessagesPanel').then((m) => ({ default: m.DirectMessagesPanel }))
+);
 
 interface GlobalUIProps {
   reconnecting: boolean;
@@ -68,7 +80,9 @@ interface GlobalUIProps {
   onOpenProfile?: () => void;
   // Sprint 20: Level up celebration
   levelUpData: { oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null;
-  setLevelUpData: (data: { oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null) => void;
+  setLevelUpData: (
+    data: { oldLevel: number; newLevel: number; newlyUnlockedSkins: string[] } | null
+  ) => void;
   // Direct Messages
   showDirectMessages: boolean;
   setShowDirectMessages: (show: boolean) => void;
@@ -133,7 +147,8 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
 
   // Check if ProfileProgressModal should be open (from any source)
   // Sprint 21: Added showAchievementsPanel - achievements now opens ProfileProgressModal with achievements tab
-  const isProfileModalOpen = showPersonalHub || showQuestsPanel || _showRewardsCalendar || showAchievementsPanel;
+  const isProfileModalOpen =
+    showPersonalHub || showQuestsPanel || _showRewardsCalendar || showAchievementsPanel;
 
   // Close handler that resets all related states
   const handleProfileModalClose = () => {
@@ -144,10 +159,11 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
   };
   const auth = useAuth();
 
-  const {
-    handleReplaceWithBot,
-    handleChangeBotDifficulty,
-  } = useBotManagement(socket, gameId, gameState);
+  const { handleReplaceWithBot, handleChangeBotDifficulty } = useBotManagement(
+    socket,
+    gameId,
+    gameState
+  );
 
   // Handler for kicking players
   const handleKickPlayer = (playerId: string) => {
@@ -207,7 +223,9 @@ const GlobalUI: React.FC<GlobalUIProps> = ({
           isOpen={showFriendsPanel}
           onClose={() => setShowFriendsPanel(false)}
           socket={socket}
-          currentPlayer={auth.user?.username || gameState?.players.find(p => p.id === socket?.id)?.name || ''}
+          currentPlayer={
+            auth.user?.username || gameState?.players.find((p) => p.id === socket?.id)?.name || ''
+          }
           onStartConversation={handleStartConversation}
         />
         {/* Direct Messages Panel */}

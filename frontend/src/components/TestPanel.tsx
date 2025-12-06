@@ -74,19 +74,27 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
           <UICard variant="bordered" size="md">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Phase:</span>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  Phase:
+                </span>
                 <p className="text-lg font-bold capitalize">{gameState.phase.replace('_', ' ')}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Round:</span>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  Round:
+                </span>
                 <p className="text-lg font-bold">{gameState.roundNumber}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Team 1 Score:</span>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  Team 1 Score:
+                </span>
                 <p className="text-lg font-bold text-orange-600">{gameState.teamScores.team1}</p>
               </div>
               <div>
-                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Team 2 Score:</span>
+                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400">
+                  Team 2 Score:
+                </span>
                 <p className="text-lg font-bold text-purple-600">{gameState.teamScores.team2}</p>
               </div>
             </div>
@@ -176,13 +184,20 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
           <div className="grid grid-cols-2 gap-4">
             <Button
               variant="secondary"
-              onClick={() => window.open('https://69291bd0d238365e7e12f66c-nqeyaruzoe.chromatic.com/', '_blank')}
+              onClick={() =>
+                window.open('https://69291bd0d238365e7e12f66c-nqeyaruzoe.chromatic.com/', '_blank')
+              }
             >
               <span aria-hidden="true">📖</span> Open Storybook
             </Button>
             <Button
               variant="warning"
-              onClick={() => window.open('https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568', '_blank')}
+              onClick={() =>
+                window.open(
+                  'https://sentry.io/organizations/marc-3h/issues/?project=4510241709293568',
+                  '_blank'
+                )
+              }
             >
               <span aria-hidden="true">🐛</span> Open Sentry
             </Button>
@@ -216,8 +231,8 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
                   className="underline hover:text-blue-200"
                 >
                   sentry.io
-                </a>
-                {' '}to verify errors appear and configure alerts.
+                </a>{' '}
+                to verify errors appear and configure alerts.
               </p>
             </UICard>
           </UICard>
@@ -226,8 +241,8 @@ export function TestPanel({ gameState, socket, isOpen, onClose }: TestPanelProps
         {/* Info */}
         <UICard variant="gradient" gradient="warning" size="sm">
           <p className="text-sm text-white">
-            <strong>⚠️ Warning:</strong> These actions directly modify the game state.
-            Use for testing purposes only. Changes affect all connected players.
+            <strong>⚠️ Warning:</strong> These actions directly modify the game state. Use for
+            testing purposes only. Changes affect all connected players.
           </p>
         </UICard>
       </div>

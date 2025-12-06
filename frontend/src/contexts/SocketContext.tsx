@@ -54,9 +54,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <SocketContext.Provider value={{ socket, reconnecting }}>
-      {children}
-    </SocketContext.Provider>
+    <SocketContext.Provider value={{ socket, reconnecting }}>{children}</SocketContext.Provider>
   );
 }
 

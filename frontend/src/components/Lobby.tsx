@@ -25,14 +25,22 @@ import { Button } from './ui/Button';
 import { Tabs, Tab } from './ui/Tabs';
 
 // Lazy load heavy modals
-const PlayerStatsModal = lazy(() => import('./PlayerStatsModal').then(m => ({ default: m.PlayerStatsModal })));
-const GlobalLeaderboard = lazy(() => import('./GlobalLeaderboard').then(m => ({ default: m.GlobalLeaderboard })));
+const PlayerStatsModal = lazy(() =>
+  import('./PlayerStatsModal').then((m) => ({ default: m.PlayerStatsModal }))
+);
+const GlobalLeaderboard = lazy(() =>
+  import('./GlobalLeaderboard').then((m) => ({ default: m.GlobalLeaderboard }))
+);
 
 interface LobbyProps {
   onCreateGame: (playerName: string, persistenceMode?: 'elo' | 'casual') => void;
   onJoinGame: (gameId: string, playerName: string) => void;
   onSpectateGame: (gameId: string, spectatorName?: string) => void;
-  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual', playerName?: string) => void;
+  onQuickPlay: (
+    difficulty: BotDifficulty,
+    persistenceMode: 'elo' | 'casual',
+    playerName?: string
+  ) => void;
   onRejoinGame?: () => void;
   hasValidSession?: boolean;
   autoJoinGameId?: string;
@@ -46,20 +54,39 @@ interface LobbyProps {
   onShowWhyRegister?: () => void;
 }
 
-
-export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, onRejoinGame, hasValidSession, autoJoinGameId, onlinePlayers, socket, botDifficulty = 'medium', onBotDifficultyChange, onShowLogin, onShowRegister, onShowProgress, onShowWhyRegister }: LobbyProps) {
+export function Lobby({
+  onCreateGame,
+  onJoinGame,
+  onSpectateGame,
+  onQuickPlay,
+  onRejoinGame,
+  hasValidSession,
+  autoJoinGameId,
+  onlinePlayers,
+  socket,
+  botDifficulty = 'medium',
+  onBotDifficultyChange,
+  onShowLogin,
+  onShowRegister,
+  onShowProgress,
+  onShowWhyRegister,
+}: LobbyProps) {
   const { user, updateProfile, getUserProfile, isLoading: authLoading } = useAuth();
   // Use authenticated username if available, otherwise use stored playerName for guests
   // Initialize empty - will be set by useEffect once auth state is known
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
-  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(autoJoinGameId ? 'join' : 'menu');
+  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(
+    autoJoinGameId ? 'join' : 'menu'
+  );
   const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
   const [showRules, setShowRules] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
   const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
-  const [socialTab, setSocialTab] = useState<'recent' | 'online' | 'chat' | 'friends' | 'messages' | 'profile'>('online');
+  const [socialTab, setSocialTab] = useState<
+    'recent' | 'online' | 'chat' | 'friends' | 'messages' | 'profile'
+  >('online');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -68,7 +95,7 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   // Lobby chat hook for UnifiedChat
   const { messages: lobbyMessages, sendMessage: sendLobbyMessage } = useLobbyChat({
     socket,
-    playerName
+    playerName,
   });
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
   const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual'); // Default to casual for Quick Play
@@ -79,7 +106,6 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   // Row 3: Content buttons
   const [navRow, setNavRow] = useState<number>(0);
   const [navCol, setNavCol] = useState<number>(0); // Column within current row
-
 
   // Load recent players on mount
   useEffect(() => {
@@ -130,7 +156,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
   // Focus the name input when joining from URL
   useEffect(() => {
     if (autoJoinGameId && mode === 'join') {
-      const nameInput = document.querySelector<HTMLInputElement>('[data-testid="player-name-input"]');
+      const nameInput = document.querySelector<HTMLInputElement>(
+        '[data-testid="player-name-input"]'
+      );
       if (nameInput) {
         setTimeout(() => nameInput.focus(), 100);
       }
@@ -145,7 +173,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
       // Row 0: Login/Register buttons
       const items: HTMLElement[] = [];
       const loginBtn = document.querySelector('[data-keyboard-nav="login-btn"]') as HTMLElement;
-      const registerBtn = document.querySelector('[data-keyboard-nav="register-btn"]') as HTMLElement;
+      const registerBtn = document.querySelector(
+        '[data-keyboard-nav="register-btn"]'
+      ) as HTMLElement;
       if (loginBtn) items.push(loginBtn);
       if (registerBtn) items.push(registerBtn);
       return items;
@@ -168,8 +198,10 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
       const tabContent = document.querySelector('[data-tab-content]');
       if (tabContent) {
         // Get content buttons excluding sub-tabs
-        const allButtons = Array.from(tabContent.querySelectorAll('[data-keyboard-nav]')) as HTMLElement[];
-        return allButtons.filter(btn => !btn.hasAttribute('data-nav-subtab'));
+        const allButtons = Array.from(
+          tabContent.querySelectorAll('[data-keyboard-nav]')
+        ) as HTMLElement[];
+        return allButtons.filter((btn) => !btn.hasAttribute('data-nav-subtab'));
       }
     }
     return [];
@@ -335,7 +367,18 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mode, mainTab, socialTab, navRow, navCol, user, playerName, socket, hasValidSession, onlinePlayers]);
+  }, [
+    mode,
+    mainTab,
+    socialTab,
+    navRow,
+    navCol,
+    user,
+    playerName,
+    socket,
+    hasValidSession,
+    onlinePlayers,
+  ]);
 
   if (mode === 'create') {
     return (
@@ -444,7 +487,8 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             <div
               className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full animate-pulse"
               style={{
-                background: 'radial-gradient(circle, var(--color-team2-primary) 0%, transparent 70%)',
+                background:
+                  'radial-gradient(circle, var(--color-team2-primary) 0%, transparent 70%)',
                 opacity: 0.2,
                 animationDuration: '3s',
                 animationDelay: '1s',
@@ -455,24 +499,23 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
           {/* Main container with neon border */}
           <div
             className="
-              bg-[var(--color-bg-secondary)]
+              bg-skin-secondary
               rounded-[var(--radius-xl)]
               p-8 md:p-10
               max-w-md w-full
               border-[var(--modal-border-width)]
-              border-[var(--color-border-accent)]
+              border-skin-accent
               relative
               overflow-hidden
+              shadow-main-glow
             "
-            style={{
-              boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
-            }}
           >
             {/* Scanline effect overlay */}
             <div
               className="absolute inset-0 pointer-events-none z-10 opacity-30"
               style={{
-                background: 'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 2px)',
+                background:
+                  'repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.03) 0px, rgba(0, 0, 0, 0.03) 1px, transparent 1px, transparent 2px)',
               }}
             />
 
@@ -484,16 +527,10 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
             {/* Title with neon glow */}
             <div className="text-center mb-8 relative z-20">
-              <h1
-                className="text-5xl md:text-6xl font-display uppercase tracking-wider"
-                style={{
-                  color: 'var(--color-text-primary)',
-                  textShadow: '0 0 10px var(--color-glow), 0 0 20px var(--color-glow), 0 0 40px var(--color-glow)',
-                }}
-              >
+              <h1 className="text-5xl md:text-6xl font-display uppercase tracking-wider text-skin-primary text-shadow-glow">
                 J⋀ffre
               </h1>
-              <p className="text-[var(--color-text-muted)] text-xs uppercase tracking-widest mt-2 font-body">
+              <p className="text-skin-muted text-xs uppercase tracking-widest mt-2 font-body">
                 Multiplayer Trick Card Game
               </p>
 
@@ -521,9 +558,9 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
                 ) : (
                   <div className="flex flex-col items-center gap-3">
                     {playerName.trim() && (
-                      <p className="text-xs text-[var(--color-text-muted)] font-body">
+                      <p className="text-xs text-skin-muted font-body">
                         Playing as{' '}
-                        <span className="font-display text-[var(--color-text-accent)]">{playerName}</span>
+                        <span className="font-display text-skin-accent">{playerName}</span>
                       </p>
                     )}
                     <div className="flex items-center justify-center gap-3">
@@ -552,12 +589,18 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
             {/* Horizontal Tab Navigation - Arcade style */}
             <div className="mb-6 relative z-20">
               <Tabs
-                tabs={[
-                  { id: 'play', label: 'Play' },
-                  { id: 'social', label: 'Social', badge: onlinePlayers.length > 0 ? onlinePlayers.length : undefined },
-                  { id: 'stats', label: 'Stats' },
-                  { id: 'settings', label: 'Settings' },
-                ] as Tab[]}
+                tabs={
+                  [
+                    { id: 'play', label: 'Play' },
+                    {
+                      id: 'social',
+                      label: 'Social',
+                      badge: onlinePlayers.length > 0 ? onlinePlayers.length : undefined,
+                    },
+                    { id: 'stats', label: 'Stats' },
+                    { id: 'settings', label: 'Settings' },
+                  ] as Tab[]
+                }
                 activeTab={mainTab}
                 onChange={(tabId) => {
                   sounds.buttonClick();
@@ -642,7 +685,16 @@ export function Lobby({ onCreateGame, onJoinGame, onSpectateGame, onQuickPlay, o
 
         {/* Stats & Leaderboard Modals */}
         {socket && (
-          <ErrorBoundary fallback={<StatsErrorFallback onClose={() => { setShowPlayerStats(false); setShowLeaderboard(false); }} />}>
+          <ErrorBoundary
+            fallback={
+              <StatsErrorFallback
+                onClose={() => {
+                  setShowPlayerStats(false);
+                  setShowLeaderboard(false);
+                }}
+              />
+            }
+          >
             <Suspense fallback={<div />}>
               <PlayerStatsModal
                 playerName={selectedPlayerName}

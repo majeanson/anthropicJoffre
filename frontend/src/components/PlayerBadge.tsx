@@ -17,15 +17,18 @@ export function PlayerBadge({
   botDifficulty,
   isThinking = false,
   isCurrentTurn = false,
-  compact = true
+  compact = true,
 }: PlayerBadgeProps) {
   const teamColor = teamId === 1 ? 'team1' : 'team2';
 
-  const difficultyIcon = isBot && botDifficulty ? {
-    'easy': '🟢',
-    'medium': '🟡',
-    'hard': '🔴'
-  }[botDifficulty] : null;
+  const difficultyIcon =
+    isBot && botDifficulty
+      ? {
+          easy: '🟢',
+          medium: '🟡',
+          hard: '🔴',
+        }[botDifficulty]
+      : null;
 
   if (compact) {
     return (
@@ -38,7 +41,9 @@ export function PlayerBadge({
         </UIBadge>
         <div className="flex items-center gap-0.5">
           {isBot && (
-            <span className="text-sm" title={`Bot (${botDifficulty})`}>🤖</span>
+            <span className="text-sm" title={`Bot (${botDifficulty})`}>
+              🤖
+            </span>
           )}
           {difficultyIcon && (
             <span className="text-xs" title={botDifficulty}>
@@ -46,7 +51,9 @@ export function PlayerBadge({
             </span>
           )}
           {isThinking && (
-            <span className="text-xs animate-pulse" title="Thinking...">💭</span>
+            <span className="text-xs animate-pulse" title="Thinking...">
+              💭
+            </span>
           )}
         </div>
       </div>
@@ -55,14 +62,16 @@ export function PlayerBadge({
 
   // Non-compact version for backwards compatibility
   return (
-    <div
-      className="flex items-center gap-2"
-      data-testid={`player-badge-${name}`}
-    >
+    <div className="flex items-center gap-2" data-testid={`player-badge-${name}`}>
       <UIBadge variant="solid" color={teamColor} size="sm">
         {name}
         {isBot && <span title={`Bot (${botDifficulty})`}> 🤖</span>}
-        {isThinking && <span title="Thinking..." className="animate-pulse"> 💭</span>}
+        {isThinking && (
+          <span title="Thinking..." className="animate-pulse">
+            {' '}
+            💭
+          </span>
+        )}
         {isCurrentTurn && <span className="text-green-300"> (Your Turn)</span>}
       </UIBadge>
     </div>

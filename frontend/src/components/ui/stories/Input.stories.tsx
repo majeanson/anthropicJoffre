@@ -122,26 +122,10 @@ export const Arcane: Story = {
 export const AllVariants: Story = {
   render: () => (
     <div className="space-y-6 p-6 bg-[#0B0E14] rounded-xl min-w-96">
-      <Input
-        variant="default"
-        label="Default"
-        placeholder="Standard input field..."
-      />
-      <Input
-        variant="filled"
-        label="Filled"
-        placeholder="Filled background variant..."
-      />
-      <Input
-        variant="elegant"
-        label="Elegant"
-        placeholder="With focus underline..."
-      />
-      <Input
-        variant="arcane"
-        label="Arcane"
-        placeholder="Sacred geometry corners..."
-      />
+      <Input variant="default" label="Default" placeholder="Standard input field..." />
+      <Input variant="filled" label="Filled" placeholder="Filled background variant..." />
+      <Input variant="elegant" label="Elegant" placeholder="With focus underline..." />
+      <Input variant="arcane" label="Arcane" placeholder="Sacred geometry corners..." />
     </div>
   ),
 };
@@ -170,7 +154,12 @@ export const WithLeftIcon: Story = {
     placeholder: 'Query the ancient knowledge...',
     leftIcon: (
       <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.5}
+          d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+        />
       </svg>
     ),
   },
@@ -288,10 +277,7 @@ export const AlchemistForm: Story = {
           placeholder="Transmutation, Potions, etc..."
           leftIcon={<span>⚗</span>}
         />
-        <PasswordInput
-          label="Secret Passphrase"
-          placeholder="Guard it well..."
-        />
+        <PasswordInput label="Secret Passphrase" placeholder="Guard it well..." />
         <Input
           variant="arcane"
           label="Years of Practice"
@@ -349,19 +335,8 @@ export const DarkLaboratory: Story = {
       <SearchInput placeholder="Search for ingredients..." fullWidth />
 
       <div className="grid grid-cols-2 gap-4">
-        <Input
-          variant="filled"
-          label="Element Type"
-          placeholder="Fire, Water..."
-          size="sm"
-        />
-        <Input
-          variant="filled"
-          label="Potency Level"
-          placeholder="1-10"
-          type="number"
-          size="sm"
-        />
+        <Input variant="filled" label="Element Type" placeholder="Fire, Water..." size="sm" />
+        <Input variant="filled" label="Potency Level" placeholder="1-10" type="number" size="sm" />
       </div>
 
       <ElegantInput

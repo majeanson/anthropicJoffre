@@ -28,27 +28,27 @@ export type SkinId =
 export interface SkinColors {
   // Background layers
   bg: {
-    primary: string;      // Main app background
-    secondary: string;    // Card/panel backgrounds
-    tertiary: string;     // Nested element backgrounds
-    accent: string;       // Accent background (buttons, highlights)
-    overlay: string;      // Modal overlays
+    primary: string; // Main app background
+    secondary: string; // Card/panel backgrounds
+    tertiary: string; // Nested element backgrounds
+    accent: string; // Accent background (buttons, highlights)
+    overlay: string; // Modal overlays
   };
 
   // Text colors
   text: {
-    primary: string;      // Main text
-    secondary: string;    // Subdued text
-    accent: string;       // Highlighted text
-    inverse: string;      // Text on accent backgrounds
-    muted: string;        // Very subdued text
+    primary: string; // Main text
+    secondary: string; // Subdued text
+    accent: string; // Highlighted text
+    inverse: string; // Text on accent backgrounds
+    muted: string; // Very subdued text
   };
 
   // Border colors
   border: {
-    default: string;      // Standard borders
-    accent: string;       // Highlighted borders
-    subtle: string;       // Very light borders
+    default: string; // Standard borders
+    accent: string; // Highlighted borders
+    subtle: string; // Very light borders
   };
 
   // Semantic colors
@@ -85,9 +85,9 @@ export interface SkinColors {
 
 export interface SkinTypography {
   fontFamily: {
-    display: string;      // Headlines, titles
-    body: string;         // Body text
-    mono: string;         // Code, numbers
+    display: string; // Headlines, titles
+    body: string; // Body text
+    mono: string; // Code, numbers
   };
   fontWeight: {
     normal: number;
@@ -175,13 +175,13 @@ export interface Skin {
   id: SkinId;
   name: string;
   description: string;
-  preview: string;           // Preview image/gradient for skin selector
-  isDark: boolean;           // Whether this is a dark theme
+  preview: string; // Preview image/gradient for skin selector
+  isDark: boolean; // Whether this is a dark theme
   colors: SkinColors;
   typography: SkinTypography;
   effects: SkinEffects;
   components: SkinComponents;
-  cssVariables: Record<string, string>;  // CSS custom properties
+  cssVariables: Record<string, string>; // CSS custom properties
   /** Pricing info for shop (optional, defaults to level-gated) */
   pricing?: SkinPricing;
 }
@@ -200,51 +200,51 @@ export const tavernNoirSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#0d0c0a',           // Deep charcoal-black
-      secondary: '#1c1814',         // Dark mahogany
-      tertiary: '#2a2118',          // Warm dark brown
-      accent: '#c9a227',            // Burnished gold
+      primary: '#0d0c0a', // Deep charcoal-black
+      secondary: '#1c1814', // Dark mahogany
+      tertiary: '#2a2118', // Warm dark brown
+      accent: '#c9a227', // Burnished gold
       overlay: 'rgba(13, 12, 10, 0.96)',
     },
 
     text: {
-      primary: '#f4efe4',           // Warm ivory
-      secondary: '#a89b8a',         // Aged parchment
-      accent: '#c9a227',            // Burnished gold
-      inverse: '#0d0c0a',           // Deep charcoal
-      muted: '#6b5d4d',             // Dusty brown
+      primary: '#f4efe4', // Warm ivory
+      secondary: '#a89b8a', // Aged parchment
+      accent: '#c9a227', // Burnished gold
+      inverse: '#0d0c0a', // Deep charcoal
+      muted: '#6b5d4d', // Dusty brown
     },
 
     border: {
-      default: '#3d3429',           // Dark brass
-      accent: '#c9a227',            // Gold
-      subtle: '#261f19',            // Nearly invisible
+      default: '#3d3429', // Dark brass
+      accent: '#c9a227', // Gold
+      subtle: '#261f19', // Nearly invisible
     },
 
-    success: '#4a9c6d',             // Muted emerald
-    warning: '#d4a03a',             // Amber candlelight
-    error: '#a63d3d',               // Deep crimson
-    info: '#5c8db8',                // Smoky blue
+    success: '#4a9c6d', // Muted emerald
+    warning: '#d4a03a', // Amber candlelight
+    error: '#a63d3d', // Deep crimson
+    info: '#5c8db8', // Smoky blue
 
     team1: {
-      primary: '#a63d3d',           // Crimson velvet
+      primary: '#a63d3d', // Crimson velvet
       secondary: '#c45454',
       text: '#f4efe4',
     },
     team2: {
-      primary: '#3d6a8a',           // Midnight blue
+      primary: '#3d6a8a', // Midnight blue
       secondary: '#4d82a6',
       text: '#f4efe4',
     },
 
     suits: {
-      red: '#b84444',               // Blood red
-      brown: '#8b6914',             // Dark amber
-      green: '#3d7a54',             // Forest green
-      blue: '#3d6a8a',              // Steel blue
+      red: '#b84444', // Blood red
+      brown: '#8b6914', // Dark amber
+      green: '#3d7a54', // Forest green
+      blue: '#3d6a8a', // Steel blue
     },
 
-    glow: '#c9a227',                // Gold candlelight
+    glow: '#c9a227', // Gold candlelight
     highlight: '#c9a227',
     shadow: '#000000',
   },
@@ -291,10 +291,10 @@ export const tavernNoirSkin: Skin = {
 
     specialEffects: {
       scanlines: false,
-      noise: true,              // Subtle grain texture
-      glow: true,               // Candlelight glow
+      noise: true, // Subtle grain texture
+      glow: true, // Candlelight glow
       pixelated: false,
-      gradientOverlay: true,    // Vignette effect
+      gradientOverlay: true, // Vignette effect
     },
   },
 
@@ -340,19 +340,19 @@ export const luxuryCasinoSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#0a0908',           // Near black with warmth
-      secondary: '#141210',         // Rich black
-      tertiary: '#1e1a16',          // Card backgrounds
-      accent: '#d4af37',            // Pure gold
+      primary: '#0a0908', // Near black with warmth
+      secondary: '#141210', // Rich black
+      tertiary: '#1e1a16', // Card backgrounds
+      accent: '#d4af37', // Pure gold
       overlay: 'rgba(10, 9, 8, 0.96)',
     },
 
     text: {
-      primary: '#f5f0e6',           // Cream white
-      secondary: '#9a9080',         // Warm gray
-      accent: '#d4af37',            // Gold
-      inverse: '#0a0908',           // Dark
-      muted: '#5a5448',             // Subdued
+      primary: '#f5f0e6', // Cream white
+      secondary: '#9a9080', // Warm gray
+      accent: '#d4af37', // Gold
+      inverse: '#0a0908', // Dark
+      muted: '#5a5448', // Subdued
     },
 
     border: {
@@ -367,12 +367,12 @@ export const luxuryCasinoSkin: Skin = {
     info: '#3498db',
 
     team1: {
-      primary: '#9b2335',           // Deep burgundy
+      primary: '#9b2335', // Deep burgundy
       secondary: '#b83347',
       text: '#ffffff',
     },
     team2: {
-      primary: '#1e3a5f',           // Navy blue
+      primary: '#1e3a5f', // Navy blue
       secondary: '#2a4f7f',
       text: '#ffffff',
     },
@@ -479,17 +479,17 @@ export const modernMinimalSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#f5f3f0',           // Softer warm cream (easier on eyes)
-      secondary: '#ffffff',         // Pure white for panels
-      tertiary: '#ebe8e4',          // Warm light gray
-      accent: '#1f2937',            // Dark gray accent (more contrast)
+      primary: '#f5f3f0', // Softer warm cream (easier on eyes)
+      secondary: '#ffffff', // Pure white for panels
+      tertiary: '#ebe8e4', // Warm light gray
+      accent: '#1f2937', // Dark gray accent (more contrast)
       overlay: 'rgba(245, 243, 240, 0.98)',
     },
 
     text: {
-      primary: '#1f2937',           // Darker gray for better readability
-      secondary: '#4b5563',         // Medium gray
-      accent: '#0369a1',            // Strong blue
+      primary: '#1f2937', // Darker gray for better readability
+      secondary: '#4b5563', // Medium gray
+      accent: '#0369a1', // Strong blue
       inverse: '#ffffff',
       muted: '#6b7280',
     },
@@ -585,7 +585,7 @@ export const modernMinimalSkin: Skin = {
     },
     card: {
       borderWidth: '1px',
-      bgColor: '#fefefe',           // Bright white for playing cards
+      bgColor: '#fefefe', // Bright white for playing cards
       cornerRadius: '10px',
     },
     modal: {
@@ -615,39 +615,39 @@ export const modernMinimalDarkSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#18181b',           // Zinc-900
-      secondary: '#1f1f23',         // Slightly lighter
-      tertiary: '#27272a',          // Zinc-800
-      accent: '#f4f4f5',            // Light accent (inverted)
+      primary: '#18181b', // Zinc-900
+      secondary: '#1f1f23', // Slightly lighter
+      tertiary: '#27272a', // Zinc-800
+      accent: '#f4f4f5', // Light accent (inverted)
       overlay: 'rgba(24, 24, 27, 0.98)',
     },
 
     text: {
-      primary: '#f4f4f5',           // Zinc-100
-      secondary: '#a1a1aa',         // Zinc-400
-      accent: '#38bdf8',            // Sky-400 (softer blue)
+      primary: '#f4f4f5', // Zinc-100
+      secondary: '#a1a1aa', // Zinc-400
+      accent: '#38bdf8', // Sky-400 (softer blue)
       inverse: '#18181b',
-      muted: '#71717a',             // Zinc-500
+      muted: '#71717a', // Zinc-500
     },
 
     border: {
-      default: '#3f3f46',           // Zinc-700
+      default: '#3f3f46', // Zinc-700
       accent: '#f4f4f5',
       subtle: '#27272a',
     },
 
-    success: '#22c55e',             // Green-500
-    warning: '#f59e0b',             // Amber-500
-    error: '#ef4444',               // Red-500
-    info: '#38bdf8',                // Sky-400
+    success: '#22c55e', // Green-500
+    warning: '#f59e0b', // Amber-500
+    error: '#ef4444', // Red-500
+    info: '#38bdf8', // Sky-400
 
     team1: {
-      primary: '#ea580c',           // Orange-600
+      primary: '#ea580c', // Orange-600
       secondary: '#f97316',
       text: '#ffffff',
     },
     team2: {
-      primary: '#6366f1',           // Indigo-500
+      primary: '#6366f1', // Indigo-500
       secondary: '#818cf8',
       text: '#ffffff',
     },
@@ -721,7 +721,7 @@ export const modernMinimalDarkSkin: Skin = {
     },
     card: {
       borderWidth: '1px',
-      bgColor: '#27272a',           // Dark card background
+      bgColor: '#27272a', // Dark card background
       cornerRadius: '10px',
     },
     modal: {
@@ -892,25 +892,25 @@ export const classicParchmentSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#e8dcc8',           // Warm aged parchment (was too white)
-      secondary: '#efe5d6',         // Slightly lighter parchment
-      tertiary: '#d9ccb4',          // Darker aged paper
-      accent: '#8b2323',            // Burgundy ink
+      primary: '#e8dcc8', // Warm aged parchment (was too white)
+      secondary: '#efe5d6', // Slightly lighter parchment
+      tertiary: '#d9ccb4', // Darker aged paper
+      accent: '#8b2323', // Burgundy ink
       overlay: 'rgba(232, 220, 200, 0.98)',
     },
 
     text: {
-      primary: '#2a2318',           // Dark sepia ink
-      secondary: '#4a4035',         // Medium sepia
-      accent: '#8b2323',            // Burgundy accent
-      inverse: '#efe5d6',           // Light parchment
-      muted: '#7a6e5c',             // Faded ink
+      primary: '#2a2318', // Dark sepia ink
+      secondary: '#4a4035', // Medium sepia
+      accent: '#8b2323', // Burgundy accent
+      inverse: '#efe5d6', // Light parchment
+      muted: '#7a6e5c', // Faded ink
     },
 
     border: {
-      default: '#b5a890',           // Aged paper edge
-      accent: '#8b2323',            // Burgundy
-      subtle: '#c9bea8',            // Light border
+      default: '#b5a890', // Aged paper edge
+      accent: '#8b2323', // Burgundy
+      subtle: '#c9bea8', // Light border
     },
 
     success: '#2d6a4f',
@@ -998,7 +998,7 @@ export const classicParchmentSkin: Skin = {
     },
     card: {
       borderWidth: '2px',
-      bgColor: '#f5efe0',           // Warm cream parchment for cards
+      bgColor: '#f5efe0', // Warm cream parchment for cards
       cornerRadius: '8px',
     },
     modal: {
@@ -1025,58 +1025,59 @@ export const classicParchmentSkin: Skin = {
 export const midnightAlchemySkin: Skin = {
   id: 'midnight-alchemy',
   name: '🌙 Midnight Alchemy',
-  description: 'Mystical alchemist\'s study with ancient artifacts, copper accents, and ethereal glow',
+  description:
+    "Mystical alchemist's study with ancient artifacts, copper accents, and ethereal glow",
   preview: 'linear-gradient(135deg, #0B0E14 0%, #131824 50%, #1A1F2E 100%)',
   isDark: true,
 
   colors: {
     bg: {
-      primary: '#0B0E14',           // Deep midnight void
-      secondary: '#131824',         // Alchemist's chamber
-      tertiary: '#1A1F2E',          // Workbench shadow
-      accent: '#C17F59',            // Burnished copper
+      primary: '#0B0E14', // Deep midnight void
+      secondary: '#131824', // Alchemist's chamber
+      tertiary: '#1A1F2E', // Workbench shadow
+      accent: '#C17F59', // Burnished copper
       overlay: 'rgba(11, 14, 20, 0.96)',
     },
 
     text: {
-      primary: '#E8E4DC',           // Aged manuscript
-      secondary: '#9CA3AF',         // Faded ink
-      accent: '#D4A574',            // Rose gold illumination
-      inverse: '#0B0E14',           // Deep void
-      muted: '#6B7280',             // Weathered text
+      primary: '#E8E4DC', // Aged manuscript
+      secondary: '#9CA3AF', // Faded ink
+      accent: '#D4A574', // Rose gold illumination
+      inverse: '#0B0E14', // Deep void
+      muted: '#6B7280', // Weathered text
     },
 
     border: {
-      default: '#2D3548',           // Brass patina
-      accent: '#C17F59',            // Polished copper
-      subtle: '#1F2937',            // Shadow edge
+      default: '#2D3548', // Brass patina
+      accent: '#C17F59', // Polished copper
+      subtle: '#1F2937', // Shadow edge
     },
 
-    success: '#2DD4BF',             // Alchemical teal (transmutation)
-    warning: '#F59E0B',             // Molten gold
-    error: '#DC2626',               // Dragon's blood
-    info: '#60A5FA',                // Celestial blue
+    success: '#2DD4BF', // Alchemical teal (transmutation)
+    warning: '#F59E0B', // Molten gold
+    error: '#DC2626', // Dragon's blood
+    info: '#60A5FA', // Celestial blue
 
     team1: {
-      primary: '#B45309',           // Ember orange
+      primary: '#B45309', // Ember orange
       secondary: '#D97706',
       text: '#FEF3C7',
     },
     team2: {
-      primary: '#7C3AED',           // Mystic violet
+      primary: '#7C3AED', // Mystic violet
       secondary: '#8B5CF6',
       text: '#F5F3FF',
     },
 
     suits: {
-      red: '#DC2626',               // Ruby essence
-      brown: '#B45309',             // Amber resin
-      green: '#059669',             // Emerald elixir
-      blue: '#2563EB',              // Sapphire tincture
+      red: '#DC2626', // Ruby essence
+      brown: '#B45309', // Amber resin
+      green: '#059669', // Emerald elixir
+      blue: '#2563EB', // Sapphire tincture
     },
 
-    glow: '#D4A574',                // Rose gold ethereal
-    highlight: '#C17F59',           // Copper luminance
+    glow: '#D4A574', // Rose gold ethereal
+    highlight: '#C17F59', // Copper luminance
     shadow: '#000000',
   },
 
@@ -1172,17 +1173,17 @@ export const sakuraSpringSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#fdf6f8',           // Soft cream pink
-      secondary: '#ffffff',         // Pure white
-      tertiary: '#fce7ef',          // Light sakura
-      accent: '#e91e63',            // Vivid cherry blossom
+      primary: '#fdf6f8', // Soft cream pink
+      secondary: '#ffffff', // Pure white
+      tertiary: '#fce7ef', // Light sakura
+      accent: '#e91e63', // Vivid cherry blossom
       overlay: 'rgba(253, 246, 248, 0.98)',
     },
 
     text: {
-      primary: '#3d2c35',           // Deep rose brown
-      secondary: '#6b5660',         // Muted plum
-      accent: '#c2185b',            // Cherry accent
+      primary: '#3d2c35', // Deep rose brown
+      secondary: '#6b5660', // Muted plum
+      accent: '#c2185b', // Cherry accent
       inverse: '#ffffff',
       muted: '#9e8d95',
     },
@@ -1199,12 +1200,12 @@ export const sakuraSpringSkin: Skin = {
     info: '#1976d2',
 
     team1: {
-      primary: '#d81b60',           // Deep pink
+      primary: '#d81b60', // Deep pink
       secondary: '#ec407a',
       text: '#ffffff',
     },
     team2: {
-      primary: '#5e35b1',         // Deep purple
+      primary: '#5e35b1', // Deep purple
       secondary: '#7e57c2',
       text: '#ffffff',
     },
@@ -1310,17 +1311,17 @@ export const oceanDepthsSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#0a1628',           // Abyssal blue
-      secondary: '#0d2137',         // Deep ocean
-      tertiary: '#0f2b47',          // Twilight zone
-      accent: '#00bcd4',            // Bioluminescent cyan
+      primary: '#0a1628', // Abyssal blue
+      secondary: '#0d2137', // Deep ocean
+      tertiary: '#0f2b47', // Twilight zone
+      accent: '#00bcd4', // Bioluminescent cyan
       overlay: 'rgba(10, 22, 40, 0.96)',
     },
 
     text: {
-      primary: '#e0f4f8',           // Sea foam white
-      secondary: '#8cb4c9',         // Pale blue
-      accent: '#4dd0e1',            // Bright cyan
+      primary: '#e0f4f8', // Sea foam white
+      secondary: '#8cb4c9', // Pale blue
+      accent: '#4dd0e1', // Bright cyan
       inverse: '#0a1628',
       muted: '#5a8599',
     },
@@ -1331,18 +1332,18 @@ export const oceanDepthsSkin: Skin = {
       subtle: '#0d2137',
     },
 
-    success: '#26a69a',             // Teal coral
-    warning: '#ffb74d',             // Amber fish
-    error: '#ef5350',               // Crimson anemone
-    info: '#29b6f6',                // Light blue
+    success: '#26a69a', // Teal coral
+    warning: '#ffb74d', // Amber fish
+    error: '#ef5350', // Crimson anemone
+    info: '#29b6f6', // Light blue
 
     team1: {
-      primary: '#e65100',           // Orange coral
+      primary: '#e65100', // Orange coral
       secondary: '#ff6d00',
       text: '#ffffff',
     },
     team2: {
-      primary: '#0288d1',           // Ocean blue
+      primary: '#0288d1', // Ocean blue
       secondary: '#03a9f4',
       text: '#ffffff',
     },
@@ -1449,17 +1450,17 @@ export const forestEnchantedSkin: Skin = {
 
   colors: {
     bg: {
-      primary: '#0f1f16',           // Deep forest floor
-      secondary: '#1a3325',         // Shadowy undergrowth
-      tertiary: '#234430',          // Mossy stone
-      accent: '#4caf50',            // Magical green
+      primary: '#0f1f16', // Deep forest floor
+      secondary: '#1a3325', // Shadowy undergrowth
+      tertiary: '#234430', // Mossy stone
+      accent: '#4caf50', // Magical green
       overlay: 'rgba(15, 31, 22, 0.96)',
     },
 
     text: {
-      primary: '#e8f5e9',           // Moonlit leaf
-      secondary: '#a5d6a7',         // Pale moss
-      accent: '#69f0ae',            // Fairy light
+      primary: '#e8f5e9', // Moonlit leaf
+      secondary: '#a5d6a7', // Pale moss
+      accent: '#69f0ae', // Fairy light
       inverse: '#0f1f16',
       muted: '#5d8a66',
     },
@@ -1470,18 +1471,18 @@ export const forestEnchantedSkin: Skin = {
       subtle: '#1a3325',
     },
 
-    success: '#66bb6a',             // Fresh leaf
-    warning: '#ffa726',             // Amber resin
-    error: '#ef5350',               // Red berry
-    info: '#42a5f5',                // Sky through canopy
+    success: '#66bb6a', // Fresh leaf
+    warning: '#ffa726', // Amber resin
+    error: '#ef5350', // Red berry
+    info: '#42a5f5', // Sky through canopy
 
     team1: {
-      primary: '#bf360c',           // Autumn ember
+      primary: '#bf360c', // Autumn ember
       secondary: '#e64a19',
       text: '#ffffff',
     },
     team2: {
-      primary: '#1565c0',           // Deep stream
+      primary: '#1565c0', // Deep stream
       secondary: '#1e88e5',
       text: '#ffffff',
     },
@@ -1742,17 +1743,17 @@ export interface SkinPricingInfo {
  * - Premium skins: purchasable with cosmetic currency
  */
 export const skinPricing: Record<SkinId, SkinPricingInfo> = {
-  'midnight-alchemy': { price: 0, suggestedLevel: 0 },       // Free (default dark)
-  'classic-parchment': { price: 0, suggestedLevel: 0 },      // Free (default light)
-  'modern-minimal': { price: 65, suggestedLevel: 3 },        // Cheap (-35%)
-  'tavern-noir': { price: 160, suggestedLevel: 5 },          // Medium (-35%)
-  'modern-minimal-dark': { price: 260, suggestedLevel: 8 },  // Medium (-35%)
-  'luxury-casino': { price: 490, suggestedLevel: 12 },       // Premium (-35%)
-  'cyberpunk-neon': { price: 650, suggestedLevel: 15 },      // Most expensive (-35%)
+  'midnight-alchemy': { price: 0, suggestedLevel: 0 }, // Free (default dark)
+  'classic-parchment': { price: 0, suggestedLevel: 0 }, // Free (default light)
+  'modern-minimal': { price: 65, suggestedLevel: 3 }, // Cheap (-35%)
+  'tavern-noir': { price: 160, suggestedLevel: 5 }, // Medium (-35%)
+  'modern-minimal-dark': { price: 260, suggestedLevel: 8 }, // Medium (-35%)
+  'luxury-casino': { price: 490, suggestedLevel: 12 }, // Premium (-35%)
+  'cyberpunk-neon': { price: 650, suggestedLevel: 15 }, // Most expensive (-35%)
   // Sprint 21: New skins
-  'sakura-spring': { price: 195, suggestedLevel: 6 },        // Medium-low (-35%)
-  'ocean-depths': { price: 390, suggestedLevel: 10 },        // Medium-high (-35%)
-  'forest-enchanted': { price: 550, suggestedLevel: 14 },    // Premium (-35%)
+  'sakura-spring': { price: 195, suggestedLevel: 6 }, // Medium-low (-35%)
+  'ocean-depths': { price: 390, suggestedLevel: 10 }, // Medium-high (-35%)
+  'forest-enchanted': { price: 550, suggestedLevel: 14 }, // Premium (-35%)
 };
 
 /**
@@ -1766,7 +1767,10 @@ export function getSkinPricing(skinId: SkinId): SkinPricingInfo {
  * Get upcoming skins that will be available at higher levels
  * Returns skins that have suggestedLevel > currentLevel, sorted by level
  */
-export function getUpcomingSkins(currentLevel: number, limit: number = 3): Array<{
+export function getUpcomingSkins(
+  currentLevel: number,
+  limit: number = 3
+): Array<{
   skin: Skin;
   pricing: SkinPricingInfo;
   levelsToGo: number;

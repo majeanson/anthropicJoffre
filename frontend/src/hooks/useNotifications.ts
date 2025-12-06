@@ -24,14 +24,14 @@ export function useNotifications(socket: Socket | null, isAuthenticated: boolean
     // Listen for notifications
     const handleNotificationsUpdated = (updatedNotifications: Notification[]) => {
       setNotifications(updatedNotifications);
-      const unread = updatedNotifications.filter(n => !n.is_read).length;
+      const unread = updatedNotifications.filter((n) => !n.is_read).length;
       setUnreadCount(unread);
     };
 
     const handleNotificationReceived = (notification: Notification) => {
-      setNotifications(prev => [notification, ...prev]);
+      setNotifications((prev) => [notification, ...prev]);
       if (!notification.is_read) {
-        setUnreadCount(prev => prev + 1);
+        setUnreadCount((prev) => prev + 1);
       }
 
       // Check if it's an achievement
@@ -55,23 +55,26 @@ export function useNotifications(socket: Socket | null, isAuthenticated: boolean
     };
   }, [socket, isAuthenticated]);
 
-  const markAsRead = useCallback((notificationId: number) => {
-    if (!socket) return;
-    socket.emit('mark_notification_read', notificationId);
+  const markAsRead = useCallback(
+    (notificationId: number) => {
+      if (!socket) return;
+      socket.emit('mark_notification_read', notificationId);
 
-    // Optimistically update UI
-    setNotifications(prev => prev.map(n =>
-      n.notification_id === notificationId ? { ...n, is_read: true } : n
-    ));
-    setUnreadCount(prev => Math.max(0, prev - 1));
-  }, [socket]);
+      // Optimistically update UI
+      setNotifications((prev) =>
+        prev.map((n) => (n.notification_id === notificationId ? { ...n, is_read: true } : n))
+      );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+    },
+    [socket]
+  );
 
   const markAllAsRead = useCallback(() => {
     if (!socket) return;
     socket.emit('mark_all_notifications_read');
 
     // Optimistically update UI
-    setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
     setUnreadCount(0);
   }, [socket]);
 
@@ -95,6 +98,6 @@ export function useNotifications(socket: Socket | null, isAuthenticated: boolean
     markAsRead,
     markAllAsRead,
     clearAll,
-    dismissAchievement
+    dismissAchievement,
   };
 }

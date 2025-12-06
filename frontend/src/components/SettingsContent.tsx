@@ -52,9 +52,10 @@ function ToggleSwitch({
           relative
           transition-all duration-[var(--duration-fast)]
           flex-shrink-0 ml-3
-          ${enabled
-            ? 'bg-[var(--color-success)]'
-            : 'bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)]'
+          ${
+            enabled
+              ? 'bg-[var(--color-success)]'
+              : 'bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)]'
           }
         `}
         style={{
@@ -103,13 +104,7 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
           bg-[var(--color-bg-tertiary)]
         "
       >
-        <h3
-          className="text-lg font-display uppercase tracking-wider text-center mb-6"
-          style={{
-            color: 'var(--color-text-primary)',
-            textShadow: '0 0 10px var(--color-glow)',
-          }}
-        >
+        <h3 className="text-lg font-display uppercase tracking-wider text-center mb-6 text-skin-primary skin-glow-text">
           Preferences
         </h3>
 
@@ -327,7 +322,10 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
           <NeonButton
             data-keyboard-nav="how-to-play"
             size="lg"
-            onClick={() => { sounds.buttonClick(); onShowRules(); }}
+            onClick={() => {
+              sounds.buttonClick();
+              onShowRules();
+            }}
             fullWidth
             leftIcon={<span>📖</span>}
             glow
@@ -337,13 +335,7 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
 
           {/* About */}
           <div className="text-center py-2">
-            <p
-              className="font-display text-lg uppercase tracking-wider"
-              style={{
-                color: 'var(--color-text-primary)',
-                textShadow: '0 0 5px var(--color-glow)',
-              }}
-            >
+            <p className="font-display text-lg uppercase tracking-wider text-skin-primary text-shadow-glow-sm">
               J⋀ffre
             </p>
             <p className="text-xs text-[var(--color-text-muted)] mt-1 font-body">
@@ -356,7 +348,10 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
             data-keyboard-nav="debug-fun"
             variant="ghost"
             size="lg"
-            onClick={() => { sounds.buttonClick(); onShowDebug(); }}
+            onClick={() => {
+              sounds.buttonClick();
+              onShowDebug();
+            }}
             fullWidth
             leftIcon={<span>🎮</span>}
           >

@@ -56,7 +56,10 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       }
 
       if (!replayData.round_history || !Array.isArray(replayData.round_history)) {
-        logger.error('[GameReplay] round_history is missing or not an array:', replayData.round_history);
+        logger.error(
+          '[GameReplay] round_history is missing or not an array:',
+          replayData.round_history
+        );
         setError('Replay data is malformed (missing round history)');
         setLoading(false);
         return;
@@ -72,7 +75,11 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       setLoading(false);
     };
 
-    const handleError = (errorData: { message?: string; correlationId?: string; correlation_id?: string }) => {
+    const handleError = (errorData: {
+      message?: string;
+      correlationId?: string;
+      correlation_id?: string;
+    }) => {
       logger.error('[GameReplay] Error loading replay', undefined, { errorData, gameId });
 
       // Extract correlation ID if available
@@ -113,9 +120,9 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     const delay = playSpeed === 0.5 ? 4000 : playSpeed === 1 ? 2000 : 1000;
     const timer = setTimeout(() => {
       if (hasNextTrick) {
-        setCurrentTrickIndex(prev => prev + 1);
+        setCurrentTrickIndex((prev) => prev + 1);
       } else if (hasNextRound) {
-        setCurrentRoundIndex(prev => prev + 1);
+        setCurrentRoundIndex((prev) => prev + 1);
         setCurrentTrickIndex(0);
       } else {
         setIsPlaying(false);
@@ -151,7 +158,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     };
   }, [replayData, currentRoundIndex, currentTrickIndex]);
 
-  const { currentRound, currentTricks, hasNextRound, hasPrevRound, hasNextTrick, hasPrevTrick } = currentRoundData;
+  const { currentRound, currentTricks, hasNextRound, hasPrevRound, hasNextTrick, hasPrevTrick } =
+    currentRoundData;
 
   // Calculate starting hands from trick history (expensive operation) - MUST be before early returns
   const startingHands = useMemo(() => {
@@ -159,10 +167,10 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
     const hands: Record<string, CardType[]> = {};
     if (replayData) {
-      replayData.player_names.forEach(name => hands[name] = []);
+      replayData.player_names.forEach((name) => (hands[name] = []));
 
-      currentRound.tricks.forEach(trick => {
-        trick.trick.forEach(trickCard => {
+      currentRound.tricks.forEach((trick) => {
+        trick.trick.forEach((trickCard) => {
           // Defensive check: ensure player exists in hands before pushing
           // This handles cases where player names changed (e.g., bot replacement)
           if (!hands[trickCard.playerName]) {
@@ -171,7 +179,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
               playerNameFromTrick: trickCard.playerName,
               availablePlayers: Object.keys(hands),
               round: currentRoundIndex,
-              trick: currentTrickIndex
+              trick: currentTrickIndex,
             });
             hands[trickCard.playerName] = [];
           }
@@ -190,7 +198,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
     if (!currentTricks) return played;
 
     for (let i = 0; i <= currentTrickIndex && i < currentTricks.length; i++) {
-      currentTricks[i].trick.forEach(trickCard => {
+      currentTricks[i].trick.forEach((trickCard) => {
         played.add(`${trickCard.card.color}-${trickCard.card.value}`);
       });
     }
@@ -199,21 +207,24 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   }, [currentTricks, currentTrickIndex]);
 
   // Sprint 8 Task 2: Memoized navigation callbacks - MUST be before early returns
-  const navigateToRound = useCallback((index: number) => {
-    if (index >= 0 && index < (replayData?.round_history?.length || 0)) {
-      setCurrentRoundIndex(index);
-      setCurrentTrickIndex(0);
-      setIsPlaying(false);
-      sounds.trickWon();
-    }
-  }, [replayData]);
+  const navigateToRound = useCallback(
+    (index: number) => {
+      if (index >= 0 && index < (replayData?.round_history?.length || 0)) {
+        setCurrentRoundIndex(index);
+        setCurrentTrickIndex(0);
+        setIsPlaying(false);
+        sounds.trickWon();
+      }
+    },
+    [replayData]
+  );
 
   const handleNextTrick = useCallback(() => {
     if (hasNextTrick) {
-      setCurrentTrickIndex(prev => prev + 1);
+      setCurrentTrickIndex((prev) => prev + 1);
       sounds.cardPlay();
     } else if (hasNextRound) {
-      setCurrentRoundIndex(prev => prev + 1);
+      setCurrentRoundIndex((prev) => prev + 1);
       setCurrentTrickIndex(0);
       sounds.trickWon();
     }
@@ -221,7 +232,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
   const handlePrevTrick = useCallback(() => {
     if (hasPrevTrick) {
-      setCurrentTrickIndex(prev => prev - 1);
+      setCurrentTrickIndex((prev) => prev - 1);
       sounds.cardPlay();
     } else if (hasPrevRound) {
       const prevRoundIndex = currentRoundIndex - 1;
@@ -234,7 +245,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   }, [hasPrevTrick, hasPrevRound, currentRoundIndex, replayData]);
 
   const handlePlayPause = useCallback(() => {
-    setIsPlaying(prev => !prev);
+    setIsPlaying((prev) => !prev);
     sounds.cardPlay();
   }, []);
 
@@ -251,7 +262,10 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
       >
         <div className="text-center py-4">
           <Spinner size="lg" color="primary" className="mb-4" />
-          <p className="text-lg font-semibold text-gray-700 dark:text-gray-200" data-testid="loading-message">
+          <p
+            className="text-lg font-semibold text-gray-700 dark:text-gray-200"
+            data-testid="loading-message"
+          >
             Loading replay...
           </p>
         </div>
@@ -271,11 +285,19 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         testId="error-modal"
       >
         <div className="text-center">
-          <p className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2" data-testid="error-message">
+          <p
+            className="text-lg font-semibold text-red-600 dark:text-red-400 mb-2"
+            data-testid="error-message"
+          >
             {error || 'Failed to load replay'}
           </p>
           {correlationId && (
-            <UICard variant="default" size="sm" className="mt-4 !bg-red-50 dark:!bg-red-900/30 !border-red-200 dark:!border-red-700" data-testid="error-correlation-id">
+            <UICard
+              variant="default"
+              size="sm"
+              className="mt-4 !bg-red-50 dark:!bg-red-900/30 !border-red-200 dark:!border-red-700"
+              data-testid="error-correlation-id"
+            >
               <p className="text-xs text-red-700 dark:text-red-300 font-mono">
                 Error ID: {correlationId}
               </p>
@@ -300,11 +322,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             >
               Try Again
             </Button>
-            <Button
-              data-testid="close-button"
-              onClick={onClose}
-              variant="secondary"
-            >
+            <Button data-testid="close-button" onClick={onClose} variant="secondary">
               Close
             </Button>
           </div>
@@ -326,17 +344,17 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         testId="no-data-modal"
       >
         <div className="text-center">
-          <p className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2" data-testid="no-data-warning">
+          <p
+            className="text-lg font-semibold text-yellow-600 dark:text-yellow-400 mb-2"
+            data-testid="no-data-warning"
+          >
             No Replay Data Available
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            This game has no recorded rounds. The game may have ended prematurely or data was not saved.
+            This game has no recorded rounds. The game may have ended prematurely or data was not
+            saved.
           </p>
-          <Button
-            data-testid="close-button"
-            onClick={onClose}
-            variant="primary"
-          >
+          <Button data-testid="close-button" onClick={onClose} variant="primary">
             Close
           </Button>
         </div>
@@ -348,7 +366,11 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
   const currentBet = currentRound?.highestBet;
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-2 md:p-4" onClick={onClose} onKeyDown={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-2 md:p-4"
+      onClick={onClose}
+      onKeyDown={(e) => e.stopPropagation()}
+    >
       <div
         className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-800 dark:to-gray-900 rounded-xl md:rounded-2xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-y-auto border-2 md:border-4 border-emerald-600 dark:border-emerald-500"
         onClick={(e) => e.stopPropagation()}
@@ -357,7 +379,9 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         <div className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-4 md:px-8 py-4 md:py-6 rounded-t-lg md:rounded-t-xl">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 md:gap-4 min-w-0">
-              <span className="text-2xl md:text-4xl" aria-hidden="true">🎮</span>
+              <span className="text-2xl md:text-4xl" aria-hidden="true">
+                🎮
+              </span>
               <div className="min-w-0">
                 <h2 className="text-xl md:text-3xl font-black">Game Replay</h2>
                 <p className="text-emerald-100 text-xs md:text-sm mt-1 truncate">
@@ -403,12 +427,21 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 <span className="text-xl md:text-2xl">🏆</span>
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Final Score</p>
-                  <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2" data-testid="final-scores">
-                    <span className={`text-sm md:text-xl font-black ${replayData.winning_team === 1 ? 'text-green-600' : 'text-gray-600'}`} data-testid="team1-score">
+                  <div
+                    className="flex flex-col md:flex-row md:items-center gap-1 md:gap-2"
+                    data-testid="final-scores"
+                  >
+                    <span
+                      className={`text-sm md:text-xl font-black ${replayData.winning_team === 1 ? 'text-green-600' : 'text-gray-600'}`}
+                      data-testid="team1-score"
+                    >
                       T1: {replayData.team1_score}
                     </span>
                     <span className="hidden md:inline text-gray-400">vs</span>
-                    <span className={`text-sm md:text-xl font-black ${replayData.winning_team === 2 ? 'text-green-600' : 'text-gray-600'}`} data-testid="team2-score">
+                    <span
+                      className={`text-sm md:text-xl font-black ${replayData.winning_team === 2 ? 'text-green-600' : 'text-gray-600'}`}
+                      data-testid="team2-score"
+                    >
                       T2: {replayData.team2_score}
                     </span>
                   </div>
@@ -421,7 +454,8 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                 <div>
                   <p className="text-xs text-gray-500 dark:text-gray-400">Duration</p>
                   <p className="text-sm md:text-lg font-bold text-gray-700 dark:text-gray-200">
-                    {Math.floor(replayData.game_duration_seconds / 60)}m {replayData.game_duration_seconds % 60}s
+                    {Math.floor(replayData.game_duration_seconds / 60)}m{' '}
+                    {replayData.game_duration_seconds % 60}s
                   </p>
                 </div>
               </div>
@@ -453,7 +487,9 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             {replayData.is_bot_game && (
               <div className="flex items-center gap-2 px-2 md:px-3 py-1 bg-blue-100 dark:bg-blue-900/30 rounded-lg self-start md:self-auto">
                 <span className="text-lg md:text-xl">🤖</span>
-                <span className="text-xs md:text-sm font-semibold text-blue-700 dark:text-blue-400">Bot Game</span>
+                <span className="text-xs md:text-sm font-semibold text-blue-700 dark:text-blue-400">
+                  Bot Game
+                </span>
               </div>
             )}
           </div>
@@ -494,9 +530,13 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
               <div className="flex items-center gap-2 text-sm md:text-base">
                 <span className="text-xs text-gray-500 dark:text-gray-400">Score:</span>
-                <span className="font-bold text-orange-600">T1: {currentRound.roundScore?.team1 || 0}</span>
+                <span className="font-bold text-orange-600">
+                  T1: {currentRound.roundScore?.team1 || 0}
+                </span>
                 <span className="text-gray-400">/</span>
-                <span className="font-bold text-purple-600">T2: {currentRound.roundScore?.team2 || 0}</span>
+                <span className="font-bold text-purple-600">
+                  T2: {currentRound.roundScore?.team2 || 0}
+                </span>
               </div>
             </div>
           </div>
@@ -535,11 +575,15 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                           className={`relative flex flex-col items-center ${isWinner ? 'ring-4 ring-green-500 ring-offset-2 rounded-xl' : ''}`}
                         >
                           <div className="text-center mb-2">
-                            <p className={`text-xs md:text-sm font-bold ${
-                              replayData.player_teams[replayData.player_names.indexOf(trickCard.playerName)] === 1
-                                ? 'text-orange-600'
-                                : 'text-purple-600'
-                            }`}>
+                            <p
+                              className={`text-xs md:text-sm font-bold ${
+                                replayData.player_teams[
+                                  replayData.player_names.indexOf(trickCard.playerName)
+                                ] === 1
+                                  ? 'text-orange-600'
+                                  : 'text-purple-600'
+                              }`}
+                            >
                               {trickCard.playerName}
                             </p>
                           </div>
@@ -567,12 +611,18 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                   </h3>
                   <div className="space-y-4">
                     {Object.entries(startingHands).map(([playerName, cards]) => {
-                      const teamId = replayData.player_teams[replayData.player_names.indexOf(playerName)];
+                      const teamId =
+                        replayData.player_teams[replayData.player_names.indexOf(playerName)];
                       return (
-                        <div key={playerName} className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3">
-                          <span className={`font-bold text-sm md:w-24 flex-shrink-0 ${
-                            teamId === 1 ? 'text-orange-600' : 'text-purple-600'
-                          }`}>
+                        <div
+                          key={playerName}
+                          className="flex flex-col md:flex-row md:items-center gap-2 md:gap-3"
+                        >
+                          <span
+                            className={`font-bold text-sm md:w-24 flex-shrink-0 ${
+                              teamId === 1 ? 'text-orange-600' : 'text-purple-600'
+                            }`}
+                          >
                             {playerName}:
                           </span>
                           <div className="flex gap-1.5 md:gap-2 flex-wrap overflow-x-auto">
@@ -581,10 +631,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
                               const isPlayed = playedCards.has(cardKey);
 
                               return (
-                                <div
-                                  key={idx}
-                                  className={isPlayed ? 'opacity-30' : 'opacity-100'}
-                                >
+                                <div key={idx} className={isPlayed ? 'opacity-30' : 'opacity-100'}>
                                   <Card card={card} size="tiny" />
                                 </div>
                               );
@@ -602,13 +649,17 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
             <div className="space-y-4 md:space-y-6">
               {/* Playback Controls */}
               <div className="bg-parchment-50 dark:bg-gray-800 rounded-xl p-4 md:p-6 shadow-lg border border-parchment-400 dark:border-gray-600">
-                <h3 className="text-base md:text-lg font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4">Playback Controls</h3>
+                <h3 className="text-base md:text-lg font-black text-umber-800 dark:text-gray-200 mb-3 md:mb-4">
+                  Playback Controls
+                </h3>
 
                 {/* Speed Control */}
                 <div className="mb-3 md:mb-4">
-                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">Speed:</p>
+                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">
+                    Speed:
+                  </p>
                   <div className="flex gap-2">
-                    {[0.5, 1, 2].map(speed => (
+                    {[0.5, 1, 2].map((speed) => (
                       <Button
                         key={speed}
                         data-testid={`speed-${speed}x`}
@@ -657,7 +708,9 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
 
                 {/* Round Jump Buttons */}
                 <div className="border-t pt-3 md:pt-4 dark:border-gray-700">
-                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">Jump to Round:</p>
+                  <p className="text-xs md:text-sm text-umber-700 dark:text-gray-400 mb-2">
+                    Jump to Round:
+                  </p>
                   <div className="grid grid-cols-5 md:grid-cols-3 gap-1">
                     {replayData.round_history.map((_, idx) => (
                       <Button

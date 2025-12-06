@@ -18,7 +18,12 @@ interface LoginModalProps {
   onSwitchToPasswordReset: () => void;
 }
 
-export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwitchToPasswordReset }: LoginModalProps) {
+export default function LoginModal({
+  isOpen,
+  onClose,
+  onSwitchToRegister,
+  onSwitchToPasswordReset,
+}: LoginModalProps) {
   // All hooks MUST be called before any conditional returns (Rules of Hooks)
   const { login, error, clearError } = useAuth();
   const [username, setUsername] = useState('');
@@ -65,9 +70,7 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Error Message */}
-        {error && (
-          <Alert variant="error">{error}</Alert>
-        )}
+        {error && <Alert variant="error">{error}</Alert>}
 
         {/* Username/Email Field */}
         <Input
@@ -124,7 +127,10 @@ export default function LoginModal({ isOpen, onClose, onSwitchToRegister, onSwit
         </Button>
 
         {/* Register Link */}
-        <div className="text-center pt-4 border-t" style={{ borderColor: 'var(--color-border-default)' }}>
+        <div
+          className="text-center pt-4 border-t"
+          style={{ borderColor: 'var(--color-border-default)' }}
+        >
           <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
             Don't have an account?{' '}
             <Button

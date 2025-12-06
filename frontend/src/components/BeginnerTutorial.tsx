@@ -134,10 +134,7 @@ export function BeginnerTutorial({
 
         case 'betting_decision':
           // Show when betting phase has at least one bet placed (so user can see the mechanics)
-          return (
-            gameState.phase === 'betting' &&
-            (gameState.currentBets?.length || 0) >= 1
-          );
+          return gameState.phase === 'betting' && (gameState.currentBets?.length || 0) >= 1;
 
         case 'playing_intro':
           return (
@@ -191,9 +188,9 @@ export function BeginnerTutorial({
       );
 
       // Check if this is a new step (not already in accumulated steps)
-      const isNewStep = !accumulatedSteps.some(s => s.phase === highestPriority.phase);
+      const isNewStep = !accumulatedSteps.some((s) => s.phase === highestPriority.phase);
       if (isNewStep) {
-        setAccumulatedSteps(prev => [...prev, highestPriority]);
+        setAccumulatedSteps((prev) => [...prev, highestPriority]);
       }
 
       // Only set current step if we don't have one yet (prevent auto-closing)
@@ -245,7 +242,9 @@ export function BeginnerTutorial({
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700 px-4 py-3 -mx-4 -mt-4 mb-4 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-white font-bold text-lg flex items-center gap-2">
-            <span className="text-2xl" aria-hidden="true">{currentStep.icon}</span>
+            <span className="text-2xl" aria-hidden="true">
+              {currentStep.icon}
+            </span>
             <span>{currentStep.title}</span>
           </h3>
           <Button
@@ -278,13 +277,22 @@ export function BeginnerTutorial({
       <div className="max-h-[400px] overflow-y-auto -mx-4 px-4">
         {/* Show all accumulated steps */}
         {accumulatedSteps.map((step, index) => (
-          <div key={step.phase} className={index > 0 ? 'mt-4 pt-4 border-t border-blue-300 dark:border-blue-700' : ''}>
+          <div
+            key={step.phase}
+            className={index > 0 ? 'mt-4 pt-4 border-t border-blue-300 dark:border-blue-700' : ''}
+          >
             {/* Step header */}
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-xl" aria-hidden="true">{step.icon}</span>
-              <span className="text-blue-900 dark:text-blue-100 text-sm font-bold">{step.title}</span>
+              <span className="text-xl" aria-hidden="true">
+                {step.icon}
+              </span>
+              <span className="text-blue-900 dark:text-blue-100 text-sm font-bold">
+                {step.title}
+              </span>
               {step.phase === currentStep?.phase && (
-                <span className="ml-auto text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">NEW</span>
+                <span className="ml-auto text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">
+                  NEW
+                </span>
               )}
             </div>
             {/* Step content */}

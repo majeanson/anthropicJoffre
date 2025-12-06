@@ -27,18 +27,10 @@ export function LobbyErrorFallback({ onClose }: LobbyErrorFallbackProps) {
           Failed to load the game lobby. The server may be temporarily unavailable.
         </p>
         <div className="space-y-3">
-          <Button
-            onClick={onClose || (() => window.location.reload())}
-            variant="primary"
-            fullWidth
-          >
+          <Button onClick={onClose || (() => window.location.reload())} variant="primary" fullWidth>
             Close Lobby Browser
           </Button>
-          <Button
-            onClick={() => window.location.reload()}
-            variant="secondary"
-            fullWidth
-          >
+          <Button onClick={() => window.location.reload()} variant="secondary" fullWidth>
             Reload Page
           </Button>
         </div>

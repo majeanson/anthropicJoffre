@@ -59,14 +59,15 @@ export function PlayerAvatar({
   size = 'md',
   clickable = false,
   onClickName,
-  className = ''
+  className = '',
 }: PlayerAvatarProps) {
   // Team colors
-  const teamBadgeColor = teamId === 1
-    ? 'bg-orange-600 text-white border-orange-400'
-    : teamId === 2
-    ? 'bg-purple-600 text-white border-purple-400'
-    : 'bg-gray-600 text-white border-gray-400';
+  const teamBadgeColor =
+    teamId === 1
+      ? 'bg-orange-600 text-white border-orange-400'
+      : teamId === 2
+        ? 'bg-purple-600 text-white border-purple-400'
+        : 'bg-gray-600 text-white border-gray-400';
 
   // Current turn highlight
   const turnHighlight = isCurrentTurn
@@ -80,12 +81,7 @@ export function PlayerAvatar({
     <div className={`relative inline-flex items-center gap-2 ${containerPadding} ${className}`}>
       {/* Avatar with indicators */}
       <div className="relative">
-        <Avatar
-          username={playerName}
-          avatarUrl={avatarUrl}
-          size={size}
-          className={turnHighlight}
-        />
+        <Avatar username={playerName} avatarUrl={avatarUrl} size={size} className={turnHighlight} />
 
         {/* Online status dot (top-right) */}
         {!isBot && (
@@ -141,9 +137,7 @@ export function PlayerAvatar({
                 className="text-sm font-semibold truncate"
               />
             ) : (
-              <span className="text-sm font-semibold text-white truncate">
-                {playerName}
-              </span>
+              <span className="text-sm font-semibold text-white truncate">{playerName}</span>
             )}
             {isBot && <span className="text-xs text-blue-400">🤖</span>}
           </div>
@@ -164,9 +158,7 @@ export function PlayerAvatar({
 
           {/* Current turn indicator */}
           {isCurrentTurn && (
-            <span className="text-xs text-green-400 font-semibold">
-              ▶ Your Turn
-            </span>
+            <span className="text-xs text-green-400 font-semibold">▶ Your Turn</span>
           )}
         </div>
       )}

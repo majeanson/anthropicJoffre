@@ -28,7 +28,8 @@ export const ERROR_MESSAGES = {
   RECENT_GAMES_LOAD_FAILED: 'Failed to load recent games',
   GAME_REPLAY_FAILED: 'Failed to load game replay',
   REPLAY_UNAVAILABLE: 'Failed to load replay',
-  REPLAY_CORRUPTED: 'Failed to load or play the game replay. The replay data may be corrupted or unavailable.',
+  REPLAY_CORRUPTED:
+    'Failed to load or play the game replay. The replay data may be corrupted or unavailable.',
 
   // Player & Profile
   PLAYER_STATS_FAILED: 'Failed to load player statistics',
@@ -79,10 +80,7 @@ export function getErrorMessage(
 /**
  * Format error message with additional context
  */
-export function formatErrorMessage(
-  messageKey: ErrorMessageKey,
-  context?: string
-): string {
+export function formatErrorMessage(messageKey: ErrorMessageKey, context?: string): string {
   const baseMessage = ERROR_MESSAGES[messageKey];
   return context ? `${baseMessage}: ${context}` : baseMessage;
 }

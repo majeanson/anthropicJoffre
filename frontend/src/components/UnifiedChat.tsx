@@ -52,7 +52,7 @@ export function UnifiedChat({
   maxMessages = 100,
   placeholder = 'Type a message...',
   className = '',
-  compact = false
+  compact = false,
 }: UnifiedChatProps) {
   const [inputMessage, setInputMessage] = useState('');
   const [isExpanded, setIsExpanded] = useState(mode !== 'floating');
@@ -63,12 +63,14 @@ export function UnifiedChat({
 
   const quickEmojis = ['👍', '👎', '🔥', '😂', 'GG', '✨'];
 
-  const chatTitle = title || {
-    team: '💬 Team Chat',
-    game: '💬 Game Chat',
-    lobby: '💬 Lobby Chat',
-    dm: '💬 Direct Message'
-  }[context];
+  const chatTitle =
+    title ||
+    {
+      team: '💬 Team Chat',
+      game: '💬 Game Chat',
+      lobby: '💬 Lobby Chat',
+      dm: '💬 Direct Message',
+    }[context];
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -82,7 +84,7 @@ export function UnifiedChat({
     if (mode === 'floating' && !isExpanded && showUnreadCounter && messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.playerId !== currentPlayerId) {
-        setUnreadCount(prev => prev + 1);
+        setUnreadCount((prev) => prev + 1);
       }
     }
   }, [messages, isExpanded, currentPlayerId, mode, showUnreadCounter]);
@@ -101,20 +103,26 @@ export function UnifiedChat({
     }
   }, [isExpanded]);
 
-  const handleSendMessage = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMessage.trim()) return;
-    onSendMessage(inputMessage.trim());
-    setInputMessage('');
-    inputRef.current?.focus();
-  }, [inputMessage, onSendMessage]);
+  const handleSendMessage = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!inputMessage.trim()) return;
+      onSendMessage(inputMessage.trim());
+      setInputMessage('');
+      inputRef.current?.focus();
+    },
+    [inputMessage, onSendMessage]
+  );
 
-  const handleQuickEmoji = useCallback((emoji: string) => {
-    onSendMessage(emoji);
-  }, [onSendMessage]);
+  const handleQuickEmoji = useCallback(
+    (emoji: string) => {
+      onSendMessage(emoji);
+    },
+    [onSendMessage]
+  );
 
   const handleEmojiSelect = useCallback((emoji: string) => {
-    setInputMessage(prev => prev + emoji);
+    setInputMessage((prev) => prev + emoji);
     setShowEmojis(false);
     inputRef.current?.focus();
   }, []);
@@ -167,10 +175,12 @@ export function UnifiedChat({
   });
 
   const containerClasses = {
-    panel: 'fixed right-4 bottom-4 w-80 md:w-80 rounded-[var(--radius-lg)] shadow-2xl border-2 flex flex-col max-h-96 z-50',
-    floating: 'fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 max-h-[50vh] sm:max-h-[500px] border-2 rounded-[var(--radius-lg)] shadow-2xl z-40 flex flex-col animate-slide-in',
+    panel:
+      'fixed right-4 bottom-4 w-80 md:w-80 rounded-[var(--radius-lg)] shadow-2xl border-2 flex flex-col max-h-96 z-50',
+    floating:
+      'fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:w-80 max-h-[50vh] sm:max-h-[500px] border-2 rounded-[var(--radius-lg)] shadow-2xl z-40 flex flex-col animate-slide-in',
     embedded: 'w-full border-2 rounded-[var(--radius-lg)] flex flex-col',
-    modal: 'fixed inset-0 flex items-center justify-center z-50 p-4'
+    modal: 'fixed inset-0 flex items-center justify-center z-50 p-4',
   }[mode];
 
   function renderChatContent() {
@@ -180,7 +190,8 @@ export function UnifiedChat({
         <div
           className="px-4 py-3 rounded-t-[var(--radius-lg)] flex justify-between items-center"
           style={{
-            background: 'linear-gradient(to right, var(--color-bg-tertiary), var(--color-bg-secondary))',
+            background:
+              'linear-gradient(to right, var(--color-bg-tertiary), var(--color-bg-secondary))',
             borderBottom: '1px solid var(--color-border-default)',
           }}
         >
@@ -214,14 +225,10 @@ export function UnifiedChat({
 
         {/* Messages */}
         <div
-          className={`flex-1 overflow-y-auto p-3 ${compact ? 'min-h-[150px] max-h-[200px]' : 'min-h-[150px] sm:min-h-[200px] max-h-[300px] sm:max-h-[400px]'}`}
-          style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
+          className={`flex-1 overflow-y-auto p-3 bg-skin-tertiary ${compact ? 'min-h-[150px] max-h-[200px]' : 'min-h-[150px] sm:min-h-[200px] max-h-[300px] sm:max-h-[400px]'}`}
         >
           {messages.length === 0 ? (
-            <p
-              className="text-sm text-center py-4"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
+            <p className="text-sm text-center py-4 text-skin-muted">
               No messages yet. Say something!
             </p>
           ) : (
@@ -231,15 +238,11 @@ export function UnifiedChat({
                 return (
                   <div
                     key={idx}
-                    className="text-sm p-2 rounded-[var(--radius-md)] shadow-sm"
-                    style={{
-                      backgroundColor: isOwnMessage
-                        ? 'color-mix(in srgb, var(--color-text-accent) 15%, var(--color-bg-secondary))'
-                        : 'var(--color-bg-secondary)',
-                      borderLeft: isOwnMessage
-                        ? '3px solid var(--color-text-accent)'
-                        : '3px solid var(--color-border-subtle)',
-                    }}
+                    className={`text-sm p-2 rounded-[var(--radius-md)] shadow-sm ${
+                      isOwnMessage
+                        ? 'bg-skin-accent/10 border-l-[3px] border-skin-accent'
+                        : 'bg-skin-secondary border-l-[3px] border-skin-border-subtle'
+                    }`}
                   >
                     <div className="flex items-center justify-between mb-0.5">
                       {onPlayerClick ? (
@@ -251,23 +254,16 @@ export function UnifiedChat({
                         />
                       ) : (
                         <span
-                          className="font-semibold text-xs"
-                          style={{ color: isOwnMessage ? 'var(--color-text-accent)' : 'var(--color-text-secondary)' }}
+                          className={`font-semibold text-xs ${
+                            isOwnMessage ? 'text-skin-accent' : 'text-skin-secondary'
+                          }`}
                         >
                           {msg.playerName}
                         </span>
                       )}
-                      <span
-                        className="text-xs"
-                        style={{ color: 'var(--color-text-muted)' }}
-                      >
-                        {formatTime(msg.timestamp)}
-                      </span>
+                      <span className="text-xs text-skin-muted">{formatTime(msg.timestamp)}</span>
                     </div>
-                    <p
-                      className="break-words"
-                      style={{ color: 'var(--color-text-primary)' }}
-                    >
+                    <p className="break-words" style={{ color: 'var(--color-text-primary)' }}>
                       {msg.message}
                     </p>
                   </div>
@@ -326,7 +322,10 @@ export function UnifiedChat({
                 </Button>
                 {showEmojis && (
                   <div className="absolute bottom-full mb-2 left-0 z-10">
-                    <EmojiPicker onSelectEmoji={handleEmojiSelect} onClose={() => setShowEmojis(false)} />
+                    <EmojiPicker
+                      onSelectEmoji={handleEmojiSelect}
+                      onClose={() => setShowEmojis(false)}
+                    />
                   </div>
                 )}
               </div>

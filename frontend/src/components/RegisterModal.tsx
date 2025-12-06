@@ -39,21 +39,21 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
       logger.error('[RegisterModal] USERNAME WAS CLEARED!', {
         prev: prevUsernameRef.current,
         current: username,
-        stack: new Error().stack
+        stack: new Error().stack,
       });
     }
     if (prevEmailRef.current && !email) {
       logger.error('[RegisterModal] EMAIL WAS CLEARED!', {
         prev: prevEmailRef.current,
         current: email,
-        stack: new Error().stack
+        stack: new Error().stack,
       });
     }
     if (prevPasswordRef.current && !password) {
       logger.error('[RegisterModal] PASSWORD WAS CLEARED!', {
         prev: prevPasswordRef.current.length + ' chars',
         current: password.length + ' chars',
-        stack: new Error().stack
+        stack: new Error().stack,
       });
     }
 
@@ -63,7 +63,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   });
 
   // Password strength indicator
-  const getPasswordStrength = (pwd: string): { strength: string; color: string; percentage: number } => {
+  const getPasswordStrength = (
+    pwd: string
+  ): { strength: string; color: string; percentage: number } => {
     if (pwd.length === 0) return { strength: '', color: 'bg-gray-600', percentage: 0 };
     if (pwd.length < 8) return { strength: 'Weak', color: 'bg-red-500', percentage: 25 };
 
@@ -102,11 +104,13 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         username,
         email,
         password,
-        display_name: displayName.trim() || undefined
+        display_name: displayName.trim() || undefined,
       });
 
       // Success
-      setSuccessMessage('Account created successfully! Please check your email to verify your account.');
+      setSuccessMessage(
+        'Account created successfully! Please check your email to verify your account.'
+      );
 
       // Clear form only on success
       setUsername('');
@@ -152,14 +156,10 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Success Message */}
-        {successMessage && (
-          <Alert variant="success">{successMessage}</Alert>
-        )}
+        {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
         {/* Error Message */}
-        {error && (
-          <Alert variant="error">{error}</Alert>
-        )}
+        {error && <Alert variant="error">{error}</Alert>}
 
         {/* Username Field */}
         <Input
@@ -173,7 +173,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           autoComplete="username"
           minLength={3}
           maxLength={50}
-          error={username && username.length < 3 ? 'Username must be at least 3 characters' : undefined}
+          error={
+            username && username.length < 3 ? 'Username must be at least 3 characters' : undefined
+          }
           variant="filled"
           fullWidth
         />
@@ -226,12 +228,14 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           {password && (
             <div className="mt-2">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Password Strength:</span>
-                <span className={`text-xs font-semibold ${passwordStrength.color.replace('bg-', 'text-')}`}>
+                <span className="text-xs text-skin-muted">Password Strength:</span>
+                <span
+                  className={`text-xs font-semibold ${passwordStrength.color.replace('bg-', 'text-')}`}
+                >
                   {passwordStrength.strength}
                 </span>
               </div>
-              <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--color-bg-tertiary)' }}>
+              <div className="w-full h-2 rounded-full overflow-hidden bg-skin-tertiary">
                 <div
                   className={`h-full ${passwordStrength.color} transition-all duration-300`}
                   style={{ width: `${passwordStrength.percentage}%` }}
@@ -252,7 +256,9 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
           disabled={isLoading || !!successMessage}
           autoComplete="new-password"
           showPasswordToggle
-          error={confirmPassword && password !== confirmPassword ? 'Passwords do not match' : undefined}
+          error={
+            confirmPassword && password !== confirmPassword ? 'Passwords do not match' : undefined
+          }
           variant="filled"
           fullWidth
         />
@@ -270,8 +276,8 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
         </Button>
 
         {/* Login Link */}
-        <div className="text-center pt-4 border-t" style={{ borderColor: 'var(--color-border-default)' }}>
-          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+        <div className="text-center pt-4 border-t border-skin-default">
+          <p className="text-sm text-skin-muted">
             Already have an account?{' '}
             <Button
               type="button"

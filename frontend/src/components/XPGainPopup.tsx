@@ -65,9 +65,7 @@ const XPFloater = memo(function XPFloater({
       }}
     >
       <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-amber-500 shadow-lg shadow-amber-500/30">
-        <span className="text-lg font-bold text-white drop-shadow-sm">
-          +{gain.amount}
-        </span>
+        <span className="text-lg font-bold text-white drop-shadow-sm">+{gain.amount}</span>
         <span className="text-sm font-semibold text-amber-100">XP</span>
       </div>
     </div>
@@ -101,12 +99,7 @@ export function XPGainPopup({ gains, onRemoveGain }: XPGainPopupProps) {
       <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
         <div className="relative h-32 w-40">
           {gains.slice(-5).map((gain, index) => (
-            <XPFloater
-              key={gain.id}
-              gain={gain}
-              index={index}
-              onComplete={onRemoveGain}
-            />
+            <XPFloater key={gain.id} gain={gain} index={index} onComplete={onRemoveGain} />
           ))}
         </div>
       </div>
@@ -124,20 +117,18 @@ export function useXPGainPopup() {
       amount,
       timestamp: Date.now(),
     };
-    setGains(prev => [...prev, newGain]);
+    setGains((prev) => [...prev, newGain]);
   }, []);
 
   const removeGain = useCallback((id: string) => {
-    setGains(prev => prev.filter(g => g.id !== id));
+    setGains((prev) => prev.filter((g) => g.id !== id));
   }, []);
 
   return {
     gains,
     addGain,
     removeGain,
-    XPGainPopupComponent: (
-      <XPGainPopup gains={gains} onRemoveGain={removeGain} />
-    ),
+    XPGainPopupComponent: <XPGainPopup gains={gains} onRemoveGain={removeGain} />,
   };
 }
 

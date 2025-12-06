@@ -5,7 +5,10 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react';
-import { ConnectionQualityIndicator, ConnectionQualityBadge } from '../../ConnectionQualityIndicator';
+import {
+  ConnectionQualityIndicator,
+  ConnectionQualityBadge,
+} from '../../ConnectionQualityIndicator';
 import type { ConnectionStats } from '../../hooks/useConnectionQuality';
 
 const meta = {
@@ -54,7 +57,9 @@ export const AllQualityStates: Story = {
   name: 'All Quality States',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-6">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Connection Quality States</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Connection Quality States
+      </h3>
 
       <div className="grid grid-cols-2 gap-4">
         {/* Excellent */}
@@ -109,7 +114,9 @@ export const BadgeVersion: Story = {
   name: 'Compact Badge Version',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-6">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Compact Badge (for in-game use)</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Compact Badge (for in-game use)
+      </h3>
 
       <div className="flex flex-wrap gap-6">
         <div className="p-3 rounded-lg bg-[var(--color-bg-secondary)]">
@@ -150,7 +157,9 @@ export const InGameHeader: Story = {
   name: 'In Game Header Context',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[600px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Game Header Integration</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Game Header Integration
+      </h3>
 
       {/* Mock game header */}
       <div className="flex items-center justify-between p-4 rounded-lg bg-[var(--color-bg-secondary)] border border-[var(--color-border-primary)]">
@@ -202,18 +211,70 @@ export const ConnectionStatesSimulation: Story = {
   name: 'Connection States Over Time',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Typical Connection Journey</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Typical Connection Journey
+      </h3>
 
       <div className="space-y-3">
         {[
-          { time: '0:00', stats: { ping: null, quality: 'offline' as const, isConnected: false, lastPingTime: null }, label: 'Connecting...' },
-          { time: '0:02', stats: { ping: 234, quality: 'poor' as const, isConnected: true, lastPingTime: Date.now() }, label: 'Initial connection' },
-          { time: '0:05', stats: { ping: 145, quality: 'fair' as const, isConnected: true, lastPingTime: Date.now() }, label: 'Stabilizing' },
-          { time: '0:10', stats: { ping: 78, quality: 'good' as const, isConnected: true, lastPingTime: Date.now() }, label: 'Normal operation' },
-          { time: '0:30', stats: { ping: 32, quality: 'excellent' as const, isConnected: true, lastPingTime: Date.now() }, label: 'Optimal' },
+          {
+            time: '0:00',
+            stats: {
+              ping: null,
+              quality: 'offline' as const,
+              isConnected: false,
+              lastPingTime: null,
+            },
+            label: 'Connecting...',
+          },
+          {
+            time: '0:02',
+            stats: {
+              ping: 234,
+              quality: 'poor' as const,
+              isConnected: true,
+              lastPingTime: Date.now(),
+            },
+            label: 'Initial connection',
+          },
+          {
+            time: '0:05',
+            stats: {
+              ping: 145,
+              quality: 'fair' as const,
+              isConnected: true,
+              lastPingTime: Date.now(),
+            },
+            label: 'Stabilizing',
+          },
+          {
+            time: '0:10',
+            stats: {
+              ping: 78,
+              quality: 'good' as const,
+              isConnected: true,
+              lastPingTime: Date.now(),
+            },
+            label: 'Normal operation',
+          },
+          {
+            time: '0:30',
+            stats: {
+              ping: 32,
+              quality: 'excellent' as const,
+              isConnected: true,
+              lastPingTime: Date.now(),
+            },
+            label: 'Optimal',
+          },
         ].map((state, i) => (
-          <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-[var(--color-bg-secondary)]">
-            <span className="text-[var(--color-text-tertiary)] font-mono text-sm w-12">{state.time}</span>
+          <div
+            key={i}
+            className="flex items-center gap-4 p-3 rounded-lg bg-[var(--color-bg-secondary)]"
+          >
+            <span className="text-[var(--color-text-tertiary)] font-mono text-sm w-12">
+              {state.time}
+            </span>
             <ConnectionQualityIndicator stats={state.stats} />
             <span className="text-[var(--color-text-secondary)] text-sm">{state.label}</span>
           </div>
@@ -227,15 +288,24 @@ export const ComparisonSideBySide: Story = {
   name: 'Full vs Compact Comparison',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Indicator vs Badge Comparison</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Indicator vs Badge Comparison
+      </h3>
 
       <div className="grid grid-cols-2 gap-8">
         {/* Full Indicator */}
         <div>
-          <h4 className="text-[var(--color-text-secondary)] text-sm mb-3">Full Indicator (settings, lobby)</h4>
+          <h4 className="text-[var(--color-text-secondary)] text-sm mb-3">
+            Full Indicator (settings, lobby)
+          </h4>
           <div className="space-y-3">
             <ConnectionQualityIndicator
-              stats={{ ping: 45, quality: 'excellent', isConnected: true, lastPingTime: Date.now() }}
+              stats={{
+                ping: 45,
+                quality: 'excellent',
+                isConnected: true,
+                lastPingTime: Date.now(),
+              }}
             />
             <ConnectionQualityIndicator
               stats={{ ping: 156, quality: 'fair', isConnected: true, lastPingTime: Date.now() }}
@@ -245,11 +315,18 @@ export const ComparisonSideBySide: Story = {
 
         {/* Compact Badge */}
         <div>
-          <h4 className="text-[var(--color-text-secondary)] text-sm mb-3">Compact Badge (in-game)</h4>
+          <h4 className="text-[var(--color-text-secondary)] text-sm mb-3">
+            Compact Badge (in-game)
+          </h4>
           <div className="space-y-3">
             <div className="p-2 rounded bg-[var(--color-bg-secondary)] inline-block">
               <ConnectionQualityBadge
-                stats={{ ping: 45, quality: 'excellent', isConnected: true, lastPingTime: Date.now() }}
+                stats={{
+                  ping: 45,
+                  quality: 'excellent',
+                  isConnected: true,
+                  lastPingTime: Date.now(),
+                }}
               />
             </div>
             <div className="p-2 rounded bg-[var(--color-bg-secondary)] inline-block ml-3">

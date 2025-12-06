@@ -71,7 +71,7 @@ export const zIndex = {
  * @param stackLevel - 0 for base modal, 1+ for nested modals
  */
 export function getModalZIndex(stackLevel: number = 0): number {
-  return zIndex.modal + (stackLevel * 100);
+  return zIndex.modal + stackLevel * 100;
 }
 
 /**

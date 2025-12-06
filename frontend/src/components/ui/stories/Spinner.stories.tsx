@@ -147,10 +147,7 @@ export const WhiteColor: Story = {
   },
   decorators: [
     (Story) => (
-      <div
-        className="p-8 rounded-lg"
-        style={{ background: '#131824' }}
-      >
+      <div className="p-8 rounded-lg" style={{ background: '#131824' }}>
         <Story />
       </div>
     ),
@@ -167,37 +164,25 @@ export const AllSizes: Story = {
     <div className="flex items-center gap-6 p-6 bg-[#0B0E14] rounded-xl">
       <div className="text-center">
         <Spinner size="xs" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           xs
         </p>
       </div>
       <div className="text-center">
         <Spinner size="sm" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           sm
         </p>
       </div>
       <div className="text-center">
         <Spinner size="md" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           md
         </p>
       </div>
       <div className="text-center">
         <Spinner size="lg" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           lg
         </p>
       </div>
@@ -215,28 +200,19 @@ export const AllVariants: Story = {
     <div className="flex items-center gap-8 p-6 bg-[#0B0E14] rounded-xl">
       <div className="text-center">
         <Spinner variant="default" size="lg" />
-        <p
-          className="text-xs mt-3"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-3" style={{ color: '#6B7280' }}>
           Ring
         </p>
       </div>
       <div className="text-center">
         <Spinner variant="dots" size="lg" />
-        <p
-          className="text-xs mt-3"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-3" style={{ color: '#6B7280' }}>
           Essence
         </p>
       </div>
       <div className="text-center">
         <Spinner variant="pulse" size="lg" />
-        <p
-          className="text-xs mt-3"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-3" style={{ color: '#6B7280' }}>
           Pulse
         </p>
       </div>
@@ -254,58 +230,37 @@ export const AllColors: Story = {
     <div className="flex flex-wrap items-center gap-6 p-6 bg-[#0B0E14] rounded-xl">
       <div className="text-center">
         <Spinner color="primary" size="md" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           Copper
         </p>
       </div>
       <div className="text-center">
         <Spinner color="success" size="md" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           Emerald
         </p>
       </div>
       <div className="text-center">
         <Spinner color="warning" size="md" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           Amber
         </p>
       </div>
       <div className="text-center">
         <Spinner color="error" size="md" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           Ruby
         </p>
       </div>
       <div className="text-center">
         <Spinner color="gray" size="md" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#6B7280' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#6B7280' }}>
           Mercury
         </p>
       </div>
-      <div
-        className="text-center p-3 rounded-lg"
-        style={{ background: '#131824' }}
-      >
+      <div className="text-center p-3 rounded-lg" style={{ background: '#131824' }}>
         <Spinner color="white" size="md" />
-        <p
-          className="text-xs mt-2"
-          style={{ color: '#9CA3AF' }}
-        >
+        <p className="text-xs mt-2" style={{ color: '#9CA3AF' }}>
           Moonlight
         </p>
       </div>
@@ -392,10 +347,7 @@ export const ReconnectingState: Story = {
       }}
     >
       <Spinner size="sm" color="warning" />
-      <span
-        className="font-medium"
-        style={{ color: '#FBBF24' }}
-      >
+      <span className="font-medium" style={{ color: '#FBBF24' }}>
         Restoring ethereal connection...
       </span>
     </div>
@@ -417,10 +369,7 @@ export const FullPageLoading: Story = {
       }}
     >
       <Spinner size="lg" color="primary" />
-      <p
-        className="mt-4 text-sm"
-        style={{ color: '#6B7280' }}
-      >
+      <p className="mt-4 text-sm" style={{ color: '#6B7280' }}>
         Loading experiment data...
       </p>
     </div>
@@ -465,16 +414,9 @@ export const TransmutationProgress: Story = {
         border: '1px solid #2D3548',
       }}
     >
-      <div
-        className="relative inline-block"
-        style={{ width: '80px', height: '80px' }}
-      >
+      <div className="relative inline-block" style={{ width: '80px', height: '80px' }}>
         <Spinner size="lg" color="primary" />
-        <div
-          className="absolute inset-0 flex items-center justify-center text-2xl"
-        >
-          ⚗
-        </div>
+        <div className="absolute inset-0 flex items-center justify-center text-2xl">⚗</div>
       </div>
       <h3
         className="text-lg font-bold mt-4"

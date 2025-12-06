@@ -120,11 +120,7 @@ export function KeyboardShortcutsModal({
           </div>
 
           {/* Got it button for keyboard navigation */}
-          <Button
-            variant="primary"
-            fullWidth
-            onClick={onClose}
-          >
+          <Button variant="primary" fullWidth onClick={onClose}>
             Got it!
           </Button>
         </div>
@@ -151,9 +147,7 @@ function ShortcutSection({ title, icon, shortcuts, active }: ShortcutSectionProp
   return (
     <div
       className={`rounded-lg p-4 border-2 transition-colors ${
-        active
-          ? 'bg-blue-900/30 border-blue-500'
-          : 'bg-gray-800/50 border-gray-700'
+        active ? 'bg-blue-900/30 border-blue-500' : 'bg-gray-800/50 border-gray-700'
       }`}
     >
       <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
@@ -183,9 +177,7 @@ function ShortcutSection({ title, icon, shortcuts, active }: ShortcutSectionProp
             <div className="flex-1 text-right">
               <span className="text-sm text-gray-300">{shortcut.description}</span>
               {shortcut.condition && (
-                <span className="ml-2 text-xs text-gray-500 italic">
-                  ({shortcut.condition})
-                </span>
+                <span className="ml-2 text-xs text-gray-500 italic">({shortcut.condition})</span>
               )}
             </div>
           </div>

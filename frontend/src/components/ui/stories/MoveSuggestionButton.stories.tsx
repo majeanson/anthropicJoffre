@@ -20,7 +20,9 @@ function InteractiveMoveSuggestion(props: {
   return (
     <MoveSuggestionButton
       suggestion={props.suggestion ?? 'Play the Red 7'}
-      details={props.details ?? 'This card follows suit and has a good chance of winning the trick.'}
+      details={
+        props.details ?? 'This card follows suit and has a good chance of winning the trick.'
+      }
       alternatives={props.alternatives}
       isOpen={isOpen}
       onToggle={() => setIsOpen(!isOpen)}

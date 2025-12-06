@@ -277,28 +277,19 @@ export const AllVariants: Story = {
     return (
       <div className="space-y-8 p-6 bg-[#0B0E14] rounded-xl">
         <div>
-          <h4
-            className="text-sm font-medium mb-2"
-            style={{ color: '#6B7280' }}
-          >
+          <h4 className="text-sm font-medium mb-2" style={{ color: '#6B7280' }}>
             Underline
           </h4>
           <Tabs variant="underline" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
         <div>
-          <h4
-            className="text-sm font-medium mb-2"
-            style={{ color: '#6B7280' }}
-          >
+          <h4 className="text-sm font-medium mb-2" style={{ color: '#6B7280' }}>
             Pills
           </h4>
           <Tabs variant="pills" tabs={tabs} activeTab="tab1" onChange={() => {}} />
         </div>
         <div>
-          <h4
-            className="text-sm font-medium mb-2"
-            style={{ color: '#6B7280' }}
-          >
+          <h4 className="text-sm font-medium mb-2" style={{ color: '#6B7280' }}>
             Boxed
           </h4>
           <Tabs variant="boxed" tabs={tabs} activeTab="tab1" onChange={() => {}} />
@@ -339,26 +330,17 @@ export const Interactive: Story = {
           onChange={setActiveTab}
         />
 
-        <div
-          className="mt-4 p-4 rounded-lg min-h-[100px]"
-          style={{ background: '#0B0E14' }}
-        >
+        <div className="mt-4 p-4 rounded-lg min-h-[100px]" style={{ background: '#0B0E14' }}>
           <TabPanel tabId="guild" activeTab={activeTab}>
-            <p style={{ color: '#E8E4DC' }}>
-              Your fellow alchemists await in the guild hall.
-            </p>
+            <p style={{ color: '#E8E4DC' }}>Your fellow alchemists await in the guild hall.</p>
           </TabPanel>
 
           <TabPanel tabId="scrolls" activeTab={activeTab}>
-            <p style={{ color: '#E8E4DC' }}>
-              Unread scrolls containing new discoveries.
-            </p>
+            <p style={{ color: '#E8E4DC' }}>Unread scrolls containing new discoveries.</p>
           </TabPanel>
 
           <TabPanel tabId="archives" activeTab={activeTab}>
-            <p style={{ color: '#E8E4DC' }}>
-              Ancient formulas preserved for eternity.
-            </p>
+            <p style={{ color: '#E8E4DC' }}>Ancient formulas preserved for eternity.</p>
           </TabPanel>
         </div>
       </div>
@@ -418,29 +400,20 @@ export const GuildPanel: Story = {
                 className="p-2 rounded flex items-center gap-2"
                 style={{ background: '#0B0E14' }}
               >
-                <span
-                  className="w-2 h-2 rounded-full"
-                  style={{ background: '#10B981' }}
-                />
+                <span className="w-2 h-2 rounded-full" style={{ background: '#10B981' }} />
                 <span style={{ color: '#E8E4DC' }}>{name}</span>
               </div>
             ))}
           </TabPanel>
 
           <TabPanel tabId="all" activeTab={activeTab}>
-            <p
-              className="text-center py-4"
-              style={{ color: '#6B7280' }}
-            >
+            <p className="text-center py-4" style={{ color: '#6B7280' }}>
               Showing all guild members...
             </p>
           </TabPanel>
 
           <TabPanel tabId="blocked" activeTab={activeTab}>
-            <p
-              className="text-center py-4"
-              style={{ color: '#6B7280' }}
-            >
+            <p className="text-center py-4" style={{ color: '#6B7280' }}>
               No exiled members
             </p>
           </TabPanel>
@@ -486,19 +459,13 @@ export const ExperimentModeSelector: Story = {
           }}
         >
           {activeTab === 'practice' && (
-            <p style={{ color: '#E8E4DC' }}>
-              Experiment freely with no guild standing impact
-            </p>
+            <p style={{ color: '#E8E4DC' }}>Experiment freely with no guild standing impact</p>
           )}
           {activeTab === 'ranked' && (
-            <p style={{ color: '#E8E4DC' }}>
-              Compete to climb the Grand Alchemist rankings
-            </p>
+            <p style={{ color: '#E8E4DC' }}>Compete to climb the Grand Alchemist rankings</p>
           )}
           {activeTab === 'custom' && (
-            <p style={{ color: '#E8E4DC' }}>
-              Configure custom experiment parameters
-            </p>
+            <p style={{ color: '#E8E4DC' }}>Configure custom experiment parameters</p>
           )}
         </div>
       </div>
@@ -564,9 +531,7 @@ export const ElementalTabs: Story = {
             borderLeft: `3px solid ${elementColors[activeTab]}`,
           }}
         >
-          <span
-            className="text-3xl block mb-2"
-          >
+          <span className="text-3xl block mb-2">
             {activeTab === 'fire' && '🔥'}
             {activeTab === 'water' && '💧'}
             {activeTab === 'earth' && '🌿'}

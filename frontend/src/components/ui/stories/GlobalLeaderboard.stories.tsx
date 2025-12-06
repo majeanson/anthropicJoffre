@@ -77,37 +77,189 @@ interface MockPlayer {
 }
 
 const mockPlayers: MockPlayer[] = [
-  { rank: 1, name: 'ProPlayer', elo: 2150, peak: 2200, games: 500, wins: 350, losses: 150, winRate: 70, tier: 'Diamond', rounds: 2500, roundWinRate: 65, avgTricks: 2.3, betSuccess: 72 },
-  { rank: 2, name: 'Champion123', elo: 2050, peak: 2100, games: 420, wins: 280, losses: 140, winRate: 67, tier: 'Diamond', rounds: 2100, roundWinRate: 62, avgTricks: 2.2, betSuccess: 68 },
-  { rank: 3, name: 'CardMaster', elo: 1980, peak: 2020, games: 380, wins: 240, losses: 140, winRate: 63, tier: 'Platinum', rounds: 1900, roundWinRate: 60, avgTricks: 2.1, betSuccess: 65 },
-  { rank: 4, name: 'TrumpKing', elo: 1920, peak: 1950, games: 300, wins: 180, losses: 120, winRate: 60, tier: 'Platinum', rounds: 1500, roundWinRate: 58, avgTricks: 2.0, betSuccess: 62 },
-  { rank: 5, name: 'BetWinner', elo: 1850, peak: 1900, games: 250, wins: 145, losses: 105, winRate: 58, tier: 'Gold', rounds: 1250, roundWinRate: 55, avgTricks: 1.9, betSuccess: 60 },
-  { rank: 6, name: 'LuckyAces', elo: 1780, peak: 1820, games: 220, wins: 125, losses: 95, winRate: 57, tier: 'Gold', rounds: 1100, roundWinRate: 53, avgTricks: 1.8, betSuccess: 58 },
-  { rank: 7, name: 'TrickTaker', elo: 1650, peak: 1700, games: 180, wins: 95, losses: 85, winRate: 53, tier: 'Silver', rounds: 900, roundWinRate: 50, avgTricks: 1.7, betSuccess: 55 },
-  { rank: 8, name: 'CardShark', elo: 1580, peak: 1620, games: 150, wins: 78, losses: 72, winRate: 52, tier: 'Silver', rounds: 750, roundWinRate: 48, avgTricks: 1.6, betSuccess: 52 },
-  { rank: 9, name: 'NewPlayer', elo: 1450, peak: 1480, games: 80, wins: 40, losses: 40, winRate: 50, tier: 'Bronze', rounds: 400, roundWinRate: 45, avgTricks: 1.5, betSuccess: 48 },
-  { rank: 10, name: 'Beginner', elo: 1350, peak: 1380, games: 40, wins: 18, losses: 22, winRate: 45, tier: 'Bronze', rounds: 200, roundWinRate: 42, avgTricks: 1.4, betSuccess: 45 },
+  {
+    rank: 1,
+    name: 'ProPlayer',
+    elo: 2150,
+    peak: 2200,
+    games: 500,
+    wins: 350,
+    losses: 150,
+    winRate: 70,
+    tier: 'Diamond',
+    rounds: 2500,
+    roundWinRate: 65,
+    avgTricks: 2.3,
+    betSuccess: 72,
+  },
+  {
+    rank: 2,
+    name: 'Champion123',
+    elo: 2050,
+    peak: 2100,
+    games: 420,
+    wins: 280,
+    losses: 140,
+    winRate: 67,
+    tier: 'Diamond',
+    rounds: 2100,
+    roundWinRate: 62,
+    avgTricks: 2.2,
+    betSuccess: 68,
+  },
+  {
+    rank: 3,
+    name: 'CardMaster',
+    elo: 1980,
+    peak: 2020,
+    games: 380,
+    wins: 240,
+    losses: 140,
+    winRate: 63,
+    tier: 'Platinum',
+    rounds: 1900,
+    roundWinRate: 60,
+    avgTricks: 2.1,
+    betSuccess: 65,
+  },
+  {
+    rank: 4,
+    name: 'TrumpKing',
+    elo: 1920,
+    peak: 1950,
+    games: 300,
+    wins: 180,
+    losses: 120,
+    winRate: 60,
+    tier: 'Platinum',
+    rounds: 1500,
+    roundWinRate: 58,
+    avgTricks: 2.0,
+    betSuccess: 62,
+  },
+  {
+    rank: 5,
+    name: 'BetWinner',
+    elo: 1850,
+    peak: 1900,
+    games: 250,
+    wins: 145,
+    losses: 105,
+    winRate: 58,
+    tier: 'Gold',
+    rounds: 1250,
+    roundWinRate: 55,
+    avgTricks: 1.9,
+    betSuccess: 60,
+  },
+  {
+    rank: 6,
+    name: 'LuckyAces',
+    elo: 1780,
+    peak: 1820,
+    games: 220,
+    wins: 125,
+    losses: 95,
+    winRate: 57,
+    tier: 'Gold',
+    rounds: 1100,
+    roundWinRate: 53,
+    avgTricks: 1.8,
+    betSuccess: 58,
+  },
+  {
+    rank: 7,
+    name: 'TrickTaker',
+    elo: 1650,
+    peak: 1700,
+    games: 180,
+    wins: 95,
+    losses: 85,
+    winRate: 53,
+    tier: 'Silver',
+    rounds: 900,
+    roundWinRate: 50,
+    avgTricks: 1.7,
+    betSuccess: 55,
+  },
+  {
+    rank: 8,
+    name: 'CardShark',
+    elo: 1580,
+    peak: 1620,
+    games: 150,
+    wins: 78,
+    losses: 72,
+    winRate: 52,
+    tier: 'Silver',
+    rounds: 750,
+    roundWinRate: 48,
+    avgTricks: 1.6,
+    betSuccess: 52,
+  },
+  {
+    rank: 9,
+    name: 'NewPlayer',
+    elo: 1450,
+    peak: 1480,
+    games: 80,
+    wins: 40,
+    losses: 40,
+    winRate: 50,
+    tier: 'Bronze',
+    rounds: 400,
+    roundWinRate: 45,
+    avgTricks: 1.5,
+    betSuccess: 48,
+  },
+  {
+    rank: 10,
+    name: 'Beginner',
+    elo: 1350,
+    peak: 1380,
+    games: 40,
+    wins: 18,
+    losses: 22,
+    winRate: 45,
+    tier: 'Bronze',
+    rounds: 200,
+    roundWinRate: 42,
+    avgTricks: 1.4,
+    betSuccess: 45,
+  },
 ];
 
 const getTierColor = (tier: string) => {
   switch (tier) {
-    case 'Diamond': return 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200';
-    case 'Platinum': return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-200';
-    case 'Gold': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200';
-    case 'Silver': return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200';
-    case 'Bronze': return 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200';
-    default: return 'bg-gray-100 text-gray-600';
+    case 'Diamond':
+      return 'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-200';
+    case 'Platinum':
+      return 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-200';
+    case 'Gold':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200';
+    case 'Silver':
+      return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200';
+    case 'Bronze':
+      return 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-200';
+    default:
+      return 'bg-gray-100 text-gray-600';
   }
 };
 
 const getTierIcon = (tier: string) => {
   switch (tier) {
-    case 'Diamond': return '💎';
-    case 'Platinum': return '🏆';
-    case 'Gold': return '🥇';
-    case 'Silver': return '🥈';
-    case 'Bronze': return '🥉';
-    default: return '';
+    case 'Diamond':
+      return '💎';
+    case 'Platinum':
+      return '🏆';
+    case 'Gold':
+      return '🥇';
+    case 'Silver':
+      return '🥈';
+    case 'Bronze':
+      return '🥉';
+    default:
+      return '';
   }
 };
 
@@ -138,9 +290,7 @@ export const FullLeaderboard: Story = {
         <div className="space-y-4">
           {/* Toggle Button */}
           <div className="flex justify-center">
-            <Button variant="primary">
-              📊 Show Round Stats
-            </Button>
+            <Button variant="primary">📊 Show Round Stats</Button>
           </div>
 
           {/* Table Header */}
@@ -177,7 +327,9 @@ export const FullLeaderboard: Story = {
               </div>
 
               <div className="col-span-1 flex flex-col items-center justify-center">
-                <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{player.elo}</p>
+                <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+                  {player.elo}
+                </p>
                 <p className="text-xs text-gray-500">Peak: {player.peak}</p>
               </div>
 
@@ -186,11 +338,15 @@ export const FullLeaderboard: Story = {
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.winRate}%</p>
+                <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                  {player.winRate}%
+                </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.tier)}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.tier)}`}
+                >
                   {getTierIcon(player.tier)} {player.tier}
                 </span>
               </div>
@@ -251,9 +407,7 @@ export const RoundStatsView: Story = {
         <div className="space-y-4">
           {/* Toggle Button */}
           <div className="flex justify-center">
-            <Button variant="primary">
-              🏆 Show Game Stats
-            </Button>
+            <Button variant="primary">🏆 Show Game Stats</Button>
           </div>
 
           {/* Table Header - Round Stats */}
@@ -283,24 +437,33 @@ export const RoundStatsView: Story = {
               <div className="col-span-2 flex flex-col justify-center">
                 <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{player.name}</p>
                 <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {Math.round(player.rounds * player.roundWinRate / 100)}W - {Math.round(player.rounds * (100 - player.roundWinRate) / 100)}L
+                  {Math.round((player.rounds * player.roundWinRate) / 100)}W -{' '}
+                  {Math.round((player.rounds * (100 - player.roundWinRate)) / 100)}L
                 </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">{player.rounds}</p>
+                <p className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                  {player.rounds}
+                </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.roundWinRate}%</p>
+                <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                  {player.roundWinRate}%
+                </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-orange-600 dark:text-orange-400">{player.avgTricks}</p>
+                <p className="text-xl font-bold text-orange-600 dark:text-orange-400">
+                  {player.avgTricks}
+                </p>
               </div>
 
               <div className="col-span-1 flex items-center justify-center">
-                <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{player.betSuccess}%</p>
+                <p className="text-xl font-bold text-purple-600 dark:text-purple-400">
+                  {player.betSuccess}%
+                </p>
               </div>
             </div>
           ))}
@@ -334,19 +497,27 @@ export const TopThreeHighlight: Story = {
             </div>
             <div className="col-span-2">
               <p className="font-bold text-lg text-gray-900 dark:text-gray-100">{player.name}</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">{player.wins}W - {player.losses}L</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400">
+                {player.wins}W - {player.losses}L
+              </p>
             </div>
             <div className="col-span-1 text-center">
-              <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">{player.elo}</p>
+              <p className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+                {player.elo}
+              </p>
             </div>
             <div className="col-span-1 text-center">
               <p className="text-xl font-bold text-gray-700 dark:text-gray-300">{player.games}</p>
             </div>
             <div className="col-span-1 text-center">
-              <p className="text-xl font-bold text-green-600 dark:text-green-400">{player.winRate}%</p>
+              <p className="text-xl font-bold text-green-600 dark:text-green-400">
+                {player.winRate}%
+              </p>
             </div>
             <div className="col-span-1 flex items-center justify-center">
-              <span className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.tier)}`}>
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-bold ${getTierColor(player.tier)}`}
+              >
                 {getTierIcon(player.tier)} {player.tier}
               </span>
             </div>

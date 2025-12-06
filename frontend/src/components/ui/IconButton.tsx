@@ -35,7 +35,8 @@ import { sizes } from '../../config/layout';
 export type IconButtonVariant = 'circular' | 'square' | 'minimal' | 'header';
 export type IconButtonSize = 'sm' | 'md' | 'lg';
 
-export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
+export interface IconButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   /** Icon element to display */
   icon: ReactNode;
   /** Button shape */

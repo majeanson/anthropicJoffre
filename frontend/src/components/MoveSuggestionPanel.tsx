@@ -25,7 +25,8 @@ export function MoveSuggestionPanel({
   if (!isMyTurn) return null;
 
   // Check if there's a suggestion to show
-  const hasSuggestion = gameState.phase === 'betting' ||
+  const hasSuggestion =
+    gameState.phase === 'betting' ||
     (gameState.phase === 'playing' && suggestMove(gameState, currentPlayerId) !== null);
 
   if (!hasSuggestion) return null;
@@ -36,14 +37,14 @@ export function MoveSuggestionPanel({
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className="text-2xl" aria-hidden="true">💡</span>
+          <span className="text-2xl" aria-hidden="true">
+            💡
+          </span>
           <div className="flex-1">
             <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
               {suggestion.skip ? 'Consider Skipping' : `Suggested Bet: ${suggestion.amount} points`}
             </p>
-            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-              {suggestion.reason}
-            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">{suggestion.reason}</p>
             {isExpanded && suggestion.alternatives && (
               <p className="text-xs text-blue-700 dark:text-blue-300 mt-2 italic">
                 {suggestion.alternatives}
@@ -84,14 +85,15 @@ export function MoveSuggestionPanel({
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <span className="text-2xl" aria-hidden="true">🎯</span>
+          <span className="text-2xl" aria-hidden="true">
+            🎯
+          </span>
           <div className="flex-1">
             <p className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-              Suggested: <span className={getPriorityColor()}>{getCardDisplay(suggestion.card)}</span>
+              Suggested:{' '}
+              <span className={getPriorityColor()}>{getCardDisplay(suggestion.card)}</span>
             </p>
-            <p className="text-xs text-blue-600 dark:text-blue-400">
-              {suggestion.reason}
-            </p>
+            <p className="text-xs text-blue-600 dark:text-blue-400">{suggestion.reason}</p>
             {isExpanded && (
               <>
                 <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
@@ -111,7 +113,12 @@ export function MoveSuggestionPanel({
   };
 
   return (
-    <UICard variant="gradient" gradient="info" size="sm" className="border-2 border-blue-300 dark:border-blue-700">
+    <UICard
+      variant="gradient"
+      gradient="info"
+      size="sm"
+      className="border-2 border-blue-300 dark:border-blue-700"
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
           {gameState.phase === 'betting' && renderBettingSuggestion()}

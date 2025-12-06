@@ -40,9 +40,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       logger.debug('[Auth] Fetching current user with token');
       const response = await fetch(API_ENDPOINTS.authProfile(), {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        credentials: 'include' // Ensure cookies are sent
+        credentials: 'include', // Ensure cookies are sent
       });
 
       if (!response.ok) {
@@ -79,8 +79,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         method: 'POST',
         credentials: 'include', // Send httpOnly cookies
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
 
       if (!response.ok) {
@@ -89,7 +89,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (data.code === 'TOKEN_THEFT_DETECTED') {
           logger.warn('[Auth] Token theft detected! User must re-login', { code: data.code });
         }
-        logger.debug('[Auth] Refresh failed:', { status: response.status, error: data.error || 'Unknown error' });
+        logger.debug('[Auth] Refresh failed:', {
+          status: response.status,
+          error: data.error || 'Unknown error',
+        });
         throw new Error('Failed to refresh token');
       }
 
@@ -124,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetchWithCsrf(API_ENDPOINTS.authLogin(), {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       const result = await response.json();
@@ -154,7 +157,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetchWithCsrf(API_ENDPOINTS.authRegister(), {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
 
       const result = await response.json();
@@ -183,8 +186,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Call logout endpoint to revoke refresh token
     fetchWithCsrf(API_ENDPOINTS.authLogout(), {
-      method: 'POST'
-    }).catch(err => logger.error('Failed to revoke refresh token on logout', err));
+      method: 'POST',
+    }).catch((err) => logger.error('Failed to revoke refresh token on logout', err));
   }, []);
 
   // Clear error
@@ -200,9 +203,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await fetch(API_ENDPOINTS.userProfile(), {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
-        credentials: 'include'
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -219,39 +222,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Update user profile
   // Sprint 18: CSRF protection
-  const updateProfile = useCallback(async (data: ProfileUpdateData) => {
-    const token = getAccessToken();
-    if (!token) return;
+  const updateProfile = useCallback(
+    async (data: ProfileUpdateData) => {
+      const token = getAccessToken();
+      if (!token) return;
 
-    setError(null);
-    try {
-      const response = await fetchWithCsrf(API_ENDPOINTS.userProfile(), {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-      });
+      setError(null);
+      try {
+        const response = await fetchWithCsrf(API_ENDPOINTS.userProfile(), {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+        });
 
-      if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.error || 'Failed to update profile');
+        if (!response.ok) {
+          const result = await response.json();
+          throw new Error(result.error || 'Failed to update profile');
+        }
+
+        // Always refresh current user after profile update to show latest data
+        await fetchCurrentUser();
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to update profile';
+        setError(message);
+        throw err;
       }
-
-      // Always refresh current user after profile update to show latest data
-      await fetchCurrentUser();
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to update profile';
-      setError(message);
-      throw err;
-    }
-  }, [fetchCurrentUser]);
+    },
+    [fetchCurrentUser]
+  );
 
   // Load user on mount and initialize CSRF
   // Sprint 18: Initialize CSRF token cache on app load
   useEffect(() => {
     // Initialize CSRF token in parallel with user fetch
-    initializeCsrf().catch(err => logger.error('Failed to initialize CSRF token', err));
+    initializeCsrf().catch((err) => logger.error('Failed to initialize CSRF token', err));
 
     fetchCurrentUser();
   }, [fetchCurrentUser]);
@@ -305,7 +311,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     clearError,
     updateProfile,
     getUserProfile,
-    getAccessToken
+    getAccessToken,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

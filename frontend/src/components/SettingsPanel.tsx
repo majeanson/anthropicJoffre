@@ -42,10 +42,22 @@ export function SettingsPanel({
   onLeaveGame,
   onOpenRules,
   isSpectator = false,
-  connectionStats
+  connectionStats,
 }: SettingsPanelProps) {
   const { animationsEnabled, setAnimationsEnabled, beginnerMode, setBeginnerMode } = useSettings();
-  const { skinId, setSkin, availableSkins, cardSkinId, setCardSkin, availableCardSkins, isCardSkinUnlocked, getCardSkinRequiredLevel, isSkinUnlocked, getRequiredLevel, playerLevel } = useSkin();
+  const {
+    skinId,
+    setSkin,
+    availableSkins,
+    cardSkinId,
+    setCardSkin,
+    availableCardSkins,
+    isCardSkinUnlocked,
+    getCardSkinRequiredLevel,
+    isSkinUnlocked,
+    getRequiredLevel,
+    playerLevel,
+  } = useSkin();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
 
   if (!isOpen) return null;
@@ -72,7 +84,7 @@ export function SettingsPanel({
   ];
 
   // Convert skins to Select options with lock indicators
-  const skinOptions = availableSkins.map(skin => {
+  const skinOptions = availableSkins.map((skin) => {
     const isLocked = !isSkinUnlocked(skin.id);
     const requiredLevel = getRequiredLevel(skin.id);
     return {
@@ -83,7 +95,7 @@ export function SettingsPanel({
   });
 
   // Convert card skins to Select options with lock indicators
-  const cardSkinOptions = availableCardSkins.map(cardSkin => {
+  const cardSkinOptions = availableCardSkins.map((cardSkin) => {
     const isLocked = !isCardSkinUnlocked(cardSkin.id);
     const requiredLevel = getCardSkinRequiredLevel(cardSkin.id);
     return {
@@ -114,13 +126,19 @@ export function SettingsPanel({
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🎓</span>
-                  <span className="text-[var(--color-text-primary)] font-semibold">Beginner Mode</span>
+                  <span className="text-[var(--color-text-primary)] font-semibold">
+                    Beginner Mode
+                  </span>
                 </div>
                 <span className="text-xs text-[var(--color-text-muted)] ml-8">
                   Tutorial tips + 2x timeout (120s)
                 </span>
               </div>
-              <UIToggle enabled={beginnerMode} onChange={(v) => setBeginnerMode(v)} label="Beginner Mode" />
+              <UIToggle
+                enabled={beginnerMode}
+                onChange={(v) => setBeginnerMode(v)}
+                label="Beginner Mode"
+              />
             </div>
 
             {/* Autoplay Toggle */}
@@ -130,7 +148,11 @@ export function SettingsPanel({
                   <span className="text-2xl">{autoplayEnabled ? '⚡' : '🎮'}</span>
                   <span className="text-[var(--color-text-primary)] font-semibold">Autoplay</span>
                 </div>
-                <UIToggle enabled={autoplayEnabled} onChange={() => onAutoplayToggle()} label="Autoplay" />
+                <UIToggle
+                  enabled={autoplayEnabled}
+                  onChange={() => onAutoplayToggle()}
+                  label="Autoplay"
+                />
               </div>
             )}
 
@@ -193,7 +215,7 @@ export function SettingsPanel({
                 variant="arcane"
               />
               <p className="text-xs text-[var(--color-text-muted)] mt-2 ml-1">
-                {availableSkins.find(s => s.id === skinId)?.description}
+                {availableSkins.find((s) => s.id === skinId)?.description}
                 {playerLevel < 15 && (
                   <span className="block mt-1 text-[var(--color-text-accent)]">
                     Level up to unlock more visual themes!
@@ -218,7 +240,7 @@ export function SettingsPanel({
                 variant="arcane"
               />
               <p className="text-xs text-[var(--color-text-muted)] mt-2 ml-1">
-                {availableCardSkins.find(s => s.id === cardSkinId)?.description}
+                {availableCardSkins.find((s) => s.id === cardSkinId)?.description}
                 {playerLevel < 30 && (
                   <span className="block mt-1 text-[var(--color-text-accent)]">
                     Level up to unlock more card styles!
@@ -228,12 +250,19 @@ export function SettingsPanel({
             </div>
 
             {/* Animations Toggle */}
-            <div className="flex items-center justify-between" data-testid="settings-animations-pref">
+            <div
+              className="flex items-center justify-between"
+              data-testid="settings-animations-pref"
+            >
               <div className="flex items-center gap-2">
                 <span className="text-2xl">✨</span>
                 <span className="text-[var(--color-text-primary)] font-semibold">Animations</span>
               </div>
-              <UIToggle enabled={animationsEnabled} onChange={(v) => setAnimationsEnabled(v)} label="Animations" />
+              <UIToggle
+                enabled={animationsEnabled}
+                onChange={(v) => setAnimationsEnabled(v)}
+                label="Animations"
+              />
             </div>
 
             {/* Sound Toggle (if available) */}
@@ -320,23 +349,18 @@ export function SettingsPanel({
 
       {/* Settings Panel - Increased width for tabs, positioned above chat on mobile */}
       <div
-        className="fixed bottom-20 right-4 sm:bottom-4 md:bottom-6 md:right-6 border-2 rounded-lg shadow-2xl z-[10001] w-full sm:w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in"
-        style={{
-          backgroundColor: 'var(--color-bg-secondary)',
-          borderColor: 'var(--color-border-accent)',
-        }}
+        className="fixed bottom-20 right-4 sm:bottom-4 md:bottom-6 md:right-6 border-2 border-skin-accent rounded-lg shadow-2xl z-[10001] w-full sm:w-[420px] max-w-[calc(100vw-2rem)] animate-slide-in bg-skin-secondary"
         onClick={(e) => e.stopPropagation()}
         data-testid="settings-panel"
       >
         {/* Header */}
         <div
-          className="px-4 py-2 rounded-t-md border-b-2 flex items-center justify-between"
+          className="px-4 py-2 rounded-t-md border-b-2 border-skin-accent flex items-center justify-between"
           style={{
             background: `linear-gradient(to right, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 80%, var(--color-text-accent)))`,
-            borderColor: 'var(--color-border-accent)',
           }}
         >
-          <h2 className="font-bold text-lg flex items-center gap-2" style={{ color: 'var(--color-text-inverse)' }}>
+          <h2 className="font-bold text-lg flex items-center gap-2 text-skin-inverse">
             <span>⚙️</span>
             <span>Settings</span>
           </h2>
@@ -344,8 +368,7 @@ export function SettingsPanel({
             onClick={onClose}
             variant="ghost"
             size="sm"
-            className="hover:opacity-80"
-            style={{ color: 'var(--color-text-inverse)' }}
+            className="hover:opacity-80 text-skin-inverse"
             title="Close Settings"
             data-testid="settings-close-button"
           >
@@ -365,9 +388,7 @@ export function SettingsPanel({
         />
 
         {/* Tab Content */}
-        <div className="p-4 max-h-[400px] overflow-y-auto">
-          {renderTabContent()}
-        </div>
+        <div className="p-4 max-h-[400px] overflow-y-auto">{renderTabContent()}</div>
       </div>
     </>,
     document.body

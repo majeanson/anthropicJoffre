@@ -157,7 +157,9 @@ export const BettingValidation: Story = {
   name: 'Betting Validation',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-4 w-[400px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Betting Phase Messages</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Betting Phase Messages
+      </h3>
 
       <div className="space-y-3">
         <SmartValidationMessage
@@ -165,7 +167,9 @@ export const BettingValidation: Story = {
         />
 
         <SmartValidationMessage
-          messages={[{ type: 'warning', text: 'You are the dealer - you must bet if everyone skips' }]}
+          messages={[
+            { type: 'warning', text: 'You are the dealer - you must bet if everyone skips' },
+          ]}
         />
 
         <SmartValidationMessage
@@ -184,7 +188,9 @@ export const PlayingValidation: Story = {
   name: 'Playing Phase Validation',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] space-y-4 w-[400px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Playing Phase Messages</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Playing Phase Messages
+      </h3>
 
       <div className="space-y-3">
         <SmartValidationMessage
@@ -192,7 +198,7 @@ export const PlayingValidation: Story = {
         />
 
         <SmartValidationMessage
-          messages={[{ type: 'warning', text: 'This card won\'t beat the current leader' }]}
+          messages={[{ type: 'warning', text: "This card won't beat the current leader" }]}
         />
 
         <SmartValidationMessage
@@ -215,20 +221,27 @@ export const FixedHeight: Story = {
   name: 'Fixed Height (h-14)',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Fixed Height Consistency</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Fixed Height Consistency
+      </h3>
       <p className="text-[var(--color-text-secondary)] text-sm mb-4">
         All messages have the same height for stable UI
       </p>
 
       <div className="space-y-2">
+        <SmartValidationMessage messages={[{ type: 'error', text: 'Short error' }]} />
         <SmartValidationMessage
-          messages={[{ type: 'error', text: 'Short error' }]}
+          messages={[
+            { type: 'warning', text: 'This is a medium length warning message for testing' },
+          ]}
         />
         <SmartValidationMessage
-          messages={[{ type: 'warning', text: 'This is a medium length warning message for testing' }]}
-        />
-        <SmartValidationMessage
-          messages={[{ type: 'info', text: 'Very long informational message that demonstrates text handling in the component' }]}
+          messages={[
+            {
+              type: 'info',
+              text: 'Very long informational message that demonstrates text handling in the component',
+            },
+          ]}
         />
       </div>
     </div>

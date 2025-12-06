@@ -17,7 +17,11 @@ interface NotificationCenterProps {
   onJoinGame?: (gameId: string) => void;
 }
 
-export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: NotificationCenterProps) {
+export function NotificationCenter({
+  socket,
+  isAuthenticated,
+  onJoinGame,
+}: NotificationCenterProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
@@ -47,7 +51,7 @@ export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: Noti
     };
 
     const handleNotificationReceived = (notification: Notification) => {
-      setNotifications(prev => [notification, ...prev]);
+      setNotifications((prev) => [notification, ...prev]);
     };
 
     const handleCountUpdated = (count: number) => {
@@ -101,14 +105,22 @@ export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: Noti
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'achievement_unlocked': return '🏆';
-      case 'friend_request': return '👥';
-      case 'friend_request_accepted': return '🤝';
-      case 'friend_accepted': return '✅';
-      case 'game_invite': return '🎮';
-      case 'mention': return '💬';
-      case 'system': return '📢';
-      default: return '🔔';
+      case 'achievement_unlocked':
+        return '🏆';
+      case 'friend_request':
+        return '👥';
+      case 'friend_request_accepted':
+        return '🤝';
+      case 'friend_accepted':
+        return '✅';
+      case 'game_invite':
+        return '🎮';
+      case 'mention':
+        return '💬';
+      case 'system':
+        return '📢';
+      default:
+        return '🔔';
     }
   };
 
@@ -136,28 +148,22 @@ export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: Noti
 
       {/* Dropdown - Positioned above the floating button */}
       {isOpen && (
-        <UICard variant="elevated" size="md" className="absolute right-0 bottom-full mb-2 w-96 z-50 max-h-[600px] flex flex-col border-2">
+        <UICard
+          variant="elevated"
+          size="md"
+          className="absolute right-0 bottom-full mb-2 w-96 z-50 max-h-[600px] flex flex-col border-2"
+        >
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b-2 border-gray-200 dark:border-gray-600">
-            <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">
-              Notifications
-            </h3>
+            <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">Notifications</h3>
             <div className="flex gap-2">
               {unreadCount > 0 && (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleMarkAllAsRead}
-                >
+                <Button variant="primary" size="sm" onClick={handleMarkAllAsRead}>
                   Mark all read
                 </Button>
               )}
               {notifications.length > 0 && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleClearAll}
-                >
+                <Button variant="secondary" size="sm" onClick={handleClearAll}>
                   Clear all
                 </Button>
               )}
@@ -197,20 +203,22 @@ export function NotificationCenter({ socket, isAuthenticated, onJoinGame }: Noti
                         <p className="text-xs text-gray-500 dark:text-gray-500">
                           {formatTime(notification.created_at)}
                         </p>
-                        {notification.notification_type === 'game_invite' && notification.data?.game_id && onJoinGame && (
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleMarkAsRead(notification.notification_id);
-                              onJoinGame(notification.data!.game_id);
-                              setIsOpen(false);
-                            }}
-                          >
-                            Join Game
-                          </Button>
-                        )}
+                        {notification.notification_type === 'game_invite' &&
+                          notification.data?.game_id &&
+                          onJoinGame && (
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsRead(notification.notification_id);
+                                onJoinGame(notification.data!.game_id);
+                                setIsOpen(false);
+                              }}
+                            >
+                              Join Game
+                            </Button>
+                          )}
                       </div>
                     </div>
                   </div>

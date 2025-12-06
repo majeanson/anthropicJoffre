@@ -126,9 +126,7 @@ export function UISliderField({
   return (
     <div className="w-full">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-sm text-umber-700 dark:text-gray-300 font-medium">
-          {fieldLabel}
-        </span>
+        <span className="text-sm text-umber-700 dark:text-gray-300 font-medium">{fieldLabel}</span>
         {showValueLabel && valueLabelPosition === 'right' && (
           <span className="text-xs text-umber-600 dark:text-gray-400 tabular-nums">
             {valueDisplay}

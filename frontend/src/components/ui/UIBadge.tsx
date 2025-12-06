@@ -105,7 +105,7 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
   const sizeStyle = sizeStyles[size];
   const colorVar = colorVars[color];
 
-  // Get variant-specific styles
+  // Get variant-specific styles (dynamic colors and effects that require CSS variables)
   const getStyles = (): React.CSSProperties => {
     switch (variant) {
       case 'solid':
@@ -116,9 +116,6 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
         };
       case 'outline':
         return {
-          backgroundColor: 'transparent',
-          borderWidth: '1px',
-          borderStyle: 'solid',
           borderColor: colorVar,
           color: colorVar,
         };
@@ -130,8 +127,6 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
       case 'arcane':
         return {
           backgroundColor: `color-mix(in srgb, ${colorVar} 10%, var(--color-bg-secondary))`,
-          borderWidth: '1px',
-          borderStyle: 'solid',
           borderColor: colorVar,
           color: colorVar,
           boxShadow: `0 0 15px color-mix(in srgb, ${colorVar} 30%, transparent)`,
@@ -140,7 +135,6 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
         return {
           backgroundColor: `color-mix(in srgb, ${colorVar} 20%, transparent)`,
           color: colorVar,
-          backdropFilter: 'blur(4px)',
         };
       default:
         return {
@@ -161,6 +155,8 @@ export const UIBadge: React.FC<UIBadgeProps> = ({
         ${shape === 'pill' ? 'rounded-full' : 'rounded-[var(--radius-md)]'}
         ${pulse ? 'animate-pulse' : ''}
         ${variant === 'arcane' ? 'relative' : ''}
+        ${variant === 'outline' ? 'bg-transparent border border-solid' : ''}
+        ${variant === 'translucent' ? 'backdrop-blur-sm' : ''}
         ${className}
       `}
       style={getStyles()}

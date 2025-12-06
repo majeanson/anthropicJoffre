@@ -42,11 +42,11 @@ export function SideBetToast({ socket, playerName, enabled = true }: SideBetToas
       id: Math.random().toString(36).substr(2, 9),
       timestamp: Date.now(),
     };
-    setToasts(prev => [newToast, ...prev].slice(0, 3)); // Keep max 3 toasts
+    setToasts((prev) => [newToast, ...prev].slice(0, 3)); // Keep max 3 toasts
   }, []);
 
   const removeToast = useCallback((id: string) => {
-    setToasts(prev => prev.filter(t => t.id !== id));
+    setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
   useEffect(() => {
@@ -129,7 +129,7 @@ export function SideBetToast({ socket, playerName, enabled = true }: SideBetToas
   useEffect(() => {
     const timer = setInterval(() => {
       const now = Date.now();
-      setToasts(prev => prev.filter(t => now - t.timestamp < 5000));
+      setToasts((prev) => prev.filter((t) => now - t.timestamp < 5000));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
@@ -147,13 +147,14 @@ export function SideBetToast({ socket, playerName, enabled = true }: SideBetToas
             p-3 rounded-lg shadow-xl border
             min-w-[240px] max-w-[320px]
             backdrop-blur-sm
-            ${toast.type === 'won'
-              ? 'bg-gradient-to-r from-green-500/90 to-emerald-600/90 border-green-400/50 text-white'
-              : toast.type === 'lost'
-              ? 'bg-gradient-to-r from-red-500/80 to-red-600/80 border-red-400/50 text-white'
-              : toast.type === 'accepted'
-              ? 'bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/50 text-white'
-              : 'bg-[var(--color-bg-secondary)]/95 border-yellow-500/50 text-[var(--color-text-primary)]'
+            ${
+              toast.type === 'won'
+                ? 'bg-gradient-to-r from-green-500/90 to-emerald-600/90 border-green-400/50 text-white'
+                : toast.type === 'lost'
+                  ? 'bg-gradient-to-r from-red-500/80 to-red-600/80 border-red-400/50 text-white'
+                  : toast.type === 'accepted'
+                    ? 'bg-gradient-to-r from-blue-500/80 to-indigo-600/80 border-blue-400/50 text-white'
+                    : 'bg-[var(--color-bg-secondary)]/95 border-yellow-500/50 text-[var(--color-text-primary)]'
             }
           `}
           style={{
@@ -164,9 +165,13 @@ export function SideBetToast({ socket, playerName, enabled = true }: SideBetToas
           <div className="flex items-start gap-3">
             {/* Icon */}
             <span className="text-2xl flex-shrink-0">
-              {toast.type === 'won' ? '🏆' :
-               toast.type === 'lost' ? '💔' :
-               toast.type === 'accepted' ? '🤝' : '🎲'}
+              {toast.type === 'won'
+                ? '🏆'
+                : toast.type === 'lost'
+                  ? '💔'
+                  : toast.type === 'accepted'
+                    ? '🤝'
+                    : '🎲'}
             </span>
 
             <div className="flex-1 min-w-0">
@@ -182,7 +187,8 @@ export function SideBetToast({ socket, playerName, enabled = true }: SideBetToas
               {toast.coins && (
                 <div className="flex items-center gap-2 mt-1">
                   <span className="text-sm font-bold">
-                    {toast.type === 'won' ? '+' : ''}{toast.coins} 🪙
+                    {toast.type === 'won' ? '+' : ''}
+                    {toast.coins} 🪙
                   </span>
                   {toast.streakBonus && toast.streakBonus > 0 && (
                     <span className="text-xs bg-white/20 px-1.5 py-0.5 rounded">

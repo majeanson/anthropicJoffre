@@ -120,9 +120,7 @@ export const EmojiMode: Story = {
   name: 'Emoji Mode (Direct)',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
-        Direct emoji avatars
-      </h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Direct emoji avatars</h3>
       <div className="flex flex-wrap gap-4">
         <Avatar username="Player1" avatarUrl="🦊" size="lg" />
         <Avatar username="Player2" avatarUrl="🐼" size="lg" />
@@ -227,9 +225,11 @@ export const AllCategories: Story = {
           <span>🐾</span> Animals
         </h4>
         <div className="flex flex-wrap gap-3">
-          {['dog', 'cat', 'fox', 'lion', 'tiger', 'bear', 'panda', 'koala', 'wolf', 'dragon'].map(id => (
-            <Avatar key={id} username="User" avatarUrl={id} size="md" />
-          ))}
+          {['dog', 'cat', 'fox', 'lion', 'tiger', 'bear', 'panda', 'koala', 'wolf', 'dragon'].map(
+            (id) => (
+              <Avatar key={id} username="User" avatarUrl={id} size="md" />
+            )
+          )}
         </div>
       </div>
 
@@ -239,7 +239,18 @@ export const AllCategories: Story = {
           <span>🧙</span> Characters
         </h4>
         <div className="flex flex-wrap gap-3">
-          {['ninja', 'mage', 'superhero', 'detective', 'robot', 'alien', 'ghost', 'vampire', 'elf', 'fairy'].map(id => (
+          {[
+            'ninja',
+            'mage',
+            'superhero',
+            'detective',
+            'robot',
+            'alien',
+            'ghost',
+            'vampire',
+            'elf',
+            'fairy',
+          ].map((id) => (
             <Avatar key={id} username="User" avatarUrl={id} size="md" />
           ))}
         </div>
@@ -251,7 +262,18 @@ export const AllCategories: Story = {
           <span>💎</span> Objects
         </h4>
         <div className="flex flex-wrap gap-3">
-          {['crown', 'gem', 'trophy', 'medal', 'star', 'fire', 'lightning', 'rocket', 'sword', 'shield'].map(id => (
+          {[
+            'crown',
+            'gem',
+            'trophy',
+            'medal',
+            'star',
+            'fire',
+            'lightning',
+            'rocket',
+            'sword',
+            'shield',
+          ].map((id) => (
             <Avatar key={id} username="User" avatarUrl={id} size="md" />
           ))}
         </div>
@@ -263,7 +285,18 @@ export const AllCategories: Story = {
           <span>🌿</span> Nature
         </h4>
         <div className="flex flex-wrap gap-3">
-          {['sun', 'moon', 'rainbow', 'cloud', 'snowflake', 'tree', 'flower', 'rose', 'mushroom', 'volcano'].map(id => (
+          {[
+            'sun',
+            'moon',
+            'rainbow',
+            'cloud',
+            'snowflake',
+            'tree',
+            'flower',
+            'rose',
+            'mushroom',
+            'volcano',
+          ].map((id) => (
             <Avatar key={id} username="User" avatarUrl={id} size="md" />
           ))}
         </div>
@@ -275,7 +308,18 @@ export const AllCategories: Story = {
           <span>🍕</span> Food
         </h4>
         <div className="flex flex-wrap gap-3">
-          {['pizza', 'burger', 'taco', 'sushi', 'ramen', 'donut', 'cake', 'icecream', 'coffee', 'cookie'].map(id => (
+          {[
+            'pizza',
+            'burger',
+            'taco',
+            'sushi',
+            'ramen',
+            'donut',
+            'cake',
+            'icecream',
+            'coffee',
+            'cookie',
+          ].map((id) => (
             <Avatar key={id} username="User" avatarUrl={id} size="md" />
           ))}
         </div>
@@ -287,7 +331,18 @@ export const AllCategories: Story = {
           <span>⚽</span> Sports & Games
         </h4>
         <div className="flex flex-wrap gap-3">
-          {['soccer', 'basketball', 'baseball', 'football', 'tennis', 'bowling', 'gaming', 'chess', 'cards', 'target'].map(id => (
+          {[
+            'soccer',
+            'basketball',
+            'baseball',
+            'football',
+            'tennis',
+            'bowling',
+            'gaming',
+            'chess',
+            'cards',
+            'target',
+          ].map((id) => (
             <Avatar key={id} username="User" avatarUrl={id} size="md" />
           ))}
         </div>
@@ -312,17 +367,27 @@ export const PlayerList: Story = {
           { name: 'CrystalMage', avatar: 'mage', status: 'away' },
           { name: 'GhostHunter', avatar: 'ghost', status: 'offline' },
         ].map((player) => (
-          <div key={player.name} className="flex items-center gap-3 p-2 rounded-lg bg-[var(--color-bg-secondary)]">
+          <div
+            key={player.name}
+            className="flex items-center gap-3 p-2 rounded-lg bg-[var(--color-bg-secondary)]"
+          >
             <div className="relative">
               <Avatar username={player.name} avatarUrl={player.avatar} size="md" />
-              <span className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[var(--color-bg-secondary)] ${
-                player.status === 'online' ? 'bg-green-500' :
-                player.status === 'away' ? 'bg-yellow-500' : 'bg-gray-500'
-              }`} />
+              <span
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[var(--color-bg-secondary)] ${
+                  player.status === 'online'
+                    ? 'bg-green-500'
+                    : player.status === 'away'
+                      ? 'bg-yellow-500'
+                      : 'bg-gray-500'
+                }`}
+              />
             </div>
             <div>
               <p className="text-[var(--color-text-primary)] font-medium">{player.name}</p>
-              <p className="text-xs text-[var(--color-text-tertiary)] capitalize">{player.status}</p>
+              <p className="text-xs text-[var(--color-text-tertiary)] capitalize">
+                {player.status}
+              </p>
             </div>
           </div>
         ))}
@@ -335,7 +400,9 @@ export const GameLobby: Story = {
   name: 'Game Lobby Example',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Game Lobby - Team Selection</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Game Lobby - Team Selection
+      </h3>
       <div className="grid grid-cols-2 gap-6">
         {/* Team 1 */}
         <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/30">
@@ -381,10 +448,25 @@ export const LeaderboardEntry: Story = {
           { rank: 1, name: 'ChampionX', avatar: 'crown', wins: 142, color: 'text-yellow-400' },
           { rank: 2, name: 'ProGamer', avatar: 'trophy', wins: 128, color: 'text-gray-300' },
           { rank: 3, name: 'CardMaster', avatar: 'cards', wins: 115, color: 'text-amber-600' },
-          { rank: 4, name: 'LuckyDice', avatar: 'dice', wins: 98, color: 'text-[var(--color-text-secondary)]' },
-          { rank: 5, name: 'StarPlayer', avatar: 'star', wins: 87, color: 'text-[var(--color-text-secondary)]' },
+          {
+            rank: 4,
+            name: 'LuckyDice',
+            avatar: 'dice',
+            wins: 98,
+            color: 'text-[var(--color-text-secondary)]',
+          },
+          {
+            rank: 5,
+            name: 'StarPlayer',
+            avatar: 'star',
+            wins: 87,
+            color: 'text-[var(--color-text-secondary)]',
+          },
         ].map((player) => (
-          <div key={player.rank} className="flex items-center gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]">
+          <div
+            key={player.rank}
+            className="flex items-center gap-3 p-3 rounded-lg bg-[var(--color-bg-secondary)]"
+          >
             <span className={`w-6 text-center font-bold ${player.color}`}>#{player.rank}</span>
             <Avatar username={player.name} avatarUrl={player.avatar} size="sm" />
             <span className="text-[var(--color-text-primary)] flex-1">{player.name}</span>

@@ -140,10 +140,7 @@ export const ModalSelector: Story = {
         <NeonButton onClick={() => setIsOpen(true)} glow>
           Open Skin Selector
         </NeonButton>
-        <SkinSelectorModal
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-        />
+        <SkinSelectorModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       </div>
     );
   },
@@ -238,8 +235,12 @@ export const SettingsPageExample: Story = {
       </div>
 
       <div className="flex gap-3 pt-4">
-        <Button variant="ghost" fullWidth>Reset</Button>
-        <Button variant="primary" fullWidth>Save</Button>
+        <Button variant="ghost" fullWidth>
+          Reset
+        </Button>
+        <Button variant="primary" fullWidth>
+          Save
+        </Button>
       </div>
     </div>
   ),
@@ -296,9 +297,7 @@ export const WelcomeScreenExample: Story = {
           <h1 className="font-display text-[var(--color-text-primary)] text-2xl uppercase tracking-wider mb-2">
             Welcome to Jaffre
           </h1>
-          <p className="text-[var(--color-text-muted)] font-body">
-            Multiplayer trick card game
-          </p>
+          <p className="text-[var(--color-text-muted)] font-body">Multiplayer trick card game</p>
         </div>
 
         <div className="space-y-3">
@@ -310,10 +309,7 @@ export const WelcomeScreenExample: Story = {
           </p>
         </div>
 
-        <SkinSelectorModal
-          isOpen={showModal}
-          onClose={() => setShowModal(false)}
-        />
+        <SkinSelectorModal isOpen={showModal} onClose={() => setShowModal(false)} />
       </div>
     );
   },

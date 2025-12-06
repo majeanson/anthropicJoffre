@@ -8,12 +8,7 @@
 
 import { useEffect, useCallback, useRef, useState } from 'react';
 
-export type KeyboardContext =
-  | 'lobby'
-  | 'team_selection'
-  | 'betting'
-  | 'playing'
-  | 'global';
+export type KeyboardContext = 'lobby' | 'team_selection' | 'betting' | 'playing' | 'global';
 
 export interface KeyboardShortcut {
   key: string;
@@ -87,29 +82,28 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
   /**
    * Handle keyboard events
    */
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!enabled) return;
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!enabled) return;
 
-    // Don't intercept if user is typing in an input
-    const target = event.target as HTMLElement;
-    if (
-      target.tagName === 'INPUT' ||
-      target.tagName === 'TEXTAREA' ||
-      target.isContentEditable
-    ) {
-      return;
-    }
-
-    const key = getEventKey(event);
-    const shortcut = shortcutsRef.current.get(key);
-
-    if (shortcut) {
-      if (preventDefault) {
-        event.preventDefault();
+      // Don't intercept if user is typing in an input
+      const target = event.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        return;
       }
-      shortcut.action();
-    }
-  }, [enabled, preventDefault]);
+
+      const key = getEventKey(event);
+      const shortcut = shortcutsRef.current.get(key);
+
+      if (shortcut) {
+        if (preventDefault) {
+          event.preventDefault();
+        }
+        shortcut.action();
+      }
+    },
+    [enabled, preventDefault]
+  );
 
   /**
    * Register global keyboard event listener
@@ -125,15 +119,18 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
   /**
    * Helper to navigate list with arrow keys
    */
-  const navigateList = useCallback((direction: 'up' | 'down' | 'left' | 'right', maxIndex: number) => {
-    setFocusIndex(prev => {
-      if (direction === 'up' || direction === 'left') {
-        return Math.max(0, prev - 1);
-      } else {
-        return Math.min(maxIndex, prev + 1);
-      }
-    });
-  }, []);
+  const navigateList = useCallback(
+    (direction: 'up' | 'down' | 'left' | 'right', maxIndex: number) => {
+      setFocusIndex((prev) => {
+        if (direction === 'up' || direction === 'left') {
+          return Math.max(0, prev - 1);
+        } else {
+          return Math.min(maxIndex, prev + 1);
+        }
+      });
+    },
+    []
+  );
 
   /**
    * Reset focus index (useful when list changes)
@@ -157,11 +154,7 @@ export function useKeyboardNavigation(options: UseKeyboardNavigationOptions) {
  * Generate unique key for shortcut
  */
 function getShortcutKey(shortcut: KeyboardShortcut): string {
-  const modifiers = [
-    shortcut.ctrl && 'Ctrl',
-    shortcut.shift && 'Shift',
-    shortcut.alt && 'Alt',
-  ]
+  const modifiers = [shortcut.ctrl && 'Ctrl', shortcut.shift && 'Shift', shortcut.alt && 'Alt']
     .filter(Boolean)
     .join('+');
 
@@ -172,11 +165,7 @@ function getShortcutKey(shortcut: KeyboardShortcut): string {
  * Generate key string from keyboard event
  */
 function getEventKey(event: KeyboardEvent): string {
-  const modifiers = [
-    event.ctrlKey && 'Ctrl',
-    event.shiftKey && 'Shift',
-    event.altKey && 'Alt',
-  ]
+  const modifiers = [event.ctrlKey && 'Ctrl', event.shiftKey && 'Shift', event.altKey && 'Alt']
     .filter(Boolean)
     .join('+');
 

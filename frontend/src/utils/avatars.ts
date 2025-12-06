@@ -59,7 +59,14 @@ export const AVATARS: Avatar[] = [
   // ═══════════════════════════════════════════════════════════════════════════
   { id: 'unicorn', emoji: '🦄', name: 'Unicorn', category: 'mythical', unlockLevel: 15 },
   { id: 'dragon', emoji: '🐉', name: 'Dragon', category: 'mythical', unlockLevel: 18 },
-  { id: 'phoenix', emoji: '🔥', name: 'Phoenix', category: 'mythical', unlockLevel: 20, unlockDescription: 'The legendary firebird' },
+  {
+    id: 'phoenix',
+    emoji: '🔥',
+    name: 'Phoenix',
+    category: 'mythical',
+    unlockLevel: 20,
+    unlockDescription: 'The legendary firebird',
+  },
   { id: 'ghost', emoji: '👻', name: 'Ghost', category: 'mythical', unlockLevel: 22 },
   { id: 'alien', emoji: '👽', name: 'Alien', category: 'mythical', unlockLevel: 25 },
 
@@ -75,9 +82,30 @@ export const AVATARS: Avatar[] = [
   // ═══════════════════════════════════════════════════════════════════════════
   // SPECIAL AVATARS - Achievement/Event unlocks (not level-based)
   // ═══════════════════════════════════════════════════════════════════════════
-  { id: 'trophy', emoji: '🏆', name: 'Champion', category: 'special', unlockLevel: 999, unlockDescription: 'Win 100 games' },
-  { id: 'medal', emoji: '🏅', name: 'Medalist', category: 'special', unlockLevel: 999, unlockDescription: 'Complete all achievements' },
-  { id: 'rocket', emoji: '🚀', name: 'Rocket', category: 'special', unlockLevel: 999, unlockDescription: 'Play 500 games' },
+  {
+    id: 'trophy',
+    emoji: '🏆',
+    name: 'Champion',
+    category: 'special',
+    unlockLevel: 999,
+    unlockDescription: 'Win 100 games',
+  },
+  {
+    id: 'medal',
+    emoji: '🏅',
+    name: 'Medalist',
+    category: 'special',
+    unlockLevel: 999,
+    unlockDescription: 'Complete all achievements',
+  },
+  {
+    id: 'rocket',
+    emoji: '🚀',
+    name: 'Rocket',
+    category: 'special',
+    unlockLevel: 999,
+    unlockDescription: 'Play 500 games',
+  },
 ];
 
 /**
@@ -115,13 +143,48 @@ export interface SkinReward {
 }
 
 export const SKIN_REWARDS: SkinReward[] = [
-  { skinId: 'midnight-alchemy', name: 'Midnight Alchemy', unlockLevel: 0, description: 'Mystical alchemist aesthetic' },
-  { skinId: 'tavern-noir', name: 'Tavern Noir', unlockLevel: 0, description: 'Moody candlelit atmosphere' },
-  { skinId: 'modern-minimal', name: 'Modern Minimal', unlockLevel: 5, description: 'Clean, light interface' },
-  { skinId: 'classic-parchment', name: 'Classic Parchment', unlockLevel: 10, description: 'Traditional elegance' },
-  { skinId: 'modern-minimal-dark', name: 'Modern Dark', unlockLevel: 15, description: 'Sleek dark interface' },
-  { skinId: 'luxury-casino', name: 'Luxury Casino', unlockLevel: 25, description: 'Gold accents and velvet depth' },
-  { skinId: 'cyberpunk-neon', name: 'Cyberpunk Neon', unlockLevel: 40, description: 'Neon with glitch effects' },
+  {
+    skinId: 'midnight-alchemy',
+    name: 'Midnight Alchemy',
+    unlockLevel: 0,
+    description: 'Mystical alchemist aesthetic',
+  },
+  {
+    skinId: 'tavern-noir',
+    name: 'Tavern Noir',
+    unlockLevel: 0,
+    description: 'Moody candlelit atmosphere',
+  },
+  {
+    skinId: 'modern-minimal',
+    name: 'Modern Minimal',
+    unlockLevel: 5,
+    description: 'Clean, light interface',
+  },
+  {
+    skinId: 'classic-parchment',
+    name: 'Classic Parchment',
+    unlockLevel: 10,
+    description: 'Traditional elegance',
+  },
+  {
+    skinId: 'modern-minimal-dark',
+    name: 'Modern Dark',
+    unlockLevel: 15,
+    description: 'Sleek dark interface',
+  },
+  {
+    skinId: 'luxury-casino',
+    name: 'Luxury Casino',
+    unlockLevel: 25,
+    description: 'Gold accents and velvet depth',
+  },
+  {
+    skinId: 'cyberpunk-neon',
+    name: 'Cyberpunk Neon',
+    unlockLevel: 40,
+    description: 'Neon with glitch effects',
+  },
 ];
 
 // Keep CardBackReward as alias for backwards compatibility
@@ -136,35 +199,35 @@ export const CARD_BACK_REWARDS = SKIN_REWARDS;
  * Get avatar by ID
  */
 export function getAvatarById(id: string): Avatar | undefined {
-  return AVATARS.find(avatar => avatar.id === id);
+  return AVATARS.find((avatar) => avatar.id === id);
 }
 
 /**
  * Get avatars available to a player at a given level
  */
 export function getUnlockedAvatars(playerLevel: number): Avatar[] {
-  return AVATARS.filter(avatar => avatar.unlockLevel <= playerLevel);
+  return AVATARS.filter((avatar) => avatar.unlockLevel <= playerLevel);
 }
 
 /**
  * Get locked avatars (not yet available)
  */
 export function getLockedAvatars(playerLevel: number): Avatar[] {
-  return AVATARS.filter(avatar => avatar.unlockLevel > playerLevel);
+  return AVATARS.filter((avatar) => avatar.unlockLevel > playerLevel);
 }
 
 /**
  * Get avatars by category
  */
 export function getAvatarsByCategory(category: Avatar['category']): Avatar[] {
-  return AVATARS.filter(avatar => avatar.category === category);
+  return AVATARS.filter((avatar) => avatar.category === category);
 }
 
 /**
  * Get default avatars (always available)
  */
 export function getDefaultAvatars(): Avatar[] {
-  return AVATARS.filter(avatar => avatar.category === 'default');
+  return AVATARS.filter((avatar) => avatar.category === 'default');
 }
 
 /**
@@ -197,7 +260,7 @@ export function getAvatarUrl(avatarId: string): string {
  */
 export function getTitleForLevel(level: number): Title {
   // Find the highest title the player has unlocked
-  const unlocked = TITLES.filter(t => t.unlockLevel <= level);
+  const unlocked = TITLES.filter((t) => t.unlockLevel <= level);
   return unlocked[unlocked.length - 1] || TITLES[0];
 }
 
@@ -205,13 +268,17 @@ export function getTitleForLevel(level: number): Title {
  * Get next title to unlock
  */
 export function getNextTitle(level: number): Title | null {
-  return TITLES.find(t => t.unlockLevel > level) || null;
+  return TITLES.find((t) => t.unlockLevel > level) || null;
 }
 
 /**
  * Categories for filtering in UI
  */
-export const AVATAR_CATEGORIES: Array<{ id: Avatar['category']; name: string; description: string }> = [
+export const AVATAR_CATEGORIES: Array<{
+  id: Avatar['category'];
+  name: string;
+  description: string;
+}> = [
   { id: 'default', name: 'Starter', description: 'Available to all players' },
   { id: 'animals', name: 'Animals', description: 'Unlock through leveling' },
   { id: 'mythical', name: 'Mythical', description: 'Rare creatures' },
@@ -222,7 +289,10 @@ export const AVATAR_CATEGORIES: Array<{ id: Avatar['category']; name: string; de
 /**
  * Get all rewards a player will unlock at the next few levels
  */
-export function getUpcomingRewards(currentLevel: number, lookAhead: number = 5): {
+export function getUpcomingRewards(
+  currentLevel: number,
+  lookAhead: number = 5
+): {
   level: number;
   avatars: Avatar[];
   title: Title | null;
@@ -236,9 +306,9 @@ export function getUpcomingRewards(currentLevel: number, lookAhead: number = 5):
   }[] = [];
 
   for (let level = currentLevel + 1; level <= currentLevel + lookAhead; level++) {
-    const avatarsAtLevel = AVATARS.filter(a => a.unlockLevel === level);
-    const titleAtLevel = TITLES.find(t => t.unlockLevel === level) || null;
-    const skinsAtLevel = SKIN_REWARDS.filter(s => s.unlockLevel === level);
+    const avatarsAtLevel = AVATARS.filter((a) => a.unlockLevel === level);
+    const titleAtLevel = TITLES.find((t) => t.unlockLevel === level) || null;
+    const skinsAtLevel = SKIN_REWARDS.filter((s) => s.unlockLevel === level);
 
     if (avatarsAtLevel.length > 0 || titleAtLevel || skinsAtLevel.length > 0) {
       rewards.push({

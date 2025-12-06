@@ -75,7 +75,8 @@ export const CrossTeam: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Swap request from opposing team - shows warning that accepting will change your team',
+        story:
+          'Swap request from opposing team - shows warning that accepting will change your team',
       },
     },
   },

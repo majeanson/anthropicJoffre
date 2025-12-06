@@ -42,7 +42,9 @@ describe('QuickPlayPanel', () => {
   });
 
   it('shows correct description for each difficulty level', () => {
-    const { rerender } = renderWithProviders(<QuickPlayPanel {...defaultProps} botDifficulty="easy" />);
+    const { rerender } = renderWithProviders(
+      <QuickPlayPanel {...defaultProps} botDifficulty="easy" />
+    );
     expect(screen.getByText('Random play, good for beginners')).toBeInTheDocument();
 
     rerender(<QuickPlayPanel {...defaultProps} botDifficulty="medium" />);
@@ -92,7 +94,9 @@ describe('QuickPlayPanel', () => {
 
     const checkbox = screen.getByRole('checkbox');
     expect(checkbox).toBeDisabled();
-    expect(screen.getByText('🔒 Available when registered - Register to enable ranked mode')).toBeInTheDocument();
+    expect(
+      screen.getByText('🔒 Available when registered - Register to enable ranked mode')
+    ).toBeInTheDocument();
   });
 
   it('shows ranked badge when persistence is elo', () => {
@@ -106,10 +110,14 @@ describe('QuickPlayPanel', () => {
       created_at: '2025-01-01T00:00:00Z',
       last_login_at: null,
     };
-    renderWithProviders(<QuickPlayPanel {...defaultProps} quickPlayPersistence="elo" user={mockUser} />);
+    renderWithProviders(
+      <QuickPlayPanel {...defaultProps} quickPlayPersistence="elo" user={mockUser} />
+    );
 
     expect(screen.getByText('🏆 Ranked')).toBeInTheDocument();
-    expect(screen.getByText('Game will be saved to your profile and affect your ranking')).toBeInTheDocument();
+    expect(
+      screen.getByText('Game will be saved to your profile and affect your ranking')
+    ).toBeInTheDocument();
   });
 
   it('calls onQuickPlay with correct parameters when button is clicked', async () => {

@@ -156,15 +156,15 @@ export function getLevelTitle(level: number): string {
 export function getLevelColor(level: number): string {
   // Validate input
   const safeLevel = Math.max(1, Math.floor(level) || 1);
-  if (safeLevel >= 100) return 'text-red-500';       // Grandmaster - Red
-  if (safeLevel >= 75) return 'text-purple-500';     // Master - Purple
-  if (safeLevel >= 50) return 'text-yellow-400';     // Expert - Gold
-  if (safeLevel >= 35) return 'text-cyan-400';       // Veteran - Cyan
-  if (safeLevel >= 25) return 'text-blue-400';       // Adept - Blue
-  if (safeLevel >= 15) return 'text-green-400';      // Skilled - Green
-  if (safeLevel >= 10) return 'text-lime-400';       // Apprentice - Lime
-  if (safeLevel >= 5) return 'text-gray-300';        // Novice - Silver
-  return 'text-amber-700';                            // Beginner - Bronze
+  if (safeLevel >= 100) return 'text-red-500'; // Grandmaster - Red
+  if (safeLevel >= 75) return 'text-purple-500'; // Master - Purple
+  if (safeLevel >= 50) return 'text-yellow-400'; // Expert - Gold
+  if (safeLevel >= 35) return 'text-cyan-400'; // Veteran - Cyan
+  if (safeLevel >= 25) return 'text-blue-400'; // Adept - Blue
+  if (safeLevel >= 15) return 'text-green-400'; // Skilled - Green
+  if (safeLevel >= 10) return 'text-lime-400'; // Apprentice - Lime
+  if (safeLevel >= 5) return 'text-gray-300'; // Novice - Silver
+  return 'text-amber-700'; // Beginner - Bronze
 }
 
 /**

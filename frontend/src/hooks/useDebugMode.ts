@@ -38,19 +38,19 @@ export function useDebugMode(): UseDebugModeReturn {
   const [debugInfoOpen, setDebugInfoOpen] = useState<boolean>(false);
 
   const toggleDebugPanel = useCallback(() => {
-    setDebugPanelOpen(prev => !prev);
+    setDebugPanelOpen((prev) => !prev);
   }, []);
 
   const toggleTestPanel = useCallback(() => {
-    setTestPanelOpen(prev => !prev);
+    setTestPanelOpen((prev) => !prev);
   }, []);
 
   const toggleDebugMenu = useCallback(() => {
-    setDebugMenuOpen(prev => !prev);
+    setDebugMenuOpen((prev) => !prev);
   }, []);
 
   const toggleDebugInfo = useCallback(() => {
-    setDebugInfoOpen(prev => !prev);
+    setDebugInfoOpen((prev) => !prev);
   }, []);
 
   return {

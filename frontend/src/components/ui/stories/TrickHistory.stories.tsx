@@ -189,12 +189,7 @@ export const PointVariations: Story = {
         <p className="text-[var(--color-text-secondary)] text-sm mb-4">
           Normal (+1), Red Zero (+6), Brown Zero (-1)
         </p>
-        <TrickHistory
-          tricks={pointTricks}
-          players={mockPlayers}
-          trump="blue"
-          showWinner={true}
-        />
+        <TrickHistory tricks={pointTricks} players={mockPlayers} trump="blue" showWinner={true} />
       </div>
     );
   },
@@ -245,7 +240,9 @@ export const CurrentTrickHighlight: Story = {
   name: 'Current Trick Highlight',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[450px]">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Current Trick Highlight</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Current Trick Highlight
+      </h3>
       <p className="text-[var(--color-text-secondary)] text-sm mb-4">
         Trick 3 is highlighted as current (yellow border)
       </p>
@@ -300,12 +297,7 @@ export const TeamWinners: Story = {
         <p className="text-[var(--color-text-secondary)] text-sm mb-4">
           Alice & Charlie = Team 1 (Orange) | Bob & Diana = Team 2 (Purple)
         </p>
-        <TrickHistory
-          tricks={teamTricks}
-          players={mockPlayers}
-          trump="green"
-          showWinner={true}
-        />
+        <TrickHistory tricks={teamTricks} players={mockPlayers} trump="green" showWinner={true} />
       </div>
     );
   },
@@ -342,11 +334,7 @@ export const EmptyState: Story = {
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[400px]">
       <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">No Tricks Yet</h3>
-      <TrickHistory
-        tricks={[]}
-        players={mockPlayers}
-        trump="red"
-      />
+      <TrickHistory tricks={[]} players={mockPlayers} trump="red" />
     </div>
   ),
 };
@@ -411,7 +399,9 @@ export const FullRound: Story = {
 
     return (
       <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[450px] max-h-[600px] overflow-y-auto">
-        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Full Round (8 Tricks)</h3>
+        <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+          Full Round (8 Tricks)
+        </h3>
         <TrickHistory
           tricks={fullRoundTricks}
           players={mockPlayers}

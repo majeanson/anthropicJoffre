@@ -10,31 +10,17 @@ import { UICard, Button } from '../ui';
 export function PlayingPhaseFallback() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-900 via-gray-900 to-gray-800 flex items-center justify-center p-4">
-      <UICard
-        variant="elevated"
-        size="lg"
-        className="border-2 border-red-500 max-w-md text-center"
-      >
+      <UICard variant="elevated" size="lg" className="border-2 border-red-500 max-w-md text-center">
         <div className="text-6xl mb-4">🎮</div>
-        <h2 className="text-2xl font-bold text-white mb-4">
-          Game Error
-        </h2>
+        <h2 className="text-2xl font-bold text-white mb-4">Game Error</h2>
         <p className="text-gray-300 mb-6">
           Something went wrong during gameplay. Your game state should be preserved.
         </p>
         <div className="space-y-3">
-          <Button
-            onClick={() => window.location.reload()}
-            variant="success"
-            fullWidth
-          >
+          <Button onClick={() => window.location.reload()} variant="success" fullWidth>
             Reload Game
           </Button>
-          <Button
-            onClick={() => window.history.back()}
-            variant="secondary"
-            fullWidth
-          >
+          <Button onClick={() => window.history.back()} variant="secondary" fullWidth>
             Return to Lobby
           </Button>
         </div>

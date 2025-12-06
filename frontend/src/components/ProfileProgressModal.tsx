@@ -17,12 +17,26 @@ import { LevelProgressBar } from './LevelProgressBar';
 import { WeeklyCalendar, WeeklyCalendarDay } from './WeeklyCalendar';
 import { RewardsTab } from './RewardsTab';
 import { AchievementCard } from './AchievementCard';
-import { useSkin, useSpecialCardSkins, type SkinId, type CardSkinId } from '../contexts/SkinContext';
+import {
+  useSkin,
+  useSpecialCardSkins,
+  type SkinId,
+  type CardSkinId,
+} from '../contexts/SkinContext';
 import { rarityStyles, getUnlockRequirementText } from '../config/specialCardSkins';
 import { skinList, getSkinPricing } from '../config/skins';
 import { cardSkinList, getCardSkinPricing } from '../config/cardSkins';
 import { Card } from './Card';
-import { Button, ProgressBar, UIBadge, UICard, Select, Checkbox, LoadingState, EmptyState } from './ui';
+import {
+  Button,
+  ProgressBar,
+  UIBadge,
+  UICard,
+  Select,
+  Checkbox,
+  LoadingState,
+  EmptyState,
+} from './ui';
 import { AchievementProgress, AchievementCategory, AchievementTier } from '../types/achievements';
 
 export type TabId = 'overview' | 'quests' | 'calendar' | 'skins' | 'rewards' | 'achievements';
@@ -117,8 +131,12 @@ export function ProfileProgressModal({
   const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
   const [achievementsLoading, setAchievementsLoading] = useState(false);
   const [achievementPoints, setAchievementPoints] = useState(0);
-  const [achievementFilterCategory, setAchievementFilterCategory] = useState<AchievementCategory | 'all'>('all');
-  const [achievementFilterTier, setAchievementFilterTier] = useState<AchievementTier | 'all'>('all');
+  const [achievementFilterCategory, setAchievementFilterCategory] = useState<
+    AchievementCategory | 'all'
+  >('all');
+  const [achievementFilterTier, setAchievementFilterTier] = useState<AchievementTier | 'all'>(
+    'all'
+  );
   const [showUnlockedOnly, setShowUnlockedOnly] = useState(false);
 
   const {
@@ -171,13 +189,22 @@ export function ProfileProgressModal({
 
     // Request achievements
     setAchievementsLoading(true);
-    socket.emit('get_player_achievements', { playerName }, (response: { success: boolean; achievements?: AchievementProgress[]; points?: number; error?: string }) => {
-      if (response.success && response.achievements) {
-        setAchievements(response.achievements);
-        setAchievementPoints(response.points || 0);
+    socket.emit(
+      'get_player_achievements',
+      { playerName },
+      (response: {
+        success: boolean;
+        achievements?: AchievementProgress[];
+        points?: number;
+        error?: string;
+      }) => {
+        if (response.success && response.achievements) {
+          setAchievements(response.achievements);
+          setAchievementPoints(response.points || 0);
+        }
+        setAchievementsLoading(false);
       }
-      setAchievementsLoading(false);
-    });
+    );
 
     // Set up listeners
     const handleProgression = (data: PlayerProgression) => {
@@ -227,9 +254,7 @@ export function ProfileProgressModal({
             : quest
         )
       );
-      setQuestNotification(
-        `Claimed: +${data.rewards.xp} XP, +${data.rewards.currency} coins!`
-      );
+      setQuestNotification(`Claimed: +${data.rewards.xp} XP, +${data.rewards.currency} coins!`);
       setTimeout(() => setQuestNotification(null), 5000);
       setClaimingQuestId(null);
       // Refresh progression data
@@ -284,36 +309,46 @@ export function ProfileProgressModal({
     };
   }, [isOpen, socket, playerName, setCosmeticCurrency, setUnlockedSkinIds]);
 
-  const handleClaimWeeklyReward = useCallback((dayNumber: number) => {
-    if (!socket || !playerName) return;
-    setIsClaimingReward(true);
-    socket.emit('claim_weekly_reward', { playerName, dayNumber });
-  }, [socket, playerName]);
+  const handleClaimWeeklyReward = useCallback(
+    (dayNumber: number) => {
+      if (!socket || !playerName) return;
+      setIsClaimingReward(true);
+      socket.emit('claim_weekly_reward', { playerName, dayNumber });
+    },
+    [socket, playerName]
+  );
 
-  const handleClaimQuestReward = useCallback((questId: number) => {
-    if (!socket || claimingQuestId) return;
-    setClaimingQuestId(questId);
-    socket.emit('claim_quest_reward', { playerName, questId });
-  }, [socket, playerName, claimingQuestId]);
+  const handleClaimQuestReward = useCallback(
+    (questId: number) => {
+      if (!socket || claimingQuestId) return;
+      setClaimingQuestId(questId);
+      socket.emit('claim_quest_reward', { playerName, questId });
+    },
+    [socket, playerName, claimingQuestId]
+  );
 
   // Purchase skin handler
-  const handlePurchaseSkin = useCallback((skinIdToBuy: string, skinType: 'ui' | 'card') => {
-    if (!socket || isPurchasing) return;
+  const handlePurchaseSkin = useCallback(
+    (skinIdToBuy: string, skinType: 'ui' | 'card') => {
+      if (!socket || isPurchasing) return;
 
-    const pricing = skinType === 'ui'
-      ? getSkinPricing(skinIdToBuy as SkinId)
-      : getCardSkinPricing(skinIdToBuy as CardSkinId);
+      const pricing =
+        skinType === 'ui'
+          ? getSkinPricing(skinIdToBuy as SkinId)
+          : getCardSkinPricing(skinIdToBuy as CardSkinId);
 
-    if (pricing.price <= 0) return; // Can't purchase free skins
+      if (pricing.price <= 0) return; // Can't purchase free skins
 
-    setIsPurchasing(true);
-    setPurchaseError(null);
-    socket.emit('purchase_skin', {
-      skinId: skinIdToBuy,
-      price: pricing.price,
-      skinType,
-    });
-  }, [socket, isPurchasing]);
+      setIsPurchasing(true);
+      setPurchaseError(null);
+      socket.emit('purchase_skin', {
+        skinId: skinIdToBuy,
+        price: pricing.price,
+        skinType,
+      });
+    },
+    [socket, isPurchasing]
+  );
 
   // Stop preview when modal closes
   useEffect(() => {
@@ -336,58 +371,38 @@ export function ProfileProgressModal({
   // Use portal to ensure modal renders at document.body level, avoiding stacking context issues
   return createPortal(
     <div
-      className="fixed inset-0 flex items-center justify-center z-[10000]"
-      style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+      className="fixed inset-0 flex items-center justify-center z-[10000] bg-black/60"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl"
-        style={{
-          backgroundColor: 'var(--color-bg-primary)',
-          border: '1px solid var(--color-border-subtle)',
-        }}
+        className="w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-xl shadow-2xl bg-skin-primary border border-skin-subtle"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div
-          className="flex items-center justify-between p-4 border-b"
-          style={{ borderColor: 'var(--color-border-subtle)' }}
-        >
-          <h2
-            className="text-xl font-bold"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
-            {playerName}'s Progress
-          </h2>
+        <div className="flex items-center justify-between p-4 border-b border-skin-subtle">
+          <h2 className="text-xl font-bold text-skin-primary">{playerName}'s Progress</h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-500/20 transition-colors"
-            style={{ color: 'var(--color-text-secondary)' }}
+            className="p-2 rounded-full hover:bg-gray-500/20 transition-colors text-skin-secondary"
           >
             ✕
           </button>
         </div>
 
         {/* Tabs */}
-        <div
-          className="flex border-b"
-          style={{ borderColor: 'var(--color-border-subtle)' }}
-        >
+        <div className="flex border-b border-skin-subtle">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`
                 flex-1 py-3 px-4 text-sm font-medium transition-colors
-                ${activeTab === tab.id
-                  ? 'border-b-2'
-                  : 'hover:bg-gray-500/10'
+                ${
+                  activeTab === tab.id
+                    ? 'border-b-2 text-skin-accent border-skin-accent'
+                    : 'hover:bg-gray-500/10 text-skin-secondary border-transparent'
                 }
               `}
-              style={{
-                color: activeTab === tab.id ? 'var(--color-text-accent)' : 'var(--color-text-secondary)',
-                borderColor: activeTab === tab.id ? 'var(--color-text-accent)' : 'transparent',
-              }}
             >
               <span className="mr-1">{tab.icon}</span>
               <span className="hidden sm:inline">{tab.label}</span>
@@ -397,6 +412,8 @@ export function ProfileProgressModal({
 
         {/* Content */}
         <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 140px)' }}>
+          {' '}
+          {/* Dynamic calculation required */}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin text-2xl">⌛</div>
@@ -428,11 +445,7 @@ export function ProfileProgressModal({
                       value={progression.streak.longestStreak}
                       suffix="days"
                     />
-                    <StatCard
-                      icon="💰"
-                      label="Coins"
-                      value={progression.cosmeticCurrency}
-                    />
+                    <StatCard icon="💰" label="Coins" value={progression.cosmeticCurrency} />
                     <StatCard
                       icon="🎨"
                       label="Skins"
@@ -442,28 +455,23 @@ export function ProfileProgressModal({
                   </div>
 
                   {/* Quest Summary */}
-                  <div
-                    className="p-4 rounded-lg"
-                    style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-                  >
-                    <h3
-                      className="font-semibold mb-3"
-                      style={{ color: 'var(--color-text-primary)' }}
-                    >
-                      Quest Summary
-                    </h3>
+                  <div className="p-4 rounded-lg bg-skin-secondary">
+                    <h3 className="font-semibold mb-3 text-skin-primary">Quest Summary</h3>
                     <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div style={{ color: 'var(--color-text-secondary)' }}>
-                        Quests Completed Today: <strong>{progression.questStats.questsCompletedToday}/3</strong>
+                      <div className="text-skin-secondary">
+                        Quests Completed Today:{' '}
+                        <strong>{progression.questStats.questsCompletedToday}/3</strong>
                       </div>
-                      <div style={{ color: 'var(--color-text-secondary)' }}>
-                        Total Completed: <strong>{progression.questStats.totalQuestsCompleted}</strong>
+                      <div className="text-skin-secondary">
+                        Total Completed:{' '}
+                        <strong>{progression.questStats.totalQuestsCompleted}</strong>
                       </div>
-                      <div style={{ color: 'var(--color-text-secondary)' }}>
+                      <div className="text-skin-secondary">
                         XP from Quests: <strong>{progression.questStats.totalXpEarned}</strong>
                       </div>
-                      <div style={{ color: 'var(--color-text-secondary)' }}>
-                        Coins from Quests: <strong>{progression.questStats.totalCurrencyEarned}</strong>
+                      <div className="text-skin-secondary">
+                        Coins from Quests:{' '}
+                        <strong>{progression.questStats.totalCurrencyEarned}</strong>
                       </div>
                     </div>
                   </div>
@@ -475,28 +483,21 @@ export function ProfileProgressModal({
                 <div className="space-y-4">
                   {/* Achievements summary */}
                   {(() => {
-                    const unlockedCount = achievements.filter(a => a.is_unlocked).length;
+                    const unlockedCount = achievements.filter((a) => a.is_unlocked).length;
                     const totalCount = achievements.length;
-                    const completionPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+                    const completionPercent =
+                      totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
 
                     return (
                       <>
-                        <div
-                          className="p-4 rounded-lg"
-                          style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-                        >
+                        <div className="p-4 rounded-lg bg-skin-secondary">
                           <div className="flex items-center justify-between mb-3">
-                            <h3
-                              className="font-semibold"
-                              style={{ color: 'var(--color-text-primary)' }}
-                            >
+                            <h3 className="font-semibold text-skin-primary">
                               🏆 Achievement Progress
                             </h3>
-                            <span
-                              className="text-sm font-bold"
-                              style={{ color: 'var(--color-text-accent)' }}
-                            >
-                              {unlockedCount}/{totalCount} ({completionPercent}%) • {achievementPoints} pts
+                            <span className="text-sm font-bold text-skin-accent">
+                              {unlockedCount}/{totalCount} ({completionPercent}%) •{' '}
+                              {achievementPoints} pts
                             </span>
                           </div>
                           <ProgressBar
@@ -514,7 +515,11 @@ export function ProfileProgressModal({
                             <Select
                               label="Category"
                               value={achievementFilterCategory}
-                              onChange={(e) => setAchievementFilterCategory(e.target.value as AchievementCategory | 'all')}
+                              onChange={(e) =>
+                                setAchievementFilterCategory(
+                                  e.target.value as AchievementCategory | 'all'
+                                )
+                              }
                               size="sm"
                               options={[
                                 { value: 'all', label: 'All' },
@@ -527,7 +532,9 @@ export function ProfileProgressModal({
                             <Select
                               label="Tier"
                               value={achievementFilterTier}
-                              onChange={(e) => setAchievementFilterTier(e.target.value as AchievementTier | 'all')}
+                              onChange={(e) =>
+                                setAchievementFilterTier(e.target.value as AchievementTier | 'all')
+                              }
                               size="sm"
                               options={[
                                 { value: 'all', label: 'All' },
@@ -549,34 +556,44 @@ export function ProfileProgressModal({
                         {/* Achievements grid */}
                         {achievementsLoading ? (
                           <LoadingState message="Loading achievements..." card />
-                        ) : (() => {
-                          const filteredAchievements = achievements.filter(achievement => {
-                            if (achievementFilterCategory !== 'all' && achievement.category !== achievementFilterCategory) return false;
-                            if (achievementFilterTier !== 'all' && achievement.tier !== achievementFilterTier) return false;
-                            if (showUnlockedOnly && !achievement.is_unlocked) return false;
-                            return true;
-                          });
+                        ) : (
+                          (() => {
+                            const filteredAchievements = achievements.filter((achievement) => {
+                              if (
+                                achievementFilterCategory !== 'all' &&
+                                achievement.category !== achievementFilterCategory
+                              )
+                                return false;
+                              if (
+                                achievementFilterTier !== 'all' &&
+                                achievement.tier !== achievementFilterTier
+                              )
+                                return false;
+                              if (showUnlockedOnly && !achievement.is_unlocked) return false;
+                              return true;
+                            });
 
-                          return filteredAchievements.length === 0 ? (
-                            <EmptyState
-                              icon="🏆"
-                              title="No achievements found"
-                              description="No achievements match your current filters"
-                              card
-                              compact
-                            />
-                          ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {filteredAchievements.map((achievement) => (
-                                <AchievementCard
-                                  key={achievement.achievement_id}
-                                  achievement={achievement}
-                                  size="medium"
-                                />
-                              ))}
-                            </div>
-                          );
-                        })()}
+                            return filteredAchievements.length === 0 ? (
+                              <EmptyState
+                                icon="🏆"
+                                title="No achievements found"
+                                description="No achievements match your current filters"
+                                card
+                                compact
+                              />
+                            ) : (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {filteredAchievements.map((achievement) => (
+                                  <AchievementCard
+                                    key={achievement.achievement_id}
+                                    achievement={achievement}
+                                    size="medium"
+                                  />
+                                ))}
+                              </div>
+                            );
+                          })()
+                        )}
                       </>
                     );
                   })()}
@@ -598,41 +615,31 @@ export function ProfileProgressModal({
                 <div className="space-y-4">
                   {/* Notification */}
                   {questNotification && (
-                    <UICard variant="gradient" gradient="success" size="sm" className="text-center animate-pulse">
+                    <UICard
+                      variant="gradient"
+                      gradient="success"
+                      size="sm"
+                      className="text-center animate-pulse"
+                    >
                       <p className="text-green-900 dark:text-white">{questNotification}</p>
                     </UICard>
                   )}
 
                   {/* Quest summary */}
-                  <div
-                    className="p-4 rounded-lg"
-                    style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-                  >
+                  <div className="p-4 rounded-lg bg-skin-secondary">
                     <div className="flex items-center justify-between mb-3">
-                      <h3
-                        className="font-semibold"
-                        style={{ color: 'var(--color-text-primary)' }}
-                      >
-                        Today's Progress
-                      </h3>
-                      <span
-                        className="text-sm font-bold"
-                        style={{ color: 'var(--color-text-accent)' }}
-                      >
-                        {quests.filter(q => q.completed).length}/{quests.length}
+                      <h3 className="font-semibold text-skin-primary">Today's Progress</h3>
+                      <span className="text-sm font-bold text-skin-accent">
+                        {quests.filter((q) => q.completed).length}/{quests.length}
                       </span>
                     </div>
 
                     {/* Progress bar */}
-                    <div
-                      className="h-2 rounded-full overflow-hidden"
-                      style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-                    >
+                    <div className="h-2 rounded-full overflow-hidden bg-skin-tertiary">
                       <div
-                        className="h-full rounded-full transition-all duration-300"
+                        className="h-full rounded-full transition-all duration-300 bg-skin-accent"
                         style={{
-                          width: `${quests.length > 0 ? (quests.filter(q => q.completed).length / quests.length) * 100 : 0}%`,
-                          backgroundColor: 'var(--color-text-accent)',
+                          width: `${quests.length > 0 ? (quests.filter((q) => q.completed).length / quests.length) * 100 : 0}%`,
                         }}
                       />
                     </div>
@@ -642,8 +649,8 @@ export function ProfileProgressModal({
                   {quests.length === 0 ? (
                     <div className="text-center py-8">
                       <p className="text-xl mb-2">📋</p>
-                      <p style={{ color: 'var(--color-text-muted)' }}>No quests available</p>
-                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Check back tomorrow for new quests!</p>
+                      <p className="text-skin-muted">No quests available</p>
+                      <p className="text-xs text-skin-muted">Check back tomorrow for new quests!</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -664,10 +671,10 @@ export function ProfileProgressModal({
                               <div className="flex items-center gap-3">
                                 <span className="text-2xl">{quest.template.icon}</span>
                                 <div>
-                                  <h3 className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                                  <h3 className="font-semibold text-skin-primary">
                                     {quest.template.name}
                                   </h3>
-                                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                                  <p className="text-sm text-skin-muted">
                                     {quest.template.description}
                                   </p>
                                 </div>
@@ -678,8 +685,8 @@ export function ProfileProgressModal({
                                   quest.template.quest_type === 'easy'
                                     ? 'success'
                                     : quest.template.quest_type === 'medium'
-                                    ? 'warning'
-                                    : 'error'
+                                      ? 'warning'
+                                      : 'error'
                                 }
                                 size="sm"
                               >
@@ -704,14 +711,14 @@ export function ProfileProgressModal({
                             <div className="flex items-center justify-between">
                               <div className="flex gap-4 text-sm">
                                 <div className="flex items-center gap-1">
-                                  <span style={{ color: 'var(--color-info)' }}>⭐</span>
-                                  <span style={{ color: 'var(--color-text-secondary)' }}>
+                                  <span className="text-skin-info">⭐</span>
+                                  <span className="text-skin-secondary">
                                     {quest.template.reward_xp} XP
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <span style={{ color: 'var(--color-warning)' }}>💰</span>
-                                  <span style={{ color: 'var(--color-text-secondary)' }}>
+                                  <span className="text-skin-warning">💰</span>
+                                  <span className="text-skin-secondary">
                                     {quest.template.reward_currency} coins
                                   </span>
                                 </div>
@@ -728,9 +735,11 @@ export function ProfileProgressModal({
                                   {claimingQuestId === quest.id ? 'Claiming...' : 'Claim'}
                                 </Button>
                               ) : quest.reward_claimed ? (
-                                <span style={{ color: 'var(--color-success)' }} className="font-semibold text-sm">✓ Claimed</span>
+                                <span className="font-semibold text-sm text-skin-success">
+                                  ✓ Claimed
+                                </span>
                               ) : (
-                                <span style={{ color: 'var(--color-text-muted)' }} className="text-sm">In Progress</span>
+                                <span className="text-sm text-skin-muted">In Progress</span>
                               )}
                             </div>
                           </UICard>
@@ -739,10 +748,7 @@ export function ProfileProgressModal({
                     </div>
                   )}
 
-                  <p
-                    className="text-xs text-center"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
+                  <p className="text-xs text-center text-skin-muted">
                     New quests available daily at midnight UTC
                   </p>
                 </div>
@@ -763,18 +769,15 @@ export function ProfileProgressModal({
               {activeTab === 'skins' && progression && (
                 <div className="space-y-6">
                   {/* Balance and status bar */}
-                  <div
-                    className="flex items-center justify-between p-3 rounded-lg"
-                    style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-                  >
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-skin-secondary">
                     <div>
-                      <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                        Level: <strong style={{ color: 'var(--color-text-primary)' }}>{progression.level}</strong>
+                      <p className="text-xs text-skin-muted">
+                        Level: <strong className="text-skin-primary">{progression.level}</strong>
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span style={{ color: 'var(--color-warning)' }}>💰</span>
-                      <span className="font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                      <span className="text-skin-warning">💰</span>
+                      <span className="font-bold text-skin-primary">
                         {progression.cosmeticCurrency.toLocaleString()}
                       </span>
                     </div>
@@ -821,21 +824,53 @@ export function ProfileProgressModal({
                         </div>
                       </div>
                       <div className="text-xs text-blue-200 space-y-1">
-                        {previewSkinId && <div>UI Theme: <span className="text-white">{skinList.find(s => s.id === previewSkinId)?.name || previewSkinId}</span></div>}
-                        {previewCardSkinId && <div>Card Style: <span className="text-white">{cardSkinList.find(s => s.id === previewCardSkinId)?.name || previewCardSkinId}</span></div>}
-                        {previewSpecialSkins?.redZeroSkin && previewSpecialSkins.redZeroSkin !== equippedSpecialSkins.redZeroSkin && (
-                          <div>Red Zero: <span className="text-white">{redZeroSkins.find(s => s.skinId === previewSpecialSkins.redZeroSkin)?.skinName || previewSpecialSkins.redZeroSkin}</span></div>
+                        {previewSkinId && (
+                          <div>
+                            UI Theme:{' '}
+                            <span className="text-white">
+                              {skinList.find((s) => s.id === previewSkinId)?.name || previewSkinId}
+                            </span>
+                          </div>
                         )}
-                        {previewSpecialSkins?.brownZeroSkin && previewSpecialSkins.brownZeroSkin !== equippedSpecialSkins.brownZeroSkin && (
-                          <div>Brown Zero: <span className="text-white">{brownZeroSkins.find(s => s.skinId === previewSpecialSkins.brownZeroSkin)?.skinName || previewSpecialSkins.brownZeroSkin}</span></div>
+                        {previewCardSkinId && (
+                          <div>
+                            Card Style:{' '}
+                            <span className="text-white">
+                              {cardSkinList.find((s) => s.id === previewCardSkinId)?.name ||
+                                previewCardSkinId}
+                            </span>
+                          </div>
                         )}
+                        {previewSpecialSkins?.redZeroSkin &&
+                          previewSpecialSkins.redZeroSkin !== equippedSpecialSkins.redZeroSkin && (
+                            <div>
+                              Red Zero:{' '}
+                              <span className="text-white">
+                                {redZeroSkins.find(
+                                  (s) => s.skinId === previewSpecialSkins.redZeroSkin
+                                )?.skinName || previewSpecialSkins.redZeroSkin}
+                              </span>
+                            </div>
+                          )}
+                        {previewSpecialSkins?.brownZeroSkin &&
+                          previewSpecialSkins.brownZeroSkin !==
+                            equippedSpecialSkins.brownZeroSkin && (
+                            <div>
+                              Brown Zero:{' '}
+                              <span className="text-white">
+                                {brownZeroSkins.find(
+                                  (s) => s.skinId === previewSpecialSkins.brownZeroSkin
+                                )?.skinName || previewSpecialSkins.brownZeroSkin}
+                              </span>
+                            </div>
+                          )}
                       </div>
                     </div>
                   )}
 
                   {/* Combined Live Preview - Shows both card fronts AND backs */}
-                  <div className="p-4 rounded-lg bg-[var(--color-bg-tertiary)] border border-[var(--color-border-subtle)]">
-                    <p className="text-xs text-[var(--color-text-muted)] mb-3 text-center uppercase tracking-wider">
+                  <div className="p-4 rounded-lg bg-skin-tertiary border border-skin-subtle">
+                    <p className="text-xs text-skin-muted mb-3 text-center uppercase tracking-wider">
                       👁️ Live Preview (Cards & Backs)
                     </p>
                     <div className="flex flex-col items-center gap-3">
@@ -854,23 +889,17 @@ export function ProfileProgressModal({
                         <Card card={{ color: 'brown', value: 0 }} size="small" />
                       </div>
                     </div>
-                    <p className="text-xs text-[var(--color-text-muted)] mt-3 text-center">
+                    <p className="text-xs text-skin-muted mt-3 text-center">
                       Top: Card fronts • Bottom: Card backs & special cards
                     </p>
                   </div>
 
                   {/* Card Skins Section */}
                   <div>
-                    <h3
-                      className="font-semibold mb-3 flex items-center gap-2"
-                      style={{ color: 'var(--color-text-primary)' }}
-                    >
+                    <h3 className="font-semibold mb-3 flex items-center gap-2 text-skin-primary">
                       <span>🃏</span> Card Skins
                     </h3>
-                    <p
-                      className="text-xs mb-3"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
+                    <p className="text-xs mb-3 text-skin-muted">
                       Click to preview. Mix and match across all skin types!
                     </p>
 
@@ -878,7 +907,9 @@ export function ProfileProgressModal({
                       {cardSkinList.map((cardSkinItem) => {
                         const pricing = getCardSkinPricing(cardSkinItem.id);
                         // A skin is unlocked if: it's free (price 0) OR player has purchased it
-                        const isUnlocked = pricing.price === 0 || progression.unlockedSkins.includes(cardSkinItem.id);
+                        const isUnlocked =
+                          pricing.price === 0 ||
+                          progression.unlockedSkins.includes(cardSkinItem.id);
                         const isActive = cardSkinId === cardSkinItem.id;
                         const isPreviewing = previewCardSkinId === cardSkinItem.id;
                         const canAfford = progression.cosmeticCurrency >= pricing.price;
@@ -887,18 +918,15 @@ export function ProfileProgressModal({
                           <div
                             key={cardSkinItem.id}
                             className={`
-                              relative p-3 rounded-lg text-left transition-all cursor-pointer
-                              ${isActive
-                                ? 'ring-2 ring-blue-500'
-                                : isPreviewing
-                                  ? 'ring-2 ring-purple-500'
-                                  : 'hover:ring-1 hover:ring-purple-500/50'
+                              relative p-3 rounded-lg text-left transition-all cursor-pointer bg-skin-secondary border
+                              ${
+                                isActive
+                                  ? 'ring-2 ring-blue-500 border-skin-accent'
+                                  : isPreviewing
+                                    ? 'ring-2 ring-purple-500 border-purple-500'
+                                    : 'hover:ring-1 hover:ring-purple-500/50 border-skin-subtle'
                               }
                             `}
-                            style={{
-                              backgroundColor: 'var(--color-bg-secondary)',
-                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
-                            }}
                             onClick={() => startPreviewCardSkin(cardSkinItem.id)}
                           >
                             {/* Preview gradient with mini cards */}
@@ -911,7 +939,10 @@ export function ProfileProgressModal({
                                   key={idx}
                                   className="w-6 h-9 rounded text-white font-bold text-xs flex items-center justify-center"
                                   style={{
-                                    backgroundColor: cardSkinItem.suits[['red', 'blue', 'green'][idx] as 'red' | 'blue' | 'green'].color,
+                                    backgroundColor:
+                                      cardSkinItem.suits[
+                                        ['red', 'blue', 'green'][idx] as 'red' | 'blue' | 'green'
+                                      ].color,
                                     fontFamily: cardSkinItem.fontFamily,
                                   }}
                                 >
@@ -921,16 +952,10 @@ export function ProfileProgressModal({
                             </div>
 
                             {/* Skin info */}
-                            <h4
-                              className="font-medium text-sm"
-                              style={{ color: 'var(--color-text-primary)' }}
-                            >
+                            <h4 className="font-medium text-sm text-skin-primary">
                               {cardSkinItem.name}
                             </h4>
-                            <p
-                              className="text-xs line-clamp-1 mb-2"
-                              style={{ color: 'var(--color-text-muted)' }}
-                            >
+                            <p className="text-xs line-clamp-1 mb-2 text-skin-muted">
                               {cardSkinItem.description}
                             </p>
 
@@ -950,9 +975,7 @@ export function ProfileProgressModal({
                                       Select
                                     </button>
                                   )}
-                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                                    ✓ Owned
-                                  </span>
+                                  <span className="text-xs text-skin-muted">✓ Owned</span>
                                 </>
                               ) : (
                                 <>
@@ -977,7 +1000,7 @@ export function ProfileProgressModal({
                                       Free
                                     </span>
                                   )}
-                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                  <span className="text-xs text-skin-muted">
                                     Lvl {pricing.suggestedLevel}
                                   </span>
                                 </>
@@ -991,201 +1014,181 @@ export function ProfileProgressModal({
 
                   {/* Special Card Skins Section (Red 0 & Brown 0) */}
                   <div>
-                    <h3
-                      className="font-semibold mb-3 flex items-center gap-2"
-                      style={{ color: 'var(--color-text-primary)' }}
-                    >
+                    <h3 className="font-semibold mb-3 flex items-center gap-2 text-skin-primary">
                       <span>✨</span> Special Card Skins
                     </h3>
-                    <p
-                      className="text-xs mb-3"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      Customize your Red 0 (+5 pts) and Brown 0 (-2 pts) cards. Unlock skins via achievements!
+                    <p className="text-xs mb-3 text-skin-muted">
+                      Customize your Red 0 (+5 pts) and Brown 0 (-2 pts) cards. Unlock skins via
+                      achievements!
                     </p>
 
                     {/* Red Zero Skins */}
                     <div className="mb-4">
-                      <h4
-                        className="text-sm font-medium mb-2 flex items-center gap-2"
-                        style={{ color: 'var(--color-text-secondary)' }}
-                      >
+                      <h4 className="text-sm font-medium mb-2 flex items-center gap-2 text-skin-secondary">
                         <span className="text-lg">🔥</span> Red Zero (+5 Points)
                       </h4>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {redZeroSkins.map((skin) => {
-                            const isUnlocked = skin.isUnlocked;
-                            const isEquipped = equippedSpecialSkins.redZeroSkin === skin.skinId;
-                            const isPreviewing = previewSpecialSkins?.redZeroSkin === skin.skinId;
-                            const rarityStyle = rarityStyles[skin.rarity];
+                          const isUnlocked = skin.isUnlocked;
+                          const isEquipped = equippedSpecialSkins.redZeroSkin === skin.skinId;
+                          const isPreviewing = previewSpecialSkins?.redZeroSkin === skin.skinId;
+                          const rarityStyle = rarityStyles[skin.rarity];
 
-                            return (
-                              <div
-                                key={skin.skinId}
-                                className={`
-                                  relative p-2 rounded-lg text-center transition-all cursor-pointer
-                                  ${isEquipped
-                                    ? 'ring-2 ring-orange-500'
-                                    : isPreviewing
-                                      ? 'ring-2 ring-purple-500'
-                                      : 'hover:ring-1 hover:ring-orange-400/50'
+                          return (
+                            <div
+                              key={skin.skinId}
+                              className={`
+                                  relative p-2 rounded-lg text-center transition-all cursor-pointer bg-skin-secondary border
+                                  ${
+                                    isEquipped
+                                      ? 'ring-2 ring-orange-500 border-orange-500'
+                                      : isPreviewing
+                                        ? 'ring-2 ring-purple-500 border-purple-500'
+                                        : 'hover:ring-1 hover:ring-orange-400/50 border-skin-subtle'
                                   }
                                   ${!isUnlocked ? 'opacity-60' : ''}
                                 `}
-                                style={{
-                                  backgroundColor: 'var(--color-bg-secondary)',
-                                  border: `1px solid ${isEquipped ? '#f97316' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
-                                }}
-                                onClick={() => startPreviewSpecialSkin('red_zero', skin.skinId)}
+                              onClick={() => startPreviewSpecialSkin('red_zero', skin.skinId)}
+                            >
+                              {/* Rarity badge */}
+                              <div
+                                className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}
                               >
-                                {/* Rarity badge */}
-                                <div className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}>
-                                  {skin.rarity}
-                                </div>
+                                {skin.rarity}
+                              </div>
 
-                                {/* Icon or image preview */}
-                                <div
-                                  className="w-12 h-16 mx-auto mb-1 rounded flex items-center justify-center"
-                                  style={{
-                                    backgroundColor: skin.borderColor || '#dc2626',
-                                    boxShadow: skin.glowColor ? `0 0 12px ${skin.glowColor}` : undefined,
-                                  }}
-                                >
-                                  {skin.centerIcon ? (
-                                    <span className="text-2xl">{skin.centerIcon}</span>
-                                  ) : (
-                                    <img
-                                      src="/cards/production/red_bon.jpg"
-                                      alt={skin.skinName}
-                                      className="w-full h-full object-cover rounded"
-                                    />
-                                  )}
-                                </div>
-
-                                <p
-                                  className="text-xs font-medium truncate"
-                                  style={{ color: 'var(--color-text-primary)' }}
-                                >
-                                  {skin.skinName}
-                                </p>
-
-                                {/* Status */}
-                                {isEquipped ? (
-                                  <span className="text-[10px] text-orange-400">Equipped</span>
-                                ) : isUnlocked ? (
-                                  <span className="text-[10px] text-green-400">Select</span>
+                              {/* Icon or image preview */}
+                              <div
+                                className="w-12 h-16 mx-auto mb-1 rounded flex items-center justify-center"
+                                style={{
+                                  backgroundColor: skin.borderColor || '#dc2626',
+                                  boxShadow: skin.glowColor
+                                    ? `0 0 12px ${skin.glowColor}`
+                                    : undefined,
+                                }}
+                              >
+                                {skin.centerIcon ? (
+                                  <span className="text-2xl">{skin.centerIcon}</span>
                                 ) : (
-                                  <span className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
-                                    {getUnlockRequirementText(skin)}
-                                  </span>
+                                  <img
+                                    src="/cards/production/red_bon.jpg"
+                                    alt={skin.skinName}
+                                    className="w-full h-full object-cover rounded"
+                                  />
                                 )}
                               </div>
-                            );
-                          })}
+
+                              <p className="text-xs font-medium truncate text-skin-primary">
+                                {skin.skinName}
+                              </p>
+
+                              {/* Status */}
+                              {isEquipped ? (
+                                <span className="text-[10px] text-orange-400">Equipped</span>
+                              ) : isUnlocked ? (
+                                <span className="text-[10px] text-green-400">Select</span>
+                              ) : (
+                                <span className="text-[10px] text-skin-muted">
+                                  {getUnlockRequirementText(skin)}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 
                     {/* Brown Zero Skins */}
                     <div>
-                      <h4
-                        className="text-sm font-medium mb-2 flex items-center gap-2"
-                        style={{ color: 'var(--color-text-secondary)' }}
-                      >
+                      <h4 className="text-sm font-medium mb-2 flex items-center gap-2 text-skin-secondary">
                         <span className="text-lg">🌍</span> Brown Zero (-2 Points)
                       </h4>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                         {brownZeroSkins.map((skin) => {
-                            const isUnlocked = skin.isUnlocked;
-                            const isEquipped = equippedSpecialSkins.brownZeroSkin === skin.skinId;
-                            const isPreviewing = previewSpecialSkins?.brownZeroSkin === skin.skinId;
-                            const rarityStyle = rarityStyles[skin.rarity];
+                          const isUnlocked = skin.isUnlocked;
+                          const isEquipped = equippedSpecialSkins.brownZeroSkin === skin.skinId;
+                          const isPreviewing = previewSpecialSkins?.brownZeroSkin === skin.skinId;
+                          const rarityStyle = rarityStyles[skin.rarity];
 
-                            return (
-                              <div
-                                key={skin.skinId}
-                                className={`
-                                  relative p-2 rounded-lg text-center transition-all cursor-pointer
-                                  ${isEquipped
-                                    ? 'ring-2 ring-amber-700'
-                                    : isPreviewing
-                                      ? 'ring-2 ring-purple-500'
-                                      : 'hover:ring-1 hover:ring-amber-600/50'
+                          return (
+                            <div
+                              key={skin.skinId}
+                              className={`
+                                  relative p-2 rounded-lg text-center transition-all cursor-pointer bg-skin-secondary border
+                                  ${
+                                    isEquipped
+                                      ? 'ring-2 ring-amber-700 border-amber-700'
+                                      : isPreviewing
+                                        ? 'ring-2 ring-purple-500 border-purple-500'
+                                        : 'hover:ring-1 hover:ring-amber-600/50 border-skin-subtle'
                                   }
                                   ${!isUnlocked ? 'opacity-60' : ''}
                                 `}
-                                style={{
-                                  backgroundColor: 'var(--color-bg-secondary)',
-                                  border: `1px solid ${isEquipped ? '#92400e' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
-                                }}
-                                onClick={() => startPreviewSpecialSkin('brown_zero', skin.skinId)}
+                              onClick={() => startPreviewSpecialSkin('brown_zero', skin.skinId)}
+                            >
+                              {/* Rarity badge */}
+                              <div
+                                className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}
                               >
-                                {/* Rarity badge */}
-                                <div className={`absolute top-1 right-1 text-[8px] px-1 py-0.5 rounded ${rarityStyle.badgeColor} text-white uppercase tracking-wider`}>
-                                  {skin.rarity}
-                                </div>
+                                {skin.rarity}
+                              </div>
 
-                                {/* Icon or image preview */}
-                                <div
-                                  className="w-12 h-16 mx-auto mb-1 rounded flex items-center justify-center"
-                                  style={{
-                                    backgroundColor: skin.borderColor || '#78350f',
-                                    boxShadow: skin.glowColor ? `0 0 12px ${skin.glowColor}` : undefined,
-                                  }}
-                                >
-                                  {skin.centerIcon ? (
-                                    <span className="text-2xl">{skin.centerIcon}</span>
-                                  ) : (
-                                    <img
-                                      src="/cards/production/brown_bon.jpg"
-                                      alt={skin.skinName}
-                                      className="w-full h-full object-cover rounded"
-                                    />
-                                  )}
-                                </div>
-
-                                <p
-                                  className="text-xs font-medium truncate"
-                                  style={{ color: 'var(--color-text-primary)' }}
-                                >
-                                  {skin.skinName}
-                                </p>
-
-                                {/* Status */}
-                                {isEquipped ? (
-                                  <span className="text-[10px] text-amber-600">Equipped</span>
-                                ) : isUnlocked ? (
-                                  <span className="text-[10px] text-green-400">Select</span>
+                              {/* Icon or image preview */}
+                              <div
+                                className="w-12 h-16 mx-auto mb-1 rounded flex items-center justify-center"
+                                style={{
+                                  backgroundColor: skin.borderColor || '#78350f',
+                                  boxShadow: skin.glowColor
+                                    ? `0 0 12px ${skin.glowColor}`
+                                    : undefined,
+                                }}
+                              >
+                                {skin.centerIcon ? (
+                                  <span className="text-2xl">{skin.centerIcon}</span>
                                 ) : (
-                                  <span className="text-[10px]" style={{ color: 'var(--color-text-muted)' }}>
-                                    {getUnlockRequirementText(skin)}
-                                  </span>
+                                  <img
+                                    src="/cards/production/brown_bon.jpg"
+                                    alt={skin.skinName}
+                                    className="w-full h-full object-cover rounded"
+                                  />
                                 )}
                               </div>
-                            );
-                          })}
+
+                              <p className="text-xs font-medium truncate text-skin-primary">
+                                {skin.skinName}
+                              </p>
+
+                              {/* Status */}
+                              {isEquipped ? (
+                                <span className="text-[10px] text-amber-600">Equipped</span>
+                              ) : isUnlocked ? (
+                                <span className="text-[10px] text-green-400">Select</span>
+                              ) : (
+                                <span className="text-[10px] text-skin-muted">
+                                  {getUnlockRequirementText(skin)}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
 
                   {/* UI Theme Skins Section */}
                   <div>
-                    <h3
-                      className="font-semibold mb-3 flex items-center gap-2"
-                      style={{ color: 'var(--color-text-primary)' }}
-                    >
+                    <h3 className="font-semibold mb-3 flex items-center gap-2 text-skin-primary">
                       <span>🎨</span> UI Themes
                     </h3>
-                    <p
-                      className="text-xs mb-3"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
+                    <p className="text-xs mb-3 text-skin-muted">
                       Click to preview. Mix and match across all skin types!
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {skinList.map((skinItem) => {
                         const pricing = getSkinPricing(skinItem.id as SkinId);
                         // A skin is unlocked if: it's free (price 0) OR player has purchased it
-                        const isUnlocked = pricing.price === 0 || progression.unlockedSkins.includes(skinItem.id);
+                        const isUnlocked =
+                          pricing.price === 0 || progression.unlockedSkins.includes(skinItem.id);
                         const isActive = skinId === skinItem.id;
                         const isPreviewing = previewSkinId === skinItem.id;
                         const canAfford = progression.cosmeticCurrency >= pricing.price;
@@ -1194,18 +1197,15 @@ export function ProfileProgressModal({
                           <div
                             key={skinItem.id}
                             className={`
-                              relative p-3 rounded-lg text-left transition-all cursor-pointer
-                              ${isActive
-                                ? 'ring-2 ring-blue-500'
-                                : isPreviewing
-                                  ? 'ring-2 ring-purple-500'
-                                  : 'hover:ring-1 hover:ring-purple-500/50'
+                              relative p-3 rounded-lg text-left transition-all cursor-pointer bg-skin-secondary border
+                              ${
+                                isActive
+                                  ? 'ring-2 ring-blue-500 border-skin-accent'
+                                  : isPreviewing
+                                    ? 'ring-2 ring-purple-500 border-purple-500'
+                                    : 'hover:ring-1 hover:ring-purple-500/50 border-skin-subtle'
                               }
                             `}
-                            style={{
-                              backgroundColor: 'var(--color-bg-secondary)',
-                              border: `1px solid ${isActive ? 'var(--color-text-accent)' : isPreviewing ? '#a855f7' : 'var(--color-border-subtle)'}`,
-                            }}
                             onClick={() => startPreviewSkin(skinItem.id as SkinId)}
                           >
                             {/* Preview gradient */}
@@ -1215,16 +1215,10 @@ export function ProfileProgressModal({
                             />
 
                             {/* Skin info */}
-                            <h4
-                              className="font-medium text-sm"
-                              style={{ color: 'var(--color-text-primary)' }}
-                            >
+                            <h4 className="font-medium text-sm text-skin-primary">
                               {skinItem.name}
                             </h4>
-                            <p
-                              className="text-xs line-clamp-1 mb-2"
-                              style={{ color: 'var(--color-text-muted)' }}
-                            >
+                            <p className="text-xs line-clamp-1 mb-2 text-skin-muted">
                               {skinItem.description}
                             </p>
 
@@ -1244,9 +1238,7 @@ export function ProfileProgressModal({
                                       Select
                                     </button>
                                   )}
-                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                                    ✓ Owned
-                                  </span>
+                                  <span className="text-xs text-skin-muted">✓ Owned</span>
                                 </>
                               ) : (
                                 <>
@@ -1271,7 +1263,7 @@ export function ProfileProgressModal({
                                       Free
                                     </span>
                                   )}
-                                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                  <span className="text-xs text-skin-muted">
                                     Lvl {pricing.suggestedLevel}
                                   </span>
                                 </>
@@ -1306,31 +1298,13 @@ function StatCard({
   suffix?: string;
 }) {
   return (
-    <div
-      className="p-3 rounded-lg text-center"
-      style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-    >
+    <div className="p-3 rounded-lg text-center bg-skin-secondary">
       <div className="text-xl mb-1">{icon}</div>
-      <div
-        className="text-lg font-bold"
-        style={{ color: 'var(--color-text-primary)' }}
-      >
+      <div className="text-lg font-bold text-skin-primary">
         {value.toLocaleString()}
-        {suffix && (
-          <span
-            className="text-xs font-normal ml-1"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
-            {suffix}
-          </span>
-        )}
+        {suffix && <span className="text-xs font-normal ml-1 text-skin-muted">{suffix}</span>}
       </div>
-      <div
-        className="text-xs"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        {label}
-      </div>
+      <div className="text-xs text-skin-muted">{label}</div>
     </div>
   );
 }

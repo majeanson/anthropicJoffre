@@ -44,7 +44,10 @@ export interface GameTooltipProps {
   testId?: string;
 }
 
-const variantStyles: Record<GameTooltipVariant, { gradient: string; border: string; iconBg: string }> = {
+const variantStyles: Record<
+  GameTooltipVariant,
+  { gradient: string; border: string; iconBg: string }
+> = {
   info: {
     gradient: 'from-blue-600 to-blue-700',
     border: 'border-blue-300',
@@ -161,13 +164,15 @@ export function GameTooltip({
         {/* Header */}
         <div className="flex items-center gap-3 mb-3">
           {icon && (
-            <div className={`
+            <div
+              className={`
               flex items-center justify-center
               w-10 h-10
               ${styles.iconBg}
               rounded-full
               flex-shrink-0
-            `}>
+            `}
+            >
               <span className="text-xl">{icon}</span>
             </div>
           )}
@@ -192,9 +197,7 @@ export function GameTooltip({
         </div>
 
         {/* Content */}
-        <div className="text-white/95">
-          {children}
-        </div>
+        <div className="text-white/95">{children}</div>
       </div>
     </div>
   );
@@ -247,18 +250,17 @@ export function GameTooltipTrigger({
         transition-all
         flex items-center justify-center
         focus:outline-none focus:ring-2 focus:ring-offset-2
-        ${isOpen
-          ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white scale-110 ring-2 ring-white focus:ring-blue-400'
-          : 'bg-parchment-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:scale-105 focus:ring-blue-500'
+        ${
+          isOpen
+            ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white scale-110 ring-2 ring-white focus:ring-blue-400'
+            : 'bg-parchment-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:scale-105 focus:ring-blue-500'
         }
         ${className}
       `}
       aria-label={label}
       aria-expanded={isOpen}
     >
-      <span className={`text-lg ${pulse && !isOpen ? 'animate-pulse' : ''}`}>
-        {icon}
-      </span>
+      <span className={`text-lg ${pulse && !isOpen ? 'animate-pulse' : ''}`}>{icon}</span>
     </button>
   );
 }

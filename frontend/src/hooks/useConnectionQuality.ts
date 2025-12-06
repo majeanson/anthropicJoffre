@@ -56,7 +56,7 @@ export function useConnectionQuality(socket: Socket | null) {
    */
   const measurePing = useCallback(() => {
     if (!socket || !socket.connected) {
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
         ping: null,
         quality: 'offline',
@@ -122,7 +122,7 @@ export function useConnectionQuality(socket: Socket | null) {
     };
 
     const handleDisconnect = () => {
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
         ping: null,
         quality: 'offline',

@@ -19,28 +19,40 @@ import { Checkbox } from './ui/Checkbox';
 import { Select } from './ui/Select';
 
 // Lazy load GameReplay component
-const GameReplay = lazy(() => import('./GameReplay').then(m => ({ default: m.GameReplay })));
+const GameReplay = lazy(() => import('./GameReplay').then((m) => ({ default: m.GameReplay })));
 
 // Sprint 8 Task 2: Move pure helper functions outside component for performance
 const getPhaseColor = (phase: string): string => {
   switch (phase) {
-    case 'team_selection': return 'var(--color-info)';
-    case 'betting': return 'var(--color-warning)';
-    case 'playing': return 'var(--color-success)';
-    case 'scoring': return 'var(--color-team2-primary)';
-    case 'game_over': return 'var(--color-text-muted)';
-    default: return 'var(--color-text-muted)';
+    case 'team_selection':
+      return 'var(--color-info)';
+    case 'betting':
+      return 'var(--color-warning)';
+    case 'playing':
+      return 'var(--color-success)';
+    case 'scoring':
+      return 'var(--color-team2-primary)';
+    case 'game_over':
+      return 'var(--color-text-muted)';
+    default:
+      return 'var(--color-text-muted)';
   }
 };
 
 const getPhaseLabel = (phase: string) => {
   switch (phase) {
-    case 'team_selection': return 'Team Selection';
-    case 'betting': return 'Betting';
-    case 'playing': return 'Playing';
-    case 'scoring': return 'Scoring';
-    case 'game_over': return 'Game Over';
-    default: return phase;
+    case 'team_selection':
+      return 'Team Selection';
+    case 'betting':
+      return 'Betting';
+    case 'playing':
+      return 'Playing';
+    case 'scoring':
+      return 'Scoring';
+    case 'game_over':
+      return 'Game Over';
+    default:
+      return phase;
   }
 };
 
@@ -88,8 +100,13 @@ interface LobbyBrowserProps {
   onShowWhyRegister?: () => void;
 }
 
-
-export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onShowWhyRegister }: LobbyBrowserProps) {
+export function LobbyBrowser({
+  socket,
+  onJoinGame,
+  onSpectateGame,
+  onClose,
+  onShowWhyRegister,
+}: LobbyBrowserProps) {
   const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<'active' | 'recent'>('active');
   const [games, setGames] = useState<LobbyGame[]>([]);
@@ -164,7 +181,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
         // Retry on 5xx errors (server errors) or network issues
         if (response.status >= 500 && retryCount < 2) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
           return fetchGames(isInitialLoad, retryCount + 1);
         }
 
@@ -184,7 +201,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
         // Retry on network errors
         if (retryCount < 2) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchGames(isInitialLoad, retryCount + 1);
         }
       } else {
@@ -231,7 +248,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
         // Retry on 5xx errors (server errors)
         if (response.status >= 500 && retryCount < 2) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchRecentGames(isInitialLoad, retryCount + 1);
         }
 
@@ -252,12 +269,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
         // Retry on network errors
         if (retryCount < 2) {
-          await new Promise(resolve => setTimeout(resolve, 1000 * (retryCount + 1)));
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchRecentGames(isInitialLoad, retryCount + 1);
         }
       } else {
         const errorMessage = getErrorMessage(err, 'UNKNOWN_ERROR');
-        logger.error('[LobbyBrowser] Failed to load recent games:', errorMessage, { error: String(err) });
+        logger.error('[LobbyBrowser] Failed to load recent games:', errorMessage, {
+          error: String(err),
+        });
         setError(`${ERROR_MESSAGES.RECENT_GAMES_LOAD_FAILED}: ${errorMessage}`);
       }
     } finally {
@@ -283,20 +302,18 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
     // Apply filters
     if (filterWithBots) {
-      filtered = filtered.filter(game => game.botPlayerCount > 0);
+      filtered = filtered.filter((game) => game.botPlayerCount > 0);
     }
     if (filterNeedsPlayers) {
-      filtered = filtered.filter(game =>
-        game.humanPlayerCount < 4 || game.botPlayerCount > 0
-      );
+      filtered = filtered.filter((game) => game.humanPlayerCount < 4 || game.botPlayerCount > 0);
     }
     if (filterInProgress) {
-      filtered = filtered.filter(game => game.isInProgress);
+      filtered = filtered.filter((game) => game.isInProgress);
     }
     if (filterGameMode === 'ranked') {
-      filtered = filtered.filter(game => game.persistenceMode === 'elo');
+      filtered = filtered.filter((game) => game.persistenceMode === 'elo');
     } else if (filterGameMode === 'casual') {
-      filtered = filtered.filter(game => game.persistenceMode === 'casual');
+      filtered = filtered.filter((game) => game.persistenceMode === 'casual');
     }
 
     // Apply sorting
@@ -332,7 +349,11 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't handle if in input/select
       const target = e.target as HTMLElement;
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT') {
+      if (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.tagName === 'SELECT'
+      ) {
         return;
       }
 
@@ -345,7 +366,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
         case 'ArrowUp':
           e.preventDefault();
           if (currentListLength > 0) {
-            setSelectedIndex(prev => (prev - 1 + currentListLength) % currentListLength);
+            setSelectedIndex((prev) => (prev - 1 + currentListLength) % currentListLength);
             sounds.buttonClick();
           }
           break;
@@ -353,7 +374,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
         case 'ArrowDown':
           e.preventDefault();
           if (currentListLength > 0) {
-            setSelectedIndex(prev => (prev + 1) % currentListLength);
+            setSelectedIndex((prev) => (prev + 1) % currentListLength);
             sounds.buttonClick();
           }
           break;
@@ -410,29 +431,37 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeTab, currentListLength, selectedIndex, filteredAndSortedGames, recentGames, onClose, onSpectateGame, handleJoinGameClick]);
+  }, [
+    activeTab,
+    currentListLength,
+    selectedIndex,
+    filteredAndSortedGames,
+    recentGames,
+    onClose,
+    onSpectateGame,
+    handleJoinGameClick,
+  ]);
 
   // Show GameReplay if a game is selected for replay
   if (replayGameId) {
     return (
-      <Suspense fallback={
-        <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
-          <div className="text-[var(--color-text-accent)] font-display animate-pulse">Loading replay...</div>
-        </div>
-      }>
-        <GameReplay
-          gameId={replayGameId}
-          socket={socket}
-          onClose={() => setReplayGameId(null)}
-        />
+      <Suspense
+        fallback={
+          <div className="min-h-screen bg-[var(--color-bg-primary)] flex items-center justify-center">
+            <div className="text-[var(--color-text-accent)] font-display animate-pulse">
+              Loading replay...
+            </div>
+          </div>
+        }
+      >
+        <GameReplay gameId={replayGameId} socket={socket} onClose={() => setReplayGameId(null)} />
       </Suspense>
     );
   }
 
   return (
     <div
-      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-      style={{ backdropFilter: 'blur(8px)' }}
+      className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm"
       onKeyDown={(e) => e.stopPropagation()}
     >
       <div
@@ -442,34 +471,19 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
           max-w-4xl w-full max-h-[90vh]
           overflow-hidden
           border-2 border-[var(--color-border-accent)]
+          shadow-[var(--shadow-glow),var(--shadow-lg)]
         "
-        style={{
-          boxShadow: 'var(--shadow-glow), var(--shadow-lg)',
-        }}
       >
         {/* Header */}
-        <div
-          className="p-6 flex items-center justify-between relative"
-          style={{
-            background: 'linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-bg-primary) 100%)',
-            borderBottom: '2px solid var(--color-border-accent)',
-          }}
-        >
+        <div className="p-6 flex items-center justify-between relative bg-gradient-to-br from-[var(--color-bg-tertiary)] to-[var(--color-bg-primary)] border-b-2 border-skin-accent">
           <div>
-            <h2
-              className="text-2xl sm:text-3xl font-display uppercase tracking-wider"
-              style={{
-                color: 'var(--color-text-primary)',
-                textShadow: '0 0 20px var(--color-glow), 0 0 40px var(--color-glow)',
-              }}
-            >
+            <h2 className="text-2xl sm:text-3xl font-display uppercase tracking-wider text-skin-primary drop-shadow-[0_0_20px_var(--color-glow)]">
               Game Lobby
             </h2>
             <p className="text-sm text-[var(--color-text-muted)] mt-1 font-body">
               {activeTab === 'active'
                 ? `${games.length} active game${games.length !== 1 ? 's' : ''}`
-                : `${recentGames.length} recent game${recentGames.length !== 1 ? 's' : ''}`
-              }
+                : `${recentGames.length} recent game${recentGames.length !== 1 ? 's' : ''}`}
             </p>
           </div>
           <button
@@ -484,17 +498,24 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
             aria-label="Close"
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
 
         {/* Tab Navigation - Arcade Style */}
         <Tabs
-          tabs={[
-            { id: 'active', label: 'Active Games', icon: '🎮' },
-            { id: 'recent', label: 'Recent Games', icon: '📜' },
-          ] as Tab[]}
+          tabs={
+            [
+              { id: 'active', label: 'Active Games', icon: '🎮' },
+              { id: 'recent', label: 'Recent Games', icon: '📜' },
+            ] as Tab[]
+          }
           activeTab={activeTab}
           onChange={(tabId) => {
             setActiveTab(tabId as 'active' | 'recent');
@@ -518,7 +539,10 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
               "
             >
               <button
-                onClick={() => { setShowJoinInput(!showJoinInput); sounds.buttonClick(); }}
+                onClick={() => {
+                  setShowJoinInput(!showJoinInput);
+                  sounds.buttonClick();
+                }}
                 className="
                   w-full px-4 py-3
                   flex items-center justify-between
@@ -603,10 +627,14 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
                 {/* Game Mode Filter */}
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">Mode:</span>
+                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">
+                    Mode:
+                  </span>
                   <Select
                     value={filterGameMode}
-                    onChange={(e) => setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')}
+                    onChange={(e) =>
+                      setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')
+                    }
                     options={[
                       { value: 'all', label: 'All Games' },
                       { value: 'ranked', label: 'Ranked' },
@@ -618,7 +646,9 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
 
                 {/* Sort Dropdown */}
                 <div className="flex items-center gap-2 ml-auto">
-                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">Sort:</span>
+                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">
+                    Sort:
+                  </span>
                   <Select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
@@ -633,7 +663,10 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
               </div>
 
               {/* Active filter count */}
-              {(filterWithBots || filterNeedsPlayers || filterInProgress || filterGameMode !== 'all') && (
+              {(filterWithBots ||
+                filterNeedsPlayers ||
+                filterInProgress ||
+                filterGameMode !== 'all') && (
                 <div className="mt-3 text-xs text-[var(--color-text-muted)] font-body">
                   Showing {filteredAndSortedGames.length} of {games.length} games
                 </div>
@@ -684,10 +717,8 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
                 rounded-[var(--radius-lg)]
                 border-2 border-[var(--color-error)]
                 bg-[var(--color-error)]/10
+                shadow-[0_0_20px_rgba(255,0,110,0.3)]
               "
-              style={{
-                boxShadow: '0 0 20px rgba(255, 0, 110, 0.3)',
-              }}
             >
               <div className="flex items-start gap-3">
                 <span className="text-2xl">⚠️</span>
@@ -732,10 +763,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
               {games.length === 0 ? (
                 <div className="text-center py-12">
                   <span className="text-6xl block mb-4">🎮</span>
-                  <h3
-                    className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2"
-                    style={{ textShadow: '0 0 10px var(--color-glow)' }}
-                  >
+                  <h3 className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2 drop-shadow-[0_0_10px_var(--color-glow)]">
                     No Active Games
                   </h3>
                   <p className="text-sm text-[var(--color-text-muted)] font-body">
@@ -745,10 +773,7 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
               ) : filteredAndSortedGames.length === 0 ? (
                 <div className="text-center py-12">
                   <span className="text-6xl block mb-4">🔍</span>
-                  <h3
-                    className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2"
-                    style={{ textShadow: '0 0 10px var(--color-glow)' }}
-                  >
+                  <h3 className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2 drop-shadow-[0_0_10px_var(--color-glow)]">
                     No Matches
                   </h3>
                   <p className="text-sm text-[var(--color-text-muted)] font-body">
@@ -764,24 +789,21 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
                       border-2
                       p-4
                       transition-all duration-[var(--duration-fast)]
-                      ${selectedIndex === index
-                        ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
-                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
+                      ${
+                        selectedIndex === index
+                          ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
+                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
                       }
                     `}
-                    style={selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
+                    style={
+                      selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}
+                    }
                   >
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         {/* Game ID and badges */}
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span
-                            className="font-display text-lg sm:text-xl uppercase tracking-wider"
-                            style={{
-                              color: 'var(--color-text-primary)',
-                              textShadow: '0 0 5px var(--color-glow)',
-                            }}
-                          >
+                          <span className="font-display text-lg sm:text-xl uppercase tracking-wider text-skin-primary drop-shadow-[0_0_5px_var(--color-glow)]">
                             Game {game.gameId}
                           </span>
                           <span
@@ -803,25 +825,28 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
                               px-2 py-0.5
                               rounded-full
                               text-xs font-display uppercase
-                              ${game.persistenceMode === 'elo'
-                                ? 'bg-[var(--color-warning)] text-black'
-                                : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-muted)]'
+                              ${
+                                game.persistenceMode === 'elo'
+                                  ? 'bg-skin-status-warning text-black shadow-badge-warning'
+                                  : 'bg-skin-secondary text-skin-muted'
                               }
                             `}
-                            style={game.persistenceMode === 'elo' ? { boxShadow: '0 0 8px var(--color-warning)' } : {}}
                           >
                             {game.persistenceMode === 'elo' ? '🏆 Ranked' : '🎲 Casual'}
                           </span>
                         </div>
                         {/* Player info */}
-                        <div className="text-sm text-[var(--color-text-muted)] font-body flex flex-wrap items-center gap-x-4 gap-y-1">
-                          <span>👥 {game.humanPlayerCount} player{game.humanPlayerCount !== 1 ? 's' : ''}</span>
+                        <div className="text-sm text-skin-muted font-body flex flex-wrap items-center gap-x-4 gap-y-1">
+                          <span>
+                            👥 {game.humanPlayerCount} player
+                            {game.humanPlayerCount !== 1 ? 's' : ''}
+                          </span>
                           {game.botPlayerCount > 0 && (
-                            <span>🤖 {game.botPlayerCount} bot{game.botPlayerCount !== 1 ? 's' : ''}</span>
+                            <span>
+                              🤖 {game.botPlayerCount} bot{game.botPlayerCount !== 1 ? 's' : ''}
+                            </span>
                           )}
-                          {game.isInProgress && (
-                            <span>📊 Round {game.roundNumber}</span>
-                          )}
+                          {game.isInProgress && <span>📊 Round {game.roundNumber}</span>}
                         </div>
                       </div>
 
@@ -864,13 +889,10 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
               {recentGames.length === 0 ? (
                 <div className="text-center py-12">
                   <span className="text-6xl block mb-4">📜</span>
-                  <h3
-                    className="font-display text-lg uppercase tracking-wider text-[var(--color-text-primary)] mb-2"
-                    style={{ textShadow: '0 0 10px var(--color-glow)' }}
-                  >
+                  <h3 className="font-display text-lg uppercase tracking-wider text-skin-primary mb-2 text-shadow-glow">
                     No Recent Games
                   </h3>
-                  <p className="text-sm text-[var(--color-text-muted)] font-body">
+                  <p className="text-sm text-skin-muted font-body">
                     Completed games will appear here
                   </p>
                 </div>
@@ -888,53 +910,42 @@ export function LobbyBrowser({ socket, onJoinGame, onSpectateGame, onClose, onSh
                         border-2
                         p-4
                         transition-all duration-[var(--duration-fast)]
-                        ${selectedIndex === index
-                          ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
-                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
+                        ${
+                          selectedIndex === index
+                            ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
+                            : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
                         }
                       `}
-                      style={selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}}
+                      style={
+                        selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}
+                      }
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
                           <div className="flex flex-wrap items-center gap-3 mb-2">
-                            <span
-                              className="font-display text-lg sm:text-xl uppercase tracking-wider"
-                              style={{
-                                color: 'var(--color-text-primary)',
-                                textShadow: '0 0 5px var(--color-glow)',
-                              }}
-                            >
+                            <span className="font-display text-lg sm:text-xl uppercase tracking-wider text-skin-primary text-shadow-glow-sm">
                               Game {game.game_id}
                             </span>
                             <span
-                              className="
-                                px-2 py-0.5
-                                rounded-full
-                                text-xs font-display uppercase
-                              "
-                              style={{
-                                backgroundColor: game.winning_team === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)',
-                                color: 'white',
-                                boxShadow: `0 0 8px ${game.winning_team === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)'}`,
-                              }}
+                              className={`
+                                px-2 py-0.5 rounded-full text-xs font-display uppercase text-white
+                                ${game.winning_team === 1 ? 'bg-team1 shadow-team1' : 'bg-team2 shadow-team2'}
+                              `}
                             >
                               🏆 Team {game.winning_team} Won
                             </span>
                           </div>
-                          <div className="text-sm text-[var(--color-text-muted)] font-body flex flex-wrap items-center gap-x-4 gap-y-1">
-                            <span>📊 Score: {game.team1_score} - {game.team2_score}</span>
+                          <div className="text-sm text-skin-muted font-body flex flex-wrap items-center gap-x-4 gap-y-1">
+                            <span>
+                              📊 Score: {game.team1_score} - {game.team2_score}
+                            </span>
                             <span>🎯 {game.rounds} rounds</span>
                             <span>⏱️ {durationMinutes}m</span>
                             <span>🕒 {timeAgo}</span>
                           </div>
                         </div>
 
-                        <NeonButton
-                          onClick={() => setReplayGameId(game.game_id)}
-                          size="sm"
-                          glow
-                        >
+                        <NeonButton onClick={() => setReplayGameId(game.game_id)} size="sm" glow>
                           <span aria-hidden="true">📺</span>
                           Watch Replay
                         </NeonButton>

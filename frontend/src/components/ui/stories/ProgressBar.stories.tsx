@@ -235,7 +235,10 @@ export const AllSizes: Story = {
     value: 50,
   },
   render: () => (
-    <div className="space-y-6 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+    <div
+      className="space-y-6 p-6 rounded-xl"
+      style={{ backgroundColor: 'var(--color-bg-primary)' }}
+    >
       <ProgressBar value={60} size="sm" label="Small" showValue />
       <ProgressBar value={60} size="md" label="Medium" showValue />
       <ProgressBar value={60} size="lg" label="Large" showValue />
@@ -252,7 +255,10 @@ export const AllColors: Story = {
     value: 50,
   },
   render: () => (
-    <div className="space-y-4 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+    <div
+      className="space-y-4 p-6 rounded-xl"
+      style={{ backgroundColor: 'var(--color-bg-primary)' }}
+    >
       <ProgressBar value={70} color="accent" label="Accent" showValue />
       <ProgressBar value={70} color="primary" label="Primary" showValue />
       <ProgressBar value={70} color="success" label="Success" showValue />
@@ -273,7 +279,10 @@ export const AllVariants: Story = {
     value: 50,
   },
   render: () => (
-    <div className="space-y-6 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+    <div
+      className="space-y-6 p-6 rounded-xl"
+      style={{ backgroundColor: 'var(--color-bg-primary)' }}
+    >
       <ProgressBar value={65} variant="default" label="Default" showValue />
       <ProgressBar value={65} variant="gradient" label="Gradient" showValue />
       <ProgressBar value={65} variant="arcane" label="Arcane" showValue />
@@ -372,23 +381,13 @@ export const AchievementProgress: Story = {
         <div className="flex items-center gap-3">
           <span className="text-2xl">✓</span>
           <div className="flex-1">
-            <ProgressBar
-              value={100}
-              label="First Win"
-              showValue
-              color="success"
-            />
+            <ProgressBar value={100} label="First Win" showValue color="success" />
           </div>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-2xl">🎯</span>
           <div className="flex-1">
-            <ProgressBar
-              value={40}
-              label="Sharpshooter"
-              showValue
-              color="accent"
-            />
+            <ProgressBar value={40} label="Sharpshooter" showValue color="accent" />
           </div>
         </div>
       </div>
@@ -418,34 +417,10 @@ export const HealthLevels: Story = {
       >
         Health Levels
       </h3>
-      <ProgressBar
-        value={25}
-        label="Critical"
-        showValue
-        color="error"
-        size="sm"
-      />
-      <ProgressBar
-        value={50}
-        label="Moderate"
-        showValue
-        color="warning"
-        size="sm"
-      />
-      <ProgressBar
-        value={75}
-        label="Good"
-        showValue
-        color="info"
-        size="sm"
-      />
-      <ProgressBar
-        value={100}
-        label="Full Health"
-        showValue
-        color="success"
-        size="sm"
-      />
+      <ProgressBar value={25} label="Critical" showValue color="error" size="sm" />
+      <ProgressBar value={50} label="Moderate" showValue color="warning" size="sm" />
+      <ProgressBar value={75} label="Good" showValue color="info" size="sm" />
+      <ProgressBar value={100} label="Full Health" showValue color="success" size="sm" />
     </div>
   ),
 };
@@ -472,24 +447,9 @@ export const LoadingStates: Story = {
       >
         Loading Progress
       </h3>
-      <ProgressBar
-        value={30}
-        variant="arcane"
-        label="Connecting..."
-        color="info"
-      />
-      <ProgressBar
-        value={60}
-        variant="arcane"
-        label="Loading assets..."
-        color="accent"
-      />
-      <ProgressBar
-        value={90}
-        variant="gradient"
-        label="Almost ready..."
-        color="success"
-      />
+      <ProgressBar value={30} variant="arcane" label="Connecting..." color="info" />
+      <ProgressBar value={60} variant="arcane" label="Loading assets..." color="accent" />
+      <ProgressBar value={90} variant="gradient" label="Almost ready..." color="success" />
     </div>
   ),
 };

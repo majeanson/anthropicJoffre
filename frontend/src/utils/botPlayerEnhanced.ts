@@ -32,9 +32,9 @@ interface HandAnalysis {
   hasFourOfSameColor: boolean;
 
   // Strategic evaluation
-  canControlRed0: boolean;  // Has high cards to win red 0
-  vulnerableToBrown0: boolean;  // Risk of getting brown 0
-  suitControl: Record<CardColor, boolean>;  // Can control each suit
+  canControlRed0: boolean; // Has high cards to win red 0
+  vulnerableToBrown0: boolean; // Risk of getting brown 0
+  suitControl: Record<CardColor, boolean>; // Can control each suit
 
   // Betting evaluation
   estimatedTricks: number;
@@ -45,11 +45,11 @@ interface HandAnalysis {
 
 interface CardMemory {
   playedCards: Card[];
-  remainingCards: Map<string, Card>;  // key: "color-value"
+  remainingCards: Map<string, Card>; // key: "color-value"
   highestRemainingByColor: Record<CardColor, number>;
   red0Status: 'in_hand' | 'played' | 'unknown';
   brown0Status: 'in_hand' | 'played' | 'unknown';
-  partnerSignals: string[];  // Track partner's plays for signals
+  partnerSignals: string[]; // Track partner's plays for signals
 }
 
 interface PlayDecision {
@@ -72,7 +72,7 @@ export class EnhancedBotPlayer {
       highestRemainingByColor: { red: 7, brown: 7, green: 7, blue: 7 },
       red0Status: 'unknown',
       brown0Status: 'unknown',
-      partnerSignals: []
+      partnerSignals: [],
     };
 
     // Initialize all cards as remaining
@@ -108,16 +108,16 @@ export class EnhancedBotPlayer {
     gameState: GameState,
     playerId: string
   ): { amount: number; withoutTrump: boolean; skipped: boolean } {
-    const player = gameState.players.find(p => p.id === playerId);
+    const player = gameState.players.find((p) => p.id === playerId);
     if (!player) return { amount: 7, withoutTrump: false, skipped: true };
 
     // Analyze hand
     const analysis = this.analyzeHand(player.hand, gameState.trump);
 
     // Get betting context
-    const playerIndex = gameState.players.findIndex(p => p.id === playerId);
+    const playerIndex = gameState.players.findIndex((p) => p.id === playerId);
     const isDealer = playerIndex === gameState.dealerIndex;
-    const currentBets = gameState.currentBets.filter(b => !b.skipped);
+    const currentBets = gameState.currentBets.filter((b) => !b.skipped);
     const highestBet = this.getHighestBet(currentBets);
     const hasValidBets = currentBets.length > 0;
 
@@ -126,7 +126,7 @@ export class EnhancedBotPlayer {
       return {
         amount: analysis.recommendedBet,
         withoutTrump: false,
-        skipped: false
+        skipped: false,
       };
     }
 
@@ -135,12 +135,11 @@ export class EnhancedBotPlayer {
       const skipThresholds = {
         easy: { weak: 0.6, normal: 0.3 },
         medium: { weak: 0.4, normal: 0.2 },
-        hard: { weak: 0.3, normal: 0.1 }
+        hard: { weak: 0.3, normal: 0.1 },
       };
 
-      const threshold = skipThresholds[this.difficulty][
-        analysis.handQuality === 'weak' ? 'weak' : 'normal'
-      ];
+      const threshold =
+        skipThresholds[this.difficulty][analysis.handQuality === 'weak' ? 'weak' : 'normal'];
 
       if (Math.random() < threshold) {
         return { amount: 7, withoutTrump: false, skipped: true };
@@ -168,15 +167,15 @@ export class EnhancedBotPlayer {
 
     // Override for difficulty levels
     if (this.difficulty === 'easy') {
-      withoutTrump = Math.random() < 0.05;  // Rarely bet without trump
+      withoutTrump = Math.random() < 0.05; // Rarely bet without trump
     } else if (this.difficulty === 'medium') {
-      withoutTrump = withoutTrump && Math.random() < 0.7;  // Sometimes follow recommendation
+      withoutTrump = withoutTrump && Math.random() < 0.7; // Sometimes follow recommendation
     }
 
     return {
       amount: betAmount,
       withoutTrump,
-      skipped: false
+      skipped: false,
     };
   }
 
@@ -199,11 +198,11 @@ export class EnhancedBotPlayer {
       estimatedTricks: 0,
       recommendedBet: 7,
       shouldBetWithoutTrump: false,
-      handQuality: 'normal'
+      handQuality: 'normal',
     };
 
     // Count cards by color and value
-    hand.forEach(card => {
+    hand.forEach((card) => {
       analysis.colorDistribution[card.color]++;
 
       if (card.color === trump) {
@@ -217,7 +216,10 @@ export class EnhancedBotPlayer {
     });
 
     // Find longest suit
-    for (const [color, count] of Object.entries(analysis.colorDistribution) as [CardColor, number][]) {
+    for (const [color, count] of Object.entries(analysis.colorDistribution) as [
+      CardColor,
+      number,
+    ][]) {
       if (count > analysis.longestSuit.count) {
         analysis.longestSuit = { color, count };
       }
@@ -228,7 +230,7 @@ export class EnhancedBotPlayer {
       }
 
       // Check suit control (having 6 or 7 in a suit)
-      const hasHighCard = hand.some(c => c.color === color && c.value >= 6);
+      const hasHighCard = hand.some((c) => c.color === color && c.value >= 6);
       if (hasHighCard && count >= 2) {
         analysis.suitControl[color] = true;
       }
@@ -237,23 +239,23 @@ export class EnhancedBotPlayer {
     // Red 0 control analysis
     if (analysis.hasRed0) {
       // Need high cards in same suit or trump to protect it
-      const redHighCards = hand.filter(c => c.color === 'red' && c.value >= 5).length;
+      const redHighCards = hand.filter((c) => c.color === 'red' && c.value >= 5).length;
       const canProtect = redHighCards >= 1 || analysis.trumpCount >= 2;
       analysis.canControlRed0 = canProtect;
     } else {
       // Can we win red 0 from opponent?
-      const hasRed7 = hand.some(c => c.color === 'red' && c.value === 7);
-      const hasHighTrump = !!trump && hand.some(c => c.color === trump && c.value >= 5);
+      const hasRed7 = hand.some((c) => c.color === 'red' && c.value === 7);
+      const hasHighTrump = !!trump && hand.some((c) => c.color === trump && c.value >= 5);
       analysis.canControlRed0 = hasRed7 || hasHighTrump;
     }
 
     // Brown 0 vulnerability
     if (analysis.hasBrown0) {
-      analysis.vulnerableToBrown0 = true;  // Always vulnerable if we have it
+      analysis.vulnerableToBrown0 = true; // Always vulnerable if we have it
     } else {
       // Are we vulnerable to receiving it?
-      const brownCards = hand.filter(c => c.color === 'brown').length;
-      const lowBrownCards = hand.filter(c => c.color === 'brown' && c.value <= 3).length;
+      const brownCards = hand.filter((c) => c.color === 'brown').length;
+      const lowBrownCards = hand.filter((c) => c.color === 'brown' && c.value <= 3).length;
       analysis.vulnerableToBrown0 = brownCards > 0 && lowBrownCards === brownCards;
     }
 
@@ -262,8 +264,8 @@ export class EnhancedBotPlayer {
 
     // Trump tricks
     if (trump) {
-      tricks += Math.min(analysis.trumpCount, 3);  // Each trump likely wins
-      if (analysis.trumpStrength >= 15) tricks += 1;  // Bonus for strong trump
+      tricks += Math.min(analysis.trumpCount, 3); // Each trump likely wins
+      if (analysis.trumpStrength >= 15) tricks += 1; // Bonus for strong trump
     }
 
     // High card tricks
@@ -271,38 +273,38 @@ export class EnhancedBotPlayer {
     for (const color of colors) {
       if (color === trump) continue;
 
-      const colorCards = hand.filter(c => c.color === color);
-      const has7 = colorCards.some(c => c.value === 7);
-      const has6 = colorCards.some(c => c.value === 6);
+      const colorCards = hand.filter((c) => c.color === color);
+      const has7 = colorCards.some((c) => c.value === 7);
+      const has6 = colorCards.some((c) => c.value === 6);
 
-      if (has7) tricks += 0.8;  // 7 likely wins
-      if (has6 && !has7) tricks += 0.5;  // 6 might win if 7 is out
+      if (has7) tricks += 0.8; // 7 likely wins
+      if (has6 && !has7) tricks += 0.5; // 6 might win if 7 is out
 
       // Long suit advantage
       if (analysis.colorDistribution[color] >= 4) {
-        tricks += 0.5;  // Control advantage
+        tricks += 0.5; // Control advantage
       }
     }
 
     // Special card adjustments
     if (analysis.hasRed0 && analysis.canControlRed0) {
-      tricks += 0.5;  // Bonus for controlling red 0
+      tricks += 0.5; // Bonus for controlling red 0
     }
     if (analysis.hasBrown0) {
-      tricks -= 0.3;  // Penalty for brown 0 risk
+      tricks -= 0.3; // Penalty for brown 0 risk
     }
 
     analysis.estimatedTricks = Math.round(tricks);
 
     // Calculate recommended bet (7-8 normal, 9-10 rare, 11-12 exceptional)
     if (analysis.estimatedTricks >= 11) {
-      analysis.recommendedBet = 11 + (Math.random() < 0.3 ? 1 : 0);  // 11-12
+      analysis.recommendedBet = 11 + (Math.random() < 0.3 ? 1 : 0); // 11-12
       analysis.handQuality = 'exceptional';
     } else if (analysis.estimatedTricks >= 9) {
-      analysis.recommendedBet = 9 + (Math.random() < 0.4 ? 1 : 0);  // 9-10
+      analysis.recommendedBet = 9 + (Math.random() < 0.4 ? 1 : 0); // 9-10
       analysis.handQuality = 'strong';
     } else if (analysis.estimatedTricks >= 7) {
-      analysis.recommendedBet = 7 + (Math.random() < 0.6 ? 1 : 0);  // 7-8
+      analysis.recommendedBet = 7 + (Math.random() < 0.6 ? 1 : 0); // 7-8
       analysis.handQuality = 'normal';
     } else {
       analysis.recommendedBet = 7;
@@ -326,7 +328,7 @@ export class EnhancedBotPlayer {
    * Play a card with advanced strategy
    */
   static playCard(gameState: GameState, playerId: string): Card | null {
-    const player = gameState.players.find(p => p.id === playerId);
+    const player = gameState.players.find((p) => p.id === playerId);
     if (!player || player.hand.length === 0) return null;
 
     // Initialize or update game memory
@@ -346,7 +348,7 @@ export class EnhancedBotPlayer {
     const memory = this.gameMemory.get(gameState.id)!;
 
     // Generate play decisions for each card
-    const decisions = legalPlays.map(card =>
+    const decisions = legalPlays.map((card) =>
       this.evaluatePlay(card, gameState, playerId, position, partner, memory)
     );
 
@@ -355,12 +357,14 @@ export class EnhancedBotPlayer {
 
     if (this.difficulty === 'easy') {
       // Easy: 30% optimal, 70% random
-      return Math.random() < 0.3 ? decisions[0].card :
-        legalPlays[Math.floor(Math.random() * legalPlays.length)];
+      return Math.random() < 0.3
+        ? decisions[0].card
+        : legalPlays[Math.floor(Math.random() * legalPlays.length)];
     } else if (this.difficulty === 'medium') {
       // Medium: 70% optimal, 30% suboptimal
-      return Math.random() < 0.7 ? decisions[0].card :
-        decisions[Math.min(1, decisions.length - 1)].card;
+      return Math.random() < 0.7
+        ? decisions[0].card
+        : decisions[Math.min(1, decisions.length - 1)].card;
     } else {
       // Hard: Always optimal
       return decisions[0].card;
@@ -379,7 +383,7 @@ export class EnhancedBotPlayer {
     memory: CardMemory
   ): PlayDecision {
     const trick = gameState.currentTrick;
-    let priority = 50;  // Base priority
+    let priority = 50; // Base priority
     let reasoning = '';
 
     // Special card handling
@@ -439,7 +443,7 @@ export class EnhancedBotPlayer {
         priority = 50 + trickValue;
         reasoning = 'Can win trick';
       } else {
-        priority = 40 - card.value;  // Play low if can't win
+        priority = 40 - card.value; // Play low if can't win
         reasoning = 'Cannot win, playing low';
       }
     } else if (position === 3) {
@@ -447,7 +451,7 @@ export class EnhancedBotPlayer {
       const winner = this.getCurrentTrickWinner(gameState);
       if (partner && winner === partner.id) {
         // Partner winning - support them
-        priority = 30 - card.value;  // Play low
+        priority = 30 - card.value; // Play low
         reasoning = 'Partner winning, playing low';
       } else {
         // Opponent winning - try to take it
@@ -468,7 +472,7 @@ export class EnhancedBotPlayer {
       if (partner && winner === partner.id) {
         // Partner winning
         if (trickValue > 5) {
-          priority = 20;  // Don't waste good cards
+          priority = 20; // Don't waste good cards
           reasoning = 'Partner winning valuable trick';
         } else {
           priority = 30 - card.value;
@@ -506,9 +510,9 @@ export class EnhancedBotPlayer {
       // Check if 7 of same color has been played
       const seven = `${card.color}-7`;
       if (memory.remainingCards.has(seven)) {
-        return 30;  // Don't waste 6 when 7 is still out
+        return 30; // Don't waste 6 when 7 is still out
       }
-      return 60;  // 6 is good if 7 is gone
+      return 60; // 6 is good if 7 is gone
     }
 
     if (card.value === 7) {
@@ -518,18 +522,19 @@ export class EnhancedBotPlayer {
 
     // Leading with high brown early is good (to dump brown 0)
     if (card.color === 'brown' && card.value >= 5 && memory.brown0Status !== 'played') {
-      return 70;  // Force out brown cards
+      return 70; // Force out brown cards
     }
 
     // Leading trump is situational
     if (card.color === trump) {
       // Draw out opponent trumps if we have many
-      const trumpCount = gameState.players[gameState.currentPlayerIndex]?.hand
-        .filter(c => c.color === trump).length || 0;
+      const trumpCount =
+        gameState.players[gameState.currentPlayerIndex]?.hand.filter((c) => c.color === trump)
+          .length || 0;
       if (trumpCount >= 3) {
-        return 55;  // Draw trumps
+        return 55; // Draw trumps
       }
-      return 35;  // Save trumps
+      return 35; // Save trumps
     }
 
     // Medium cards (3-5) are good leads
@@ -545,13 +550,13 @@ export class EnhancedBotPlayer {
    * Evaluate the value of winning current trick
    */
   private static evaluateTrickValue(trick: { playerId: string; card: Card }[]): number {
-    let value = 1;  // Base value
+    let value = 1; // Base value
 
-    trick.forEach(tc => {
+    trick.forEach((tc) => {
       if (tc.card.color === 'red' && tc.card.value === 0) {
-        value += 5;  // Red 0 is very valuable
+        value += 5; // Red 0 is very valuable
       } else if (tc.card.color === 'brown' && tc.card.value === 0) {
-        value -= 3;  // Brown 0 is bad
+        value -= 3; // Brown 0 is bad
       }
     });
 
@@ -566,7 +571,7 @@ export class EnhancedBotPlayer {
     if (!memory) return;
 
     // Track current trick
-    gameState.currentTrick.forEach(tc => {
+    gameState.currentTrick.forEach((tc) => {
       const key = `${tc.card.color}-${tc.card.value}`;
       if (memory.remainingCards.has(key)) {
         memory.remainingCards.delete(key);
@@ -596,8 +601,8 @@ export class EnhancedBotPlayer {
     // Update from our hand (to track special cards we hold)
     const player = gameState.players[gameState.currentPlayerIndex];
     if (player) {
-      const hasRed0 = player.hand.some(c => c.color === 'red' && c.value === 0);
-      const hasBrown0 = player.hand.some(c => c.color === 'brown' && c.value === 0);
+      const hasRed0 = player.hand.some((c) => c.color === 'red' && c.value === 0);
+      const hasBrown0 = player.hand.some((c) => c.color === 'brown' && c.value === 0);
 
       if (hasRed0 && memory.red0Status === 'unknown') {
         memory.red0Status = 'in_hand';
@@ -613,11 +618,11 @@ export class EnhancedBotPlayer {
    */
   private static getLegalPlays(gameState: GameState, hand: Card[]): Card[] {
     if (gameState.currentTrick.length === 0) {
-      return hand;  // Can play any card when leading
+      return hand; // Can play any card when leading
     }
 
     const ledSuit = gameState.currentTrick[0].card.color;
-    const sameSuitCards = hand.filter(c => c.color === ledSuit);
+    const sameSuitCards = hand.filter((c) => c.color === ledSuit);
 
     // Must follow suit if possible
     if (sameSuitCards.length > 0) {
@@ -660,12 +665,12 @@ export class EnhancedBotPlayer {
    */
   private static getCardPower(card: Card, trump: CardColor | null, ledSuit: CardColor): number {
     if (card.color === trump) {
-      return 100 + card.value;  // Trump always wins
+      return 100 + card.value; // Trump always wins
     }
     if (card.color === ledSuit) {
-      return 50 + card.value;  // Led suit next best
+      return 50 + card.value; // Led suit next best
     }
-    return card.value;  // Off-suit can't win
+    return card.value; // Off-suit can't win
   }
 
   /**
@@ -696,10 +701,10 @@ export class EnhancedBotPlayer {
    * Get partner player
    */
   private static getPartner(gameState: GameState, playerId: string): Player | null {
-    const player = gameState.players.find(p => p.id === playerId);
+    const player = gameState.players.find((p) => p.id === playerId);
     if (!player) return null;
 
-    return gameState.players.find(p => p.id !== playerId && p.teamId === player.teamId) || null;
+    return gameState.players.find((p) => p.id !== playerId && p.teamId === player.teamId) || null;
   }
 
   /**

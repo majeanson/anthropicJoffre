@@ -20,6 +20,62 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Skin-aware colors - automatically adapt to current skin
+        // Maps to CSS variables from frontend/src/config/skins.ts
+        // Usage: bg-skin-primary, text-skin-primary, border-skin-default, etc.
+        skin: {
+          // Backgrounds - use with bg-skin-*
+          'primary': 'var(--color-bg-primary)',
+          'secondary': 'var(--color-bg-secondary)',
+          'tertiary': 'var(--color-bg-tertiary)',
+          'accent': 'var(--color-bg-accent)',
+          'overlay': 'var(--color-bg-overlay)',
+        },
+        // Text colors - use with text-skin-*
+        'skin-text': {
+          'primary': 'var(--color-text-primary)',
+          'secondary': 'var(--color-text-secondary)',
+          'accent': 'var(--color-text-accent)',
+          'inverse': 'var(--color-text-inverse)',
+          'muted': 'var(--color-text-muted)',
+        },
+        // Border colors - use with border-skin-*
+        'skin-border': {
+          'default': 'var(--color-border-default)',
+          'accent': 'var(--color-border-accent)',
+          'subtle': 'var(--color-border-subtle)',
+        },
+        // Status colors - use with bg-skin-status-*, text-skin-status-*, etc.
+        'skin-status': {
+          'success': 'var(--color-success)',
+          'warning': 'var(--color-warning)',
+          'error': 'var(--color-error)',
+          'info': 'var(--color-info)',
+        },
+        // Team colors
+        'skin-team1': {
+          'primary': 'var(--color-team1-primary)',
+          'secondary': 'var(--color-team1-secondary)',
+          'text': 'var(--color-team1-text)',
+        },
+        'skin-team2': {
+          'primary': 'var(--color-team2-primary)',
+          'secondary': 'var(--color-team2-secondary)',
+          'text': 'var(--color-team2-text)',
+        },
+        // Card suit colors
+        'skin-suit': {
+          'red': 'var(--color-suit-red)',
+          'brown': 'var(--color-suit-brown)',
+          'green': 'var(--color-suit-green)',
+          'blue': 'var(--color-suit-blue)',
+        },
+        // Effects
+        'skin-effect': {
+          'glow': 'var(--color-glow)',
+          'highlight': 'var(--color-highlight)',
+          'shadow': 'var(--color-shadow)',
+        },
         // Historic theme colors inspired by traditional card game aesthetics
         // Note: Design token system available at frontend/src/design-system/colors.ts
         parchment: {
@@ -82,6 +138,61 @@ export default {
           800: '#18406E',
           900: '#18365B',
         },
+      },
+      // Direct mappings for text colors
+      textColor: {
+        'skin': {
+          'primary': 'var(--color-text-primary)',
+          'secondary': 'var(--color-text-secondary)',
+          'accent': 'var(--color-text-accent)',
+          'inverse': 'var(--color-text-inverse)',
+          'muted': 'var(--color-text-muted)',
+          'success': 'var(--color-success)',
+          'warning': 'var(--color-warning)',
+          'error': 'var(--color-error)',
+          'info': 'var(--color-info)',
+        },
+      },
+      // Direct mappings for background colors
+      backgroundColor: {
+        'skin': {
+          'primary': 'var(--color-bg-primary)',
+          'secondary': 'var(--color-bg-secondary)',
+          'tertiary': 'var(--color-bg-tertiary)',
+          'accent': 'var(--color-bg-accent)',
+          'overlay': 'var(--color-bg-overlay)',
+        },
+      },
+      // Direct mappings for border colors
+      borderColor: {
+        'skin': {
+          'default': 'var(--color-border-default)',
+          'accent': 'var(--color-border-accent)',
+          'subtle': 'var(--color-border-subtle)',
+        },
+      },
+      // Stroke colors for SVG elements - use with stroke-skin-*
+      stroke: {
+        'skin-inverse': 'var(--color-text-inverse)',
+        'skin-primary': 'var(--color-text-primary)',
+        'skin-accent': 'var(--color-text-accent)',
+        'skin-muted': 'var(--color-text-muted)',
+      },
+      // Fill colors for SVG elements - use with fill-skin-*
+      fill: {
+        'skin-inverse': 'var(--color-text-inverse)',
+        'skin-primary': 'var(--color-text-primary)',
+        'skin-accent': 'var(--color-text-accent)',
+        'skin-muted': 'var(--color-text-muted)',
+      },
+      // Ring colors - use with ring-skin-*
+      ringColor: {
+        'skin-accent': 'var(--color-text-accent)',
+        'skin-primary': 'var(--color-bg-primary)',
+      },
+      // Ring offset colors
+      ringOffsetColor: {
+        'skin-primary': 'var(--color-bg-primary)',
       },
       fontFamily: {
         serif: ['Georgia', 'Cambria', 'Times New Roman', 'serif'],
@@ -300,6 +411,11 @@ export default {
           '0%': { opacity: '0', transform: 'scale(0.8)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        // Custom bounce timings for decorative elements
+        'bounce-slow': {
+          '0%, 100%': { transform: 'translateY(-10%)', animationTimingFunction: 'cubic-bezier(0.8, 0, 1, 1)' },
+          '50%': { transform: 'translateY(0)', animationTimingFunction: 'cubic-bezier(0, 0, 0.2, 1)' },
+        },
       },
       animation: {
         'slide-from-bottom': 'slide-from-bottom 0.4s ease-out',
@@ -349,6 +465,11 @@ export default {
         'progress-fill': 'progress-fill 5s linear forwards',
         // Polish: Suggestion button entrance
         'fade-in-scale': 'fade-in-scale 0.3s ease-out',
+        // Custom bounce timing variations for decorative elements
+        'bounce-3s': 'bounce 3s infinite',
+        'bounce-3s-half': 'bounce 3.5s 0.5s infinite',
+        'bounce-4s': 'bounce 4s 1s infinite',
+        'bounce-4s-half': 'bounce 4.5s 1.5s infinite',
       },
     },
   },

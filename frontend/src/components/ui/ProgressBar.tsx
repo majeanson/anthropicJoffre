@@ -29,7 +29,15 @@ import React from 'react';
 
 export type ProgressBarVariant = 'default' | 'gradient' | 'arcane' | 'striped';
 export type ProgressBarSize = 'sm' | 'md' | 'lg';
-export type ProgressBarColor = 'accent' | 'success' | 'warning' | 'error' | 'info' | 'muted' | 'primary' | 'gray';
+export type ProgressBarColor =
+  | 'accent'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'info'
+  | 'muted'
+  | 'primary'
+  | 'gray';
 
 export interface ProgressBarProps {
   /** Current value */
@@ -91,9 +99,7 @@ export function ProgressBar({
   const percentage = Math.min(100, Math.max(0, (value / max) * 100));
 
   // Format value display
-  const displayValue = valueFormatter
-    ? valueFormatter(value, max)
-    : `${Math.round(percentage)}%`;
+  const displayValue = valueFormatter ? valueFormatter(value, max) : `${Math.round(percentage)}%`;
 
   const sizeStyle = sizeClasses[size];
   const colorVar = colorVars[color];
@@ -121,13 +127,16 @@ export function ProgressBar({
   };
 
   // Arcane animation styles (striped pattern)
-  const arcaneStyle: React.CSSProperties = variant === 'arcane' ? {
-    backgroundImage: `
+  const arcaneStyle: React.CSSProperties =
+    variant === 'arcane'
+      ? {
+          backgroundImage: `
       linear-gradient(45deg, rgba(255,255,255,.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.1) 75%, transparent 75%, transparent),
       linear-gradient(90deg, color-mix(in srgb, ${colorVar} 80%, black), ${colorVar}, color-mix(in srgb, ${colorVar} 80%, white))
     `,
-    backgroundSize: '1rem 1rem, 200% 100%',
-  } : {};
+          backgroundSize: '1rem 1rem, 200% 100%',
+        }
+      : {};
 
   return (
     <div className={`w-full ${className}`} style={style}>
@@ -136,8 +145,7 @@ export function ProgressBar({
         <div className="flex items-center justify-between mb-2">
           {label && (
             <span
-              className={`font-display font-semibold tracking-wider uppercase ${sizeStyle.text}`}
-              style={{ color: 'var(--color-text-secondary)' }}
+              className={`font-display font-semibold tracking-wider uppercase text-skin-secondary ${sizeStyle.text}`}
             >
               {label}
             </span>
@@ -160,10 +168,10 @@ export function ProgressBar({
       <div
         className={`
           w-full rounded-full overflow-hidden relative
+          bg-skin-tertiary
           ${sizeStyle.bar}
         `}
         style={{
-          backgroundColor: 'var(--color-bg-tertiary)',
           boxShadow: 'var(--shadow-inset)',
         }}
         role="progressbar"

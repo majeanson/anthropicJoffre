@@ -29,7 +29,7 @@ export function useChatNotifications({
   socket,
   currentPlayerId,
   chatOpen,
-  onNewChatMessage
+  onNewChatMessage,
 }: UseChatNotificationsOptions): UseChatNotificationsReturn {
   const [unreadChatCount, setUnreadChatCount] = useState(0);
 
@@ -40,7 +40,7 @@ export function useChatNotifications({
     const handleChatMessage = (msg: ChatMessage) => {
       // Increment unread count if chat is closed
       if (!chatOpen) {
-        setUnreadChatCount(prev => prev + 1);
+        setUnreadChatCount((prev) => prev + 1);
 
         // Play notification sound if message is from another player
         if (msg.playerId !== currentPlayerId) {
@@ -68,6 +68,6 @@ export function useChatNotifications({
 
   return {
     unreadChatCount,
-    setUnreadChatCount
+    setUnreadChatCount,
   };
 }

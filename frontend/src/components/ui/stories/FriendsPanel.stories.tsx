@@ -75,9 +75,13 @@ const FriendsPanelMock = ({
                   actions={
                     <div className="flex items-center gap-2">
                       {friend.is_online && friend.game_id && (
-                        <Button variant="primary" size="sm">Watch</Button>
+                        <Button variant="primary" size="sm">
+                          Watch
+                        </Button>
                       )}
-                      <Button variant="danger" size="sm">Remove</Button>
+                      <Button variant="danger" size="sm">
+                        Remove
+                      </Button>
                     </div>
                   }
                 />
@@ -89,7 +93,9 @@ const FriendsPanelMock = ({
         {activeTab === 'requests' && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">Received Requests</h3>
+              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">
+                Received Requests
+              </h3>
               <div className="space-y-3">
                 {pendingRequests.length === 0 ? (
                   <EmptyState icon="📬" title="No pending requests" compact />
@@ -101,8 +107,16 @@ const FriendsPanelMock = ({
                       metadata={new Date(request.created_at).toLocaleDateString()}
                       actions={
                         <div className="flex gap-2">
-                          <Button variant="primary" size="sm" className="bg-green-600 hover:bg-green-700 border-green-700">Accept</Button>
-                          <Button variant="danger" size="sm">Reject</Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 border-green-700"
+                          >
+                            Accept
+                          </Button>
+                          <Button variant="danger" size="sm">
+                            Reject
+                          </Button>
                         </div>
                       }
                     />
@@ -112,7 +126,9 @@ const FriendsPanelMock = ({
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">Sent Requests</h3>
+              <h3 className="text-lg font-semibold text-umber-900 dark:text-gray-100 mb-3">
+                Sent Requests
+              </h3>
               <div className="space-y-3">
                 {sentRequests.length === 0 ? (
                   <EmptyState icon="📤" title="No sent requests" compact />
@@ -123,7 +139,9 @@ const FriendsPanelMock = ({
                       playerName={request.to_player}
                       metadata={`Sent ${new Date(request.created_at).toLocaleDateString()}`}
                       actions={
-                        <UIBadge variant="solid" color="warning" size="sm">Pending</UIBadge>
+                        <UIBadge variant="solid" color="warning" size="sm">
+                          Pending
+                        </UIBadge>
                       }
                     />
                   ))
@@ -154,9 +172,7 @@ const FriendsPanelMock = ({
               </Button>
             </div>
 
-            {isLoading && (
-              <LoadingState message="Searching..." size="sm" />
-            )}
+            {isLoading && <LoadingState message="Searching..." size="sm" />}
 
             {!isLoading && searchResults.length === 0 && searchQuery.length >= 2 && (
               <EmptyState icon="🔍" title="No players found" compact />
@@ -264,9 +280,7 @@ export const RequestsTab: Story = {
       { id: 1, from_player: 'NewPlayer1', created_at: '2025-01-15' },
       { id: 2, from_player: 'NewPlayer2', created_at: '2025-01-14' },
     ],
-    sentRequests: [
-      { id: 3, to_player: 'ProGamer', created_at: '2025-01-13' },
-    ],
+    sentRequests: [{ id: 3, to_player: 'ProGamer', created_at: '2025-01-13' }],
   },
 };
 
@@ -293,12 +307,8 @@ export const DarkMode: Story = {
     isOpen: true,
     onClose: () => {},
     activeTab: 'requests',
-    pendingRequests: [
-      { id: 1, from_player: 'DarkPlayer', created_at: '2025-01-15' },
-    ],
-    sentRequests: [
-      { id: 2, to_player: 'NightOwl', created_at: '2025-01-14' },
-    ],
+    pendingRequests: [{ id: 1, from_player: 'DarkPlayer', created_at: '2025-01-15' }],
+    sentRequests: [{ id: 2, to_player: 'NightOwl', created_at: '2025-01-14' }],
   },
   decorators: [
     (Story) => (

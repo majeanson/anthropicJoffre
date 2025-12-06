@@ -83,7 +83,11 @@ describe('JoinGameForm', () => {
   it('shows spectator info message when spectator type is selected', () => {
     renderWithProviders(<JoinGameForm {...defaultProps} joinType="spectator" />);
 
-    expect(screen.getByText('As a spectator, you can watch the game but cannot play cards. Player hands will be hidden.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'As a spectator, you can watch the game but cannot play cards. Player hands will be hidden.'
+      )
+    ).toBeInTheDocument();
   });
 
   it('shows (Optional) for player name when spectator type is selected', () => {

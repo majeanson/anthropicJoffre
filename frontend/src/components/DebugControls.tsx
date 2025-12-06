@@ -61,7 +61,11 @@ const DebugControls: React.FC<DebugControlsProps> = ({
 
         {/* Dropdown Menu */}
         {debugMenuOpen && (
-          <UICard variant="elevated" size="sm" className="absolute top-12 right-0 min-w-[180px] backdrop-blur-sm bg-gray-900">
+          <UICard
+            variant="elevated"
+            size="sm"
+            className="absolute top-12 right-0 min-w-[180px] backdrop-blur-sm bg-gray-900"
+          >
             <Button
               variant="ghost"
               size="sm"

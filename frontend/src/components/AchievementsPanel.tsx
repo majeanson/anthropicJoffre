@@ -36,19 +36,28 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
     if (!socket) return;
 
     setLoading(true);
-    socket.emit('get_player_achievements', { playerName }, (response: { success: boolean; achievements?: AchievementProgress[]; points?: number; error?: string }) => {
-      if (response.success && response.achievements) {
-        setAchievements(response.achievements);
-        setTotalPoints(response.points || 0);
+    socket.emit(
+      'get_player_achievements',
+      { playerName },
+      (response: {
+        success: boolean;
+        achievements?: AchievementProgress[];
+        points?: number;
+        error?: string;
+      }) => {
+        if (response.success && response.achievements) {
+          setAchievements(response.achievements);
+          setTotalPoints(response.points || 0);
+        }
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    );
   };
 
   if (!isOpen) return null;
 
   // Filter achievements
-  const filteredAchievements = achievements.filter(achievement => {
+  const filteredAchievements = achievements.filter((achievement) => {
     if (filterCategory !== 'all' && achievement.category !== filterCategory) return false;
     if (filterTier !== 'all' && achievement.tier !== filterTier) return false;
     if (showUnlockedOnly && !achievement.is_unlocked) return false;
@@ -56,7 +65,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
   });
 
   // Calculate stats
-  const unlockedCount = achievements.filter(a => a.is_unlocked).length;
+  const unlockedCount = achievements.filter((a) => a.is_unlocked).length;
   const totalCount = achievements.length;
   const completionPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
 

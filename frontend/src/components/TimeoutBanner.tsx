@@ -9,7 +9,7 @@ interface TimeoutBannerProps {
 export function TimeoutBanner({
   playerName,
   secondsRemaining,
-  isCurrentPlayer
+  isCurrentPlayer,
 }: TimeoutBannerProps) {
   if (secondsRemaining === 0 || secondsRemaining > 60) {
     return null;
@@ -31,9 +31,7 @@ export function TimeoutBanner({
       >
         <div className="flex items-center gap-3">
           {/* Timer Icon */}
-          <div className="text-2xl">
-            ⏱️
-          </div>
+          <div className="text-2xl">⏱️</div>
 
           {/* Countdown */}
           <div className="flex flex-col">
@@ -56,8 +54,8 @@ export function TimeoutBanner({
                 backgroundColor: isCritical
                   ? 'var(--color-error)'
                   : isWarning
-                  ? 'var(--color-warning)'
-                  : 'var(--color-info)'
+                    ? 'var(--color-warning)'
+                    : 'var(--color-info)',
               }}
             />
           </div>
@@ -66,9 +64,7 @@ export function TimeoutBanner({
         {/* Warning Message */}
         {isWarning && (
           <div className="mt-2 text-center text-xs font-semibold text-white/90">
-            {isCritical
-              ? '⚡ Action will be taken automatically!'
-              : '⚠️ Running out of time...'}
+            {isCritical ? '⚡ Action will be taken automatically!' : '⚠️ Running out of time...'}
           </div>
         )}
       </UICard>

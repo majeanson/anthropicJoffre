@@ -45,7 +45,9 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
       setError(null);
 
       try {
-        const response = await fetch(`${CONFIG.API_BASE_URL}/api/players/${encodeURIComponent(playerName)}/active-games`);
+        const response = await fetch(
+          `${CONFIG.API_BASE_URL}/api/players/${encodeURIComponent(playerName)}/active-games`
+        );
 
         if (!response.ok) {
           throw new Error(ERROR_MESSAGES.ACTIVE_GAMES_LOAD_FAILED);
@@ -81,9 +83,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
   if (loading && activeGames.length === 0) {
     return (
       <UICard variant="bordered" size="md" gradient="info" className="text-center">
-        <p style={{ color: 'var(--color-info)' }}>
-          🔍 Loading your active games...
-        </p>
+        <p className="text-skin-info">🔍 Loading your active games...</p>
       </UICard>
     );
   }
@@ -91,9 +91,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
   if (error) {
     return (
       <UICard variant="bordered" size="md" gradient="error" className="text-center">
-        <p style={{ color: 'var(--color-error)' }}>
-          ⚠️ {error}
-        </p>
+        <p className="text-skin-error">⚠️ {error}</p>
       </UICard>
     );
   }
@@ -104,10 +102,14 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
 
   const getPhaseLabel = (phase: string) => {
     switch (phase) {
-      case 'betting': return '💰 Betting';
-      case 'playing': return '🎮 Playing';
-      case 'scoring': return '📊 Scoring';
-      default: return phase;
+      case 'betting':
+        return '💰 Betting';
+      case 'playing':
+        return '🎮 Playing';
+      case 'scoring':
+        return '📊 Scoring';
+      default:
+        return phase;
     }
   };
 
@@ -119,10 +121,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
 
   return (
     <UICard variant="bordered" size="lg" gradient="success">
-      <h3
-        className="font-bold text-lg mb-3 flex items-center gap-2"
-        style={{ color: 'var(--color-success)' }}
-      >
+      <h3 className="font-bold text-lg mb-3 flex items-center gap-2 text-skin-success">
         <span aria-hidden="true">🔄</span>
         <span>Your Active Games ({activeGames.length})</span>
       </h3>
@@ -133,39 +132,35 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
             key={game.gameId}
             variant="bordered"
             size="md"
-            className="transition-colors"
-            style={{ ['--hover-border' as string]: 'var(--color-success)' }}
+            className="transition-colors hover:border-skin-status-success"
           >
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span
-                    className="font-mono text-xs"
-                    style={{ color: 'var(--color-text-muted)' }}
-                  >
+                  <span className="font-mono text-xs text-skin-muted">
                     {game.gameId.substring(0, 8).toUpperCase()}
                   </span>
-                  <span
-                    className="text-sm font-semibold"
-                    style={{ color: 'var(--color-text-secondary)' }}
-                  >
+                  <span className="text-sm font-semibold text-skin-secondary">
                     {getPhaseLabel(game.phase)}
                   </span>
                 </div>
 
-                <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                <div className="text-xs text-skin-muted">
                   Players: {game.playerNames.join(', ')}
                 </div>
 
                 <div className="flex items-center gap-4 mt-1 text-sm">
-                  <span className="font-bold" style={{ color: 'var(--color-team1-primary)' }}>
+                  <span className="font-bold text-skin-team1-text">
                     Team 1: {game.teamScores.team1}
                   </span>
-                  <span className="font-bold" style={{ color: 'var(--color-team2-primary)' }}>
+                  <span className="font-bold text-skin-team2-text">
                     Team 2: {game.teamScores.team2}
                   </span>
                   {game.myTeamId && (
-                    <span className="text-xs font-semibold" style={getTeamColorStyle(game.myTeamId)}>
+                    <span
+                      className="text-xs font-semibold"
+                      style={getTeamColorStyle(game.myTeamId)}
+                    >
                       (You're Team {game.myTeamId})
                     </span>
                   )}
@@ -189,7 +184,7 @@ export function ActiveGames({ playerName, socket, onResumeGame }: ActiveGamesPro
         ))}
       </div>
 
-      <p className="text-xs mt-3 text-center" style={{ color: 'var(--color-success)' }}>
+      <p className="text-xs mt-3 text-center text-skin-success">
         💡 Click Resume to rejoin your game
       </p>
     </UICard>

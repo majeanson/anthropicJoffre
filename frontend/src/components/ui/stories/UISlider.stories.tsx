@@ -293,9 +293,7 @@ export const InteractiveDemo: StoryObj = {
           <p className="text-4xl font-bold text-purple-600 dark:text-purple-400 tabular-nums">
             {value}%
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            Current Value
-          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Current Value</p>
         </div>
 
         <div className="w-full h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">

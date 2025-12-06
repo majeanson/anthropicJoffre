@@ -23,7 +23,7 @@ export function SwapConfirmationModal({
   fromPlayerName,
   willChangeTeams,
   onAccept,
-  onReject
+  onReject,
 }: SwapConfirmationModalProps) {
   const [timeLeft, setTimeLeft] = useState(30);
 
@@ -40,7 +40,7 @@ export function SwapConfirmationModal({
 
     // Update countdown every second
     const countdownInterval = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
           return 0;
         }
@@ -83,14 +83,12 @@ export function SwapConfirmationModal({
         {willChangeTeams && (
           <div className="bg-gradient-to-r from-yellow-600 to-orange-600 border-2 border-orange-800 rounded-lg p-3">
             <div className="flex items-start gap-2">
-              <span className="text-xl" aria-hidden="true">⚠️</span>
+              <span className="text-xl" aria-hidden="true">
+                ⚠️
+              </span>
               <div className="flex-1">
-                <p className="font-semibold text-white">
-                  Warning: Team Change
-                </p>
-                <p className="text-sm text-white/90">
-                  This swap will change your team!
-                </p>
+                <p className="font-semibold text-white">Warning: Team Change</p>
+                <p className="text-sm text-white/90">This swap will change your team!</p>
               </div>
             </div>
           </div>
@@ -99,9 +97,7 @@ export function SwapConfirmationModal({
         <div className="text-sm text-gray-600 dark:text-gray-400">
           <p>• Your position and turn order will be swapped</p>
           <p>• Your cards and game progress will be preserved</p>
-          {willChangeTeams && (
-            <p>• Your team will change due to the new position</p>
-          )}
+          {willChangeTeams && <p>• Your team will change due to the new position</p>}
         </div>
 
         <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">

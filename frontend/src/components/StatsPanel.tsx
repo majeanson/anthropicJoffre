@@ -37,7 +37,9 @@ export function StatsPanel({
     <div className="space-y-3">
       <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-6 border-2 border-parchment-400 dark:border-gray-600 text-center">
         <p className="text-4xl mb-3">📊</p>
-        <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4">Player Statistics</h3>
+        <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4">
+          Player Statistics
+        </h3>
 
         <div className="space-y-3">
           <Button

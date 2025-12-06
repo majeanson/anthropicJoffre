@@ -66,7 +66,9 @@ export function clearCsrfToken() {
  *
  * @param additionalHeaders - Optional additional headers to include
  */
-export async function getHeadersWithCsrf(additionalHeaders: HeadersInit = {}): Promise<HeadersInit> {
+export async function getHeadersWithCsrf(
+  additionalHeaders: HeadersInit = {}
+): Promise<HeadersInit> {
   const token = await fetchCsrfToken();
 
   return {
@@ -89,7 +91,7 @@ const CSRF_EXEMPT_PATHS = [
  * Check if URL is exempt from CSRF protection
  */
 function isCsrfExempt(url: string): boolean {
-  return CSRF_EXEMPT_PATHS.some(path => url.includes(path));
+  return CSRF_EXEMPT_PATHS.some((path) => url.includes(path));
 }
 
 /**
@@ -141,11 +143,7 @@ export async function fetchWithCsrf(
   const response = await fetch(url, fetchOptions);
 
   // If CSRF error and retry enabled, clear token and retry once
-  if (
-    !response.ok &&
-    retryOnCsrfError &&
-    response.status === 403
-  ) {
+  if (!response.ok && retryOnCsrfError && response.status === 403) {
     try {
       const data = await response.clone().json();
       if (data.code === 'CSRF_VALIDATION_FAILED') {

@@ -79,8 +79,10 @@ export function Tabs({
   const containerStyles: Record<TabVariant, string> = {
     underline: 'border-b-2 border-[var(--color-border-default)]',
     pills: 'gap-2',
-    arcane: 'gap-1 p-1 bg-[var(--color-bg-tertiary)]/50 rounded-[var(--radius-lg)] border border-[var(--color-border-default)]',
-    boxed: 'gap-1 p-1 bg-[var(--color-bg-tertiary)]/50 rounded-[var(--radius-lg)] border border-[var(--color-border-default)]',
+    arcane:
+      'gap-1 p-1 bg-[var(--color-bg-tertiary)]/50 rounded-[var(--radius-lg)] border border-[var(--color-border-default)]',
+    boxed:
+      'gap-1 p-1 bg-[var(--color-bg-tertiary)]/50 rounded-[var(--radius-lg)] border border-[var(--color-border-default)]',
   };
 
   return (
@@ -162,7 +164,8 @@ export function Tabs({
               return {
                 base: 'border-b-2 -mb-[2px] transition-all duration-[var(--duration-normal)]',
                 active: 'border-[var(--color-text-accent)] text-[var(--color-text-accent)]',
-                inactive: 'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-accent)]/50',
+                inactive:
+                  'border-transparent text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:border-[var(--color-text-accent)]/50',
               };
           }
         };
@@ -196,10 +199,7 @@ export function Tabs({
           >
             {/* Icon */}
             {tab.icon && (
-              <span
-                className={sizeStyle.icon}
-                aria-hidden="true"
-              >
+              <span className={sizeStyle.icon} aria-hidden="true">
                 {tab.icon}
               </span>
             )}
@@ -214,9 +214,10 @@ export function Tabs({
                   ${sizeStyle.badge}
                   inline-flex items-center justify-center
                   rounded-full font-display font-bold
-                  ${isActive
-                    ? 'bg-[var(--color-text-accent)] text-[var(--color-text-inverse)]'
-                    : 'bg-[var(--color-error)] text-white'
+                  ${
+                    isActive
+                      ? 'bg-[var(--color-text-accent)] text-[var(--color-text-inverse)]'
+                      : 'bg-[var(--color-error)] text-white'
                   }
                 `}
                 style={{
@@ -285,8 +286,6 @@ export const ArcaneTabs = (props: Omit<TabsProps, 'variant'>) => (
 );
 
 /** Pill tabs */
-export const PillTabs = (props: Omit<TabsProps, 'variant'>) => (
-  <Tabs variant="pills" {...props} />
-);
+export const PillTabs = (props: Omit<TabsProps, 'variant'>) => <Tabs variant="pills" {...props} />;
 
 export default Tabs;

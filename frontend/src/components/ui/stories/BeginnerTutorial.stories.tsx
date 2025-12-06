@@ -174,7 +174,12 @@ export const PlayingIntro: Story = {
       currentTrick: [],
       currentRoundTricks: [],
       trump: 'blue',
-      highestBet: createMockBet({ playerId: 'player1', playerName: 'You', amount: 8, withoutTrump: false }),
+      highestBet: createMockBet({
+        playerId: 'player1',
+        playerName: 'You',
+        amount: 8,
+        withoutTrump: false,
+      }),
     }),
     currentPlayerId: 'player1',
   },
@@ -184,12 +189,8 @@ export const PlayingIntro: Story = {
 export const FollowingSuit: Story = {
   args: {
     gameState: createMockGameState('playing', {
-      currentTrick: [
-        createMockTrickCard({ color: 'red', value: 5 } as Card, 'player2', 'Bot 1'),
-      ],
-      currentRoundTricks: [
-        createMockTrickResult(),
-      ],
+      currentTrick: [createMockTrickCard({ color: 'red', value: 5 } as Card, 'player2', 'Bot 1')],
+      currentRoundTricks: [createMockTrickResult()],
       trump: 'blue',
     }),
     currentPlayerId: 'player1',
@@ -201,9 +202,7 @@ export const TrumpCards: Story = {
   args: {
     gameState: createMockGameState('playing', {
       currentTrick: [],
-      currentRoundTricks: [
-        createMockTrickResult(),
-      ],
+      currentRoundTricks: [createMockTrickResult()],
       trump: 'blue',
     }),
     currentPlayerId: 'player1',
@@ -226,9 +225,7 @@ export const SpecialCards: Story = {
           ],
         }),
       ],
-      currentRoundTricks: [
-        createMockTrickResult(),
-      ],
+      currentRoundTricks: [createMockTrickResult()],
       trump: 'green',
     }),
     currentPlayerId: 'player1',

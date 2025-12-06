@@ -657,6 +657,62 @@ button:not(:disabled):active {
 .text-team1 { color: var(--color-team1-primary); }
 .text-team2 { color: var(--color-team2-primary); }
 
+.border-team1 { border-color: var(--color-team1-primary); }
+.border-team2 { border-color: var(--color-team2-primary); }
+
+/* Team container backgrounds with transparency */
+.bg-team1-10 { background-color: color-mix(in srgb, var(--color-team1-primary) 10%, transparent); }
+.bg-team2-10 { background-color: color-mix(in srgb, var(--color-team2-primary) 10%, transparent); }
+.bg-team1-20 { background-color: color-mix(in srgb, var(--color-team1-primary) 20%, transparent); }
+.bg-team2-20 { background-color: color-mix(in srgb, var(--color-team2-primary) 20%, transparent); }
+
+/* Team text shadows */
+.text-shadow-team1 { text-shadow: 0 0 10px var(--color-team1-primary); }
+.text-shadow-team2 { text-shadow: 0 0 10px var(--color-team2-primary); }
+
+/* Team box shadows */
+.shadow-team1 { box-shadow: 0 0 10px color-mix(in srgb, var(--color-team1-primary) 40%, transparent); }
+.shadow-team2 { box-shadow: 0 0 10px color-mix(in srgb, var(--color-team2-primary) 40%, transparent); }
+
+/* Main container shadow */
+.shadow-main-glow { box-shadow: var(--shadow-glow), var(--shadow-lg); }
+.shadow-skin-glow { box-shadow: 0 0 10px var(--color-glow); }
+
+/* Background grid pattern */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(var(--color-border-subtle) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-border-subtle) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Turn indicator shadows */
+.shadow-turn-active { box-shadow: 0 0 20px var(--color-glow), 0 0 40px var(--color-glow); }
+.shadow-turn-team1 { box-shadow: 0 0 15px var(--color-team1-primary); }
+.shadow-turn-team2 { box-shadow: 0 0 15px var(--color-team2-primary); }
+
+/* Navigation level shadows */
+.shadow-nav-active { box-shadow: 0 0 15px var(--color-glow); }
+.shadow-btn-selected { box-shadow: 0 0 10px var(--color-glow); }
+
+/* Betting history styles */
+.bg-gradient-betting-card {
+  background: linear-gradient(to bottom right, var(--color-bg-secondary), var(--color-bg-tertiary));
+}
+.bg-gradient-highest-bet {
+  background: linear-gradient(to right, var(--color-success), color-mix(in srgb, var(--color-success) 80%, black));
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-success) 40%, transparent);
+}
+.border-dashed-default { border: 1px dashed var(--color-border-default); }
+.border-t-skin-default { border-top: 1px solid var(--color-border-default); }
+
+/* Text shadows */
+.text-shadow-glow { text-shadow: 0 0 10px var(--color-glow); }
+.text-shadow-glow-sm { text-shadow: 0 0 5px var(--color-glow); }
+
+/* Ranked mode badge */
+.shadow-badge-warning { box-shadow: 0 0 8px var(--color-warning); }
+
 /* Suit color utilities */
 .text-suit-red { color: var(--color-suit-red); }
 .text-suit-brown { color: var(--color-suit-brown); }
@@ -766,6 +822,188 @@ button:not(:disabled):active {
 .playing-card:hover:not(:disabled) {
   transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow-glow), var(--shadow-lg);
+}
+
+/* Card component styles */
+.card-base {
+  background-color: var(--card-bg-color);
+  box-shadow: var(--shadow-md);
+  transition: all var(--duration-normal) var(--easing);
+}
+
+.card-playable {
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transform: translateY(-6px);
+}
+
+.card-playable:hover {
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  transform: translateY(-8px) scale(1.03);
+}
+
+.card-disabled {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Card back styles */
+.card-back-bg {
+  background: linear-gradient(135deg,
+    var(--color-bg-tertiary) 0%,
+    var(--color-bg-secondary) 50%,
+    var(--color-bg-tertiary) 100%
+  );
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Card parchment texture overlay */
+.card-parchment-overlay {
+  background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.08) 100%);
+}
+
+/* Card inner glow for playable cards */
+.card-inner-glow-red { background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-suit-red) 12%, transparent) 0%, transparent 65%); }
+.card-inner-glow-brown { background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-suit-brown) 12%, transparent) 0%, transparent 65%); }
+.card-inner-glow-green { background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-suit-green) 12%, transparent) 0%, transparent 65%); }
+.card-inner-glow-blue { background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-suit-blue) 12%, transparent) 0%, transparent 65%); }
+
+/* Card value badge */
+.card-badge {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.card-badge-red { background-color: var(--color-suit-red); }
+.card-badge-brown { background-color: var(--color-suit-brown); }
+.card-badge-green { background-color: var(--color-suit-green); }
+.card-badge-blue { background-color: var(--color-suit-blue); }
+
+/* Card special badge glow */
+.card-special-badge-success {
+  background-color: var(--color-success);
+  box-shadow: 0 2px 10px var(--color-success);
+}
+
+.card-special-badge-error {
+  background-color: var(--color-error);
+  box-shadow: 0 2px 10px var(--color-error);
+}
+
+/* Card disabled overlay */
+.card-disabled-overlay {
+  background-color: color-mix(in srgb, var(--color-bg-primary) 60%, transparent);
+  backdrop-filter: grayscale(90%) brightness(0.7);
+}
+
+.card-disabled-seal {
+  background: linear-gradient(135deg, var(--color-error), color-mix(in srgb, var(--color-error) 70%, black));
+  box-shadow: var(--shadow-md);
+}
+
+/* Card center emblem filter */
+.card-emblem-playable {
+  filter: brightness(1.1);
+}
+
+.card-emblem-drop-shadow {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+}
+
+.card-emblem-playable-drop-shadow {
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)) brightness(1.05);
+}
+
+/* Card stack positioning */
+.card-stack-offset {
+  --stack-index: 0;
+  top: calc(var(--stack-index) * -2px);
+  left: calc(var(--stack-index) * 1px);
+  z-index: var(--stack-index);
+}
+
+/* Card count badge */
+.card-count-badge {
+  background: linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 90%, black));
+  color: var(--color-text-inverse);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Card spotlight effect */
+.card-spotlight {
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--color-glow) 15%, transparent) 0%, color-mix(in srgb, var(--color-highlight) 8%, transparent) 30%, transparent 60%);
+  filter: blur(12px);
+  animation: ethereal-pulse 3s ease-in-out infinite;
+}
+
+/* Card center symbol (for card backs) */
+.card-center-symbol {
+  background: linear-gradient(135deg, var(--color-bg-accent), color-mix(in srgb, var(--color-bg-accent) 80%, black));
+  box-shadow: var(--shadow-glow), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+/* Team-colored card back variants */
+.card-back-team1 {
+  border-color: var(--color-team1-primary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 25px rgba(180, 83, 9, 0.3);
+}
+
+.card-back-team2 {
+  border-color: var(--color-team2-primary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 25px rgba(124, 58, 237, 0.3);
+}
+
+.card-center-symbol-team1 {
+  background: linear-gradient(135deg, var(--color-team1-primary), color-mix(in srgb, var(--color-team1-primary) 80%, black));
+  box-shadow: var(--shadow-glow);
+}
+
+.card-center-symbol-team2 {
+  background: linear-gradient(135deg, var(--color-team2-primary), color-mix(in srgb, var(--color-team2-primary) 80%, black));
+  box-shadow: var(--shadow-glow);
+}
+
+/* ============================================================================
+   CARD SKIN SELECTOR STYLES
+   ============================================================================ */
+
+/* Preview card container */
+.skin-preview-card {
+  transform: scale(0.75);
+  transform-origin: center;
+  transition: all 0.2s ease;
+}
+
+.skin-preview-card-active {
+  opacity: 1;
+}
+
+.skin-preview-card-inactive {
+  opacity: 0.9;
+}
+
+/* Mini card preview in skin selector */
+.skin-mini-card {
+  width: 2.5rem;
+  height: 3.5rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: box-shadow 0.2s ease;
+}
+
+/* Skin swatch preview */
+.skin-swatch {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.75rem;
 }
 
 /* Card suit glow effects */
@@ -1106,5 +1344,61 @@ button:not(:disabled):active {
   }
   50% {
     box-shadow: 0 0 25px var(--color-glow), 0 0 40px var(--color-glow);
+  }
+}
+
+/* ============================================================================
+   MOBILE UTILITIES
+   ============================================================================ */
+
+/* Hide scrollbar but keep scrolling */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera */
+}
+
+/* Prevent overscroll bounce during gameplay */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* Game container - prevents pull-to-refresh and other mobile gestures */
+.game-container {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+}
+
+/* Prevent text selection on game elements */
+.game-area {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Touch device optimizations - coarse pointer indicates touchscreen */
+@media (pointer: coarse) {
+  /* Ensure minimum touch target sizes */
+  button:not(.icon-button),
+  [role="button"]:not(.icon-button),
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+  }
+
+  /* Larger checkbox/radio hit areas */
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 44px;
+    transform: scale(1.25);
+  }
+
+  /* Remove hover effects that cause sticky state on touch */
+  .no-touch-hover:hover {
+    background-color: inherit !important;
   }
 }

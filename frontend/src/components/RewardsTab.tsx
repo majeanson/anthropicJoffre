@@ -26,12 +26,7 @@ interface RewardsTabProps {
   nextLevelXP: number;
 }
 
-export function RewardsTab({
-  playerLevel,
-  totalXp,
-  currentLevelXP,
-  nextLevelXP,
-}: RewardsTabProps) {
+export function RewardsTab({ playerLevel, totalXp, currentLevelXP, nextLevelXP }: RewardsTabProps) {
   // Current title
   const currentTitle = getTitleForLevel(playerLevel);
   const nextTitle = getNextTitle(playerLevel);
@@ -41,22 +36,27 @@ export function RewardsTab({
     const baseRewards = getUpcomingRewards(playerLevel, 10);
 
     // Enhance with card skins and UI skins
-    return baseRewards.map(reward => ({
+    return baseRewards.map((reward) => ({
       ...reward,
-      cardSkins: cardSkinList.filter(cs => cs.requiredLevel === reward.level),
-      uiSkins: skinList.filter(s => getSkinPricing(s.id).suggestedLevel === reward.level && getSkinPricing(s.id).price > 0),
+      cardSkins: cardSkinList.filter((cs) => cs.requiredLevel === reward.level),
+      uiSkins: skinList.filter(
+        (s) =>
+          getSkinPricing(s.id).suggestedLevel === reward.level && getSkinPricing(s.id).price > 0
+      ),
     }));
   }, [playerLevel]);
 
   // Also find levels with ONLY skins (not covered by base rewards)
   const additionalSkinLevels = useMemo(() => {
-    const existingLevels = new Set(upcomingRewards.map(r => r.level));
+    const existingLevels = new Set(upcomingRewards.map((r) => r.level));
     const skinOnlyRewards: { level: number; cardSkins: CardSkin[]; uiSkins: Skin[] }[] = [];
 
     for (let level = playerLevel + 1; level <= playerLevel + 10; level++) {
       if (!existingLevels.has(level)) {
-        const cardSkinsAtLevel = cardSkinList.filter(cs => cs.requiredLevel === level);
-        const uiSkinsAtLevel = skinList.filter(s => getSkinPricing(s.id).suggestedLevel === level && getSkinPricing(s.id).price > 0);
+        const cardSkinsAtLevel = cardSkinList.filter((cs) => cs.requiredLevel === level);
+        const uiSkinsAtLevel = skinList.filter(
+          (s) => getSkinPricing(s.id).suggestedLevel === level && getSkinPricing(s.id).price > 0
+        );
         if (cardSkinsAtLevel.length > 0 || uiSkinsAtLevel.length > 0) {
           skinOnlyRewards.push({ level, cardSkins: cardSkinsAtLevel, uiSkins: uiSkinsAtLevel });
         }
@@ -68,10 +68,10 @@ export function RewardsTab({
 
   // Calculate progress stats
   const stats = useMemo(() => {
-    const unlockedAvatars = AVATARS.filter(a => isAvatarUnlocked(a.id, playerLevel)).length;
-    const unlockedTitles = TITLES.filter(t => t.unlockLevel <= playerLevel).length;
-    const unlockedSkins = SKIN_REWARDS.filter(s => s.unlockLevel <= playerLevel).length;
-    const unlockedCardSkins = cardSkinList.filter(cs => cs.requiredLevel <= playerLevel).length;
+    const unlockedAvatars = AVATARS.filter((a) => isAvatarUnlocked(a.id, playerLevel)).length;
+    const unlockedTitles = TITLES.filter((t) => t.unlockLevel <= playerLevel).length;
+    const unlockedSkins = SKIN_REWARDS.filter((s) => s.unlockLevel <= playerLevel).length;
+    const unlockedCardSkins = cardSkinList.filter((cs) => cs.requiredLevel <= playerLevel).length;
 
     return {
       avatars: { unlocked: unlockedAvatars, total: AVATARS.length },
@@ -98,10 +98,7 @@ export function RewardsTab({
             <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Current Level
             </div>
-            <div
-              className="text-3xl font-bold"
-              style={{ color: 'var(--color-text-accent)' }}
-            >
+            <div className="text-3xl font-bold" style={{ color: 'var(--color-text-accent)' }}>
               Level {playerLevel}
             </div>
           </div>
@@ -109,38 +106,27 @@ export function RewardsTab({
             <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Title
             </div>
-            <div className={`text-xl font-semibold ${currentTitle.color}`}>
-              {currentTitle.name}
-            </div>
+            <div className={`text-xl font-semibold ${currentTitle.color}`}>{currentTitle.name}</div>
           </div>
         </div>
 
         {/* XP Progress Bar */}
         <div className="mb-2">
           <div className="flex justify-between text-sm mb-1">
-            <span style={{ color: 'var(--color-text-muted)' }}>
+            <span className="text-skin-muted">
               {currentLevelXP.toLocaleString()} / {nextLevelXP.toLocaleString()} XP
             </span>
-            <span style={{ color: 'var(--color-text-accent)' }}>
-              {Math.round(xpProgress)}%
-            </span>
+            <span className="text-skin-accent">{Math.round(xpProgress)}%</span>
           </div>
-          <div
-            className="h-3 rounded-full overflow-hidden"
-            style={{ backgroundColor: 'var(--color-bg-tertiary)' }}
-          >
+          <div className="h-3 rounded-full overflow-hidden bg-skin-tertiary">
             <div
-              className="h-full rounded-full transition-all duration-500"
+              className="h-full rounded-full transition-all duration-500 bg-gradient-to-r from-skin-status-info to-skin-accent"
               style={{
                 width: `${xpProgress}%`,
-                background: 'linear-gradient(90deg, var(--color-info) 0%, var(--color-accent) 100%)',
               }}
             />
           </div>
-          <div
-            className="text-xs text-center mt-1"
-            style={{ color: 'var(--color-text-muted)' }}
-          >
+          <div className="text-xs text-center mt-1 text-skin-muted">
             Total XP: {totalXp.toLocaleString()}
           </div>
         </div>
@@ -177,17 +163,14 @@ export function RewardsTab({
       {/* Upcoming Rewards */}
       {(upcomingRewards.length > 0 || additionalSkinLevels.length > 0) && (
         <div>
-          <h3
-            className="text-lg font-semibold mb-3"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
+          <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
             Upcoming Rewards
           </h3>
           <div className="space-y-2">
             {/* Merge and sort all upcoming rewards by level */}
             {[
-              ...upcomingRewards.map(r => ({ ...r, type: 'full' as const })),
-              ...additionalSkinLevels.map(r => ({
+              ...upcomingRewards.map((r) => ({ ...r, type: 'full' as const })),
+              ...additionalSkinLevels.map((r) => ({
                 level: r.level,
                 avatars: [] as Avatar[],
                 title: null as Title | null,
@@ -198,7 +181,7 @@ export function RewardsTab({
               })),
             ]
               .sort((a, b) => a.level - b.level)
-              .map(reward => (
+              .map((reward) => (
                 <UpcomingRewardRow
                   key={reward.level}
                   level={reward.level}
@@ -228,9 +211,7 @@ export function RewardsTab({
               <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 Next Title at Level {nextTitle.unlockLevel}
               </div>
-              <div className={`text-lg font-semibold ${nextTitle.color}`}>
-                {nextTitle.name}
-              </div>
+              <div className={`text-lg font-semibold ${nextTitle.color}`}>{nextTitle.name}</div>
             </div>
             <div
               className="text-sm px-3 py-1 rounded-full"
@@ -247,14 +228,11 @@ export function RewardsTab({
 
       {/* All Titles Preview */}
       <div>
-        <h3
-          className="text-lg font-semibold mb-3"
-          style={{ color: 'var(--color-text-primary)' }}
-        >
+        <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
           All Titles
         </h3>
         <div className="flex flex-wrap gap-2">
-          {TITLES.map(title => {
+          {TITLES.map((title) => {
             const unlocked = title.unlockLevel <= playerLevel;
             return (
               <div
@@ -265,11 +243,17 @@ export function RewardsTab({
                 style={{
                   backgroundColor: 'var(--color-bg-tertiary)',
                 }}
-                title={unlocked ? `Unlocked at Level ${title.unlockLevel}` : `Unlocks at Level ${title.unlockLevel}`}
+                title={
+                  unlocked
+                    ? `Unlocked at Level ${title.unlockLevel}`
+                    : `Unlocks at Level ${title.unlockLevel}`
+                }
               >
                 {!unlocked && <span className="mr-1">🔒</span>}
                 {title.name}
-                {!unlocked && <span className="ml-1 text-xs opacity-70">Lv.{title.unlockLevel}</span>}
+                {!unlocked && (
+                  <span className="ml-1 text-xs opacity-70">Lv.{title.unlockLevel}</span>
+                )}
               </div>
             );
           })}
@@ -362,7 +346,7 @@ function UpcomingRewardRow({
 
       {/* Rewards */}
       <div className="flex-1 flex flex-wrap gap-2">
-        {avatars.map(avatar => (
+        {avatars.map((avatar) => (
           <div
             key={avatar.id}
             className="flex items-center gap-1 px-2 py-1 rounded-full text-sm"
@@ -382,7 +366,7 @@ function UpcomingRewardRow({
             <span>{title.name}</span>
           </div>
         )}
-        {skins.map(skin => (
+        {skins.map((skin) => (
           <div
             key={skin.skinId}
             className="flex items-center gap-1 px-2 py-1 rounded-full text-sm"
@@ -393,7 +377,7 @@ function UpcomingRewardRow({
             <span style={{ color: 'var(--color-text-muted)' }}>{skin.name}</span>
           </div>
         ))}
-        {cardSkins.map(cardSkin => (
+        {cardSkins.map((cardSkin) => (
           <div
             key={cardSkin.id}
             className="flex items-center gap-1 px-2 py-1 rounded-full text-sm"
@@ -404,7 +388,7 @@ function UpcomingRewardRow({
             <span style={{ color: 'var(--color-text-muted)' }}>{cardSkin.name}</span>
           </div>
         ))}
-        {uiSkins.map(uiSkin => (
+        {uiSkins.map((uiSkin) => (
           <div
             key={uiSkin.id}
             className="flex items-center gap-1 px-2 py-1 rounded-full text-sm"

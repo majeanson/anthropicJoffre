@@ -61,7 +61,7 @@ function EmojiPickerDemo() {
   const [selectedEmojis, setSelectedEmojis] = useState<string[]>([]);
 
   const handleSelectEmoji = (emoji: string) => {
-    setSelectedEmojis(prev => [...prev, emoji]);
+    setSelectedEmojis((prev) => [...prev, emoji]);
     setIsOpen(false);
   };
 
@@ -77,7 +77,9 @@ function EmojiPickerDemo() {
             <span className="text-[var(--color-text-tertiary)] text-sm">None yet - pick some!</span>
           ) : (
             selectedEmojis.map((emoji, i) => (
-              <span key={i} className="text-2xl">{emoji}</span>
+              <span key={i} className="text-2xl">
+                {emoji}
+              </span>
             ))
           )}
         </div>
@@ -85,20 +87,14 @@ function EmojiPickerDemo() {
 
       {/* Toggle button */}
       <div className="relative">
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          variant="secondary"
-        >
+        <Button onClick={() => setIsOpen(!isOpen)} variant="secondary">
           {isOpen ? 'Close Picker' : 'Open Emoji Picker'} 😊
         </Button>
 
         {/* Picker (positioned above button) */}
         {isOpen && (
           <div className="absolute bottom-full mb-2 left-0">
-            <EmojiPicker
-              onSelectEmoji={handleSelectEmoji}
-              onClose={() => setIsOpen(false)}
-            />
+            <EmojiPicker onSelectEmoji={handleSelectEmoji} onClose={() => setIsOpen(false)} />
           </div>
         )}
       </div>
@@ -120,10 +116,7 @@ export const Default: Story = {
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)]">
       <div className="relative w-80">
-        <EmojiPicker
-          onSelectEmoji={() => {}}
-          onClose={() => {}}
-        />
+        <EmojiPicker onSelectEmoji={() => {}} onClose={() => {}} />
       </div>
     </div>
   ),
@@ -138,7 +131,7 @@ function ChatWithEmojiPicker() {
   const [showPicker, setShowPicker] = useState(false);
 
   const handleSelectEmoji = (emoji: string) => {
-    setMessage(prev => prev + emoji);
+    setMessage((prev) => prev + emoji);
     setShowPicker(false);
   };
 
@@ -188,10 +181,7 @@ function ChatWithEmojiPicker() {
         {/* Emoji picker */}
         {showPicker && (
           <div className="absolute bottom-full right-0 mb-2">
-            <EmojiPicker
-              onSelectEmoji={handleSelectEmoji}
-              onClose={() => setShowPicker(false)}
-            />
+            <EmojiPicker onSelectEmoji={handleSelectEmoji} onClose={() => setShowPicker(false)} />
           </div>
         )}
       </div>
@@ -247,11 +237,13 @@ export const PositioningExample: Story = {
   name: 'Positioning Context',
   render: () => (
     <div className="p-6 rounded-lg bg-[var(--color-bg-primary)] w-[500px] h-[400px] relative">
-      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">Emoji Picker Positioning</h3>
+      <h3 className="text-[var(--color-text-primary)] font-semibold mb-4">
+        Emoji Picker Positioning
+      </h3>
 
       <p className="text-[var(--color-text-secondary)] text-sm mb-8">
-        The emoji picker uses absolute positioning and appears above its trigger element.
-        It includes proper z-indexing for overlay behavior.
+        The emoji picker uses absolute positioning and appears above its trigger element. It
+        includes proper z-indexing for overlay behavior.
       </p>
 
       {/* Positioned at bottom for demo */}
@@ -262,10 +254,7 @@ export const PositioningExample: Story = {
               😊
             </Button>
             <div className="absolute bottom-full right-0 mb-2">
-              <EmojiPicker
-                onSelectEmoji={() => {}}
-                onClose={() => {}}
-              />
+              <EmojiPicker onSelectEmoji={() => {}} onClose={() => {}} />
             </div>
           </div>
         </div>

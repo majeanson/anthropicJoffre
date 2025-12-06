@@ -13,7 +13,9 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
   const rematchVotes = gameState.rematchVotes || [];
 
   // Find current player to get their name (rematchVotes now stores names, not IDs)
-  const currentPlayer = gameState.players.find(p => p.name === currentPlayerId || p.id === currentPlayerId);
+  const currentPlayer = gameState.players.find(
+    (p) => p.name === currentPlayerId || p.id === currentPlayerId
+  );
   const currentPlayerName = currentPlayer?.name || '';
   const hasVoted = rematchVotes.includes(currentPlayerName);
   const votesNeeded = 4 - rematchVotes.length;
@@ -44,9 +46,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
                 {votesNeeded === 1 ? '1 more vote needed!' : `${votesNeeded} more votes needed`}
               </p>
             ) : (
-              <p className="text-lg text-forest-700 font-bold animate-pulse">
-                Starting rematch...
-              </p>
+              <p className="text-lg text-forest-700 font-bold animate-pulse">Starting rematch...</p>
             )}
           </div>
 
@@ -70,9 +70,7 @@ export function RematchVoting({ socket, gameId, gameState, currentPlayerId }: Re
                   <div className="text-xs font-bold text-umber-900 dark:text-gray-100 max-w-[60px] truncate">
                     {isCurrentPlayer ? 'You' : player.name}
                   </div>
-                  <div className="text-2xl mt-1">
-                    {voted ? '✓' : '○'}
-                  </div>
+                  <div className="text-2xl mt-1">{voted ? '✓' : '○'}</div>
                 </div>
               );
             })}

@@ -66,7 +66,7 @@ export function LevelUpModal({
 
   const tierInfo = getTierInfo(newLevel);
   const unlockedSkinItems = newlyUnlockedSkins
-    .map(id => skinList.find(s => s.id === id))
+    .map((id) => skinList.find((s) => s.id === id))
     .filter(Boolean);
 
   // Get upcoming skins as a teaser (only if no skins were just unlocked)
@@ -77,8 +77,7 @@ export function LevelUpModal({
 
   return (
     <div
-      className="fixed inset-0 flex items-center justify-center z-[100]"
-      style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}
+      className="fixed inset-0 flex items-center justify-center z-[100] bg-black/80"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -108,20 +107,15 @@ export function LevelUpModal({
         className={`
           relative w-full max-w-md mx-4 p-6 rounded-2xl text-center
           transform transition-all duration-500
+          bg-skin-primary border-2 border-skin-accent shadow-[0_0_60px_rgba(59,130,246,0.3)]
           ${showContent ? 'scale-100 opacity-100' : 'scale-50 opacity-0'}
         `}
-        style={{
-          backgroundColor: 'var(--color-bg-primary)',
-          border: '2px solid var(--color-text-accent)',
-          boxShadow: '0 0 60px rgba(59, 130, 246, 0.3)',
-        }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-500/20"
-          style={{ color: 'var(--color-text-secondary)' }}
+          className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-500/20 text-skin-secondary"
           aria-label="Close level up modal"
         >
           <span aria-hidden="true">✕</span>
@@ -129,14 +123,10 @@ export function LevelUpModal({
 
         {/* Level Up Header */}
         <div className="mb-6">
-          <h2
-            id="levelup-title"
-            className="text-3xl font-bold mb-2"
-            style={{ color: 'var(--color-text-primary)' }}
-          >
+          <h2 id="levelup-title" className="text-3xl font-bold mb-2 text-skin-primary">
             Level Up!
           </h2>
-          <p id="levelup-description" style={{ color: 'var(--color-text-muted)' }}>
+          <p id="levelup-description" className="text-skin-muted">
             Congratulations! You reached level {newLevel}.
           </p>
         </div>
@@ -195,15 +185,11 @@ export function LevelUpModal({
         {unlockedSkinItems.length > 0 && (
           <div
             className={`
-              mt-4 pt-4 border-t transition-all duration-500
+              mt-4 pt-4 border-t border-skin-subtle transition-all duration-500
               ${showSkins ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}
-            style={{ borderColor: 'var(--color-border-subtle)' }}
           >
-            <h3
-              className="text-sm font-semibold mb-3"
-              style={{ color: 'var(--color-text-secondary)' }}
-            >
+            <h3 className="text-sm font-semibold mb-3 text-skin-secondary">
               🎨 New Skin Unlocked!
             </h3>
 
@@ -211,26 +197,12 @@ export function LevelUpModal({
               {unlockedSkinItems.map((skin) => (
                 <div
                   key={skin!.id}
-                  className="flex items-center gap-3 p-2 rounded-lg"
-                  style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+                  className="flex items-center gap-3 p-2 rounded-lg bg-skin-secondary"
                 >
-                  <div
-                    className="w-10 h-10 rounded"
-                    style={{ background: skin!.preview }}
-                  />
+                  <div className="w-10 h-10 rounded" style={{ background: skin!.preview }} />
                   <div className="text-left">
-                    <div
-                      className="font-medium text-sm"
-                      style={{ color: 'var(--color-text-primary)' }}
-                    >
-                      {skin!.name}
-                    </div>
-                    <div
-                      className="text-xs"
-                      style={{ color: 'var(--color-text-muted)' }}
-                    >
-                      {skin!.description}
-                    </div>
+                    <div className="font-medium text-sm text-skin-primary">{skin!.name}</div>
+                    <div className="text-xs text-skin-muted">{skin!.description}</div>
                   </div>
                 </div>
               ))}
@@ -242,27 +214,20 @@ export function LevelUpModal({
         {upcomingSkins.length > 0 && (
           <div
             className={`
-              mt-4 pt-4 border-t transition-all duration-500
+              mt-4 pt-4 border-t border-skin-subtle transition-all duration-500
               ${showSkins ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}
-            style={{ borderColor: 'var(--color-border-subtle)' }}
           >
-            <p
-              className="text-xs mb-2"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
+            <p className="text-xs mb-2 text-skin-muted">
               Coming soon at Level {upcomingSkins[0].pricing.suggestedLevel}...
             </p>
-            <div
-              className="flex items-center gap-2 p-2 rounded-lg opacity-60"
-              style={{ backgroundColor: 'var(--color-bg-secondary)' }}
-            >
+            <div className="flex items-center gap-2 p-2 rounded-lg opacity-60 bg-skin-secondary">
               <div
                 className="w-8 h-8 rounded grayscale"
                 style={{ background: upcomingSkins[0].skin.preview }}
               />
               <div className="text-left text-xs">
-                <span style={{ color: 'var(--color-text-secondary)' }}>
+                <span className="text-skin-secondary">
                   {upcomingSkins[0].skin.name} ({upcomingSkins[0].levelsToGo} levels to go)
                 </span>
               </div>
@@ -274,21 +239,12 @@ export function LevelUpModal({
         {newLevel >= 50 && upcomingSkins.length === 0 && unlockedSkinItems.length === 0 && (
           <div
             className={`
-              mt-4 pt-4 border-t text-center transition-all duration-500
+              mt-4 pt-4 border-t border-skin-subtle text-center transition-all duration-500
               ${showSkins ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}
-            style={{ borderColor: 'var(--color-border-subtle)' }}
           >
-            <p
-              className="text-sm font-semibold"
-              style={{ color: 'var(--color-text-accent)' }}
-            >
-              🎖️ Maximum Level Reached!
-            </p>
-            <p
-              className="text-xs mt-1"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
+            <p className="text-sm font-semibold text-skin-accent">🎖️ Maximum Level Reached!</p>
+            <p className="text-xs mt-1 text-skin-muted">
               You've unlocked all level-based rewards. Keep playing to earn more coins!
             </p>
           </div>

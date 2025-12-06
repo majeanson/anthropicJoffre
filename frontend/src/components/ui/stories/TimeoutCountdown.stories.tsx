@@ -42,8 +42,11 @@ Displays turn timeout with visual urgency escalation.
   tags: ['autodocs'],
   argTypes: {
     playerName: { control: 'text', description: 'Name of player whose turn it is' },
-    secondsRemaining: { control: { type: 'range', min: 0, max: 60, step: 1 }, description: 'Seconds left' },
-    isYourTurn: { control: 'boolean', description: 'Is it the current user\'s turn?' },
+    secondsRemaining: {
+      control: { type: 'range', min: 0, max: 60, step: 1 },
+      description: 'Seconds left',
+    },
+    isYourTurn: { control: 'boolean', description: "Is it the current user's turn?" },
   },
 } satisfies Meta<typeof TimeoutCountdown>;
 
@@ -202,14 +205,18 @@ export const HiddenStates: Story = {
       <div className="space-y-4">
         {/* 0 seconds */}
         <div className="p-4 rounded-lg bg-[var(--color-bg-secondary)] border border-dashed border-[var(--color-border-primary)]">
-          <p className="text-[var(--color-text-secondary)] text-sm mb-2">0 seconds (timeout occurred)</p>
+          <p className="text-[var(--color-text-secondary)] text-sm mb-2">
+            0 seconds (timeout occurred)
+          </p>
           <TimeoutCountdown playerName="Alice" secondsRemaining={0} isYourTurn={false} />
           <p className="text-[var(--color-text-tertiary)] text-xs">(Nothing rendered)</p>
         </div>
 
         {/* > 60 seconds */}
         <div className="p-4 rounded-lg bg-[var(--color-bg-secondary)] border border-dashed border-[var(--color-border-primary)]">
-          <p className="text-[var(--color-text-secondary)] text-sm mb-2">&gt; 60 seconds (no urgency)</p>
+          <p className="text-[var(--color-text-secondary)] text-sm mb-2">
+            &gt; 60 seconds (no urgency)
+          </p>
           <TimeoutCountdown playerName="Alice" secondsRemaining={90} isYourTurn={false} />
           <p className="text-[var(--color-text-tertiary)] text-xs">(Nothing rendered)</p>
         </div>
@@ -225,7 +232,7 @@ export const HiddenStates: Story = {
 function TimeoutCountdownDisplay({
   playerName,
   secondsRemaining,
-  isYourTurn
+  isYourTurn,
 }: {
   playerName: string;
   secondsRemaining: number;
@@ -238,11 +245,7 @@ function TimeoutCountdownDisplay({
   const isWarning = secondsRemaining <= 15;
   const isCritical = secondsRemaining <= 5;
 
-  const bgColor = isCritical
-    ? 'bg-red-600'
-    : isWarning
-    ? 'bg-yellow-600'
-    : 'bg-blue-600';
+  const bgColor = isCritical ? 'bg-red-600' : isWarning ? 'bg-yellow-600' : 'bg-blue-600';
 
   return (
     <div className={`${bgColor} text-white px-4 py-2 rounded-lg inline-block`}>
@@ -256,9 +259,7 @@ function TimeoutCountdownDisplay({
               d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <span className="font-bold">
-            {isYourTurn ? 'Your turn' : playerName}
-          </span>
+          <span className="font-bold">{isYourTurn ? 'Your turn' : playerName}</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="text-2xl font-black">{secondsRemaining}</span>

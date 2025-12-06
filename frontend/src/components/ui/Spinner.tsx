@@ -20,7 +20,15 @@
 
 export type SpinnerSize = 'xs' | 'sm' | 'md' | 'lg';
 export type SpinnerVariant = 'default' | 'dots' | 'pulse' | 'arcane';
-export type SpinnerColor = 'accent' | 'primary' | 'white' | 'muted' | 'success' | 'warning' | 'error' | 'gray';
+export type SpinnerColor =
+  | 'accent'
+  | 'primary'
+  | 'white'
+  | 'muted'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'gray';
 
 export interface SpinnerProps {
   /** Spinner size */
@@ -96,14 +104,12 @@ export function Spinner({
         role="status"
         aria-label={label}
         className={`
-          inline-block rounded-full
-          animate-spin
+          inline-block rounded-full animate-spin border-solid
           ${sizeStyle.ring}
           ${className}
         `}
         style={{
           borderWidth: size === 'lg' ? '3px' : '2px',
-          borderStyle: 'solid',
           borderColor: colorStyle.color,
           borderTopColor: 'transparent',
           filter: `drop-shadow(0 0 6px ${colorStyle.glow})`,
@@ -149,8 +155,7 @@ export function Spinner({
         role="status"
         aria-label={label}
         className={`
-          inline-block rounded-full
-          animate-pulse
+          inline-block rounded-full animate-pulse
           ${sizeStyle.ring}
           ${className}
         `}
@@ -178,13 +183,10 @@ export function Spinner({
         role="status"
         aria-label={label}
         className={`
-          inline-flex items-center justify-center
+          inline-flex items-center justify-center animate-spin-slow
           ${sizeStyle.ring}
           ${className}
         `}
-        style={{
-          animation: 'spin 3s linear infinite',
-        }}
       >
         <svg
           width={arcaneSize}
@@ -249,18 +251,12 @@ export function Spinner({
 export interface PresetSpinnerProps extends Omit<SpinnerProps, 'variant'> {}
 
 /** Arcane spinner with sacred geometry */
-export const ArcaneSpinner = (props: PresetSpinnerProps) => (
-  <Spinner variant="arcane" {...props} />
-);
+export const ArcaneSpinner = (props: PresetSpinnerProps) => <Spinner variant="arcane" {...props} />;
 
 /** Dots spinner for subtle loading */
-export const DotsSpinner = (props: PresetSpinnerProps) => (
-  <Spinner variant="dots" {...props} />
-);
+export const DotsSpinner = (props: PresetSpinnerProps) => <Spinner variant="dots" {...props} />;
 
 /** Pulse spinner for prominent loading */
-export const PulseSpinner = (props: PresetSpinnerProps) => (
-  <Spinner variant="pulse" {...props} />
-);
+export const PulseSpinner = (props: PresetSpinnerProps) => <Spinner variant="pulse" {...props} />;
 
 export default Spinner;

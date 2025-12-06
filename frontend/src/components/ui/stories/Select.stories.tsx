@@ -407,16 +407,8 @@ export const ComparisonStates: Story = {
   },
   render: () => (
     <div className="space-y-4 w-80 p-6 bg-[#0B0E14] rounded-xl">
-      <Select
-        label="Normal"
-        options={difficultyOptions}
-        placeholder="Select..."
-      />
-      <Select
-        label="With Value"
-        options={difficultyOptions}
-        value="journeyman"
-      />
+      <Select label="Normal" options={difficultyOptions} placeholder="Select..." />
+      <Select label="With Value" options={difficultyOptions} value="journeyman" />
       <Select
         label="With Helper"
         options={difficultyOptions}
@@ -428,12 +420,7 @@ export const ComparisonStates: Story = {
         options={difficultyOptions}
         error="Selection is required by the Council"
       />
-      <Select
-        label="Sealed"
-        options={difficultyOptions}
-        value="apprentice"
-        disabled
-      />
+      <Select label="Sealed" options={difficultyOptions} value="apprentice" disabled />
     </div>
   ),
 };

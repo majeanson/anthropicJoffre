@@ -44,7 +44,7 @@ export function ShareReplayPrompt({
   finalScore,
   playerTeam,
   onClose,
-  onViewReplay
+  onViewReplay,
 }: ShareReplayPromptProps) {
   const [copied, setCopied] = useState(false);
 
@@ -84,11 +84,15 @@ export function ShareReplayPrompt({
     >
       {/* Score Display */}
       <div className="flex justify-center gap-4 text-xl mb-6">
-        <span className={`font-bold ${winningTeam === 1 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+        <span
+          className={`font-bold ${winningTeam === 1 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}
+        >
           Team 1: {finalScore.team1}
         </span>
         <span className="text-gray-500">-</span>
-        <span className={`font-bold ${winningTeam === 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}>
+        <span
+          className={`font-bold ${winningTeam === 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}
+        >
           Team 2: {finalScore.team2}
         </span>
       </div>
@@ -103,12 +107,16 @@ export function ShareReplayPrompt({
       {/* Action buttons */}
       <div className="space-y-3">
         {/* Copy Link */}
-        <Button
-          variant={copied ? 'secondary' : 'primary'}
-          fullWidth
-          onClick={handleCopyLink}
-        >
-          {copied ? <><span aria-hidden="true">✓</span> Link Copied!</> : <><span aria-hidden="true">🔗</span> Copy Replay Link</>}
+        <Button variant={copied ? 'secondary' : 'primary'} fullWidth onClick={handleCopyLink}>
+          {copied ? (
+            <>
+              <span aria-hidden="true">✓</span> Link Copied!
+            </>
+          ) : (
+            <>
+              <span aria-hidden="true">🔗</span> Copy Replay Link
+            </>
+          )}
         </Button>
 
         {/* Social Share Buttons */}
@@ -142,11 +150,7 @@ export function ShareReplayPrompt({
         </Button>
 
         {/* Close */}
-        <Button
-          variant="secondary"
-          fullWidth
-          onClick={onClose}
-        >
+        <Button variant="secondary" fullWidth onClick={onClose}>
           Close
         </Button>
       </div>

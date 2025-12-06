@@ -62,11 +62,7 @@ export function LoadingState({
   const content = (
     <div className={`text-center py-8 ${className}`}>
       <Spinner size={size} color={color} />
-      {message && (
-        <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">
-          {message}
-        </p>
-      )}
+      {message && <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">{message}</p>}
     </div>
   );
 
@@ -122,7 +118,9 @@ export function EmptyState({
       <div className={`${compact ? 'text-4xl' : 'text-6xl'} mb-4`} aria-hidden="true">
         {icon}
       </div>
-      <h3 className={`font-bold text-gray-700 dark:text-gray-300 ${compact ? 'text-base' : 'text-lg'}`}>
+      <h3
+        className={`font-bold text-gray-700 dark:text-gray-300 ${compact ? 'text-base' : 'text-lg'}`}
+      >
         {title}
       </h3>
       {description && (
@@ -132,10 +130,7 @@ export function EmptyState({
       )}
       {action && (
         <div className="mt-4">
-          <Button
-            variant={action.variant || 'primary'}
-            onClick={action.onClick}
-          >
+          <Button variant={action.variant || 'primary'} onClick={action.onClick}>
             {action.label}
           </Button>
         </div>
@@ -185,30 +180,25 @@ export function ErrorState({
   className = '',
 }: ErrorStateProps) {
   const content = (
-    <div className={`bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4 ${className}`}>
+    <div
+      className={`bg-red-50 dark:bg-red-900/30 border-2 border-red-400 dark:border-red-700 rounded-lg p-4 ${className}`}
+    >
       <div className="flex items-start gap-3">
-        <span className="text-2xl flex-shrink-0" aria-hidden="true">⚠️</span>
+        <span className="text-2xl flex-shrink-0" aria-hidden="true">
+          ⚠️
+        </span>
         <div className="flex-1 min-w-0">
-          <p className="text-red-800 dark:text-red-200 font-semibold">
-            {message}
-          </p>
+          <p className="text-red-800 dark:text-red-200 font-semibold">{message}</p>
           {correlationId && (
             <p className="text-xs text-red-700 dark:text-red-300 font-mono mt-2">
               Error ID: {correlationId}
               <br />
-              <span className="opacity-75">
-                Please include this ID when reporting the issue
-              </span>
+              <span className="opacity-75">Please include this ID when reporting the issue</span>
             </p>
           )}
           {onRetry && (
             <div className="mt-3">
-              <Button
-                variant="danger"
-                size="sm"
-                onClick={onRetry}
-                disabled={isRetrying}
-              >
+              <Button variant="danger" size="sm" onClick={onRetry} disabled={isRetrying}>
                 {isRetrying ? 'Retrying...' : `🔄 ${retryLabel}`}
               </Button>
             </div>
@@ -292,19 +282,11 @@ export function DataState<T>({
 
   // Error state
   if (error) {
-    return (
-      <ErrorState
-        message={error}
-        correlationId={correlationId}
-        onRetry={onRetry}
-      />
-    );
+    return <ErrorState message={error} correlationId={correlationId} onRetry={onRetry} />;
   }
 
   // Empty state
-  const isEmpty = Array.isArray(data)
-    ? data.length === 0
-    : data === null || data === undefined;
+  const isEmpty = Array.isArray(data) ? data.length === 0 : data === null || data === undefined;
 
   if (isEmpty) {
     return (

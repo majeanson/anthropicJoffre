@@ -9,7 +9,9 @@ import { memo } from 'react';
 import { Player } from '../../types/game';
 import { MoveSuggestionButton } from '../MoveSuggestionButton';
 import { GameTooltip } from '../ui';
+import { AchievementBadges } from '../AchievementBadges';
 import type { MoveSuggestion } from '../../utils/moveSuggestion';
+import type { AchievementProgress } from '../../types/achievements';
 
 export interface PlayerPositionProps {
   player: Player | null;
@@ -25,6 +27,8 @@ export interface PlayerPositionProps {
   suggestion: MoveSuggestion | null;
   suggestionOpen: boolean;
   onToggleSuggestion: () => void;
+  /** Optional achievement badges to display */
+  achievementBadges?: AchievementProgress[];
 }
 
 export const PlayerPosition = memo(function PlayerPosition({
@@ -41,6 +45,7 @@ export const PlayerPosition = memo(function PlayerPosition({
   suggestion,
   suggestionOpen,
   onToggleSuggestion,
+  achievementBadges,
 }: PlayerPositionProps) {
   // Helper: Get bot difficulty badge (with click-to-toggle thinking)
   const getBotDifficultyBadge = (): JSX.Element | null => {
@@ -60,25 +65,26 @@ export const PlayerPosition = memo(function PlayerPosition({
         <>
           <button
             onClick={onToggleBotThinking}
-            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1 transition-all active:scale-95 cursor-pointer hover:brightness-110 ${
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1 transition-all active:scale-95 cursor-pointer hover:brightness-110 text-white ${
               botThinkingOpen ? 'ring-2 ring-white scale-105' : ''
             }`}
             style={{
               backgroundColor: badge.bgColor,
-              color: 'white',
               boxShadow: `0 2px 8px ${badge.bgColor}`,
             }}
             title={`Click to see what ${player.name} is thinking`}
             aria-expanded={botThinkingOpen}
-            aria-label={botThinkingOpen ? `Hide ${player.name}'s thinking` : `Show ${player.name}'s thinking`}
+            aria-label={
+              botThinkingOpen ? `Hide ${player.name}'s thinking` : `Show ${player.name}'s thinking`
+            }
           >
             <span className={isThinking ? 'animate-pulse' : ''}>🤖</span>
             <span className="hidden md:inline">{badge.label}</span>
             {isThinking && (
               <span className="flex gap-0.5 text-base md:text-xs">
-                <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-                <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                <span className="animate-bounce delay-0">.</span>
+                <span className="animate-bounce delay-150">.</span>
+                <span className="animate-bounce delay-300">.</span>
               </span>
             )}
           </button>
@@ -104,26 +110,35 @@ export const PlayerPosition = memo(function PlayerPosition({
               </div>
 
               {/* Main action */}
-              <div className="text-lg font-bold">
-                {botThinking}
-              </div>
+              <div className="text-lg font-bold">{botThinking}</div>
 
               {/* Explanation based on action type */}
               <div className="text-sm opacity-90 space-y-2">
                 {botThinking?.includes('Red 0') && (
-                  <p>💡 Red 0 adds +5 bonus points to the trick winner. Bots play it when their team is winning the trick.</p>
+                  <p>
+                    💡 Red 0 adds +5 bonus points to the trick winner. Bots play it when their team
+                    is winning the trick.
+                  </p>
                 )}
                 {botThinking?.includes('Brown 0') && (
-                  <p>💡 Brown 0 gives -2 penalty points. Bots dump it when opponents are winning the trick.</p>
+                  <p>
+                    💡 Brown 0 gives -2 penalty points. Bots dump it when opponents are winning the
+                    trick.
+                  </p>
                 )}
                 {botThinking?.includes('trump') && (
                   <p>💡 Trump cards beat all non-trump cards. Higher trump beats lower trump.</p>
                 )}
                 {botThinking?.includes('Leading') && (
-                  <p>💡 The first card played sets the "led suit" that others must follow if they have it.</p>
+                  <p>
+                    💡 The first card played sets the "led suit" that others must follow if they
+                    have it.
+                  </p>
                 )}
                 {botThinking?.includes('7 ') && (
-                  <p>💡 7 is the highest value card in any suit - it can only be beaten by trump.</p>
+                  <p>
+                    💡 7 is the highest value card in any suit - it can only be beaten by trump.
+                  </p>
                 )}
                 {botThinking?.includes('secure the win') && (
                   <p>💡 Playing a high card to guarantee winning this trick.</p>
@@ -138,10 +153,9 @@ export const PlayerPosition = memo(function PlayerPosition({
     // No bot thinking - just show static badge
     return (
       <span
-        className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1"
+        className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1 text-white"
         style={{
           backgroundColor: badge.bgColor,
-          color: 'white',
           boxShadow: `0 2px 8px ${badge.bgColor}`,
         }}
         title={`Bot (${badge.label} difficulty)${isThinking ? ' - Thinking...' : ''}`}
@@ -150,9 +164,9 @@ export const PlayerPosition = memo(function PlayerPosition({
         <span className="hidden md:inline">{badge.label}</span>
         {isThinking && (
           <span className="flex gap-0.5 text-base md:text-xs">
-            <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
-            <span className="animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
-            <span className="animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+            <span className="animate-bounce delay-0">.</span>
+            <span className="animate-bounce delay-150">.</span>
+            <span className="animate-bounce delay-300">.</span>
           </span>
         )}
       </span>
@@ -177,8 +191,10 @@ export const PlayerPosition = memo(function PlayerPosition({
       };
     }
 
-    const teamColor = player.teamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)';
-    const teamTextColor = player.teamId === 1 ? 'var(--color-team1-text)' : 'var(--color-team2-text)';
+    const teamColor =
+      player.teamId === 1 ? 'var(--color-team1-primary)' : 'var(--color-team2-primary)';
+    const teamTextColor =
+      player.teamId === 1 ? 'var(--color-team1-text)' : 'var(--color-team2-text)';
 
     return {
       background: teamColor,
@@ -245,9 +261,13 @@ export const PlayerPosition = memo(function PlayerPosition({
       >
         <span
           className="flex items-center justify-center relative"
-          style={{ color: player && !player.isEmpty
-            ? (player.teamId === 1 ? 'var(--color-team1-text)' : 'var(--color-team2-text)')
-            : 'var(--color-text-muted)'
+          style={{
+            color:
+              player && !player.isEmpty
+                ? player.teamId === 1
+                  ? 'var(--color-team1-text)'
+                  : 'var(--color-team2-text)'
+                : 'var(--color-text-muted)',
           }}
         >
           {player?.isEmpty && <span aria-hidden="true">💺 </span>}
@@ -255,7 +275,6 @@ export const PlayerPosition = memo(function PlayerPosition({
             <button
               onClick={handleNameClick}
               className="hover:underline cursor-pointer focus:outline-none rounded px-1 -mx-1"
-              style={{ outline: 'none' }}
               title={`View ${player.name}'s profile`}
             >
               {getDisplayName()}
@@ -265,6 +284,10 @@ export const PlayerPosition = memo(function PlayerPosition({
           )}
           {isYou && ' (You)'}
           {getBotDifficultyBadge()}
+          {/* Achievement badges for human players */}
+          {!player?.isBot && achievementBadges && achievementBadges.length > 0 && (
+            <AchievementBadges badges={achievementBadges} size="sm" />
+          )}
         </span>
       </div>
     </div>

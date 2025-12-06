@@ -8,7 +8,9 @@ import { AchievementCard } from '../../AchievementCard';
 import { AchievementProgress } from '../../../types/achievements';
 
 // Mock achievement data
-const createMockAchievement = (overrides: Partial<AchievementProgress> = {}): AchievementProgress => ({
+const createMockAchievement = (
+  overrides: Partial<AchievementProgress> = {}
+): AchievementProgress => ({
   achievement_id: 1,
   achievement_key: 'first_victory',
   achievement_name: 'First Victory',
@@ -315,19 +317,39 @@ export const AllTiersLight: Story = {
   render: () => (
     <div className="space-y-4 w-80">
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'bronze', is_unlocked: true, achievement_name: 'Bronze Achievement', icon: '🥉' })}
+        achievement={createMockAchievement({
+          tier: 'bronze',
+          is_unlocked: true,
+          achievement_name: 'Bronze Achievement',
+          icon: '🥉',
+        })}
         size="medium"
       />
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'silver', is_unlocked: true, achievement_name: 'Silver Achievement', icon: '🥈' })}
+        achievement={createMockAchievement({
+          tier: 'silver',
+          is_unlocked: true,
+          achievement_name: 'Silver Achievement',
+          icon: '🥈',
+        })}
         size="medium"
       />
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'gold', is_unlocked: true, achievement_name: 'Gold Achievement', icon: '🥇' })}
+        achievement={createMockAchievement({
+          tier: 'gold',
+          is_unlocked: true,
+          achievement_name: 'Gold Achievement',
+          icon: '🥇',
+        })}
         size="medium"
       />
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'platinum', is_unlocked: true, achievement_name: 'Platinum Achievement', icon: '💎' })}
+        achievement={createMockAchievement({
+          tier: 'platinum',
+          is_unlocked: true,
+          achievement_name: 'Platinum Achievement',
+          icon: '💎',
+        })}
         size="medium"
       />
     </div>
@@ -348,19 +370,39 @@ export const AllTiersLockedLight: Story = {
   render: () => (
     <div className="space-y-4 w-80">
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'bronze', is_unlocked: false, achievement_name: 'Bronze Achievement', icon: '🥉' })}
+        achievement={createMockAchievement({
+          tier: 'bronze',
+          is_unlocked: false,
+          achievement_name: 'Bronze Achievement',
+          icon: '🥉',
+        })}
         size="medium"
       />
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'silver', is_unlocked: false, achievement_name: 'Silver Achievement', icon: '🥈' })}
+        achievement={createMockAchievement({
+          tier: 'silver',
+          is_unlocked: false,
+          achievement_name: 'Silver Achievement',
+          icon: '🥈',
+        })}
         size="medium"
       />
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'gold', is_unlocked: false, achievement_name: 'Gold Achievement', icon: '🥇' })}
+        achievement={createMockAchievement({
+          tier: 'gold',
+          is_unlocked: false,
+          achievement_name: 'Gold Achievement',
+          icon: '🥇',
+        })}
         size="medium"
       />
       <AchievementCard
-        achievement={createMockAchievement({ tier: 'platinum', is_unlocked: false, achievement_name: 'Platinum Achievement', icon: '💎' })}
+        achievement={createMockAchievement({
+          tier: 'platinum',
+          is_unlocked: false,
+          achievement_name: 'Platinum Achievement',
+          icon: '💎',
+        })}
         size="medium"
       />
     </div>

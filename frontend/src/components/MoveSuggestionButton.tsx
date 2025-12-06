@@ -44,9 +44,10 @@ export function MoveSuggestionButton({
           icon="💡"
           label={isOpen ? 'Hide move suggestion' : 'Show move suggestion'}
           pulse={!isOpen}
-          className={isOpen
-            ? '!bg-gradient-to-r !from-green-500 !to-emerald-600'
-            : '!text-green-600 dark:!text-green-400'
+          className={
+            isOpen
+              ? '!bg-gradient-to-r !from-green-500 !to-emerald-600'
+              : '!text-green-600 dark:!text-green-400'
           }
         />
       </div>

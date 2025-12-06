@@ -49,12 +49,13 @@ const colorConfig: Record<DividerColor, string> = {
   team2: 'border-purple-400/50 dark:border-purple-500/50',
 };
 
-const spacingConfig: Record<'none' | 'sm' | 'md' | 'lg', { horizontal: string; vertical: string }> = {
-  none: { horizontal: '', vertical: '' },
-  sm: { horizontal: 'my-2', vertical: 'mx-2' },
-  md: { horizontal: 'my-4', vertical: 'mx-4' },
-  lg: { horizontal: 'my-6', vertical: 'mx-6' },
-};
+const spacingConfig: Record<'none' | 'sm' | 'md' | 'lg', { horizontal: string; vertical: string }> =
+  {
+    none: { horizontal: '', vertical: '' },
+    sm: { horizontal: 'my-2', vertical: 'mx-2' },
+    md: { horizontal: 'my-4', vertical: 'mx-4' },
+    lg: { horizontal: 'my-6', vertical: 'mx-6' },
+  };
 
 export function UIDivider({
   orientation = 'horizontal',
@@ -74,13 +75,14 @@ export function UIDivider({
   // Gradient variant uses a different approach
   if (variant === 'gradient') {
     const gradientSize = size === 'sm' ? 'h-px' : size === 'md' ? 'h-0.5' : 'h-1';
-    const gradientColor = color === 'team1'
-      ? 'from-transparent via-orange-400/50 to-transparent'
-      : color === 'team2'
-      ? 'from-transparent via-purple-400/50 to-transparent'
-      : color === 'amber'
-      ? 'from-transparent via-amber-600/50 to-transparent'
-      : 'from-transparent via-gray-400/50 to-transparent';
+    const gradientColor =
+      color === 'team1'
+        ? 'from-transparent via-orange-400/50 to-transparent'
+        : color === 'team2'
+          ? 'from-transparent via-purple-400/50 to-transparent'
+          : color === 'amber'
+            ? 'from-transparent via-amber-600/50 to-transparent'
+            : 'from-transparent via-gray-400/50 to-transparent';
 
     return (
       <div
@@ -121,9 +123,7 @@ export function UIDivider({
       aria-orientation="horizontal"
     >
       <div className={`flex-1 ${sizeClass} ${variantClass} ${colorClass}`} />
-      <span className="px-3 text-sm font-medium text-umber-600 dark:text-gray-400">
-        {label}
-      </span>
+      <span className="px-3 text-sm font-medium text-umber-600 dark:text-gray-400">{label}</span>
       <div className={`flex-1 ${sizeClass} ${variantClass} ${colorClass}`} />
     </div>
   );

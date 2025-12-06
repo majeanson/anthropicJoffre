@@ -130,7 +130,9 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-red-500 to-rose-600">
           <UICard variant="elevated" size="lg" className="max-w-md text-center">
-            <div className="text-6xl mb-4" aria-hidden="true">⚠️</div>
+            <div className="text-6xl mb-4" aria-hidden="true">
+              ⚠️
+            </div>
             <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
               Something Went Wrong
             </h2>
@@ -157,18 +159,10 @@ export class ErrorBoundary extends Component<Props, State> {
               </div>
             )}
             <div className="flex gap-4 justify-center">
-              <Button
-                variant="success"
-                size="lg"
-                onClick={this.handleReset}
-              >
+              <Button variant="success" size="lg" onClick={this.handleReset}>
                 Try Again
               </Button>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => window.location.reload()}
-              >
+              <Button variant="primary" size="lg" onClick={() => window.location.reload()}>
                 Reload Game
               </Button>
             </div>

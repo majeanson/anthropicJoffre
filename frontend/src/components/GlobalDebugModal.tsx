@@ -55,7 +55,11 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
           console.log('[GlobalDebug] Health data:', healthData);
           setServerHealth(healthData);
         } else {
-          console.error('[GlobalDebug] Health fetch failed:', healthResponse.status, healthResponse.statusText);
+          console.error(
+            '[GlobalDebug] Health fetch failed:',
+            healthResponse.status,
+            healthResponse.statusText
+          );
         }
 
         // Fetch games list
@@ -66,7 +70,11 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
           console.log('[GlobalDebug] Games data:', data);
           setGames(data.games || []);
         } else {
-          console.error('[GlobalDebug] Games fetch failed:', gamesResponse.status, gamesResponse.statusText);
+          console.error(
+            '[GlobalDebug] Games fetch failed:',
+            gamesResponse.status,
+            gamesResponse.statusText
+          );
           const errorData = await gamesResponse.text();
           console.error('[GlobalDebug] Error response:', errorData);
         }
@@ -122,19 +130,22 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
   const handleTestFrontendSentry = async () => {
     console.log('🧪 Testing Frontend Sentry...');
     try {
-      const eventId = Sentry.captureException(new Error('🧪 Test Error - Frontend Sentry Integration'), {
-        level: 'error',
-        tags: {
-          test: true,
-          source: 'global_debug_panel',
-          type: 'manual_test',
-        },
-        extra: {
-          activeGames: games.length,
-          serverHealth: serverHealth,
-          timestamp: new Date().toISOString(),
-        },
-      });
+      const eventId = Sentry.captureException(
+        new Error('🧪 Test Error - Frontend Sentry Integration'),
+        {
+          level: 'error',
+          tags: {
+            test: true,
+            source: 'global_debug_panel',
+            type: 'manual_test',
+          },
+          extra: {
+            activeGames: games.length,
+            serverHealth: serverHealth,
+            timestamp: new Date().toISOString(),
+          },
+        }
+      );
       console.log('✅ Sentry event captured with ID:', eventId);
 
       // Force flush to ensure event is sent immediately
@@ -142,7 +153,11 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
       await Sentry.flush(2000); // Wait up to 2 seconds for events to send
       console.log('✅ Sentry queue flushed');
 
-      alert('✅ Frontend Sentry test error sent! Event ID: ' + eventId + '\nCheck your Sentry dashboard in ~10 seconds.');
+      alert(
+        '✅ Frontend Sentry test error sent! Event ID: ' +
+          eventId +
+          '\nCheck your Sentry dashboard in ~10 seconds.'
+      );
     } catch (error) {
       console.error('❌ Error capturing Sentry event:', error);
       alert('❌ Error sending to Sentry: ' + error);
@@ -165,7 +180,7 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
     sortBy === 'uptime' ? b.uptimeMinutes - a.uptimeMinutes : b.roundNumber - a.roundNumber
   );
 
-  const finishedGames = games.filter(g => g.phase === 'game_over');
+  const finishedGames = games.filter((g) => g.phase === 'game_over');
 
   if (!isOpen) return null;
 
@@ -180,261 +195,307 @@ export function GlobalDebugModal({ isOpen, onClose, socket }: GlobalDebugModalPr
       size="xl"
     >
       <div className="space-y-6">
-          {/* Server Health */}
-          <section>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">🖥️ Server Health</h3>
-            {clearMessage && (
-              <div className={`mb-3 p-3 rounded-lg ${clearMessage.startsWith('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                {clearMessage}
-              </div>
-            )}
-            {serverHealth && (
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
-                  <p className="text-lg font-bold text-green-600">{serverHealth.status.toUpperCase()}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Uptime:</span>
-                  <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
-                    {Math.floor(serverHealth.uptime / 3600)}h {Math.floor((serverHealth.uptime % 3600) / 60)}m
-                  </p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Active Games:</span>
-                  <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{serverHealth.activeGames}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Heap:</span>
-                  <p className="text-lg font-bold text-gray-800 dark:text-gray-200">{serverHealth.memory.heapUsedMB}MB</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Memory:</span>
-                  <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
-                    <div
-                      className={`h-3 rounded-full ${
-                        (serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) > 0.8 ? 'bg-red-500' :
-                        (serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) > 0.6 ? 'bg-yellow-500' : 'bg-green-500'
-                      }`}
-                      style={{ width: `${(serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100}%` }}
-                    />
-                  </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                    {Math.round((serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100)}%
-                  </p>
-                </div>
-              </div>
-            )}
-          </section>
-
-          {/* Quick Actions */}
-          <section>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">⚡ Quick Actions</h3>
-            <div className="flex flex-wrap gap-3">
-              <Button
-                variant="warning"
-                size="md"
-                onClick={handleClearFinished}
-                disabled={isClearing || finishedGames.length === 0}
-              >
-                🗑️ Clear Finished ({finishedGames.length})
-              </Button>
-              <Button
-                variant="danger"
-                size="md"
-                onClick={handleClearAll}
-                disabled={isClearing}
-              >
-                {isClearing ? '🔄 Clearing...' : `🗑️ Clear All (${games.length})`}
-              </Button>
+        {/* Server Health */}
+        <section>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+            🖥️ Server Health
+          </h3>
+          {clearMessage && (
+            <div
+              className={`mb-3 p-3 rounded-lg ${clearMessage.startsWith('✅') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+            >
+              {clearMessage}
             </div>
-          </section>
-
-          {/* Storybook */}
-          <section>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">📖 Storybook UI</h3>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                Browse all UI components in the design system.
-              </p>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => window.open('http://localhost:6006', '_blank')}
-              >
-                <span>📚</span>
-                <span>Open Storybook (localhost:6006)</span>
-              </Button>
-            </div>
-          </section>
-
-          {/* Sentry Testing */}
-          <section>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-red-200 pb-2">
-              🚨 Sentry Error Tracking Tests
-            </h3>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                Test Sentry error tracking integration for both frontend and backend.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button
-                  variant="warning"
-                  size="lg"
-                  onClick={handleTestFrontendSentry}
-                >
-                  <span>📱</span>
-                  <span>Test Frontend Sentry</span>
-                </Button>
-                <Button
-                  variant="warning"
-                  size="lg"
-                  onClick={handleTestBackendSentry}
-                  disabled={!socket}
-                >
-                  <span>🖥️</span>
-                  <span>Test Backend Sentry</span>
-                </Button>
+          )}
+          {serverHealth && (
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
+                <p className="text-lg font-bold text-green-600">
+                  {serverHealth.status.toUpperCase()}
+                </p>
               </div>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
-                <p className="text-xs text-blue-800 dark:text-blue-200">
-                  <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
-                  <a
-                    href="https://sentry.io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:text-blue-600"
-                  >
-                    sentry.io
-                  </a>
-                  {' '}to verify errors appear and configure alerts.
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Uptime:</span>
+                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                  {Math.floor(serverHealth.uptime / 3600)}h{' '}
+                  {Math.floor((serverHealth.uptime % 3600) / 60)}m
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Active Games:</span>
+                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                  {serverHealth.activeGames}
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Heap:</span>
+                <p className="text-lg font-bold text-gray-800 dark:text-gray-200">
+                  {serverHealth.memory.heapUsedMB}MB
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Memory:</span>
+                <div className="w-full bg-gray-200 rounded-full h-3 mt-1">
+                  <div
+                    className={`h-3 rounded-full ${
+                      serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB > 0.8
+                        ? 'bg-red-500'
+                        : serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB > 0.6
+                          ? 'bg-yellow-500'
+                          : 'bg-green-500'
+                    }`}
+                    style={{
+                      width: `${(serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100}%`,
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  {Math.round(
+                    (serverHealth.memory.heapUsedMB / serverHealth.memory.heapTotalMB) * 100
+                  )}
+                  %
                 </p>
               </div>
             </div>
-          </section>
+          )}
+        </section>
 
-          {/* Games Table */}
-          <section>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">🎮 All Games ({games.length})</h3>
-              <Select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'uptime' | 'round')}
-                options={[
-                  { value: 'uptime', label: 'Sort by Uptime' },
-                  { value: 'round', label: 'Sort by Round' },
-                ]}
-                size="sm"
-              />
+        {/* Quick Actions */}
+        <section>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+            ⚡ Quick Actions
+          </h3>
+          <div className="flex flex-wrap gap-3">
+            <Button
+              variant="warning"
+              size="md"
+              onClick={handleClearFinished}
+              disabled={isClearing || finishedGames.length === 0}
+            >
+              🗑️ Clear Finished ({finishedGames.length})
+            </Button>
+            <Button variant="danger" size="md" onClick={handleClearAll} disabled={isClearing}>
+              {isClearing ? '🔄 Clearing...' : `🗑️ Clear All (${games.length})`}
+            </Button>
+          </div>
+        </section>
+
+        {/* Storybook */}
+        <section>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+            📖 Storybook UI
+          </h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Browse all UI components in the design system.
+            </p>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => window.open('http://localhost:6006', '_blank')}
+            >
+              <span>📚</span>
+              <span>Open Storybook (localhost:6006)</span>
+            </Button>
+          </div>
+        </section>
+
+        {/* Sentry Testing */}
+        <section>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3 border-b-2 border-red-200 pb-2">
+            🚨 Sentry Error Tracking Tests
+          </h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+              Test Sentry error tracking integration for both frontend and backend.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Button variant="warning" size="lg" onClick={handleTestFrontendSentry}>
+                <span>📱</span>
+                <span>Test Frontend Sentry</span>
+              </Button>
+              <Button
+                variant="warning"
+                size="lg"
+                onClick={handleTestBackendSentry}
+                disabled={!socket}
+              >
+                <span>🖥️</span>
+                <span>Test Backend Sentry</span>
+              </Button>
             </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+              <p className="text-xs text-blue-800 dark:text-blue-200">
+                <strong>💡 Tip:</strong> After testing, check your Sentry dashboard at{' '}
+                <a
+                  href="https://sentry.io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-blue-600"
+                >
+                  sentry.io
+                </a>{' '}
+                to verify errors appear and configure alerts.
+              </p>
+            </div>
+          </div>
+        </section>
 
-            {games.length === 0 ? (
-              <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 text-center">
-                <p className="text-gray-500">No active games</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-gray-100 dark:bg-gray-700">
-                    <tr>
-                      <th className="px-4 py-2 text-left">Game ID</th>
-                      <th className="px-4 py-2 text-left">Phase</th>
-                      <th className="px-4 py-2 text-center">Players</th>
-                      <th className="px-4 py-2 text-center">Round</th>
-                      <th className="px-4 py-2 text-center">Uptime</th>
-                      <th className="px-4 py-2 text-center">Actions</th>
+        {/* Games Table */}
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200">
+              🎮 All Games ({games.length})
+            </h3>
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as 'uptime' | 'round')}
+              options={[
+                { value: 'uptime', label: 'Sort by Uptime' },
+                { value: 'round', label: 'Sort by Round' },
+              ]}
+              size="sm"
+            />
+          </div>
+
+          {games.length === 0 ? (
+            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-8 text-center">
+              <p className="text-gray-500">No active games</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-100 dark:bg-gray-700">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Game ID</th>
+                    <th className="px-4 py-2 text-left">Phase</th>
+                    <th className="px-4 py-2 text-center">Players</th>
+                    <th className="px-4 py-2 text-center">Round</th>
+                    <th className="px-4 py-2 text-center">Uptime</th>
+                    <th className="px-4 py-2 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedGames.map((game) => (
+                    <tr
+                      key={game.gameId}
+                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-750"
+                    >
+                      <td className="px-4 py-3 font-mono text-xs text-purple-600">
+                        {game.gameId.slice(0, 8)}...
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            game.phase === 'team_selection'
+                              ? 'bg-purple-100 text-purple-800'
+                              : game.phase === 'betting'
+                                ? 'bg-orange-100 text-orange-800'
+                                : game.phase === 'playing'
+                                  ? 'bg-green-100 text-green-800'
+                                  : game.phase === 'scoring'
+                                    ? 'bg-blue-100 text-blue-800'
+                                    : 'bg-gray-100 text-gray-800'
+                          }`}
+                        >
+                          {game.phase.toUpperCase().replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center font-semibold">{game.playerCount}/4</td>
+                      <td className="px-4 py-3 text-center">{game.roundNumber}</td>
+                      <td className="px-4 py-3 text-center text-gray-600">
+                        {game.uptimeMinutes < 60
+                          ? `${game.uptimeMinutes}m`
+                          : `${Math.floor(game.uptimeMinutes / 60)}h`}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <Button
+                          variant="danger"
+                          size="xs"
+                          onClick={() => handleClearGame(game.gameId)}
+                          disabled={isClearing}
+                        >
+                          Clear
+                        </Button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {sortedGames.map((game) => (
-                      <tr key={game.gameId} className="border-b hover:bg-gray-50 dark:hover:bg-gray-750">
-                        <td className="px-4 py-3 font-mono text-xs text-purple-600">{game.gameId.slice(0, 8)}...</td>
-                        <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            game.phase === 'team_selection' ? 'bg-purple-100 text-purple-800' :
-                            game.phase === 'betting' ? 'bg-orange-100 text-orange-800' :
-                            game.phase === 'playing' ? 'bg-green-100 text-green-800' :
-                            game.phase === 'scoring' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {game.phase.toUpperCase().replace('_', ' ')}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-center font-semibold">{game.playerCount}/4</td>
-                        <td className="px-4 py-3 text-center">{game.roundNumber}</td>
-                        <td className="px-4 py-3 text-center text-gray-600">
-                          {game.uptimeMinutes < 60 ? `${game.uptimeMinutes}m` : `${Math.floor(game.uptimeMinutes / 60)}h`}
-                        </td>
-                        <td className="px-4 py-3 text-center">
-                          <Button
-                            variant="danger"
-                            size="xs"
-                            onClick={() => handleClearGame(game.gameId)}
-                            disabled={isClearing}
-                          >
-                            Clear
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </section>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
 
-          {/* Build Info & Features */}
-          <section>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">🏗️ Build Information</h3>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Version:</span>
-                  <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.version}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Commit:</span>
-                  <p className="font-mono text-sm text-gray-800 dark:text-gray-200">{buildInfo.git.commitHash}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Branch:</span>
-                  <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.git.branch}</p>
-                </div>
-                <div>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">Build Date:</span>
-                  <p className="text-sm text-gray-800 dark:text-gray-200">
-                    {new Date(buildInfo.buildDate).toLocaleDateString()}
-                  </p>
-                </div>
+        {/* Build Info & Features */}
+        <section>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+            🏗️ Build Information
+          </h3>
+          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Version:</span>
+                <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.version}</p>
               </div>
               <div>
-                <span className="text-sm text-gray-600 dark:text-gray-400 block mb-2">Latest Commit:</span>
-                <p className="text-sm italic text-gray-700 dark:text-gray-300">{buildInfo.git.commitMessage}</p>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Commit:</span>
+                <p className="font-mono text-sm text-gray-800 dark:text-gray-200">
+                  {buildInfo.git.commitHash}
+                </p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Branch:</span>
+                <p className="font-bold text-gray-800 dark:text-gray-200">{buildInfo.git.branch}</p>
+              </div>
+              <div>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Build Date:</span>
+                <p className="text-sm text-gray-800 dark:text-gray-200">
+                  {new Date(buildInfo.buildDate).toLocaleDateString()}
+                </p>
               </div>
             </div>
-          </section>
+            <div>
+              <span className="text-sm text-gray-600 dark:text-gray-400 block mb-2">
+                Latest Commit:
+              </span>
+              <p className="text-sm italic text-gray-700 dark:text-gray-300">
+                {buildInfo.git.commitMessage}
+              </p>
+            </div>
+          </div>
+        </section>
 
-          {/* Summary Stats */}
-          <section>
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">📊 Phase Breakdown</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-purple-700 font-semibold">Team Selection</p>
-                <p className="text-3xl font-bold text-purple-600">{games.filter(g => g.phase === 'team_selection').length}</p>
-              </div>
-              <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-orange-700 font-semibold">Betting</p>
-                <p className="text-3xl font-bold text-orange-600">{games.filter(g => g.phase === 'betting').length}</p>
-              </div>
-              <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-green-700 font-semibold">Playing</p>
-                <p className="text-3xl font-bold text-green-600">{games.filter(g => g.phase === 'playing').length}</p>
-              </div>
-              <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-700 font-semibold">Finished</p>
-                <p className="text-3xl font-bold text-gray-600">{finishedGames.length}</p>
-              </div>
+        {/* Summary Stats */}
+        <section>
+          <h3 className="text-lg font-bold text-gray-800 dark:text-gray-200 mb-3">
+            📊 Phase Breakdown
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 text-center">
+              <p className="text-sm text-purple-700 font-semibold">Team Selection</p>
+              <p className="text-3xl font-bold text-purple-600">
+                {games.filter((g) => g.phase === 'team_selection').length}
+              </p>
             </div>
-          </section>
+            <div className="bg-orange-50 border-2 border-orange-300 rounded-lg p-4 text-center">
+              <p className="text-sm text-orange-700 font-semibold">Betting</p>
+              <p className="text-3xl font-bold text-orange-600">
+                {games.filter((g) => g.phase === 'betting').length}
+              </p>
+            </div>
+            <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4 text-center">
+              <p className="text-sm text-green-700 font-semibold">Playing</p>
+              <p className="text-3xl font-bold text-green-600">
+                {games.filter((g) => g.phase === 'playing').length}
+              </p>
+            </div>
+            <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 text-center">
+              <p className="text-sm text-gray-700 font-semibold">Finished</p>
+              <p className="text-3xl font-bold text-gray-600">{finishedGames.length}</p>
+            </div>
+          </div>
+        </section>
       </div>
     </Modal>
   );

@@ -27,7 +27,11 @@ interface QuickPlayPanelProps {
   onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
   quickPlayPersistence: 'elo' | 'casual';
   setQuickPlayPersistence: (mode: 'elo' | 'casual') => void;
-  onQuickPlay: (difficulty: BotDifficulty, persistenceMode: 'elo' | 'casual', playerName?: string) => void;
+  onQuickPlay: (
+    difficulty: BotDifficulty,
+    persistenceMode: 'elo' | 'casual',
+    playerName?: string
+  ) => void;
   user: User | null;
   playerName?: string;
   onPlayerNameChange?: (name: string) => void;
@@ -139,21 +143,30 @@ export function QuickPlayPanel({
             </label>
             <div className="grid grid-cols-3 gap-2">
               <Button
-                onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('easy'); }}
+                onClick={() => {
+                  sounds.buttonClick();
+                  onBotDifficultyChange && onBotDifficultyChange('easy');
+                }}
                 variant={botDifficulty === 'easy' ? 'primary' : 'ghost'}
                 size="sm"
               >
                 Easy
               </Button>
               <Button
-                onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('medium'); }}
+                onClick={() => {
+                  sounds.buttonClick();
+                  onBotDifficultyChange && onBotDifficultyChange('medium');
+                }}
                 variant={botDifficulty === 'medium' ? 'primary' : 'ghost'}
                 size="sm"
               >
                 Medium
               </Button>
               <Button
-                onClick={() => { sounds.buttonClick(); onBotDifficultyChange && onBotDifficultyChange('hard'); }}
+                onClick={() => {
+                  sounds.buttonClick();
+                  onBotDifficultyChange && onBotDifficultyChange('hard');
+                }}
                 variant={botDifficulty === 'hard' ? 'primary' : 'ghost'}
                 size="sm"
               >
@@ -168,7 +181,11 @@ export function QuickPlayPanel({
           </div>
 
           {/* Persistence Mode Selector */}
-          <UICard variant="bordered" size="sm" className={`bg-parchment-100 dark:bg-gray-800 ${!tierInfo.canPlayRanked ? 'opacity-60' : ''}`}>
+          <UICard
+            variant="bordered"
+            size="sm"
+            className={`bg-parchment-100 dark:bg-gray-800 ${!tierInfo.canPlayRanked ? 'opacity-60' : ''}`}
+          >
             <div className="flex items-center justify-between gap-3">
               <Checkbox
                 id="rankedMode"
@@ -180,18 +197,26 @@ export function QuickPlayPanel({
               />
               <UIBadge
                 variant="solid"
-                color={quickPlayPersistence === 'elo' && tierInfo.canPlayRanked ? 'warning' : 'gray'}
+                color={
+                  quickPlayPersistence === 'elo' && tierInfo.canPlayRanked ? 'warning' : 'gray'
+                }
                 size="sm"
               >
-                {quickPlayPersistence === 'elo' && tierInfo.canPlayRanked ? '🏆 Ranked' : '🎮 Casual'}
+                {quickPlayPersistence === 'elo' && tierInfo.canPlayRanked
+                  ? '🏆 Ranked'
+                  : '🎮 Casual'}
               </UIBadge>
             </div>
             <p className="text-xs text-umber-600 dark:text-gray-400 mt-2">
-              {!tierInfo.canPlayRanked
-                ? <><span aria-hidden="true">🔒</span> Register an account to enable ranked mode</>
-                : quickPlayPersistence === 'elo'
-                ? 'Affects your ranking and saves to profile'
-                : 'No stats saved - practice freely'}
+              {!tierInfo.canPlayRanked ? (
+                <>
+                  <span aria-hidden="true">🔒</span> Register an account to enable ranked mode
+                </>
+              ) : quickPlayPersistence === 'elo' ? (
+                'Affects your ranking and saves to profile'
+              ) : (
+                'No stats saved - practice freely'
+              )}
             </p>
           </UICard>
         </div>
