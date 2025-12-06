@@ -54,9 +54,12 @@ export const PlayerHand = memo(function PlayerHand({
 
   // Mobile fan-style: track focused card index for swipe navigation
   const [focusedCardIndex, setFocusedCardIndex] = useState<number>(Math.floor(hand.length / 2));
+  // Preview index shows which card WILL be selected during active swipe
+  const [previewCardIndex, setPreviewCardIndex] = useState<number | null>(null);
   const handContainerRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
+  const startFocusedIndex = useRef<number>(0);
 
   // Calculate playable cards (suit-following rules)
   const playableCards = useMemo(() => {
@@ -294,11 +297,34 @@ export const PlayerHand = memo(function PlayerHand({
     }
   }, [hand.length, focusedCardIndex]);
 
-  // Touch handlers for mobile swipe navigation - proportional to swipe distance
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  }, []);
+  // Touch handlers for mobile swipe navigation - real-time preview during swipe
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      touchStartX.current = e.touches[0].clientX;
+      touchStartY.current = e.touches[0].clientY;
+      startFocusedIndex.current = focusedCardIndex;
+      setPreviewCardIndex(null);
+    },
+    [focusedCardIndex]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      const touchX = e.touches[0].clientX;
+      const touchY = e.touches[0].clientY;
+      const deltaX = touchX - touchStartX.current;
+      const deltaY = touchY - touchStartY.current;
+
+      // Only handle horizontal swipes
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 15) {
+        // Calculate preview index based on swipe distance (40px per card)
+        const cardsToMove = Math.round(deltaX / -40); // negative because swipe left = next card
+        const newIndex = Math.max(0, Math.min(hand.length - 1, startFocusedIndex.current + cardsToMove));
+        setPreviewCardIndex(newIndex);
+      }
+    },
+    [hand.length]
+  );
 
   const handleTouchEnd = useCallback(
     (e: React.TouchEvent) => {
@@ -307,22 +333,16 @@ export const PlayerHand = memo(function PlayerHand({
       const deltaX = touchEndX - touchStartX.current;
       const deltaY = touchEndY - touchStartY.current;
 
-      // Only handle horizontal swipes (ignore vertical scrolls)
+      // Commit the preview if we were swiping horizontally
       if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
-        // Calculate how many cards to skip based on swipe distance
-        // Every 40px of swipe = 1 card movement
-        const cardsToMove = Math.round(Math.abs(deltaX) / 40);
-        const clampedMove = Math.max(1, Math.min(cardsToMove, hand.length - 1));
-
-        if (deltaX > 0) {
-          // Swipe right - go to previous cards
-          setFocusedCardIndex((prev) => Math.max(0, prev - clampedMove));
-        } else {
-          // Swipe left - go to next cards
-          setFocusedCardIndex((prev) => Math.min(hand.length - 1, prev + clampedMove));
-        }
+        const cardsToMove = Math.round(deltaX / -40);
+        const newIndex = Math.max(0, Math.min(hand.length - 1, startFocusedIndex.current + cardsToMove));
+        setFocusedCardIndex(newIndex);
         sounds.cardDeal();
       }
+
+      // Clear preview
+      setPreviewCardIndex(null);
     },
     [hand.length]
   );
@@ -372,31 +392,11 @@ export const PlayerHand = memo(function PlayerHand({
         data-testid="player-hand"
         ref={handContainerRef}
         onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         {/* Mobile: Fan-style card layout - swipe to navigate, tap to play */}
-        <div className="md:hidden relative h-52 sm:h-56 flex items-end justify-center overflow-visible pb-5">
-          {/* Card position indicator dots */}
-          {hand.length > 1 && (
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex gap-2 z-[150]">
-              {hand.map((_, i) => (
-                <button
-                  key={i}
-                  className={`rounded-full transition-all duration-200 ${
-                    i === focusedCardIndex
-                      ? 'w-6 h-2 bg-skin-accent shadow-lg'
-                      : 'w-2 h-2 bg-skin-muted/50 active:scale-125'
-                  }`}
-                  onClick={() => {
-                    setFocusedCardIndex(i);
-                    sounds.cardDeal();
-                  }}
-                  aria-label={`Go to card ${i + 1}`}
-                />
-              ))}
-            </div>
-          )}
-
+        <div className="md:hidden relative h-52 sm:h-56 flex items-end justify-center overflow-visible">
           {/* Fan of cards - overlapping like a real hand, swipe to navigate */}
           <div className="relative flex items-end justify-center w-full h-full">
             {displayHand.map((card, index) => {
@@ -409,10 +409,14 @@ export const PlayerHand = memo(function PlayerHand({
                 card.value === cardInTransition.value;
               const isSelected = selectedCardIndex === index;
               const isQueued = isCardQueued(card);
-              const isFocused = focusedCardIndex === index;
+
+              // Use preview index during swipe, otherwise use focused index
+              const activeIndex = previewCardIndex !== null ? previewCardIndex : focusedCardIndex;
+              const isFocused = activeIndex === index;
+              const isPreview = previewCardIndex !== null && previewCardIndex === index;
 
               // Calculate fan position - spread cards to use full width
-              const centerOffset = index - focusedCardIndex;
+              const centerOffset = index - activeIndex;
               // Show more of each card (~45px visible edge) to use screen width
               const cardVisibleEdge = 45;
               const xOffset = centerOffset * cardVisibleEdge;
@@ -429,7 +433,7 @@ export const PlayerHand = memo(function PlayerHand({
               // Subtle rotation for natural fan effect
               const rotation = isFocused ? 0 : centerOffset * 3;
 
-              // Opacity: slightly dim non-focused cards
+              // Opacity: slightly dim non-focused cards, preview card gets highlight
               const opacity = isFocused ? 1 : 0.8;
 
               return (
@@ -461,8 +465,12 @@ export const PlayerHand = memo(function PlayerHand({
                     }
                   }}
                 >
+                  {/* Preview indicator during swipe - blue glow */}
+                  {isPreview && (
+                    <div className="absolute -inset-3 rounded-2xl bg-blue-400/50 pointer-events-none z-0 shadow-[0_0_20px_rgba(59,130,246,0.5)]" />
+                  )}
                   {/* Glow effect for focused playable card */}
-                  {isFocused && isCurrentTurn && playable && (
+                  {isFocused && !isPreview && isCurrentTurn && playable && (
                     <div className="absolute -inset-3 rounded-2xl bg-green-400/40 animate-pulse pointer-events-none z-0" />
                   )}
                   {/* Selection indicator ring */}

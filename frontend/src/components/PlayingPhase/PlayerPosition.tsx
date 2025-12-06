@@ -65,7 +65,7 @@ export const PlayerPosition = memo(function PlayerPosition({
         <>
           <button
             onClick={onToggleBotThinking}
-            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1 transition-all active:scale-95 cursor-pointer hover:brightness-110 text-white ${
+            className={`inline-flex items-center gap-0.5 px-1 sm:px-1.5 md:px-2 py-0.5 md:py-1 rounded text-[8px] sm:text-[10px] md:text-xs font-bold ml-0.5 sm:ml-1 transition-all active:scale-95 cursor-pointer hover:brightness-110 text-white ${
               botThinkingOpen ? 'ring-2 ring-white scale-105' : ''
             }`}
             style={{
@@ -153,17 +153,17 @@ export const PlayerPosition = memo(function PlayerPosition({
     // No bot thinking - just show static badge
     return (
       <span
-        className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs md:text-[10px] font-bold ml-1 text-white"
+        className="inline-flex items-center gap-0.5 px-1 sm:px-1.5 md:px-2 py-0.5 md:py-1 rounded text-[8px] sm:text-[10px] md:text-xs font-bold ml-0.5 sm:ml-1 text-white"
         style={{
           backgroundColor: badge.bgColor,
           boxShadow: `0 2px 8px ${badge.bgColor}`,
         }}
         title={`Bot (${badge.label} difficulty)${isThinking ? ' - Thinking...' : ''}`}
       >
-        <span className={isThinking ? 'animate-pulse' : ''}>🤖</span>
-        <span className="hidden md:inline">{badge.label}</span>
+        <span className={`text-[10px] sm:text-xs ${isThinking ? 'animate-pulse' : ''}`}>🤖</span>
+        <span className="hidden sm:inline">{badge.label}</span>
         {isThinking && (
-          <span className="flex gap-0.5 text-base md:text-xs">
+          <span className="flex gap-0.5 text-[10px] sm:text-xs">
             <span className="animate-bounce delay-0">.</span>
             <span className="animate-bounce delay-150">.</span>
             <span className="animate-bounce delay-300">.</span>
@@ -251,7 +251,7 @@ export const PlayerPosition = memo(function PlayerPosition({
       )}
 
       <div
-        className={`max-w-[180px] px-3 md:px-4 py-1 md:py-1.5 rounded-[var(--radius-lg)] text-xs md:text-sm font-bold shadow-lg ${
+        className={`max-w-[100px] sm:max-w-[140px] md:max-w-[180px] px-1.5 sm:px-2 md:px-4 py-0.5 sm:py-1 md:py-1.5 rounded-[var(--radius-md)] md:rounded-[var(--radius-lg)] text-[10px] sm:text-xs md:text-sm font-bold shadow-md md:shadow-lg ${
           isWinner ? 'ring-2 md:ring-3' : ''
         }`}
         style={{
@@ -260,7 +260,7 @@ export const PlayerPosition = memo(function PlayerPosition({
         }}
       >
         <span
-          className="flex items-center justify-center relative"
+          className="flex items-center justify-center relative truncate"
           style={{
             color:
               player && !player.isEmpty
@@ -270,23 +270,25 @@ export const PlayerPosition = memo(function PlayerPosition({
                 : 'var(--color-text-muted)',
           }}
         >
-          {player?.isEmpty && <span aria-hidden="true">💺 </span>}
+          {player?.isEmpty && <span className="hidden sm:inline" aria-hidden="true">💺 </span>}
           {isClickable ? (
             <button
               onClick={handleNameClick}
-              className="hover:underline cursor-pointer focus:outline-none rounded px-1 -mx-1"
+              className="hover:underline cursor-pointer focus:outline-none rounded truncate"
               title={`View ${player.name}'s profile`}
             >
               {getDisplayName()}
             </button>
           ) : (
-            getDisplayName()
+            <span className="truncate">{getDisplayName()}</span>
           )}
-          {isYou && ' (You)'}
+          {isYou && <span className="hidden sm:inline"> (You)</span>}
           {getBotDifficultyBadge()}
-          {/* Achievement badges for human players */}
+          {/* Achievement badges for human players - hidden on mobile */}
           {!player?.isBot && achievementBadges && achievementBadges.length > 0 && (
-            <AchievementBadges badges={achievementBadges} size="sm" />
+            <span className="hidden md:inline">
+              <AchievementBadges badges={achievementBadges} size="sm" />
+            </span>
           )}
         </span>
       </div>
