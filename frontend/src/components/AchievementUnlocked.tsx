@@ -3,12 +3,11 @@
  * Sprint 3 Phase 3.5
  *
  * Shows animated achievement unlock notification
+ * Click anywhere on the popup to dismiss
  */
 
 import { useEffect, useState } from 'react';
 import { Achievement } from '../types/achievements';
-import { UICard, UICardGradient } from './ui/UICard';
-import { Button } from './ui/Button';
 import { sounds } from '../utils/sounds';
 
 interface AchievementUnlockedProps {
@@ -60,33 +59,37 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
 
   const rarity = getRarity();
 
-  const getRarityGradient = (): UICardGradient => {
+  // Get background gradient based on rarity - using explicit colors for all skins
+  const getRarityStyles = () => {
     switch (rarity) {
-      case 'common':
-        return 'success';
-      case 'rare':
-        return 'info';
-      case 'epic':
-        return 'team2';
       case 'legendary':
-        return 'warning';
-      default:
-        return 'success';
+        return {
+          bg: 'bg-gradient-to-br from-yellow-500 via-amber-500 to-orange-500',
+          glow: 'shadow-[0_0_30px_rgba(251,191,36,0.6)]',
+          border: 'border-yellow-300',
+        };
+      case 'epic':
+        return {
+          bg: 'bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700',
+          glow: 'shadow-[0_0_25px_rgba(147,51,234,0.5)]',
+          border: 'border-purple-300',
+        };
+      case 'rare':
+        return {
+          bg: 'bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600',
+          glow: 'shadow-[0_0_20px_rgba(59,130,246,0.4)]',
+          border: 'border-blue-300',
+        };
+      default: // common
+        return {
+          bg: 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600',
+          glow: 'shadow-[0_0_15px_rgba(34,197,94,0.4)]',
+          border: 'border-green-300',
+        };
     }
   };
 
-  const getRarityGlow = () => {
-    switch (rarity) {
-      case 'legendary':
-        return 'shadow-[0_0_30px_rgba(251,191,36,0.5)]';
-      case 'epic':
-        return 'shadow-[0_0_25px_rgba(147,51,234,0.4)]';
-      case 'rare':
-        return 'shadow-[0_0_20px_rgba(59,130,246,0.3)]';
-      default:
-        return 'shadow-2xl';
-    }
-  };
+  const rarityStyles = getRarityStyles();
 
   // Get name with fallback to achievement_name
   const name = achievement.name || achievement.achievement_name;
@@ -97,22 +100,22 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
         isVisible ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
       }`}
     >
-      <UICard
-        variant="gradient"
-        gradient={getRarityGradient()}
-        size="lg"
-        className={`${getRarityGlow()} animate-bounce-once relative`}
+      {/* Clickable card - click anywhere to dismiss */}
+      <button
+        onClick={handleClose}
+        className={`
+          ${rarityStyles.bg} ${rarityStyles.glow}
+          p-5 rounded-xl border-2 ${rarityStyles.border}
+          animate-bounce-once cursor-pointer
+          hover:scale-105 active:scale-95 transition-transform
+          text-left w-full max-w-md
+        `}
+        aria-label="Click to dismiss achievement notification"
       >
-        {/* Close Button */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleClose}
-          className="absolute top-2 right-2 text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white text-2xl leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 dark:hover:bg-white/10"
-          aria-label="Close achievement notification"
-        >
-          ×
-        </Button>
+        {/* Close hint */}
+        <div className="absolute top-2 right-3 text-white/60 text-xs">
+          tap to close
+        </div>
 
         <div className="flex items-center gap-4">
           {/* Trophy Icon */}
@@ -120,13 +123,13 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
             🏆
           </div>
 
-          {/* Content - Use dark text in light mode, white in dark mode */}
-          <div className="text-gray-900 dark:text-white">
-            <div className="text-xs uppercase tracking-wider mb-1 text-gray-700 dark:text-white/90">
+          {/* Content - Always white text on colored gradient backgrounds */}
+          <div className="flex-1">
+            <div className="text-xs uppercase tracking-wider mb-1 text-white/90 font-semibold">
               {achievement.is_secret ? '🔓 Secret Achievement Unlocked!' : 'Achievement Unlocked!'}
             </div>
-            <div className="font-bold text-xl mb-1">{name}</div>
-            <div className="text-sm text-gray-700 dark:text-white/80">
+            <div className="font-bold text-xl mb-1 text-white">{name}</div>
+            <div className="text-sm text-white/90">
               {achievement.description}
             </div>
           </div>
@@ -137,11 +140,11 @@ export function AchievementUnlocked({ achievement, onDismiss }: AchievementUnloc
           </div>
         </div>
 
-        {/* Progress Bar Animation */}
-        <div className="mt-3 h-1 bg-gray-300 dark:bg-white/20 rounded-full overflow-hidden">
-          <div className="h-full bg-gray-700 dark:bg-white animate-progress-fill" />
+        {/* Progress Bar Animation - white on colored bg */}
+        <div className="mt-3 h-1 bg-white/30 rounded-full overflow-hidden">
+          <div className="h-full bg-white animate-progress-fill" />
         </div>
-      </UICard>
+      </button>
     </div>
   );
 }
