@@ -101,13 +101,13 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
     >
       {/* Progress Bar */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="flex-1 bg-blue-800/50 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+        <div className="flex-1 bg-gray-300 rounded-full h-3 overflow-hidden">
           <div
-            className="bg-green-400 h-full transition-all duration-500 rounded-full"
+            className="bg-green-500 h-full transition-all duration-500 rounded-full"
             style={{ width: `${stats.percentage}%` }}
           />
         </div>
-        <span className="text-gray-900 dark:text-white text-sm font-bold whitespace-nowrap">
+        <span className="text-gray-800 text-sm font-bold whitespace-nowrap">
           {stats.completed}/{stats.total} ({stats.percentage}%)
         </span>
       </div>
@@ -116,8 +116,8 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
       <div className="space-y-6">
         {/* Completion Message */}
         {stats.allCompleted && (
-          <div className="mb-4 bg-green-100 dark:bg-green-900/30 border-2 border-green-500 rounded-lg p-4">
-            <p className="text-green-800 dark:text-green-200 font-bold text-center">
+          <div className="mb-4 bg-green-100 border-2 border-green-500 rounded-lg p-4">
+            <p className="text-green-800 font-bold text-center">
               🎉 Congratulations! You've completed all tutorials!
             </p>
           </div>
@@ -138,21 +138,21 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
                   rounded-lg border-2 transition-all overflow-hidden
                   ${
                     isCompleted
-                      ? 'bg-green-50 dark:bg-green-900/20 border-green-400 dark:border-green-600'
-                      : 'bg-gray-50 dark:bg-gray-700/50 border-gray-300 dark:border-gray-600'
+                      ? 'bg-green-50 border-green-400'
+                      : 'bg-gray-100 border-gray-300'
                   }
-                  ${isExpanded ? 'ring-2 ring-blue-400 dark:ring-blue-500' : ''}
+                  ${isExpanded ? 'ring-2 ring-blue-400' : ''}
                 `}
               >
                 {/* Clickable Header */}
                 <button
                   onClick={() => toggleExpanded(phase)}
-                  className="w-full flex items-start gap-3 p-3 text-left hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  className="w-full flex items-start gap-3 p-3 text-left hover:bg-black/5 transition-colors"
                 >
                   {/* Icon/Checkmark */}
                   <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center">
                     {isCompleted ? (
-                      <span className="text-2xl text-green-600 dark:text-green-400">✓</span>
+                      <span className="text-2xl text-green-600">✓</span>
                     ) : (
                       <span className="text-2xl">{TUTORIAL_ICONS[phase]}</span>
                     )}
@@ -163,23 +163,19 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
                     <h3
                       className={`
                         font-semibold text-sm
-                        ${
-                          isCompleted
-                            ? 'text-green-800 dark:text-green-200'
-                            : 'text-gray-800 dark:text-gray-200'
-                        }
+                        ${isCompleted ? 'text-green-800' : 'text-gray-800'}
                       `}
                     >
                       {TUTORIAL_TITLES[phase]}
                     </h3>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
+                    <p className="text-xs text-gray-600 mt-0.5">
                       {isCompleted ? 'Completed' : 'Not yet seen'} • Tap to{' '}
                       {isExpanded ? 'hide' : 'view'}
                     </p>
                   </div>
 
                   {/* Expand/Collapse Indicator */}
-                  <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                  <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-500">
                     <span
                       className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                     >
@@ -190,15 +186,15 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
 
                 {/* Expandable Content */}
                 {isExpanded && (
-                  <div className="px-3 pb-3 pt-0 border-t border-gray-200 dark:border-gray-600">
-                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
+                  <div className="px-3 pb-3 pt-0 border-t border-gray-200">
+                    <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">{TUTORIAL_ICONS[phase]}</span>
-                        <span className="text-blue-900 dark:text-blue-100 font-bold text-sm">
+                        <span className="text-blue-800 font-bold text-sm">
                           {TUTORIAL_TITLES[phase]}
                         </span>
                       </div>
-                      <p className="text-blue-900 dark:text-blue-100 text-sm whitespace-pre-line leading-relaxed">
+                      <p className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
                         {TUTORIAL_CONTENT[phase]}
                       </p>
                     </div>
@@ -211,8 +207,8 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
 
         {/* Help Text */}
         {!stats.allCompleted && (
-          <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-700 rounded-lg p-4">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="mt-6 bg-blue-50 border border-blue-300 rounded-lg p-4">
+            <p className="text-sm text-blue-800">
               <span className="font-bold">💡 Tip:</span> Tutorials appear automatically as you play.
               Complete all steps to unlock the "Tutorial Master" achievement!
             </p>

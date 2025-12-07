@@ -241,27 +241,26 @@ export const TrickArea = memo(function TrickArea({
       {showPreviousTrick && previousCardPositions ? (
         // Previous Trick View
         <>
-          {/* Modal overlay */}
-          <div className="absolute inset-0 rounded-[var(--radius-lg)] z-30 bg-black/50 backdrop-blur-sm" />
+          {/* Modal overlay - lighter to keep cards visible */}
+          <div className="absolute inset-0 rounded-[var(--radius-lg)] z-30 bg-black/30" />
 
-          {/* Title */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-50">
-            <div className="rounded-[var(--radius-lg)] px-4 py-2 border-2 border-skin-warning bg-skin-tertiary shadow-[0_0_15px_var(--color-warning)]">
-              <div className="text-sm md:text-2xl font-display uppercase tracking-wider mb-1 md:mb-2 text-skin-warning">
-                Previous Trick
-              </div>
-              <div className="text-xs md:text-lg text-skin-primary">
-                Winner:{' '}
-                {gameState.players.find((p) => p.id === gameState.previousTrick?.winnerId)?.name}
-              </div>
-              <div className="text-xs md:text-sm text-skin-muted">
-                +{gameState.previousTrick?.points || 0} points
+          {/* Circular Layout - Previous Trick - higher z-index so cards are fully visible */}
+          <div className="relative h-[320px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-50">
+            {/* Title - centered but smaller to not overlap cards */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
+              <div className="rounded-lg px-3 py-1.5 border-2 border-yellow-400 bg-gray-900/90 shadow-lg">
+                <div className="text-xs md:text-base font-bold uppercase tracking-wider text-yellow-400">
+                  Previous Trick
+                </div>
+                <div className="text-[10px] md:text-sm text-white">
+                  Winner:{' '}
+                  {gameState.players.find((p) => p.id === gameState.previousTrick?.winnerId)?.name}
+                </div>
+                <div className="text-[10px] md:text-xs text-gray-300">
+                  +{gameState.previousTrick?.points || 0} points
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Circular Layout - Previous Trick */}
-          <div className="relative h-[220px] sm:h-[300px] md:h-[380px] w-full min-w-[260px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-40">
             {/* Bottom */}
             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 md:gap-1.5">
               {renderCard(

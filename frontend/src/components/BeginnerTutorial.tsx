@@ -8,7 +8,6 @@ import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { GameState } from '../types/game';
 import { markTutorialCompleted, getTutorialStats } from '../utils/tutorialProgress';
-import { UICard } from './ui/UICard';
 import { Button } from './ui/Button';
 
 export type TutorialPhase =
@@ -230,15 +229,12 @@ export function BeginnerTutorial({
   const tutorialStats = getTutorialStats();
 
   return createPortal(
-    <UICard
-      variant="gradient"
-      gradient="info"
-      size="lg"
-      className="fixed top-20 right-4 md:right-6 z-[10000] w-[380px] max-w-[calc(100vw-2rem)] animate-slide-in border-4 border-blue-400 dark:border-blue-600"
+    <div
+      className="fixed top-20 right-4 md:right-6 z-[10000] w-[380px] max-w-[calc(100vw-2rem)] animate-slide-in rounded-xl shadow-2xl overflow-hidden"
       data-testid="beginner-tutorial"
     >
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-700 dark:to-indigo-700 px-4 py-3 -mx-4 -mt-4 mb-4 rounded-t-lg border-b-4 border-blue-600 dark:border-blue-800">
+      {/* Header - solid blue gradient for readability */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <h3 className="text-white font-bold text-lg flex items-center gap-2">
             <span className="text-2xl" aria-hidden="true">
@@ -272,22 +268,20 @@ export function BeginnerTutorial({
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-h-[400px] overflow-y-auto -mx-4 px-4">
+      {/* Content - light background for readability */}
+      <div className="bg-blue-50 p-4 max-h-[400px] overflow-y-auto">
         {/* Show all accumulated steps */}
         {accumulatedSteps.map((step, index) => (
           <div
             key={step.phase}
-            className={index > 0 ? 'mt-4 pt-4 border-t border-blue-300 dark:border-blue-700' : ''}
+            className={index > 0 ? 'mt-4 pt-4 border-t border-blue-200' : ''}
           >
             {/* Step header */}
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xl" aria-hidden="true">
                 {step.icon}
               </span>
-              <span className="text-blue-900 dark:text-blue-100 text-sm font-bold">
-                {step.title}
-              </span>
+              <span className="text-blue-800 text-sm font-bold">{step.title}</span>
               {step.phase === currentStep?.phase && (
                 <span className="ml-auto text-xs bg-green-500 text-white px-2 py-0.5 rounded-full font-semibold">
                   NEW
@@ -295,15 +289,15 @@ export function BeginnerTutorial({
               )}
             </div>
             {/* Step content */}
-            <p className="text-blue-900 dark:text-blue-100 text-sm whitespace-pre-line leading-relaxed">
+            <p className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
               {step.content}
             </p>
           </div>
         ))}
       </div>
 
-      {/* Actions */}
-      <div className="mt-4 -mx-4 -mb-4 px-4 pb-4">
+      {/* Actions - slightly darker footer */}
+      <div className="bg-blue-100 px-4 py-3 border-t border-blue-200">
         <Button
           variant="primary"
           fullWidth
@@ -313,7 +307,7 @@ export function BeginnerTutorial({
           Got It! ✓
         </Button>
       </div>
-    </UICard>,
+    </div>,
     document.body
   );
 }
