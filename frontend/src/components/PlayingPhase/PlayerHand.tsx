@@ -4,11 +4,11 @@
  * Renders player's hand with card dealing animation and keyboard navigation.
  * Uses CSS variables for skin compatibility.
  *
- * Mobile: Fan-style layout with horizontal scroll/swipe
- * - Cards overlap like a real hand of cards
- * - Active/selected card pops up and is fully visible
- * - Swipe left/right to cycle through cards
- * - Larger cards for better touch targets
+ * Mobile: Adaptive layout based on card count
+ * - When cards fit: Horizontal row with all cards visible (straight, no overlap)
+ * - When cards don't fit: Fan-style with swipe navigation
+ * - Cards are always straight (no rotation)
+ * - Uses full available width
  *
  * Desktop: Traditional grid layout with wrapping
  */
@@ -395,117 +395,198 @@ export const PlayerHand = memo(function PlayerHand({
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Mobile: Fan-style card layout - swipe to navigate, tap to play */}
-        <div className="md:hidden relative h-40 sm:h-44 flex items-end justify-center overflow-visible">
-          {/* Fan of cards - overlapping like a real hand, swipe to navigate */}
-          <div className="relative flex items-end justify-center w-full h-full">
-            {displayHand.map((card, index) => {
-              const playable = isCardPlayable(card);
-              const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
-              const dealDelay = index * 120;
-              const isTransitioning =
-                cardInTransition &&
-                card.color === cardInTransition.color &&
-                card.value === cardInTransition.value;
-              const isSelected = selectedCardIndex === index;
-              const isQueued = isCardQueued(card);
+        {/* Mobile: Adaptive layout - row when cards fit, fan when they don't */}
+        {(() => {
+          // Card width (~70px for large cards) + gap (8px) = ~78px per card
+          // Screen width minus padding (~32px total) determines if cards fit
+          // If cards fit in a row, show them all; otherwise use fan navigation
+          const cardWidth = 70;
+          const cardGap = 8;
+          const containerPadding = 32;
+          const availableWidth = typeof window !== 'undefined' ? window.innerWidth - containerPadding : 360;
+          const totalCardsWidth = displayHand.length * cardWidth + (displayHand.length - 1) * cardGap;
+          const allCardsFit = totalCardsWidth <= availableWidth;
 
-              // Use preview index during swipe, otherwise use focused index
-              const activeIndex = previewCardIndex !== null ? previewCardIndex : focusedCardIndex;
-              const isFocused = activeIndex === index;
-              const isPreview = previewCardIndex !== null && previewCardIndex === index;
+          return (
+            <div className="md:hidden relative flex items-end justify-center overflow-visible" style={{ minHeight: allCardsFit ? '140px' : '160px' }}>
+              {allCardsFit ? (
+                // All cards fit: Show them in a straight row
+                <div className="flex items-end justify-center gap-2 w-full pb-2">
+                  {displayHand.map((card, index) => {
+                    const playable = isCardPlayable(card);
+                    const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
+                    const dealDelay = index * 120;
+                    const isTransitioning =
+                      cardInTransition &&
+                      card.color === cardInTransition.color &&
+                      card.value === cardInTransition.value;
+                    const isSelected = selectedCardIndex === index;
+                    const isQueued = isCardQueued(card);
 
-              // Calculate fan position - spread cards to use full width
-              const centerOffset = index - activeIndex;
-              // Show more of each card (~45px visible edge) to use screen width
-              const cardVisibleEdge = 45;
-              const xOffset = centerOffset * cardVisibleEdge;
-
-              // Z-index: focused card always on top, others stack by distance
-              const zIndex = isFocused ? 100 : 50 - Math.abs(centerOffset);
-
-              // Focused card is scaled up prominently; others are slightly smaller
-              const scale = isFocused ? 1.25 : 0.8;
-
-              // Focused card pops up above the others
-              const yOffset = isFocused ? -16 : 8;
-
-              // Subtle rotation for natural fan effect
-              const rotation = isFocused ? 0 : centerOffset * 3;
-
-              // Opacity: slightly dim non-focused cards, preview card gets highlight
-              const opacity = isFocused ? 1 : 0.8;
-
-              return (
-                <div
-                  key={`${card.color}-${card.value}-${index}`}
-                  ref={(el) => {
-                    cardRefs.current[index] = el;
-                  }}
-                  className={`absolute bottom-6 will-change-transform ${
-                    showDealingAnimation && !isCardDealt
-                      ? 'opacity-0 scale-50'
-                      : isTransitioning
-                        ? 'opacity-0 -translate-y-20'
-                        : ''
-                  }`}
-                  style={{
-                    transform: `translateX(${xOffset}px) translateY(${yOffset}px) scale(${scale}) rotate(${rotation}deg)`,
-                    zIndex: isQueued ? 9999 : zIndex,
-                    opacity: showDealingAnimation && !isCardDealt ? 0 : isTransitioning ? 0 : opacity,
-                    transition: isTransitioning
-                      ? 'opacity 350ms ease-out, transform 350ms ease-out'
-                      : `transform 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease-out`,
-                    transitionDelay: showDealingAnimation && !isCardDealt ? `${dealDelay}ms` : '0ms',
-                  }}
-                  onClick={() => {
-                    if (!isFocused) {
-                      handleCardFocus(index);
-                      sounds.cardDeal();
-                    }
-                  }}
-                >
-                  {/* Preview indicator during swipe - blue glow */}
-                  {isPreview && (
-                    <div className="absolute -inset-3 rounded-2xl bg-blue-400/50 pointer-events-none z-0 shadow-[0_0_20px_rgba(59,130,246,0.5)]" />
-                  )}
-                  {/* Glow effect for focused playable card */}
-                  {isFocused && !isPreview && isCurrentTurn && playable && (
-                    <div className="absolute -inset-3 rounded-2xl bg-green-400/40 animate-pulse pointer-events-none z-0" />
-                  )}
-                  {/* Selection indicator ring */}
-                  {isSelected && (
-                    <div className="absolute -inset-3 rounded-2xl animate-pulse pointer-events-none z-10 shadow-[0_0_0_4px_var(--color-info)]" />
-                  )}
-                  {/* Queued indicator */}
-                  {isQueued && (
-                    <>
-                      <div className="absolute -inset-3 rounded-2xl animate-pulse pointer-events-none z-20 shadow-[0_0_0_4px_var(--color-warning)]" />
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold px-4 py-1.5 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none bg-warning text-skin-primary border-warning">
-                        QUEUED
+                    return (
+                      <div
+                        key={`${card.color}-${card.value}-${index}`}
+                        ref={(el) => {
+                          cardRefs.current[index] = el;
+                        }}
+                        className={`relative will-change-transform ${
+                          showDealingAnimation && !isCardDealt
+                            ? 'opacity-0 scale-50'
+                            : isTransitioning
+                              ? 'opacity-0 -translate-y-20'
+                              : ''
+                        } ${isSelected || isQueued ? '-translate-y-3 scale-110' : ''}`}
+                        style={{
+                          zIndex: isQueued ? 9999 : isSelected ? 100 : 'auto',
+                          opacity: showDealingAnimation && !isCardDealt ? 0 : isTransitioning ? 0 : 1,
+                          transition: isTransitioning
+                            ? 'opacity 350ms ease-out, transform 350ms ease-out'
+                            : `transform 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease-out`,
+                          transitionDelay: showDealingAnimation && !isCardDealt ? `${dealDelay}ms` : '0ms',
+                        }}
+                      >
+                        {/* Glow effect for playable card on current turn */}
+                        {isCurrentTurn && playable && (
+                          <div className="absolute -inset-2 rounded-xl bg-green-400/30 animate-pulse pointer-events-none z-0" />
+                        )}
+                        {/* Selection indicator ring */}
+                        {isSelected && (
+                          <div className="absolute -inset-2 rounded-xl animate-pulse pointer-events-none z-10 shadow-[0_0_0_3px_var(--color-info)]" />
+                        )}
+                        {/* Queued indicator */}
+                        {isQueued && (
+                          <>
+                            <div className="absolute -inset-2 rounded-xl animate-pulse pointer-events-none z-20 shadow-[0_0_0_3px_var(--color-warning)]" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xs font-bold px-2 py-1 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none bg-warning text-skin-primary border-warning">
+                              QUEUED
+                            </div>
+                          </>
+                        )}
+                        <CardComponent
+                          card={card}
+                          size="large"
+                          onClick={(e) => handleCardClick(card, e)}
+                          disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
+                          isPlayable={isCurrentTurn ? playable : !isQueued}
+                          isKeyboardSelected={isSelected}
+                        />
                       </div>
-                    </>
-                  )}
-                  <CardComponent
-                    card={card}
-                    size="large"
-                    onClick={(e) => {
-                      if (isFocused) {
-                        handleCardClick(card, e);
-                      } else {
-                        handleCardFocus(index);
-                        sounds.cardDeal();
-                      }
-                    }}
-                    disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
-                    isPlayable={isCurrentTurn ? playable : !isQueued}
-                    isKeyboardSelected={isSelected}
-                  />
+                    );
+                  })}
                 </div>
-              );
-            })}
-          </div>
-        </div>
+              ) : (
+                // Cards don't fit: Fan-style with swipe navigation (no rotation)
+                <div className="relative flex items-end justify-center w-full h-full">
+                  {displayHand.map((card, index) => {
+                    const playable = isCardPlayable(card);
+                    const isCardDealt = showDealingAnimation && index <= dealingCardIndex;
+                    const dealDelay = index * 120;
+                    const isTransitioning =
+                      cardInTransition &&
+                      card.color === cardInTransition.color &&
+                      card.value === cardInTransition.value;
+                    const isSelected = selectedCardIndex === index;
+                    const isQueued = isCardQueued(card);
+
+                    // Use preview index during swipe, otherwise use focused index
+                    const activeIndex = previewCardIndex !== null ? previewCardIndex : focusedCardIndex;
+                    const isFocused = activeIndex === index;
+                    const isPreview = previewCardIndex !== null && previewCardIndex === index;
+
+                    // Calculate fan position - spread cards to use more width
+                    const centerOffset = index - activeIndex;
+                    // Wider card spacing for better visibility (~55px visible edge)
+                    const cardVisibleEdge = 55;
+                    const xOffset = centerOffset * cardVisibleEdge;
+
+                    // Z-index: focused card always on top, others stack by distance
+                    const zIndex = isFocused ? 100 : 50 - Math.abs(centerOffset);
+
+                    // Focused card is scaled up prominently; others are slightly smaller
+                    const scale = isFocused ? 1.15 : 0.85;
+
+                    // Focused card pops up above the others
+                    const yOffset = isFocused ? -12 : 4;
+
+                    // NO rotation - cards stay straight
+                    // const rotation = 0;
+
+                    // Opacity: slightly dim non-focused cards
+                    const opacity = isFocused ? 1 : 0.75;
+
+                    return (
+                      <div
+                        key={`${card.color}-${card.value}-${index}`}
+                        ref={(el) => {
+                          cardRefs.current[index] = el;
+                        }}
+                        className={`absolute bottom-4 will-change-transform ${
+                          showDealingAnimation && !isCardDealt
+                            ? 'opacity-0 scale-50'
+                            : isTransitioning
+                              ? 'opacity-0 -translate-y-20'
+                              : ''
+                        }`}
+                        style={{
+                          transform: `translateX(${xOffset}px) translateY(${yOffset}px) scale(${scale})`,
+                          zIndex: isQueued ? 9999 : zIndex,
+                          opacity: showDealingAnimation && !isCardDealt ? 0 : isTransitioning ? 0 : opacity,
+                          transition: isTransitioning
+                            ? 'opacity 350ms ease-out, transform 350ms ease-out'
+                            : `transform 200ms cubic-bezier(0.4, 0, 0.2, 1), opacity 200ms ease-out`,
+                          transitionDelay: showDealingAnimation && !isCardDealt ? `${dealDelay}ms` : '0ms',
+                        }}
+                        onClick={() => {
+                          if (!isFocused) {
+                            handleCardFocus(index);
+                            sounds.cardDeal();
+                          }
+                        }}
+                      >
+                        {/* Preview indicator during swipe - blue glow */}
+                        {isPreview && (
+                          <div className="absolute -inset-3 rounded-2xl bg-blue-400/50 pointer-events-none z-0 shadow-[0_0_20px_rgba(59,130,246,0.5)]" />
+                        )}
+                        {/* Glow effect for focused playable card */}
+                        {isFocused && !isPreview && isCurrentTurn && playable && (
+                          <div className="absolute -inset-3 rounded-2xl bg-green-400/40 animate-pulse pointer-events-none z-0" />
+                        )}
+                        {/* Selection indicator ring */}
+                        {isSelected && (
+                          <div className="absolute -inset-3 rounded-2xl animate-pulse pointer-events-none z-10 shadow-[0_0_0_4px_var(--color-info)]" />
+                        )}
+                        {/* Queued indicator */}
+                        {isQueued && (
+                          <>
+                            <div className="absolute -inset-3 rounded-2xl animate-pulse pointer-events-none z-20 shadow-[0_0_0_4px_var(--color-warning)]" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-bold px-4 py-1.5 rounded-full shadow-2xl z-30 whitespace-nowrap border-2 pointer-events-none bg-warning text-skin-primary border-warning">
+                              QUEUED
+                            </div>
+                          </>
+                        )}
+                        <CardComponent
+                          card={card}
+                          size="large"
+                          onClick={(e) => {
+                            if (isFocused) {
+                              handleCardClick(card, e);
+                            } else {
+                              handleCardFocus(index);
+                              sounds.cardDeal();
+                            }
+                          }}
+                          disabled={isCurrentTurn ? !playable || !!isTransitioning : false}
+                          isPlayable={isCurrentTurn ? playable : !isQueued}
+                          isKeyboardSelected={isSelected}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* Desktop: Traditional grid layout */}
         <div className="hidden md:block overflow-x-auto overflow-y-visible md:overflow-visible -mx-1 sm:-mx-2 md:mx-0 px-1 sm:px-2 md:px-0 pt-4 sm:pt-6 -mt-2 sm:-mt-4 pb-2 scrollbar-none">
