@@ -454,6 +454,7 @@ export function Lobby({
                   <SettingsContent
                     onShowRules={() => setShowRules(true)}
                     onShowDebug={() => setShowDebug(true)}
+                    socket={socket}
                   />
                 )}
               </div>

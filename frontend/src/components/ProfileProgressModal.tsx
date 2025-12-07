@@ -300,6 +300,31 @@ export function ProfileProgressModal({
     [socket, isPurchasing]
   );
 
+  // Wrapper for setting equipped special skins that also persists to backend
+  const handleSetEquippedSpecialSkins = useCallback(
+    (newEquipped: typeof equippedSpecialSkins) => {
+      // Update local state
+      setEquippedSpecialSkins(newEquipped);
+
+      // Persist each changed skin to backend
+      if (socket) {
+        if (newEquipped.redZeroSkin !== equippedSpecialSkins.redZeroSkin) {
+          socket.emit('equip_special_card_skin', {
+            skinId: newEquipped.redZeroSkin,
+            cardType: 'red_zero',
+          });
+        }
+        if (newEquipped.brownZeroSkin !== equippedSpecialSkins.brownZeroSkin) {
+          socket.emit('equip_special_card_skin', {
+            skinId: newEquipped.brownZeroSkin,
+            cardType: 'brown_zero',
+          });
+        }
+      }
+    },
+    [socket, setEquippedSpecialSkins, equippedSpecialSkins]
+  );
+
   // Stop preview when modal closes
   useEffect(() => {
     if (!isOpen && isPreviewActive) {
@@ -435,7 +460,7 @@ export function ProfileProgressModal({
                   brownZeroSkins={brownZeroSkins}
                   setSkin={setSkin}
                   setCardSkin={setCardSkin}
-                  setEquippedSpecialSkins={setEquippedSpecialSkins}
+                  setEquippedSpecialSkins={handleSetEquippedSpecialSkins}
                   startPreviewSkin={startPreviewSkin}
                   startPreviewCardSkin={startPreviewCardSkin}
                   startPreviewSpecialSkin={startPreviewSpecialSkin}

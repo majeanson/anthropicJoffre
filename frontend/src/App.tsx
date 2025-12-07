@@ -141,7 +141,7 @@ function AppContent() {
   const { checkTutorialAchievement } = useTutorialAchievement({ socket });
 
   // Sprint 20: Skin context for level-based skin unlocks
-  const { setPlayerLevel, setUnlockedSkinIds, setSkinRequirements, loadPreferencesFromBackend } =
+  const { setPlayerLevel, setUnlockedSkinIds, setSkinRequirements, loadPreferencesFromBackend, updateAccessToken } =
     useSkin();
 
   // Sprint 3 Refactoring: Audio management hook
@@ -286,14 +286,19 @@ function AppContent() {
   }, [modals]);
 
   // Load skin preferences from backend when user is authenticated
+  // Also keep the access token reference updated for saving preferences
   useEffect(() => {
     if (auth.isAuthenticated) {
       const token = auth.getAccessToken();
       if (token) {
         loadPreferencesFromBackend(token);
+        updateAccessToken(token);
       }
+    } else {
+      // Clear the token when user logs out
+      updateAccessToken(null);
     }
-  }, [auth.isAuthenticated, auth.getAccessToken, loadPreferencesFromBackend]);
+  }, [auth.isAuthenticated, auth.getAccessToken, loadPreferencesFromBackend, updateAccessToken]);
 
   // Handler to open player profile modal
   const handleClickPlayer = useCallback((playerName: string) => {

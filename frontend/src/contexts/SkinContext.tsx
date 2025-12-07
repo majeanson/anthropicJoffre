@@ -138,6 +138,9 @@ interface SkinContextValue {
   /** Load skin preferences from backend (called when user logs in) */
   loadPreferencesFromBackend: (accessToken: string) => Promise<void>;
 
+  /** Update the access token for saving preferences (called when token is refreshed) */
+  updateAccessToken: (accessToken: string | null) => void;
+
   /** Whether preferences have been loaded from backend */
   isPreferencesLoaded: boolean;
 
@@ -318,7 +321,10 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
   // Save preferences to backend (debounced)
   const savePreferencesToBackend = useCallback(async (newSkinId: string, newCardSkinId: string) => {
     const token = accessTokenRef.current;
-    if (!token) return;
+    if (!token) {
+      console.debug('[SkinContext] No auth token, skipping backend save (guest mode)');
+      return;
+    }
 
     // Clear any existing timeout
     if (saveTimeoutRef.current) {
@@ -328,7 +334,7 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
     // Debounce saves to backend (500ms)
     saveTimeoutRef.current = setTimeout(async () => {
       try {
-        await fetchWithCsrf(API_ENDPOINTS.userPreferences(), {
+        const response = await fetchWithCsrf(API_ENDPOINTS.userPreferences(), {
           method: 'PUT',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -338,7 +344,13 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
             card_skin_id: newCardSkinId,
           }),
         });
-        console.debug('[SkinContext] Preferences saved to backend');
+
+        if (!response.ok) {
+          console.error('[SkinContext] Backend save failed:', response.status, response.statusText);
+          return;
+        }
+
+        console.debug('[SkinContext] Preferences saved to backend:', { skin_id: newSkinId, card_skin_id: newCardSkinId });
       } catch (error) {
         console.error('[SkinContext] Failed to save preferences to backend:', error);
       }
@@ -390,6 +402,12 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
     } finally {
       setIsPreferencesLoaded(true);
     }
+  }, []);
+
+  // Update access token (called when token is refreshed or user logs out)
+  const updateAccessToken = useCallback((accessToken: string | null) => {
+    accessTokenRef.current = accessToken;
+    console.debug('[SkinContext] Access token updated:', accessToken ? 'set' : 'cleared');
   }, []);
 
   // Check if a skin is unlocked for the player
@@ -569,6 +587,7 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
       getCardSkinRequiredLevel,
       // Backend sync
       loadPreferencesFromBackend,
+      updateAccessToken,
       isPreferencesLoaded,
       // Preview mode
       previewSkinId,
@@ -609,6 +628,7 @@ export function SkinProvider({ children, defaultSkin }: SkinProviderProps) {
       isCardSkinUnlocked,
       getCardSkinRequiredLevel,
       loadPreferencesFromBackend,
+      updateAccessToken,
       isPreferencesLoaded,
       previewSkinId,
       previewCardSkinId,

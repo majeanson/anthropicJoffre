@@ -10,6 +10,7 @@
  */
 
 import { useState } from 'react';
+import { Socket } from 'socket.io-client';
 import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
 import { useSkin, useCardSkin, useSpecialCardSkins } from '../contexts/SkinContext';
@@ -22,6 +23,7 @@ import { SpecialCardSkinDropdown } from './SpecialCardSkinSelector';
 interface SettingsContentProps {
   onShowRules: () => void;
   onShowDebug: () => void;
+  socket?: Socket | null;
 }
 
 // Toggle Switch Component for reusability
@@ -78,7 +80,7 @@ function ToggleSwitch({
   );
 }
 
-export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentProps) {
+export function SettingsContent({ onShowRules, onShowDebug, socket }: SettingsContentProps) {
   const { animationsEnabled, setAnimationsEnabled } = useSettings();
   useSkin();
   useCardSkin(); // Initialize card skin context
@@ -133,14 +135,14 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
             <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
               🔥 Red Zero Skin (+5 Points)
             </label>
-            <SpecialCardSkinDropdown cardType="red_zero" />
+            <SpecialCardSkinDropdown cardType="red_zero" socket={socket} />
           </div>
 
           <div>
             <label className="block text-xs font-display uppercase tracking-wider text-[var(--color-text-muted)] mb-2">
               🌍 Brown Zero Skin (-2 Points)
             </label>
-            <SpecialCardSkinDropdown cardType="brown_zero" />
+            <SpecialCardSkinDropdown cardType="brown_zero" socket={socket} />
             <p className="text-xs text-[var(--color-text-muted)] mt-2">
               Unlock special card skins through achievements!
             </p>

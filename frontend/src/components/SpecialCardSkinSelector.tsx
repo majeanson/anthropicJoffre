@@ -437,9 +437,10 @@ export default SpecialCardSkinSelector;
 
 interface SpecialCardSkinDropdownProps {
   cardType: SpecialCardType;
+  socket?: Socket | null;
 }
 
-export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownProps) {
+export function SpecialCardSkinDropdown({ cardType, socket }: SpecialCardSkinDropdownProps) {
   const { specialCardSkins, equippedSpecialSkins, setEquippedSpecialSkins } = useSpecialCardSkins();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -469,11 +470,16 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
     const skin = skins.find((s) => s.skinId === skinId);
     if (!skin?.isUnlocked) return;
 
-    // Update equipped skins
+    // Update local state immediately for responsiveness
     if (cardType === 'red_zero') {
       setEquippedSpecialSkins({ ...equippedSpecialSkins, redZeroSkin: skinId });
     } else {
       setEquippedSpecialSkins({ ...equippedSpecialSkins, brownZeroSkin: skinId });
+    }
+
+    // Persist to backend via socket
+    if (socket) {
+      socket.emit('equip_special_card_skin', { skinId, cardType });
     }
 
     setIsOpen(false);
