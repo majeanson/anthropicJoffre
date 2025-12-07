@@ -270,7 +270,7 @@ export function ScoringPhase({
               </div>
 
               {/* Current Bet Information */}
-              {latestRound && (
+              {latestRound && latestRound.highestBet && (
                 <section className="mb-6">
                   <h3 className="text-xl font-bold text-gray-800 mb-4 border-b-2 border-gray-300 pb-2">
                     <span aria-hidden="true">🎲</span> Round Bet
@@ -280,7 +280,7 @@ export function ScoringPhase({
                       <div>
                         <p className="text-sm text-blue-700 font-semibold mb-1">Highest Bidder</p>
                         <p className="text-lg font-bold text-gray-900">
-                          {gameState.players.find((p) => p.id === latestRound.highestBet.playerId)
+                          {gameState.players.find((p) => p.id === latestRound.highestBet?.playerId)
                             ?.name || 'Unknown'}
                         </p>
                         <p className="text-xs text-blue-600">Team {latestRound.offensiveTeam}</p>

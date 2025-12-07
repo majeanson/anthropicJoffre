@@ -45,7 +45,7 @@ const TrickItem = memo(function TrickItem({
       {/* Trick Header */}
       <div className="flex items-center justify-between mb-3">
         <span
-          className={`font-bold text-gray-800 dark:text-gray-200 ${compact ? 'text-xs' : 'text-sm'}`}
+          className={`font-bold text-gray-800 ${compact ? 'text-xs' : 'text-sm'}`}
         >
           Trick {trickIndex + 1}
         </span>
@@ -74,7 +74,7 @@ const TrickItem = memo(function TrickItem({
                 />
               </div>
               <p
-                className={`font-medium text-gray-700 dark:text-gray-300 truncate ${compact ? 'text-xs' : 'text-xs'}`}
+                className={`font-medium text-gray-700 truncate ${compact ? 'text-xs' : 'text-xs'}`}
               >
                 {trickCard.playerName || 'Unknown'}
               </p>
@@ -97,7 +97,7 @@ export const TrickHistory = memo(function TrickHistory({
   if (!tricks || tricks.length === 0) {
     return (
       <div className={`text-center py-8 ${className}`}>
-        <p className="text-gray-500 dark:text-gray-400">No tricks played yet</p>
+        <p className="text-gray-500">No tricks played yet</p>
       </div>
     );
   }
