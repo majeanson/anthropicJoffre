@@ -83,7 +83,7 @@ export function ConversationItem({
         w-full p-4 flex items-start gap-3
         hover:bg-skin-tertiary
         transition-colors text-left
-        ${isSelected ? 'bg-blue-900/30 border-l-2 border-blue-500' : ''}
+        ${isSelected ? 'bg-skin-accent/20 border-l-2 border-skin-accent' : ''}
         ${className}
       `}
     >
@@ -93,13 +93,13 @@ export function ConversationItem({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between mb-1">
-          <span className="font-semibold text-white truncate">{username}</span>
-          <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{formatTime(timestamp)}</span>
+          <span className="font-semibold text-skin-primary truncate">{username}</span>
+          <span className="text-xs text-skin-secondary flex-shrink-0 ml-2">{formatTime(timestamp)}</span>
         </div>
-        <p className="text-sm text-gray-400 truncate">{lastMessage}</p>
+        <p className="text-sm text-skin-secondary truncate">{lastMessage}</p>
         {unreadCount > 0 && (
           <div className="mt-1">
-            <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-skin-accent text-white px-2 py-0.5 rounded-full">
               {unreadCount} new
             </span>
           </div>

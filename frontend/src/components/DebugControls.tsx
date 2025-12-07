@@ -19,12 +19,8 @@ interface DebugControlsProps {
   gameId: string;
   debugMenuOpen: boolean;
   setDebugMenuOpen: (open: boolean) => void;
-  testPanelOpen: boolean;
-  setTestPanelOpen: (open: boolean) => void;
   debugPanelOpen: boolean;
   setDebugPanelOpen: (open: boolean) => void;
-  debugInfoOpen: boolean;
-  setDebugInfoOpen: (open: boolean) => void;
   showBotManagement: boolean;
   setShowBotManagement: (open: boolean) => void;
 }
@@ -64,7 +60,7 @@ const DebugControls: React.FC<DebugControlsProps> = ({
           <UICard
             variant="elevated"
             size="sm"
-            className="absolute top-12 right-0 min-w-[180px] backdrop-blur-sm bg-gray-900"
+            className="absolute top-12 right-0 min-w-[180px] backdrop-blur-sm bg-skin-primary"
           >
             <Button
               variant="ghost"
@@ -79,7 +75,7 @@ const DebugControls: React.FC<DebugControlsProps> = ({
             </Button>
             {gameState && (
               <>
-                <div className="border-t border-gray-700 my-1" />
+                <div className="border-t border-skin-subtle my-1" />
                 <Button
                   variant="ghost"
                   size="sm"

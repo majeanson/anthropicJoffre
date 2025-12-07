@@ -1,58 +1,44 @@
+/**
+ * Lobby Component
+ *
+ * Main lobby screen with tabs for Play, Social, Stats, and Settings.
+ * Features keyboard navigation (grid-based like GameBoy).
+ *
+ * Refactored to use extracted types and keyboard navigation hook.
+ */
+
 import { useState, useEffect, Suspense, lazy } from 'react';
-import { getRecentPlayers, RecentPlayer } from '../utils/recentPlayers';
-import { LobbyBrowser } from './LobbyBrowser';
-import { HowToPlay } from './HowToPlay';
-import { UnifiedDebugPanel } from './UnifiedDebugPanel';
-import { useLobbyChat } from '../hooks/useLobbyChat';
-import { SocialPanel } from './SocialPanel';
-import { StatsPanel } from './StatsPanel';
-import { GameCreationForm } from './GameCreationForm';
-import { JoinGameForm } from './JoinGameForm';
-import { ErrorBoundary } from './ErrorBoundary';
-import { LobbyErrorFallback } from './fallbacks/LobbyErrorFallback';
-import { StatsErrorFallback } from './fallbacks/StatsErrorFallback';
-import { PlayContent } from './PlayContent';
-import { SettingsContent } from './SettingsContent';
-import { Socket } from 'socket.io-client';
-import { BotDifficulty } from '../utils/botPlayer';
-import { sounds } from '../utils/sounds';
-import { OnlinePlayer } from '../types/game';
-import { useAuth } from '../contexts/AuthContext';
-import { ProfileButton } from './ProfileButton';
-import { ProfileEditorModal } from './ProfileEditorModal';
-import { LoginStreakBadge } from './LoginStreakBadge';
-import { Button } from './ui/Button';
-import { Tabs, Tab } from './ui/Tabs';
+import { getRecentPlayers, RecentPlayer } from '../../utils/recentPlayers';
+import { LobbyBrowser } from '../LobbyBrowser';
+import { HowToPlay } from '../HowToPlay';
+import { UnifiedDebugPanel } from '../UnifiedDebugPanel';
+import { useLobbyChat } from '../../hooks/useLobbyChat';
+import { SocialPanel } from '../SocialPanel';
+import { StatsPanel } from '../StatsPanel';
+import { GameCreationForm } from '../GameCreationForm';
+import { JoinGameForm } from '../JoinGameForm';
+import { ErrorBoundary } from '../ErrorBoundary';
+import { LobbyErrorFallback } from '../fallbacks/LobbyErrorFallback';
+import { StatsErrorFallback } from '../fallbacks/StatsErrorFallback';
+import { PlayContent } from '../PlayContent';
+import { SettingsContent } from '../SettingsContent';
+import { sounds } from '../../utils/sounds';
+import { useAuth } from '../../contexts/AuthContext';
+import { ProfileButton } from '../ProfileButton';
+import { ProfileEditorModal } from '../ProfileEditorModal';
+import { LoginStreakBadge } from '../LoginStreakBadge';
+import { Button } from '../ui/Button';
+import { Tabs, Tab } from '../ui/Tabs';
+import { LobbyProps, LobbyMode, LobbyMainTab, LobbySocialTab, JoinType } from './types';
+import { useLobbyKeyboardNav } from './useLobbyKeyboardNav';
 
 // Lazy load heavy modals
 const PlayerStatsModal = lazy(() =>
-  import('./PlayerStatsModal').then((m) => ({ default: m.PlayerStatsModal }))
+  import('../PlayerStatsModal').then((m) => ({ default: m.PlayerStatsModal }))
 );
 const GlobalLeaderboard = lazy(() =>
-  import('./GlobalLeaderboard').then((m) => ({ default: m.GlobalLeaderboard }))
+  import('../GlobalLeaderboard').then((m) => ({ default: m.GlobalLeaderboard }))
 );
-
-interface LobbyProps {
-  onCreateGame: (playerName: string, persistenceMode?: 'elo' | 'casual') => void;
-  onJoinGame: (gameId: string, playerName: string) => void;
-  onSpectateGame: (gameId: string, spectatorName?: string) => void;
-  onQuickPlay: (
-    difficulty: BotDifficulty,
-    persistenceMode: 'elo' | 'casual',
-    playerName?: string
-  ) => void;
-  onRejoinGame?: () => void;
-  hasValidSession?: boolean;
-  autoJoinGameId?: string;
-  onlinePlayers: OnlinePlayer[];
-  socket: Socket | null;
-  botDifficulty?: BotDifficulty;
-  onBotDifficultyChange?: (difficulty: BotDifficulty) => void;
-  onShowLogin?: () => void;
-  onShowRegister?: () => void;
-  onShowProgress?: () => void;
-  onShowWhyRegister?: () => void;
-}
 
 export function Lobby({
   onCreateGame,
@@ -76,17 +62,13 @@ export function Lobby({
   // Initialize empty - will be set by useEffect once auth state is known
   const [playerName, setPlayerName] = useState('');
   const [gameId, setGameId] = useState(autoJoinGameId || '');
-  const [mode, setMode] = useState<'menu' | 'create' | 'join' | 'spectate'>(
-    autoJoinGameId ? 'join' : 'menu'
-  );
-  const [joinType, setJoinType] = useState<'player' | 'spectator'>('player');
+  const [mode, setMode] = useState<LobbyMode>(autoJoinGameId ? 'join' : 'menu');
+  const [joinType, setJoinType] = useState<JoinType>('player');
   const [showRules, setShowRules] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [showBrowser, setShowBrowser] = useState(false);
-  const [mainTab, setMainTab] = useState<'play' | 'social' | 'stats' | 'settings'>('play');
-  const [socialTab, setSocialTab] = useState<
-    'recent' | 'online' | 'chat' | 'friends' | 'messages' | 'profile'
-  >('online');
+  const [mainTab, setMainTab] = useState<LobbyMainTab>('play');
+  const [socialTab, setSocialTab] = useState<LobbySocialTab>('online');
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [showPlayerStats, setShowPlayerStats] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -98,14 +80,25 @@ export function Lobby({
     playerName,
   });
   const [selectedPlayerName, setSelectedPlayerName] = useState('');
-  const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual'); // Default to casual for Quick Play
+  const [quickPlayPersistence, setQuickPlayPersistence] = useState<'elo' | 'casual'>('casual');
+
   // Keyboard navigation state - grid-based like GameBoy
-  // Row 0: Login/Register (if not logged in)
-  // Row 1: Main tabs (PLAY, SOCIAL, STATS, SETTINGS)
-  // Row 2: Sub-tabs (if applicable, e.g., SOCIAL sub-tabs)
-  // Row 3: Content buttons
   const [navRow, setNavRow] = useState<number>(0);
-  const [navCol, setNavCol] = useState<number>(0); // Column within current row
+  const [navCol, setNavCol] = useState<number>(0);
+
+  // Use extracted keyboard navigation hook
+  useLobbyKeyboardNav({
+    mode,
+    mainTab,
+    socialTab,
+    navRow,
+    navCol,
+    user,
+    setNavRow,
+    setNavCol,
+    setMainTab,
+    setSocialTab,
+  });
 
   // Load recent players on mount
   useEffect(() => {
@@ -164,221 +157,6 @@ export function Lobby({
       }
     }
   }, [autoJoinGameId, mode]);
-
-  // Get items for current navigation row
-  const getItemsForRow = (row: number): HTMLElement[] => {
-    const effectiveRow = user ? row + 1 : row; // Skip login row if logged in
-
-    if (effectiveRow === 0) {
-      // Row 0: Login/Register buttons
-      const items: HTMLElement[] = [];
-      const loginBtn = document.querySelector('[data-keyboard-nav="login-btn"]') as HTMLElement;
-      const registerBtn = document.querySelector(
-        '[data-keyboard-nav="register-btn"]'
-      ) as HTMLElement;
-      if (loginBtn) items.push(loginBtn);
-      if (registerBtn) items.push(registerBtn);
-      return items;
-    } else if (effectiveRow === 1) {
-      // Row 1: Main tabs (PLAY, SOCIAL, STATS, SETTINGS)
-      return Array.from(document.querySelectorAll('[data-nav-tab]')) as HTMLElement[];
-    } else if (effectiveRow === 2) {
-      // Row 2: Sub-tabs (for SOCIAL panel) or first content row
-      const subTabs = document.querySelectorAll('[data-nav-subtab]');
-      if (subTabs.length > 0) {
-        return Array.from(subTabs) as HTMLElement[];
-      }
-      // No sub-tabs, return content buttons
-      const tabContent = document.querySelector('[data-tab-content]');
-      if (tabContent) {
-        return Array.from(tabContent.querySelectorAll('[data-keyboard-nav]')) as HTMLElement[];
-      }
-    } else if (effectiveRow === 3) {
-      // Row 3: Content buttons (when sub-tabs exist)
-      const tabContent = document.querySelector('[data-tab-content]');
-      if (tabContent) {
-        // Get content buttons excluding sub-tabs
-        const allButtons = Array.from(
-          tabContent.querySelectorAll('[data-keyboard-nav]')
-        ) as HTMLElement[];
-        return allButtons.filter((btn) => !btn.hasAttribute('data-nav-subtab'));
-      }
-    }
-    return [];
-  };
-
-  // Check if current tab has sub-tabs
-  const hasSubTabs = (): boolean => {
-    return mainTab === 'social';
-  };
-
-  // Get max row based on current state
-  const getMaxRow = (): number => {
-    const baseRows = user ? 1 : 2; // 0=login (if not logged in), 1=tabs
-    if (hasSubTabs()) {
-      return baseRows + 2; // +subtabs +content
-    }
-    return baseRows + 1; // +content
-  };
-
-  // Keyboard navigation for lobby menu - grid-based like GameBoy
-  useEffect(() => {
-    if (mode !== 'menu') return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const items = getItemsForRow(navRow);
-
-      // Left/Right: Navigate within current row
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        e.preventDefault();
-
-        if (items.length === 0) return;
-
-        let newCol: number;
-        if (e.key === 'ArrowRight') {
-          newCol = (navCol + 1) % items.length;
-        } else {
-          newCol = navCol === 0 ? items.length - 1 : navCol - 1;
-        }
-
-        setNavCol(newCol);
-        items[newCol]?.focus();
-
-        // If on main tab row, also switch the tab
-        const effectiveRow = user ? navRow + 1 : navRow;
-        if (effectiveRow === 1) {
-          const tabs = ['play', 'social', 'stats', 'settings'];
-          if (tabs[newCol]) {
-            setMainTab(tabs[newCol] as typeof mainTab);
-          }
-        }
-        // If on social sub-tab row, switch the sub-tab
-        if (effectiveRow === 2 && mainTab === 'social') {
-          const subTabs = ['messages', 'friends', 'online', 'profile', 'chat'];
-          if (subTabs[newCol]) {
-            setSocialTab(subTabs[newCol] as typeof socialTab);
-          }
-        }
-
-        sounds.buttonClick();
-      }
-
-      // Down: Move to next row OR next item in single-column content
-      else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-
-        const effectiveRow = user ? navRow + 1 : navRow;
-        const contentRow = hasSubTabs() ? 3 : 2;
-
-        // If we're in content row with single column layout, navigate within items
-        if (effectiveRow >= contentRow && items.length > 1) {
-          const newCol = (navCol + 1) % items.length;
-          setNavCol(newCol);
-          items[newCol]?.focus();
-        } else {
-          // Move to next row
-          const maxRow = getMaxRow();
-          if (navRow < maxRow - 1) {
-            const nextRow = navRow + 1;
-            setNavRow(nextRow);
-
-            // Clamp column to new row's item count
-            setTimeout(() => {
-              const newItems = getItemsForRow(nextRow);
-              const newCol = Math.min(navCol, newItems.length - 1);
-              setNavCol(Math.max(0, newCol));
-              if (newItems.length > 0) {
-                newItems[Math.max(0, newCol)]?.focus();
-              }
-            }, 50);
-          }
-        }
-
-        sounds.buttonClick();
-      }
-
-      // Up: Move to previous row OR previous item in single-column content
-      else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-
-        const effectiveRow = user ? navRow + 1 : navRow;
-        const contentRow = hasSubTabs() ? 3 : 2;
-
-        // If we're in content row and not at first item, navigate within items
-        if (effectiveRow >= contentRow && navCol > 0) {
-          const newCol = navCol - 1;
-          setNavCol(newCol);
-          items[newCol]?.focus();
-        } else if (navRow > 0) {
-          // Move to previous row
-          const prevRow = navRow - 1;
-          setNavRow(prevRow);
-
-          // Clamp column to new row's item count, preserve tab position
-          setTimeout(() => {
-            const newItems = getItemsForRow(prevRow);
-            let newCol = navCol;
-
-            // If going back to main tabs, try to preserve the tab position
-            const effectivePrevRow = user ? prevRow + 1 : prevRow;
-            if (effectivePrevRow === 1) {
-              const tabs = ['play', 'social', 'stats', 'settings'];
-              newCol = tabs.indexOf(mainTab);
-            }
-
-            newCol = Math.min(Math.max(0, newCol), newItems.length - 1);
-            setNavCol(newCol);
-            if (newItems.length > 0) {
-              newItems[newCol]?.focus();
-            }
-          }, 50);
-        }
-
-        sounds.buttonClick();
-      }
-
-      // Enter: Activate focused item
-      else if (e.key === 'Enter') {
-        e.preventDefault();
-        const item = items[navCol];
-        if (item) {
-          item.click();
-        }
-      }
-
-      // Escape: Go back one row (or clear focus at top)
-      else if (e.key === 'Escape') {
-        if (navRow > 0) {
-          setNavRow(navRow - 1);
-          setTimeout(() => {
-            const newItems = getItemsForRow(navRow - 1);
-            if (newItems.length > 0) {
-              const newCol = Math.min(navCol, newItems.length - 1);
-              setNavCol(newCol);
-              newItems[newCol]?.focus();
-            }
-          }, 50);
-        } else {
-          (document.activeElement as HTMLElement)?.blur();
-        }
-        sounds.buttonClick();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [
-    mode,
-    mainTab,
-    socialTab,
-    navRow,
-    navCol,
-    user,
-    playerName,
-    socket,
-    hasValidSession,
-    onlinePlayers,
-  ]);
 
   if (mode === 'create') {
     return (
@@ -604,7 +382,7 @@ export function Lobby({
                 activeTab={mainTab}
                 onChange={(tabId) => {
                   sounds.buttonClick();
-                  setMainTab(tabId as typeof mainTab);
+                  setMainTab(tabId as LobbyMainTab);
                   setNavCol(['play', 'social', 'stats', 'settings'].indexOf(tabId));
                 }}
                 variant="boxed"
@@ -733,3 +511,6 @@ export function Lobby({
   // Should never reach here - modes are handled above
   return null;
 }
+
+// Re-export types
+export type { LobbyProps, LobbyMode, LobbyMainTab, LobbySocialTab, JoinType } from './types';

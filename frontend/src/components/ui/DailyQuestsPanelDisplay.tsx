@@ -5,6 +5,8 @@
  * Pure presentational version of DailyQuestsPanel without Socket.io dependency
  */
 
+import { useEffect } from 'react';
+
 interface QuestTemplate {
   id: number;
   quest_key: string;
@@ -49,6 +51,18 @@ export function DailyQuestsPanelDisplay({
   onClose,
   onClaimReward,
 }: DailyQuestsPanelDisplayProps) {
+  // Close on Escape key for accessibility
+  useEffect(() => {
+    if (!onClose) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const getProgressPercentage = (progress: number, target: number) => {
     return Math.min(100, Math.floor((progress / target) * 100));
   };
@@ -72,9 +86,11 @@ export function DailyQuestsPanelDisplay({
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
       onClick={onClose}
+      role="presentation"
+      aria-hidden="true"
     >
       <div
-        className="bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+        className="bg-skin-primary rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -86,7 +102,7 @@ export function DailyQuestsPanelDisplay({
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 text-3xl font-bold leading-none"
+              className="text-white hover:text-white/80 text-3xl font-bold leading-none"
               aria-label="Close"
             >
               ×
@@ -106,12 +122,12 @@ export function DailyQuestsPanelDisplay({
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-              <p className="text-gray-400 mt-4">Loading quests...</p>
+              <p className="text-skin-muted mt-4">Loading quests...</p>
             </div>
           ) : quests.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-400 text-lg">No quests available</p>
-              <p className="text-gray-500 text-sm mt-2">Check back tomorrow for new quests!</p>
+              <p className="text-skin-muted text-lg">No quests available</p>
+              <p className="text-skin-muted text-sm mt-2">Check back tomorrow for new quests!</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -126,7 +142,7 @@ export function DailyQuestsPanelDisplay({
                 return (
                   <div
                     key={quest.id}
-                    className="bg-gray-700 rounded-lg p-4 border border-gray-600 hover:border-gray-500 transition-colors"
+                    className="bg-skin-secondary rounded-lg p-4 border border-skin-default hover:border-skin-default/80 transition-colors"
                   >
                     {/* Quest Header */}
                     <div className="flex items-start justify-between mb-3">
@@ -138,7 +154,7 @@ export function DailyQuestsPanelDisplay({
                           <h3 className="text-white font-semibold text-lg">
                             {quest.template.name}
                           </h3>
-                          <p className="text-gray-400 text-sm">{quest.template.description}</p>
+                          <p className="text-skin-muted text-sm">{quest.template.description}</p>
                         </div>
                       </div>
 
@@ -155,12 +171,12 @@ export function DailyQuestsPanelDisplay({
                     {/* Progress Bar */}
                     <div className="mb-3">
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-gray-300">
+                        <span className="text-skin-secondary">
                           Progress: {quest.progress}/{quest.template.target_value}
                         </span>
-                        <span className="text-gray-300">{progressPercent}%</span>
+                        <span className="text-skin-secondary">{progressPercent}%</span>
                       </div>
-                      <div className="w-full bg-gray-600 rounded-full h-3 overflow-hidden">
+                      <div className="w-full bg-skin-tertiary rounded-full h-3 overflow-hidden">
                         <div
                           className={`h-full transition-all duration-500 ${
                             quest.completed
@@ -183,13 +199,13 @@ export function DailyQuestsPanelDisplay({
                           <span className="text-blue-400" aria-hidden="true">
                             ⭐
                           </span>
-                          <span className="text-gray-300">{quest.template.reward_xp} XP</span>
+                          <span className="text-skin-secondary">{quest.template.reward_xp} XP</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <span className="text-yellow-400" aria-hidden="true">
                             💰
                           </span>
-                          <span className="text-gray-300">
+                          <span className="text-skin-secondary">
                             {quest.template.reward_currency} coins
                           </span>
                         </div>
@@ -207,7 +223,7 @@ export function DailyQuestsPanelDisplay({
                       ) : quest.reward_claimed ? (
                         <span className="text-green-400 font-semibold">✓ Claimed</span>
                       ) : (
-                        <span className="text-gray-500 text-sm">In Progress</span>
+                        <span className="text-skin-muted text-sm">In Progress</span>
                       )}
                     </div>
                   </div>
@@ -218,8 +234,8 @@ export function DailyQuestsPanelDisplay({
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-700 p-4 rounded-b-lg border-t border-gray-600">
-          <p className="text-gray-400 text-sm text-center">
+        <div className="bg-skin-secondary p-4 rounded-b-lg border-t border-skin-default">
+          <p className="text-skin-muted text-sm text-center">
             🔄 New quests available every day at midnight
           </p>
         </div>

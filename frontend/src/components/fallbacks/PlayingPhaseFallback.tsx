@@ -9,11 +9,11 @@ import { UICard, Button } from '../ui';
 
 export function PlayingPhaseFallback() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-900 via-gray-900 to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-900 via-skin-primary to-skin-secondary flex items-center justify-center p-4">
       <UICard variant="elevated" size="lg" className="border-2 border-red-500 max-w-md text-center">
         <div className="text-6xl mb-4">🎮</div>
-        <h2 className="text-2xl font-bold text-white mb-4">Game Error</h2>
-        <p className="text-gray-300 mb-6">
+        <h2 className="text-2xl font-bold text-skin-primary mb-4">Game Error</h2>
+        <p className="text-skin-secondary mb-6">
           Something went wrong during gameplay. Your game state should be preserved.
         </p>
         <div className="space-y-3">
@@ -24,7 +24,7 @@ export function PlayingPhaseFallback() {
             Return to Lobby
           </Button>
         </div>
-        <p className="text-xs text-gray-400 mt-4">
+        <p className="text-xs text-skin-muted mt-4">
           If this persists, please refresh the page or contact support
         </p>
       </UICard>

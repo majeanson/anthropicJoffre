@@ -136,7 +136,7 @@ export function NotificationCenter({
         size="lg"
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-3 rounded-full"
-        title="Notifications"
+        aria-label="Notifications"
       >
         <span className="text-2xl">🔔</span>
         {unreadCount > 0 && (
@@ -151,7 +151,7 @@ export function NotificationCenter({
         <UICard
           variant="elevated"
           size="md"
-          className="absolute right-0 bottom-full mb-2 w-96 z-50 max-h-[600px] flex flex-col border-2"
+          className="absolute right-0 bottom-full mb-2 w-[calc(100vw-2rem)] sm:w-96 z-50 max-h-[calc(100vh-8rem)] sm:max-h-[600px] flex flex-col border-2"
         >
           {/* Header */}
           <div className="flex items-center justify-between pb-4 border-b-2 border-skin-subtle">

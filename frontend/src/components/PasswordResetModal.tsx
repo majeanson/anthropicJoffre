@@ -128,7 +128,7 @@ export default function PasswordResetModal({
         )}
 
         {/* Back to Login Link */}
-        <div className="text-center pt-4 border-t border-gray-700">
+        <div className="text-center pt-4 border-t border-skin-subtle">
           <Button
             type="button"
             variant="link"

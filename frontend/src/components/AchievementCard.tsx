@@ -20,7 +20,7 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
       case 'bronze':
         return 'from-amber-600 to-orange-700';
       case 'silver':
-        return 'from-gray-500 to-gray-700';
+        return 'from-slate-400 to-slate-600';
       case 'gold':
         return 'from-purple-600 to-pink-700';
       case 'platinum':
@@ -33,7 +33,7 @@ export function AchievementCard({ achievement, size = 'medium' }: AchievementCar
       case 'bronze':
         return 'border-amber-700';
       case 'silver':
-        return 'border-gray-500';
+        return 'border-slate-400';
       case 'gold':
         return 'border-yellow-500';
       case 'platinum':

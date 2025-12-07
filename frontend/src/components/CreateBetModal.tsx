@@ -5,7 +5,7 @@
  * Mobile-friendly design with slider for amount selection.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Socket } from 'socket.io-client';
 import type { PresetBetType, CreateSideBetPayload } from '../types/game';
 
@@ -85,6 +85,17 @@ export default function CreateBetModal({
   onClose,
 }: CreateBetModalProps) {
   void _playerName; // Silence unused warning
+
+  // Close modal on Escape key for accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
 
   // Helper to convert myTeam/theirTeam to actual team values
   // For spectators, use team1/team2 directly since they have no team
@@ -208,8 +219,13 @@ export default function CreateBetModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70" onClick={onClose} />
+      {/* Backdrop - click to close, keyboard handled by Escape key listener */}
+      <div
+        className="absolute inset-0 bg-black/70"
+        onClick={onClose}
+        role="presentation"
+        aria-hidden="true"
+      />
 
       {/* Modal */}
       <div
@@ -338,7 +354,7 @@ export default function CreateBetModal({
                   onChange={(e) => setCustomDescription(e.target.value)}
                   placeholder="e.g., Marc will play a trump on the first trick"
                   maxLength={200}
-                  className="w-full p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)] rounded-lg text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:border-yellow-500 resize-none"
+                  className="w-full p-3 bg-[var(--color-bg-tertiary)] border border-[var(--color-border-default)] rounded-lg text-[var(--color-text-primary)] placeholder:text-[var(--color-text-secondary)] focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 resize-none"
                   rows={3}
                 />
                 <div className="text-xs text-[var(--color-text-secondary)] text-right">
@@ -459,7 +475,7 @@ export default function CreateBetModal({
             <button
               onClick={handleSubmit}
               disabled={isSubmitting || balance < minAmount}
-              className="flex-1 py-3 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 disabled:from-gray-600 disabled:to-gray-700 text-white font-medium rounded-lg transition-all shadow-lg disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 disabled:from-slate-600 disabled:to-slate-700 text-white font-medium rounded-lg transition-all shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isSubmitting ? 'Creating...' : `Bet ${amount} Coins`}
             </button>

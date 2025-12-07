@@ -23,7 +23,7 @@ export function LobbyErrorFallback({ onClose }: LobbyErrorFallbackProps) {
       testId="lobby-error-fallback"
     >
       <div className="text-center">
-        <p className="text-gray-300 mb-6">
+        <p className="text-skin-secondary mb-6">
           Failed to load the game lobby. The server may be temporarily unavailable.
         </p>
         <div className="space-y-3">

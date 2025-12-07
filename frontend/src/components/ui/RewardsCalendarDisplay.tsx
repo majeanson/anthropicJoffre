@@ -5,6 +5,8 @@
  * Pure presentational version of RewardsCalendar without Socket.io dependency
  */
 
+import { useEffect } from 'react';
+
 interface CalendarReward {
   dayNumber: number;
   rewardType: string;
@@ -42,6 +44,18 @@ export function RewardsCalendarDisplay({
   onClose,
   onClaimReward,
 }: RewardsCalendarDisplayProps) {
+  // Close on Escape key for accessibility
+  useEffect(() => {
+    if (!onClose) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const getDayStatus = (dayNumber: number): 'locked' | 'claimed' | 'available' | 'missed' => {
     if (!progress) return 'locked';
 
@@ -69,14 +83,14 @@ export function RewardsCalendarDisplay({
 
     switch (status) {
       case 'claimed':
-        return `${baseClasses} bg-gray-700 border-gray-600 opacity-60`;
+        return `${baseClasses} bg-skin-secondary border-skin-default opacity-60`;
       case 'available':
         return `${baseClasses} bg-gradient-to-br from-blue-700 to-purple-700 border-blue-400 cursor-pointer hover:scale-105 shadow-lg`;
       case 'missed':
-        return `${baseClasses} bg-gray-800 border-gray-600 opacity-50`;
+        return `${baseClasses} bg-skin-tertiary border-skin-default opacity-50`;
       case 'locked':
       default:
-        return `${baseClasses} bg-gray-900 border-gray-700 opacity-40`;
+        return `${baseClasses} bg-skin-primary border-skin-default opacity-40`;
     }
   };
 
@@ -84,9 +98,11 @@ export function RewardsCalendarDisplay({
     <div
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
+      role="presentation"
+      aria-hidden="true"
     >
       <div
-        className="bg-gray-800 rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-skin-primary rounded-lg shadow-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -103,7 +119,7 @@ export function RewardsCalendarDisplay({
             </div>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 text-3xl font-bold leading-none"
+              className="text-white hover:text-white/80 text-3xl font-bold leading-none"
               aria-label="Close"
             >
               ×
@@ -123,27 +139,27 @@ export function RewardsCalendarDisplay({
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
-              <p className="text-gray-400 mt-4">Loading calendar...</p>
+              <p className="text-skin-muted mt-4">Loading calendar...</p>
             </div>
           ) : (
             <>
               {/* Legend */}
-              <div className="flex flex-wrap gap-4 mb-6 p-4 bg-gray-700 rounded-lg">
+              <div className="flex flex-wrap gap-4 mb-6 p-4 bg-skin-secondary rounded-lg">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-gradient-to-br from-blue-700 to-purple-700 border-2 border-blue-400 rounded"></div>
-                  <span className="text-gray-300 text-sm">Available to claim</span>
+                  <span className="text-skin-secondary text-sm">Available to claim</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-700 border-2 border-gray-600 rounded opacity-60"></div>
-                  <span className="text-gray-300 text-sm">Claimed</span>
+                  <div className="w-4 h-4 bg-skin-secondary border-2 border-skin-default rounded opacity-60"></div>
+                  <span className="text-skin-secondary text-sm">Claimed</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-gradient-to-br from-purple-700 to-pink-700 border-2 border-purple-400 rounded"></div>
-                  <span className="text-gray-300 text-sm">Special Milestone</span>
+                  <span className="text-skin-secondary text-sm">Special Milestone</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-900 border-2 border-gray-700 rounded opacity-40"></div>
-                  <span className="text-gray-300 text-sm">Locked</span>
+                  <div className="w-4 h-4 bg-skin-primary border-2 border-skin-default rounded opacity-40"></div>
+                  <span className="text-skin-secondary text-sm">Locked</span>
                 </div>
               </div>
 
@@ -161,7 +177,7 @@ export function RewardsCalendarDisplay({
                       aria-label={`Day ${reward.dayNumber}: ${reward.description}`}
                     >
                       {/* Day Number */}
-                      <div className="text-xs text-gray-300 font-bold mb-1">
+                      <div className="text-xs text-skin-secondary font-bold mb-1">
                         Day {reward.dayNumber}
                       </div>
 
@@ -171,7 +187,7 @@ export function RewardsCalendarDisplay({
                       </div>
 
                       {/* Description */}
-                      <div className="text-xs text-gray-300 text-center leading-tight">
+                      <div className="text-xs text-skin-secondary text-center leading-tight">
                         {reward.description}
                       </div>
 
@@ -226,8 +242,8 @@ export function RewardsCalendarDisplay({
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-700 p-4 rounded-b-lg border-t border-gray-600">
-          <p className="text-gray-400 text-sm text-center">
+        <div className="bg-skin-secondary p-4 rounded-b-lg border-t border-skin-default">
+          <p className="text-skin-muted text-sm text-center">
             🔁 Calendar resets every 30 days • Login daily to maximize rewards
           </p>
         </div>

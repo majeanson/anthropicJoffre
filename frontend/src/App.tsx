@@ -169,17 +169,8 @@ function AppContent() {
   }, [isVoiceEnabled, joinVoice, leaveVoice]);
 
   // Sprint 3 Refactoring: Debug mode management hook
-  const {
-    debugMode,
-    debugPanelOpen,
-    testPanelOpen,
-    debugMenuOpen,
-    debugInfoOpen,
-    setDebugPanelOpen,
-    setTestPanelOpen,
-    setDebugMenuOpen,
-    setDebugInfoOpen,
-  } = useDebugMode();
+  const { debugMode, debugPanelOpen, debugMenuOpen, setDebugPanelOpen, setDebugMenuOpen } =
+    useDebugMode();
 
   // Sprint 3 Refactoring: UI state management hook
   // Sprint 19: Added quest and rewards calendar state
@@ -1018,12 +1009,8 @@ function AppContent() {
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
-          testPanelOpen={testPanelOpen}
-          setTestPanelOpen={setTestPanelOpen}
           debugPanelOpen={debugPanelOpen}
           setDebugPanelOpen={setDebugPanelOpen}
-          debugInfoOpen={debugInfoOpen}
-          setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
@@ -1041,12 +1028,8 @@ function AppContent() {
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
-          testPanelOpen={testPanelOpen}
-          setTestPanelOpen={setTestPanelOpen}
           debugPanelOpen={debugPanelOpen}
           setDebugPanelOpen={setDebugPanelOpen}
-          debugInfoOpen={debugInfoOpen}
-          setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
@@ -1138,12 +1121,8 @@ function AppContent() {
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
-          testPanelOpen={testPanelOpen}
-          setTestPanelOpen={setTestPanelOpen}
           debugPanelOpen={debugPanelOpen}
           setDebugPanelOpen={setDebugPanelOpen}
-          debugInfoOpen={debugInfoOpen}
-          setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
@@ -1243,12 +1222,8 @@ function AppContent() {
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
-          testPanelOpen={testPanelOpen}
-          setTestPanelOpen={setTestPanelOpen}
           debugPanelOpen={debugPanelOpen}
           setDebugPanelOpen={setDebugPanelOpen}
-          debugInfoOpen={debugInfoOpen}
-          setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
@@ -1351,12 +1326,8 @@ function AppContent() {
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
-          testPanelOpen={testPanelOpen}
-          setTestPanelOpen={setTestPanelOpen}
           debugPanelOpen={debugPanelOpen}
           setDebugPanelOpen={setDebugPanelOpen}
-          debugInfoOpen={debugInfoOpen}
-          setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />
@@ -1442,12 +1413,8 @@ function AppContent() {
           socket={socket}
           debugMenuOpen={debugMenuOpen}
           setDebugMenuOpen={setDebugMenuOpen}
-          testPanelOpen={testPanelOpen}
-          setTestPanelOpen={setTestPanelOpen}
           debugPanelOpen={debugPanelOpen}
           setDebugPanelOpen={setDebugPanelOpen}
-          debugInfoOpen={debugInfoOpen}
-          setDebugInfoOpen={setDebugInfoOpen}
           showBotManagement={showBotManagement}
           setShowBotManagement={setShowBotManagement}
         />

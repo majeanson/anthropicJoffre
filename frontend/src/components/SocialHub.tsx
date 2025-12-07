@@ -118,6 +118,17 @@ export function SocialHub({
     setSuggestions(playerSuggestions);
   }, [socket, isAuthenticated, activeTab, recentPlayers]);
 
+  // Close modal on Escape key for accessibility
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   const handleSendFriendRequest = (playerName: string) => {
     if (!socket) return;
     socket.emit('send_friend_request', { toPlayer: playerName });
@@ -136,9 +147,11 @@ export function SocialHub({
       className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/70"
       onClick={onClose}
       onKeyDown={(e) => e.stopPropagation()}
+      role="presentation"
+      aria-hidden="true"
     >
       <div
-        className="rounded-[var(--radius-xl)] border-2 border-skin-accent w-full max-w-4xl h-[700px] shadow-2xl flex flex-col shadow-[var(--shadow-glow)] bg-gradient-to-br from-skin-secondary to-skin-primary"
+        className="rounded-[var(--radius-xl)] border-2 border-skin-accent w-full max-w-4xl h-[calc(100vh-2rem)] max-h-[700px] shadow-2xl flex flex-col shadow-[var(--shadow-glow)] bg-gradient-to-br from-skin-secondary to-skin-primary"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

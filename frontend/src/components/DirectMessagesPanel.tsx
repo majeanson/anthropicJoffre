@@ -88,6 +88,7 @@ export function DirectMessagesPanel({
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -97,6 +98,7 @@ export function DirectMessagesPanel({
     if (!socket || !isOpen) return;
 
     setLoading(true);
+    setError(null);
     socket.emit('get_conversations');
 
     const handleConversationsList = ({
@@ -106,12 +108,29 @@ export function DirectMessagesPanel({
     }) => {
       setConversations(convos);
       setLoading(false);
+      setError(null);
     };
 
+    const handleError = ({ message }: { message: string }) => {
+      setError(message || 'Failed to load conversations');
+      setLoading(false);
+    };
+
+    // Timeout fallback - if no response in 10 seconds, show error
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setError('Request timed out. Please try again.');
+        setLoading(false);
+      }
+    }, 10000);
+
     socket.on('conversations_list', handleConversationsList);
+    socket.on('dm_error', handleError);
 
     return () => {
+      clearTimeout(timeout);
       socket.off('conversations_list', handleConversationsList);
+      socket.off('dm_error', handleError);
     };
   }, [socket, isOpen]);
 
@@ -253,19 +272,41 @@ export function DirectMessagesPanel({
       icon={<span className="text-2xl">💬</span>}
       theme="blue"
       size="xl"
-      customHeight="h-[600px]"
+      customHeight="h-[calc(100vh-4rem)] sm:h-[600px]"
       contentClassName="flex flex-col p-0 overflow-hidden"
     >
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
         {/* Conversations List */}
-        <div className="w-80 border-r border-gray-700 overflow-y-auto">
+        <div className="w-full sm:w-80 border-b sm:border-b-0 sm:border-r border-skin-subtle overflow-y-auto max-h-40 sm:max-h-none">
           {loading && (
             <div className="p-4">
               <ListSkeleton count={8} hasAvatar={true} hasSecondaryText={true} />
             </div>
           )}
-          {!loading && conversations.length === 0 && (
+          {error && (
+            <div className="p-4">
+              <EmptyState
+                icon="⚠️"
+                title="Error loading conversations"
+                description={error}
+                compact
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                className="mt-2 w-full"
+                onClick={() => {
+                  setError(null);
+                  setLoading(true);
+                  socket?.emit('get_conversations');
+                }}
+              >
+                Try Again
+              </Button>
+            </div>
+          )}
+          {!loading && !error && conversations.length === 0 && (
             <EmptyState
               icon="💬"
               title="No conversations yet"
@@ -329,7 +370,7 @@ export function DirectMessagesPanel({
               {/* Input */}
               <form
                 onSubmit={handleSendMessage}
-                className="p-4 border-t border-gray-700 flex gap-2"
+                className="p-4 border-t border-skin-subtle flex gap-2"
               >
                 <Input
                   ref={inputRef}

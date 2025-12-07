@@ -34,6 +34,18 @@ export function TeamSelectionSocialSidebar({
   const [recentPlayers, setRecentPlayers] = useState<RecentPlayer[]>([]);
   const [invitedPlayers, setInvitedPlayers] = useState<Set<string>>(new Set());
 
+  // Close sidebar on Escape key for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Fetch friends list
   useEffect(() => {
     if (!socket || !isAuthenticated) return;
@@ -128,8 +140,13 @@ export function TeamSelectionSocialSidebar({
 
   return (
     <>
-      {/* Mobile overlay backdrop */}
-      <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={onClose} />
+      {/* Mobile overlay backdrop - keyboard handled by Escape key listener */}
+      <div
+        className="fixed inset-0 bg-black/50 z-40 md:hidden"
+        onClick={onClose}
+        role="presentation"
+        aria-hidden="true"
+      />
 
       <div className="fixed inset-y-0 right-0 w-80 max-w-[90vw] bg-skin-primary shadow-2xl z-50 overflow-y-auto border-l-4 border-skin-default">
         {/* Header */}
@@ -218,7 +235,7 @@ export function TeamSelectionSocialSidebar({
                       <div className="flex items-center gap-2">
                         <span
                           className={`w-2 h-2 rounded-full ${
-                            friend.is_online ? 'bg-green-500' : 'bg-gray-400'
+                            friend.is_online ? 'bg-green-500' : 'bg-skin-muted'
                           }`}
                         />
                         <span className="font-medium text-[var(--color-text-primary)]">
@@ -317,7 +334,7 @@ export function TeamSelectionSocialSidebar({
                           <div className="flex items-center gap-2">
                             <span
                               className={`w-2 h-2 rounded-full ${
-                                isOnline ? 'bg-green-500' : 'bg-gray-400'
+                                isOnline ? 'bg-green-500' : 'bg-skin-muted'
                               }`}
                             />
                             <span className="font-medium text-[var(--color-text-primary)]">

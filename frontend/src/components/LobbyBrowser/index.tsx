@@ -1,96 +1,32 @@
 /**
  * LobbyBrowser Component - Retro Gaming Edition
+ * Version 2.0.0 - Modular Architecture
  *
  * Browse and join active games, or watch replays of recent finished games.
- * Features neon-styled cards, arcade tab navigation, and retro aesthetic.
+ * Refactored into sub-components:
+ * - GameCard: Individual active game display
+ * - RecentGameCard: Individual recent game display
+ * - FilterBar: Filter and sort controls
+ * - JoinWithIdSection: Join game by ID input
  */
 
 import { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'react';
 import { Socket } from 'socket.io-client';
-import { useAuth } from '../contexts/AuthContext';
-import { API_ENDPOINTS } from '../config/constants';
-import { ERROR_MESSAGES, getErrorMessage } from '../config/errorMessages';
-import logger from '../utils/logger';
-import { sounds } from '../utils/sounds';
-import { Button, NeonButton } from './ui/Button';
-import { Input } from './ui/Input';
-import { Tabs, Tab } from './ui/Tabs';
-import { Checkbox } from './ui/Checkbox';
-import { Select } from './ui/Select';
+import { useAuth } from '../../contexts/AuthContext';
+import { API_ENDPOINTS } from '../../config/constants';
+import { ERROR_MESSAGES, getErrorMessage } from '../../config/errorMessages';
+import logger from '../../utils/logger';
+import { sounds } from '../../utils/sounds';
+import { Button } from '../ui/Button';
+import { Tabs, Tab } from '../ui/Tabs';
+import { LobbyGame, RecentGame, LobbyBrowserTabType, GameModeFilter, SortOption } from './types';
+import { GameCard } from './GameCard';
+import { RecentGameCard } from './RecentGameCard';
+import { FilterBar } from './FilterBar';
+import { JoinWithIdSection } from './JoinWithIdSection';
 
 // Lazy load GameReplay component
-const GameReplay = lazy(() => import('./GameReplay').then((m) => ({ default: m.GameReplay })));
-
-// Sprint 8 Task 2: Move pure helper functions outside component for performance
-const getPhaseColor = (phase: string): string => {
-  switch (phase) {
-    case 'team_selection':
-      return 'var(--color-info)';
-    case 'betting':
-      return 'var(--color-warning)';
-    case 'playing':
-      return 'var(--color-success)';
-    case 'scoring':
-      return 'var(--color-team2-primary)';
-    case 'game_over':
-      return 'var(--color-text-muted)';
-    default:
-      return 'var(--color-text-muted)';
-  }
-};
-
-const getPhaseLabel = (phase: string) => {
-  switch (phase) {
-    case 'team_selection':
-      return 'Team Selection';
-    case 'betting':
-      return 'Betting';
-    case 'playing':
-      return 'Playing';
-    case 'scoring':
-      return 'Scoring';
-    case 'game_over':
-      return 'Game Over';
-    default:
-      return phase;
-  }
-};
-
-interface LobbyGame {
-  gameId: string;
-  phase: string;
-  persistenceMode: 'elo' | 'casual';
-  playerCount: number;
-  humanPlayerCount: number;
-  botPlayerCount: number;
-  isJoinable: boolean;
-  isInProgress: boolean;
-  teamScores: {
-    team1: number;
-    team2: number;
-  };
-  roundNumber: number;
-  createdAt: number;
-  players: Array<{
-    name: string;
-    teamId: 1 | 2;
-    isBot: boolean;
-  }>;
-}
-
-interface RecentGame {
-  game_id: string;
-  winning_team: 1 | 2;
-  team1_score: number;
-  team2_score: number;
-  rounds: number;
-  player_names: string[];
-  player_teams: (1 | 2)[];
-  is_bot_game: boolean;
-  game_duration_seconds: number;
-  created_at: string;
-  finished_at: string;
-}
+const GameReplay = lazy(() => import('../GameReplay').then((m) => ({ default: m.GameReplay })));
 
 interface LobbyBrowserProps {
   socket: Socket | null;
@@ -108,23 +44,21 @@ export function LobbyBrowser({
   onShowWhyRegister,
 }: LobbyBrowserProps) {
   const { isAuthenticated } = useAuth();
-  const [activeTab, setActiveTab] = useState<'active' | 'recent'>('active');
+  const [activeTab, setActiveTab] = useState<LobbyBrowserTabType>('active');
   const [games, setGames] = useState<LobbyGame[]>([]);
   const [recentGames, setRecentGames] = useState<RecentGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [correlationId, setCorrelationId] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
-  const [gameId, setGameId] = useState('');
-  const [showJoinInput, setShowJoinInput] = useState(false);
   const [replayGameId, setReplayGameId] = useState<string | null>(null);
 
-  // Sprint 6: Filter and sort state
+  // Filter and sort state
   const [filterWithBots, setFilterWithBots] = useState(false);
   const [filterNeedsPlayers, setFilterNeedsPlayers] = useState(false);
   const [filterInProgress, setFilterInProgress] = useState(false);
-  const [filterGameMode, setFilterGameMode] = useState<'all' | 'ranked' | 'casual'>('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'players' | 'score'>('newest');
+  const [filterGameMode, setFilterGameMode] = useState<GameModeFilter>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
 
   // Keyboard navigation state
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -135,22 +69,17 @@ export function LobbyBrowser({
 
   // Handler to validate join game request
   const handleJoinGameClick = (game: LobbyGame) => {
-    // Check if game is ranked and user is not authenticated
     if (game.persistenceMode === 'elo' && !isAuthenticated) {
-      // Show Why Register modal instead of error message
       if (onShowWhyRegister) {
         onShowWhyRegister();
       }
       return;
     }
-
-    // Valid - proceed with join
     onJoinGame(game.gameId);
   };
 
   const fetchGames = async (isInitialLoad = false, retryCount = 0) => {
     try {
-      // Only show loading spinner on first ever load
       if (isInitialLoad && !hasLoadedActiveGames.current) {
         setLoading(true);
       }
@@ -159,11 +88,10 @@ export function LobbyBrowser({
       }
 
       const response = await fetch(API_ENDPOINTS.gamesLobby(), {
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!response.ok) {
-        // Try to parse error as JSON to extract correlation ID
         let errorData: { message?: string; correlationId?: string; correlation_id?: string };
         try {
           errorData = await response.json();
@@ -172,16 +100,13 @@ export function LobbyBrowser({
         }
 
         logger.error('[LobbyBrowser] Server error:', errorData);
-
-        // Extract correlation ID if available
         const corrId = errorData.correlationId || errorData.correlation_id || null;
         if (corrId) {
           setCorrelationId(corrId);
         }
 
-        // Retry on 5xx errors (server errors) or network issues
         if (response.status >= 500 && retryCount < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1))); // Exponential backoff
+          await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchGames(isInitialLoad, retryCount + 1);
         }
 
@@ -194,12 +119,10 @@ export function LobbyBrowser({
       setCorrelationId(null);
       hasLoadedActiveGames.current = true;
     } catch (err) {
-      // Network errors (fetch failed)
       if (err instanceof TypeError && err.message.includes('fetch')) {
         logger.error('[LobbyBrowser] Network error:', err);
         setError(ERROR_MESSAGES.NETWORK_ERROR);
 
-        // Retry on network errors
         if (retryCount < 2) {
           await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchGames(isInitialLoad, retryCount + 1);
@@ -217,7 +140,6 @@ export function LobbyBrowser({
 
   const fetchRecentGames = async (isInitialLoad = false, retryCount = 0) => {
     try {
-      // Only show loading spinner on first ever load
       if (isInitialLoad && !hasLoadedRecentGames.current) {
         setLoading(true);
       }
@@ -226,11 +148,10 @@ export function LobbyBrowser({
       }
 
       const response = await fetch(API_ENDPOINTS.recentGames(), {
-        signal: AbortSignal.timeout(10000), // 10 second timeout
+        signal: AbortSignal.timeout(10000),
       });
 
       if (!response.ok) {
-        // Try to parse error as JSON to extract correlation ID
         let errorData: { message?: string; correlationId?: string; correlation_id?: string };
         try {
           errorData = await response.json();
@@ -239,14 +160,11 @@ export function LobbyBrowser({
         }
 
         logger.error('[LobbyBrowser] Server error:', errorData);
-
-        // Extract correlation ID if available
         const corrId = errorData.correlationId || errorData.correlation_id || null;
         if (corrId) {
           setCorrelationId(corrId);
         }
 
-        // Retry on 5xx errors (server errors)
         if (response.status >= 500 && retryCount < 2) {
           await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchRecentGames(isInitialLoad, retryCount + 1);
@@ -261,13 +179,11 @@ export function LobbyBrowser({
       setCorrelationId(null);
       hasLoadedRecentGames.current = true;
     } catch (err) {
-      // Network errors (fetch failed)
       if (err instanceof TypeError && err.message.includes('fetch')) {
         const errorMessage = 'Network error. Please check your connection.';
         logger.error('[LobbyBrowser] Network error:', err);
         setError(errorMessage);
 
-        // Retry on network errors
         if (retryCount < 2) {
           await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
           return fetchRecentGames(isInitialLoad, retryCount + 1);
@@ -287,20 +203,18 @@ export function LobbyBrowser({
 
   useEffect(() => {
     if (activeTab === 'active') {
-      fetchGames(true); // Initial load
-      // Refresh active games every 5 seconds (background refresh, no loading spinner)
+      fetchGames(true);
       const interval = setInterval(() => fetchGames(false), 5000);
       return () => clearInterval(interval);
     } else {
-      fetchRecentGames(true); // Initial load
+      fetchRecentGames(true);
     }
   }, [activeTab]);
 
-  // Sprint 6: Filter and sort games
+  // Filter and sort games
   const filteredAndSortedGames = useMemo(() => {
     let filtered = [...games];
 
-    // Apply filters
     if (filterWithBots) {
       filtered = filtered.filter((game) => game.botPlayerCount > 0);
     }
@@ -316,7 +230,6 @@ export function LobbyBrowser({
       filtered = filtered.filter((game) => game.persistenceMode === 'casual');
     }
 
-    // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'newest':
@@ -347,7 +260,6 @@ export function LobbyBrowser({
   // Keyboard navigation handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't handle if in input/select
       const target = e.target as HTMLElement;
       if (
         target.tagName === 'INPUT' ||
@@ -362,7 +274,6 @@ export function LobbyBrowser({
           e.preventDefault();
           onClose();
           break;
-
         case 'ArrowUp':
           e.preventDefault();
           if (currentListLength > 0) {
@@ -370,7 +281,6 @@ export function LobbyBrowser({
             sounds.buttonClick();
           }
           break;
-
         case 'ArrowDown':
           e.preventDefault();
           if (currentListLength > 0) {
@@ -378,7 +288,6 @@ export function LobbyBrowser({
             sounds.buttonClick();
           }
           break;
-
         case 'ArrowLeft':
           e.preventDefault();
           if (activeTab === 'recent') {
@@ -386,7 +295,6 @@ export function LobbyBrowser({
             sounds.buttonClick();
           }
           break;
-
         case 'ArrowRight':
           e.preventDefault();
           if (activeTab === 'active') {
@@ -394,7 +302,6 @@ export function LobbyBrowser({
             sounds.buttonClick();
           }
           break;
-
         case 'Enter':
         case ' ':
           e.preventDefault();
@@ -408,18 +315,15 @@ export function LobbyBrowser({
                 onClose();
               }
             } else {
-              // Recent games - open replay
               const game = recentGames[selectedIndex];
               setReplayGameId(game.game_id);
             }
           }
           break;
-
         case 'Home':
           e.preventDefault();
           setSelectedIndex(0);
           break;
-
         case 'End':
           e.preventDefault();
           if (currentListLength > 0) {
@@ -439,7 +343,6 @@ export function LobbyBrowser({
     recentGames,
     onClose,
     onSpectateGame,
-    handleJoinGameClick,
   ]);
 
   // Show GameReplay if a game is selected for replay
@@ -508,7 +411,7 @@ export function LobbyBrowser({
           </button>
         </div>
 
-        {/* Tab Navigation - Arcade Style */}
+        {/* Tab Navigation */}
         <Tabs
           tabs={
             [
@@ -518,7 +421,7 @@ export function LobbyBrowser({
           }
           activeTab={activeTab}
           onChange={(tabId) => {
-            setActiveTab(tabId as 'active' | 'recent');
+            setActiveTab(tabId as LobbyBrowserTabType);
             sounds.buttonClick();
           }}
           variant="underline"
@@ -528,153 +431,28 @@ export function LobbyBrowser({
 
         {/* Content Area */}
         <div className="overflow-y-auto max-h-[calc(90vh-200px)] p-4 space-y-3">
-          {/* Join with Game ID Section - Only in Active Games tab */}
-          {activeTab === 'active' && (
-            <div
-              className="
-                rounded-[var(--radius-lg)]
-                border border-[var(--color-border-default)]
-                bg-[var(--color-bg-tertiary)]
-                overflow-hidden
-              "
-            >
-              <button
-                onClick={() => {
-                  setShowJoinInput(!showJoinInput);
-                  sounds.buttonClick();
-                }}
-                className="
-                  w-full px-4 py-3
-                  flex items-center justify-between
-                  text-left
-                  hover:bg-[var(--color-bg-secondary)]
-                  transition-colors duration-[var(--duration-fast)]
-                "
-              >
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">🔑</span>
-                  <span className="font-display text-[var(--color-text-primary)] uppercase tracking-wider text-sm">
-                    Join with Game ID
-                  </span>
-                </div>
-                <span className="text-[var(--color-text-muted)]">{showJoinInput ? '▲' : '▼'}</span>
-              </button>
+          {/* Join with Game ID Section */}
+          {activeTab === 'active' && <JoinWithIdSection onJoinGame={onJoinGame} onClose={onClose} />}
 
-              {showJoinInput && (
-                <div className="px-4 pb-4 space-y-3 border-t border-[var(--color-border-subtle)]">
-                  <div className="pt-3">
-                    <Input
-                      value={gameId}
-                      onChange={(e) => setGameId(e.target.value)}
-                      placeholder="Enter Game ID"
-                      variant="default"
-                      size="md"
-                      leftIcon={<span className="text-sm">🎮</span>}
-                    />
-                  </div>
-                  <Button
-                    data-testid="join-game-button"
-                    onClick={() => {
-                      if (gameId.trim()) {
-                        onJoinGame(gameId.trim());
-                        onClose();
-                      }
-                    }}
-                    disabled={!gameId.trim()}
-                    variant="success"
-                    size="md"
-                    fullWidth
-                  >
-                    Join Game
-                  </Button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Sprint 6: Filter and Sort Bar - Only in Active Games tab */}
+          {/* Filter Bar */}
           {activeTab === 'active' && games.length > 0 && (
-            <div
-              className="
-                p-4
-                rounded-[var(--radius-lg)]
-                border border-[var(--color-border-default)]
-                bg-[var(--color-bg-tertiary)]
-              "
-            >
-              <div className="flex flex-wrap items-center gap-4">
-                {/* Filter Checkboxes */}
-                <div className="flex items-center gap-4 flex-wrap">
-                  <Checkbox
-                    checked={filterWithBots}
-                    onChange={(e) => setFilterWithBots(e.target.checked)}
-                    label="🤖 With Bots"
-                    size="sm"
-                  />
-                  <Checkbox
-                    checked={filterNeedsPlayers}
-                    onChange={(e) => setFilterNeedsPlayers(e.target.checked)}
-                    label="💺 Needs Players"
-                    size="sm"
-                  />
-                  <Checkbox
-                    checked={filterInProgress}
-                    onChange={(e) => setFilterInProgress(e.target.checked)}
-                    label="🎮 In Progress"
-                    size="sm"
-                  />
-                </div>
-
-                {/* Game Mode Filter */}
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">
-                    Mode:
-                  </span>
-                  <Select
-                    value={filterGameMode}
-                    onChange={(e) =>
-                      setFilterGameMode(e.target.value as 'all' | 'ranked' | 'casual')
-                    }
-                    options={[
-                      { value: 'all', label: 'All Games' },
-                      { value: 'ranked', label: 'Ranked' },
-                      { value: 'casual', label: 'Casual' },
-                    ]}
-                    size="sm"
-                  />
-                </div>
-
-                {/* Sort Dropdown */}
-                <div className="flex items-center gap-2 ml-auto">
-                  <span className="text-xs text-[var(--color-text-muted)] font-body whitespace-nowrap">
-                    Sort:
-                  </span>
-                  <Select
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value as 'newest' | 'players' | 'score')}
-                    options={[
-                      { value: 'newest', label: 'Newest' },
-                      { value: 'players', label: 'Most Players' },
-                      { value: 'score', label: 'Highest Score' },
-                    ]}
-                    size="sm"
-                  />
-                </div>
-              </div>
-
-              {/* Active filter count */}
-              {(filterWithBots ||
-                filterNeedsPlayers ||
-                filterInProgress ||
-                filterGameMode !== 'all') && (
-                <div className="mt-3 text-xs text-[var(--color-text-muted)] font-body">
-                  Showing {filteredAndSortedGames.length} of {games.length} games
-                </div>
-              )}
-            </div>
+            <FilterBar
+              filterWithBots={filterWithBots}
+              setFilterWithBots={setFilterWithBots}
+              filterNeedsPlayers={filterNeedsPlayers}
+              setFilterNeedsPlayers={setFilterNeedsPlayers}
+              filterInProgress={filterInProgress}
+              setFilterInProgress={setFilterInProgress}
+              filterGameMode={filterGameMode}
+              setFilterGameMode={setFilterGameMode}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
+              totalGames={games.length}
+              filteredCount={filteredAndSortedGames.length}
+            />
           )}
 
-          {/* Loading State - Retro Skeleton Loaders */}
+          {/* Loading State */}
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (
@@ -782,102 +560,16 @@ export function LobbyBrowser({
                 </div>
               ) : (
                 filteredAndSortedGames.map((game, index) => (
-                  <div
+                  <GameCard
                     key={game.gameId}
-                    className={`
-                      rounded-[var(--radius-lg)]
-                      border-2
-                      p-4
-                      transition-all duration-[var(--duration-fast)]
-                      ${
-                        selectedIndex === index
-                          ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
-                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
-                      }
-                    `}
-                    style={
-                      selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}
-                    }
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        {/* Game ID and badges */}
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <span className="font-display text-lg sm:text-xl uppercase tracking-wider text-skin-primary drop-shadow-[0_0_5px_var(--color-glow)]">
-                            Game {game.gameId}
-                          </span>
-                          <span
-                            className="
-                              px-2 py-0.5
-                              rounded-full
-                              text-xs font-display uppercase
-                            "
-                            style={{
-                              backgroundColor: getPhaseColor(game.phase),
-                              color: 'var(--color-text-inverse)',
-                              boxShadow: `0 0 8px ${getPhaseColor(game.phase)}`,
-                            }}
-                          >
-                            {getPhaseLabel(game.phase)}
-                          </span>
-                          <span
-                            className={`
-                              px-2 py-0.5
-                              rounded-full
-                              text-xs font-display uppercase
-                              ${
-                                game.persistenceMode === 'elo'
-                                  ? 'bg-skin-status-warning text-black shadow-badge-warning'
-                                  : 'bg-skin-secondary text-skin-muted'
-                              }
-                            `}
-                          >
-                            {game.persistenceMode === 'elo' ? '🏆 Ranked' : '🎲 Casual'}
-                          </span>
-                        </div>
-                        {/* Player info */}
-                        <div className="text-sm text-skin-muted font-body flex flex-wrap items-center gap-x-4 gap-y-1">
-                          <span>
-                            👥 {game.humanPlayerCount} player
-                            {game.humanPlayerCount !== 1 ? 's' : ''}
-                          </span>
-                          {game.botPlayerCount > 0 && (
-                            <span>
-                              🤖 {game.botPlayerCount} bot{game.botPlayerCount !== 1 ? 's' : ''}
-                            </span>
-                          )}
-                          {game.isInProgress && <span>📊 Round {game.roundNumber}</span>}
-                        </div>
-                      </div>
-
-                      {/* Action buttons */}
-                      <div className="flex gap-2 sm:flex-shrink-0">
-                        {(game.isJoinable || (game.isInProgress && game.botPlayerCount > 0)) && (
-                          <Button
-                            onClick={() => handleJoinGameClick(game)}
-                            variant="success"
-                            size="sm"
-                            className="flex-1 sm:flex-none"
-                          >
-                            Join
-                          </Button>
-                        )}
-                        {game.isInProgress && (
-                          <NeonButton
-                            onClick={() => {
-                              onSpectateGame(game.gameId);
-                              onClose();
-                            }}
-                            size="sm"
-                            className="flex-1 sm:flex-none"
-                          >
-                            <span>👁️</span>
-                            Spectate
-                          </NeonButton>
-                        )}
-                      </div>
-                    </div>
-                  </div>
+                    game={game}
+                    isSelected={selectedIndex === index}
+                    onJoin={() => handleJoinGameClick(game)}
+                    onSpectate={() => {
+                      onSpectateGame(game.gameId);
+                      onClose();
+                    }}
+                  />
                 ))
               )}
             </>
@@ -897,62 +589,14 @@ export function LobbyBrowser({
                   </p>
                 </div>
               ) : (
-                recentGames.map((game, index) => {
-                  const durationMinutes = Math.floor(game.game_duration_seconds / 60);
-                  const finishedDate = new Date(game.finished_at);
-                  const timeAgo = getTimeAgo(finishedDate);
-
-                  return (
-                    <div
-                      key={game.game_id}
-                      className={`
-                        rounded-[var(--radius-lg)]
-                        border-2
-                        p-4
-                        transition-all duration-[var(--duration-fast)]
-                        ${
-                          selectedIndex === index
-                            ? 'border-[var(--color-text-accent)] bg-[var(--color-text-accent)]/10'
-                            : 'border-[var(--color-border-default)] bg-[var(--color-bg-tertiary)] hover:border-[var(--color-border-accent)]'
-                        }
-                      `}
-                      style={
-                        selectedIndex === index ? { boxShadow: '0 0 15px var(--color-glow)' } : {}
-                      }
-                    >
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex-1">
-                          <div className="flex flex-wrap items-center gap-3 mb-2">
-                            <span className="font-display text-lg sm:text-xl uppercase tracking-wider text-skin-primary text-shadow-glow-sm">
-                              Game {game.game_id}
-                            </span>
-                            <span
-                              className={`
-                                px-2 py-0.5 rounded-full text-xs font-display uppercase text-white
-                                ${game.winning_team === 1 ? 'bg-team1 shadow-team1' : 'bg-team2 shadow-team2'}
-                              `}
-                            >
-                              🏆 Team {game.winning_team} Won
-                            </span>
-                          </div>
-                          <div className="text-sm text-skin-muted font-body flex flex-wrap items-center gap-x-4 gap-y-1">
-                            <span>
-                              📊 Score: {game.team1_score} - {game.team2_score}
-                            </span>
-                            <span>🎯 {game.rounds} rounds</span>
-                            <span>⏱️ {durationMinutes}m</span>
-                            <span>🕒 {timeAgo}</span>
-                          </div>
-                        </div>
-
-                        <NeonButton onClick={() => setReplayGameId(game.game_id)} size="sm" glow>
-                          <span aria-hidden="true">📺</span>
-                          Watch Replay
-                        </NeonButton>
-                      </div>
-                    </div>
-                  );
-                })
+                recentGames.map((game, index) => (
+                  <RecentGameCard
+                    key={game.game_id}
+                    game={game}
+                    isSelected={selectedIndex === index}
+                    onWatchReplay={() => setReplayGameId(game.game_id)}
+                  />
+                ))
               )}
             </>
           )}
@@ -962,17 +606,6 @@ export function LobbyBrowser({
   );
 }
 
-// Helper function to format time ago
-function getTimeAgo(date: Date): string {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return date.toLocaleDateString();
-}
+// Re-export for backwards compatibility
+export default LobbyBrowser;
+export * from './types';

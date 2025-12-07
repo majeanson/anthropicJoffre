@@ -93,7 +93,7 @@ function SpecialSkinCard({
             <>
               <span className="text-3xl mb-1">🔒</span>
               <p className="text-sm text-white font-bold">Level {skin.unlockRequirement}</p>
-              <p className="text-xs text-gray-300">
+              <p className="text-xs text-white/70">
                 {parseInt(skin.unlockRequirement || '0', 10) - playerLevel} levels to go
               </p>
             </>
@@ -101,7 +101,7 @@ function SpecialSkinCard({
             <>
               <span className="text-3xl mb-1">🏆</span>
               <p className="text-xs text-white font-bold text-center">Achievement Required</p>
-              <p className="text-xs text-gray-300 text-center mt-1">
+              <p className="text-xs text-white/70 text-center mt-1">
                 {getUnlockRequirementText(skin)}
               </p>
             </>
@@ -444,6 +444,18 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
 
   const [isOpen, setIsOpen] = useState(false);
 
+  // Close dropdown on Escape key for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   // Filter skins by card type
   const skins = specialCardSkins.filter((s) => s.cardType === cardType);
 
@@ -582,8 +594,15 @@ export function SpecialCardSkinDropdown({ cardType }: SpecialCardSkinDropdownPro
         </div>
       )}
 
-      {/* Click outside to close */}
-      {isOpen && <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />}
+      {/* Backdrop - click to close, keyboard handled by Escape key listener */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setIsOpen(false)}
+          role="presentation"
+          aria-hidden="true"
+        />
+      )}
     </div>
   );
 }

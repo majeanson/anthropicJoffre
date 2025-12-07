@@ -2,6 +2,9 @@
  * Debug Mode Hook
  * Manages debug panel visibility and debug features
  * Sprint 3 Refactoring - Phase 1.2
+ *
+ * v2.0.0 - Cleaned up unused states (testPanelOpen, debugInfoOpen)
+ *          These are now consolidated into UnifiedDebugPanel
  */
 
 import { useState, useCallback } from 'react';
@@ -9,17 +12,11 @@ import { useState, useCallback } from 'react';
 interface UseDebugModeReturn {
   debugMode: boolean;
   debugPanelOpen: boolean;
-  testPanelOpen: boolean;
   debugMenuOpen: boolean;
-  debugInfoOpen: boolean;
   toggleDebugPanel: () => void;
-  toggleTestPanel: () => void;
   toggleDebugMenu: () => void;
-  toggleDebugInfo: () => void;
   setDebugPanelOpen: (open: boolean) => void;
-  setTestPanelOpen: (open: boolean) => void;
   setDebugMenuOpen: (open: boolean) => void;
-  setDebugInfoOpen: (open: boolean) => void;
 }
 
 /**
@@ -33,39 +30,23 @@ export function useDebugMode(): UseDebugModeReturn {
   const debugMode = import.meta.env.MODE !== 'production' && false;
 
   const [debugPanelOpen, setDebugPanelOpen] = useState<boolean>(false);
-  const [testPanelOpen, setTestPanelOpen] = useState<boolean>(false);
   const [debugMenuOpen, setDebugMenuOpen] = useState<boolean>(false);
-  const [debugInfoOpen, setDebugInfoOpen] = useState<boolean>(false);
 
   const toggleDebugPanel = useCallback(() => {
     setDebugPanelOpen((prev) => !prev);
-  }, []);
-
-  const toggleTestPanel = useCallback(() => {
-    setTestPanelOpen((prev) => !prev);
   }, []);
 
   const toggleDebugMenu = useCallback(() => {
     setDebugMenuOpen((prev) => !prev);
   }, []);
 
-  const toggleDebugInfo = useCallback(() => {
-    setDebugInfoOpen((prev) => !prev);
-  }, []);
-
   return {
     debugMode,
     debugPanelOpen,
-    testPanelOpen,
     debugMenuOpen,
-    debugInfoOpen,
     toggleDebugPanel,
-    toggleTestPanel,
     toggleDebugMenu,
-    toggleDebugInfo,
     setDebugPanelOpen,
-    setTestPanelOpen,
     setDebugMenuOpen,
-    setDebugInfoOpen,
   };
 }

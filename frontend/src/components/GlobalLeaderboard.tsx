@@ -160,12 +160,14 @@ export function GlobalLeaderboard({
   // ✅ NOW it's safe to call hooks - all conditional returns are done
   const [players, setPlayers] = useState<LeaderboardPlayer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showRoundStats, setShowRoundStats] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
 
     setLoading(true);
+    setError(null);
     socket.emit('get_leaderboard', { limit: 100, excludeBots: true });
 
     const handleLeaderboardResponse = ({
@@ -175,12 +177,29 @@ export function GlobalLeaderboard({
     }) => {
       setPlayers(receivedPlayers);
       setLoading(false);
+      setError(null);
     };
 
+    const handleError = ({ message }: { message: string }) => {
+      setError(message || 'Failed to load leaderboard');
+      setLoading(false);
+    };
+
+    // Timeout fallback
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setError('Request timed out. Please try again.');
+        setLoading(false);
+      }
+    }, 10000);
+
     socket.on('leaderboard_response', handleLeaderboardResponse);
+    socket.on('leaderboard_error', handleError);
 
     return () => {
+      clearTimeout(timeout);
       socket.off('leaderboard_response', handleLeaderboardResponse);
+      socket.off('leaderboard_error', handleError);
     };
   }, [isOpen, socket]);
 
@@ -201,7 +220,25 @@ export function GlobalLeaderboard({
           </div>
         )}
 
-        {!loading && players.length === 0 && (
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+            <EmptyState icon="⚠️" title="Error" description={error} compact />
+            <Button
+              variant="secondary"
+              size="sm"
+              className="mt-2 w-full"
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                socket.emit('get_leaderboard', { limit: 100, excludeBots: true });
+              }}
+            >
+              Try Again
+            </Button>
+          </div>
+        )}
+
+        {!loading && !error && players.length === 0 && (
           <EmptyState
             icon="🎮"
             title="No players yet!"
@@ -210,7 +247,7 @@ export function GlobalLeaderboard({
           />
         )}
 
-        {!loading && players.length > 0 && (
+        {!loading && !error && players.length > 0 && (
           <div className="space-y-4">
             {/* Toggle Stats View Button */}
             <div className="flex justify-center">

@@ -340,7 +340,7 @@ export function PlayerProfileModal({
           <div className="animate-spin text-4xl mb-2" aria-hidden="true">
             ⏳
           </div>
-          <p className="text-gray-400">Loading profile...</p>
+          <p className="text-skin-muted">Loading profile...</p>
         </div>
       )}
 
@@ -361,16 +361,16 @@ export function PlayerProfileModal({
           <div className="flex items-center gap-4">
             <Avatar username={playerName} size="lg" />
             <div className="flex-1">
-              <h3 className="text-xl font-bold text-white">{playerName}</h3>
+              <h3 className="text-xl font-bold text-skin-primary">{playerName}</h3>
               <div className="flex items-center gap-2 mt-1">
                 <span className={`text-lg ${tierColor}`} aria-hidden="true">
                   {tierIcon}
                 </span>
                 <span className={`font-semibold ${tierColor}`}>{stats.ranking_tier}</span>
-                <span className="text-gray-400" aria-hidden="true">
+                <span className="text-skin-muted" aria-hidden="true">
                   •
                 </span>
-                <span className="text-gray-300">{stats.elo_rating} ELO</span>
+                <span className="text-skin-secondary">{stats.elo_rating} ELO</span>
               </div>
             </div>
           </div>
@@ -399,19 +399,19 @@ export function PlayerProfileModal({
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <span className={`font-bold ${levelColor}`}>{levelTitle}</span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-skin-muted">
                           {formatXp(stats.total_xp || 0)} XP
                         </span>
                       </div>
                       {/* XP Progress Bar */}
                       <div className="mt-1">
-                        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div className="h-2 bg-skin-tertiary rounded-full overflow-hidden">
                           <div
                             className={`h-full bg-gradient-to-r ${levelGradient} transition-all duration-500`}
                             style={{ width: `${progress.progressPercent}%` }}
                           />
                         </div>
-                        <div className="flex justify-between text-xs text-gray-500 mt-0.5">
+                        <div className="flex justify-between text-xs text-skin-muted mt-0.5">
                           <span>Level {progress.level}</span>
                           <span>{formatXp(progress.xpToNextLevel)} XP to next</span>
                         </div>
@@ -428,8 +428,8 @@ export function PlayerProfileModal({
               {/* Bio */}
               {profile.bio && (
                 <UICard variant="bordered" size="sm">
-                  <div className="text-xs font-semibold text-gray-400 mb-1">BIO</div>
-                  <p className="text-sm text-gray-200">{profile.bio}</p>
+                  <div className="text-xs font-semibold text-skin-muted mb-1">BIO</div>
+                  <p className="text-sm text-skin-secondary">{profile.bio}</p>
                 </UICard>
               )}
 
@@ -437,8 +437,8 @@ export function PlayerProfileModal({
               <div className="flex gap-3">
                 {profile.country && (
                   <UICard variant="bordered" size="sm" className="flex-1">
-                    <div className="text-xs font-semibold text-gray-400 mb-1">COUNTRY</div>
-                    <div className="text-sm text-gray-200">
+                    <div className="text-xs font-semibold text-skin-muted mb-1">COUNTRY</div>
+                    <div className="text-sm text-skin-secondary">
                       {profile.country === 'US' && (
                         <>
                           <span aria-hidden="true">🇺🇸</span> United States
@@ -530,7 +530,7 @@ export function PlayerProfileModal({
                 )}
                 {profile.favorite_team && (
                   <UICard variant="bordered" size="sm" className="flex-1">
-                    <div className="text-xs font-semibold text-gray-400 mb-1">FAVORITE TEAM</div>
+                    <div className="text-xs font-semibold text-skin-muted mb-1">FAVORITE TEAM</div>
                     <div
                       className={`text-sm font-semibold ${profile.favorite_team === 1 ? 'text-team1' : 'text-team2'}`}
                     >
@@ -546,17 +546,17 @@ export function PlayerProfileModal({
           <div className="grid grid-cols-2 gap-4">
             <UICard variant="bordered" size="sm">
               <div className="text-2xl font-bold text-yellow-400">{stats.games_played}</div>
-              <div className="text-sm text-gray-400">Games Played</div>
+              <div className="text-sm text-skin-muted">Games Played</div>
             </UICard>
             <UICard variant="bordered" size="sm">
               <div className="text-2xl font-bold text-green-400">{stats.games_won}</div>
-              <div className="text-sm text-gray-400">Games Won</div>
+              <div className="text-sm text-skin-muted">Games Won</div>
             </UICard>
             <UICard variant="bordered" size="sm" className="col-span-2">
               <div className="text-2xl font-bold text-blue-400">
                 {stats.win_percentage.toFixed(1)}%
               </div>
-              <div className="text-sm text-gray-400">Win Rate</div>
+              <div className="text-sm text-skin-muted">Win Rate</div>
             </UICard>
           </div>
 
@@ -576,23 +576,23 @@ export function PlayerProfileModal({
               <div className="grid grid-cols-2 gap-3">
                 <div className="text-center p-2 bg-green-500/10 rounded-lg border border-green-500/20">
                   <div className="text-lg font-bold text-green-400">{stats.side_bets_won ?? 0}</div>
-                  <div className="text-xs text-gray-400">Bets Won</div>
+                  <div className="text-xs text-skin-muted">Bets Won</div>
                 </div>
                 <div className="text-center p-2 bg-red-500/10 rounded-lg border border-red-500/20">
                   <div className="text-lg font-bold text-red-400">{stats.side_bets_lost ?? 0}</div>
-                  <div className="text-xs text-gray-400">Bets Lost</div>
+                  <div className="text-xs text-skin-muted">Bets Lost</div>
                 </div>
                 <div className="text-center p-2 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
                   <div className="text-lg font-bold text-yellow-400">
                     +{stats.side_bets_coins_won ?? 0}
                   </div>
-                  <div className="text-xs text-gray-400">Coins Won</div>
+                  <div className="text-xs text-skin-muted">Coins Won</div>
                 </div>
                 <div className="text-center p-2 bg-team1-10 rounded-lg border border-team1">
                   <div className="text-lg font-bold text-team1">
                     -{stats.side_bets_coins_lost ?? 0}
                   </div>
-                  <div className="text-xs text-gray-400">Coins Lost</div>
+                  <div className="text-xs text-skin-muted">Coins Lost</div>
                 </div>
                 {(stats.best_bet_streak ?? 0) > 0 && (
                   <div className="col-span-2 text-center p-2 bg-team2-10 rounded-lg border border-team2">
@@ -600,18 +600,18 @@ export function PlayerProfileModal({
                       <span className="text-lg font-bold text-team2">
                         🔥 {stats.current_bet_streak ?? 0}
                       </span>
-                      <span className="text-xs text-gray-400">current</span>
-                      <span className="text-gray-600">|</span>
+                      <span className="text-xs text-skin-muted">current</span>
+                      <span className="text-skin-muted">|</span>
                       <span className="text-lg font-bold text-team2">
                         {stats.best_bet_streak ?? 0}
                       </span>
-                      <span className="text-xs text-gray-400">best streak</span>
+                      <span className="text-xs text-skin-muted">best streak</span>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <p className="text-sm text-gray-500 italic text-center py-2">
+              <p className="text-sm text-skin-muted italic text-center py-2">
                 No side bets placed yet
               </p>
             )}
@@ -624,7 +624,7 @@ export function PlayerProfileModal({
                 <h4 className="text-sm font-semibold text-yellow-400">
                   <span aria-hidden="true">🏆</span> Achievements
                 </h4>
-                <span className="text-xs text-gray-400">
+                <span className="text-xs text-skin-muted">
                   {achievements.filter((a) => a.is_unlocked).length}/{achievements.length} •{' '}
                   {achievementPoints} pts
                 </span>
@@ -649,7 +649,7 @@ export function PlayerProfileModal({
                               : achievement.tier === 'gold'
                                 ? 'bg-gradient-to-br from-yellow-500 to-amber-600 ring-2 ring-yellow-300'
                                 : achievement.tier === 'silver'
-                                  ? 'bg-gradient-to-br from-gray-300 to-gray-500 ring-2 ring-gray-200'
+                                  ? 'bg-gradient-to-br from-slate-300 to-slate-500 ring-2 ring-slate-200'
                                   : 'bg-gradient-to-br from-amber-600 to-amber-800 ring-2 ring-amber-400'
                           }
                           shadow-lg transform transition-transform hover:scale-110
@@ -658,18 +658,18 @@ export function PlayerProfileModal({
                         {achievement.icon}
                       </div>
                       {/* Tooltip */}
-                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+                      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-skin-primary text-skin-primary text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
                         {achievement.achievement_name}
                       </div>
                     </div>
                   ))}
                 {achievements.filter((a) => a.is_unlocked).length > 8 && (
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold bg-gray-700 text-gray-300">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold bg-skin-tertiary text-skin-secondary">
                     +{achievements.filter((a) => a.is_unlocked).length - 8}
                   </div>
                 )}
                 {achievements.filter((a) => a.is_unlocked).length === 0 && (
-                  <p className="text-sm text-gray-500 italic">No achievements yet</p>
+                  <p className="text-sm text-skin-muted italic">No achievements yet</p>
                 )}
               </div>
             </UICard>
@@ -682,7 +682,7 @@ export function PlayerProfileModal({
                 <h4 className="text-sm font-semibold text-team2">
                   <span aria-hidden="true">🤝</span> Mutual Friends
                 </h4>
-                <span className="text-xs text-gray-400">{mutualFriends.length} in common</span>
+                <span className="text-xs text-skin-muted">{mutualFriends.length} in common</span>
               </div>
               <div className="flex flex-wrap gap-2">
                 {mutualFriends.slice(0, 6).map((friendName) => (
@@ -691,11 +691,11 @@ export function PlayerProfileModal({
                     className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-team2-10 border border-team2"
                   >
                     <Avatar username={friendName} size="sm" />
-                    <span className="text-sm text-gray-200">{friendName}</span>
+                    <span className="text-sm text-skin-secondary">{friendName}</span>
                   </div>
                 ))}
                 {mutualFriends.length > 6 && (
-                  <div className="flex items-center px-3 py-1.5 rounded-full bg-gray-700 text-gray-300 text-sm">
+                  <div className="flex items-center px-3 py-1.5 rounded-full bg-skin-tertiary text-skin-secondary text-sm">
                     +{mutualFriends.length - 6} more
                   </div>
                 )}
@@ -761,7 +761,7 @@ export function PlayerProfileModal({
                 )}
 
                 {/* Block/Unblock Button */}
-                <div className="pt-2 border-t border-gray-700">
+                <div className="pt-2 border-t border-skin-default">
                   {blockStatus.isBlocked ? (
                     <Button
                       variant="secondary"

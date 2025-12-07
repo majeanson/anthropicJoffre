@@ -145,21 +145,21 @@ export function MatchStatsModal({
         {loading && (
           <div className="text-center py-12">
             <Spinner size="lg" color="primary" />
-            <p className="mt-4 text-gray-600 font-semibold">Loading match details...</p>
+            <p className="mt-4 text-skin-secondary font-semibold">Loading match details...</p>
           </div>
         )}
 
         {!loading && !matchData && (
           <div className="text-center py-12">
             <span className="text-6xl mb-4 block">😞</span>
-            <p className="text-gray-600 font-semibold">Match data not found</p>
+            <p className="text-skin-secondary font-semibold">Match data not found</p>
           </div>
         )}
 
         {!loading && matchData && (
           <>
             {/* Tabs */}
-            <div className="flex gap-2 border-b-2 border-gray-300">
+            <div className="flex gap-2 border-b-2 border-skin-default">
               <Button
                 onClick={() => setSelectedTab('overview')}
                 variant={selectedTab === 'overview' ? 'secondary' : 'ghost'}
@@ -276,7 +276,7 @@ export function MatchStatsModal({
                             </UICard>
                           ))
                         ) : (
-                          <div className="text-gray-500 text-sm italic">No players assigned</div>
+                          <div className="text-skin-muted text-sm italic">No players assigned</div>
                         )}
                       </div>
                     </UICard>
@@ -293,8 +293,8 @@ export function MatchStatsModal({
                     <span className="text-4xl mb-2 block" aria-hidden="true">
                       📋
                     </span>
-                    <p className="text-gray-600 font-semibold">No rounds recorded yet</p>
-                    <p className="text-gray-500 text-sm">
+                    <p className="text-skin-secondary font-semibold">No rounds recorded yet</p>
+                    <p className="text-skin-muted text-sm">
                       Round data will appear here once gameplay begins
                     </p>
                   </div>
@@ -321,7 +321,7 @@ export function MatchStatsModal({
                             ))}
                           </div>
                         ) : (
-                          <div className="text-gray-500 text-sm italic">
+                          <div className="text-skin-muted text-sm italic">
                             Betting phase not completed
                           </div>
                         )}
@@ -364,7 +364,7 @@ export function MatchStatsModal({
                                       : 'bg-red-100 border-2 border-red-500'
                                   }`}
                                 >
-                                  <div className="font-semibold text-gray-900">{player}</div>
+                                  <div className="font-semibold text-skin-primary">{player}</div>
                                   <div className={won ? 'text-green-700' : 'text-red-700'}>
                                     {points} pts {won ? '✓' : '✗'}
                                   </div>
@@ -394,7 +394,7 @@ export function MatchStatsModal({
                     <span className="text-4xl mb-2 block" aria-hidden="true">
                       👥
                     </span>
-                    <p className="text-gray-600 font-semibold">No player data available</p>
+                    <p className="text-skin-secondary font-semibold">No player data available</p>
                   </div>
                 ) : (
                   matchData.player_names.map((player) => {
@@ -448,7 +448,7 @@ export function MatchStatsModal({
             )}
 
             {/* Action Buttons */}
-            <div className="flex justify-center gap-3 pt-4 border-t-2 border-gray-300">
+            <div className="flex justify-center gap-3 pt-4 border-t-2 border-skin-default">
               {onViewReplay && (
                 <Button
                   variant="primary"

@@ -84,7 +84,7 @@ const TabNavigation = ({
           ${
             activeTab === tab.id
               ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-              : 'hover:bg-white/10 text-gray-400 hover:text-white'
+              : 'hover:bg-white/10 text-skin-secondary hover:text-white'
           }
         `}
       >

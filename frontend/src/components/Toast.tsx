@@ -45,7 +45,7 @@ export const Toast = memo(function Toast({
   return (
     <div className="fixed top-[68px] left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
       <div
-        className={`${bgColor} text-white px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 min-w-[300px]`}
+        className={`${bgColor} text-white px-4 sm:px-6 py-3 rounded-lg shadow-2xl flex items-center gap-3 w-[calc(100vw-2rem)] sm:min-w-[300px] sm:w-auto`}
       >
         <div className="text-2xl font-bold">{icon}</div>
         <div className="flex-1 font-semibold">{message}</div>
@@ -62,7 +62,7 @@ export const Toast = memo(function Toast({
         )}
         <button
           onClick={onClose}
-          className="text-white hover:text-gray-200 font-bold text-xl"
+          className="text-white hover:text-white/80 font-bold text-xl"
           aria-label="Close"
         >
           ×

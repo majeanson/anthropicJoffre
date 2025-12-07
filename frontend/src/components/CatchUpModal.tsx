@@ -61,7 +61,7 @@ export const CatchUpModal = memo(function CatchUpModal({
             </div>
             <div>
               <p className="text-sm font-medium text-green-700">Current Status</p>
-              <p className="text-lg font-bold text-gray-900">
+              <p className="text-lg font-bold text-skin-primary">
                 Round {gameState.roundNumber} - {phaseDisplayName}
               </p>
             </div>
@@ -77,9 +77,9 @@ export const CatchUpModal = memo(function CatchUpModal({
             <div>
               <p className="text-sm font-medium text-green-700">Score</p>
               {leadingTeam && (
-                <p className="text-lg font-bold text-gray-900">Team {leadingTeam} is leading!</p>
+                <p className="text-lg font-bold text-skin-primary">Team {leadingTeam} is leading!</p>
               )}
-              {!leadingTeam && <p className="text-lg font-bold text-gray-900">Tied game!</p>}
+              {!leadingTeam && <p className="text-lg font-bold text-skin-primary">Tied game!</p>}
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -118,7 +118,7 @@ export const CatchUpModal = memo(function CatchUpModal({
                   ✨
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-gray-900">It's your turn!</p>
+                  <p className="text-lg font-bold text-skin-primary">It's your turn!</p>
                   <p className="text-sm font-medium text-yellow-700">The game is waiting for you</p>
                 </div>
               </div>

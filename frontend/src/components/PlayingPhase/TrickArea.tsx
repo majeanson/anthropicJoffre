@@ -9,37 +9,10 @@ import { useState, useEffect, useMemo, memo } from 'react';
 import { Card as CardComponent } from '../Card';
 import { PlayerPosition } from './PlayerPosition';
 import { ConfettiEffect } from '../ConfettiEffect';
-import { GameState, TrickCard, Player } from '../../types/game';
+import { TrickCard, Player } from '../../types/game';
 import { Button } from '../ui/Button';
 import logger from '../../utils/logger';
-import type { MoveSuggestion } from '../../utils/moveSuggestion';
-import type { AchievementProgress } from '../../types/achievements';
-
-interface TrickWinnerInfo {
-  playerName: string;
-  points: number;
-  teamId: 1 | 2;
-  position: 'bottom' | 'left' | 'top' | 'right';
-}
-
-export interface TrickAreaProps {
-  gameState: GameState;
-  currentPlayerIndex: number;
-  currentTrickWinnerId: string | null;
-  isSpectator: boolean;
-  trickWinner?: TrickWinnerInfo | null;
-  onClickPlayer?: (playerName: string) => void;
-  botThinkingMap: Map<string, string>;
-  openThinkingButtons: Set<string>;
-  onToggleBotThinking: (botName: string) => void;
-  currentSuggestion: MoveSuggestion | null;
-  suggestionOpen: boolean;
-  onToggleSuggestion: () => void;
-  beginnerMode: boolean;
-  isCurrentTurn: boolean;
-  /** Map of player names to their top achievement badges */
-  playerAchievements?: Map<string, AchievementProgress[]>;
-}
+import type { TrickAreaProps } from './types';
 
 export const TrickArea = memo(function TrickArea({
   gameState,
@@ -245,18 +218,18 @@ export const TrickArea = memo(function TrickArea({
           <div className="absolute inset-0 rounded-[var(--radius-lg)] z-30 bg-black/30" />
 
           {/* Circular Layout - Previous Trick - higher z-index so cards are fully visible */}
-          <div className="relative h-[320px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-50">
+          <div className="relative h-[320px] sm:h-[340px] md:h-[380px] w-full min-w-[240px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto z-50">
             {/* Title - centered but smaller to not overlap cards */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none">
-              <div className="rounded-lg px-3 py-1.5 border-2 border-yellow-400 bg-gray-900/90 shadow-lg">
+              <div className="rounded-lg px-3 py-1.5 border-2 border-yellow-400 bg-skin-primary/95 shadow-lg">
                 <div className="text-xs md:text-base font-bold uppercase tracking-wider text-yellow-400">
                   Previous Trick
                 </div>
-                <div className="text-[10px] md:text-sm text-white">
+                <div className="text-[10px] md:text-sm text-skin-primary">
                   Winner:{' '}
                   {gameState.players.find((p) => p.id === gameState.previousTrick?.winnerId)?.name}
                 </div>
-                <div className="text-[10px] md:text-xs text-gray-300">
+                <div className="text-[10px] md:text-xs text-skin-secondary">
                   +{gameState.previousTrick?.points || 0} points
                 </div>
               </div>
@@ -306,7 +279,7 @@ export const TrickArea = memo(function TrickArea({
         // Current Trick View
         <>
           <div
-            className="relative h-[320px] sm:h-[340px] md:h-[380px] w-full min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto"
+            className="relative h-[320px] sm:h-[340px] md:h-[380px] w-full min-w-[240px] sm:min-w-[320px] md:min-w-[400px] max-w-[500px] mx-auto"
             data-testid="trick-area"
           >
             {/* Bottom - card above name, positioned from bottom edge */}

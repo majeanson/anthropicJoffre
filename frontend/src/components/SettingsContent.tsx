@@ -14,7 +14,7 @@ import { sounds } from '../utils/sounds';
 import { useSettings } from '../contexts/SettingsContext';
 import { useSkin, useCardSkin, useSpecialCardSkins } from '../contexts/SkinContext';
 import { resetTutorialProgress, getTutorialStats } from '../utils/tutorialProgress';
-import { Button, NeonButton } from './ui/Button';
+import { Button, ElegantButton } from './ui/Button';
 import { SkinSelectorDropdown } from './SkinSelector';
 import { CardSkinDropdown } from './CardSkinSelector';
 import { SpecialCardSkinDropdown } from './SpecialCardSkinSelector';
@@ -319,7 +319,7 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
           <div className="border-t border-[var(--color-border-subtle)]" />
 
           {/* How to Play */}
-          <NeonButton
+          <ElegantButton
             data-keyboard-nav="how-to-play"
             size="lg"
             onClick={() => {
@@ -331,7 +331,7 @@ export function SettingsContent({ onShowRules, onShowDebug }: SettingsContentPro
             glow
           >
             How to Play
-          </NeonButton>
+          </ElegantButton>
 
           {/* About */}
           <div className="text-center py-2">

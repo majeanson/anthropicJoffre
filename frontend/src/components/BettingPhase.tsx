@@ -21,7 +21,7 @@ import { useChatNotifications } from '../hooks/useChatNotifications';
 import { MoveSuggestionPanel } from './MoveSuggestionPanel';
 import { useSettings } from '../contexts/SettingsContext';
 import { BettingHistory } from './BettingHistory';
-import { Button, NeonButton } from './ui/Button';
+import { Button, ElegantButton } from './ui/Button';
 
 interface BettingPhaseProps {
   players: Player[];
@@ -523,7 +523,7 @@ function BettingPhaseComponent({
                           ⏭️ Skip
                         </Button>
                       )}
-                      <NeonButton
+                      <ElegantButton
                         onClick={handlePlaceBet}
                         disabled={!isCurrentBetValid()}
                         size="lg"
@@ -531,7 +531,7 @@ function BettingPhaseComponent({
                         className={`flex-1 ${navLevel === 2 && (actionIndex === 1 || !canSkip()) ? 'ring-2 ring-[var(--color-text-accent)]' : ''}`}
                       >
                         🎲 Bet {selectedAmount} {withoutTrump ? '(No Trump)' : ''}
-                      </NeonButton>
+                      </ElegantButton>
                     </div>
                   </div>
 

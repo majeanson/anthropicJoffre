@@ -198,7 +198,7 @@ export function ScoringPhase({
                 <div
                   key={i}
                   className={`w-3 h-3 rounded-full transition-all ${
-                    i < readyCount ? 'bg-green-600 scale-110' : 'bg-gray-400'
+                    i < readyCount ? 'bg-green-600 scale-110' : 'bg-skin-muted'
                   }`}
                 />
               ))}

@@ -163,19 +163,19 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
                     <h3
                       className={`
                         font-semibold text-sm
-                        ${isCompleted ? 'text-green-800' : 'text-gray-800'}
+                        ${isCompleted ? 'text-green-800' : 'text-skin-primary'}
                       `}
                     >
                       {TUTORIAL_TITLES[phase]}
                     </h3>
-                    <p className="text-xs text-gray-600 mt-0.5">
+                    <p className="text-xs text-skin-secondary mt-0.5">
                       {isCompleted ? 'Completed' : 'Not yet seen'} • Tap to{' '}
                       {isExpanded ? 'hide' : 'view'}
                     </p>
                   </div>
 
                   {/* Expand/Collapse Indicator */}
-                  <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-gray-500">
+                  <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center text-skin-muted">
                     <span
                       className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
                     >
@@ -186,7 +186,7 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
 
                 {/* Expandable Content */}
                 {isExpanded && (
-                  <div className="px-3 pb-3 pt-0 border-t border-gray-200">
+                  <div className="px-3 pb-3 pt-0 border-t border-skin-default">
                     <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-xl">{TUTORIAL_ICONS[phase]}</span>
@@ -194,7 +194,7 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
                           {TUTORIAL_TITLES[phase]}
                         </span>
                       </div>
-                      <p className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
+                      <p className="text-skin-primary text-sm whitespace-pre-line leading-relaxed">
                         {TUTORIAL_CONTENT[phase]}
                       </p>
                     </div>

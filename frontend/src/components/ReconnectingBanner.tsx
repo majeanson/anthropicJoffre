@@ -14,7 +14,7 @@ export const ReconnectingBanner = memo(function ReconnectingBanner({
 
   return (
     <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-slideDown">
-      <UICard variant="elevated" size="sm" gradient="info" className="min-w-[300px] text-white">
+      <UICard variant="elevated" size="sm" gradient="info" className="w-[calc(100vw-2rem)] sm:min-w-[300px] sm:w-auto text-white">
         <div className="flex items-center gap-3 mb-2">
           <Spinner size="sm" color="white" />
           <span className="font-bold">Reconnecting to game...</span>

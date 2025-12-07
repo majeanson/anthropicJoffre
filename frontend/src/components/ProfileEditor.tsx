@@ -159,7 +159,7 @@ export function ProfileEditor({
           id="bio"
           value={bio}
           onChange={(e) => setBio(e.target.value.slice(0, maxChars))}
-          className="w-full px-4 py-2 bg-skin-secondary text-skin-primary rounded-lg border border-skin-default focus:border-blue-500 focus:outline-none resize-none"
+          className="w-full px-4 py-2 bg-skin-secondary text-skin-primary rounded-lg border border-skin-default focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           rows={3}
           placeholder="Tell us about yourself..."
           maxLength={maxChars}

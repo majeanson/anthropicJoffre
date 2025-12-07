@@ -15,7 +15,7 @@ import { BotDifficulty } from '../utils/botPlayer';
 import { sounds } from '../utils/sounds';
 import { User } from '../types/auth';
 import { getUserTierInfo } from '../utils/userTier';
-import { Button, NeonButton } from './ui/Button';
+import { Button, ElegantButton } from './ui/Button';
 
 interface PlayContentProps {
   hasValidSession?: boolean;
@@ -165,7 +165,7 @@ export function PlayContent({
             {tierInfo.canCreateGame ? 'Create Game' : 'Create Game (Login)'}
           </Button>
 
-          <NeonButton
+          <ElegantButton
             data-testid="join-game-button"
             data-keyboard-nav="browse-games"
             size="md"
@@ -177,7 +177,7 @@ export function PlayContent({
             leftIcon={<span>🔍</span>}
           >
             Browse & Join Games
-          </NeonButton>
+          </ElegantButton>
         </div>
       </div>
 

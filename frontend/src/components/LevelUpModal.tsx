@@ -51,6 +51,18 @@ export function LevelUpModal({
     }
   }, [isOpen]);
 
+  // Close modal on Escape key for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   // Get tier info for styling
@@ -115,7 +127,7 @@ export function LevelUpModal({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 p-2 rounded-full hover:bg-gray-500/20 text-skin-secondary"
+          className="absolute top-3 right-3 p-2 rounded-full hover:bg-skin-tertiary text-skin-secondary"
           aria-label="Close level up modal"
         >
           <span aria-hidden="true">✕</span>

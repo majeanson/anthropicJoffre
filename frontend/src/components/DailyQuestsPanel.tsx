@@ -184,7 +184,7 @@ export function DailyQuestsPanel({ socket, playerName, isOpen, onClose }: DailyQ
                   key={quest.id}
                   variant="bordered"
                   size="md"
-                  className="hover:border-gray-500 transition-colors"
+                  className="hover:border-skin-subtle transition-colors"
                 >
                   {/* Quest Header */}
                   <div className="flex items-start justify-between mb-3">
@@ -258,7 +258,7 @@ export function DailyQuestsPanel({ socket, playerName, isOpen, onClose }: DailyQ
                     ) : quest.reward_claimed ? (
                       <span className="text-green-400 font-semibold">✓ Claimed</span>
                     ) : (
-                      <span className="text-gray-500 text-sm">In Progress</span>
+                      <span className="text-skin-muted text-sm">In Progress</span>
                     )}
                   </div>
                 </UICard>

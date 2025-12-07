@@ -6,30 +6,10 @@
  */
 
 import { memo } from 'react';
-import { Player } from '../../types/game';
 import { MoveSuggestionButton } from '../MoveSuggestionButton';
 import { GameTooltip } from '../ui';
 import { AchievementBadges } from '../AchievementBadges';
-import type { MoveSuggestion } from '../../utils/moveSuggestion';
-import type { AchievementProgress } from '../../types/achievements';
-
-export interface PlayerPositionProps {
-  player: Player | null;
-  isYou: boolean;
-  isWinner: boolean;
-  isThinking: boolean;
-  onClickPlayer?: (playerName: string) => void;
-  botThinking: string | null;
-  botThinkingOpen: boolean;
-  onToggleBotThinking: () => void;
-  tooltipPosition: 'top' | 'bottom' | 'left' | 'right';
-  showSuggestion: boolean;
-  suggestion: MoveSuggestion | null;
-  suggestionOpen: boolean;
-  onToggleSuggestion: () => void;
-  /** Optional achievement badges to display */
-  achievementBadges?: AchievementProgress[];
-}
+import type { PlayerPositionProps } from './types';
 
 export const PlayerPosition = memo(function PlayerPosition({
   player,
@@ -274,8 +254,8 @@ export const PlayerPosition = memo(function PlayerPosition({
           {isClickable ? (
             <button
               onClick={handleNameClick}
-              className="hover:underline cursor-pointer focus:outline-none rounded truncate"
-              title={`View ${player.name}'s profile`}
+              className="hover:underline cursor-pointer focus:outline-none focus:ring-2 focus:ring-skin-accent rounded truncate"
+              aria-label={`View ${player.name}'s profile`}
             >
               {getDisplayName()}
             </button>

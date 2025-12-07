@@ -29,7 +29,7 @@ export function LoginStreakBadgeDisplay({
   const [showTooltip, setShowTooltip] = useState(false);
 
   const getStreakColor = (currentStreak: number) => {
-    if (currentStreak === 0) return 'from-gray-600 to-gray-500';
+    if (currentStreak === 0) return 'from-slate-600 to-slate-500';
     if (currentStreak < 3) return 'from-blue-600 to-blue-500';
     if (currentStreak < 7) return 'from-purple-600 to-purple-500';
     if (currentStreak < 14) return 'from-pink-600 to-pink-500';
@@ -109,26 +109,26 @@ export function LoginStreakBadgeDisplay({
             role="tooltip"
           >
             <div className="space-y-2">
-              <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                <span className="text-gray-300 text-sm">Current Streak</span>
-                <span className="text-white font-bold">{streak.currentStreak} days</span>
+              <div className="flex justify-between items-center border-b border-skin-subtle pb-2">
+                <span className="text-skin-secondary text-sm">Current Streak</span>
+                <span className="text-skin-primary font-bold">{streak.currentStreak} days</span>
               </div>
 
-              <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                <span className="text-gray-300 text-sm">Longest Streak</span>
+              <div className="flex justify-between items-center border-b border-skin-subtle pb-2">
+                <span className="text-skin-secondary text-sm">Longest Streak</span>
                 <span className="text-yellow-400 font-bold">{streak.longestStreak} days 🏆</span>
               </div>
 
-              <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                <span className="text-gray-300 text-sm">Total Logins</span>
-                <span className="text-white font-bold">{streak.totalLogins}</span>
+              <div className="flex justify-between items-center border-b border-skin-subtle pb-2">
+                <span className="text-skin-secondary text-sm">Total Logins</span>
+                <span className="text-skin-primary font-bold">{streak.totalLogins}</span>
               </div>
 
               <div className="flex justify-between items-center">
-                <span className="text-gray-300 text-sm">Streak Freeze</span>
+                <span className="text-skin-secondary text-sm">Streak Freeze</span>
                 <span
                   className={`font-bold ${
-                    streak.streakFreezeAvailable ? 'text-blue-400' : 'text-gray-500'
+                    streak.streakFreezeAvailable ? 'text-blue-400' : 'text-skin-muted'
                   }`}
                 >
                   {streak.streakFreezeAvailable ? '✓ Available' : '✗ Used'}

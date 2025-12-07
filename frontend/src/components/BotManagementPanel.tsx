@@ -196,6 +196,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                           handleSwapClick(player.id);
                         }}
                         title="Swap positions with this bot"
+                        aria-label="Swap positions with this bot"
                       >
                         ↔️
                       </Button>
@@ -213,6 +214,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                           }
                         }}
                         title="Remove bot from game"
+                        aria-label="Remove bot from game"
                       >
                         ✕
                       </Button>
@@ -236,6 +238,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                             handleSwapClick(player.id);
                           }}
                           title="Swap positions with this player (requires confirmation)"
+                          aria-label="Swap positions with this player"
                         >
                           ↔️
                         </Button>
@@ -268,6 +271,7 @@ export const BotManagementPanel = memo(function BotManagementPanel({
                             }
                           }}
                           title="Remove player from game"
+                          aria-label="Remove player from game"
                         >
                           ✕
                         </Button>

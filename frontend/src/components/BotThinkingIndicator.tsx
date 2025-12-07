@@ -135,7 +135,7 @@ export function BotThinkingIndicator({
           variant={isOpen ? 'primary' : 'secondary'}
           size="sm"
           onClick={onToggle}
-          className={`w-8 h-8 md:w-10 md:h-10 rounded-full p-0 ${isOpen ? 'scale-110' : ''}`}
+          className={`w-11 h-11 md:w-10 md:h-10 rounded-full p-0 ${isOpen ? 'scale-110' : ''}`}
           aria-label={isOpen ? 'Hide bot thinking' : 'Show bot thinking'}
           aria-expanded={isOpen}
           title="Click to toggle bot thinking"

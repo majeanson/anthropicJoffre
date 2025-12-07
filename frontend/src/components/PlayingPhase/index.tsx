@@ -6,7 +6,6 @@
  */
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Socket } from 'socket.io-client';
 import { CardPlayEffect } from '../CardPlayEffect';
 import { TrickWinnerBanner } from '../TrickWinnerBanner';
 import { Leaderboard } from '../Leaderboard';
@@ -15,51 +14,20 @@ import { GameHeader } from '../GameHeader';
 import { HowToPlay } from '../HowToPlay';
 import SideBetsPanel from '../SideBetsPanel';
 import { SideBetToast } from '../SideBetToast';
-import { ChatMessage, VoiceParticipant } from '../../types/game';
-import { GameState, Card as CardType } from '../../types/game';
+import { Card as CardType, GameState } from '../../types/game';
 import { sounds } from '../../utils/sounds';
-import { ConnectionStats } from '../../hooks/useConnectionQuality';
+import type { AchievementProgress } from '../../types/achievements';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useChatNotifications } from '../../hooks/useChatNotifications';
 import { useAchievementCache } from '../../hooks/useAchievementCache';
 import { suggestMove } from '../../utils/moveSuggestion';
 import { Button } from '../ui/Button';
-import type { AchievementProgress } from '../../types/achievements';
 
 // Extracted components
 import { ScoreBoard } from './ScoreBoard';
 import { TrickArea } from './TrickArea';
 import { PlayerHand } from './PlayerHand';
-
-interface PlayingPhaseProps {
-  gameState: GameState;
-  currentPlayerId: string;
-  onPlayCard: (card: CardType) => void;
-  isSpectator?: boolean;
-  currentTrickWinnerId?: string | null;
-  onLeaveGame?: () => void;
-  autoplayEnabled?: boolean;
-  onAutoplayToggle?: () => void;
-  soundEnabled?: boolean;
-  onSoundToggle?: () => void;
-  onOpenBotManagement?: () => void;
-  onOpenAchievements?: () => void;
-  onOpenFriends?: () => void;
-  pendingFriendRequestsCount?: number;
-  onClickPlayer?: (playerName: string) => void;
-  socket?: Socket | null;
-  gameId?: string;
-  chatMessages?: ChatMessage[];
-  onNewChatMessage?: (message: ChatMessage) => void;
-  connectionStats?: ConnectionStats;
-  // Voice chat props
-  isVoiceEnabled?: boolean;
-  isVoiceMuted?: boolean;
-  voiceParticipants?: VoiceParticipant[];
-  voiceError?: string | null;
-  onVoiceToggle?: () => void;
-  onVoiceMuteToggle?: () => void;
-}
+import type { PlayingPhaseProps } from './types';
 
 function PlayingPhaseComponent({
   gameState,

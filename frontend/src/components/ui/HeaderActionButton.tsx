@@ -42,6 +42,8 @@ export interface HeaderActionButtonProps
   testId?: string;
   /** Additional custom classes */
   className?: string;
+  /** Accessible label for screen readers (uses label or title as fallback) */
+  'aria-label'?: string;
 }
 
 const sizeClasses: Record<HeaderActionButtonSize, { button: string; icon: string; label: string }> =
@@ -66,10 +68,15 @@ export function HeaderActionButton({
   testId,
   className = '',
   disabled = false,
+  'aria-label': ariaLabel,
+  title,
   ...props
 }: HeaderActionButtonProps) {
   const classes = sizeClasses[size];
   const showBadge = badgeCount !== undefined && badgeCount > 0;
+
+  // Use aria-label, or fall back to label or title for accessibility
+  const accessibleLabel = ariaLabel || label || title;
 
   return (
     <button
@@ -87,6 +94,8 @@ export function HeaderActionButton({
       `}
       data-testid={testId}
       disabled={disabled}
+      aria-label={accessibleLabel}
+      title={title}
       {...props}
     >
       <span className={classes.icon}>{icon}</span>

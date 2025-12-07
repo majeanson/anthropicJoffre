@@ -14,7 +14,7 @@ import { PlayerConnectionIndicator } from './PlayerConnectionIndicator';
 import { UnifiedChat } from './UnifiedChat';
 import { TeamSelectionSocialSidebar } from './TeamSelectionSocialSidebar';
 import { sounds } from '../utils/sounds';
-import { Button, NeonButton } from './ui/Button';
+import { Button, ElegantButton } from './ui/Button';
 
 // Keyboard navigation type for team selection
 type NavSection = 'header' | 'teams' | 'difficulty' | 'actions' | 'rules';
@@ -547,7 +547,7 @@ export function TeamSelection({
             </div>
           </div>
 
-          <NeonButton
+          <ElegantButton
             ref={copyLinkButtonRef}
             onClick={handleCopyGameLink}
             size="md"
@@ -556,7 +556,7 @@ export function TeamSelection({
             glow
           >
             🔗 Copy Game Link
-          </NeonButton>
+          </ElegantButton>
         </div>
 
         {/* Toast Notification */}
@@ -725,7 +725,7 @@ export function TeamSelection({
 
         {/* Rules button */}
         <div className="mt-6">
-          <NeonButton
+          <ElegantButton
             ref={rulesButtonRef}
             onClick={() => {
               sounds.buttonClick();
@@ -736,7 +736,7 @@ export function TeamSelection({
             glow
           >
             📖 Game Rules
-          </NeonButton>
+          </ElegantButton>
         </div>
       </div>
 

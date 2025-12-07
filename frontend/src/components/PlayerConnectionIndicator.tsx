@@ -52,8 +52,8 @@ export const PlayerConnectionIndicator: React.FC<PlayerConnectionIndicatorProps>
         };
       default:
         return {
-          bg: 'bg-gray-500',
-          text: 'text-gray-600',
+          bg: 'bg-slate-500',
+          text: 'text-slate-600',
           icon: '?',
           label: 'Unknown',
           pulse: false,

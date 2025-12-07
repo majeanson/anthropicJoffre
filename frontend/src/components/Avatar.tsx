@@ -46,7 +46,7 @@ export default function Avatar({ username, avatarUrl, size = 'md', className = '
       'from-amber-500 to-orange-600',
       'from-purple-500 to-pink-600',
       'from-blue-600 to-indigo-700',
-      'from-gray-500 to-gray-700',
+      'from-slate-500 to-slate-700',
     ];
 
     // Use first character code to pick color

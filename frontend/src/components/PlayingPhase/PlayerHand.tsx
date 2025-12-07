@@ -15,22 +15,9 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
 import { Card as CardComponent } from '../Card';
-import { Card as CardType, TrickCard } from '../../types/game';
+import { Card as CardType } from '../../types/game';
 import { sounds } from '../../utils/sounds';
-
-export interface PlayerHandProps {
-  hand: CardType[];
-  isCurrentTurn: boolean;
-  currentTrick: TrickCard[];
-  currentPlayerIndex: number;
-  roundNumber: number;
-  animationsEnabled: boolean;
-  isSpectator: boolean;
-  onPlayCard: (card: CardType) => void;
-  onSetPlayEffect?: (effect: { card: CardType; position: { x: number; y: number } } | null) => void;
-  queuedCard?: CardType | null;
-  onQueueCard?: (card: CardType | null) => void;
-}
+import type { PlayerHandProps } from './types';
 
 export const PlayerHand = memo(function PlayerHand({
   hand,

@@ -246,7 +246,7 @@ export function BeginnerTutorial({
             variant="ghost"
             size="sm"
             onClick={handleDismiss}
-            className="text-white hover:text-red-300 p-1"
+            className="text-white hover:text-red-300 min-w-[44px] min-h-[44px] flex items-center justify-center"
             title="Close Tutorial"
             data-testid="tutorial-close-button"
           >
@@ -289,7 +289,7 @@ export function BeginnerTutorial({
               )}
             </div>
             {/* Step content */}
-            <p className="text-gray-800 text-sm whitespace-pre-line leading-relaxed">
+            <p className="text-skin-primary text-sm whitespace-pre-line leading-relaxed">
               {step.content}
             </p>
           </div>

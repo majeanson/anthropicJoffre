@@ -10,7 +10,7 @@
  * - Modal picker
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSkin } from '../contexts/SkinContext';
 import { Skin, SkinId } from '../config/skins';
 import { Button } from './ui/Button';
@@ -165,6 +165,18 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
   const { skin, skinId, setSkin, availableSkins, isSkinUnlocked, getRequiredLevel } = useSkin();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Close dropdown on Escape key for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const handleSelect = (id: SkinId) => {
     if (!isSkinUnlocked(id)) return; // Don't allow locked skins
     setSkin(id);
@@ -216,8 +228,13 @@ export function SkinSelectorDropdown({ onSkinChange }: SkinSelectorDropdownProps
       {/* Dropdown menu */}
       {isOpen && (
         <>
-          {/* Backdrop */}
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          {/* Backdrop - click to close, keyboard handled by Escape key listener */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+            role="presentation"
+            aria-hidden="true"
+          />
 
           {/* Menu */}
           <div

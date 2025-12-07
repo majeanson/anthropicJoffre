@@ -394,8 +394,4 @@ export const GhostButton = forwardRef<HTMLButtonElement, PresetButtonProps>((pro
 ));
 GhostButton.displayName = 'GhostButton';
 
-// Legacy alias for backward compatibility
-/** @deprecated Use ElegantButton or ArcaneButton instead */
-export const NeonButton = ElegantButton;
-
 export default Button;

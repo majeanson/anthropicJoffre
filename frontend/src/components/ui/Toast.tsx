@@ -27,9 +27,8 @@ export type ToastVariant = 'success' | 'warning' | 'error' | 'info';
 export interface ToastProps {
   /** Visual style variant */
   variant?: ToastVariant;
-  /** Toast message */
-  message: string;
-  /** Optional title */
+  /** Toast message content */
+  message?: string;
   title?: string;
   /** Optional icon (overrides default) */
   icon?: ReactNode;

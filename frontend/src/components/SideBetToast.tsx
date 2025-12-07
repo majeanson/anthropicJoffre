@@ -145,7 +145,7 @@ export function SideBetToast({ socket, playerName, enabled = true }: SideBetToas
             pointer-events-auto
             animate-slide-in-right
             p-3 rounded-lg shadow-xl border
-            min-w-[240px] max-w-[320px]
+            w-[calc(100vw-2rem)] sm:min-w-[240px] sm:w-auto sm:max-w-[320px]
             backdrop-blur-sm
             ${
               toast.type === 'won'

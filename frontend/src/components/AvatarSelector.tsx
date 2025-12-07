@@ -114,7 +114,7 @@ export function AvatarSelector({
                 ${
                   isSelected
                     ? 'ring-4 ring-blue-400 scale-110 border-blue-400'
-                    : 'border-transparent hover:border-gray-500'
+                    : 'border-transparent hover:border-skin-subtle'
                 }
               `}
               title={

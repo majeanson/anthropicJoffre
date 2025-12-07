@@ -139,8 +139,22 @@ export const UICard: React.FC<UICardProps> = ({
     .filter(Boolean)
     .join(' ');
 
+  // Use button for interactive cards, div for non-interactive
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        className={`${allStyles} text-left focus:outline-none focus:ring-2 focus:ring-skin-accent focus:ring-offset-2`}
+        style={style}
+        onClick={onClick}
+      >
+        {children}
+      </button>
+    );
+  }
+
   return (
-    <div className={allStyles} style={style} onClick={onClick}>
+    <div className={allStyles} style={style}>
       {children}
     </div>
   );

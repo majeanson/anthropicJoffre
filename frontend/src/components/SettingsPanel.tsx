@@ -3,7 +3,7 @@
  * Sprint 3 Phase 3.6
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useSettings } from '../contexts/SettingsContext';
 import { useSkin } from '../contexts/SkinContext';
@@ -59,6 +59,18 @@ export function SettingsPanel({
     playerLevel,
   } = useSkin();
   const [activeTab, setActiveTab] = useState<SettingsTab>('settings');
+
+  // Close panel on Escape key for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -340,11 +352,13 @@ export function SettingsPanel({
 
   return createPortal(
     <>
-      {/* Backdrop */}
+      {/* Backdrop - keyboard handled by Escape key listener */}
       <div
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[10000] transition-opacity"
         onClick={onClose}
         data-testid="settings-backdrop"
+        role="presentation"
+        aria-hidden="true"
       />
 
       {/* Settings Panel - Increased width for tabs, positioned above chat on mobile */}

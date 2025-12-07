@@ -66,7 +66,7 @@ export default function RegisterModal({ isOpen, onClose, onSwitchToLogin }: Regi
   const getPasswordStrength = (
     pwd: string
   ): { strength: string; color: string; percentage: number } => {
-    if (pwd.length === 0) return { strength: '', color: 'bg-gray-600', percentage: 0 };
+    if (pwd.length === 0) return { strength: '', color: 'bg-skin-muted', percentage: 0 };
     if (pwd.length < 8) return { strength: 'Weak', color: 'bg-red-500', percentage: 25 };
 
     let score = 0;

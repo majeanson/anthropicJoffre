@@ -85,13 +85,13 @@ export function ShareReplayPrompt({
       {/* Score Display */}
       <div className="flex justify-center gap-4 text-xl mb-6">
         <span
-          className={`font-bold ${winningTeam === 1 ? 'text-skin-success' : 'text-gray-400'}`}
+          className={`font-bold ${winningTeam === 1 ? 'text-skin-success' : 'text-skin-muted'}`}
         >
           Team 1: {finalScore.team1}
         </span>
-        <span className="text-gray-500">-</span>
+        <span className="text-skin-muted">-</span>
         <span
-          className={`font-bold ${winningTeam === 2 ? 'text-skin-success' : 'text-gray-400'}`}
+          className={`font-bold ${winningTeam === 2 ? 'text-skin-success' : 'text-skin-muted'}`}
         >
           Team 2: {finalScore.team2}
         </span>

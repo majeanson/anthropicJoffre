@@ -41,7 +41,7 @@ const statusConfig: Record<PlayerStatus, { icon: string; text: string; color: st
   offline: {
     icon: '⚫',
     text: 'Offline',
-    color: 'text-gray-500',
+    color: 'text-skin-muted',
   },
   online: {
     icon: '🟢',

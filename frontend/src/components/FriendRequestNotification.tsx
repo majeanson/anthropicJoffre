@@ -72,7 +72,8 @@ export default function FriendRequestNotificationComponent({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="text-team2 hover:text-team2/80 text-xl font-bold p-0 w-6 h-6"
+            className="text-team2 hover:text-team2/80 text-xl font-bold p-1 min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label="Close notification"
           >
             ×
           </Button>

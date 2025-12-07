@@ -60,15 +60,26 @@ export default function FriendsPanel({
     Array<{ player_name: string; games_played: number; games_won: number }>
   >([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch friends list on mount
   useEffect(() => {
+    setError(null);
+    setIsLoading(true);
     if (activeTab === 'friends') {
       socket.emit('get_friends_list');
     } else if (activeTab === 'requests') {
       socket.emit('get_friend_requests');
       socket.emit('get_sent_friend_requests');
     }
+    // Timeout for error handling
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        setError('Request timed out. Please try again.');
+        setIsLoading(false);
+      }
+    }, 10000);
+    return () => clearTimeout(timeout);
   }, [socket, activeTab]);
 
   // Socket event listeners
@@ -78,15 +89,23 @@ export default function FriendsPanel({
     const handleFriendsList = ({ friends: friendsList }: { friends: FriendWithStatus[] }) => {
       setFriends(friendsList);
       setIsLoading(false);
+      setError(null);
     };
 
     const handleFriendRequests = ({ requests }: { requests: FriendRequest[] }) => {
       setPendingRequests(requests);
       setIsLoading(false);
+      setError(null);
     };
 
     const handleSentFriendRequests = ({ requests }: { requests: FriendRequest[] }) => {
       setSentRequests(requests);
+      setIsLoading(false);
+      setError(null);
+    };
+
+    const handleFriendsError = ({ message }: { message: string }) => {
+      setError(message || 'Failed to load data');
       setIsLoading(false);
     };
 
@@ -129,6 +148,7 @@ export default function FriendsPanel({
     socket.on('friend_request_received', handleFriendRequestReceived);
     socket.on('friend_request_sent', handleFriendRequestSent);
     socket.on('player_search_results', handlePlayerSearchResults);
+    socket.on('friends_error', handleFriendsError);
 
     return () => {
       socket.off('friends_list', handleFriendsList);
@@ -138,6 +158,7 @@ export default function FriendsPanel({
       socket.off('friend_request_received', handleFriendRequestReceived);
       socket.off('friend_request_sent', handleFriendRequestSent);
       socket.off('player_search_results', handlePlayerSearchResults);
+      socket.off('friends_error', handleFriendsError);
     };
   }, [socket]);
 
@@ -195,8 +216,35 @@ export default function FriendsPanel({
 
       {/* Content */}
       <div className="space-y-4">
+        {/* Error Display */}
+        {error && (
+          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
+            <EmptyState icon="⚠️" title="Error" description={error} compact />
+            <Button
+              variant="secondary"
+              size="sm"
+              className="mt-2 w-full"
+              onClick={() => {
+                setError(null);
+                setIsLoading(true);
+                if (activeTab === 'friends') {
+                  socket.emit('get_friends_list');
+                } else if (activeTab === 'requests') {
+                  socket.emit('get_friend_requests');
+                  socket.emit('get_sent_friend_requests');
+                }
+              }}
+            >
+              Try Again
+            </Button>
+          </div>
+        )}
+
+        {/* Loading State */}
+        {isLoading && !error && <LoadingState message="Loading..." />}
+
         {/* Friends Tab */}
-        {activeTab === 'friends' && (
+        {activeTab === 'friends' && !isLoading && !error && (
           <div className="space-y-3">
             {friends.length === 0 ? (
               <EmptyState
@@ -252,7 +300,7 @@ export default function FriendsPanel({
         )}
 
         {/* Requests Tab */}
-        {activeTab === 'requests' && (
+        {activeTab === 'requests' && !isLoading && !error && (
           <div className="space-y-6">
             {/* Received Requests */}
             <div>
@@ -321,7 +369,7 @@ export default function FriendsPanel({
         )}
 
         {/* Search Tab */}
-        {activeTab === 'search' && (
+        {activeTab === 'search' && !error && (
           <div className="space-y-4">
             <div className="flex gap-2">
               <Input

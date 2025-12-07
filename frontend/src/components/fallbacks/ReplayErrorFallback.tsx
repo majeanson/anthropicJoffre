@@ -23,7 +23,7 @@ export function ReplayErrorFallback({ onClose }: ReplayErrorFallbackProps) {
       testId="replay-error-fallback"
     >
       <div className="text-center">
-        <p className="text-gray-300 mb-6">
+        <p className="text-skin-secondary mb-6">
           Failed to load or play the game replay. The replay data may be corrupted or unavailable.
         </p>
         <div className="space-y-3">

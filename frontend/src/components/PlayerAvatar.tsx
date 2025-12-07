@@ -67,11 +67,11 @@ export function PlayerAvatar({
       ? 'bg-orange-600 text-white border-orange-400'
       : teamId === 2
         ? 'bg-purple-600 text-white border-purple-400'
-        : 'bg-gray-600 text-white border-gray-400';
+        : 'bg-skin-muted text-white border-skin-subtle';
 
   // Current turn highlight
   const turnHighlight = isCurrentTurn
-    ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-gray-900'
+    ? 'ring-2 ring-green-400 ring-offset-2 ring-offset-skin-primary'
     : '';
 
   // Size mappings
@@ -86,8 +86,8 @@ export function PlayerAvatar({
         {/* Online status dot (top-right) */}
         {!isBot && (
           <div
-            className={`absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-gray-900 ${
-              isOnline ? 'bg-green-500' : 'bg-gray-500'
+            className={`absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-skin-primary ${
+              isOnline ? 'bg-green-500' : 'bg-skin-muted'
             }`}
             title={isOnline ? 'Online' : 'Offline'}
           />
@@ -96,7 +96,7 @@ export function PlayerAvatar({
         {/* Bot indicator (bottom-right) */}
         {isBot && (
           <div
-            className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-blue-600 border-2 border-gray-900 flex items-center justify-center text-xs"
+            className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-blue-600 border-2 border-skin-primary flex items-center justify-center text-xs"
             title="Bot Player"
           >
             🤖
@@ -106,7 +106,7 @@ export function PlayerAvatar({
         {/* Dealer indicator (bottom-left) */}
         {isDealer && (
           <div
-            className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full bg-yellow-600 border-2 border-gray-900 flex items-center justify-center text-xs"
+            className="absolute -bottom-0.5 -left-0.5 w-5 h-5 rounded-full bg-yellow-600 border-2 border-skin-primary flex items-center justify-center text-xs"
             title="Dealer"
           >
             ♦️

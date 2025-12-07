@@ -142,6 +142,9 @@ export { ConversationItem } from './ConversationItem';
 export { UnreadBadge } from './UnreadBadge';
 export type { UnreadBadgeVariant, UnreadBadgeSize, UnreadBadgePosition } from './UnreadBadge';
 
+// Stats & Progress components
+export { StatCard } from './StatCard';
+
 // Export config for convenience
 export { themes, getTheme } from '../../config/themes';
 export type { ThemeName, Theme } from '../../config/themes';

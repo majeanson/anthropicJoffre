@@ -13,7 +13,7 @@ import {
   SkinSelectorModal,
   QuickSkinToggle,
 } from '../../SkinSelector';
-import { Button, NeonButton } from '../Button';
+import { Button, ElegantButton } from '../Button';
 
 const meta = {
   title: 'UI/SkinSelector',
@@ -137,9 +137,9 @@ export const ModalSelector: Story = {
 
     return (
       <div className="p-8">
-        <NeonButton onClick={() => setIsOpen(true)} glow>
+        <ElegantButton onClick={() => setIsOpen(true)} glow>
           Open Skin Selector
-        </NeonButton>
+        </ElegantButton>
         <SkinSelectorModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
       </div>
     );
@@ -301,9 +301,9 @@ export const WelcomeScreenExample: Story = {
         </div>
 
         <div className="space-y-3">
-          <NeonButton fullWidth glow size="lg" onClick={() => setShowModal(true)}>
+          <ElegantButton fullWidth glow size="lg" onClick={() => setShowModal(true)}>
             Choose Your Style
-          </NeonButton>
+          </ElegantButton>
           <p className="text-[var(--color-text-muted)] text-xs">
             You can change this anytime in settings
           </p>

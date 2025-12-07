@@ -75,9 +75,9 @@ export function WeeklyCalendar({
             : 'from-blue-500/20 to-indigo-500/20 border-2 border-blue-400 shadow-lg shadow-blue-500/20'
         } cursor-pointer hover:scale-105 active:scale-95`;
       case 'missed':
-        return `${base} bg-gray-500/10 border border-gray-500/30 opacity-50`;
+        return `${base} bg-skin-secondary border border-skin-default opacity-50`;
       case 'locked':
-        return `${base} bg-gray-500/10 border border-gray-500/20 opacity-60`;
+        return `${base} bg-skin-secondary border border-skin-subtle opacity-60`;
     }
   };
 
@@ -120,7 +120,7 @@ export function WeeklyCalendar({
                 {status === 'claimed' ? (
                   <span className="text-green-500">✓</span>
                 ) : status === 'missed' ? (
-                  <span className="text-gray-400">—</span>
+                  <span className="text-skin-muted">—</span>
                 ) : isClaiming ? (
                   <span className="animate-spin">⌛</span>
                 ) : (
@@ -195,7 +195,7 @@ export function WeeklyCalendarCompact({
         ${
           hasUnclaimedToday
             ? 'bg-gradient-to-r from-blue-500/20 to-indigo-500/20 border border-blue-400'
-            : 'bg-gray-500/10 border border-gray-500/30'
+            : 'bg-skin-secondary border border-skin-default'
         }
       `}
     >

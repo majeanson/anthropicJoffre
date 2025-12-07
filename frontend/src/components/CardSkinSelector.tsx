@@ -99,7 +99,7 @@ function CardSkinCard({
         <div className="absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-black/50 z-10">
           <span className="text-4xl mb-2">🔒</span>
           <p className="text-sm text-white font-bold">Level {requiredLevel}</p>
-          <p className="text-xs text-gray-300 mt-1">
+          <p className="text-xs text-skin-muted mt-1">
             {requiredLevel - currentLevel} levels to unlock
           </p>
         </div>
@@ -343,6 +343,18 @@ export function CardSkinDropdown({ onSkinChange }: CardSkinDropdownProps) {
   } = useCardSkin();
   const [isOpen, setIsOpen] = useState(false);
 
+  // Close dropdown on Escape key for accessibility
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen]);
+
   const handleSelect = (id: CardSkinId) => {
     if (!isCardSkinUnlocked(id)) return;
     if (id === cardSkinId) {
@@ -405,8 +417,13 @@ export function CardSkinDropdown({ onSkinChange }: CardSkinDropdownProps) {
       {/* Dropdown menu */}
       {isOpen && (
         <>
-          {/* Backdrop */}
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          {/* Backdrop - click to close, keyboard handled by Escape key listener */}
+          <div
+            className="fixed inset-0 z-40"
+            onClick={() => setIsOpen(false)}
+            role="presentation"
+            aria-hidden="true"
+          />
 
           {/* Menu */}
           <div className="absolute top-full left-0 right-0 mt-2 rounded-lg border-2 border-skin-border-accent bg-skin-secondary shadow-lg z-50 overflow-hidden max-h-80 overflow-y-auto animate-slideUp">

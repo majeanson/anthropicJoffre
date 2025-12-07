@@ -181,7 +181,21 @@ export function UIDropdownMenu({
   return (
     <div className={`relative ${className}`} data-testid={testId}>
       {/* Trigger */}
-      <div ref={triggerRef} onClick={handleTriggerClick} data-testid={`${testId}-trigger`}>
+      <div
+        ref={triggerRef}
+        onClick={handleTriggerClick}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleTriggerClick();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        data-testid={`${testId}-trigger`}
+      >
         {trigger}
       </div>
 

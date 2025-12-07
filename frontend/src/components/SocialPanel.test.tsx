@@ -5,7 +5,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderWithProviders, screen, userEvent } from '../test/utils';
-import { SocialPanel } from './SocialPanel';
+import { SocialPanel, SocialPanelTabType } from './SocialPanel';
 import { OnlinePlayer } from '../types/game';
 import { RecentPlayer } from '../utils/recentPlayers';
 
@@ -45,7 +45,7 @@ describe('SocialPanel', () => {
   ];
 
   const defaultProps = {
-    socialTab: 'online' as 'recent' | 'online' | 'chat' | 'friends',
+    socialTab: 'online' as SocialPanelTabType,
     setSocialTab: mockSetSocialTab,
     onlinePlayers,
     recentPlayers,

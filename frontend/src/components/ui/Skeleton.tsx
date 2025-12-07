@@ -52,7 +52,7 @@ export function TableSkeleton({ rows = 5, columns = 3, showHeader = true }: Tabl
     <div className="space-y-3">
       {/* Header */}
       {showHeader && (
-        <div className="flex gap-4 pb-3 border-b border-gray-700">
+        <div className="flex gap-4 pb-3 border-b border-skin-subtle">
           {Array.from({ length: columns }).map((_, i) => (
             <Skeleton key={`header-${i}`} width={i === 0 ? '40%' : '30%'} height="24px" />
           ))}
@@ -87,7 +87,7 @@ export function CardSkeleton({ count = 1, hasAvatar = false }: CardSkeletonProps
   return (
     <div className="space-y-3">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+        <div key={index} className="bg-skin-tertiary rounded-lg p-4 border border-skin-subtle">
           <div className="flex items-center gap-3">
             {hasAvatar && <Skeleton variant="circular" width="48px" height="48px" />}
             <div className="flex-1 space-y-2">
@@ -118,7 +118,7 @@ export function ListSkeleton({
   return (
     <div className="space-y-2">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="flex items-center gap-3 p-3 hover:bg-gray-700/30 rounded-lg">
+        <div key={index} className="flex items-center gap-3 p-3 hover:bg-skin-tertiary rounded-lg">
           {hasAvatar && <Skeleton variant="circular" width="40px" height="40px" />}
           <div className="flex-1 space-y-2">
             <Skeleton width="70%" height="16px" />
@@ -142,7 +142,7 @@ export function StatsGridSkeleton({ columns = 2, rows = 4 }: StatsGridSkeletonPr
   return (
     <div className={`grid grid-cols-${columns} gap-4`}>
       {Array.from({ length: columns * rows }).map((_, index) => (
-        <div key={index} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+        <div key={index} className="bg-skin-tertiary rounded-lg p-4 border border-skin-subtle">
           <Skeleton width="60%" height="16px" className="mb-2" />
           <Skeleton width="80%" height="32px" />
         </div>

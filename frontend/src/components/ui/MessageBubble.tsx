@@ -75,7 +75,7 @@ export function MessageBubble({
         >
           <p className="break-words">{text}</p>
         </div>
-        <span className="text-xs text-gray-400 mt-1 px-2">
+        <span className="text-xs text-skin-muted mt-1 px-2">
           {formatTime(timestamp)}
           {isSent && isRead && ' • Read'}
         </span>

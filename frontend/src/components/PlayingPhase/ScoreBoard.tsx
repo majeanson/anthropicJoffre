@@ -8,13 +8,8 @@
 import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import { ContextualGameInfo } from '../ContextualGameInfo';
 import { TimeoutIndicator } from '../TimeoutIndicator';
-import { GameState, CardColor, Player } from '../../types/game';
-
-export interface ScoreBoardProps {
-  gameState: GameState;
-  isCurrentTurn: boolean;
-  onAutoplayTimeout: () => void;
-}
+import { Player, CardColor } from '../../types/game';
+import type { ScoreBoardProps } from './types';
 
 export const ScoreBoard = memo(function ScoreBoard({
   gameState,
