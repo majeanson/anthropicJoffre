@@ -342,7 +342,7 @@ export function SettingsPanel({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm z-[10000] transition-opacity"
+        className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-[10000] transition-opacity"
         onClick={onClose}
         data-testid="settings-backdrop"
       />

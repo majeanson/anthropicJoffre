@@ -103,7 +103,7 @@ export function ProfileEditorModal({
         testId="profile-editor-modal"
       >
         <div className="text-center py-8">
-          <p className="text-gray-700">Loading profile...</p>
+          <p className="text-gray-700 dark:text-gray-300">Loading profile...</p>
         </div>
       </Modal>
     );

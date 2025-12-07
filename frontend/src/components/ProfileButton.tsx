@@ -122,7 +122,7 @@ export function ProfileButton({
   const triggerButton = (
     <button
       onClick={!user ? handleGuestClick : undefined}
-      className={`flex items-center gap-3 bg-gradient-to-r from-parchment-200 to-parchment-300 hover:from-parchment-300 hover:to-parchment-400 px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-parchment-400 focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
+      className={`flex items-center gap-3 bg-gradient-to-r from-parchment-200 to-parchment-300 dark:from-gray-700 dark:to-gray-600 hover:from-parchment-300 hover:to-parchment-400 dark:hover:from-gray-600 dark:hover:to-gray-500 px-4 py-3 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg border-2 border-parchment-400 dark:border-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 ${className}`}
       title={user ? `View ${user.username}'s profile` : 'Click to learn why you should register!'}
     >
       <Avatar
@@ -132,11 +132,11 @@ export function ProfileButton({
       />
       {!compact && (
         <div className="flex flex-col items-start">
-          <div className="text-xs font-medium text-umber-600 uppercase tracking-wide">
+          <div className="text-xs font-medium text-umber-600 dark:text-gray-400 uppercase tracking-wide">
             My Profile
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-base font-bold text-umber-900 max-w-[120px] truncate">
+            <span className="text-base font-bold text-umber-900 dark:text-gray-100 max-w-[120px] truncate">
               {user?.username || playerName || 'Guest'}
             </span>
             {user?.is_verified && (
@@ -146,7 +146,7 @@ export function ProfileButton({
             )}
             {user && (
               <svg
-                className="w-4 h-4 text-umber-600"
+                className="w-4 h-4 text-umber-600 dark:text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

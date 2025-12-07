@@ -76,11 +76,11 @@ export function HeaderActionButton({
       className={`
         relative
         bg-white/20 hover:bg-white/30
-       
+        dark:bg-black/30 dark:hover:bg-black/40
         rounded
         backdrop-blur-sm
         transition-all duration-200
-        border border-white/30
+        border border-white/30 dark:border-gray-600
         flex items-center gap-1.5
         ${classes.button}
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
@@ -93,7 +93,7 @@ export function HeaderActionButton({
       <span className={classes.icon}>{icon}</span>
       {label && (
         <span
-          className={`hidden md:inline text-white font-semibold ${classes.label}`}
+          className={`hidden md:inline text-white dark:text-gray-100 font-semibold ${classes.label}`}
         >
           {label}
         </span>

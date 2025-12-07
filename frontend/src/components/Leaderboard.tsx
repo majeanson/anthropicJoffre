@@ -58,7 +58,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
       <div className="space-y-6">
         {/* Current Standings */}
         <section>
-          <h3 className="text-xl font-bold text-umber-900 mb-4 border-b-2 border-parchment-400 pb-2 font-serif">
+          <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
             <span aria-hidden="true">📊</span> Current Standings
           </h3>
           <div className="grid grid-cols-2 gap-4">
@@ -70,14 +70,14 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               className={leadingTeam === 1 ? 'ring-4 ring-yellow-400' : ''}
             >
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-2xl font-bold text-orange-800">Team 1</h4>
+                <h4 className="text-2xl font-bold text-orange-800 dark:text-orange-200">Team 1</h4>
                 {leadingTeam === 1 && (
                   <span className="text-3xl" aria-hidden="true">
                     👑
                   </span>
                 )}
               </div>
-              <div className="text-5xl font-bold text-orange-600 mb-4">
+              <div className="text-5xl font-bold text-orange-600 dark:text-orange-300 mb-4">
                 {team1Score}
               </div>
               <div className="space-y-2">
@@ -86,12 +86,12 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                     key={player.id}
                     variant="bordered"
                     size="sm"
-                    className="bg-parchment-50 bg-opacity-80 border-orange-200"
+                    className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 border-orange-200 dark:border-orange-700"
                   >
-                    <p className="font-semibold text-orange-900">
+                    <p className="font-semibold text-orange-900 dark:text-orange-200">
                       {player.name}
                     </p>
-                    <p className="text-sm text-orange-700">
+                    <p className="text-sm text-orange-700 dark:text-orange-300">
                       Tricks: {player.tricksWon}
                     </p>
                   </UICard>
@@ -107,14 +107,14 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
               className={leadingTeam === 2 ? 'ring-4 ring-yellow-400' : ''}
             >
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-2xl font-bold text-purple-800">Team 2</h4>
+                <h4 className="text-2xl font-bold text-purple-800 dark:text-purple-200">Team 2</h4>
                 {leadingTeam === 2 && (
                   <span className="text-3xl" aria-hidden="true">
                     👑
                   </span>
                 )}
               </div>
-              <div className="text-5xl font-bold text-purple-600 mb-4">
+              <div className="text-5xl font-bold text-purple-600 dark:text-purple-300 mb-4">
                 {team2Score}
               </div>
               <div className="space-y-2">
@@ -123,12 +123,12 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                     key={player.id}
                     variant="bordered"
                     size="sm"
-                    className="bg-parchment-50 bg-opacity-80 border-purple-200"
+                    className="bg-parchment-50 dark:bg-gray-700 bg-opacity-80 border-purple-200 dark:border-purple-700"
                   >
-                    <p className="font-semibold text-purple-900">
+                    <p className="font-semibold text-purple-900 dark:text-purple-200">
                       {player.name}
                     </p>
-                    <p className="text-sm text-purple-700">
+                    <p className="text-sm text-purple-700 dark:text-purple-300">
                       Tricks: {player.tricksWon}
                     </p>
                   </UICard>
@@ -138,7 +138,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
           </div>
 
           {leadingTeam === null && (
-            <p className="text-center text-umber-700 mt-4 font-semibold">
+            <p className="text-center text-umber-700 dark:text-gray-300 mt-4 font-semibold">
               It's a tie! Both teams have {team1Score} points.
             </p>
           )}
@@ -147,35 +147,35 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
         {/* Current Bet */}
         {gameState.highestBet && (
           <section>
-            <h3 className="text-xl font-bold text-umber-900 mb-4 border-b-2 border-parchment-400 pb-2 font-serif">
+            <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
               <span aria-hidden="true">🎲</span> Current Bet
             </h3>
             <UICard
               variant="bordered"
               size="md"
-              className="bg-gradient-to-r from-parchment-100 to-parchment-200"
+              className="bg-gradient-to-r from-parchment-100 to-parchment-200 dark:from-gray-700 dark:to-gray-800"
             >
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-sm text-umber-700 font-semibold">
+                  <p className="text-sm text-umber-700 dark:text-gray-300 font-semibold">
                     Highest Bidder
                   </p>
-                  <p className="text-lg font-bold text-umber-900">
+                  <p className="text-lg font-bold text-umber-900 dark:text-gray-100">
                     {gameState.players.find((p) => p.id === gameState.highestBet?.playerId)?.name ||
                       'Unknown'}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-umber-700 font-semibold">
+                  <p className="text-sm text-umber-700 dark:text-gray-300 font-semibold">
                     Bet Amount
                   </p>
-                  <p className="text-lg font-bold text-umber-900">
+                  <p className="text-lg font-bold text-umber-900 dark:text-gray-100">
                     {gameState.highestBet.amount} points
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-umber-700 font-semibold">Type</p>
-                  <p className="text-lg font-bold text-umber-900">
+                  <p className="text-sm text-umber-700 dark:text-gray-300 font-semibold">Type</p>
+                  <p className="text-lg font-bold text-umber-900 dark:text-gray-100">
                     {gameState.highestBet.withoutTrump ? (
                       <span className="text-crimson-600">Without Trump (2x)</span>
                     ) : (
@@ -191,7 +191,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
         {/* Round History */}
         {reversedRoundHistory.length > 0 && (
           <section>
-            <h3 className="text-xl font-bold text-umber-900 mb-4 border-b-2 border-parchment-400 pb-2 font-serif">
+            <h3 className="text-xl font-bold text-umber-900 dark:text-gray-100 mb-4 border-b-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 pb-2 font-serif">
               <span aria-hidden="true">📜</span> Round History
             </h3>
             <div className="space-y-3">
@@ -205,12 +205,12 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                     key={round.roundNumber}
                     variant="bordered"
                     size="md"
-                    className="bg-parchment-100 overflow-hidden transition-colors"
+                    className="bg-parchment-100 dark:bg-gray-700 overflow-hidden transition-colors"
                   >
-                    <div className="p-4 hover:bg-parchment-200">
+                    <div className="p-4 hover:bg-parchment-200 dark:bg-gray-600">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <h4 className="text-lg font-bold text-umber-900">
+                          <h4 className="text-lg font-bold text-umber-900 dark:text-gray-100">
                             Round {round.roundNumber}
                           </h4>
                           {hasTricks && (
@@ -237,36 +237,36 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
 
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <p className="text-umber-700 font-semibold">Bidder</p>
-                          <p className="font-bold text-umber-900">
+                          <p className="text-umber-700 dark:text-gray-300 font-semibold">Bidder</p>
+                          <p className="font-bold text-umber-900 dark:text-gray-100">
                             {betPlayer?.name || 'Unknown'}
                           </p>
-                          <p className="text-xs text-umber-600">
+                          <p className="text-xs text-umber-600 dark:text-gray-400">
                             Team {round.offensiveTeam}
                           </p>
                         </div>
                         <div>
-                          <p className="text-umber-700 font-semibold">Bet</p>
-                          <p className="font-bold text-umber-900">
+                          <p className="text-umber-700 dark:text-gray-300 font-semibold">Bet</p>
+                          <p className="font-bold text-umber-900 dark:text-gray-100">
                             {round.betAmount} points
                           </p>
-                          <p className="text-xs text-umber-600">
+                          <p className="text-xs text-umber-600 dark:text-gray-400">
                             {round.withoutTrump ? 'Without Trump (2x)' : 'With Trump'}
                           </p>
                         </div>
                         <div>
-                          <p className="text-umber-700 font-semibold">
+                          <p className="text-umber-700 dark:text-gray-300 font-semibold">
                             Points Earned
                           </p>
-                          <p className="font-bold text-umber-900">
+                          <p className="font-bold text-umber-900 dark:text-gray-100">
                             {round.offensivePoints} / {round.betAmount}
                           </p>
-                          <p className="text-xs text-umber-600">
+                          <p className="text-xs text-umber-600 dark:text-gray-400">
                             Defensive: {round.defensivePoints}
                           </p>
                         </div>
                         <div>
-                          <p className="text-umber-700 font-semibold">
+                          <p className="text-umber-700 dark:text-gray-300 font-semibold">
                             Round Score
                           </p>
                           <p className="font-bold">
@@ -280,7 +280,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                               {round.roundScore.team2}
                             </span>
                           </p>
-                          <p className="text-xs text-umber-600">
+                          <p className="text-xs text-umber-600 dark:text-gray-400">
                             Total: {round.cumulativeScore.team1} - {round.cumulativeScore.team2}
                           </p>
                         </div>
@@ -289,9 +289,9 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
 
                     {/* Expandable Trick History */}
                     {isExpanded && hasTricks && (
-                      <div className="bg-parchment-50 border-t-2 border-parchment-400 p-4">
+                      <div className="bg-parchment-50 dark:bg-gray-800 border-t-2 border-parchment-400 dark:border-gray-600 dark:border-gray-500 p-4">
                         <div className="mb-3 flex items-center gap-2">
-                          <h5 className="text-sm font-bold text-umber-800">
+                          <h5 className="text-sm font-bold text-umber-800 dark:text-gray-200">
                             <span aria-hidden="true">🃏</span> Tricks Played
                           </h5>
                           {round.trump && (
@@ -309,10 +309,10 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                                 key={trickIndex}
                                 variant="bordered"
                                 size="sm"
-                                className="bg-parchment-100"
+                                className="bg-parchment-100 dark:bg-gray-700"
                               >
                                 <div className="flex items-center justify-between mb-2">
-                                  <span className="text-sm font-semibold text-umber-800">
+                                  <span className="text-sm font-semibold text-umber-800 dark:text-gray-200">
                                     Trick {trickIndex + 1}
                                   </span>
                                   <UIBadge variant="solid" color={winnerBadgeColor} size="sm">
@@ -338,7 +338,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
                                             disabled={true}
                                           />
                                         </div>
-                                        <p className="text-xs font-medium text-umber-700 truncate">
+                                        <p className="text-xs font-medium text-umber-700 dark:text-gray-300 truncate">
                                           {player?.name || 'Unknown'}
                                         </p>
                                       </div>
@@ -363,9 +363,9 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
             <UICard
               variant="bordered"
               size="lg"
-              className="bg-parchment-100 text-center"
+              className="bg-parchment-100 dark:bg-gray-700 text-center"
             >
-              <p className="text-umber-600 text-lg">
+              <p className="text-umber-600 dark:text-gray-400 text-lg">
                 No rounds completed yet. Start playing to see round history!
               </p>
             </UICard>

@@ -81,7 +81,7 @@ export function ConversationItem({
       onClick={onClick}
       className={`
         w-full p-4 flex items-start gap-3
-        hover:bg-gray-700/50
+        hover:bg-gray-700/50 dark:hover:bg-gray-700/50
         transition-colors text-left
         ${isSelected ? 'bg-blue-900/30 border-l-2 border-blue-500' : ''}
         ${className}

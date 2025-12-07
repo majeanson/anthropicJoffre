@@ -26,8 +26,8 @@ export function InlineBetStatus({
         text: `${bet.amount}${bet.withoutTrump ? '*' : ''}`,
         color:
           player.teamId === 1
-            ? 'bg-orange-500/80 text-white'
-            : 'bg-purple-500/80 text-white',
+            ? 'bg-orange-500/80 dark:bg-orange-600/80 text-white'
+            : 'bg-purple-500/80 dark:bg-purple-600/80 text-white',
       };
     }
 
@@ -35,7 +35,7 @@ export function InlineBetStatus({
       return {
         icon: '⊗',
         text: 'skip',
-        color: 'bg-gray-400 text-gray-700',
+        color: 'bg-gray-400 dark:bg-gray-600 text-gray-700 dark:text-gray-300',
       };
     }
 
@@ -45,15 +45,15 @@ export function InlineBetStatus({
         text: '?',
         color:
           player.teamId === 1
-            ? 'bg-orange-300 text-orange-900'
-            : 'bg-purple-300 text-purple-900',
+            ? 'bg-orange-300 dark:bg-orange-400 text-orange-900'
+            : 'bg-purple-300 dark:bg-purple-400 text-purple-900',
       };
     }
 
     return {
       icon: '○',
       text: '?',
-      color: 'bg-gray-200 text-gray-600',
+      color: 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400',
     };
   };
 
@@ -61,10 +61,10 @@ export function InlineBetStatus({
     <UICard
       variant="bordered"
       size="sm"
-      className="bg-parchment-100 border-umber-700"
+      className="bg-parchment-100 dark:bg-gray-800 border-umber-700 dark:border-gray-600"
       data-testid="inline-bet-status"
     >
-      <div className="text-umber-700 font-semibold text-sm mb-2 text-center">
+      <div className="text-umber-700 dark:text-gray-400 font-semibold text-sm mb-2 text-center">
         Bets
       </div>
       <div className="space-y-2">

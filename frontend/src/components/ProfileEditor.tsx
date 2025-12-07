@@ -121,11 +121,11 @@ export function ProfileEditor({
     <div className="space-y-6">
       {/* Avatar Selection */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
           Avatar
         </label>
         <div className="flex items-center gap-4">
-          <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center text-6xl">
+          <div className="w-20 h-20 bg-white dark:bg-gray-700 rounded-lg flex items-center justify-center text-6xl">
             {selectedAvatar?.emoji || '👤'}
           </div>
           <Button onClick={() => setShowAvatarSelector(!showAvatarSelector)} variant="primary">
@@ -151,7 +151,7 @@ export function ProfileEditor({
       <div>
         <label
           htmlFor="bio"
-          className="block text-sm font-semibold text-gray-700 mb-2"
+          className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2"
         >
           Bio
         </label>
@@ -159,12 +159,12 @@ export function ProfileEditor({
           id="bio"
           value={bio}
           onChange={(e) => setBio(e.target.value.slice(0, maxChars))}
-          className="w-full px-4 py-2 bg-white text-gray-900 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none resize-none"
+          className="w-full px-4 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:outline-none resize-none"
           rows={3}
           placeholder="Tell us about yourself..."
           maxLength={maxChars}
         />
-        <div className="text-right text-xs text-gray-500 mt-1">
+        <div className="text-right text-xs text-gray-500 dark:text-gray-400 mt-1">
           {charCount}/{maxChars} characters
         </div>
       </div>
@@ -182,7 +182,7 @@ export function ProfileEditor({
 
       {/* Favorite Team */}
       <div>
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
           Favorite Team Color
         </label>
         <div className="flex gap-3">
@@ -241,7 +241,7 @@ export function ProfileEditor({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 pt-4 border-t border-gray-200">
+      <div className="flex gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
         <Button onClick={handleSave} disabled={isSaving} variant="primary" className="flex-1">
           {isSaving ? 'Saving...' : 'Save Profile'}
         </Button>

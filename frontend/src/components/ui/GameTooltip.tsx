@@ -253,7 +253,7 @@ export function GameTooltipTrigger({
         ${
           isOpen
             ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white scale-110 ring-2 ring-white focus:ring-blue-400'
-            : 'bg-parchment-50 text-gray-700 hover:scale-105 focus:ring-blue-500'
+            : 'bg-parchment-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:scale-105 focus:ring-blue-500'
         }
         ${className}
       `}

@@ -85,21 +85,21 @@ export function ShareReplayPrompt({
       {/* Score Display */}
       <div className="flex justify-center gap-4 text-xl mb-6">
         <span
-          className={`font-bold ${winningTeam === 1 ? 'text-emerald-600' : 'text-gray-400'}`}
+          className={`font-bold ${winningTeam === 1 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}
         >
           Team 1: {finalScore.team1}
         </span>
         <span className="text-gray-500">-</span>
         <span
-          className={`font-bold ${winningTeam === 2 ? 'text-emerald-600' : 'text-gray-400'}`}
+          className={`font-bold ${winningTeam === 2 ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-400'}`}
         >
           Team 2: {finalScore.team2}
         </span>
       </div>
 
       {/* Share message */}
-      <UICard variant="bordered" size="sm" className="mb-6 bg-parchment-100">
-        <p className="text-umber-900 text-center text-sm">
+      <UICard variant="bordered" size="sm" className="mb-6 bg-parchment-100 dark:bg-gray-800/50">
+        <p className="text-umber-900 dark:text-gray-300 text-center text-sm">
           <span aria-hidden="true">🎮</span> Share this epic game with friends!
         </p>
       </UICard>
@@ -157,7 +157,7 @@ export function ShareReplayPrompt({
 
       {/* Game ID footer */}
       <div className="mt-4 text-center">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           Game ID: <span className="font-mono">{gameId}</span>
         </p>
       </div>

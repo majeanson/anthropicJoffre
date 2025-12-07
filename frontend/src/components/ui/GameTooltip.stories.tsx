@@ -74,7 +74,7 @@ function InteractiveWrapper({
         {children}
       </GameTooltip>
 
-      <p className="text-sm text-gray-500 mt-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
         Click the button above to toggle the tooltip
       </p>
     </div>

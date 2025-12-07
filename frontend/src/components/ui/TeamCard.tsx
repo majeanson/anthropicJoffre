@@ -58,22 +58,22 @@ const teamColors: Record<
   }
 > = {
   1: {
-    solid: 'bg-orange-500 text-white border-orange-600',
+    solid: 'bg-orange-500 dark:bg-orange-600 text-white border-orange-600 dark:border-orange-700',
     subtle:
-      'bg-orange-100/50 text-orange-900 border-orange-300',
+      'bg-orange-100/50 dark:bg-orange-900/30 text-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-700',
     outlined:
-      'bg-transparent text-orange-700 border-orange-400',
+      'bg-transparent text-orange-700 dark:text-orange-300 border-orange-400 dark:border-orange-600',
     selectedRing:
-      'ring-2 ring-orange-400 ring-offset-2',
+      'ring-2 ring-orange-400 dark:ring-orange-500 ring-offset-2 dark:ring-offset-gray-800',
   },
   2: {
-    solid: 'bg-purple-500 text-white border-purple-600',
+    solid: 'bg-purple-500 dark:bg-purple-600 text-white border-purple-600 dark:border-purple-700',
     subtle:
-      'bg-purple-100/50 text-purple-900 border-purple-300',
+      'bg-purple-100/50 dark:bg-purple-900/30 text-purple-900 dark:text-purple-100 border-purple-300 dark:border-purple-700',
     outlined:
-      'bg-transparent text-purple-700 border-purple-400',
+      'bg-transparent text-purple-700 dark:text-purple-300 border-purple-400 dark:border-purple-600',
     selectedRing:
-      'ring-2 ring-purple-400 ring-offset-2',
+      'ring-2 ring-purple-400 dark:ring-purple-500 ring-offset-2 dark:ring-offset-gray-800',
   },
 };
 
@@ -141,7 +141,7 @@ export interface TeamBadgeProps {
 
 export function TeamBadge({ teamId, children, className = '' }: TeamBadgeProps) {
   const bgColor =
-    teamId === 1 ? 'bg-orange-500' : 'bg-purple-500';
+    teamId === 1 ? 'bg-orange-500 dark:bg-orange-600' : 'bg-purple-500 dark:bg-purple-600';
 
   return (
     <span
@@ -171,7 +171,7 @@ export interface TeamIndicatorProps {
 
 export function TeamIndicator({ teamId, size = 'md', className = '' }: TeamIndicatorProps) {
   const bgColor =
-    teamId === 1 ? 'bg-orange-500' : 'bg-purple-500';
+    teamId === 1 ? 'bg-orange-500 dark:bg-orange-400' : 'bg-purple-500 dark:bg-purple-400';
 
   const sizeClass = {
     sm: 'w-2 h-2',

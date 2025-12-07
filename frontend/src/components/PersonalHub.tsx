@@ -141,7 +141,7 @@ export function PersonalHub({
       {loading ? (
         <div className="text-center py-8">
           <Spinner size="lg" color="primary" />
-          <p className="text-gray-600 mt-4">Loading your progress...</p>
+          <p className="text-gray-600 dark:text-gray-400 mt-4">Loading your progress...</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -170,18 +170,18 @@ export function PersonalHub({
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className={`font-bold text-lg ${levelColor}`}>{levelTitle}</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {formatXp(playerStats.total_xp)} XP Total
                         </span>
                       </div>
                       {/* XP Progress Bar */}
-                      <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                         <div
                           className={`h-full bg-gradient-to-r ${levelGradient} transition-all duration-500`}
                           style={{ width: `${progress.progressPercent}%` }}
                         />
                       </div>
-                      <div className="flex justify-between text-xs text-gray-500 mt-1">
+                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                         <span>
                           {progress.progressPercent}% to Level {progress.level + 1}
                         </span>
@@ -190,12 +190,12 @@ export function PersonalHub({
                     </div>
                   </div>
                   {/* Quick Stats Row */}
-                  <div className="mt-4 pt-3 border-t border-gray-200 grid grid-cols-3 gap-2 text-center">
+                  <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 grid grid-cols-3 gap-2 text-center">
                     <div>
                       <div className="text-lg font-bold text-blue-500">
                         {playerStats.games_played}
                       </div>
-                      <div className="text-[10px] text-gray-500 uppercase">
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">
                         Games
                       </div>
                     </div>
@@ -203,7 +203,7 @@ export function PersonalHub({
                       <div className="text-lg font-bold text-green-500">
                         {playerStats.win_percentage.toFixed(0)}%
                       </div>
-                      <div className="text-[10px] text-gray-500 uppercase">
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">
                         Win Rate
                       </div>
                     </div>
@@ -211,7 +211,7 @@ export function PersonalHub({
                       <div className="text-lg font-bold text-yellow-500">
                         {playerStats.elo_rating}
                       </div>
-                      <div className="text-[10px] text-gray-500 uppercase">
+                      <div className="text-[10px] text-gray-500 dark:text-gray-400 uppercase">
                         ELO
                       </div>
                     </div>
@@ -231,8 +231,8 @@ export function PersonalHub({
               <div className="flex items-center gap-3">
                 <span className="text-3xl">🔥</span>
                 <div>
-                  <h3 className="text-gray-900 font-bold text-lg">Login Streak</h3>
-                  <p className="text-gray-700 text-sm">
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg">Login Streak</h3>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm">
                     Keep your streak alive!
                   </p>
                 </div>
@@ -252,19 +252,19 @@ export function PersonalHub({
               <div className="flex items-center gap-3">
                 <span className="text-3xl">📋</span>
                 <div>
-                  <h3 className="text-gray-900 font-bold text-lg">Daily Quests</h3>
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg">Daily Quests</h3>
                   {questSummary ? (
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       {questSummary.completed}/{questSummary.total} completed
                       {questSummary.claimable > 0 && (
-                        <span className="text-green-600 ml-2">
+                        <span className="text-green-600 dark:text-green-400 ml-2">
                           ({questSummary.claimable} reward{questSummary.claimable > 1 ? 's' : ''}{' '}
                           available!)
                         </span>
                       )}
                     </p>
                   ) : (
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Complete quests for XP & coins
                     </p>
                   )}
@@ -292,20 +292,20 @@ export function PersonalHub({
               <div className="flex items-center gap-3">
                 <span className="text-3xl">📅</span>
                 <div>
-                  <h3 className="text-gray-900 font-bold text-lg">
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg">
                     30-Day Rewards
                   </h3>
                   {calendarSummary ? (
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Day {calendarSummary.currentDay} of 30
                       {calendarSummary.canClaimToday && (
-                        <span className="text-green-600 ml-2">
+                        <span className="text-green-600 dark:text-green-400 ml-2">
                           (Today's reward available!)
                         </span>
                       )}
                     </p>
                   ) : (
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Login daily for rewards
                     </p>
                   )}
@@ -333,8 +333,8 @@ export function PersonalHub({
               <div className="flex items-center gap-3">
                 <span className="text-3xl">🏆</span>
                 <div>
-                  <h3 className="text-gray-900 font-bold text-lg">Achievements</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg">Achievements</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">
                     Track your accomplishments
                   </p>
                 </div>
@@ -356,8 +356,8 @@ export function PersonalHub({
               <div className="flex items-center gap-3">
                 <span className="text-3xl">👤</span>
                 <div>
-                  <h3 className="text-gray-900 font-bold text-lg">My Profile</h3>
-                  <p className="text-gray-600 text-sm">View stats & customize</p>
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg">My Profile</h3>
+                  <p className="text-gray-600 dark:text-gray-400 text-sm">View stats & customize</p>
                 </div>
               </div>
               <Button variant="ghost" size="sm">
@@ -368,11 +368,11 @@ export function PersonalHub({
 
           {/* Call to Action */}
           {questSummary && questSummary.completed < questSummary.total && (
-            <div className="mt-6 pt-4 border-t border-gray-300">
+            <div className="mt-6 pt-4 border-t border-gray-300 dark:border-gray-700">
               <UICard variant="gradient" gradient="info" size="sm">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">💡</span>
-                  <p className="text-gray-900 text-sm">
+                  <p className="text-gray-900 dark:text-white text-sm">
                     <strong>Tip:</strong> Play a game to make progress on your daily quests!
                   </p>
                 </div>

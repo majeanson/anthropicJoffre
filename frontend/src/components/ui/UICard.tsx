@@ -98,7 +98,7 @@ export const UICard: React.FC<UICardProps> = ({
     : '';
 
   // Variant-specific styles - use parchment theme for consistent light backgrounds
-  // Note: Removed variants since UICard is primarily used in parchment-themed modals
+  // Note: Removed dark: variants since UICard is primarily used in parchment-themed modals
   const variantStyles = {
     default: 'bg-parchment-100 shadow-md',
     elevated: 'bg-parchment-100 shadow-lg',
@@ -110,7 +110,7 @@ export const UICard: React.FC<UICardProps> = ({
   const borderColor = variant === 'bordered' ? 'border-parchment-400' : '';
 
   // Gradient styles (only for gradient variant) - fully opaque backgrounds
-  // Note: Removed variants since UICard is primarily used in parchment-themed modals
+  // Note: Removed dark: variants since UICard is primarily used in parchment-themed modals
   const gradientStyles =
     variant === 'gradient'
       ? {

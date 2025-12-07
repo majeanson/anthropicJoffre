@@ -431,7 +431,7 @@ export function SocialPanel({
       </div>
 
       {/* Content Area */}
-      <div className="bg-parchment-200 rounded-lg p-4 border-2 border-parchment-400 min-h-[320px] max-h-[320px] overflow-y-auto">
+      <div className="bg-parchment-200 dark:bg-gray-700 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-600 min-h-[320px] max-h-[320px] overflow-y-auto">
         {/* Messages Tab */}
         {socialTab === 'messages' && (
           <div className="space-y-2">
@@ -505,10 +505,10 @@ export function SocialPanel({
                 return (
                   <div
                     key={player.socketId}
-                    className={`bg-parchment-100 rounded-lg p-3 border-2 transition-colors ${
+                    className={`bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 transition-colors ${
                       isLfg
-                        ? 'border-purple-400 bg-gradient-to-r from-purple-50 to-parchment-100'
-                        : 'border-parchment-400 hover:border-green-400'
+                        ? 'border-purple-400 dark:border-purple-500 bg-gradient-to-r from-purple-50 to-parchment-100 dark:from-purple-900/20 dark:to-gray-600'
+                        : 'border-parchment-400 dark:border-gray-500 hover:border-green-400 dark:hover:border-green-500'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -601,7 +601,7 @@ export function SocialPanel({
               return humanPlayers.map((player) => (
                 <div
                   key={player.name}
-                  className="bg-parchment-100 rounded-lg p-3 border-2 border-parchment-400 hover:border-blue-400 transition-colors"
+                  className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border-2 border-parchment-400 dark:border-gray-500 hover:border-blue-400 dark:hover:border-blue-500 transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -650,7 +650,7 @@ export function SocialPanel({
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                       placeholder="Search by name..."
-                      className="flex-1 px-3 py-2 text-sm rounded-lg border-2 border-parchment-400 bg-parchment-50 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg border-2 border-parchment-400 dark:border-gray-500 bg-parchment-50 dark:bg-gray-700 text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     />
                     <Button
                       onClick={handleSearch}
@@ -679,7 +679,7 @@ export function SocialPanel({
                         return (
                           <div
                             key={player.player_name}
-                            className="bg-purple-100 rounded-lg p-2 border border-purple-300"
+                            className="bg-purple-100 dark:bg-purple-900/40 rounded-lg p-2 border border-purple-300 dark:border-purple-600"
                           >
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex-1 min-w-0">
@@ -740,7 +740,7 @@ export function SocialPanel({
                       {pendingRequests.map((request) => (
                         <div
                           key={request.id}
-                          className="bg-blue-100 rounded-lg p-3 border-2 border-blue-300"
+                          className="bg-blue-100 dark:bg-blue-900/40 rounded-lg p-3 border-2 border-blue-300 dark:border-blue-600"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div>
@@ -784,7 +784,7 @@ export function SocialPanel({
                       {sentRequests.map((request) => (
                         <div
                           key={request.id}
-                          className="bg-yellow-100 rounded-lg p-3 border-2 border-yellow-300"
+                          className="bg-yellow-100 dark:bg-yellow-900/40 rounded-lg p-3 border-2 border-yellow-300 dark:border-yellow-600"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div>
@@ -821,7 +821,7 @@ export function SocialPanel({
                         return (
                           <div
                             key={friend.player_name}
-                            className="bg-parchment-100 rounded-lg p-2 border border-parchment-400 hover:border-purple-400 transition-colors"
+                            className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-2 border border-parchment-400 dark:border-gray-500 hover:border-purple-400 dark:hover:border-purple-500 transition-colors"
                           >
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -898,7 +898,7 @@ export function SocialPanel({
                       {friendSuggestions.slice(0, 3).map((suggestion) => (
                         <div
                           key={suggestion}
-                          className="bg-parchment-100 rounded-lg p-2 border border-parchment-400 hover:border-emerald-400 transition-colors"
+                          className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-2 border border-parchment-400 dark:border-gray-500 hover:border-emerald-400 dark:hover:border-emerald-500 transition-colors"
                         >
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex-1 min-w-0">
@@ -908,7 +908,7 @@ export function SocialPanel({
                                 variant="plain"
                                 className="font-semibold text-sm truncate text-left"
                               />
-                              <p className="text-xs text-emerald-600">
+                              <p className="text-xs text-emerald-600 dark:text-emerald-400">
                                 Played together recently
                               </p>
                             </div>
@@ -979,14 +979,14 @@ export function SocialPanel({
             ) : (
               <div className="space-y-4">
                 {/* Profile Header */}
-                <div className="bg-parchment-100 rounded-lg p-4 border-2 border-parchment-400">
+                <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-4 border-2 border-parchment-400 dark:border-gray-500">
                   <div className="text-center">
                     <div className="text-4xl mb-2">👤</div>
                     <h3 className="text-lg font-bold text-[var(--color-text-primary)]">
                       {user.username}
                     </h3>
                     {user.is_verified && (
-                      <p className="text-xs text-blue-600 mt-1 flex items-center justify-center gap-1">
+                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center justify-center gap-1">
                         <span>✓</span>
                         <span>Verified Account</span>
                       </p>
@@ -1027,7 +1027,7 @@ export function SocialPanel({
                 </div>
 
                 {/* Profile Info */}
-                <div className="bg-parchment-100 rounded-lg p-3 border border-parchment-400">
+                <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border border-parchment-400 dark:border-gray-500">
                   <h4 className="text-xs font-bold text-[var(--color-text-secondary)] mb-2 uppercase">
                     Account Info
                   </h4>
@@ -1048,7 +1048,7 @@ export function SocialPanel({
                 </div>
 
                 {/* Profile Editor */}
-                <div className="bg-parchment-100 rounded-lg p-3 border border-parchment-400">
+                <div className="bg-parchment-100 dark:bg-gray-600 rounded-lg p-3 border border-parchment-400 dark:border-gray-500">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="text-xs font-bold text-[var(--color-text-secondary)] uppercase">
                       Profile
@@ -1133,7 +1133,7 @@ export function SocialPanel({
                           value={profileBio}
                           onChange={(e) => setProfileBio(e.target.value.slice(0, 200))}
                           placeholder="Tell others about yourself..."
-                          className="w-full px-2 py-1.5 text-sm rounded border border-parchment-400 bg-white text-[var(--color-text-primary)] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1.5 text-sm rounded border border-parchment-400 dark:border-gray-500 bg-white dark:bg-gray-700 text-[var(--color-text-primary)] focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           rows={3}
                           maxLength={200}
                         />

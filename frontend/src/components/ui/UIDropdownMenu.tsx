@@ -217,7 +217,7 @@ export function UIDropdownMenu({
                       disabled={item.disabled}
                       className={`w-full justify-start px-4 py-2 rounded-none ${
                         item.danger
-                          ? '!bg-transparent hover:!bg-red-50'
+                          ? '!bg-transparent hover:!bg-red-50 dark:hover:!bg-red-900/20'
                           : ''
                       }`}
                       role="menuitem"
