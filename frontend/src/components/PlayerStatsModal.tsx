@@ -307,7 +307,7 @@ export function PlayerStatsModal({
           </div>
         </div>
       }
-      theme="parchment"
+      theme="minimal"
       size="xl"
     >
       <div className="space-y-6">

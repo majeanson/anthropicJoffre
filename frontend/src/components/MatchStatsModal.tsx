@@ -138,7 +138,7 @@ export function MatchStatsModal({
       title="Match Details"
       subtitle={`Game ID: ${gameId}`}
       icon="📊"
-      theme="parchment"
+      theme="minimal"
       size="xl"
     >
       <div className="space-y-6">

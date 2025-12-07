@@ -76,7 +76,7 @@ export function AchievementsPanel({ isOpen, onClose, socket, playerName }: Achie
       title="Achievements"
       subtitle={`${unlockedCount}/${totalCount} unlocked (${completionPercent}%) • ${totalPoints} points`}
       icon="🏆"
-      theme="parchment"
+      theme="minimal"
       size="xl"
     >
       {/* Progress bar */}

@@ -29,7 +29,7 @@ export function KeyboardShortcutsModal({
         title="Keyboard Shortcuts"
         subtitle="Game Boy-style navigation"
         icon={<span>⌨️</span>}
-        theme="parchment"
+        theme="minimal"
         size="xl"
         testId="keyboard-shortcuts-modal"
       >

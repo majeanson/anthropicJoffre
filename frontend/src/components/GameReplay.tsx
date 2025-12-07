@@ -257,7 +257,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         onClose={onClose}
         size="sm"
         showCloseButton={false}
-        theme="parchment"
+        theme="minimal"
         testId="loading-modal"
       >
         <div className="text-center py-4">
@@ -339,7 +339,7 @@ export function GameReplay({ gameId, socket, onClose }: GameReplayProps) {
         onClose={onClose}
         title="No Replay Data"
         icon="⚠️"
-        theme="parchment"
+        theme="minimal"
         size="sm"
         testId="no-data-modal"
       >

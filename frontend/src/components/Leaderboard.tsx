@@ -51,7 +51,7 @@ export function Leaderboard({ gameState, isOpen, onClose }: LeaderboardProps) {
       title="Leaderboard"
       icon="🏆"
       subtitle={`Round ${gameState.roundNumber} Stats & History`}
-      theme="parchment"
+      theme="minimal"
       size="xl"
       testId="leaderboard"
     >
