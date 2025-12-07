@@ -97,30 +97,28 @@ export const UICard: React.FC<UICardProps> = ({
       }[padding]
     : '';
 
-  // Variant-specific styles - use parchment theme for consistent light backgrounds
-  // Note: Removed dark: variants since UICard is primarily used in parchment-themed modals
+  // Variant-specific styles - use skin-aware CSS variables for all themes
   const variantStyles = {
-    default: 'bg-parchment-100 shadow-md',
-    elevated: 'bg-parchment-100 shadow-lg',
-    bordered: 'bg-parchment-100 border-2 shadow-sm',
+    default: 'bg-skin-secondary shadow-md',
+    elevated: 'bg-skin-secondary shadow-lg',
+    bordered: 'bg-skin-secondary border-2 shadow-sm',
     gradient: '',
   }[variant];
 
   // Border color for bordered variant
-  const borderColor = variant === 'bordered' ? 'border-parchment-400' : '';
+  const borderColor = variant === 'bordered' ? 'border-skin-default' : '';
 
-  // Gradient styles (only for gradient variant) - fully opaque backgrounds
-  // Note: Removed dark: variants since UICard is primarily used in parchment-themed modals
+  // Gradient styles (only for gradient variant) - skin-aware backgrounds
   const gradientStyles =
     variant === 'gradient'
       ? {
-          team1: 'bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200',
-          team2: 'bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200',
-          success: 'bg-gradient-to-br from-green-50 to-green-100 border border-green-200',
-          warning: 'bg-gradient-to-br from-yellow-50 to-yellow-100 border border-yellow-200',
-          error: 'bg-gradient-to-br from-red-50 to-red-100 border border-red-200',
-          info: 'bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200',
-          primary: 'bg-gradient-to-br from-indigo-50 to-indigo-100 border border-indigo-200',
+          team1: 'bg-team1-10 border border-team1',
+          team2: 'bg-team2-10 border border-team2',
+          success: 'bg-skin-success border border-skin-success',
+          warning: 'bg-skin-warning border border-skin-warning',
+          error: 'bg-skin-error border border-skin-error',
+          info: 'bg-skin-info border border-skin-info',
+          primary: 'bg-skin-tertiary border border-skin-accent',
         }[gradient]
       : '';
 

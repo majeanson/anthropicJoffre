@@ -157,7 +157,7 @@ export function ScoringPhase({
       )}
 
       <div className="flex-1 flex items-center justify-center p-4 md:p-6">
-        <UICard variant="elevated" size="lg" className="bg-parchment-100 max-w-4xl w-full">
+        <UICard variant="elevated" size="lg" className="max-w-4xl w-full">
           <h2
             className="text-2xl md:text-3xl font-bold mb-4 md:mb-6 text-skin-primary text-center"
             data-testid="scoring-phase-heading"

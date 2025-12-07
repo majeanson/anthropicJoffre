@@ -223,13 +223,13 @@ export function MatchStatsModal({
                     <div className="text-3xl font-bold text-purple-600">
                       {matchData.team1_score ?? 0} - {matchData.team2_score ?? 0}
                     </div>
-                    <div className="text-sm text-umber-700 mt-1">
+                    <div className="text-sm text-skin-muted mt-1">
                       {matchData.winning_team ? 'Final Score' : 'Current Score'}
                     </div>
                   </UICard>
                   <UICard variant="bordered" size="md" className="text-center">
                     <div className="text-3xl font-bold text-blue-600">{matchData.rounds ?? 0}</div>
-                    <div className="text-sm text-umber-700 mt-1">Rounds Played</div>
+                    <div className="text-sm text-skin-muted mt-1">Rounds Played</div>
                   </UICard>
                   <UICard variant="bordered" size="md" className="text-center">
                     <div className="text-3xl font-bold text-green-600">
@@ -237,13 +237,13 @@ export function MatchStatsModal({
                         ? formatDuration(matchData.game_duration_seconds)
                         : 'N/A'}
                     </div>
-                    <div className="text-sm text-umber-700 mt-1">Duration</div>
+                    <div className="text-sm text-skin-muted mt-1">Duration</div>
                   </UICard>
                   <UICard variant="bordered" size="md" className="text-center">
                     <div className="text-3xl font-bold text-amber-600">
                       {matchData.trump_suit || 'N/A'}
                     </div>
-                    <div className="text-sm text-umber-700 mt-1">Trump Suit</div>
+                    <div className="text-sm text-skin-muted mt-1">Trump Suit</div>
                   </UICard>
                 </div>
 
@@ -272,7 +272,7 @@ export function MatchStatsModal({
                         {getTeamPlayers(teamId as 1 | 2).length > 0 ? (
                           getTeamPlayers(teamId as 1 | 2).map((player) => (
                             <UICard key={player} variant="default" size="sm">
-                              <div className="font-semibold text-umber-900">{player}</div>
+                              <div className="font-semibold text-skin-primary">{player}</div>
                             </UICard>
                           ))
                         ) : (
@@ -301,19 +301,19 @@ export function MatchStatsModal({
                 ) : (
                   matchData.round_history.map((round, idx) => (
                     <UICard key={idx} variant="bordered" size="lg">
-                      <h4 className="text-xl font-bold text-umber-900 mb-4">
+                      <h4 className="text-xl font-bold text-skin-primary mb-4">
                         Round {round.roundNumber || idx + 1}
                       </h4>
 
                       {/* Bets */}
                       <div className="mb-4">
-                        <h5 className="font-semibold text-umber-800 mb-2">Bets:</h5>
+                        <h5 className="font-semibold text-skin-primary mb-2">Bets:</h5>
                         {round.bets && Object.keys(round.bets).length > 0 ? (
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {Object.entries(round.bets).map(([player, bet]) => (
-                              <div key={player} className="bg-parchment-100 rounded p-2 text-sm">
-                                <div className="font-semibold text-umber-900">{player}</div>
-                                <div className="text-umber-700">
+                              <div key={player} className="bg-skin-tertiary rounded p-2 text-sm">
+                                <div className="font-semibold text-skin-primary">{player}</div>
+                                <div className="text-skin-muted">
                                   {bet?.amount ?? '?'} pts{' '}
                                   {bet?.withoutTrump && <span aria-hidden="true">🚫♠️</span>}
                                 </div>
@@ -330,7 +330,7 @@ export function MatchStatsModal({
                       {/* Tricks Summary */}
                       {round.tricks && round.tricks.length > 0 && (
                         <div className="mb-4">
-                          <h5 className="font-semibold text-umber-800 mb-2">
+                          <h5 className="font-semibold text-skin-primary mb-2">
                             Tricks ({round.tricks.length}/8):
                           </h5>
                           <div className="flex flex-wrap gap-1">
@@ -349,7 +349,7 @@ export function MatchStatsModal({
 
                       {/* Results */}
                       <div>
-                        <h5 className="font-semibold text-umber-800 mb-2">Results:</h5>
+                        <h5 className="font-semibold text-skin-primary mb-2">Results:</h5>
                         {round.pointsWon && Object.keys(round.pointsWon).length > 0 ? (
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {Object.entries(round.pointsWon).map(([player, points]) => {
@@ -421,23 +421,23 @@ export function MatchStatsModal({
                             <div className="text-2xl font-bold text-skin-accent">
                               {stats.totalPoints}
                             </div>
-                            <div className="text-xs text-umber-700 mt-1">Total Points</div>
+                            <div className="text-xs text-skin-muted mt-1">Total Points</div>
                           </div>
-                          <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
+                          <div className="bg-skin-tertiary rounded-lg p-3 text-center border border-skin-default">
                             <div className="text-2xl font-bold text-blue-600">
                               {stats.roundsWon}
                             </div>
-                            <div className="text-xs text-umber-700 mt-1">Rounds Won</div>
+                            <div className="text-xs text-skin-muted mt-1">Rounds Won</div>
                           </div>
-                          <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
+                          <div className="bg-skin-tertiary rounded-lg p-3 text-center border border-skin-default">
                             <div className="text-2xl font-bold text-green-600">{stats.betsWon}</div>
-                            <div className="text-xs text-umber-700 mt-1">Bets Won</div>
+                            <div className="text-xs text-skin-muted mt-1">Bets Won</div>
                           </div>
-                          <div className="bg-parchment-50 rounded-lg p-3 text-center border border-parchment-400">
+                          <div className="bg-skin-tertiary rounded-lg p-3 text-center border border-skin-default">
                             <div className="text-2xl font-bold text-amber-600">
                               {stats.tricksWon}
                             </div>
-                            <div className="text-xs text-umber-700 mt-1">Tricks Won</div>
+                            <div className="text-xs text-skin-muted mt-1">Tricks Won</div>
                           </div>
                         </div>
                       </div>
