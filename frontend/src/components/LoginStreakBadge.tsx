@@ -77,9 +77,9 @@ export function LoginStreakBadge({ socket, playerName, onClick }: LoginStreakBad
   if (!streak) return null;
 
   const getStreakColor = (currentStreak: number) => {
-    if (currentStreak === 0) return 'from-gray-400 to-gray-500';
+    if (currentStreak === 0) return 'from-skin-muted to-skin-secondary';
     if (currentStreak < 3) return 'from-blue-500 to-indigo-600';
-    if (currentStreak < 7) return 'from-gray-500 to-gray-700';
+    if (currentStreak < 7) return 'from-skin-accent to-team2';
     if (currentStreak < 14) return 'from-purple-500 to-indigo-600';
     return 'from-amber-500 to-orange-600'; // 14+ days = legendary
   };
@@ -150,28 +150,28 @@ export function LoginStreakBadge({ socket, playerName, onClick }: LoginStreakBad
           <div className="absolute top-full mt-2 left-0 z-[10500] min-w-[280px]">
             <UICard variant="elevated" size="sm">
               <div className="space-y-2">
-                <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                  <span className="text-gray-300 text-sm">Current Streak</span>
-                  <span className="text-white font-bold">{streak.currentStreak} days</span>
+                <div className="flex justify-between items-center border-b border-skin-default pb-2">
+                  <span className="text-skin-secondary text-sm">Current Streak</span>
+                  <span className="text-skin-primary font-bold">{streak.currentStreak} days</span>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                  <span className="text-gray-300 text-sm">Longest Streak</span>
+                <div className="flex justify-between items-center border-b border-skin-default pb-2">
+                  <span className="text-skin-secondary text-sm">Longest Streak</span>
                   <span className="text-yellow-400 font-bold">
                     {streak.longestStreak} days <span aria-hidden="true">🏆</span>
                   </span>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-600 pb-2">
-                  <span className="text-gray-300 text-sm">Total Logins</span>
-                  <span className="text-white font-bold">{streak.totalLogins}</span>
+                <div className="flex justify-between items-center border-b border-skin-default pb-2">
+                  <span className="text-skin-secondary text-sm">Total Logins</span>
+                  <span className="text-skin-primary font-bold">{streak.totalLogins}</span>
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-300 text-sm">Streak Freeze</span>
+                  <span className="text-skin-secondary text-sm">Streak Freeze</span>
                   <span
                     className={`font-bold ${
-                      streak.streakFreezeAvailable ? 'text-blue-400' : 'text-gray-500'
+                      streak.streakFreezeAvailable ? 'text-skin-info' : 'text-skin-muted'
                     }`}
                   >
                     {streak.streakFreezeAvailable ? '✓ Available' : '✗ Used'}

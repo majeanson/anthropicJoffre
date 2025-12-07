@@ -49,7 +49,7 @@ const RESOLUTION_TIMING_LABELS: Record<string, { label: string; icon: string; co
   trick: { label: 'After Trick', icon: '⚡', color: 'text-blue-400' },
   round: { label: 'End of Round', icon: '🔄', color: 'text-purple-400' },
   game: { label: 'End of Game', icon: '🏁', color: 'text-orange-400' },
-  manual: { label: 'Manual', icon: '👆', color: 'text-gray-400' },
+  manual: { label: 'Manual', icon: '👆', color: 'text-skin-muted' },
 };
 
 // Helper to format team prediction relative to viewer
@@ -483,7 +483,7 @@ export default function SideBetsPanel({
                         <button
                           onClick={() => handleAcceptBet(bet.id)}
                           disabled={balance < bet.amount}
-                          className="w-full py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
+                          className="w-full py-2 bg-green-600 hover:bg-green-500 disabled:bg-skin-tertiary disabled:cursor-not-allowed text-white text-sm rounded transition-colors"
                         >
                           {balance < bet.amount ? 'Not enough coins' : 'Accept Bet (opposite side)'}
                         </button>
@@ -599,7 +599,7 @@ export default function SideBetsPanel({
                               </button>
                               <button
                                 onClick={() => handleDisputeBet(bet.id)}
-                                className="flex-1 py-2 bg-gray-600 hover:bg-gray-500 text-white text-xs rounded transition-colors"
+                                className="flex-1 py-2 bg-skin-tertiary hover:bg-skin-secondary text-skin-primary text-xs rounded transition-colors"
                               >
                                 Dispute
                               </button>
@@ -688,7 +688,7 @@ export default function SideBetsPanel({
                             : isLoser
                               ? 'border-red-500/50'
                               : bet.status === 'disputed'
-                                ? 'border-gray-500/50'
+                                ? 'border-skin-default'
                                 : bet.status === 'cancelled'
                                   ? 'border-yellow-500/30'
                                   : 'border-[var(--color-border-default)]'
@@ -709,7 +709,7 @@ export default function SideBetsPanel({
                           <span
                             className={`text-xs font-medium ${
                               bet.status === 'disputed'
-                                ? 'text-gray-400'
+                                ? 'text-skin-muted'
                                 : bet.status === 'cancelled'
                                   ? 'text-yellow-400'
                                   : isWinner
@@ -818,7 +818,7 @@ export default function SideBetsPanel({
                 </button>
                 <button
                   onClick={handlePromptDispute}
-                  className="flex-1 py-3 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg transition-colors"
+                  className="flex-1 py-3 bg-skin-tertiary hover:bg-skin-secondary text-skin-primary font-medium rounded-lg transition-colors"
                 >
                   Dispute
                 </button>

@@ -108,9 +108,9 @@ export function KeyboardShortcutsModal({
           />
 
           {/* Tips */}
-          <div className="mt-6 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
-            <h3 className="text-lg font-bold text-blue-400 mb-2">💡 Pro Tips</h3>
-            <ul className="text-gray-300 text-sm space-y-1">
+          <div className="mt-6 p-4 bg-skin-info/20 border border-skin-info rounded-lg">
+            <h3 className="text-lg font-bold text-skin-info mb-2">💡 Pro Tips</h3>
+            <ul className="text-skin-secondary text-sm space-y-1">
               <li>• All keyboard shortcuts work without touching the mouse!</li>
               <li>• Use Tab to navigate between buttons and inputs</li>
               <li>• Press Escape to quickly close any modal or panel</li>
@@ -147,14 +147,14 @@ function ShortcutSection({ title, icon, shortcuts, active }: ShortcutSectionProp
   return (
     <div
       className={`rounded-lg p-4 border-2 transition-colors ${
-        active ? 'bg-blue-900/30 border-blue-500' : 'bg-gray-800/50 border-gray-700'
+        active ? 'bg-skin-info/30 border-skin-info' : 'bg-skin-tertiary border-skin-default'
       }`}
     >
       <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
         <span>{icon}</span>
-        <span className={active ? 'text-blue-400' : 'text-gray-200'}>{title}</span>
+        <span className={active ? 'text-skin-info' : 'text-skin-primary'}>{title}</span>
         {active && (
-          <span className="ml-2 px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+          <span className="ml-2 px-2 py-0.5 bg-skin-info text-white text-xs rounded-full">
             Current Phase
           </span>
         )}
@@ -165,19 +165,19 @@ function ShortcutSection({ title, icon, shortcuts, active }: ShortcutSectionProp
             <div className="flex gap-1.5 flex-wrap items-center">
               {shortcut.keys.map((key, i) => (
                 <div key={i} className="flex items-center gap-1">
-                  <kbd className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-xs font-mono text-gray-200 shadow-sm min-w-[2rem] text-center">
+                  <kbd className="px-2 py-1 bg-skin-tertiary border border-skin-default rounded text-xs font-mono text-skin-primary shadow-sm min-w-[2rem] text-center">
                     {key}
                   </kbd>
                   {i < shortcut.keys.length - 1 && shortcut.keys.length > 1 && (
-                    <span className="text-gray-500 text-xs">or</span>
+                    <span className="text-skin-muted text-xs">or</span>
                   )}
                 </div>
               ))}
             </div>
             <div className="flex-1 text-right">
-              <span className="text-sm text-gray-300">{shortcut.description}</span>
+              <span className="text-sm text-skin-secondary">{shortcut.description}</span>
               {shortcut.condition && (
-                <span className="ml-2 text-xs text-gray-500 italic">({shortcut.condition})</span>
+                <span className="ml-2 text-xs text-skin-muted italic">({shortcut.condition})</span>
               )}
             </div>
           </div>

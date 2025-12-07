@@ -157,24 +157,24 @@ export function RewardsCalendar({ socket, playerName, isOpen, onClose }: Rewards
 
     if (reward.isSpecial) {
       if (status === 'claimed') {
-        return `${baseClasses} bg-gradient-to-br from-gray-600 to-gray-800 border-purple-500 opacity-60`;
+        return `${baseClasses} bg-skin-tertiary border-team2 opacity-60`;
       }
       if (status === 'available') {
-        return `${baseClasses} bg-gradient-to-br from-gray-500 to-gray-700 border-purple-400 cursor-pointer hover:scale-105 shadow-lg shadow-purple-500/50 animate-pulse`;
+        return `${baseClasses} bg-team2/30 border-team2 cursor-pointer hover:scale-105 shadow-lg shadow-team2/50 animate-pulse`;
       }
-      return `${baseClasses} bg-gradient-to-br from-gray-600 to-gray-800 border-purple-700/50`;
+      return `${baseClasses} bg-skin-tertiary border-team2/50`;
     }
 
     switch (status) {
       case 'claimed':
-        return `${baseClasses} bg-gray-700 border-gray-600 opacity-60`;
+        return `${baseClasses} bg-skin-tertiary border-skin-default opacity-60`;
       case 'available':
-        return `${baseClasses} bg-gradient-to-br from-purple-600 to-indigo-700 border-blue-400 cursor-pointer hover:scale-105 shadow-lg`;
+        return `${baseClasses} bg-gradient-to-br from-team2 to-skin-accent border-skin-info cursor-pointer hover:scale-105 shadow-lg`;
       case 'missed':
-        return `${baseClasses} bg-gray-800 border-gray-600 opacity-50`;
+        return `${baseClasses} bg-skin-tertiary border-skin-default opacity-50`;
       case 'locked':
       default:
-        return `${baseClasses} bg-gray-900 border-gray-700 opacity-40`;
+        return `${baseClasses} bg-skin-primary border-skin-default opacity-40`;
     }
   };
 
@@ -212,7 +212,7 @@ export function RewardsCalendar({ socket, playerName, isOpen, onClose }: Rewards
       {loading ? (
         <div className="text-center py-12">
           <Spinner size="lg" color="primary" />
-          <p className="text-gray-400 mt-4">Loading calendar...</p>
+          <p className="text-skin-muted mt-4">Loading calendar...</p>
         </div>
       ) : (
         <>
@@ -220,20 +220,20 @@ export function RewardsCalendar({ socket, playerName, isOpen, onClose }: Rewards
           <UICard variant="default" size="sm" className="mb-6">
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gradient-to-br from-purple-600 to-indigo-700 border-2 border-blue-400 rounded"></div>
-                <span className="text-gray-300 text-sm">Available to claim</span>
+                <div className="w-4 h-4 bg-gradient-to-br from-team2 to-skin-accent border-2 border-skin-info rounded"></div>
+                <span className="text-skin-secondary text-sm">Available to claim</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-700 border-2 border-gray-600 rounded opacity-60"></div>
-                <span className="text-gray-300 text-sm">Claimed</span>
+                <div className="w-4 h-4 bg-skin-tertiary border-2 border-skin-default rounded opacity-60"></div>
+                <span className="text-skin-secondary text-sm">Claimed</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gradient-to-br from-gray-500 to-gray-700 border-2 border-purple-400 rounded"></div>
-                <span className="text-gray-300 text-sm">Special Milestone</span>
+                <div className="w-4 h-4 bg-team2/30 border-2 border-team2 rounded"></div>
+                <span className="text-skin-secondary text-sm">Special Milestone</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-900 border-2 border-gray-700 rounded opacity-40"></div>
-                <span className="text-gray-300 text-sm">Locked</span>
+                <div className="w-4 h-4 bg-skin-primary border-2 border-skin-default rounded opacity-40"></div>
+                <span className="text-skin-secondary text-sm">Locked</span>
               </div>
             </div>
           </UICard>
@@ -253,13 +253,13 @@ export function RewardsCalendar({ socket, playerName, isOpen, onClose }: Rewards
                   className={getDayClasses(reward)}
                 >
                   {/* Day Number */}
-                  <div className="text-xs text-gray-300 font-bold mb-1">Day {reward.dayNumber}</div>
+                  <div className="text-xs text-skin-secondary font-bold mb-1">Day {reward.dayNumber}</div>
 
                   {/* Icon */}
                   <div className="text-2xl mb-1">{reward.icon}</div>
 
                   {/* Description */}
-                  <div className="text-xs text-gray-300 text-center leading-tight">
+                  <div className="text-xs text-skin-secondary text-center leading-tight">
                     {reward.description}
                   </div>
 
@@ -303,7 +303,7 @@ export function RewardsCalendar({ socket, playerName, isOpen, onClose }: Rewards
       )}
 
       {/* Footer Note */}
-      <p className="text-gray-400 text-sm text-center mt-6 pt-4 border-t border-gray-600">
+      <p className="text-skin-muted text-sm text-center mt-6 pt-4 border-t border-skin-default">
         Calendar resets every 30 days • Login daily to maximize rewards
       </p>
     </Modal>

@@ -359,10 +359,10 @@ export function PlayerStatsModal({
             <span className="text-6xl" aria-hidden="true">
               ❌
             </span>
-            <p className="mt-4 text-gray-700 font-bold text-lg">
+            <p className="mt-4 text-skin-primary font-bold text-lg">
               No statistics found for {playerName}
             </p>
-            <p className="text-gray-600">Play some games to start building your stats!</p>
+            <p className="text-skin-secondary">Play some games to start building your stats!</p>
           </div>
         )}
 
@@ -433,30 +433,30 @@ export function PlayerStatsModal({
 
                 {/* Trick Performance */}
                 <div className="bg-gradient-to-r from-indigo-50 to-cyan-50 rounded-lg p-6 border-2 border-indigo-200">
-                  <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+                  <h3 className="text-xl font-bold mb-4 text-skin-primary flex items-center gap-2">
                     <span aria-hidden="true">🎯</span> Trick Performance
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <p className="text-gray-600 text-sm">Total Tricks</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Total Tricks</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.total_tricks_won || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Avg Per Round</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Avg Per Round</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.avg_tricks_per_round || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Best Round</p>
+                      <p className="text-skin-muted text-sm">Best Round</p>
                       <p className="text-2xl font-bold text-green-700">
                         {stats.most_tricks_in_round || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Zero Tricks</p>
+                      <p className="text-skin-muted text-sm">Zero Tricks</p>
                       <p className="text-2xl font-bold text-red-700">
                         {stats.zero_trick_rounds || 0}
                       </p>
@@ -466,22 +466,22 @@ export function PlayerStatsModal({
 
                 {/* Betting Performance */}
                 <div className="bg-skin-tertiary rounded-lg p-6 border-2 border-skin-default">
-                  <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+                  <h3 className="text-xl font-bold mb-4 text-skin-primary flex items-center gap-2">
                     <span aria-hidden="true">💰</span> Betting Performance
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <p className="text-gray-600 text-sm">Bets Placed</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Bets Placed</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.total_bets_placed || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Bets Made</p>
+                      <p className="text-skin-muted text-sm">Bets Made</p>
                       <p className="text-2xl font-bold text-green-700">{stats.bets_made || 0}</p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Bets Failed</p>
+                      <p className="text-skin-muted text-sm">Bets Failed</p>
                       <p className="text-2xl font-bold text-red-700">{stats.bets_failed || 0}</p>
                     </div>
                     <div>
@@ -491,14 +491,14 @@ export function PlayerStatsModal({
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Avg Bet</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Avg Bet</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.avg_bet_amount || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Highest Bet</p>
-                      <p className="text-2xl font-bold text-gray-900">{stats.highest_bet || 0}</p>
+                      <p className="text-skin-muted text-sm">Highest Bet</p>
+                      <p className="text-2xl font-bold text-skin-primary">{stats.highest_bet || 0}</p>
                     </div>
                     <div>
                       <p className="text-skin-secondary text-sm">Without Trump</p>
@@ -511,24 +511,24 @@ export function PlayerStatsModal({
 
                 {/* Points Performance */}
                 <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-lg p-6 border-2 border-emerald-200">
-                  <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+                  <h3 className="text-xl font-bold mb-4 text-skin-primary flex items-center gap-2">
                     <span aria-hidden="true">⭐</span> Points Performance
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
-                      <p className="text-gray-600 text-sm">Total Points</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Total Points</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.total_points_earned || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Avg Per Round</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Avg Per Round</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.avg_points_per_round || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Best Round</p>
+                      <p className="text-skin-muted text-sm">Best Round</p>
                       <p className="text-2xl font-bold text-green-700">
                         {stats.highest_points_in_round || 0}
                       </p>
@@ -585,30 +585,30 @@ export function PlayerStatsModal({
 
                 {/* Streaks */}
                 <div className="bg-skin-tertiary rounded-lg p-6 border-2 border-skin-default">
-                  <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+                  <h3 className="text-xl font-bold mb-4 text-skin-primary flex items-center gap-2">
                     <span aria-hidden="true">🔥</span> Streaks
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <p className="text-gray-600 text-sm">Current Win</p>
+                      <p className="text-skin-muted text-sm">Current Win</p>
                       <p className="text-2xl font-bold text-green-700">
                         {stats.current_win_streak || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Best Win</p>
+                      <p className="text-skin-muted text-sm">Best Win</p>
                       <p className="text-2xl font-bold text-green-700">
                         {stats.best_win_streak || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Current Loss</p>
+                      <p className="text-skin-muted text-sm">Current Loss</p>
                       <p className="text-2xl font-bold text-red-700">
                         {stats.current_loss_streak || 0}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Worst Loss</p>
+                      <p className="text-skin-muted text-sm">Worst Loss</p>
                       <p className="text-2xl font-bold text-red-700">
                         {stats.worst_loss_streak || 0}
                       </p>
@@ -618,25 +618,25 @@ export function PlayerStatsModal({
 
                 {/* Game Records */}
                 <div className="bg-gradient-to-r from-cyan-50 to-blue-50 rounded-lg p-6 border-2 border-cyan-200">
-                  <h3 className="text-xl font-bold mb-4 text-gray-800 flex items-center gap-2">
+                  <h3 className="text-xl font-bold mb-4 text-skin-primary flex items-center gap-2">
                     <span aria-hidden="true">📈</span> Game Records
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
-                      <p className="text-gray-600 text-sm">Fastest Win</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Fastest Win</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.fastest_win || 'N/A'} {stats.fastest_win && 'rounds'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Longest Game</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Longest Game</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.longest_game || 0} rounds
                       </p>
                     </div>
                     <div>
-                      <p className="text-gray-600 text-sm">Avg Duration</p>
-                      <p className="text-2xl font-bold text-gray-900">
+                      <p className="text-skin-muted text-sm">Avg Duration</p>
+                      <p className="text-2xl font-bold text-skin-primary">
                         {stats.avg_game_duration_minutes || 0} min
                       </p>
                     </div>
@@ -663,7 +663,7 @@ export function PlayerStatsModal({
                 {/* Result Filter - Only show for finished games */}
                 {historyTab === 'finished' && (
                   <div className="flex gap-2 items-center flex-wrap">
-                    <span className="text-sm font-semibold text-gray-700">Filter:</span>
+                    <span className="text-sm font-semibold text-skin-secondary">Filter:</span>
                     <Button
                       onClick={() => setResultFilter('all')}
                       variant={resultFilter === 'all' ? 'secondary' : 'ghost'}
@@ -686,7 +686,7 @@ export function PlayerStatsModal({
                       ❌ Losses
                     </Button>
 
-                    <span className="text-sm font-semibold text-gray-700 ml-4">Sort by:</span>
+                    <span className="text-sm font-semibold text-skin-secondary ml-4">Sort by:</span>
                     <Button
                       onClick={() => setSortBy('date')}
                       variant={sortBy === 'date' ? 'primary' : 'ghost'}
@@ -723,7 +723,7 @@ export function PlayerStatsModal({
                 {historyLoading && (
                   <div className="text-center py-12">
                     <Spinner size="lg" color="success" />
-                    <p className="mt-4 text-gray-600 font-semibold">Loading game history...</p>
+                    <p className="mt-4 text-skin-muted font-semibold">Loading game history...</p>
                   </div>
                 )}
 
@@ -757,8 +757,8 @@ export function PlayerStatsModal({
                     <span className="text-6xl" aria-hidden="true">
                       📭
                     </span>
-                    <p className="mt-4 text-gray-700 font-bold text-lg">No game history found</p>
-                    <p className="text-gray-600">Play some games to build your history!</p>
+                    <p className="mt-4 text-skin-secondary font-bold text-lg">No game history found</p>
+                    <p className="text-skin-muted">Play some games to build your history!</p>
                   </div>
                 )}
 
@@ -769,7 +769,7 @@ export function PlayerStatsModal({
                         <span className="text-4xl" aria-hidden="true">
                           🔍
                         </span>
-                        <p className="mt-4 text-gray-700 font-bold">
+                        <p className="mt-4 text-skin-secondary font-bold">
                           No{' '}
                           {resultFilter === 'won'
                             ? 'wins'
@@ -781,7 +781,7 @@ export function PlayerStatsModal({
                       </div>
                     ) : (
                       <>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-skin-muted">
                           Showing {filteredAndSortedGames.length} {historyTab} game
                           {filteredAndSortedGames.length !== 1 ? 's' : ''}
                           {historyTab === 'finished' && resultFilter !== 'all' && (
@@ -824,7 +824,7 @@ export function PlayerStatsModal({
                 {profileLoading && (
                   <div className="text-center py-12">
                     <Spinner size="lg" color="warning" />
-                    <p className="mt-4 text-gray-600 font-semibold">Loading profile...</p>
+                    <p className="mt-4 text-skin-muted font-semibold">Loading profile...</p>
                   </div>
                 )}
 
@@ -889,7 +889,7 @@ export function PlayerStatsModal({
             )}
 
             {/* Footer */}
-            <div className="text-center text-sm text-gray-500 pt-4 border-t-2 border-gray-300">
+            <div className="text-center text-sm text-skin-muted pt-4 border-t-2 border-skin-default">
               <p>Member since: {new Date(stats.created_at).toLocaleDateString()}</p>
               <p>Last updated: {new Date(stats.updated_at).toLocaleString()}</p>
             </div>

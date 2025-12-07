@@ -826,7 +826,7 @@ export function SocialPanel({
                             <div className="flex items-center justify-between gap-2">
                               <div className="flex items-center gap-2 flex-1 min-w-0">
                                 <span
-                                  className={`text-sm flex-shrink-0 ${isOnline ? 'text-green-500' : 'text-gray-400'}`}
+                                  className={`text-sm flex-shrink-0 ${isOnline ? 'text-green-500' : 'text-skin-muted'}`}
                                 >
                                   {isOnline ? '🟢' : '⚫'}
                                 </span>
@@ -1100,24 +1100,24 @@ export function SocialPanel({
                           Bio:
                         </span>
                         <p className="text-[var(--color-text-primary)]">
-                          {profileBio || <span className="text-gray-400 italic">Not set</span>}
+                          {profileBio || <span className="text-skin-muted italic">Not set</span>}
                         </p>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-secondary)]">Country:</span>
                         <span className="text-[var(--color-text-primary)] font-medium">
-                          {profileCountry || <span className="text-gray-400 italic">Not set</span>}
+                          {profileCountry || <span className="text-skin-muted italic">Not set</span>}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-[var(--color-text-secondary)]">Favorite Team:</span>
                         <span
-                          className={`font-medium ${profileFavoriteTeam === 1 ? 'text-orange-600' : profileFavoriteTeam === 2 ? 'text-purple-600' : 'text-gray-400'}`}
+                          className={`font-medium ${profileFavoriteTeam === 1 ? 'text-team1' : profileFavoriteTeam === 2 ? 'text-team2' : 'text-skin-muted'}`}
                         >
                           {profileFavoriteTeam ? (
                             `Team ${profileFavoriteTeam}`
                           ) : (
-                            <span className="text-gray-400 italic">Not set</span>
+                            <span className="text-skin-muted italic">Not set</span>
                           )}
                         </span>
                       </div>
@@ -1137,7 +1137,7 @@ export function SocialPanel({
                           rows={3}
                           maxLength={200}
                         />
-                        <div className="text-xs text-gray-500 mt-1">{profileBio.length}/200</div>
+                        <div className="text-xs text-skin-muted mt-1">{profileBio.length}/200</div>
                       </div>
 
                       <Select
