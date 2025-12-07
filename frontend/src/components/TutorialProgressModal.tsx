@@ -101,13 +101,13 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
     >
       {/* Progress Bar */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="flex-1 bg-gray-300 rounded-full h-3 overflow-hidden">
+        <div className="flex-1 bg-skin-tertiary rounded-full h-3 overflow-hidden">
           <div
             className="bg-green-500 h-full transition-all duration-500 rounded-full"
             style={{ width: `${stats.percentage}%` }}
           />
         </div>
-        <span className="text-gray-800 text-sm font-bold whitespace-nowrap">
+        <span className="text-skin-primary text-sm font-bold whitespace-nowrap">
           {stats.completed}/{stats.total} ({stats.percentage}%)
         </span>
       </div>
@@ -138,8 +138,8 @@ export function TutorialProgressModal({ isOpen, onClose }: TutorialProgressModal
                   rounded-lg border-2 transition-all overflow-hidden
                   ${
                     isCompleted
-                      ? 'bg-green-50 border-green-400'
-                      : 'bg-gray-100 border-gray-300'
+                      ? 'bg-skin-success border-skin-success'
+                      : 'bg-skin-tertiary border-skin-default'
                   }
                   ${isExpanded ? 'ring-2 ring-blue-400' : ''}
                 `}

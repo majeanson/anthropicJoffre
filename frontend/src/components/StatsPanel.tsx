@@ -35,7 +35,7 @@ export function StatsPanel({
 }: StatsPanelProps) {
   return (
     <div className="space-y-3">
-      <div className="bg-parchment-200 bg-skin-secondary rounded-lg p-6 border-2 border-parchment-400 border-skin-default text-center">
+      <div className="bg-skin-secondary rounded-lg p-6 border-2 border-skin-default text-center">
         <p className="text-4xl mb-3">📊</p>
         <h3 className="text-xl font-bold text-skin-primary mb-4">
           Player Statistics
